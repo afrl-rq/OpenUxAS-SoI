@@ -10,7 +10,7 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
 	// duration_s - number of second to run UxAS
-    uint32_t duration_s{10};
+    uint32_t duration_s{13};
     // testPath - relative path to the directory containing configration and other test files
     std::string testPath("../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/");
     // uxasConfigurationFile - path and file name of the UxAS configuration file
@@ -41,7 +41,7 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
 	*	EXPECT_EQ - Google Test Macro
     */
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.StartupComplete")));
-    EXPECT_EQ(14,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
+    EXPECT_EQ(10,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
 
 };
 
