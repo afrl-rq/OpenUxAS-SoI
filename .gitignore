@@ -31,6 +31,14 @@ zyre.wrap
 
 # generated documentation
 doc/LMCP
+doc/doxygen/html
+doc/doxygen/latex
+doc/reference/UserManual/UxAS_UserManual.aux
+doc/reference/UserManual/UxAS_UserManual.lof
+doc/reference/UserManual/UxAS_UserManual.log
+doc/reference/UserManual/UxAS_UserManual.out
+doc/reference/UserManual/UxAS_UserManual.pdf
+doc/reference/UserManual/UxAS_UserManual.toc
 
 # generated LMCP source code
 src/LMCP
@@ -41,3 +49,6 @@ tests/**/output/**
 # example output
 examples/**/log/**
 examples/**/datawork/**
+
+# Mac OS X file system
+**.DS_Store
