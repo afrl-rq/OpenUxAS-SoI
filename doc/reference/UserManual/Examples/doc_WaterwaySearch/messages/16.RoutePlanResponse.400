@@ -1,0 +1,74 @@
+<AssignmentCostMatrix Series="UXTASK">
+  <CorrespondingAutomationRequestID>0</CorrespondingAutomationRequestID>
+  <TaskLevelRelationship></TaskLevelRelationship>
+  <TaskList>
+  <int64>1000</int64>
+  </TaskList>
+  <OperatingRegion>0</OperatingRegion>
+  <CostMatrix>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>500</VehicleID>
+     <IntialTaskID>1000</IntialTaskID>
+     <IntialTaskOption>5</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>4</DestinationTaskOption>
+     <TimeToGo>78296</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>500</VehicleID>
+     <IntialTaskID>1000</IntialTaskID>
+     <IntialTaskOption>4</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>5</DestinationTaskOption>
+     <TimeToGo>62293</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>500</VehicleID>
+     <IntialTaskID>0</IntialTaskID>
+     <IntialTaskOption>0</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>5</DestinationTaskOption>
+     <TimeToGo>169024</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>500</VehicleID>
+     <IntialTaskID>0</IntialTaskID>
+     <IntialTaskOption>0</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>4</DestinationTaskOption>
+     <TimeToGo>293384</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>400</VehicleID>
+     <IntialTaskID>0</IntialTaskID>
+     <IntialTaskOption>0</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>1</DestinationTaskOption>
+     <TimeToGo>107318</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>400</VehicleID>
+     <IntialTaskID>0</IntialTaskID>
+     <IntialTaskOption>0</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>2</DestinationTaskOption>
+     <TimeToGo>211969</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>400</VehicleID>
+     <IntialTaskID>1000</IntialTaskID>
+     <IntialTaskOption>1</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>2</DestinationTaskOption>
+     <TimeToGo>48234</TimeToGo>
+   </TaskOptionCost>
+   <TaskOptionCost Series="UXTASK">
+     <VehicleID>400</VehicleID>
+     <IntialTaskID>1000</IntialTaskID>
+     <IntialTaskOption>2</IntialTaskOption>
+     <DestinationTaskID>1000</DestinationTaskID>
+     <DestinationTaskOption>1</DestinationTaskOption>
+     <TimeToGo>54292</TimeToGo>
+   </TaskOptionCost>
+  </CostMatrix>
+</AssignmentCostMatrix>

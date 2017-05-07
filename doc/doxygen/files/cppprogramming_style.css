@@ -1,0 +1,193 @@
+body {
+    counter-reset: rule_counter;
+}
+
+.ruleCount:before {
+	counter-increment:rule_counter;
+	content:counter(rule_counter);
+}
+
+BODY, TD, OL, P, CENTER {
+        font-family:    "trebuchet MS";
+        font-size:      10pt;
+}
+
+A {
+        font-family:    "trebuchet MS";
+        font-size:      10pt;
+        color:          #0000bb;
+}
+
+pre {
+        margin: 0;
+}
+
+H1 {
+        font-family:    "trebuchet MS";
+        font-size:      16pt;
+        font-weight:    bold;
+        padding-top:    15px;
+}
+
+
+H2, H3, H4 {
+        font-family:    "trebuchet MS";
+        font-size:      12pt;
+        font-weight:    bold;
+}
+
+
+TT, CODE, PRE {
+        font-family:    monospace;
+}
+
+
+CODE {
+        color:          #000099;
+        font-size:      1.00em;
+}
+
+.quote {
+        font-family:    "trebuchet MS";
+        font-size:      36;
+        color:          eeeeee;
+}
+
+.heading {
+        font-family:    "trebuchet MS";
+        font-size:      48;
+        color:          ffffff;
+        font-weight:    bold;
+}
+
+.title {
+        font-family:    "trebuchet MS";
+        font-size:      36;
+        color:          000000;
+        font-weight:    bold;
+}
+
+.code {
+        color:          #000099;
+}
+
+.comment {
+        color:          #990000;
+}
+
+.normal {
+        color:          #000099;
+}
+
+.access, .noaccess, .legend {
+        background:     #990000;
+        font-size:      8pt;
+}
+
+.noaccess {
+        background:     #ccbbbb;
+}
+
+.legend {
+        background:     #ccaaaa;
+}
+
+.trendentry {
+        font-size:      1.0em;
+}
+
+
+.navigator {
+        font-family:    Helvetica, sans-serif;
+        font-weight:    bold;
+        background:     #ccbbbb;
+}
+
+.rule {
+        font-family:     "trebuchet MS";
+        border-width:    0;
+        border-collapse: collapse;
+}
+
+.android-table {
+        padding:         0px 25px 0px 25px;
+}
+
+.android-command {
+        background:     #ffffdd;
+        font-family:    Fixed, monospace;
+        border-width:   1px;
+        border-style:   solid;
+        border-color:   #cccccc;
+        padding:        15px;
+}
+
+.recom {
+        background:     #bbccee;
+        font-weight:    bold;
+        border-width:   1px;
+        border-style:   solid;
+        border-color:   #667799;
+        padding:        5px;
+}
+
+.example, not {
+        color:          #000077;
+        white-space:    pre;
+        font-family:    monospace;
+        font-size:      1.00em;
+        border-width:   1px;
+        border-style:   solid;
+        border-color:   #667799;
+        padding:        5px;
+}
+
+.example2, not {
+        white-space:    pre;
+        font-family:    monospace;
+        border-width:   1px;
+        border-style:   solid;
+        border-color:   #667799;
+        padding:        5px;
+}
+
+.not {
+        color:          #770000;
+}
+
+.color1 {
+        color:          #007700;
+}
+
+.color2 {
+        color:          #FF00CC;
+}
+
+.color3 {
+        color:          #770000;
+}
+
+.android-hr {
+        border:           0;
+        background-color: #a6c939;
+        height:           20px;
+}
+
+.practice {
+        background:     #BBCCEE;
+        font-weight:    bold;
+}
+
+.rationale {
+        font-style:     normal;
+        font-size:      10pt;
+        border-width:   1px;
+        border-style:   solid;
+        border-color:   #667799;
+        padding:        5px;
+}
+
+.warning {
+        color:          red;
+        background:     yellow;
+}

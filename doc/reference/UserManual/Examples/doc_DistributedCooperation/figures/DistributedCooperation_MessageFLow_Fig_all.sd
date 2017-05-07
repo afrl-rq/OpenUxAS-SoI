@@ -1,0 +1,54 @@
+#!>>
+#!  UAV 1000
+#!
+#!<<
+
+#    PM:Plan Manager[pr] "PlanManager"
+
+SM:SendMessages[pr] "SendMessages"
+AP:AssignmentPlans[pr] "Assignment Services"
+/TKS:Tasks[tar] "Tasks"
+/CPTK:Tasks[tar] "CoopTask"
+ZYR:ZyreInterface[pr] "ZyreInterface"
+V2000:Actor[pr] "UAV 2000"
+
+#!color:#000000;background-color:white;
+[c Initialization]
+#!color:#000000;background-color:white;
+SM:=AP.AirVehicleConfiguration  (1000,2000,3000)[1]
+*1 SM
+
+*1
+
+SM:=AP.AirVehicleState(1000)[2]
+*1 SM
+
+*1
+SM:=AP.AllTasks[3]
+*1 SM
+
+*1
+SM:=AP.AllBondaries[4]
+*1 SM
+
+*1
+SM:=AP.AssignmentCoordinatorTask[5]
+AP:=CPTK.new()  [6]&
+[/c]
+
+[c Assignment]
+SM:CPTK.CoordinatedAutomationReq[7]
+CPTK:=ZYR.AssignmentCoordination(1000)[8]&
+ZYR:=V2000.ZYR.AssignmentCoordination(1000)[9]&
+*1 ZYR
+
+*1
+V2000:=ZYR.  ZYR.AssignmentCoordination(2000)[10]&
+ZYR:=CPTK. ZYR.AssignmentCoordination(2000)[11]&
+CPTK:>CPTK.WaitForMaxTimeOut[12]&
+CPTK:=AP.TaskAutomationReq[13]&
+*1 AP
+
+*1
+AP:=CPTK.TaskAutomationResp[14]&
+[/c]

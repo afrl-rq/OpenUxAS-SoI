@@ -1,0 +1,1 @@
+\DeclareUnicodeCharacter{2079}{$^9$}% support older LaTeX versions

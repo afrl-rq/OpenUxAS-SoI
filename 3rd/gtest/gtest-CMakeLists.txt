@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.3)
+
+project(${GTEST_DOWNLOAD_DIR} LANGUAGES NONE)
+
+include(ExternalProject)
+ExternalProject_Add(googletest
+  DOWNLOAD_COMMAND wget https://googletest.googlecode.com/files/gtest-1.7.0.zip
+  URL_HASH SHA1=f85f6d2481e2c6c4a18539e391aa4ea8ab0394af
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/${GTEST_SRC_DIR}"
+  BINARY_DIR "${CMAKE_BINARY_DIR}/${GTEST_BUILD_DIR}"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)
+

@@ -1,0 +1,27 @@
+<PatternSearchTask Series="IMPACT">
+  <SearchLocationID>13</SearchLocationID>
+  <SearchLocation>
+   <Location3D Series="CMASI">
+     <Latitude>0</Latitude>
+     <Longitude>0</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </SearchLocation>
+  <Pattern>Spiral</Pattern>
+  <Extent>2000</Extent>
+  <DesiredWavelengthBands>
+  </DesiredWavelengthBands>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0</GroundSampleDistance>
+  <TaskID>1111</TaskID>
+  <Label></Label>
+  <EligibleEntities>
+  </EligibleEntities>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</PatternSearchTask>
+

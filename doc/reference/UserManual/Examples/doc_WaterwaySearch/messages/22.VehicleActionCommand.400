@@ -1,0 +1,22 @@
+<VehicleActionCommand Series="CMASI">
+  <CommandID>0</CommandID>
+  <VehicleID>400</VehicleID>
+  <VehicleActionList>
+   <GimbalStareAction Series="CMASI">
+     <Starepoint>
+      <Location3D Series="CMASI">
+        <Latitude>45.310124047208</Latitude>
+        <Longitude>-121.007811962157</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </Starepoint>
+     <Duration>0</Duration>
+     <PayloadID>1</PayloadID>
+     <AssociatedTaskList>
+     <int64>1000</int64>
+     </AssociatedTaskList>
+   </GimbalStareAction>
+  </VehicleActionList>
+  <Status>Pending</Status>
+</VehicleActionCommand>

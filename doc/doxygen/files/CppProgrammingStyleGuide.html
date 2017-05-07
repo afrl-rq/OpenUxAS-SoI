@@ -1,0 +1,3051 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+<!--
+*******************************************************************************
+  Page header
+*******************************************************************************
+-->
+
+   <title> C++11 Programming Style Guide Recommendations</title>
+   <link rel="STYLESHEET" href="cppprogramming_style.css" type="text/css">
+</head>
+
+
+<body link="7a88a1" marginheight="20" marginwidth="20" vlink="7a88a1" bgcolor="white">
+
+
+<!--
+*******************************************************************************
+   Display Heading
+*******************************************************************************
+-->
+<center>
+<h1 class="title">C++11 Programming Style Recommendations</h1>
+
+<br>
+
+</center>
+
+<p>
+
+</p><hr size="1">
+
+<!--
+*******************************************************************************
+   Table of contents
+*******************************************************************************
+-->
+<h1>Table of Contents</h1>
+
+<table cellpadding="8" cellspacing="0" border="0"><tbody><tr><td>
+</td></tr></tbody></table>
+
+
+&nbsp; &nbsp; <a href="#introduction">1 Introduction</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Layout%20of%20the%20Recommendations">1.1 Layout of the Recommendations</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Recommendation">1.2 Recommendations Importance</a><br>
+  <br>
+
+&nbsp; &nbsp; <a href="#Naming%20Conventions">2 Naming Conventions</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#General">2.1 General</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Specific">2.2 Specific</a><br>
+  <br>
+
+&nbsp; &nbsp; <a href="#Files">3 Files</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Source%20Files">3.1 Source Files</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Include%20Files">3.2 Include Files and Include Statements</a><br>
+  <br>
+
+&nbsp; &nbsp; <a href="#Statements">4 Statements</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Types">4.1 Types</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Variables">4.2 Variables</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Loops">4.3 Loops</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Conditionals">4.4 Conditionals</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Misc">4.5 Miscellaneous</a><br>
+  <br>
+
+&nbsp; &nbsp; <a href="#Layout%20and%20Comments">5 Layout and Comments</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Layout">5.1 Layout</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#White%20Space">5.2 White space</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Comments">5.3 Comments</a><br>
+  <br>
+
+&nbsp; &nbsp; <a href="#References">6 References</a><br>
+  <br>
+
+
+<table cellpadding="8" cellspacing="0" border="0"><tbody><tr><td>
+</td></tr></tbody></table>
+
+<hr width="100%">
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+<!--
+*******************************************************************************
+
+   1 INTRODUCTION
+
+*******************************************************************************
+-->
+<hr size="1">
+<h1>
+<a name="Introduction"></a>1 Introduction</h1>
+
+<p>
+This document lists C++ coding recommendations common in the C++ development
+community.  These style recommendations are based on use of the C++11 language 
+standard.  The provided guidance is forward compatible with C++14.
+
+</p><p>
+This document was derived from <a href="http://geosoft.no/development/cppstyle.html">C++ Programming Style Guide</a>.  
+The recommendations are based on established standards collected from a number
+of sources, individual experience, local requirements/needs, as well as
+recommendations given in <a href="#ref1">[1]</a> - <a href="#ref7">[8]</a>.
+
+
+</p><h3>
+<a name="Layout of the Recommendations"></a>1.1 Layout of the
+Recommendations.</h3>
+
+<p>
+The recommendations are grouped by topic and each recommendation is
+numbered to make it easy to refer to during code reviews.
+
+</p><p>
+Layout of the recommendations is as follows:
+
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="recom">
+Recommendation short description.
+</td>
+</tr>
+
+<tr>
+<td class="example2">Illustrative code (as applicable).
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+Motivation, background and additional information.
+</td>
+</tr>
+</tbody></table>
+
+
+</p><h3>
+<a name="Recommendation"></a>1.2 Recommendation Importance</h3>
+
+<p>
+In the guideline sections the terms <i>should</i> and 
+<i>can</i> have special meaning. A <i>should</i> is a strong recommendation, and a <i>can</i> is a general guideline.
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+</p><p>
+<h1>
+<a name="Naming Conventions"></a>2 Naming Conventions
+</h1>
+
+<h3>
+<a name="General"></a>2.1 General Naming Conventions</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Names representing classes, structs, enums, typedefs and aliased types <em>should</em> 
+be upper camel case.  Names <em>should</em> be descriptive.  
+<a href="CppProgrammingPracticesGuide.html#alias">Alias declarations</a> <em>should not</em> 
+depend upon other alias declarations.  The _t suffix <em>should</em> be appended to 
+typedefs and aliased types.
+</td>
+</tr>
+
+<tr>
+<td class="example2">MyServiceClass
+MyVehicleConfigurationStructSuperLongName
+MyColorEnum
+
+namespace uxas // example of alias declaration
+{
+   namespace type
+   {
+      using ComponentMap_t = std::unordered_map&lt;size_t, std::shared_ptr&lt;component::ComponentBase&gt;&gt;;	  
+   };
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="variable_names"></a>
+Variable names <em>should</em> describe the purpose of the variable.  Variable names 
+<em>should</em> be lower camel case.  Private and 
+protected class and instance variables <em>should</em> have the following prefixes:
+<ul><li><tt>s_</tt> (class variables)
+</li><li><tt>m_</tt> (instance variables)
+</li></ul>
+Public member variable names should be lower camel case without a prefix except for boolean variables.
+</p><p>
+<a href="CppProgrammingStyleGuide.html#is_boolean">Boolean variables</a> should have the <tt>is</tt> prefix.  For private and protected boolean variables, the <tt>s_</tt> and <tt>m_</tt> prefixes preceed the <tt>is</tt> prefix (e.g., m_isDone).
+</p>
+</td>
+</tr>
+
+<tr>
+<td class="example2">line // name for a line object or a pointer to a line object
+searchZone
+
+// example instance variable names
+m_line
+m_searchZone
+m_isReady // boolean variable
+m_points // plural name if variable is a collection of objects
+
+// example class variable names
+s_line
+s_searchZone
+s_isReady // boolean variable
+s_points // plural name if variable is a collection of objects
+
+// examples of not-allowed Hungarian notation variable names
+pLine <span class="not">// do not use Hungarian notation</span>
+bSuccess <span class="not">// do not use Hungarian notation</span>
+m_bSuccess <span class="not">// do not use Hungarian notation</span>
+dAngle_m <span class="not">// do not use Hungarian notation</span>
+uintDistance_m <span class="not">// do not use Hungarian notation</span>
+s_uintDistance_m <span class="not">// do not use Hungarian notation</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community that minimizes variable 
+naming collisions and makes variables easy to distinguish.
+<p>
+Apart from its name and its type, the <em>scope</em> of a variable is its
+most important feature.  Using <tt>s_</tt> to  Indicate class scope and 
+<tt>m_</tt> to indicate instance scope simplifies distinguishing these 
+variables from local scratch variables.  
+</p><p>
+A beneficial side effect of this naming convention is the implied, natural
+convention for naming get/set accessor functions:
+<pre>void setDepth(int32 depth) { m_depth = depth; };
+</pre>
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Named constants (including enumeration values) <em>should</em> be all uppercase
+using underscore to separate words.
+</td>
+</tr>
+
+<tr>
+<td class="example2">constexpr int32 MAX_ITERATIONS = 25;
+constexpr double PI = 3.1416;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community.
+In general, the use of such constants should be minimized.
+In some cases, implementing the value as a method is a better choice:
+<p>
+</p><pre>constexpr int32 getMaxIterations() { return 25; };<span class="not">// don't use:  #define MAX_ITERATIONS = 25</span></pre>
+
+<p>
+This form is both easier to read, and it ensures a unified interface
+towards class values.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Names representing methods or functions <em>should</em> be verbs and written in mixed
+case starting with lower case.
+</td>
+</tr>
+
+<tr>
+<td class="example2">getName(), computeTotalWidth()
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community.
+This is identical to variable names, but functions in C++ are already
+distingushable from variables by their specific form.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Names representing namespaces should be all lowercase and singular.
+</td>
+</tr>
+
+<tr>
+<td class="example2">model::analyzer, io::iomanager, common::math::geometry
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Names representing template types should be a single upper case letter.
+</td>
+</tr>
+
+<tr>
+<td class="example2">template&lt;class T&gt; ...
+template&lt;class C, class D&gt; ...
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community.
+This makes template names stand out relative to all other names used.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Abbreviations and acronyms included in names <em>should</em> be camel case instead of all upper case [7].
+</td>
+</tr>
+
+<tr>
+<td class="example2">exportHtmlSource(); <span class="not">// don't use: exportHTMLSource();</span>
+openDvdPlayer();    <span class="not">// don't use: openDVDPlayer();</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Using all upper case for the base name will give conflicts with the naming
+conventions given above. A variable of this type would have to be
+named dVD, hTML
+etc. which obviously is not very readable.
+Another problem is illustrated in the examples above; When the name is
+connected to another, the readability is seriously reduced; the word
+following the abbreviation does not stand out as it should.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Global variables should always be referred to using the :: operator.
+</td>
+</tr>
+
+<tr>
+<td class="example2">::mainWindow.open(), ::applicationContext.getName()
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+In general, the use of global variables should be avoided. Consider
+using singleton objects instead.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Generic variables should have the same name as their type.  The exceptional case is variables of basic types (e.g., int32, string, etc.), then the variable's name should describe what it represents (e.g., "totalDelay_ms").
+</td>
+</tr>
+
+<tr>
+<td class="example2">void setVehicleState(VehicleState* vehicleState, int32 timeOffset_ms)
+<span class="not">// improper: void setVehicleState(VehicleState* value1, int32 value2)</span>
+<span class="not">// improper: void setVehicleState(VehicleState* aVehicleState, int32 anOffset)</span>
+<span class="not">// improper: void setVehicleState(VehicleState* t, int32 o)</span>
+
+void connect(Database* database)
+<span class="not">// improper: void connect(Database* db)</span>
+<span class="not">// improper: void connect (Database* oracleDB)</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Reduce complexity by reducing the number of terms and names used.
+Also makes it easy to deduce the type given a variable name only.
+<p>
+If for some reason this convention doesn't seem to <em>fit</em> it is a strong
+indication that the type name is badly chosen.
+</p><p>
+Non-generic variables have a <em>role</em>. These variables can often be named
+by combining role and type:
+
+</p><p>
+</p><pre>  Point  startingPoint, centerPoint;
+  Name   loginName;
+</pre>
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+All names and comments should be written in English.
+</td>
+</tr>
+
+<tr>
+<td class="example2">fileName;   <span class="not">// don't use: filNavn</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+English is the preferred language for international development.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Variables with a large scope should have long names, variables
+with a small scope can have short names [4].
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Scratch variables used for temporary storage or indices are best kept short.
+A programmer reading such variables should be able to assume that its value
+is not used outside of a few lines of code.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The name of the object is implicit, and should be avoided in a
+method name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">line.getLength();   <span class="not">// improper: line.getLineLength();</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The latter seems natural in the class declaration, but proves superfluous in
+use, as shown in the example.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+
+
+</p><h3>
+<a name="Specific"></a>2.2 Specific Naming Conventions</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+<p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="style_getset"></a>
+The terms <i>Get/Set</i> <em>should</em> be used when naming accessor functions 
+that provide <em>public</em> access to a private objects that belong to 
+either a class or class instance.  Use <i>get</i> (lower camel case) when 
+naming const or non-const get accessor functions that provide <em>protected</em> access 
+to a private or protected object.  Reference: <a href="CppProgrammingPracticesGuide.html#pract_getset">get/set practices rule</a>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">public:
+   const std::string&amp; GetType() const { return (m_type); };
+
+   SetType(std::string& type) { m_type = type; };
+
+protected:
+   // lower camel case function name - convention for protected accessor
+   // here, const not used, so derived classes can modify m_type via function
+   std::string&amp; getType() { return (m_type); };
+
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Use of get and set is a common convention in the C++ development community.  This 
+practice is widely used in the Java and C# communities.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+A descriptive adjective should be used for methods.  The term 
+<i>compute</i> can be used in methods where something is computed.  
+The term <i>find</i> can be used in methods where something is
+looked up.
+</td>
+</tr>
+
+<tr>
+<td class="example2">valueSet->computeAverage();
+matrix-&gt;computeInverse();
+vertex.findNearestVertex();
+matrix.findMinElement();
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Use of "compute" provides a clue of a potentially time-consuming
+operation; a developer might consider caching the result.  Use of "find" 
+provides a clue of what is likely a look-up requiring minimal of computations.
+Consistent use of the key terms enhances readability.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The term <i>initialize</i> should be used where an object or a concept
+is established.
+</td>
+</tr>
+
+<tr>
+<td class="example2">vehicle.initialize();
+vehicle.initializeConfiguration();
+vehicle.initializeState(const VehicleState&  vehicleState);
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Do not use abbreviation <i>init </i>.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Variables representing GUI components should be suffixed by
+the component type name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">mainWindow, propertiesDialog, widthScale, loginText,
+leftScrollbar, mainForm, fileMenu, minLabel, exitButton, yesToggle etc.
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Enhances readability since the name gives the user an immediate clue of the
+type of the variable and thereby the objects resources.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Plural form should be used on names representing a collection of objects.
+</td>
+</tr>
+
+<tr>
+<td class="example2">vector&lt;Point&gt; points;
+int32 distances_m[];
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Enhances readability since the name gives the user an immediate clue of the
+type of the variable and the operations that can be performed on its elements.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Append the word <i>Count</i> to members that represent a number of items. 
+</td>
+</tr>
+
+<tr>
+<td class="example2">pointCount, lineCount, getPointCount()
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The notation is taken from mathematics where it is an established
+convention for indicating a number of objects.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer iterator variable names <em>ii</em>, <em>jj</em>, <em>kk</em>, 
+<em>mm</em>, <em>nn</em>, <em>oo</em>, <em>pp</em> etc..  Don't use 
+<em>ll</em> since it can easily be mis-read as <em>ii</em>.  Do not use 
+single character names.  Descriptive, longer names are permissible.
+</td>
+</tr>
+
+<tr>
+<td class="example2">for (int32 ii = 0; ii &lt; tables.getCount(); ii++)
+{
+   for (int32 jj = 0; jj &lt; tables[ii].getRowCount(); jj++)
+   {
+      for (int32 kk = 0; kk &lt; tables[ii].getColumnCount(); kk++)
+      {
+         ...
+         tables[ii].setCell(jj, kk, value);
+      }
+   }
+}
+
+for (vector&lt;MyClass&gt;::iterator myClassIt = list.begin(); myClassIt != list.end(); myClassIt++)
+{
+  Element element = *myClassIt;
+  ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Use of the <em>xx</em> name pattern for the index variable streamlines 
+analysis of loop behavior.  It is especially beneficial in nested loop 
+analysis.  Similar benefits are obtained from longer, descriptive names.
+<p>
+Prefer reserving <em>jj</em>, <em>kk</em>, <em>mm</em>, <em>nn</em>, etc. 
+variables for nested loops.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="is_boolean"></a>
+The prefix <i>is</i> should be used for boolean methods 
+that return a boolean property or characteristic of the object.
+Exclude the <i>is</i> prefix for cases when a boolean is returned by a function 
+that primarily performs processing (e.g., performWork method that returns a 
+boolean indicating outcome of performing work).  See <a href="CppProgrammingStyleGuide.html#variable_names">variable name 
+conventions.
+
+</td>
+</tr>
+
+<tr>
+<td class="example2">isSet, isVisible, isFinished, isFound, isOpen
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice in the C++ development community and partially enforced
+in Java.
+<p>
+Using the <i>is</i> prefix solves a common problem of
+choosing bad boolean names like <tt>status</tt> or <tt>flag</tt>.
+<tt>isStatus</tt> or <tt>isFlag</tt> simply doesn't fit, and the programmer
+is forced to choose more meaningful names.
+</p><p>
+There are a few alternatives to the <em>is</em> prefix that fit better in some
+situations. These are the <em>has</em> and <em>can</em> prefixes:
+</p><p>
+<pre>bool hasRadar();
+bool canEvaluate();
+</pre>
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Complement names <em>should</em> be used for complement operations [4].
+</td>
+</tr>
+
+<tr>
+<td class="example2">get/set, add/remove, create/destroy, start/stop, insert/delete,
+increment/decrement, old/new, begin/end, first/last, up/down, min/max,
+next/previous, old/new, open/close, show/hide, suspend/resume, etc.
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Reduce complexity by symmetry.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Abbreviations in names should be avoided.</td>
+</tr>
+
+<tr>
+<td class="example2">computeAverage();   <span class="not">// do not use: compAvg();</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+There are two types of words to consider.
+First are the common words listed in a language dictionary.
+These <em>should never</em> be abbreviated.  <em>Never</em> write:
+<p>
+<tt>cmd&nbsp;&nbsp; </tt> instead of <tt> &nbsp; command</tt><br>
+<tt>cp &nbsp;&nbsp; </tt> instead of <tt> &nbsp; copy</tt><br>
+<tt>pt &nbsp;&nbsp; </tt> instead of <tt> &nbsp; point</tt><br>
+<tt>comp&nbsp;      </tt> instead of <tt> &nbsp; compute</tt><br>
+<tt>init&nbsp;      </tt> instead of <tt> &nbsp; initialize</tt><br>
+etc.<br>
+</p><p>
+Then there are domain specific phrases that are more naturally
+known through their abbreviations/acronym. These phrases should be kept
+abbreviated. <em>Never</em> write:
+</p><p>
+<tt>  HypertextMarkupLanguage&nbsp;</tt>  instead of <tt> &nbsp; html</tt><br>
+<tt>  CentralProcessingUnit &nbsp;&nbsp;</tt>   instead of <tt> &nbsp; cpu</tt><br>
+<tt>  PriceEarningRatio &nbsp;&nbsp; &nbsp; &nbsp;</tt>  instead of <tt> &nbsp; pe</tt><br>
+etc.
+
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Negated boolean variable names <em>should</em> be avoided.
+</td>
+</tr>
+
+<tr>
+<td class="example2">bool isError; <span class="not">// don't use: isNoError</span>
+bool isFound; <span class="not">// don't use: isNotFound</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The problem arises when such a name is used in conjunction with the logical 
+negation operator as this results in a double negative.  
+The meaning of <tt>!isNotFound</tt> is not immediately apparent.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Names of enumeration constants should be <em>singular</em> 
+(e.g., Color, Type, State) instead of plural (e.g., Colors, Types, States).  
+Enumeration constant names may be prefixed by a common type name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">enum class Color // scoped enumeration due to use of "class" keyword
+{
+  RED, // no common name prefix
+  GREEN,
+  BLUE
+};
+
+enum class Color
+{
+  COLOR_RED, // "COLOR" common name prefix
+  COLOR_GREEN,
+  COLOR_BLUE
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+This gives additional information of where the declaration can be found,
+which constants belongs together, and what concept the constants represent.
+<p>
+An alternative approach is to always refer to the constants through their
+common type: <tt>Color::RED</tt>, <tt>Airline::AIR_FRANCE</tt> etc.
+</p><p>
+The enum name should be <em>singular</em> as
+in <tt>enum Color {...}</tt>. A plural name like <tt>enum Colors {...}</tt>
+may look fine when declaring the type, but is less readable when used.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Exception classes should be suffixed with <em>Exception</em>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">class AccessException
+{
+   ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Exception classes are really not part of the main design of the program, and
+naming them like this makes them stand out relative to the other classes.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Functions (methods returning something) should be named after what they
+return and procedures (<i>void</i> methods) after the processing that they 
+perform.
+</td>
+</tr>
+
+<tr>
+<td class="example2">int32 getTotalCount();
+void computeMeanValue();
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Increase readability. Makes it clear what the unit should do and especially
+all the things it is not supposed to do. This again makes it easier to keep
+the code clean of side effects.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+
+
+</p><p>
+</p><h1>
+<a name="Files"></a>3 Files
+</h1>
+
+<h3>
+<a name="Source Files"></a>3.1 Source Files
+</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+A class should be declared in a header file and defined in a source file.  
+The header and source files for a class should have <i>.h</i> and <i>.cpp</i> 
+extensions, respectively.
+</td>
+</tr>
+
+<tr>
+<td class="example2">MyClass.h, MyClass.cpp
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Adhere to common C++ standards for declaration, implementation and file 
+extensions.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="member_defns"></a>
+All <a href="CppProgrammingPracticesGuide.html#explicit_def_del">definitions</a> should reside in source files with 
+four exceptions:
+
+<ul><li>Private and protected variables and associated, rudimentary get/set accessor functions.
+</li><li>Single-line function implementations.
+</li><li>Deleted functions.
+</li><li>Default and deleted copy/move constructors and operators.
+</li></ul>
+
+</td>
+</tr>
+
+<tr>
+<td class="example2">class MyClass // within MyClass.h
+{
+public:
+   // get/set accessor functions
+   const std::string& GetName() const { return return m_name; };
+
+   void SetName(const std::string& name) { m_name = name; };
+
+   // deleted functions.  // add info or link to programming practices
+   bool isEven(char) = delete; // prevent invoking isEven with char parameter
+   bool isEven(bool) = delete; // prevent invoking isEven with bool parameter
+   bool isEven(double) = delete; // prevent invoking isEven with double or float parameter
+
+   // default copy constructor and copy operator
+   MyClass(const MyClass&) = default; // explicit declaration of default implementation
+   MyClass& operator=(const MyClass&) = delete; // delete unwanted copy assignment operator
+
+   // deleted move constructors and move operator
+   MyClass(const MyClass&&) = delete; // delete unwanted move constructor
+   MyClass& operator=(const MyClass&&) = delete; // delete unwanted move assignment operator   
+
+protected:   
+   virtual bool performWork() { return (false); };
+
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Header files declare an interface.  The header files should 
+also contain simple, one line implementations are placed in the When looking for an implementation, the programmer should
+always know that it is found in the source file.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer file content limited to 120 columns; file content up to 160 columns is allowable.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Limiting content columns improves readability since it avoids default editor 
+word-wrap behavior and increases consistency of coding across the team.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Special characters such as TAB and page break control characters <em>should</em> be 
+avoided.  In IDEs, configure indentation to consist of spaces.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+These characters often cause problems for editors, printers, terminal
+emulators or debuggers - especially if used in a multi-programmer, 
+multi-platform environment.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Make obvious splitting for cases of incomplete lines [4].
+</td>
+</tr>
+
+<tr>
+<td class="example2">totalSum = a + b + c +
+           d + e;
+
+function (param1, param2,
+          param3);
+
+setText ("Long line split"
+         "into two parts.");
+
+for (int32 tableIndex = 0; tableIndex &lt; tableCount;
+     tableCount += tableCountStep)
+{
+  ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Split lines occurs when a statement exceed the 80 column limit given above.
+It is difficult to give rigid rules for how lines should be split, but the
+examples above should give a general hint.
+
+<p>
+In general:
+</p>
+<ul><li>Break after a comma.
+</li><li>Break after an operator.
+</li><li> Align the new line with the beginning of the expression on the
+previous line.
+</li></ul>
+
+</td>
+</tr>
+</tbody></table>
+
+
+
+</p><h3>
+<a name="Include Files"></a>3.2 Include Files and Include Statements</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="header_guard"></a>
+Header files <em>should</em> contain an <a href="CppProgrammingPracticesGuide.html#define_guard">include guard</a>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">#ifndef CLASSNAME_H
+#define CLASSNAME_H
+   ...
+#endif // COM_COMPANY_MODULE_CLASSNAME_H
+</td>
+</tr>
+
+<tr>
+<td class="example2">#ifndef COM_COMPANY_MODULE_CLASSNAME_H
+#define COM_COMPANY_MODULE_CLASSNAME_H
+   ...
+#endif // COM_COMPANY_MODULE_CLASSNAME_H
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The construction is to avoid compilation errors. The name convention
+resembles the location of the file inside the source tree and prevents
+naming conflicts.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Include statements should be sorted and grouped by their
+hierarchical position in the system with low level files included last.   
+Headers should not be dependent upon other headers (<a href="http://stackoverflow.com/questions/2762568/c-c-include-file-order-best-practices">C/C++ include file order/best practices</a>).
+Within a group, include statements should be alphabetically sorted.
+Leave an empty line between groups of include statements.
+<ul><li>Prototype/interface header for this implementation (ie, the .h/.hh file that corresponds to this .cpp/.cc file).
+</li><li>Other headers from the same project, as needed.
+</li><li>Headers from other non-standard, non-system libraries (e.g., Qt, Eigen, etc).
+</li><li>Headers from other "almost-standard" libraries (e.g., Boost)
+</li><li>Standard C++ headers (e.g., iostream, functional, etc)
+</li><li>Standard C headers (e.g., cstdint, dirent.h, etc)
+</li></ul>
+</td>
+</tr>
+
+<tr>
+<td class="example2">#include "com/company/ui/MainWindow.h"
+#include "com/company/ui/PropertiesDialog.h"
+
+#include &lt;qt/qbutton.h&gt;
+#include &lt;qt/qtextfield.h&gt;
+
+#include &lt;fstream&gt;
+#include &lt;iomanip&gt;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+In addition to show the reader the individual include files, it also give an
+immediate clue about the modules that are involved.
+<p>
+Include file paths should never be absolute. Compiler directives should
+instead be used to indicate root directories for includes.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Include statements should be located at the top of a file only.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Common practice. Avoid unwanted compilation side effects by "hidden"
+include statements deep into a source file.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+
+
+</p><p>
+</p><h1>
+<a name="Statements"></a>4 Statements
+</h1>
+
+<h3>
+<a name="Types"></a>4.1 Types</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Types that are local to one file should be declared inside that file.  
+For example, a type that is only used in a source file should be declared 
+in the source file instead of its associated the header file. 
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Enforces information hiding.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Type conversions <em>should always</em> be done explicitly.  <em>Never</em> rely on implicit
+type conversion.
+</td>
+</tr>
+
+<tr>
+<td class="example2">floatValue = static_cast&lt;float&gt;(intValue); <span class="not">// don't use: floatValue = intValue;</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+By this, the programmer indicates that he is aware of the different types
+involved and that the mix is intentional.
+</td>
+</tr>
+</tbody></table>
+
+</p><h3> <a name="Variables"></a>4.2 Variables</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer initializing variables where they are declared.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+This ensures that variables are valid at any time. For limited cases, it is 
+impractical to initialize a variable to a valid value where it is declared:
+<p>
+</p><pre>int32 x, y, z;
+getCenter(&amp;x, &amp;y, &amp;z);
+</pre>
+
+<p>
+In these cases, variables should be left uninitialized rather than initialized 
+to irrelevant values.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Declare a pointer or reference variable by placing the asterisk or 
+ampersand adjacent to the type name.  C++ pointers and references should have 
+their reference symbol next to the type rather than to the name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">float* x; <span class="not">// don't use: float *x; </span>
+int32& y; <span class="not">// don't use: int32 &y;</span>
+char* m_name;
+const string&amp; m_defaultMessage;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The <em>pointer-ness</em> or <em>reference-ness</em> of a variable is a
+property of the <em>type</em> rather than the name.  Placing the asterisk or 
+ampersand adjacent to the variable name is a style used in C-programming.  
+This convention aligns with common C++ programming practices.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Variable names <em>should</em> have distinctive meaning.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Enhance readability by ensuring all concepts are represented
+uniquely. Reduce chance of error by side effects.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Variables names should explicitly describe associated units.  Unit representation is appended to the end of the variable name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">int32 distance_m; // _m denotes meters
+int32 edgeDistance_ft; // _ft denotes feet
+int32 vehicleMass_kg; // _kg denotes kilograms
+int32 vehicleSpeed_mps; // _mps denotes meter per second
+real32 vehicleAcceleration_kgmps2; // _kgmps2 denotes kilogram meters per second squared
+int32 eventDuration_s; // _s denotes seconds
+int32 dataSampleInterval_ms; // _ms denotes milliseconds
+real32 angle_deg; // _deg denotes degrees
+real32 angle_rad; // _rad denotes radians
+real32 angle_grad; // _grad denotes grads
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Non-ambiguous representation of units.
+</td>
+</tr>
+</tbody></table>
+  
+  
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Implicit boolean test should not be used other than for boolean variables.
+</td>
+</tr>
+
+<tr>
+<td class="example2">if (lineCount != 0)  <span class="not">// don't use: if (lineCount)</span>
+if (distance_m != 0.0) <span class="not">// don't use: if (distance_m)
+</i></td>
+</tr>
+
+<tr>
+<td class="rationale">
+It is not necessarily defined by the C++ standard that ints and floats 0 are
+implemented as binary 0. Also, by using an explicit test the statement gives
+an immediate clue of the type being tested.
+<p>
+Test pointers using nullptr, i.e. <tt>if (pValue != nullptr)</tt>.  Do not 
+implicitly pointers for 0 or NULL.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Variables should be declared in the smallest scope possible.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Keeping the operations on a variable within a small scope, it is easier to
+control the effects and side effects of the variable.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Order of function parameters should be inputs following by outputs.
+</td>
+</tr>
+
+<tr>
+<td class="example2">MyObject 
+MyObjectEventHandler::GetUpdatedMyObject(const MyObjectEvent&amp; event, MyObject&amp; myObject)
+{
+   ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Ordering improves understandability.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+</p><h3> <a name="Loops"></a>4.3 Loops</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Loop variables should be initialized immediately before the loop.  
+Instructions inside of a <tt>for()</tt> statement should be limited to 
+<em>loop control</em> statements.  
+</td>
+</tr>
+
+<tr>
+<td class="example2">sum = 0;
+for (ii = 0; ii &lt; 100; ii++)  <span class="not">// don't use: for (<span style="background-color: #FFFF00">sum = 0,</span> ii = 0; ii &lt; 100; ii++)</span>
+{
+   ...
+   sum += value[ii];
+}
+  
+isWorking = true;
+while (isWorking)
+{ 
+   ...
+   if (conditions)
+   {
+      isWorking = false; // discontinue loop processing
+   }
+}
+
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Increase maintainability and readability. Make a clear distinction of between 
+loop <em>controls</em> and what is <em>contained</em> inside of the loop.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="avoid_do_while"></a>
+Minimize use of <tt>do-while</tt> loops.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+<em>do-while</em> loops are less readable than ordinary <em>while</em> loops
+and <em>for</em> loops
+since the conditional is at the bottom of the loop. The reader should
+scan the entire loop in order to understand the scope of the loop.
+<p>
+In addition, <em>do-while</em> loops are not needed. Any <em>do-while</em>
+loop can easily be rewritten into a <em>while</em> loop or a <em>for</em>
+loop. Reducing the number of constructs used enhance readability.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use <tt>while (true)</tt> for infinite loop implementation.
+</td>
+</tr>
+
+<tr>
+<td class="example2">bool isError = false;
+while (true)
+{
+   ...
+   if (isLoopingDone)
+   {
+      break; // discontinue loop processing
+   }
+
+   if (isError)
+   {
+      break; // discontinue loop processing
+   }
+}
+<span class="not">
+for (;;) // improper implementation
+{
+   ...
+}
+
+while (1) // improper implementation
+{
+   ...
+}
+</i>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Testing against true provides the greatest readability.  Testing against 1 is 
+not meaningful. The form 
+<tt>for (;;)</tt> has very poor readable; it obscures the infinite loop.
+</td>
+</tr>
+</tbody></table>
+
+</p><h3>
+<a name="Conditionals"></a>4.4 Conditionals</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer placing the normative case into the <i>if</i> block 
+and the less common case in the <i>else</i> block of an if-else statement [4].  
+If the normative case consists of many lines of code and the non-normative 
+case is a few lines of code, then it is okay to place the non-normative case 
+in first block.  For less complex <i>if/else if/else</i> implementations, favor returning from the last line of a function.  
+For more complex <i>if/else if/else</i> implementations (especially validation logic, such as parameter validation), 
+favor the simplicity of returning from the inside of a conditional blocks.  This approach often avoids 
+deeply nested code blocks that are difficult to read.
+</td>
+</tr>
+
+<tr>
+<td class="example2">if (condition)
+{
+   ...
+}
+
+bool isOk = readFile (fileName);
+if (isOk) // normative case first
+{ 
+   ...
+}
+else
+{
+   ...
+}
+
+if (!isOk) // non-normative case first (less common, but okay)
+{
+   ... a few lines of code ...
+}
+else
+{
+   ... normative case has many, many lines of code ...
+   ... so for this case, place in second block ...
+}
+
+if (condition)
+{
+   ...
+}
+else if (condition)
+{
+   ...
+}
+else
+{
+   ...
+}
+
+// Prefer use of multiple return statements 
+// to enhance simplicity and readability over 
+// adding another variable to represent return value
+if (1st_invalid_condition)
+{
+   return (false);
+}
+else if (2nd_invalid_condition)
+{
+   return (false);
+}
+if (1st_valid_condition)
+{
+   ...
+   return (true)
+}
+else if (2nd_valid_condition)
+{
+   ...
+   return (true)
+}
+else if (3rd_valid_condition)
+{ 
+   ...
+   return (true)
+}
+else if (4th_valid_condition)
+{ 
+   ...
+   return (true)
+}
+else // first three conditions are false
+{
+   ...
+   return (true)
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Better readability and reduced maintenance complexity.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer multiple return statements instead of adding another variable 
+to represent return value for the case of multiple catch blocks 
+(enhance simplicity and readability).
+</td>
+</tr>
+
+<tr>
+<td class="example2">// For the case of multiple catch blocks, prefer returning from within the catch block (less complex logic).  
+try
+{
+   ...
+   return (true);
+}
+catch (Exception&amp; mostCommonException)
+{
+   ...
+   return (false);
+}
+catch (Exception&amp; lessCommonException)
+{
+   ...
+   return (false);
+}
+catch (Exception&amp; rareException)
+{ 
+   ...
+   return (false);
+}
+catch (Exception&amp; anyOtherException)
+{
+   ...
+   return (false);
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Avoids introduction of another variable for return purpose only.  
+This is important for both the readability and performance.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The conditional should be put on a separate line followed by enclosing in 
+braces on separate lines.  This rule applies even if the block contains a 
+single statement.
+</td>
+</tr>
+
+<tr>
+<td class="example2">if (isDone) <span class="not">// do not implement as a single line: if (isDone) doCleanup();</span>
+{
+   doCleanup();
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+This is for debugging purposes. When writing on a single line impairs debugging 
+since it is not apparent whether the test is true or false.  Use of braces improves 
+readability.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Executable statements in conditionals <em>should</em> be avoided.
+</td>
+</tr>
+
+<tr>
+<td class="example2">File* fileHandle = open(fileName, "w");
+if (fileHandle != nullptr)
+{
+   ...
+}
+
+<span class="not">// improper implementation</span>
+if (!(fileHandle = open(fileName, "w")))
+{
+   ...
+}
+</i>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Conditionals with executable statements are just very difficult to read.
+This is especially true for programmers new to C/C++.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+For 
+conditional statements containing multiple conditions, logically group and 
+organize for best readability.  Prefer limiting the number of conditions on a 
+single line to one or two.  Use parentheses to assure readability of the 
+intended logic.  For complex conditional expressions, introduce 
+temporary boolean variables [4].
+</td>
+</tr>
+
+<tr>
+<td class="example2">if (aaaaa1 &gt; aaaaa2 &amp;&amp; bbbbb1 == bbbbb2 
+    &amp;&amp; ccccc1 &amp;&amp; (ddddd1 || eeeee1))
+{
+   ...
+}
+
+<span class="not">// improper</span>
+if (aaaaa1 > aaaaa2 &amp;&amp; bbbbb1 == bbbbb2 &amp;&amp; ccccc1 &amp;&amp; (ddddd1 || eeeee1))
+{
+   ...
+}
+
+//
+// introduce temporary boolean variables for complex logic cases
+//
+bool isFinished = (elementIndex &lt; 0) || (elementIndex &gt; maxElementIndex);
+bool isRepeatedEntry = elementIndex == lastElement;
+if (isFinished || isRepeatedEntry)
+{
+   ...
+}
+</i>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Make conditionals easier to read, debug and maintain by not placing 
+many conditionals on a single line. Assignment of boolean 
+expressions to temporary boolean variables can enhance readability and 
+documentation.
+</td>
+</tr>
+</tbody></table>
+
+
+
+</p><h3> <a name="Misc"></a>4.5 Miscellaneous</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The use of hard-coded numbers in the code should be avoided. Numbers other
+than <i>0 </i>and <i>1 </i>should instead be declared as named constants.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+If the number does not have an obvious meaning by itself, the readability is
+enhanced by introducing a named constant instead.
+A different approach is to introduce a method from which the constant can
+be accessed.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Floating point <a href="CppProgrammingPracticesGuide.html#constexpr">constants</a> should always be written with 
+decimal point and at least one digit both before and after the decimal point.
+</td>
+</tr>
+
+<tr><td class="example2">real32 total = 0.0; <span class="not">// don't use:  real32 total = 0;</span>
+real32 speed = 3.0e8; <span class="not">// don't use:  real32 speed = 3e8;</span>
+real32 length = 0.5; <span class="not">// don't use:  real32 length = .5;</span>
+
+real32 sum;
+...
+sum = (a + b) * 10.0;
+
+</td></tr>
+
+<tr>
+<td class="rationale">
+The number and expression system in C++ is borrowed from mathematics, 
+so best practice is to adhere to mathematical conventions for syntax wherever
+possible.  0.5 is a lot more readable than .5;
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Functions <em>should always</em> have the return value type explicitly present.
+</td>
+</tr>
+
+<tr>
+<td class="example2">int32 // type explicitly implemented
+getValue()   <span class="not">// improper (no return type): getValue()</span>
+{
+   ...
+   ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+If not exlicitly present, C++ implies <tt>int</tt> return value for
+functions. A programmer <em>should never</em> rely on this feature, since this
+might be confusing for programmers not aware of this artifact.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Never use <tt>goto</tt>.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Goto statements violate the idea of structured code. Only in some very few
+cases (for instance breaking out of deeply nested structures) should goto be
+considered, and only if the alternative structured counterpart is proven to
+be less readable.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Set native pointers to null value by using <tt>nullptr</tt>.  Do not set to <tt>0</tt> or <tt>NULL</tt>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">string* p = nullptr;
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+Use of <tt>nullptr</tt> replaces use of <tt>0</tt> in C++11.  <tt>NULL</tt> is part of the standard C library; it has become obsolete in C++.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+
+
+</p><p>
+</p><h1>
+<a name="Layout and Comments"></a>5 Layout and Comments
+</h1>
+
+<h3>
+<a name="Layout"></a>5.1 Layout</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Class declarations and definitions <em>should</em> be sorted 
+<tt>public</tt>, <tt>protected </tt>and <tt>private</tt> [5][4].  
+Leave out sections that do not apply.  Order within sections 
+should be as follows [3]:
+<ul><li><tt>using</tt> statements and <tt>Enum</tt>s
+</li><li>Constants (e.g., static constexpr data members)
+</li><li>Constructors
+</li><li>Destructor
+</li><li>Methods, including static methods
+</li><li>Get/Set Accessors
+</li><li>Data Members (except static constexpr data members)
+</li><li>Friend declarations go in the private section
+</li></ul>
+</td>
+</tr>
+
+<tr>
+<td class="example2">class MyDerivedClass : public MyBaseClass
+{
+
+   public:
+       ...
+
+   protected:
+       ...
+
+   private:
+       ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+This aligns with the general block rule.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Basic indentation should be four spaces.  Do not use tab characters.  In most Integrated Development Environments (IDEs), use of spaces can be specified via code formatting configuration settings.
+</td>
+</tr>
+
+<tr>
+<td class="example2">for (ii = 0; ii &lt; elementCount; ii++)
+{
+   a[ii] = 0;
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Indentation of one is too small to emphasize the logical layout of the code.
+Indentation larger than four makes deeply nested code difficult to read and
+increases the chance that the lines should be split. Choosing between
+indentation of two, three and four, &nbsp; two and four are the more common.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+<p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Block layout for namespaces and classes (braces not indented) is shown in 
+the first example.  The second example illustrates block layout for functions, 
+loops and control statements.  All open/close braces are column aligned.  
+Blocks containing a single statement <em>should</em> be enclosed by column-aligned braces.  
+Do use not the bracing layout shown in the third example [7].
+</td>
+</tr>
+
+<td class="example2" width="33%">mynamespaceA // fiat bracing (no indent of braces)
+{
+mynamespaceB
+{
+mynamespaceC
+{
+MyClass // class block layout (no indent of braces)
+{
+public:
+   ...
+   DoSomething();
+   ...
+};
+};
+};
+};
+
+while (!isDone) // functions, loops and control statements block layout
+{
+   doSomething();
+   isDone = calcuateProcessingCompleted();
+}
+
+<span class="not">while (!isDone) // do not use this indentation style
+   {
+      doSomething();
+      isDone = calcuateProcessingCompleted();
+   }
+</span>
+   
+// function
+void someFunction()
+{
+   ...
+}
+
+// for
+for (initialization; condition; update)
+{
+   ...
+}
+
+// while
+while (condition)
+{
+   ...
+}
+
+// do-while loops <a href="CppProgrammingStyleGuide.html#avoid_do_while">(minimize do-while loops)</a>
+do
+{
+   ...
+}
+while (condition);
+
+// try-catch
+try
+{
+   ...
+}
+catch (Exception& exception)
+{
+   ...
+}
+
+// single statement if-else, for or while
+statements <em>should</em> be written with brackets.
+
+if (condition)
+{
+   x = y + z;
+}
+
+while (ii &lt; maxCount)
+{
+   ii++;
+}
+
+for (initialization; condition; update)
+{
+   count++;
+}
+
+switch (condition)
+{
+   case ABC :
+      ...
+      // fall-through (insert comment documenting intent of falling through)
+
+   case DEF :
+      ...
+      break;
+
+   case XYZ :
+      ...
+      break;
+
+   default :
+      ...
+      break;
+}
+</td>
+</tr>
+
+<tr>
+<td colspan="3" class="rationale">
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Empty <tt>for</tt> statements should be avoided.
+</td>
+</tr>
+
+<tr>
+<td class="example2">for (initialization; condition; update)
+   ;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The format of the example emphasizes the fact that the for statement is empty 
+and it makes it obvious for the reader that this is intentional.  
+Empty loops should be avoided however.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+. The function return type can be put in the left column immediately above 
+the function name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">void
+MyClass::myMethod(void)
+{
+   ...
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+This makes it easier to spot function names within a file since
+they all start in the first column.
+</td>
+</tr>
+</tbody></table>
+
+
+</p><h3> <a name="White Space"></a>5.2 White Space</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+General whitespace practices.
+<ul><li>Conventional operators should be surrounded by a space character.
+</li><li>C++ reserved words should be followed by a white space.
+</li><li>Commas should be followed by a white space. 
+</li><li>Colons should be surrounded by white space.
+</li><li>Semicolons in for statements should be followed by a space character. 
+</li></ul>
+</td>
+</tr>
+
+<tr>
+<td class="example2">a = (b + c) * d; <span class="not">// improper syntax (missing spaces): a=(b+c)*d</span>
+
+while (true) <span class="not">// don't use: while(true) </span>
+{ 
+   ...
+}
+
+doSomething(a, b, c, d);  <span class="not">// improper: doSomething(a,b,c,d);</span>
+
+case 100 :  <span class="not">// don't use: case 100:</span>
+
+for (ii = 0; ii &lt; 10; ii++) <span class="not">// improper: for(ii=0;ii&lt;10;ii++)<i>
+{
+   ...
+}
+</i></i></td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+Makes the individual components of the statements stand out. Enhances
+readability. It is difficult to give a complete list of the suggested use of
+whitespace in C++ code. The examples above however should give a general idea
+of the intentions.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Method names should not be followed by a white space in general, including 
+when it is followed by another name.
+</td>
+</tr>
+
+<tr>
+<td class="example2">doSomething(currentFile);
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Promotes semantic consistency across the code base.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Logical units within a block should be separated by one blank line.
+</td>
+</tr>
+
+<tr>
+<td class="example2">Matrix4x4 matrix = new Matrix4x4();
+
+double cosAngle = Math.cos(angle);
+double sinAngle = Math.sin(angle);
+
+matrix.setElement(1, 1, cosAngle);
+matrix.setElement(1, 2, sinAngle);
+matrix.setElement(2, 1, -sinAngle);
+matrix.setElement(2, 2, cosAngle);
+
+multiply(matrix);
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Enhance readability by introducing white space between logical units of
+a block.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Variables in declarations can be left aligned.
+</td>
+</tr>
+
+<tr>
+<td class="example2">AsciiFile* file;
+int        nPoints;
+float      x, y;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Enhance readability. The variables are easier to spot from the types by
+alignment.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use alignment to enhance readability.
+</td>
+</tr>
+
+<tr>
+<td class="example2">if      (a == lowValue)    compueSomething();
+else if (a == mediumValue) computeSomethingElse();
+else if (a == highValue)   computeSomethingElseYet();
+
+value = (potential        * oilDensity)   / constant1 +
+        (depth            * waterDensity) / constant2 +
+        (zCoordinateValue * gasDensity)   / constant3;
+
+minPosition     = computeDistance(min,     x, y, z);
+averagePosition = computeDistance(average, x, y, z);
+
+switch (value)
+{
+  case PHASE_OIL   : strcpy(phase, "Oil");   break;
+  case PHASE_WATER : strcpy(phase, "Water"); break;
+  case PHASE_GAS   : strcpy(phase, "Gas");   break;
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+There are a number of places in the code where white space can
+be included to enhance readability even if this violates common guidelines.
+Many of these cases have to do with code alignment. General guidelines on
+code alignment are difficult to give, but the examples above should give
+a general clue.
+</td>
+</tr>
+</tbody></table>
+
+
+
+</p><h3> <a name="Comments"></a>5.3 Comments</h3>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Code should be implicitly informative and have complementary information 
+in comments.  Comments relating to long-term objectives, development roadmap 
+or persistent issues should start with keywords (TODO, REVIEW, DESIGN, ISSUE, ROADMAP), date and initials of developers to enhance discovery.  
+Implementing complex, cryptic code should be avoided to minimize extensive 
+explanation via extensive commenting. [4]
+</td>
+</tr>
+
+<tr>
+<td class="example2">// TODO 20150507 dbk
+// optimize area search algorithm (assess linear vs. non-linear methods)
+
+// TODO ROADMAP 20150918 rjt
+// revise telemetry implementation to depend on std::chrono
+// reduce dependency on Boost library
+
+// TODO REVIEW 20151118 rjt
+// review messaging paradigm design to assure 
+// coherence of communication with other systems
+
+// DESIGN 20150911 rjt message addressing - entity ID
+// - received/sent LMCP messages always include entity ID
+// - the entity cast address is derived from entity ID (see getEntityCastAddress function)
+
+// DESIGN 20150825 dbk, rjt notional configuration XML design notes
+
+// ISSUE 20151118 rjt (nuisance issue)
+// Due Google Test's single-threaded implementation and 
+// the UxAS's multi-threaded implementation, nuisance errors
+// can occur and should be ignored.
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+In general, the use of comments should be minimized by making
+the code self-documenting by appropriate name choices and an explicit
+logical structure.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use <i>//</i> for all comments, including multi-line comments within a function.  <i>/* ... */</i> block comments are okay for member and class descriptions.
+</td>
+</tr>
+
+<tr>
+<td class="example2">// Comment spanning
+// more than one line.
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Since multilevel C-commenting is not supported, using // comments ensure
+that it is always possible to comment out entire sections of a file using
+/* */ for debugging purposes etc.
+<p>
+There should be a space between the "//" and the actual comment, and comments
+should always start with an upper case letter and end with a period.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Comments should be included relative to their position in the code. [4]
+</td>
+</tr>
+
+<tr>
+<td class="example2">while (true)
+{
+  // Do something descriptive comment
+  something();
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Minimize comments that break the logical structure of the code.
+</td>
+</tr>
+</tbody></table>
+
+  
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+For large sections of code, add editor-fold comments to the start and 
+end of each section to enable "folding" (collapsing) the large code section.
+</td>
+</tr>
+
+<tr>
+<td class="example2">/*! @name Public Accessor Functions
+ *   
+ */
+// &lt;editor-fold defaultstate="collapsed" desc="Get and Set Accessors FOLD"&gt;
+   static constexpr std::int32_t GetCount() { return (s_Count); };
+// &lt;/editor-fold&gt;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Simplifies code maintenance since it enables only viewing sections of code 
+that are relevant to a the coding task at hand.
+</td>
+</tr>36
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Class and method header comments should follow the JavaDoc style Doxygen conventions.
+</td>
+</tr>
+
+<tr>
+<td class="example2">/**
+ * \brief The getStatusMessage function returns status string message containing
+ *            the the object's status string and input parameters id and time.
+ * \param id
+ * \param time
+ * \return status message string
+ */
+const std::string& getStatusMessage(std::int32_t id, std::time_t time) const
+{
+    std::ostringstream strStream;
+    strStream &lt;&lt; "Status for " &lt;&lt; std::to_string(id) &lt;&lt; " is " m_status &lt;&lt; " at time " &lt;&lt; std::to_string(time);
+    return strStream.str();
+}
+	
+void foo(int v /**&lt; [in] docs for input parameter v. */);	
+
+/** \brief Brief description.
+ *           Brief description continued.
+ *
+ *  Detailed description starts here.
+ * @param id
+ * @param time
+ * @return 
+ */
+const std::string getActionMessage(std::int32_t id) const
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Doxygen documentation is similar to Java documentation which is 
+more mature than C/C++ documentation community practices.  Doxygen 
+helps produce high quality hypertext documentation from source code 
+comments that adhere to Doxygen-compliant comment syntax.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Code comments (especially file header block comments) should include the following documentation tags (as applicable):
+</td>
+</tr>
+
+<tr>
+<td class="example2">   \file
+   \class
+   \name
+   \brief
+   \author
+   \warning
+   \param
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Documentation tags enable use of automated documentation (e.g., Doxygen ).
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+
+
+
+
+</p><h1>
+<a name="References"></a>6 References
+</h1>
+</p><p><a name="ref1"></a>[1] <a href="http://geosoft.no/development/cppstyle.html">C++ Programming Style Guidelines</a>
+
+</p><p><a name="ref2"></a>[2] <a href="http://geosoft.no/development/cpppractice.html">C++ Programming Practice Guidelines</a>
+
+</p><p><a name="ref3"></a>[3] <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.html">Google C++ Style Guide</a>
+
+<p><a name="ref4"></a>[4] <a href="http://www.cc2e.com/Default.aspx">Code Complete, Steve McConnell - Microsoft Press, 2004</a>
+
+</p><p><a name="ref5"></a>[5] <a href="https://www.doc.ic.ac.uk/lab/cplus/c++.rules/">Programming in C++, Rules and Recommendations, M. Henricson / E. Nyquist, 1992</a>
+
+</p><p><a name="ref6"></a>[6] <a href="http://www.literateprogramming.com/wildfire.pdf">Wildfire C++ Programming Style, Keith Gabryelski, Wildfire Communications, 1997</a>
+
+</p><p><a name="ref7"></a>[7] <a href="http://www.possibility.com/Cpp/CppCodingStandard.html">C++ Coding Standard, Todd Hoff, 2008</a>
+
+</p><p><a name="ref8"></a>[8] <a href="http://www.stack.nl/%7Edimitri/doxygen/index.html">Doxygen documentation system</a>
+</p></body></html>
+

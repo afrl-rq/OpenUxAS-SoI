@@ -1,0 +1,8 @@
+<AutomationRequest Series="CMASI">
+	<Label>PISR_FromGoogleEarth</Label>
+	<EntityList>
+		<int64>400</int64>
+		<int64>500</int64>
+	</EntityList>
+	<TaskList><int64>1000</int64></TaskList>
+</AutomationRequest>

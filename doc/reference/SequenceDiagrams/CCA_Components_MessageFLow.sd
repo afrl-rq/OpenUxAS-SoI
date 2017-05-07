@@ -1,0 +1,132 @@
+#!>>
+#! Message Flow: Task Planning, Assignment, and Execution (3/18/2016)
+#!
+#!<<
+
+#    PM:Plan Manager[pr] "PlanManager"
+
+CI:Actor[pr] "ControlInterface"
+AV:AutomationRequestValidator[pr] "Automation Request Validator"
+TM:TaskManager[pr] "TaskManager"
+/TK01:Task01[tvar] "Task"
+RA:RouteAggregator[pr] "Route Aggregator"
+PR:Planner[pr] "Planner"
+AS:Assignment[pr] "Assignment"
+PB:PlanBuilder[pr] "PlanBuilder"
+SM:SensorManager[pr] "Sensor Manager"
+WM:WaypointManager[pr] "WaypointManager"
+VI:VehicleInterface [pr] "VehicleInterface"
+
+[c Initialization]
+VI:={PR,RA,TM}.[Entity Configurations]
+VI:={PR,WM,PB,TM}.[Entity States]
+CI:=PR.[Keep In/Out Zones]
+CI:=PR.[Operating RegionS]
+CI:=TM.[Task]
+*1 TM
+New Tasks are sent:
+- TaskConfiguration
+- All EntityConfigurations
+- All EntityStates
+- Point, Line, or Area
+  of interest, when required
+*1
+TM:=TK01.new(Task)&
+[/c]
+
+[c Assignment]
+CI:AV.[AutomationRequest]&
+CI:AV.[SandboxAutomationRequest]&
+AV:{TM,AS,TK01,RA,PB}.[UniqueAutomationRequest]&
+*1 TK01
+For each eligible entity, calculate the
+planning points required to calculate
+task costs:
+1) Request sensor footprint information
+for all eligible vehicles (if required)
+*1
+*1 RA 
+Store AutomationRequest for future
+cost matrix calculations.
+*1
+TK01:=SM.[SensorFootprintRequest]&
+SM:=TK01.[SensorFootprintResponse]&
+*1 TK01
+2) Find task options and composition.
+3) For each option, calculate planning
+points.
+*1
+TK01:=RA.[RouteRequest](cost only)&
+*1 RA 
+Based on entity requirements, send
+requests to planners to calculate
+costs for all of the task options.
+*1
+RA:=PR.[RoutePlanRequest](cost only)&
+PR:=RA.[RoutePlanResponses](cost only)&
+RA:=TK01.[RouteResponse](cost only)&
+*1 TK01
+4) Send options and composition.
+*1
+TK01:={RA,AS}.[TaskPlanOptions]&
+*1 RA 
+After receiving all TaskPlanOptions
+(requested in the AutomationRequest)
+request costs for plans from each entity
+to each eligible task and from each task
+to every other task.
+*1
+RA:=PR.[RoutePlanRequest](cost only)&
+PR:=RA.[RoutePlanResponses](cost only)&
+RA:AS.[AssignmentCostMatrix]&
+*1 AS 
+The assignment is calculated once 
+the AssignmentCostMatrix and the Task 
+Plan Costs, from all of the requested
+tasks, are received.
+*1
+AS:PB.[TaskAssignmentSummary]&
+[/c]
+
+[c Implementation]
+*1 PB 
+Constructs plans by:
+1) For each assigned task option,
+calculate final task plan. 
+*1
+PB:TK01.[TaskImplementationRequest]&
+*1 TK01
+1) Construct final plans
+2) Cache assignment for use during
+execution
+*1
+TK01:=RA.[RouteRequest]&
+RA:=PR.[RoutePlanRequest]&
+PR:=RA.[RoutePlanResponses]&
+RA:=TK01.[RouteResponse]&
+TK01:PB.[TaskImplementationResponse]&
+*1 PB 
+2) Based on assigned order of task
+options, construct waypoint plans and
+send automation response.
+*1
+
+PB:AV.[UniqueAutomationResponse]&
+AV:{CI,WM}.[AutomationResponse]&
+AV:CI.[SandboxAutomationResponse]&
+[/c]
+
+[c Execution]
+VI:={TK01,WM}.[AirVehicleState](UAV01)&
+WM:=VI.[MissionCommand](UAV01)&
+*1 TK01 
+Tasks monitor VehicleStates to act
+on assigned portions of the plan,
+e.g., starts recording video based
+on vehicle state
+*1
+TK01:=VI.[VehicleActionCommand](UAV01)&
+TK01:=WM.[MissionCommand](UAV01)&
+TK01:=CI.[TaskComplete]&
+
+[/c]

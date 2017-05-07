@@ -1,0 +1,32 @@
+<CoordinatedAutomationRequest Series="UXTASK">
+  <RequestID>100000</RequestID>
+  <MaximumResponseTime>10000</MaximumResponseTime>
+  <OriginalRequest>
+    <AutomationRequest Series="CMASI">
+      <EntityList>
+        <int64>1000</int64>
+        <int64>2000</int64>
+<!-- Add third UAV to test MaximumResponseTime
+     should wait until MaximumResponseTime and
+     then run assignment with UAVs 1000 and 2000 -->
+        <!-- <int64>3000</int64> -->
+      </EntityList>
+      <TaskList>
+        <!-- ImpactLineSearchTask -->
+        <int64>21</int64> 
+        <!-- LineSearchTask -->
+        <int64>20</int64> 
+        <!-- LineSearchTask -->
+        <int64>30</int64>
+        <!-- AreaSearchTask -->
+        <int64>50</int64>
+        <!-- AngledAreaSearchTask -->
+        <int64>51</int64> 
+      </TaskList>
+      <TaskRelationships></TaskRelationships>
+      <OperatingRegion>100</OperatingRegion>
+      <RedoAllTasks>true</RedoAllTasks>
+    </AutomationRequest>
+    </OriginalRequest>
+    <PlanningStates></PlanningStates>
+</CoordinatedAutomationRequest>

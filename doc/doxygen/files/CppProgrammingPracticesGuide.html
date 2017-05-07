@@ -1,0 +1,1873 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+<!--
+*******************************************************************************
+  Page header
+*******************************************************************************
+-->
+
+   <title> C++11 Programming Practices Recommendations</title>
+   <link rel="STYLESHEET" href="cppprogramming_style.css" type="text/css">
+</head>
+
+
+<body link="7a88a1" marginheight="20" marginwidth="20" vlink="7a88a1" bgcolor="white">
+
+<!--
+*******************************************************************************
+   Display Heading
+*******************************************************************************
+-->
+<center>
+<h1 class="title">C++11 Programming Practice Recommendations</h1>
+
+<br>
+
+</center>
+
+<p>
+
+</p><hr size="1">
+
+<!--
+*******************************************************************************
+   Table of contents
+*******************************************************************************
+-->
+<h1>Table of Contents</h1>
+
+<table border="0" cellpadding="8" cellspacing="0"><tbody><tr><td>
+</td></tr></tbody></table>
+
+
+&nbsp; &nbsp; <a href="#Introduction">1 Introduction</a>
+<br>
+<!--
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Layout%20of%20the%20Recommendations">1.1 Layout of the Recommendations</a><br>
+  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#Recommendation">1.2 Recommendations Importance</a><br>
+  <br>
+-->
+&nbsp; &nbsp; <a href="#General%20C++11">2 General C++11</a>
+  <br>
+
+&nbsp; &nbsp; <a href="#Constructors,%20Destructors,%20Assignment%20Operators%20and%20Functions">3 Constructors, Destructors, Operators and Functions</a>
+  <br>
+
+  <!--
+&nbsp; &nbsp; <a href="#Operators">4 Operators</a>
+  <br>
+-->
+&nbsp; &nbsp; <a href="#Object%20Orientation%20and%20Inheritance">4 Object Orientation and Inheritance</a>
+  <br>
+
+&nbsp; &nbsp; <a href="#Error%20Handling">5 Error Handling</a>
+  <br>
+
+&nbsp; &nbsp; <a href="#References">6 References</a>
+  <br>
+  <br>
+
+<table border="0" cellpadding="8" cellspacing="0"><tbody><tr><td>
+</td></tr></tbody></table>
+
+
+<!--
+*******************************************************************************
+
+   1 INTRODUCTION
+
+*******************************************************************************
+-->
+<hr size="1">
+<h1>
+<a name="Introduction"></a>1 Introduction</h1>
+
+<p>
+This document lists C++11 coding recommendations common in the C++ development
+community.  While recommendations make use of the C++11 language 
+standard, they do not provide comprehensive guidance for use of all C++11 
+features.  These recommendations are forward compatible with C++14.
+
+</p><p>
+This document was derived from <a href="http://geosoft.no/development/cpppractice.html">C++ Programming Practice Guidelines</a>.  
+The recommendations are based on established standards collected from a number
+of sources, individual experience, local requirements/needs, as well as
+recommendations given in <a href="#ref1">[1]</a> - <a href="#ref11">[11]</a>.
+
+<p>
+The recommendations given in this document are based on writings by
+Scott Meyers (see <a href="#ref3">[3]</a>, 
+<a href="#ref8">[8]</a> - <a href="#ref10">[10]</a>),
+as well as other sources.
+
+</p><h3>
+<a name="Layout of the Recommendations"></a>1.1 Layout of the
+Recommendations.</h3>
+
+<p>
+The recommendations are grouped by topic and each recommendation is
+numbered to make it easy to refer to during code reviews.
+
+</p><p>
+Layout of the recommendations is as follows:
+
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="recom">
+Recommendation short description.
+</td>
+</tr>
+
+<tr>
+<td class="example2">Illustrative code (as applicable).
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+Motivation, background and additional information.
+</td>
+</tr>
+</tbody></table>
+
+
+</p><h3>
+<a name="Recommendation"></a>1.2 Recommendation Importance</h3>
+
+<p>
+In the guideline sections the terms <i>should</i> and 
+<i>can</i> have special meaning. A <i>should</i> is a strong recommendation, and a <i>can</i> is a general guideline.
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+</p><p>
+<h1>
+<a name="General C++11"></a>2 General C++11</h1>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="constexpr"></a>
+Prefer <tt>constexpr</tt> over <tt>const</tt> for objects having defined value at compile-time and for functions that can be evaluated at compile-time.  Generally, minimize use of <tt>#define</tt> statements.
+</td>
+</tr>
+
+<tr>
+<td class="example2">constexpr double PI = 3.1416; <span class="not">// don't use: #define PI 3.1416</span>
+constexpr // constexpr func
+uint64 multiplyTwoUnsignedIntegers(uint32 x, uint32 y) noexcept
+{
+   return (x * y);
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Use of <tt>constexpr</tt> implies the value of the object or function is known at compile-time. <tt>#define</tt> is not part of the C++ language definition.
+<p>
+Instead of typeless macros, use functions with template parameters.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+   [>new / moved from 6.]
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+If <tt>constexpr</tt> is not used, <tt>const</tt> should be used wherever possible.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+A member function that does not affect the state of an object
+is to be declared <tt>const</tt>. These are the only functions which may be
+invoked on a <tt>const</tt> object.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="define_guard"></a>
+Implement a <a href="CppProgrammingStyleGuide.html#header_guard">unique include guard</a> in header files.  If a collision occurs, then add namespace information.
+</td>
+</tr>
+
+<tr>
+<td class="example2">#ifndef STRING_H // patterned after file name
+#define STRING_H
+// ...
+#endif  // STRING_H
+
+#ifndef UTILITY_XML_STRING_H // patterned after namespace and file name
+#define UTILITY_XML_STRING_H // to overcome a collision
+// ...
+#endif  // UTILITY_XML_STRING_H
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Prevent compile-time multiple definition errors.</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="alias"></a></a>
+Limit use of alias declarations.  Constrain aliasing use to cases of frequently used, very long symbols.  Do not use <tt>typedef</tt> declarations.  Do not alias namespaces.  
+</td>
+</tr>
+
+<tr>
+<td class="example2">namespace uxas // example of type aliasing
+{
+namespace type
+{
+   using ComponentMap_t = std::unordered_map&lt;uint32_t, std::shared_ptr&lt;component::ComponentBase&gt;;
+};
+};
+
+// direct use in a template (here, if typedef was used, it would require more coding)
+template&lt;typename T&gt; // MyItemList&lt;T&gt;
+using MyItemList = std::list&lt;T, MyItemData&lt;T&gt;&gt;; // synonym for std::list&lt;T, MyItemData&lt;T&gt;&gt;
+MyItemList&lt;ServiceBase&gt; _serviceList;
+
+<span class="not">// do not alias a namespace</span>
+namespace abc
+{
+namespace def
+{
+namespace hij
+{
+namespace klm
+{
+namespace nop
+{
+int32_t messageCount = 11;
+}
+}
+}
+}
+}
+
+namespace ns_alias = abc::def::hij::klm::nop; // declare alias (synonym) for namespace abc::def::hij::klm::nop
+
+int main()
+{
+   ns_alias::messageCount = 33; <span class="not">// do not alias a namespace</span>
+}
+
+<span class="not">// do not alias a namespace via the "using" statement</span>
+using namespace uxas::enums;
+Color color = Color::RED; // uxas::enums::Color
+
+// avoid aliasing specific functions
+using c_out = std::cout;
+c_out  &lt;&lt; "Example of aliasing std::cout" &lt;&lt; std::endl;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Alias declarations directly support template implementations.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Minimize use of unnamed namespaces.  Prefer use of private class members to limit scope.  Can use unnamed namespaces only in source files (.cpp) to define translation unit scoped items (reduces namespace pollution).
+</td>
+</tr>
+
+<tr>
+<td class="example2">#include &lt;iostream&gt;
+
+namespace
+{
+   int variable;
+   void fnc (int);
+}
+
+namespace
+{
+   void fnc (int i)
+   {
+      std::cout &lt;&lt; i &lt;&lt; std::endl;
+   }
+}
+
+int main()
+{
+   fnc(variable);
+   return 0;
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Provides internal linkage without using the static keyword; does not create global scoped items.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use scoped enumerations.
+</td>
+</tr>
+
+<tr>
+<td class="example2">enum class Animal // "class" keyword prevents implicit casting
+{
+   CAT,
+   DOG,
+   RABBIT
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Exclusion of the keyword <tt>class</tt> results in an unscoped enumeration that allows implicit casting to an integral type.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use the <tt>iostream</tt> library instead of the <tt>stdio</tt> library.
+</td>
+</tr>
+
+<tr>
+<td class="example2">#include &lt;iostream&gt; <span class="not">// do not use: #include &lt;stdio.h&gt;</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The <tt>stdio</tt> has been replaced by the much more powerful <tt>iostream</tt> library, and
+when programming C++ the latter should be preferred.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+C++ style casts should be preferred to C style casts.
+</td>
+</tr>
+
+<tr>
+<td class="example2">static_cast&lt;double&gt; distance_m; <span class="not">// do not use: (double) distance_m</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Adhere to common C++ programming practices.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Only use auto declarations for iterators and control loops.  Otherwise, use explicit declarations.
+</td>
+</tr>
+
+<tr>
+<td class="example2"></td>
+</tr>
+
+<tr>
+<td class="rationale">
+Explicit declarations reduce the risk introducing of type-related errors.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer <tt>const_iterator</tt>s to <tt>iterator</tt>s when not modifying values during iteration.
+</td>
+</tr>
+
+<tr>
+<td class="example2">std::vector&lt;int32&gt; values;
+...
+auto it = std::find(values.cbegin(),values.cend(), 1983); // use cbegin and cend
+values.insert(it, 1998);
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Reduce likelihood of unintended modification of values.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer braced initialization.
+</td>
+</tr>
+
+<tr>
+<td class="example2">int32 x{ 0 };
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Braced initialization is the most widely usable initialization syntax; it prevents narrowing conversions.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer references over pointers.
+</td>
+</tr>
+
+<tr>
+<td class="example2">// function with constant string parameter (pass by reference) - preferred implementation
+void setMessage(const std::string&amp; message)
+{
+   ...
+}
+
+// function with constant string parameter (pass by pointer) - minimize as viable
+void setMessage(const std::shared_ptr&lt;std::string&gt; message)
+{
+   ...
+}
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+If it is possible for the referred object to be <em>null</em>, 
+then use <a href="CppProgrammingPracticesGuide.html#smart_pointers">smart pointers</a>.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="smart_pointers"></a>
+Use shared smart pointers; do not use native pointers.  Use 
+unique smart pointers and weak smart pointers to effect and 
+explicitly communicate associated scope limitations.
+</td>
+</tr>
+
+<tr>
+<td class="example2">std::unique_ptr&lt;std::vector&lt;int32&gt;&gt; rowIndex = std::make_unique&lt;std::vector&lt;int32&gt;&gt;(10, 1); // 10 elements, each having value of 1
+std::shared_ptr&lt;std::vector&lt;int32&gt;&gt; columnIndex = std::make_shared&lt;std::vector&lt;int32&gt;&gt;((10, 1); // 10 elements, each having value of 1
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Smart pointers were introduced in C++11 with intent of reducing pointer-related errors.  They provide:
+<ul><li>Dependable "garbage collection" without errant, premature destruction or errant multiple destruction attempts.</tt>
+</li><li>Stable, controlled management of dangling pointers (should use weak_ptr in some cases).</tt>
+</li></ul>
+Information about <tt>std::weak_ptr</tt>s is available at: <a href="http://en.cppreference.com/w/cpp/memory/weak_ptr">C++ Reference std::weak_ptr</a> and 
+<a href="http://stackoverflow.com/questions/12030650/when-is-stdweak-ptr-useful">When is std::weak_ptr useful?</a>
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer using <tt>std::make_unique</tt> and 
+<tt>std::make_shared</tt> functions for creating 
+<tt>std::unique_ptr</tt>s and <tt>std::shared_ptr</tt>s, respectively.  
+The only exception is for cases when custom delete functions are necessary 
+or the passing of braced initializers is important to implementation.  
+In these cases only, 
+use the <tt>new</tt> instead of the <tt>make</tt> functions.  
+For C++11 (only), 
+the template shown in the code example should be added <a href="#ref7">[3]</a>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">// add make_unique function missing from C++11 (but included in C++14)
+template&lt;typename T, typename... Args&gt;
+std::unique_ptr&lt;T&gt; make_unique(Args&&... params)
+{
+   return std::unique_ptr&lt;T&gt;(new T(std::forward&lt;Args&gt;(params)...));
+}
+
+// create base class unique smart pointer to a derived class object
+std::unique_ptr&lt;MyBaseClass&gt; baseClass_up = std::make_unique&lt;MyDerivedClass&gt;();
+
+// create base class shared smart pointer to a derived class object
+std::shared_ptr&lt;MyBaseClass&gt; baseClass_sp = std::make_shared&lt;MyDerivedClass&gt;();
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+Using <tt>std::make_unique</tt> and <tt>std::make_shared</tt> provide stronger exception safety, greater protection against resource leakage, cleaner, simpler source code and smaller, faster object code <a href="#ref7">[3]</a>.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule TODO Smart Pointers Pimpl
+--------------------------------------------------
+  Smart Pointers
+--------------------------------------------------
+Pimpl (struct data member)   
+   The Pimpl Idiom decreases
+build times by reducing
+compilation dependencies
+between class clients and class
+implementations.
+For std::unique_ptr pImpl
+pointers, declare special
+member functions in the class
+header, but implement them in
+the implementation file. Do this
+even if the default function
+implementations are acceptable
+****************************************************************************
+-->
+
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use <tt>nullptr</tt> for setting native pointers to null or passing in a null pointer parameter to a function.  Do not use <tt>0</tt> or <tt>NULL</tt>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">string* myObject = nullptr;
+</td>
+</tr>
+
+
+<tr>
+<td class="rationale">
+Use of <tt>nullptr</tt> replaces use of <tt>0</tt> in C++11.  <tt>NULL</tt> is part of the standard C library, but is made obsolete in C++.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Generally avoid variable argument lists <tt>(...)</tt>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Variable argument lists prohibit strong type checking as provided by C++.
+In most cases variable argument lists can be exchanged by function
+overloading and by using default arguments.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<tt>new</tt> and <tt>delete</tt> should be preferred over <tt>malloc</tt>, <tt>realloc</tt> and <tt>free</tt>.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+In C++ there is no need for the older memory management functions
+<tt>malloc</tt>, <tt>realloc</tt> and <tt>free</tt>. It enhances readability of the code to use
+one consistent set of memory management methods. Also it makes deallocating
+memory safer, since it is dangerous to do <tt>delete</tt> on a
+<tt>malloc</tt>'ed object or <tt>free</tt> on a <tt>new</tt>'ed object.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+
+</p><p>
+</p><h1>
+<a name="Constructors, Destructors, Assignment Operators and Functions"></a>
+3 Constructors, Destructors, Operators and Functions</h1>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="explicit_def_del"></a>
+Explicitly <a href="CppProgrammingStyleGuide.html#member_defns">define or delete</a> copy/move constructors, operators and functions instead of implementing private "empty" constructors, operators and functions.
+</td>
+</tr>
+
+<tr>
+<td class="example2">bool isEven(int number); // required function
+
+bool isEven(char) = delete; // prevent invoking isEven with char parameter
+bool isEven(bool) = delete; // prevent invoking isEven with bool parameter
+bool isEven(double) = delete; // prevent invoking isEven with double or float parameter
+
+
+MyClass(const MyClass& other) = delete; // prevent copy construction
+MyClass& operator=(const MyClass& other) = delete; // prevent copy assignment operation
+
+MyClass(const MyClass&& other) = delete; // prevent move construction
+MyClass& operator=(const MyClass&& other) = delete; // prevent move assignment operation
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+<p>
+Intent is preventing implementation/invocation of unwanted constructors, operators and functions.
+</p><p>
+Note that in some cases, compilers <em>generate</em> constructors and assignment operators.
+By declaring such methods private and skipping their definition, attempts
+within code to call them will be trapped by the compiler.
+</p><p>
+Methods that are implicitly generated by the compiler if they are not
+explicitly defined are:
+<ul><li>Default constructor <tt>MyClass()</tt>
+</li><li>Destructor <tt>~MyClass()</tt>
+</li><li>Copy constructor <tt>MyClass(const MyClass& other)</tt>
+</li><li>Copy Assignment operator <tt>MyClass& MyClass::operator= (const MyClass& other)</tt>
+</li><li>Move constructor <tt>MyClass(const MyClass&& other)</tt>
+</li><li>Move Assignment operator <tt>MyClass&& MyClass::operator= (const MyClass&& other)</tt>
+</li></ul>
+</p>
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Copy/move constructors and copy/move assignment operators should always 
+be defined or deleted for classes with dynamically allocated memory 
+(<a href="#ref8">[8]</a>, Item 11).
+</td>
+</tr>
+
+<tr>
+<td class="example2">MyClass(const MyClass& other) = delete; // prevent copy construction
+MyClass& operator=(const MyClass& other) = delete; // prevent copy assignment operation
+
+MyClass(const MyClass&& other) = delete; // prevent move construction
+MyClass& operator=(const MyClass&& other) = delete; // prevent move assignment operation
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Unless a copy/move constructor or a copy/move assignment operator is explicitly 
+defined or deleted, the compiler will generate them automatically.  
+If the class uses dynamically allocated memory, the default generated
+copy/move constructors and copy/move assignment operators often do not behave 
+as desired (e.g., memory management).   For this copy case, a default 
+implementation may suffice when multiple objects of the same 
+class indeed <em>should</em> share a common data allocation. In this case, it 
+should be defined via the <tt>= default</tt> implementation.   Additionally, 
+it is necessary to make sure that the shared data is not deallocated as long 
+as there are references to it via use of smart pointers.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The assignment operator should always return a reference to *this.  It should always check for assignment to self.
+</td>
+</tr>
+
+<tr>
+<td class="example2">MyClass& MyClass::operator= (const MyClass&amp; rhs) 
+{ 
+   if (this != &amp;rhs)
+   {
+      ... 
+   } 
+   
+   return *this;   
+} 
+
+MyClass& MyClass::operator= (const MyClass&amp; rhs) 
+{ 
+   if (*this != rhs)
+   {
+      ... 
+   } 
+   
+   return *this;   
+} 
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+This assignment operator implementation mimics the assignment of built in 
+types.  
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use the C++ keyword <tt>explicit</tt> for constructors callable with one argument.  Applies to constructors where every parameter after the first has a default value (<a href="#ref4">[4]</a>).
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Prevent errant implicit type conversions.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer simple construction and initialization.  Minimize creation logic in constructors.  Constructors may contain simple creation logic (e.g., initialization of data members).  Constructors should not contain (i) moderate/complex creation logic; (ii) virtual function invocations; (iii) attempts to raise non-fatal failures.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Complex initialization in constructors (in particular, initialization that can fail or that requires virtual method calls) has the following risks <a href="#ref4">[8]</a>:
+<ul><li>There is no easy way for constructors to signal errors, short of using exceptions.
+</li><li>If constructor work fails, the object may be in an indeterminate state.
+</li><li>Constructor calls of virtual functions of subclass implementations that are "under construction."  Future extension or modification of the class can subtlety introduce such issues.
+</li></ul>
+If object creation requires non-trivial initialization, consider using a factory function or Initialize() method <a href="#ref4">[4]</a>.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The destructor should be virtual if and only if the class contains
+virtual methods (<a href="#ref8">[8]</a>, Item 14).
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+When <tt>delete</tt> is used on a derived object where the base class
+destructor is not virtual, only the base class destructor will be called.
+<p>
+On the other hand, if a class does not contain any virtual members,
+it should not be used as a base class at all. In these cases it does not
+make sense to declare the destructor virtual both because it is not needed
+and because it will increase objects of the class with a completely
+unnecessary vptr and an associated vtbl.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use <tt>noexcept</tt> when declaring functions that will not throw exceptions.
+</td>
+</tr>
+
+<tr>
+<td class="example2">void doesNotThrowExceptionFunction(int32 x) noexcept;
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Provides more interface specification information and facilitates compiler optimization.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule TODO Functors - complete usage example
+   http://stackoverflow.com/questions/6451866/why-use-functors-over-functions
+   http://stackoverflow.com/questions/356950/c-functors-and-their-uses
+   // this is a functor
+struct add_x {
+  add_x(int x) : x(x) {}
+  int operator()(int y) { return x + y; }
+
+private:
+  int x;
+};
+
+// Now you can use it like this:
+add_x add42(42); // create an instance of the functor class
+int i = add42(8); // and "call" it
+assert(i == 50); // and it added 42 to its argument
+
+std::vector<int> in; // assume this contains a bunch of values)
+std::vector<int> out;
+// Pass a functor to std::transform, which calls the functor on every element 
+// in the input sequence, and stores the result to the output sequence
+std::transform(in.begin(), in.end(), out.begin(), add_x(1)); 
+assert(out[i] == in[i] + 1); // for all i
+   I would have used the functor I created earlier, and added 42 to each value. With add_x(1) I create a new instance of the functor, one which only adds 1 to each value. It is simply to show that often, you instantiate the functor "on the fly", when you need it, rather than creating it first, and keeping it around before you actually use it for anything.
+   
+****************************************************************************
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer use of functors over callback function pointers.
+</td>
+</tr>
+
+<tr>
+<td class="example2">// basic canonical form of a functor
+class Functor
+{
+public:
+	R operator()(T1, ..., Tn)
+	{
+		return R();
+	}
+};
+
+// example of a simple functor
+class LessThanFunctor
+{
+public:
+	bool operator()(int lhs, int rhs)
+	{
+		return lhs &lt; rhs;
+	}
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+An instance of the functor object can be initialized with / maintain internal state.
+</td>
+</tr>
+</tbody></table>
+
+-->
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Both == and != should be implemented if one of them is needed.
+</td>
+</tr>
+
+<tr>
+<td class="example2">bool C::operator!= (const C& lhs)  { return !(this == lhs); }
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+In most cases the != operator can be derived from the == operator as
+shown in the example. This is not automatically done by C++ as one could
+expect however.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Operators &, &&, || and , (comma) <em>should never</em> be
+overloaded (<a href="#ref9">[9]</a>, Item 7).
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Problem with user defined versions of these operators is that they will
+not get the same behavior as the default versions for the standard types.
+<p>
+C++ employs a short-circuit evaluation of boolean expressions which means
+that as soon the truth or falsehood of an expression has been determined,
+evaluation of the expression ceases. There is no way this behavior can
+be transferred to the user defined operator methods.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The return type of a function <em>should always</em> be specified explicitly.
+</td>
+</tr>
+
+<tr>
+<td class="example2">int32 function() <span class="not">// do not use: function()</span>
+{
+   ... 
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Functions, for which no return type is explicitly declared, implicitly receive
+<tt>int</tt> as the return type. Functions <em>should never</em> depend on this fact.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+For functions that can be implemented using a class' public interface, prefer implementing them as non-members.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Loosen coupling and increase class encapsulation <a href="#ref11">[10]</a>.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Prefer using constant (<tt>const</tt>) 
+pass-by-reference over pass-by-reference function parameters.  
+Prefer pass-by-reference over pass-by-value function parameters.  
+</td>
+</tr>
+
+<tr>
+<td class="example2">myMethod (const SomeClass& object) const // preferred over myMethod (SomeClass& object) and myMethod (SomeClass object)
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+There are two reasons for this. First is of performance.
+Pass by value for objects always involves creating a temporary object using
+the copy constructor of the objects class and destroying the object again
+on the method exit.
+<p>
+Second reason is that objects passed by value through a base-class variable
+will in effect behave as a base-class object without the extended information
+defined by the derived class.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+A public member function <em>should never</em> return a non-const reference or
+pointer to a private member data (<a href="#ref7">[11]</a>, Rule 29).
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Returning a non-const reference to member data violates the encapsulation
+of the class.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+</p><p>
+</p><h1>
+<a name="Object Orientation and Inheritance"></a>4 Object Orientation and Inheritance</h1>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+<a name="pract_getset"></a>
+Prefer declaring member variables as private over protected; prefer protected member declaration over public.
+</p><p>
+For the case of direct read/write member access by subclasses or other classes when encapsulation is not necessary, 
+declare such members as protected or public to enable direct access; do not implement Get/Set accessor functions.
+</p><p>
+For the case when read/write variable access should be controlled (encapsulation is required), declare member variables as private.  
+Public access, if needed, should be through public Get/Set accessor functions.  Subclasses should also use these same 
+public Get/Set accessor functions.  A base class can 
+have protected non-const get functions that enable subclasses to read/write/modify base class private members.
+</p><p>
+Reference: <a href="CppProgrammingStyleGuide.html#style_getset">get/set style rule</a>.
+</p>
+</td>
+</tr>
+
+<tr>
+<td class="example2">//
+// example - <b><em>no Get/Set accessor functions</em></b> since encapsulation not needed
+//
+class MyBaseClass
+{
+
+protected:
+   std::vector&lt;std::string&gt; messages { "first_message", "second_message" };
+
+public:
+   int32 totalCount { 0 };
+
+};
+
+class MyDerivedClass : public MyBaseClass
+{
+
+public:
+   void PerformWork()
+   {
+      int32 totalSize { 0 };
+      for (std::vector&lt;std::string&gt;::iterator msgIt = messages.cbegin(); msgIt != messages.cend(); msgIt++)
+      {
+         totalSize += msgIt-&gt;size();
+      }
+      
+      // can modify since a protected member
+      messages.clear();
+      
+      // setting protected variable via direct assignment
+      messages = m_workMessages;
+   };
+	  
+private:
+   std::vector&lt;std::string&gt; m_workMessages{ "message_A", "message_B" };
+
+};
+
+int main()
+{
+   MyDerivedClass derivedInstance;
+   derivedInstance.totalCount = 1;
+}
+</td>
+</tr>
+
+<tr>
+<td class="example2">//
+// example with <b><em>Get/Set accessor functions</em></b> that effect encapsulation
+//
+class MyBaseClass
+{
+
+// public Get/Set accessors functions
+public:
+   // <b><em>upper camel case</em></b> public Get accessor function
+   const std::vector&lt;std::string&gt;& GetMessages() const { return (m_messages); };
+
+   // <b><em>upper camel case</em></b> public Set accessor function
+   void  SetMessages(std::vector&lt;std::string&gt;& messages) { m_messages = messages; };
+	  
+// protected get accessor function
+protected:
+   // <b><em>lower camel case</em></b> protected get accessor function (enables read/write of private member)
+   std::vector&lt;std::string&gt;& getMessages() { return (m_messages); };
+
+private:
+   // private - so only this class can directly modify
+   std::vector&lt;std::string&gt; m_messages { "first_message", "second_message" };
+
+};
+
+class MyDerivedClass  : public MyBaseClass
+{
+
+public:
+   void PerformWork()
+   {
+      int32 totalSize { 0 };
+      // cannot modify since accessing via public, const GetMessages() function
+      for (std::vector&lt;std::string&gt;::iterator msgIt = GetMessages().cbegin(); msgIt != GetMessages().cend(); msgIt++)
+      {
+         totalSize += msgIt-&gt;size();
+      }
+      
+      // can modify since accessing via protected, non-const function
+      getMessages().clear();
+      
+      // setting private variable via public set accessor function
+      SetMessages(m_workMessages);
+   };
+	  
+private:
+   std::vector&lt;std::string&gt; m_workMessages{ "message_A", "message_B" };
+
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Adhere to common object-oriented programming practices.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+"Is-a" relationship should be modelled by inheritance, "has-a" 
+relationship should be modelled by composition.
+</td>
+</tr>
+
+<tr>
+<td class="example2">class B : public A // B "is-a" A 
+{ 
+   ... 
+} 
+
+class B 
+{ 
+   ...  
+ 
+   private: 
+      A  a_;  // B "has-a" A 
+} 
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Adhere to common object-oriented programming practices.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+The assignment operator of a derived class <em>should</em> explicitly perform
+the assignment of its base class.
+</td>
+</tr>
+
+<tr>
+<td class="example2">Derived& Derived::operator (const Derived&amp; rhs) 
+{ 
+   if (this != &amp;rhs)
+   {
+      Base::operator= (rhs);
+      ...  proceed with Derived assignments ...
+   }
+
+   return *this;
+} 
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The base class assignment is never automatically called as one could
+believe. Some compilers will not accept the above construct if the
+assigment operator of the base class is automatically generated.
+In this case use:<br>
+<br>
+<tt>
+static_cast<base&>(*this) = rhs; <br>
+</base&></tt>
+<br>
+which downcasts this to its base class and force the assignment through
+this base class reference.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Use the keyword <tt>override</tt> to explicitly override virtual functions.
+</td>
+</tr>
+
+<tr>
+<td class="example2">// example usage
+class MyBaseClass
+{
+public:
+   // base class virtual function
+   virtual void performWork();
+   ...
+};
+
+class MyDerivedClass : public MyBaseClass
+{
+public:
+   // overriding derived class virtual function
+   virtual void performWork() override;
+   ...
+};
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Absence of the keyword <tt>override</tt> results in a function in a derived class that does not override the base class function.  Issue occurs when function is invoked as object is referenced as a base object.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Non-virtual methods <em>should never</em> be redefined by a subclass.  Redefinition does not implement overriding.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+There are two reasons for this. First is that if the method <em>needs</em>
+to be redefined, then the subclass should not inherit from the base class
+in the first place. It fails to be an "is-a" of the base class.
+<p>
+Then there is a technical reason. A non-virtual function is statically bound
+and a reference to the base class will always invoke the method of the
+base class even if the object is derived from the base class.
+</p></td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Inherited default parameters <em>should never</em> be redefined.
+</td>
+</tr>
+
+<tr>
+<td class="example2">virtual uint32 getDefaultLength_m() { return 11; }; // base class function
+
+uint32 getDefaultLength_m() { return 22; };  // overriding function in derived class 
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+This is related to the previous rule. ... if inherited default parameters  <em>need</em>
+to be redefined, then the subclass should not inherit from the base class
+in the first place. It fails to be an "is-a" of the base class.
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Private and protected inheritance <em>should</em> be avoided.
+</td>
+</tr>
+
+<tr>
+<td class="example2">class C <span class="not">// using inheritance is improper (class C : private B)</span>
+{
+     ...  
+   private:
+      B  b_; // good - use of class B by composition
+}
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+While public inheritance models an "is-a" relationship, private or protected 
+inheritance doesn't model anything at all, but is purely a short-cut 
+implementation construct to re-use some code found within the base class.  
+This kind of code re-use is typically best Implemented through composition 
+("has-a" relationship).
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Processing that is specific to a derived class should be implemented in 
+a overriding virtual function; avoid downcasting.
+</td>
+</tr>
+
+<tr>
+<td class="example2">
+derivedClass = static_cast&lt;DerivedClass&gt; base; <span class="not">// avoid downcasting</span>
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+In some cases, the need for downcasting reveals a design flaw.  Generally, 
+C++ code should not branch on the type of objects (<em>"if object A is of
+type so-and-so do this, else do that"</em>).  Instead, implement this type 
+of behavior using virtual functions.  
+</td>
+</tr>
+</tbody></table>
+
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Singleton objects should be preferred to global variables.
+</td>
+</tr>
+
+<tr>
+<td class="example2">// 
+// SingletonExample.h (START)
+//
+#ifndef SINGLETON_EXAMPLE_H
+#define	SINGLETON_EXAMPLE_H
+
+#include &lt;cstdint&gt;
+#include &lt;string&gt;
+
+namespace abc
+{
+namespace def
+{
+
+class  SingletonExample
+{
+public:
+   static  SingletonExample* Instance();
+
+   // &lt;editor-fold defaultstate="collapsed" desc="Get and Set Accessors"&gt;
+   static constexpr std::int32_t getCount() { return (s_Count); };
+   // &lt;/editor-fold&gt;
+
+private:
+   SingletonExample() { }; // private constructor - cannot be externally invoked
+   SingletonExample(SingletonExample const&) = delete; // delete copy constructor
+   void operator=(SingletonExample const&) = delete; // delete copy assignment operator
+   static  SingletonExample* s_Instance;
+   static constexpr std::int32_t s_Count { 44 };
+
+};
+
+}; // namespace def
+}; // namespace abc
+
+#endif	/* SINGLETON_EXAMPLE_H */
+// 
+// SingletonExample.h (END)
+//
+
+
+// 
+// SingletonExample.cpp (START)
+//
+#include " SingletonExample.h"
+
+namespace abc
+{
+namespace def
+{
+   // Static pointer used to ensure a single instance of the class.
+   SingletonExample*  SingletonExample::s_Instance = nullptr;
+
+   /** This function is called to access the singleton instance.  
+        Calling the constructor publicly is not allowed. The constructor
+        is private and is only called by this Instance function.
+   */
+   SingletonExample *  SingletonExample::Instance()
+   {
+      // Test if need first time/one time creation
+      if (SingletonExample::s_Instance == nullptr) 
+	  {
+         s_Instance = new  SingletonExample;
+      }
+
+   return s_Instance;
+   }
+
+}; // namespace abc
+}; // namespace def
+// 
+// SingletonExample.cpp (END)
+//
+
+// usage in code
+uint32_t count = abc::def::SingletonExample::Instance()-&gt;getCount();
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+The singleton approach solves the problem of the undefined order of
+initialization of global objects which can result in objects referring
+to other objects not yet initialized.
+<p>
+In general, the need to use global objects in C++ is uncommon.
+</p></td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+</p><p>
+</p><h1>
+<a name="Error Handling"></a>5 Error Handling</h1>
+
+<!--
+****************************************************************************
+   Rule
+****************************************************************************
+-->
+</p><p>
+<table width="100%" border="">
+<tbody><tr>
+<td class="ruleCount recom">. 
+Exceptions should be caught by reference.
+</td>
+</tr>
+
+<tr>
+<td class="example2">try
+{
+   ... 
+} 
+catch (Exception& exception)
+{
+   ... 
+} 
+</td>
+</tr>
+
+<tr>
+<td class="rationale">
+Reduced computational cost benefit from using object reference.
+</td>
+</tr>
+</tbody></table>
+
+
+
+
+<!--
+---------------------------------------------------------------------------
+
+ S E C T I O N
+
+---------------------------------------------------------------------------
+-->
+
+</p><p>
+</p><h1> <a name="References"></a>6 References
+</h1>
+
+</p><p><a name="ref1"></a>[1] <a href="http://geosoft.no/development/cpppractice.html">C++ Programming Practice Guidelines</a>
+
+</p><p><a name="ref2"></a>[2] <a href="http://geosoft.no/development/cppstyle.html">C++ Programming Style Guidelines</a>
+
+</p><p><a name="ref3"></a>[3] <a href="http://shop.oreilly.com/product/0636920033707.do">Effective Modern C++, Scott Meyers - O'Reilly Media, 2014
+
+</p><p><a name="ref4"></a>[4] <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.html">Google C++ Style Guide</a>
+
+</p><p><a name="ref5"></a>[5] <a href="http://en.cppreference.com/w/cpp/language">C++ Language</a>
+
+</p><p><a name="ref6"></a>[6] <a href="http://www.cplusplus.com/doc/">C++ Reference</a>
+
+</p><p><a name="ref7"></a>[7] <a href="http://www-01.ibm.com/support/knowledgecenter/ssw_i5_54/rzakx/rzakxplugincplus.htm?cp=ssw_i5_54%2F1-1-2-6-4-0&lang=en">IBM Knowledge Center C++ Reference</a>
+
+<p><a name="ref8"></a>[8] Effective C++ Second Edition, Scott Meyers - Addison-Wesley 1998
+
+</p><p><a name="ref9"></a>[9] More Effective C++, Scott Meyers - Addison-Wesley, 1996
+
+</p><p><a name="ref10"></a>[10] <a href="http://www.drdobbs.com/cpp/how-non-member-functions-improve-encapsu/184401197">How Non-Member Functions Improve Encapsulation</a>, Scott Meyers - Dr. Dobb's Journal, February 2000
+
+</p><p><a name="ref11"></a>[11] <a href="https://www.doc.ic.ac.uk/lab/cplus/c++.rules/">Programming in C++, Rules and Recommendations, M. Henricson / E. Nyquist, 1992</a>
+
+</p></body>< html>

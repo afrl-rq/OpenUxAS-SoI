@@ -1,0 +1,12 @@
+<PointOfInterest Series="IMPACT">
+  <PointID>13</PointID>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.4806527777778</Latitude>
+     <Longitude>-87.2192722222222</Longitude>
+     <Altitude>500</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </Location>
+</PointOfInterest>
+

@@ -1,0 +1,170 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tufte-Style Book (Documentation Template)
+% LaTeX Template
+% Version 1.0 (5/1/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% The Tufte-LaTeX Developers (tufte-latex.googlecode.com)
+%
+% License:
+% Apache License (Version 2.0)
+%
+% IMPORTANT NOTE:
+% In addgraphicition to running BibTeX to compile the reference list from the .bib
+% file, you will need to run MakeIndex to compile the index at the end of the
+% document.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{tufte-book} % Use the tufte-book class which in turn uses the tufte-common class
+%\documentclass{tufte-handout} % Use the tufte-book class which in turn uses the tufte-common class
+
+
+\usepackage{graphicx} % Needed to insert images into the document
+
+\hypersetup{colorlinks} % Comment this line if you don't wish to have colored links
+
+\usepackage{microtype} % Improves character and word spacing
+
+\usepackage{booktabs} % Better horizontal rules in tables
+
+\usepackage{fancyvrb} % Allows customization of verbatim environments
+\fvset{fontsize=\normalsize} % The font size of all verbatim text can be changed here
+
+\usepackage{makeidx} % Used to generate the index
+
+\usepackage[dvipsnames]{xcolor}
+
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+%{fontsize=\footnotesize,
+{fontsize=\tiny,
+	%
+	frame=lines,  % top and bottom rule only
+	framesep=2em, % separation between frame and text
+	rulecolor=\color{Gray},
+	%
+	%label=\fbox{\color{Black}#VerbatimInput},
+	%labelposition=topline,
+	%
+	commandchars=\|\(\), % escape character and argument delimiters for
+	% commands within the verbatim
+	commentchar=*        % comment character
+}
+
+\usepackage{multicol}
+\setlength{\columnsep}{20pt}
+\setlength{\columnseprule}{0.01pt}
+
+\usepackage{import}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SET-UP APPENDIX SECTIONS TO PRINT "APPENDIX" BEFORE THE CHAPTER TITLE
+\makeatletter% since we're using commands with @ in their name
+\let\origappendix\appendix% save a copy of the original meaning of \appendix
+\renewcommand{\appendix}{%
+  \origappendix% do all the original \appendix stuff
+  \titlecontents{chapter}%
+    [0em] % distance from left margin
+    {\vspace{1.5\baselineskip}\begin{fullwidth}\LARGE\rmfamily\itshape} % above (global formatting of entry)
+    {\hspace*{0em}\appendixname~\thecontentslabel: } % before w/label (label = ``2'')
+    {\hspace*{0em}} % before w/o label
+    {\rmfamily\upshape\qquad\thecontentspage} % filler + page (leaders and page num)
+    [\end{fullwidth}] % after
+  \titleformat{\chapter}%
+    [display]% shape
+    {\relax\ifthenelse{\NOT\boolean{@tufte@symmetric}}{\begin{fullwidth}}{}}% format applied to label+text
+    {\itshape\huge Appendix~\thechapter}% label
+    {0pt}% horizontal separation between label and title body
+    {\huge\rmfamily\itshape}% before the title body
+    [\ifthenelse{\NOT\boolean{@tufte@symmetric}}{\end{fullwidth}}{}]% after the title body
+  \setcounter{tocdepth}{1}
+  \setcounter{secnumdepth}{1}
+  %
+  % Add any other special appendix-related code here.
+  %
+}
+\makeatother% restore the special meaning of @
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%----------------------------------------------------------------------------------------
+%	BOOK META-INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{UxAS User's Manual:\\Supplement} % Title of the book
+
+\author[UxAS Developers]{UxAS\ Developers} % Author
+
+%\publisher{Publisher of This Book} % Publisher
+
+%----------------------------------------------------------------------------------------
+\begin{document}
+	
+\frontmatter
+
+	
+
+%----------------------------------------------------------------------------------------
+
+
+\maketitle % Print the title page
+
+%----------------------------------------------------------------------------------------
+
+%\tableofcontents % Print the table of contents
+
+%----------------------------------------------------------------------------------------
+
+%\listoffigures % Print a list of figures
+
+%----------------------------------------------------------------------------------------
+
+%\listoftables % Print a list of tables
+
+%----------------------------------------------------------------------------------------
+
+
+%\cleardoublepage
+
+
+\appendix
+\setboolean{@mainmatter}{true}
+
+\newcommand{\MessagesPath}{./Examples/doc_WaterwaySearch/messages}
+\import{./Examples/doc_WaterwaySearch/}{WaterwayExample_Messages.tex}
+
+\renewcommand{\MessagesPath}{./Examples/doc_DistributedCooperation/messages}
+\import{./Examples/doc_DistributedCooperation/}{DistributedCooperation_Messages.tex}
+
+
+
+
+
+
+\setboolean{@mainmatter}{false}
+%----------------------------------------------------------------------------------------
+
+%\backmatter
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+%\bibliography{bibliography} % Use the bibliography.bib file for the bibliography
+%\bibliographystyle{plainnat} % Use the plainnat style of referencing
+
+%----------------------------------------------------------------------------------------
+
+\printindex % Print the index at the very end of the document
+
+\end{document}

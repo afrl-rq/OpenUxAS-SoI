@@ -1,0 +1,52 @@
+\section{Running automated tests}
+\section{Adding New Functional Test}
+\newthought{\textbf{New Functional Test Step-By-Step}}
+
+
+\begin{enumerate}
+  \item download and install GoogleTest from:
+\begin{docspec}
+	https://github.com/google/googletest
+\end{docspec} 
+
+  \item create a directory for the test:
+\begin{docspec}
+	mkdir uxas/code/tests/Test\_Services/00\_ExampleTests/01\_HelloWorld/
+\end{docspec} 
+
+  \item add a UxAS configuration file and inputs files to the new test directory. IMPORTANT: Since functional test run from the folder:
+\begin{docspec}
+  uxas/code/builds/netbeans/nb\_8.2/FunctionalTests
+\end{docspec}
+any path entered in the configuration must be relative to that folder, e.g. :
+\begin{docspec}
+../../../../tests/Test\_Services/00\_ExampleTests/02\_Test\_Example\_WaterwaySearch/MessagesToSend/
+\end{docspec} 
+
+  \item make a copy of the functional test template source code:
+\begin{docspec}
+	cp uxas/code/tests/Test\_Services/GTestFunctionalTestTemplate.cpp uxas/code/tests/Test\_Services/00\_ExampleTests/01\_HelloWorld/01\_HelloWorld\_test01.cpp
+\end{docspec} 
+
+  \item edit the new functional test source code to modify, at minimum, the following:
+	\begin{description}
+	\item[\textbf{\textit{TestName}}] - change the test name.
+	\item[\textbf{\textit{testPath}}] - add the relative path to the new directory from:
+\begin{docspec}
+		"uxas/code/builds/netbeans/nb\_8.2/FunctionalTests/"
+\end{docspec} 
+	\item[\textbf{\textit{uxasConfigurationFile}}] - add the relative path, including file name to UxAS configuration file
+	\item[\textbf{\textit{EXPECT\_EQ}}] - add/edit the google test statements necessary to test the results
+
+	\end{description}
+\item add the new functional test to netbeans:
+		\begin{enumerate}
+	  \item open the "\textit{Test Files}" folder under the "\textit{FunctionalTests}" project
+	\item (optional) add/open a logical folder:
+		"right-click" on the "\textit{Test Files}" folder and choose "\textit{New Logical Folder ...}"
+	\item add a new "Test Folder":
+		"right-click" on a logical (or "\textit{Test Files}") folder and choose "\textit{New Test Folder ...}"
+	\item add the test source file to the new Test folder:
+		"right-click" on the new "\textit{Test}" folder and choose "\textit{Add Existing Item ...}"
+	  \end{enumerate}	  
+\end{enumerate}

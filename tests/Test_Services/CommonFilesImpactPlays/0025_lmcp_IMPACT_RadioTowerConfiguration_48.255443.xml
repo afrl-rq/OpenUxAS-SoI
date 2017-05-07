@@ -1,0 +1,24 @@
+<RadioTowerConfiguration Series="IMPACT">
+  <Position>
+   <Location3D Series="CMASI">
+     <Latitude>30.471585</Latitude>
+     <Longitude>-87.181458</Longitude>
+     <Altitude>200</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </Position>
+  <Range>2500</Range>
+  <Enabled>true</Enabled>
+  <ID>21</ID>
+  <Affiliation>Unknown</Affiliation>
+  <EntityType></EntityType>
+  <Label></Label>
+  <NominalSpeed>0</NominalSpeed>
+  <NominalAltitude>0</NominalAltitude>
+  <NominalAltitudeType>AGL</NominalAltitudeType>
+  <PayloadConfigurationList>
+  </PayloadConfigurationList>
+  <Info>
+  </Info>
+</RadioTowerConfiguration>
+

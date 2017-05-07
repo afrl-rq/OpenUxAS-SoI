@@ -1,0 +1,38 @@
+#! /usr/bin/env python3
+
+from pathlib import Path, PurePath
+import os
+import re
+import hashlib
+import subprocess
+
+pd = Path('.')
+cwd = os.getcwd()
+
+os.chdir("wrap_patches")
+subprocess.call("./prepare")
+os.chdir(cwd)
+
+for tf in pd.glob('*.wrap.tmpl'):
+	wf = PurePath(tf).stem
+	with open(wf, 'w') as w:
+		with open(str(tf), 'r') as t:
+			d = ''
+			while True:
+				l = t.readline()
+				if l == '': break;
+				if re.match('^patch_filename', l):
+					h = hashlib.new('sha256')
+					bs = h.block_size
+					pf = re.split('=', l)[1].strip()
+					with open(pf, 'rb') as f:
+						while True:
+							b = f.read(bs)
+							if not b: break
+							h.update(b)
+					d = h.hexdigest()
+				l = re.sub('%top%', cwd, l)
+				if re.match('^patch_hash', l) and d == '':
+					print('%s: patch_hash must follow patch_filename\n' % t.name)
+				l = re.sub('%patch_hash%', d, l)
+				w.write(l)

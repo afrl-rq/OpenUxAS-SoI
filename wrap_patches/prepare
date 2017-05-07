@@ -1,0 +1,12 @@
+#! /usr/bin/env python3
+
+import tarfile
+from pathlib import Path, PurePath
+
+pd = Path('.')
+for p in pd.iterdir():
+	if not p.is_dir(): continue
+	m = PurePath(p).name
+	tf = tarfile.open('../' + m + '_patch.tar', 'w')
+	tf.add(m)
+	tf.close()

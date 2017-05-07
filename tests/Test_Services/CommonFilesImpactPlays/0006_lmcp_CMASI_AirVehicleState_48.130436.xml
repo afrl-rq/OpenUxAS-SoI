@@ -1,0 +1,93 @@
+<AirVehicleState Series="CMASI">
+  <Airspeed>30.8999996185303</Airspeed>
+  <VerticalSpeed>0</VerticalSpeed>
+  <WindSpeed>0</WindSpeed>
+  <WindDirection>0</WindDirection>
+  <ID>10</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>270</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.44003889</Latitude>
+     <Longitude>-87.17474167</Longitude>
+     <Altitude>609.599975585938</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>100</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>-75</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>100</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>25</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>101</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>-75</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>103</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>12</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>102</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <RadioState Series="IMPACT">
+     <Enabled>true</Enabled>
+     <InRange>true</InRange>
+     <PayloadID>105</PayloadID>
+     <Parameters>
+     </Parameters>
+   </RadioState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</AirVehicleState>
+

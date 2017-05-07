@@ -1,0 +1,6 @@
+option(
+  'afrl_internal',
+  description: 'build with internal AFRL modules',
+  type: 'boolean',
+  value: false,
+)

@@ -1,0 +1,14 @@
+#! /usr/bin/env python3
+
+from pathlib import Path
+import os
+import shutil
+
+pd = Path('.')
+for p in pd.glob('*_patch.tar'):
+	d = str(p)[0:-10]
+	if Path(d).is_dir():
+		shutil.rmtree(d)
+pc = Path('./packagecache')
+for c in pc.glob('*'):
+	os.remove(str(c))

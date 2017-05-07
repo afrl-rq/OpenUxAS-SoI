@@ -1,0 +1,18 @@
+CI:Actor[pr] "CtrlInt"
+WM01:WaypointManager[pr] "WayMan"
+RA:RteAggregator[pr] "RteAg"
+PR:Planner[pr] "Plan"
+AS:Assign[pr] "Assign"
+PB:PlanBuilder[pr] "PlanBuild"
+TM:TaskMan[pr] "TaskMan"
+/TK01:Task01[tvar] "LineSearch"
+
+[c Initialization]
+CI:={PR,RA,TM}.(1) AVCfg[400]
+CI:={PR,RA,TM}.(2) AVCfg[500]
+CI:={PR,WM01,PB,TM}.(3) AVSt[400]
+CI:={PR,WM01,PB,TM}.(4) AVSt[500]
+CI:=TM.(5) LnSrch
+TM:=TK01.new()
+[/c]
+

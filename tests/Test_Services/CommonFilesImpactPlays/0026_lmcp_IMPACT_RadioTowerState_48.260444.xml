@@ -1,0 +1,39 @@
+<RadioTowerState Series="IMPACT">
+  <Enabled>true</Enabled>
+  <ID>0</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>0</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.471585</Latitude>
+     <Longitude>-87.181458</Longitude>
+     <Altitude>200</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>0</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</RadioTowerState>
+

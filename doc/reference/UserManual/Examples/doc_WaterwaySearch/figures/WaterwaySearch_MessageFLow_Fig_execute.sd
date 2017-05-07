@@ -1,0 +1,15 @@
+CI:Actor[pr] "CtrlInt"
+WM01:WaypointManager[pr] "WayMan"
+RA:RteAggregator[pr] "RteAg"
+PR:Planner[pr] "Plan"
+AS:Assign[pr] "Assign"
+PB:PlanBuilder[pr] "PlanBuild"
+TM:TaskMan[pr] "TaskMan"
+TK01:Task01[pr] "LineSearch"
+
+[c Execution]
+CI:={TK01,WM01}.(19) AVSte[400]&
+WM01:=CI.(20) MsnCmd&
+CI:={TK01,WM01}.(21) AVSte[400]&
+TK01:=CI.(22) VActCmd&
+[/c]

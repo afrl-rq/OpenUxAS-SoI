@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS EntityID="100" FormatVersion="1.0" EntityType="Aircraft" ConsoleLoggerSeverityLevel="INFO">
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="SensorManagerService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="PlanBuilderService"/>
+    <Service Type="AutomationDiagramDataService"/>
+    <Service Type="SendMessagesService" 
+        PathToMessageFiles="../tests/Test_Utilities/AutomationRequestTests/MessagesToSend/">
+        <Message MessageFileName="AirVehicleConfiguration_V1000.xml" SendTime_ms="50"/>
+        <!-- boundaries -->
+        <Message MessageFileName="KeepOutZone_10.xml" SendTime_ms="200"/>
+        <Message MessageFileName="KeepOutZone_11.xml" SendTime_ms="210"/>
+        <Message MessageFileName="OperatingRegion_100.xml" SendTime_ms="240"/>
+        <!-- geometry for impact tasks -->
+        <Message MessageFileName="AreaOfInterest_100.xml" SendTime_ms="300"/>
+        <Message MessageFileName="LineOfInterest_101.xml" SendTime_ms="310"/>
+        <!-- the tasks -->
+        <Message MessageFileName="AreaSearchTask_50.xml" SendTime_ms="400"/>
+        <Message MessageFileName="AngledAreaSearchTask_51.xml" SendTime_ms="410"/>
+        <Message MessageFileName="ImpactLineSearchTask_21.xml" SendTime_ms="490"/>
+        <Message MessageFileName="LineSearchTask_20.xml" SendTime_ms="500"/>
+        <Message MessageFileName="LineSearchTask_30.xml" SendTime_ms="510"/>
+
+        <!-- <Message MessageFileName="AirVehicleState_V1000.xml" SendTime_ms="1000"/> -->
+        <Message MessageFileName="AutomationRequest.xml" SendTime_ms="2000"/>
+    </Service>
+    
+    <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>
+
+

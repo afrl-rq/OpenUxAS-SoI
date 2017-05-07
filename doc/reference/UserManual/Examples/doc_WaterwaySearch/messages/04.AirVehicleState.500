@@ -1,0 +1,95 @@
+<AirVehicleState Series="CMASI">
+  <Airspeed>22.1211109161377</Airspeed>
+  <VerticalSpeed>0</VerticalSpeed>
+  <WindSpeed>0</WindSpeed>
+  <WindDirection>0</WindDirection>
+  <ID>500</ID>
+  <u>22.1023426055908</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>133.585067749023</Heading>
+  <Pitch>0</Pitch>
+  <Roll>19.9994335174561</Roll>
+  <p>1.94693457160611e-05</p>
+  <q>13.4291296005249</q>
+  <r>36.8973655700684</r>
+  <Course>133.585067749023</Course>
+  <Groundspeed>22.1016960144043</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>45.3129600510461</Latitude>
+     <Longitude>-120.93888239642</Longitude>
+     <Altitude>1000</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>99.9985198974609</EnergyAvailable>
+  <ActualEnergyRate>0.000277999992249534</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>-45</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>1</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>45</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+      <Location3D Series="CMASI">
+        <Latitude>45.306489019272</Latitude>
+        <Longitude>-120.897046525366</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+      <Location3D Series="CMASI">
+        <Latitude>45.3011430044093</Latitude>
+        <Longitude>-120.927993029379</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+      <Location3D Series="CMASI">
+        <Latitude>45.3094544240634</Latitude>
+        <Longitude>-120.935006181603</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+      <Location3D Series="CMASI">
+        <Latitude>45.315076214575</Latitude>
+        <Longitude>-120.924025361341</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </Footprint>
+     <Centerpoint>
+      <Location3D Series="CMASI">
+        <Latitude>45.3087368668373</Latitude>
+        <Longitude>-120.925831336261</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </Centerpoint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>10001</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>100</CurrentCommand>
+  <Mode>Loiter</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>6839</Time>
+  <Info>
+  </Info>
+</AirVehicleState>

@@ -1,0 +1,22 @@
+  <AutomationRequest Series="CMASI">
+    <EntityList>
+      <int64>1000</int64>
+    </EntityList>
+    <TaskList>
+      <!-- BadPointSearchTask_10 -->
+      <int64>10</int64> 
+      <!-- ImpactLineSearchTask -->
+      <int64>21</int64> 
+      <!-- LineSearchTask -->
+      <int64>20</int64> 
+      <!-- LineSearchTask -->
+      <int64>30</int64>
+      <!-- AreaSearchTask -->
+      <int64>50</int64>
+      <!-- AngledAreaSearchTask -->
+      <int64>51</int64> 
+    </TaskList>
+    <TaskRelationships></TaskRelationships>
+    <OperatingRegion>100</OperatingRegion>
+    <RedoAllTasks>true</RedoAllTasks>
+  </AutomationRequest>

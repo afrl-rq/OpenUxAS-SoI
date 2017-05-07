@@ -1,0 +1,302 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tufte-Style Book (Documentation Template)
+% LaTeX Template
+% Version 1.0 (5/1/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% The Tufte-LaTeX Developers (tufte-latex.googlecode.com)
+%
+% License:
+% Apache License (Version 2.0)
+%
+% IMPORTANT NOTE:
+% In addgraphicition to running BibTeX to compile the reference list from the .bib
+% file, you will need to run MakeIndex to compile the index at the end of the
+% document.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{tufte-book} % Use the tufte-book class which in turn uses the tufte-common class
+%\documentclass{tufte-handout} % Use the tufte-book class which in turn uses the tufte-common class
+
+
+\usepackage{graphicx} % Needed to insert images into the document
+
+\hypersetup{colorlinks} % Comment this line if you don't wish to have colored links
+
+\usepackage{microtype} % Improves character and word spacing
+
+\usepackage{booktabs} % Better horizontal rules in tables
+
+\usepackage{fancyvrb} % Allows customization of verbatim environments
+\fvset{fontsize=\normalsize} % The font size of all verbatim text can be changed here
+
+\usepackage{makeidx} % Used to generate the index
+
+\usepackage[dvipsnames]{xcolor}
+
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+%{fontsize=\footnotesize,
+{fontsize=\tiny,
+	%
+	frame=lines,  % top and bottom rule only
+	framesep=2em, % separation between frame and text
+	rulecolor=\color{Gray},
+	%
+	%label=\fbox{\color{Black}#VerbatimInput},
+	%labelposition=topline,
+	%
+	commandchars=\|\(\), % escape character and argument delimiters for
+	% commands within the verbatim
+	commentchar=*        % comment character
+}
+
+\usepackage{multicol}
+\setlength{\columnsep}{20pt}
+\setlength{\columnseprule}{0.01pt}
+
+\usepackage{import}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A bunch of new commands to print commands, arguments, environments, classes, etc within the text using the correct formatting
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}
+\newenvironment{docspec}{\begin{quotation}\ttfamily\parskip0pt\parindent0pt\ignorespaces}{\end{quotation}}
+\newcommand{\docenv}[1]{\texttt{#1}\index{#1 environment@\texttt{#1} environment}\index{environments!#1@\texttt{#1}}}
+\newcommand{\docenvdef}[1]{\hlred{\texttt{#1}}\label{env:#1}\index{#1 environment@\texttt{#1} environment}\index{environments!#1@\texttt{#1}}}
+\newcommand{\docpkg}[1]{\texttt{#1}\index{#1 package@\texttt{#1} package}\index{packages!#1@\texttt{#1}}}
+\newcommand{\doccls}[1]{\texttt{#1}}
+\newcommand{\docclsopt}[1]{\texttt{#1}\index{#1 class option@\texttt{#1} class option}\index{class options!#1@\texttt{#1}}}
+\newcommand{\docclsoptdef}[1]{\hlred{\texttt{#1}}\label{clsopt:#1}\index{#1 class option@\texttt{#1} class option}\index{class options!#1@\texttt{#1}}}
+\newcommand{\docmsg}[2]{\bigskip\begin{fullwidth}\noindent\ttfamily#1\end{fullwidth}\medskip\par\noindent#2}
+\newcommand{\docfilehook}[2]{\texttt{#1}\index{file hooks!#2}\index{#1@\texttt{#1}}}
+\newcommand{\doccounter}[1]{\texttt{#1}\index{#1 counter@\texttt{#1} counter}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
+\patchcmd{\ttlh@hang}{\noindent}{}{}{}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SET-UP APPENDIX SECTIONS TO PRINT "APPENDIX" BEFORE THE CHAPTER TITLE
+\makeatletter% since we're using commands with @ in their name
+\let\origappendix\appendix% save a copy of the original meaning of \appendix
+\renewcommand{\appendix}{%
+  \origappendix% do all the original \appendix stuff
+  \titlecontents{chapter}%
+    [0em] % distance from left margin
+    {\vspace{1.5\baselineskip}\begin{fullwidth}\LARGE\rmfamily\itshape} % above (global formatting of entry)
+    {\hspace*{0em}\appendixname~\thecontentslabel: } % before w/label (label = ``2'')
+    {\hspace*{0em}} % before w/o label
+    {\rmfamily\upshape\qquad\thecontentspage} % filler + page (leaders and page num)
+    [\end{fullwidth}] % after
+  \titleformat{\chapter}%
+    [display]% shape
+    {\relax\ifthenelse{\NOT\boolean{@tufte@symmetric}}{\begin{fullwidth}}{}}% format applied to label+text
+    {\itshape\huge Appendix~\thechapter}% label
+    {0pt}% horizontal separation between label and title body
+    {\huge\rmfamily\itshape}% before the title body
+    [\ifthenelse{\NOT\boolean{@tufte@symmetric}}{\end{fullwidth}}{}]% after the title body
+  \setcounter{tocdepth}{1}
+  \setcounter{secnumdepth}{1}
+  %
+  % Add any other special appendix-related code here.
+  %
+}
+\makeatother% restore the special meaning of @
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% add numbers to chapters, sections, subsections
+\setcounter{secnumdepth}{2}
+
+% chapter format
+\titleformat{\chapter}%
+  {\huge\rmfamily\itshape\color{red}}% format applied to label+text
+  {\llap{\colorbox{red}{\parbox{1.5cm}{\hfill\itshape\huge\color{white}\thechapter}}}}% label
+  {2pt}% horizontal separation between label and title body
+  {}% before the title body
+  []% after the title body
+
+% section format
+\titleformat{\section}%
+  {\normalfont\Large\itshape\color{orange}}% format applied to label+text
+  {\llap{\colorbox{orange}{\parbox{1.5cm}{\hfill\color{white}\thesection}}}}% label
+  {1em}% horizontal separation between label and title body
+  {}% before the title body
+  []% after the title body
+
+% subsection format
+\titleformat{\subsection}%
+  {\normalfont\large\itshape\color{blue}}% format applied to label+text
+  {\llap{\colorbox{blue}{\parbox{1.5cm}{\hfill\color{white}\thesubsection}}}}% label
+  {1em}% horizontal separation between label and title body
+  {}% before the title body
+  []% after the title body
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\setcounter{tocdepth}{1}
+
+% for tables with lond entries
+%\usepackage[textwidth = 155mm]{geometry}
+\usepackage{tabularx}
+
+
+%----------------------------------------------------------------------------------------
+%	BOOK META-INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{UxAS User's Manual} % Title of the book
+
+\author[UxAS Developers]{UxAS\ Developers} % Author
+
+%\publisher{Publisher of This Book} % Publisher
+
+%----------------------------------------------------------------------------------------
+\begin{document}
+	
+\frontmatter
+
+	
+
+%----------------------------------------------------------------------------------------
+
+
+\maketitle % Print the title page
+
+%----------------------------------------------------------------------------------------
+
+\tableofcontents % Print the table of contents
+
+%----------------------------------------------------------------------------------------
+
+\listoffigures % Print a list of figures
+
+%----------------------------------------------------------------------------------------
+
+%\listoftables % Print a list of tables
+
+%----------------------------------------------------------------------------------------
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Introduction}
+\newcommand{\FiguresPath}{./Introduction/figures}
+\import{./Introduction/}{Introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Installation}
+\renewcommand{\FiguresPath}{./Installation/figures}
+\import{./Installation/}{Installation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Navigating}
+\renewcommand{\FiguresPath}{./Navigating/figures}
+\import{./Navigating/}{Navigating}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Services}
+\renewcommand{\FiguresPath}{./Services/figures}
+\import{./Services/}{Services}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Examples}
+
+
+\renewcommand{\FiguresPath}{./Examples/doc_Amase/figures}
+\import{./Examples/doc_Amase/}{Amase}
+
+
+\renewcommand{\FiguresPath}{./Examples/doc_HelloWorld/figures}
+\import{./Examples/doc_HelloWorld/}{HellowWorldExample_Description}
+
+\cleardoublepage
+
+\renewcommand{\FiguresPath}{./Examples/doc_WaterwaySearch/figures}
+\import{./Examples/doc_WaterwaySearch/}{WaterwayExample_MessageFLow}
+
+\cleardoublepage
+
+\renewcommand{\FiguresPath}{./Examples/doc_DistributedCooperation/figures}
+\import{./Examples/doc_DistributedCooperation/}{DistributedCooperationExample_MessageFLow}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Testing}
+\renewcommand{\FiguresPath}{./Testing/figures}
+\import{./Testing/}{Testing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\stepcounter{chapter}
+\chapter{Contributing}
+\renewcommand{\FiguresPath}{./Contributing/figures}
+\import{./Contributing/}{Contributing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%Glossary and Appendix
+
+%\appendix
+\setboolean{@mainmatter}{false}
+%----------------------------------------------------------------------------------------
+
+%\backmatter
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+%\bibliography{bibliography} % Use the bibliography.bib file for the bibliography
+%\bibliographystyle{plainnat} % Use the plainnat style of referencing
+
+%----------------------------------------------------------------------------------------
+
+\printindex % Print the index at the very end of the document
+
+\end{document}

@@ -1,0 +1,17 @@
+<AssignmentCoordination Series="UXTASK">
+  <CoordinatedAutomationRequestID>100000</CoordinatedAutomationRequestID>
+  <PlanningState>
+   <PlanningState Series="UXTASK">
+     <EntityID>1000</EntityID>
+     <PlanningPosition>
+      <Location3D Series="CMASI">
+        <Latitude>-22.7485171253276</Latitude>
+        <Longitude>150.644304882855</Longitude>
+        <Altitude>2500</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </PlanningPosition>
+     <PlanningHeading>0</PlanningHeading>
+   </PlanningState>
+  </PlanningState>
+</AssignmentCoordination>

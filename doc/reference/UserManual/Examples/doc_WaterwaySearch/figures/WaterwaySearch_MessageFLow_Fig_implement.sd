@@ -1,0 +1,17 @@
+CI:Actor[pr] "CtrlInt"
+WM01:WaypointManager[pr] "WayMan"
+RA:RteAggregator[pr] "RteAg"
+PR:Planner[pr] "Plan"
+AS:Assign[pr] "Assign"
+PB:PlanBuilder[pr] "PlanBuild"
+TM:TaskMan[pr] "TaskMan"
+TK01:Task01[pr] "LineSearch"
+
+[c Implementation]
+PB:TK01.(14) TskImplRq&
+TK01:=PR.(15) RtePlnRq&
+PR:=TK01.(16 )RtePlnRsp&
+TK01:PB.(17) TskImplRsp&
+PB:{CI,WM01}.(18) AtmnRsp&
+[/c]
+

@@ -1,0 +1,20 @@
+CI:Actor[pr] "CtrlInt"
+WM01:WaypointManager[pr] "WayMan"
+RA:RteAggregator[pr] "RteAg"
+PR:Planner[pr] "Plan"
+AS:Assign[pr] "Assign"
+PB:PlanBuilder[pr] "PlanBuild"
+TM:TaskMan[pr] "TaskMan"
+TK01:Task01[pr] "LineSearch"
+
+[c Assignment]
+CI:{TM,AS,TK01,RA,PB}.(6) AmtnRq&
+TK01:={RA,AS}.(7) TskPlnOpt&
+RA:=PR.(8) RtPlnRq(400)[co]&
+RA:=PR.(9) RtPlnRq(500)[co]&
+PR:=RA.(10) RtPlnRsp(400)[co]&
+PR:=RA.(11) RtPlnRsp(500)[co]&
+RA:AS.(12) AsgnCstMtrx&
+AS:PB.(13) TskAsgnSum&
+[/c]
+

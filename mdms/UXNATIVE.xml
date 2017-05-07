@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>UxAS Message Set</h2>
+ 
+        <p>This message set describes the native/internal messages for UxAS</p>
+-->
+
+<MDM>
+    <SeriesName>UXNATIVE</SeriesName>
+    <Namespace>uxas/messages/uxnative</Namespace>
+    <Version>2</Version>
+    
+    <StructList>
+        
+        <!-- Start/Stop recording -->
+        <Struct Name="VideoRecord" >
+            <!-- Start [true] or stop [false] video recording -->
+            <Field Name="Record" Type="bool" Default="false" />
+        </Struct>
+        
+        <!-- Message sent when all services have been started -->
+        <Struct Name="StartupComplete" >
+        </Struct>
+        
+        <!-- Create a new service in UxAS -->
+        <Struct Name="CreateNewService" >
+            <!-- Globally unique ID for this service. Negative ServiceIDs are invalid. If ServiceID == 0, then a unique service ID will be generated.  -->
+            <Field Name="ServiceID" Type="int64"  Default="0"/>
+            <!-- XML configuration for this service -->
+            <Field Name="XmlConfiguration" Type="string[]" />
+        </Struct>
+        
+        <!-- Remove an existing service from UxAS -->
+        <Struct Name="KillService" >
+            <!-- Globally unique ID for the service to be removed. If ServiceID == 0, then no service will be killed. ServiceID == -1 causes all services to be killed and UxAS to be shutdown. -->
+            <Field Name="ServiceID" Type="int64"  Default="0"/>
+        </Struct>
+        
+        <!-- Indicate to the waypoint manager to move to the next waypoint in the current list -->
+        <Struct Name="IncrementWaypoint" >
+            <!-- ID of vehicle which should move to the next waypoint in its list -->
+            <Field Name="VehicleID" Type="int64" />
+        </Struct>
+    
+        <!-- Simple location broadcast from entities for tracking -->
+        <Struct Name="EntityLocation" >
+            <!-- Entity ID -->
+            <Field Name="EntityID" Type="int64" />
+            <!-- Current location of entity -->
+            <Field Name="Position" Type="CMASI/Location3D" />
+            <!-- Corresponding time in milli-seconds since 1 Jan 1970 -->
+            <Field Name="Time" Type="int64" Units="milliseconds" />
+        </Struct>
+    
+        <!-- Message for measuring actual bandwidth between entities -->
+        <Struct Name="BandwidthTest" Extends="EntityLocation">
+            <!-- Message ID to track message loss -->
+            <Field Name="MessageID" Type="int64" />
+            <!-- Data payload for creating arbitrarily sized messages -->
+            <Field Name="Payload" Type="string" />
+        </Struct>
+    
+        <!-- Report for a received message containing positions of both entities and the payload size -->
+        <Struct Name="BandwidthReceiveReport">
+            <!-- Entity from which the message was sent -->
+            <Field Name="EntitySender" Type="EntityLocation" />
+            <!-- Entity which received the message -->
+            <Field Name="EntityReceiver" Type="EntityLocation" />
+            <!-- Size of the message that was received -->
+            <Field Name="TransferPayloadSize" Type="uint32" />
+        </Struct>
+
+        <!-- Command entity to execute subtasks either in strict order or determined by optimization.
+        Replaces all current sub-tasks being executed. In addtion to executing the sub-tasks, the
+        mission command used to complete the sub-tasks is returned. -->
+        <Struct Name="SubTaskExecution" >
+            <!-- List of tasks that current entity should complete -->
+            <Field Name="SubTasks" Type="CMASI/Task[]" />
+            <!-- Enable strict ordering -->
+            <Field Name="StrictOrder" Type="bool" Default="false" />
+        </Struct>
+        
+        <!-- Command an entity to perform a complete task assignment for the entire team and then execute own role -->
+        <Struct Name="SubTaskAssignment" >
+            <!-- List of tasks that current team should complete -->
+            <Field Name="SubTasks" Type="CMASI/Task[]" />
+            <!-- Neighboring entities to consider -->
+            <Field Name="Neighbors" Type="CMASI/EntityState[]" />
+        </Struct>
+    
+        <!-- Message to enable onboard processor to send commands to the autopilot, and the gimbal -->
+        <Struct Name="AutopilotKeepAlive" >
+            <!-- Enable communications between UxAS and the autopilot -->
+            <Field Name="AutopilotEnabled" Type="bool" Default="true" />
+            <!-- Enable communications between UxAS and the Gimbal.
+            Note: this does not effect the video stream. -->
+            <Field Name="GimbalEnabled" Type="bool" Default="true" />
+            <!-- Time that this message was sent -->
+            <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
+        </Struct>
+    
+        <!-- Message reporting that the onboard processor is functioning -->
+        <Struct Name="OnboardProcessorIsAlive" >
+            <!-- ID of vehicle with onboard processor -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Time that this message was sent -->
+            <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
+        </Struct>
+        
+        <!-- Entity Join -->
+        <Struct Name="EntityJoin" >
+            <!-- ID of entity joining network -->
+            <Field Name="EntityID" Type="int64" />
+            <!-- Label of entity joining network -->
+            <Field Name="Label" Type="string" />
+        </Struct>
+
+        <!-- Entity Exit -->
+        <Struct Name="EntityExit" >
+            <!-- ID of entity exiting network -->
+            <Field Name="EntityID" Type="int64" />
+            <!-- Label of entity exiting network -->
+            <Field Name="Label" Type="string" />
+        </Struct>  
+
+ </StructList>
+</MDM>

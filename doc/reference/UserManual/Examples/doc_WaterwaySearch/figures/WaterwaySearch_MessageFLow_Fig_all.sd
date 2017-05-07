@@ -1,0 +1,51 @@
+##!>>
+##! Waterway Search - assign UAV 400 or 500 to search the waterway
+##!
+##!<<
+
+#    PM:Plan Manager[pr] "PlanManager"
+
+CI:Actor[pr] "CtrlInt"
+WM01:WaypointManager[pr] "WayMan"
+RA:RteAggregator[pr] "RteAg"
+PR:Planner[pr] "Plan"
+AS:Assign[pr] "Assign"
+PB:PlanBuilder[pr] "PlanBuild"
+TM:TaskMan[pr] "TaskMan"
+/TK01:Task01[tvar] "LineSearch"
+
+[c Initialization]
+CI:={PR,RA,TM}.(1) AVCfg[400]
+CI:={PR,RA,TM}.(2) AVCfg[500]
+CI:={PR,WM01,PB,TM}.(3) AVSt[400]
+CI:={PR,WM01,PB,TM}.(4) AVSt[500]
+CI:=TM.(5) LnSrch
+TM:=TK01.new()
+[/c]
+
+[c Assignment]
+CI:{TM,AS,TK01,RA,PB}.(6) AmtnRq&
+TK01:={RA,AS}.(7) TskPlnOpt&
+RA:=PR.(8) RtPlnRq(400)[co]&
+RA:=PR.(9) RtPlnRq(500)[co]&
+PR:=RA.(10) RtPlnRsp(400)[co]&
+PR:=RA.(11) RtPlnRsp(500)[co]&
+RA:AS.(12) AsgnCstMtrx&
+AS:PB.(13) TskAsgnSum&
+[/c]
+
+[c Implementation]
+PB:TK01.(14) TskImplRq&
+TK01:=PR.(15) RtePlnRq&
+PR:=TK01.(16 )RtePlnRsp&
+TK01:PB.(17) TskImplRsp&
+PB:{CI,WM01}.(18) AtmnRsp&
+[/c]
+
+[c Execution]
+CI:={TK01,WM01}.(19) AVSte[400]&
+WM01:=CI.(20) MsnCmd&
+CI:={TK01,WM01}.(21) AVSte[400]&
+TK01:=CI.(22) VActCmd&
+
+[/c]

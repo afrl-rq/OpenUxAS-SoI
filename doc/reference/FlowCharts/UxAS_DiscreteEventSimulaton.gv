@@ -1,0 +1,205 @@
+digraph UxAS_PISR_DES {
+	
+	edge [penwidth = 2];
+
+    node[shape="box", style="rounded"]
+       ReceiveMessages; end;
+    node[shape="box",style=filled]
+       ReceiveAirVehicleState;
+       ReceiveAutomationResponse;
+       ReceiveTaskActivation;
+       ReceiveTimeAdvanceApproval;
+		numberActivationsPlusOne[label="numberActivations++"]; 
+		shutDownUxas[label="Send Shutdown\n UxAS Message"];
+		addVehicleIdToApprovalList[label="Add Vehicle ID to \nAdvance Time Approval List"]; 
+		addTimesAndAirVehicleStatesToList; findTimesAndStates; findTimesAndStates; 
+		addVehicleIdToApprovalList2[label="Add Vehicle ID to \nAdvance Time Approval List"];
+		rm_AddToInitialStateMap[label="Add to Initial State Map"];       
+    node[shape="diamond", style=""]
+       GreaterThanActivations[label="numberActivations >= MaxActivations"];
+       rm_AssignedVehicle_01[label="Assigned Vehicle?"];
+       rm_InStateMap_01[label="Vehicle State In Map?"];
+       rm_AllInitialStates_01[label="Initial States for\n all eligible vehicles?"];
+       belongsToAssignedVehicles[label="Assigned Vehicle?"];
+       isAdvanceTime[label="Approved == True"]
+       forEachMissionCommand[label="For Each MissionCommand"];
+       moreMissionCommands[label="more?"];
+       belongsToAssignedVehicles2[label="Assigned Vehicle?"];
+
+	node [shape=record];	
+		StartNextTrade [label=" |Start Next Trade|"];
+		rm_StartNextTrade_01 [label=" |Start Next Trade|"];
+		checkAdvanceTime [label=" |Advance Time|"];
+		checkAdvanceTime2 [label=" |Advance Time|"];
+
+    {rank=same; ReceiveAirVehicleState ReceiveTaskActivation ReceiveAutomationResponse ReceiveTimeAdvanceApproval}
+
+    ReceiveMessages -> ReceiveAirVehicleState
+    ReceiveAirVehicleState->rm_AssignedVehicle_01
+	rm_AssignedVehicle_01-> end[label="no"];
+	rm_AssignedVehicle_01-> rm_InStateMap_01[label="yes"];
+	rm_InStateMap_01 -> end[label="yes (only one initial state)"];
+	rm_InStateMap_01 -> rm_AddToInitialStateMap[label="no"];
+	rm_AddToInitialStateMap -> rm_AllInitialStates_01;
+	rm_AllInitialStates_01 -> end[label="no"];
+	rm_AllInitialStates_01 -> rm_StartNextTrade_01[label="yes (once)"];
+	rm_StartNextTrade_01 -> end;
+
+    ReceiveMessages -> ReceiveTaskActivation
+    ReceiveTaskActivation->numberActivationsPlusOne
+    numberActivationsPlusOne -> GreaterThanActivations
+    GreaterThanActivations -> end[label="no"]
+    GreaterThanActivations -> StartNextTrade[label="yes"]
+    StartNextTrade -> shutDownUxas[label="no"]
+    shutDownUxas -> end
+    StartNextTrade -> end[label="yes"]
+
+    ReceiveMessages -> ReceiveAutomationResponse
+	ReceiveAutomationResponse -> forEachMissionCommand
+	forEachMissionCommand -> belongsToAssignedVehicles2
+	belongsToAssignedVehicles2 -> moreMissionCommands [label="no"]
+	belongsToAssignedVehicles2 -> findTimesAndStates [label="yes"]
+	findTimesAndStates -> moreMissionCommands
+	moreMissionCommands -> forEachMissionCommand [label="yes"]
+	moreMissionCommands -> addTimesAndAirVehicleStatesToList [label="no"]
+	addTimesAndAirVehicleStatesToList -> addVehicleIdToApprovalList2
+	addVehicleIdToApprovalList2 -> checkAdvanceTime2
+	checkAdvanceTime2 -> end
+
+    ReceiveMessages -> ReceiveTimeAdvanceApproval
+    ReceiveTimeAdvanceApproval -> belongsToAssignedVehicles
+    belongsToAssignedVehicles -> end[label="no"]
+    belongsToAssignedVehicles -> isAdvanceTime[label="yes"]
+    isAdvanceTime -> end[label="no"]
+    isAdvanceTime -> addVehicleIdToApprovalList[label="yes"]
+    addVehicleIdToApprovalList -> checkAdvanceTime
+    checkAdvanceTime -> end
+
+
+	############ START NEXT TRADE ############
+	node [shape=record];	
+		snt_StartNextTrade_00[label="|Start Next Trade|"];
+    node[shape="box", style="rounded"]
+		snt_EndNextTrade_01[label="Return(isNewTrade)"];
+    node[shape="box",style=filled]
+		snt_NewTrade_01[label="isNewTrade == TRUE"];
+		snt_NotNewTrade_01[label="isNewTrade == FALSE"];
+		snt_RemoveOldPISR_Tasks_01[label="Remove Old\n PISR Tasks"];
+		snt_ResetVariables_01[label="clear: Current PISR Task List\nclear:Time Advance Approval List\nclear: Timing Entries Maps"];
+		snt_SendInitialStates_01[label="Send Initial\n Air Vehicle States"];
+		snt_SendPISR_Tasks_01[label="Send a Copy of\n the Next PISR\n Task with a\n Vehicle specific ID"];
+    node[shape="diamond", style=""]
+       snt_IsInitialized_00[label="Is Initialized?"];
+       snt_MoreTasks_00[label="PISR Task Available?"];
+       snt_ForEachAssignedVehicle_00[label="For Each Assigned\n Vehicle"];
+       snt_More_00[label="more?"];
+
+	snt_StartNextTrade_00 -> snt_IsInitialized_00
+    snt_IsInitialized_00 -> snt_EndNextTrade_01[label="no"]
+    snt_IsInitialized_00 -> snt_MoreTasks_00[label="yes"]
+    snt_MoreTasks_00 -> snt_NotNewTrade_01[label="no"]
+    snt_NotNewTrade_01 -> snt_EndNextTrade_01
+    snt_MoreTasks_00 -> snt_RemoveOldPISR_Tasks_01[label="yes"]
+    snt_RemoveOldPISR_Tasks_01 -> snt_ResetVariables_01
+	snt_ResetVariables_01 -> snt_SendInitialStates_01
+	snt_SendInitialStates_01 -> snt_ForEachAssignedVehicle_00
+	snt_ForEachAssignedVehicle_00 -> snt_SendPISR_Tasks_01
+	snt_SendPISR_Tasks_01 -> snt_More_00
+	snt_More_00 -> snt_ForEachAssignedVehicle_00[label="yes"]
+	snt_More_00 -> snt_NewTrade_01[label="no"]
+	snt_NewTrade_01 -> snt_EndNextTrade_01
+
+
+	############ ADVANCE TIME ############
+	node [shape=record];	
+		ta_AdvanceTime_00[label="|Advance Time|"];
+		ta_FindVehicleIsAndTimeWithNextActionState_00[label="|Find Vehicle ID\n and Time with\nNext Action State|"];
+    node[shape="box", style="rounded"]
+		snt_EndTimeAdvance_01[label="Return()"];
+    node[shape="box",style=filled]
+		ta_AddState_00[label="Add Time/State \nTo The SendTime Map"];
+		ta_AddState_01[label="Add Time/State \nTo The SendTime Map"];
+		ta_AddInterpolatedState_00[label="Add An Interpolated Entry \nTo The SendTime Map"];
+		ta_AdvanceTheDicreteTime_00[label="Advance The\n Discrete Time"];
+		ta_SendTheAirVehicleState_00[label="Send The\n Air Vehicle State"];
+    node[shape="diamond", style=""]
+		ta_AllApprovalsReceived_00[label="All Time Advance\n Approvals Received?"];
+		ta_ForEachAssignedVehicle_00[label="For Each Assigned\n Vehicle"];
+    	ta_MoreVehicles_00[label="more vehicles?"];
+    	ta_MoreTimeStateEntries_00[label="More Time/State\n Entries?"];
+    	ta_MoreTimeStateEntries_01[label="More Time/State\n Entries?"];
+		ta_ForEachTimeEntry_00[label="For Each Time/State\n Map Entry"];
+		ta_IsTimeLessThanNextAction_00[label="Time Entry < Next \nAction State Time"];
+		ta_IsActionState_00[label="Is Next Action State"];
+    	ta_ForEachSendTimeStateEntries_00[label="For Each Send\n Time/State Entry"];
+
+	ta_AdvanceTime_00 ->ta_AllApprovalsReceived_00
+	ta_AllApprovalsReceived_00 -> snt_EndTimeAdvance_01[label="no"]
+	ta_AllApprovalsReceived_00 -> ta_FindVehicleIsAndTimeWithNextActionState_00[label="yes"]
+	ta_FindVehicleIsAndTimeWithNextActionState_00 -> ta_ForEachAssignedVehicle_00
+	ta_ForEachAssignedVehicle_00 -> ta_ForEachTimeEntry_00
+	ta_ForEachTimeEntry_00 -> ta_IsTimeLessThanNextAction_00
+	ta_IsTimeLessThanNextAction_00 -> ta_AddState_00[label="yes"]
+	ta_AddState_00 -> ta_MoreTimeStateEntries_00
+	ta_MoreTimeStateEntries_00 -> ta_ForEachTimeEntry_00[label="yes"]
+	ta_MoreTimeStateEntries_00 -> ta_MoreVehicles_00[label="no"]
+	ta_IsTimeLessThanNextAction_00 -> ta_IsActionState_00
+	ta_IsActionState_00 -> ta_AddState_01[label="yes"]
+	ta_AddState_01 -> ta_MoreVehicles_00
+	ta_IsActionState_00 -> ta_AddInterpolatedState_00[label="no"]
+	ta_AddInterpolatedState_00 -> ta_MoreVehicles_00
+	ta_MoreVehicles_00 -> ta_ForEachAssignedVehicle_00[label="yes"]
+	ta_MoreVehicles_00 -> ta_ForEachSendTimeStateEntries_00[label="no"]
+	ta_ForEachSendTimeStateEntries_00 -> ta_AdvanceTheDicreteTime_00
+	ta_AdvanceTheDicreteTime_00 -> ta_SendTheAirVehicleState_00
+	ta_SendTheAirVehicleState_00 -> ta_MoreTimeStateEntries_01
+	ta_MoreTimeStateEntries_01 -> ta_ForEachSendTimeStateEntries_00[label="yes"]
+	ta_MoreTimeStateEntries_01 -> snt_EndTimeAdvance_01[label="no"]
+
+    {rank=same; ReceiveMessages ta_AdvanceTime_00 snt_StartNextTrade_00}
+}
+
+/*
+ReceiveAirVehicleState[label="Receive AirVehicleStates",color=gray,style=filled,fontname="Helvetica"];
+CheckRequiredStates [label="Have All Required States?",shape=polygon,sides=6,peripheries=3,color=lightblue,style=filled,fontname="Helvetica"];
+
+
+InitializeServer->WaitForClient;
+WaitForClient->WaitForClient [label="wait for connection"];
+WaitForClient->Connected;
+Connected[label="Connected",color=green,style=filled,fontname="Helvetica"];
+Connected->Loop
+WaitForClient[label="Wait For Client/Server",color=green,style=filled,fontname="Helvetica"];
+Loop->ReceiveObjects;
+Loop[label="Loop",color=green,style=filled,fontname="Helvetica"];
+ReceiveObjects->ProcessMessages;
+ProcessMessages[label="CCA_AMASE::errProcessMessage",color=green,style=filled,fontname="Helvetica"];
+ReceiveObjects->SendObjects;
+ReceiveObjects[label="Receive Objects",color=green,style=filled,fontname="Helvetica"];
+SendObjects->GetObjectsToSend;
+SendObjects[label="Send Objects",color=green,style=filled,fontname="Helvetica"];
+GetObjectsToSend[label="CCA_AMASE::bNewObjectToSend",color=green,style=filled,fontname="Helvetica"];
+SendObjects->EndLoop;
+EndLoop[label="End Loop",color=green,style=filled,fontname="Helvetica"];
+EndLoop->Loop;
+
+digraph {
+    label="How to make sure 'input' is valid";
+ 
+    node[shape="box", style="rounded"]
+       start; end;
+    node[shape="parallelogram", style=""]
+       message; input;
+    node[shape="diamond", style=""]
+       if_valid;
+ 
+    start -> input;
+    input -> if_valid;
+    if_valid -> message[label="no"];
+    if_valid -> end[label="yes"];
+    message -> input;     
+ 
+    {rank=same; message input}
+}
+
+*/
