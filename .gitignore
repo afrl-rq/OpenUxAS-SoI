@@ -37,3 +37,7 @@ src/LMCP
 
 # test output
 tests/**/output/**
+
+# example output
+examples/**/log/**
+examples/**/datawork/**
