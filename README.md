@@ -171,12 +171,22 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Select `C/C++` and click `Install`
 
 
-# Configure UxAS (Pre-Build Steps)
+# Configure UxAS and Related Projects
 
-1. Auto-generate source code for LMCP libraries: in terminal
+1. Checkout, compile OR download *OpenAMASE* (**optional**)
+   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS*
+   - Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
+   - Compile: Load provided Netbeans project, click `Build`
+   - OR Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar), place in `dist` folder
+2. Checkout, compile OR download *LmcpGen*
+   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS*
+   - Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
+   - Compile: Load provided Netbeans project, click `Build`
+   - OR Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar), place in `dist` folder
+3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
    - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS`
    - ``` sh RunLmcpGen.sh ```
-2. Prepare UxAS specific patches to external libraries: in terminal
+4. Prepare UxAS specific patches to external libraries: in terminal in `OpenUxAS` directory
    - ``` ./prepare ```
 
 The above preparation (i.e. `./prepare`) needs to be done prior to the first build and any
