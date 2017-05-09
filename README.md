@@ -229,14 +229,14 @@ Expected file system layout:
 1. EITHER Checkout+compile OR download *OpenAMASE* (**optional**)
    - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
    1. Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
-   2. Compile: Load provided Netbeans project, click `Build`
+   2. Compile: Load provided Netbeans project, click `Build`  
    OR
    1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar)
    2. Place `OpenAMASE.jar` in `OpenAMASE/OpenAMASE/dist` folder
 2. EITHER Checkout+compile OR download *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
    1. Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
-   2. Compile: Load provided Netbeans project, click `Build`
+   2. Compile: Load provided Netbeans project, click `Build`  
    OR
    1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar)
    2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
