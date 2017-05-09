@@ -97,27 +97,27 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
     echo "Installing Prerequisite Tools on Ubuntu Linux (/ ...Bash on Ubuntu on Windows?)"
     # Install git: in terminal
-    sudo apt-get install git
-    sudo apt-get install gitk
+    sudo apt -y install git
+    sudo apt -y install gitk
     # Install opengl development headers: in terminal
-    sudo apt-get install libglu1-mesa-dev
+    sudo apt -y install libglu1-mesa-dev
     # Install unique ID creation library: in terminal
-    sudo apt-get install uuid-dev
+    sudo apt -y install uuid-dev
     # Install doxygen and related packages (optional): in terminal
-    sudo apt-get install doxygen
-    sudo apt-get install graphviz
-    sudo apt-get install texlive
+    sudo apt -y install doxygen
+    sudo apt -y install graphviz
+    sudo apt -y install texlive
     # Install pip3: in terminal
-    sudo apt install python3-pip
+    sudo apt -y install python3-pip
     sudo -H pip3 install --upgrade pip
     # Install pip2: in terminal
-    sudo apt install python-pip
+    sudo apt -y install python-pip
     # Install ninja build system: in terminal
     sudo -H pip3 install ninja
     # Install meson build configuration: in terminal
     sudo -H pip3 install meson
     # Install python plotting capabilities (optional): in terminal
-    sudo apt install python-tk
+    sudo apt -y install python-tk
     sudo -H pip2 install matplotlib
     sudo -H pip2 install pandas
     echo " "
@@ -132,7 +132,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Running downloaded install script: in terminal"
-    cd ~/Downloads; sh jdk-8u131-nb-8_w-linux-x64.sh
+    cd ~/Downloads; chmod +x jdk-8u131-nb-8_w-linux-x64.sh; sh jdk-8u131-nb-8_w-linux-x64.sh
     echo "* Click Next three times, then Install"
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
@@ -149,8 +149,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
     # Install Oracle Java run-time (required for LmcpGen): in terminal
     sudo add-apt-repository ppa:webupd8team/java
-    sudo apt update; sudo apt install oracle-java8-installer
-    sudo apt install oracle-java8-set-default
+    sudo apt update; sudo apt -y install oracle-java8-installer
+    sudo apt -y install oracle-java8-set-default
     echo "...Congratulations! You're done with the dependencies installation!"
 
 else
