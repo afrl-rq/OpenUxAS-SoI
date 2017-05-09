@@ -123,16 +123,19 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     echo " "
     echo "Install Netbeans and Oracle Java JDK (optional)"
     # Download the Linux x64 version
-    echo "* Grab the .sh file from: http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html"
+    echo "* Grab the jdk-XXXXX-XX-XXX-linux-x64.sh file from: http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html"
     echo " (This cannot be downloaded automatically due to the need to agree to license &etc. terms.)"
     echo " (So, download from website manually to your ~/Downloads directory.)"
     # as of 2017-05-08, this is: jdk-8u131-nb-8_w-linux-x64.sh
+    # as of 2017-05-09, this is: jdk-8u131-nb-8_2-linux-x64.sh
     firefox http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html &
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Running downloaded install script: in terminal"
-    cd ~/Downloads; chmod +x jdk-8u131-nb-8_w-linux-x64.sh; sh jdk-8u131-nb-8_w-linux-x64.sh
+    cd ~/Downloads
+    JDK_FILE=`ls -t jdk-*-linux-x64.sh | head -1` # bash script will find newest downloaded script in directory to run
+    chmod +x $JDK_FILE; sh $JDK_FILE
     echo "* Click Next three times, then Install"
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
