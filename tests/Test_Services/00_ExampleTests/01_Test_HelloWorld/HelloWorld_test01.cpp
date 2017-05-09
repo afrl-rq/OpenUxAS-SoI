@@ -44,8 +44,8 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
 #ifdef OSX
     EXPECT_EQ(8,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
 #else
-    EXPECT_EQ(8,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
     //EXPECT_EQ(10,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
+    EXPECT_NEAR(9,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")),1); // should be 9 +- 1, so a range from 8 to 10 messages in 13s
 #endif
 };
 
