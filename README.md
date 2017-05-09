@@ -194,18 +194,54 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
 
 # Configure UxAS and Related Projects
 
-1. Checkout, compile OR download *OpenAMASE* (**optional**)
-   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS*
-   - Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
-   - Compile: Load provided Netbeans project, click `Build`
-   - OR Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar), place in `dist` folder
-2. Checkout, compile OR download *LmcpGen*
-   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS*
-   - Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
-   - Compile: Load provided Netbeans project, click `Build`
-   - OR Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar), place in `dist` folder
+Expected file system layout:
+```
+./
+  OpenAMASE
+          /OpenAMASE
+                    /config
+                    /data
+                    /dist
+                         OpenAMASE.jar <-- add this here to avoid compilation
+                    /docs
+                    /example scenarios
+                    /lib
+                    /native
+                    /nbproject
+                    /run
+                    /src
+  LcmpGen
+          /dist
+               LmcpGen.jar <-- add this here to avoid compilation
+          /nbproject
+          /src
+  OpenUxAS
+          /3rd
+          /doc
+          /examples
+          /mdms
+          /resources
+          /src
+          /tests
+          /wrap_patches
+```  
+
+1. EITHER Checkout+compile OR download *OpenAMASE* (**optional**)
+   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
+   1. Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
+   2. Compile: Load provided Netbeans project, click `Build`
+   OR
+   1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar)
+   2. Place `OpenAMASE.jar` in `OpenAMASE/OpenAMASE/dist` folder
+2. EITHER Checkout+compile OR download *LmcpGen*
+   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
+   1. Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
+   2. Compile: Load provided Netbeans project, click `Build`
+   OR
+   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar)
+   2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
-   - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS`
+   - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
    - ``` sh RunLmcpGen.sh ```
 4. Prepare UxAS specific patches to external libraries: in terminal in `OpenUxAS` directory
    - ``` ./prepare ```
