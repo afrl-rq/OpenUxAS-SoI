@@ -14,6 +14,10 @@ elif os == 'darwin'
   link_args += ['-framework', 'OpenGL']
 endif
 
+if get_option('afrl_internal')
+  subdir('UxAS-afrl_internal')
+endif
+
 # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
 sub_zeromq              = subproject('zeromq')
 lib_zeromq              = sub_zeromq.get_variable('lib')
@@ -46,9 +50,7 @@ lib_zlib                = sub_zlib.get_variable('lib')
 sub_minizip             = subproject('minizip')
 lib_minizip             = sub_minizip.get_variable('lib')
 
-# https://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.zip/download
-sub_boostlibs           = subproject('boost')
-lib_boostlibs           = sub_boostlibs.get_variable('lib')
+dep_boost = dependency('boost', modules: ['filesystem', 'regex', 'system'])
 
 # https://github.com/mikalhart/TinyGPS
 # The TinyGPS repo captured by UxAS does not seem to be available.
@@ -67,9 +69,6 @@ lib_serial              = sub_serial.get_variable('lib')
 sub_pugixml             = subproject('3rd/PugiXML')
 lib_pugixml             = sub_pugixml.get_variable('lib')
 
-sub_plans               = subproject('src/Plans')
-lib_plans               = sub_plans.get_variable('lib')
-
 sub_uxas_communications = subproject('src/Communications')
 lib_uxas_communications = sub_uxas_communications.get_variable('lib')
 
@@ -79,14 +78,20 @@ lib_dpss                = sub_dpss.get_variable('lib')
 sub_visilibity          = subproject('src/VisilibityLib')
 lib_visilibity          = sub_visilibity.get_variable('lib')
 
+if get_option('afrl_internal')
+  lib_lmcp = lib_lmcp_internal
+  incs_lmcp = incs_lmcp_internal
+else
+  subdir('src/LMCP')
+endif
+
 subdir('src/Tasks')
 
 subdir('src/Services')
 
 subdir('src/Utilities')
 
-sub_lmcp                = subproject('src/LMCP')
-lib_lmcp                = sub_lmcp.get_variable('lib')
+subdir('src/Plans')
 
 dep_thread              = dependency('threads')
 dep_uuid                = dependency('uuid')
@@ -104,7 +109,6 @@ libs = [
   lib_sqlitecpp,
   lib_sqlite3,
   lib_pugixml,
-  lib_boostlibs,
   lib_visilibity,
   lib_serial,
   lib_plans,
@@ -114,17 +118,8 @@ libs = [
   lib_dpss,
 ]
 
-# CircumNav, RRTStar
 if get_option('afrl_internal')
-  conf.set('AFRL_INTERNAL_ENABLED', true)
-  # closed-source libraries
-  libs += [
-    subproject('src/Kestrel').get_variable('lib'),
-    subproject('src/Piccolo').get_variable('lib'),
-    subproject('3rd/TrilliumSDK').get_variable('lib'),
-    subproject('3rd/Tripath').get_variable('lib'),
-    subproject('src/UGSManagement').get_variable('lib'),
-  ]
+  libs += libs_internal
 endif
 
 # creates src/Includes/config.h
@@ -133,6 +128,7 @@ subdir('src/Includes')
 deps = [
   dep_thread,
   dep_uuid,
+  dep_boost,
 ]
 
 if os == 'linux'
@@ -153,7 +149,6 @@ executable(
     'src/Communications',
     'src/Includes',
     'src/Services',
-    'boost_1_64_0',
     'cppzmq-4.2.1',
     'zeromq-4.1.1/include',
     '3rd/PugiXML/src',
