@@ -10,7 +10,7 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
 	// duration_s - number of second to run UxAS
-    uint32_t duration_s{13};
+    uint32_t duration_s{20}; //{13}; // this test seems to take ~15 s on bash Ubuntu instances
     // testPath - relative path to the directory containing configration and other test files
     std::string testPath("../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/");
     // uxasConfigurationFile - path and file name of the UxAS configuration file
