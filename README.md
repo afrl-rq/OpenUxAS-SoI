@@ -92,12 +92,15 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Reboot VM
 7. Follow Ubuntu instructions for remainder of configuration
 
-If you are a Windows user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment. You can set this up by:
-1. Updating to the Windows Creators Update
-2. [Installing Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
-3. [installing XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
+If you are a Windows user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
+
+To set this up:
+1. Update to the Windows Creators Update
+2. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
+3. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
    - `echo "export DISPLAY=:0" >> ~/.bashrc`
    - `sudo apt update & sudo apt install gedit`
+
 ...but this is currently not supported. Attempt at your own peril! :)
 
 ### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X
