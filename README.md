@@ -16,40 +16,40 @@ The LMCP specification and all source code for *OpenUxAS* is publicaly released 
 Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agreement closely follows the NASA Open Source
 Agreement Verion 1.3.
 
-# Prerequisites and Dependancies
+# Prerequisites and Dependencies
 
-The primary tools and dependancies to obtain, build, document, and simulate UxAS are:
+The primary tools and dependencies to obtain, build, document, and simulate UxAS are:
 
-1. Git
-2. OpenGL
-3. UUID library
-4. Python 2.7 and Python 3.5
-5. Meson
-6. Ninja
-7. [LmcpGen](https://github.com/afrl-rq/LmcpGen)
-8. [OpenAMASE](https://github.com/afrl-rq/OpenAMASE) (optional, simulation)
-9. Netbeans with Java JDK (optional, simulation)
-10. Doxygen (optional, documentation)
-11. LaTeX (optional, documentation)
+- Git
+- OpenGL
+- UUID library
+- Boost
+- Python 2.7 and Python 3.5
+- Meson
+- Ninja
+- [LmcpGen](https://github.com/afrl-rq/LmcpGen)
+- [OpenAMASE](https://github.com/afrl-rq/OpenAMASE) (optional, simulation)
+- NetBeans with Java JDK (optional, simulation)
+- Doxygen (optional, documentation)
+- LaTeX (optional, documentation)
 
 The UxAS build system will download and compile the following external libraries
 
-1. Google Test
-2. ZeroMQ (zeromq, czmq, cppzmq, zyre)
-3. Boost
-4. Sqlite
-5. Zlib
-6. Minizip
-7. Serial
+- Google Test
+- ZeroMQ (zeromq, czmq, cppzmq, zyre)
+- Sqlite
+- Zlib
+- Minizip
+- Serial
 
 Libraries for XML and GPS message parsing have numerous forks without centralized repository control. Code to build the following libraries is included with UxAS
 
-1. PugiXML
-2. TinyGPS
+- PugiXML
+- TinyGPS
 
 ## Supported Operating Systems
 
-For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. Support for Windows is planned, but is not yet available. We recommend an Ubuntu virtual machine on for Windows users. 
+For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. Support for Windows is planned, but is not yet available. We recommend an Ubuntu virtual machine for Windows users. 
 
 ### Windows: Install Ubuntu in Virtual Machine
 
@@ -97,75 +97,78 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
 1. Install `git`: in terminal
    - ``` sudo apt-get install git ```
    - ``` sudo apt-get install gitk ```
-2. Install opengl development headers: in terminal
+1. Install OpenGL development headers: in terminal
    - ``` sudo apt-get install libglu1-mesa-dev ```
-3. Install unique ID creation library: in terminal
+1. Install unique ID creation library: in terminal
    - ``` sudo apt-get install uuid-dev ```
-4. Install doxygen and related packages (**optional**): in terminal
+1. Install Boost libraries: in terminal
+   - ``` sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev ```
+1. Install doxygen and related packages (**optional**): in terminal
    - ``` sudo apt-get install doxygen ```
    - ``` sudo apt-get install graphviz ```
    - ``` sudo apt-get install texlive ```
-5. Install pip3: in terminal
+1. Install pip3: in terminal
    - ``` sudo apt install python3-pip ```
    - ``` sudo -H pip3 install --upgrade pip ```
-6. Install pip2: in terminal
+1. Install pip2: in terminal
    - ``` sudo apt install python-pip ```
-7. Install ninja build system: in terminal
+1. Install ninja build system: in terminal
    - ``` sudo -H pip3 install ninja ```
-8. Install meson build configuration: in terminal
+1. Install meson build configuration: in terminal
    - ``` sudo -H pip3 install meson ```
-9. Install python plotting capabilities (**optional**): in terminal
+1. Install python plotting capabilities (**optional**): in terminal
    - ``` sudo apt install python-tk ```
    - ``` sudo -H pip2 install matplotlib ```
    - ``` sudo -H pip2 install pandas ```
-9. Install [Netbeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
+1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
    - Download the Linux x64 version
    - Run downloaded install script: in terminal
    - ``` cd ~/Downloads; sh jdk-8u131-nb-8_w-linux-x64.sh ```
    - Click `Next` three times, then `Install`
-9. Enable C/C++ plug-in in Netbeans (**optional**)
-   - Open Netbeans (in Ubuntu search, type ``` Netbeans ```)
+1. Enable C/C++ plug-in in NetBeans (**optional**)
+   - Open NetBeans (in Ubuntu search, type ``` NetBeans ```)
    - Choose Tools->Plugins from the top menu
    - In the `Available Plugins` tab, search for `C++`
    - Select `C/C++` and click `Install`
-9. Install Oracle Java run-time (required for *LmcpGen*): in terminal
+1. Install Oracle Java run-time (required for *LmcpGen*): in terminal
    - ``` sudo add-apt-repository ppa:webupd8team/java ```
    - ``` sudo apt update; sudo apt install oracle-java8-installer ```
    - ``` sudo apt install oracle-java8-set-default ```
 
 ### Install Prerequisites on Mac OS X
 1. Install [XCode](https://developer.apple.com/xcode/)
-2. Enable commandline tools: in terminal ``` xcode-select --install ```
-3. Install `homebrew` (must be administrator): in terminal
+1. Enable commandline tools: in terminal ``` xcode-select --install ```
+1. Install `homebrew` (must be administrator): in terminal
     ``` sudo ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" ```
-4. Add `homebrew` to path: in terminal ``` echo `export PATH="/usr/local/bin:$PATH"` >> ~/.bash_profile ```
-5. Install `git`: in terminal ``` brew install git ```
-6. Install unique ID library: in terminal ``` brew install ossp-uuid ```
-7. Install `doxygen` and related packages (**optional**): in terminal
+1. Add `homebrew` to path: in terminal ``` echo `export PATH="/usr/local/bin:$PATH"` >> ~/.bash_profile ```
+1. Install `git`: in terminal ``` brew install git ```
+1. Install unique ID library: in terminal ``` brew install ossp-uuid ```
+1. Install Boost library: in terminal ``` brew install boost ```
+1. Install `doxygen` and related packages (**optional**): in terminal
    - ``` brew install doxygen ```
    - ``` brew install graphviz ```
    - ``` brew cask install mactex ```
-8. Install pip3: in terminal
+1. Install pip3: in terminal
    - ``` brew install python3 ```
-9. Install pip2: in terminal
+1. Install pip2: in terminal
    - ``` curl -O https://bootstrap.pypa.io/get-pip.py ```
    - ``` sudo -H python get-pip.py ```
-9. Install ninja build system: in terminal
+1. Install ninja build system: in terminal
    - ``` brew install cmake ```
    - ``` brew install pkg-config ```
    - ``` sudo -H pip3 install scikit-build ```
    - ``` sudo -H pip3 install ninja ```
-9. Install meson build configuration: in terminal
+1. Install meson build configuration: in terminal
    - ``` sudo -H pip3 install meson ```
-9. Install python plotting capabilities (**optional**): in terminal
+1. Install python plotting capabilities (**optional**): in terminal
    - ``` sudo -H pip2 install matplotlib ```
    - ``` sudo -H pip2 install pandas ```
-9. Install [Oracle Java run-time](https://java.com/en/download/mac_download.jsp) (required for *LmcpGen*)
-9. Install [Netbeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
+1. Install [Oracle Java run-time](https://java.com/en/download/mac_download.jsp) (required for *LmcpGen*)
+1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
    - Download the Mac OSX version
    - Install .dmg
-9. Enable C/C++ plug-in in Netbeans (**optional**)
-   - Open Netbeans
+1. Enable C/C++ plug-in in NetBeans (**optional**)
+   - Open NetBeans
    - Choose Tools->Plugins from the top menu
    - In the `Available Plugins` tab, search for `C++`
    - Select `C/C++` and click `Install`
@@ -176,12 +179,12 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
 1. Checkout, compile OR download *OpenAMASE* (**optional**)
    - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS*
    - Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
-   - Compile: Load provided Netbeans project, click `Build`
+   - Compile: Load provided NetBeans project, click `Build`
    - OR Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar), place in `dist` folder
 2. Checkout, compile OR download *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS*
    - Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
-   - Compile: Load provided Netbeans project, click `Build`
+   - Compile: Load provided NetBeans project, click `Build`
    - OR Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar), place in `dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
    - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS`
@@ -213,9 +216,9 @@ command: `ninja -C build clean`
    - ``` ninja -C build test ```
    - Confirm all tests passed
    
-## Compiling using Netbeans (Debug Mode)
+## Compiling using NetBeans (Debug Mode)
 
-1. Open Netbeans
+1. Open NetBeans
 2. Select File->New Project
 3. Choose `C/C++ Project with Existing Sources` and click `Next`
 4. Specify the `OpenUxAS/src` folder
