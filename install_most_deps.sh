@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Copyright © 2017 Government of the United States of America, as represented by the Secretary of the Air Force.
 # No copyright is claimed in the United States under Title 17, U. S. Code. All Other Rights Reserved.
 # Copyright 2017 University of Cincinnati. All rights reserved. See LICENSE.md file at:
