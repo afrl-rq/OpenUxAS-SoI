@@ -10,7 +10,7 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
 	// duration_s - number of second to run UxAS
-    uint32_t duration_s{20}; //{13}; // this test seems to take ~15 s on bash Ubuntu instances
+    uint32_t duration_s{13}; // this test seems to take ~14.9s to send 10 messages on bash Ubuntu instances; it's about 8-10 msgs for duration 13, depending; this test is a bit odd because it keeps sending msgs until UxAS stops but test is for a certain number of sent messages only...
     // testPath - relative path to the directory containing configration and other test files
     std::string testPath("../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/");
     // uxasConfigurationFile - path and file name of the UxAS configuration file
@@ -44,7 +44,8 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
 #ifdef OSX
     EXPECT_EQ(8,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
 #else
-    EXPECT_EQ(10,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
+    EXPECT_EQ(8,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
+    //EXPECT_EQ(10,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeyValuePair")));
 #endif
 };
 
