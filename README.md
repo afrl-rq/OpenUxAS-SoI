@@ -101,7 +101,7 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - ``` sudo apt-get install libglu1-mesa-dev ```
 1. Install unique ID creation library: in terminal
    - ``` sudo apt-get install uuid-dev ```
-1. Install Boost libraries: in terminal
+1. Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
    - ``` sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev ```
 1. Install doxygen and related packages (**optional**): in terminal
    - ``` sudo apt-get install doxygen ```
@@ -143,7 +143,10 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
 1. Add `homebrew` to path: in terminal ``` echo `export PATH="/usr/local/bin:$PATH"` >> ~/.bash_profile ```
 1. Install `git`: in terminal ``` brew install git ```
 1. Install unique ID library: in terminal ``` brew install ossp-uuid ```
-1. Install Boost library: in terminal ``` brew install boost ```
+1. Install Boost library and configure it in a fresh shell: in terminal
+   - ``` brew install boost ```
+   - ``` echo 'export BOOST_ROOT=/usr/local' >> ~/.bash_profile ```
+   - ``` bash ```
 1. Install `doxygen` and related packages (**optional**): in terminal
    - ``` brew install doxygen ```
    - ``` brew install graphviz ```
@@ -193,7 +196,7 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - ``` ./prepare ```
 
 The above preparation (i.e. `./prepare`) needs to be done prior to the first build and any
-time a file is modified in one of the wrap_patches subdirectories.
+time a file is modified in one of the `/3rd/wrap_patches` subdirectories or the `/3rd/*.wrap.tmpl` files.
 
 This also needs to be done any time you move or rename your source tree.
 
@@ -209,7 +212,7 @@ will be automatically incorporated.
    - ``` ninja -C build all ```
    - This step is the only step necessary in day-to-day development work. It's
 the Meson equivalent of `make all`. Note that the name of `ninja` may differ by distro. On Fedora, for example,
-it's ninja-build.
+it's `ninja-build`.
    - To clean the build, add the `clean` target at the end of your ninja
 command: `ninja -C build clean`
 4. Run UxAS tests: in terminal
@@ -230,8 +233,7 @@ command: `ninja -C build clean`
 10. No changes under `Code Assistance Configuration`, click `Next`
 11. Change `Project Name` to ``` UxAS ``` and click `Finish`
 
-Removing External Dependencies
-------------------------------
+## Removing External Dependencies
 
 If you ever feel the need to refresh external dependencies, you'll need
 to remove both the downloaded files and the expanded directories:
@@ -239,10 +241,9 @@ to remove both the downloaded files and the expanded directories:
 $ ./rm-external
 
 This script depends upon the presence of the patch tarballs installed
-at the top level by `wrap_patches/prepare`.
+in the `/3rd` directory by `./prepare`.
 
-About External Dependencies
----------------------------
+# About External Dependencies
 
 In porting the UxAS build system to Meson/Ninja, we've taken advantage of
 `wrap` facility to import and build 3rd-party libraries. The advantage
@@ -267,12 +268,48 @@ Clearly, this will complicate maintenance. On the plus side, once an
 external project is properly wrapped, it shouldn't require further work
 unless you require a different version of the project.
 
-I've taken the approach of stashing valid `meson.build` files in the
-`wrap_patches` directory. Obviously, this is the place to store other
-patched files (if any) needed for the build of the external project. BTW,
-note well that "patch" does not refer to a context or unified diff,
-but rather to an archive containing new and changed files. The `wrap`
-facility is not able to patch using diff files.
+We've taken the approach of stashing valid `meson.build` files in the
+`3rd/wrap_patches` directory. This is the place to store other patched
+files (if any) needed for the build of the external project. Note that
+"patch" does not refer to a context or unified diff, but rather to an
+archive containing new and changed files that overwrite the unzipped
+sources. The `wrap` facility is not able to patch using diff files.
+
+## About Boost
+
+Boost is handled slightly differently from the other external
+dependencies, in that the build system attempts to use a
+system-provided version of Boost before falling back on the `wrap`
+facility as a last resort.
+
+Boost uses a bespoke configuration and build system
+that is very difficult to replicate with a Meson-based `wrap` build,
+and so Meson itself handles Boost differently from other
+`pkg-config`-provided system dependencies.
+
+### System-provided Boost
+
+We *strongly* recommend using a system-provided Boost from `brew`,
+`apt-get`, etc. If you have a system-provided boost, but during
+Meson's configuration phase, you see something like the following, try
+setting your `BOOST_ROOT` environment variable to the prefix of your
+system-installed packages (most likely `/usr/local` for MacOS with
+Homebrew):
+
+```
+Dependency Boost (filesystem, regex, system) found: NO
+```
+
+If you have a system-provided Boost but this message still does not go
+away, [open an issue](https://github.com/afrl-rq/OpenUxAS/issues/new)
+with details of your system configuration.
+
+### Boost via Meson wrap
+
+If no system-provided Boost is available, Meson will fall back to
+using the `wrap` we maintain alongside the other external
+dependencies. This will probably work on 64-bit Linux systems, but
+unexpected trouble may arise on other platforms.
 
 # Running the Examples
 

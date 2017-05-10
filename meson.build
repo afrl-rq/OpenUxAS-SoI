@@ -50,7 +50,11 @@ lib_zlib                = sub_zlib.get_variable('lib')
 sub_minizip             = subproject('minizip')
 lib_minizip             = sub_minizip.get_variable('lib')
 
-dep_boost = dependency('boost', modules: ['filesystem', 'regex', 'system'])
+dep_boost = dependency(
+  'boost',
+  modules: ['filesystem', 'regex', 'system'],
+  fallback: ['boost', 'dep_boost'],
+)
 
 # https://github.com/mikalhart/TinyGPS
 # The TinyGPS repo captured by UxAS does not seem to be available.

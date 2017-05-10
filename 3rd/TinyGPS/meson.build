@@ -5,7 +5,11 @@ if os == 'linux'
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
 endif
 
-dep_boost = dependency('boost')
+dep_boost = dependency(
+  'boost',
+  modules: ['filesystem', 'regex', 'system'],
+  fallback: ['boost', 'dep_boost'],
+)
 
 lib = static_library(
   'tinygps',
