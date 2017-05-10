@@ -6,7 +6,7 @@ if os == 'linux'
 endif
 
 incs_boost = include_directories(
-  'boost'
+  '.'
 )
 
 lib = static_library(

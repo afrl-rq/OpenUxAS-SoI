@@ -12,15 +12,15 @@ wrap_patches_dir = subproject_dir / 'wrap_patches'
 def process_wrap_patches():
     for p in wrap_patches_dir.iterdir():
         if not p.is_dir(): continue
-        tf = tarfile.open(subproject_dir / (p.name + '_patch.tar'), 'w')
-        tf.add(p, arcname=p.name)
+        tf = tarfile.open(str(subproject_dir / (p.name + '_patch.tar')), 'w')
+        tf.add(str(p), arcname=p.name)
         tf.close()
 
 def process_wrap_templates():
     for tf in subproject_dir.glob('*.wrap.tmpl'):
         wf = subproject_dir / PurePath(tf).stem
-        with open(wf, 'w') as w:
-            with open(str(tf), 'r') as t:
+        with wf.open(mode='w') as w:
+            with tf.open(mode='r') as t:
                 d = ''
                 while True:
                     l = t.readline()
@@ -29,7 +29,7 @@ def process_wrap_templates():
                         h = hashlib.new('sha256')
                         bs = h.block_size
                         pf = re.split('=', l)[1].strip()
-                        with open(subproject_dir / pf, 'rb') as f:
+                        with (subproject_dir / pf).open(mode='rb') as f:
                             while True:
                                 b = f.read(bs)
                                 if not b: break
