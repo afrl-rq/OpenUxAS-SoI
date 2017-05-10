@@ -21,8 +21,8 @@ incs_utilities = [
   include_directories(
     '../../src/Includes',
     '../../3rd/PugiXML/src',
-    '../../sqlite-amalgamation-3120200',
-    '../../SQLiteCpp-1.3.1/include',
+    '../../3rd/sqlite-amalgamation-3120200',
+    '../../3rd/SQLiteCpp-1.3.1/include',
   ),
 ]
 

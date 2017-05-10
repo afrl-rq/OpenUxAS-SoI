@@ -29,8 +29,8 @@ incs_tasks = [
     '../../src/DPSS',
     '../../src/VisilibityLib',
     '../../3rd/PugiXML/src',
-    '../../cppzmq-4.2.1',
-    '../../zeromq-4.1.1/include',
+    '../../3rd/cppzmq-4.2.1',
+    '../../3rd/zeromq-4.1.1/include',
   ),
   incs_lmcp,
 ]

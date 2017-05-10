@@ -1,4 +1,4 @@
-project('UxAS', 'cpp', subproject_dir: '.')
+project('UxAS', 'cpp', subproject_dir: '3rd')
 
 conf = configuration_data()
 
@@ -56,7 +56,7 @@ dep_boost = dependency('boost', modules: ['filesystem', 'regex', 'system'])
 # The TinyGPS repo captured by UxAS does not seem to be available.
 # The repo contains *only* version 13, while UxAS uses what appears
 # to be version 12. Perhaps contact the author...?
-sub_tinygps             = subproject('3rd/TinyGPS')
+sub_tinygps             = subproject('TinyGPS')
 lib_tinygps             = sub_tinygps.get_variable('lib')
 
 # https://github.com/wjwwood/serial
@@ -65,18 +65,12 @@ lib_serial              = sub_serial.get_variable('lib')
 
 # https://github.com/zeux/pugixml
 # No versions of this pugixml repo are compatible.
-#sub_pugixml            = subproject('pugixml')
-sub_pugixml             = subproject('3rd/PugiXML')
+sub_pugixml             = subproject('PugiXML')
 lib_pugixml             = sub_pugixml.get_variable('lib')
 
-sub_uxas_communications = subproject('src/Communications')
-lib_uxas_communications = sub_uxas_communications.get_variable('lib')
+subdir('src/DPSS')
 
-sub_dpss                = subproject('src/DPSS')
-lib_dpss                = sub_dpss.get_variable('lib')
-
-sub_visilibity          = subproject('src/VisilibityLib')
-lib_visilibity          = sub_visilibity.get_variable('lib')
+subdir('src/VisilibityLib')
 
 if get_option('afrl_internal')
   lib_lmcp = lib_lmcp_internal
@@ -84,6 +78,8 @@ if get_option('afrl_internal')
 else
   subdir('src/LMCP')
 endif
+
+subdir('src/Communications')
 
 subdir('src/Tasks')
 
@@ -143,18 +139,20 @@ executable(
   cpp_args: [
     '-std=c++11',
   ],
-  include_directories: include_directories(
-    'src/Utilities',
-    'src/LMCP',
-    'src/Communications',
-    'src/Includes',
-    'src/Services',
-    'cppzmq-4.2.1',
-    'zeromq-4.1.1/include',
-    '3rd/PugiXML/src',
-    'sqlite-amalgamation-3120200',
-    'SQLiteCpp-1.3.1/include',
-  ),
+  include_directories: [
+    include_directories(
+      'src/Utilities',
+      'src/Communications',
+      'src/Includes',
+      'src/Services',
+      '3rd/cppzmq-4.2.1',
+      '3rd/zeromq-4.1.1/include',
+      '3rd/PugiXML/src',
+      '3rd/sqlite-amalgamation-3120200',
+      '3rd/SQLiteCpp-1.3.1/include',
+    ),
+    incs_lmcp,
+  ],
   link_with: libs,
 )
 
