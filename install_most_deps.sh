@@ -40,6 +40,10 @@ if [ "$(uname)" == "Darwin" ]; then
     brew install git
     # Install unique ID library: in terminal
     brew install ossp-uuid
+    # Install Boost library and configure it in a fresh shell: in terminal
+    brew install boost
+    echo 'export BOOST_ROOT=/usr/local' >> ~/.bash_profile
+    source ~/.bash_profile # bash
     # Install doxygen and related packages (optional): in terminal
     brew install doxygen
     brew install graphviz
@@ -66,7 +70,7 @@ if [ "$(uname)" == "Darwin" ]; then
     # command modified from: http://stackoverflow.com/questions/22934083/install-dmg-package-on-mac-os-from-terminal
     MOUNTDIR=$(echo `hdiutil mount jre-XXXXX-macosx-x64.dmg | tail -1 | awk '{$1=$2=""; print $0}'` | xargs -0 echo) && sudo installer -pkg "${MOUNTDIR}/"*.pkg -target / 
     echo " "
-    echo "Install Netbeans and Oracle Java JDK (optional)"
+    echo "Install NetBeans and Oracle Java JDK (optional)"
     # Download the Mac OSX version
     echo "* Grab the .dmg file from: http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html"
     echo " (This cannot be downloaded automatically due to the need to agree to license &etc. terms.)"
@@ -81,8 +85,10 @@ if [ "$(uname)" == "Darwin" ]; then
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
-    echo "Enable C/C++ plug-in in Netbeans (optional)"
-    echo "* Open Netbeans"
+    echo "Enable C/C++ plug-in in NetBeans (optional)"
+    # echo "* Open NetBeans"
+    # command modified from: http://stackoverflow.com/questions/1272920/run-terminal-command-on-startup-of-netbeans-in-mac-osx
+    /Applications/NetBeans/NetBeans.app/MacOS/Contents/NetBeans # or `open -a NetBeans.app`
     echo "* Choose Tools->Plugins from the top menu"
     echo "* In the Available Plugins tab, search for C++"
     echo "* Select C/C++ and click Install"
@@ -103,6 +109,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     sudo apt -y install libglu1-mesa-dev
     # Install unique ID creation library: in terminal
     sudo apt -y install uuid-dev
+    # Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
+    sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev
     # Install doxygen and related packages (optional): in terminal
     sudo apt -y install doxygen
     sudo apt -y install graphviz
@@ -121,7 +129,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     sudo -H pip2 install matplotlib
     sudo -H pip2 install pandas
     echo " "
-    echo "Install Netbeans and Oracle Java JDK (optional)"
+    echo "Install NetBeans and Oracle Java JDK (optional)"
     # Download the Linux x64 version
     echo "* Grab the jdk-XXXXX-XX-XXX-linux-x64.sh file from: http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html"
     echo " (This cannot be downloaded automatically due to the need to agree to license &etc. terms.)"
@@ -140,8 +148,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
-    echo "Enable C/C++ plug-in in Netbeans (optional)"
-    #echo "* Open Netbeans (in Ubuntu search, type Netbeans, or from commandline type:)"
+    echo "Enable C/C++ plug-in in NetBeans (optional)"
+    #echo "* Open NetBeans (in Ubuntu search, type NetBeans, or from commandline type:)"
     # command modified from: https://askubuntu.com/questions/440245/how-do-i-run-netbeans-from-the-terminal/440257#440257
     #echo "  /bin/sh \"/usr/local/netbeans-7.4/bin/netbeans\" &"  # if sudo install
     ~/netbeans-8.2/bin/netbeans & # if non-sudo install
