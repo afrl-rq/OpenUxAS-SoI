@@ -52,14 +52,14 @@ def ProcessMissionCommand(missionCommand):
 				if len(elements1):
 					longitude = float(elements1[0].firstChild.data)
 				waypointList.append([number,latitude,longitude,altitude])
-				# print '# 5a status[' + str(waypointList) + ']'
+				# print('# 5a status[' + str(waypointList) + ']')
 		waypointListPd = pd.DataFrame(data = waypointList,columns=['number','latitude','longitude','altitude'])
 
 	except StandardError:
-		print '### Error encountered while processing the MissionCommand ###'
+		print('### Error encountered while processing the MissionCommand ###')
 		isGoodMessage = False
 	except:
-		print '### Error encountered while processing the MissionCommand ###Unexpected error:', sys.exc_info()[0]
+		print('### Error encountered while processing the MissionCommand ###Unexpected error:', sys.exc_info()[0])
 		isGoodMessage = False
 	if isGoodMessage:
 		return [vehicleID,firstWaypoint,commandID,status,waypointListPd]
@@ -79,10 +79,10 @@ def ProcessAutomationResponseFile(filename):
 def main():
 	missionCommandArray = []
 	for AutomationResponseFile in glob.glob('UniqueAutomationResponse*'):
-		print 'loading [' + AutomationResponseFile + ']'
+		print('loading [' + AutomationResponseFile + ']')
 		missionCommandArray = ProcessAutomationResponseFile(AutomationResponseFile)
 	missionCommandArrayPd = pd.DataFrame(data = missionCommandArray,columns=['vehicleID','firstWaypoint','commandID','status','waypointListPd'])
-	print 'saving [MissionCommands.pkl]'
+	print('saving [MissionCommands.pkl]')
 	missionCommandArrayPd.to_pickle('MissionCommands.pkl')
 
 if __name__ == '__main__':

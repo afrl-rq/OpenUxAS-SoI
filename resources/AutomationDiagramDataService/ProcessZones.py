@@ -19,21 +19,21 @@ def ProcessZone(zoneNode,zoneType):
 	elements = zoneNode.getElementsByTagName('ZoneID')
 	if len(elements):
 		zoneID = long(elements[0].firstChild.data)
-	print 'zoneID[' + str(zoneID) + ']'
+	print('zoneID[' + str(zoneID) + ']')
 	label = ''
 	elements = zoneNode.getElementsByTagName('Label')
 	if len(elements):
 		label = str(elements[0].firstChild.data)
-	print 'label[' + str(label) + ']'
+	print('label[' + str(label) + ']')
 
 	boundaryPoints = []
 	boundaryNode = zoneNode.getElementsByTagName('Boundary')
-	print 'boundaryNode[' + str(boundaryNode[0].nodeName) + ']'
+	print('boundaryNode[' + str(boundaryNode[0].nodeName) + ']')
 	if len(boundaryNode):
 		circleNode = boundaryNode[0].getElementsByTagName('Circle')
 		polygonNode = boundaryNode[0].getElementsByTagName('Polygon')
 		rectangleNode = boundaryNode[0].getElementsByTagName('Rectangle')
-		# print 'boundaryNode[' + str(boundaryNode[0].firstChild) + ']'
+		# print('boundaryNode[' + str(boundaryNode[0].firstChild) + ']')
 		boundaryType = str('Circle')
 		if len(circleNode):
 			centerPointNode = circleNode[0].getElementsByTagName('CenterPoint')
@@ -85,9 +85,9 @@ def ProcessZone(zoneNode,zoneType):
 						altitude = float(elements[0].firstChild.data)
 					boundaryPoints.append([latitude,longitude,altitude])
 		elif len(rectangleNode):
-			print 'WARNING:: Rectangle boundary not implemented!!!'
+			print('WARNING:: Rectangle boundary not implemented!!!')
 		else:
-			print 'ERROR:: Unknown boundary area type[' + boundaryType +'] encountered!!!'
+			print('ERROR:: Unknown boundary area type[' + boundaryType +'] encountered!!!')
 	boundaryPd = pd.DataFrame(data = boundaryPoints,columns=['latitude','longitude','altitude'])
 	return [zoneID,label,zoneType,boundaryPd]
 
@@ -105,7 +105,7 @@ def ProcessZoneFile(filename):
 		elif str(zoneNode.nodeName) == 'KeepOutZone':
 			zoneType = 'KeepOutZone'
 		else:
-			print 'ERROR:: Unknown zone type[' + str(zoneNode.nodeName) +'] encountered!!!'
+			print('ERROR:: Unknown zone type[' + str(zoneNode.nodeName) +'] encountered!!!')
 			isGoodMessage = False
 		if isGoodMessage:
 			zones.append(ProcessZone(zoneNode,zoneType))
@@ -114,10 +114,10 @@ def ProcessZoneFile(filename):
 def main():
 	zoneArray = []
 	for zoneFile in glob.glob('ZoneKeep*'):
-		print 'loading [' + zoneFile + ']'
+		print('loading [' + zoneFile + ']')
 		zoneArray.extend(ProcessZoneFile(zoneFile))
 	zoneArrayPd = pd.DataFrame(data = zoneArray,columns=['zoneID','label','zoneType','boundaryPd'])
-	print 'saving [Zones.pkl]'
+	print('saving [Zones.pkl]')
 	zoneArrayPd.to_pickle('Zones.pkl')
 
 if __name__ == '__main__':
