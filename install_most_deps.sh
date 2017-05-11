@@ -5,7 +5,7 @@
 # https://github.com/afrl-rq/OpenUxAS
 # Additional copyright may be held by others, as reflected in the commit history.
 
-# from the README.md, 2017-05-08:
+# from the README.md, 2017-05-11:
 
 
 # references:
