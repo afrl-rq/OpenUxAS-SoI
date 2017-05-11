@@ -43,12 +43,16 @@
 
 #include "config.h"
 
+#ifdef AFRL_INTERNAL_ENABLED
+#include "AFRLInternalServices.h"
+#endif
+
 //////////////////////////////////////////////////////
 /// BEGIN -- SERVICE HEADER FILES SECTION          ///
 /// include service header files in this section   ///
 //////////////////////////////////////////////////////
 
-#if defined INCLUDE_SERVICE_HEADERS     
+#if defined INCLUDE_SERVICE_HEADERS
 #undef INCLUDE_SERVICE_HEADERS
 
 #ifndef UXAS_SERVICE_LIST_CODE_HEADERS  // only allow one-time definition
@@ -56,22 +60,6 @@
 
 // examples
 #include "01_HelloWorld.h"
-// adapter
-#ifdef AFRL_INTERNAL_ENABLED
-#include "AxisVideoAdapterService.h"
-#include "GarminGpsAdapterService.h"
-#include "HoustonRadarAdapterService.h"
-#include "PiccoloAutopilotAdapterService.h"
-#endif
-
-#ifndef _WIN32
-#ifdef AFRL_INTERNAL_ENABLED
-#include "KestrelAutopilotAdapterService.h"
-#include "MjpegVideoCapture.h"
-#include "TrilliumOrionAdapter.h"
-#include "VideoStreamCapture.h"
-#endif
-#endif
 
 // data
 #include "MessageLoggerDataService.h"
@@ -97,24 +85,12 @@
 #include "PatternSearchTaskService.h"
 #include "TaskManagerService.h"
 #include "TaskTrackerService.h"
-#ifdef AFRL_INTERNAL_ENABLED
-#include "CommTransferTaskService.h"
-#include "DepotTaskService.h"
-#include "PisrTaskService.h"
-#include "UgsManagementTaskService.h"
-#endif
 
 // test
 #include "SendMessagesService.h"
 #include "SerialAutomationRequestTestService.h"
 #include "TcpBridge.h"
 #include "Test_SimulationTime.h"
-#ifdef AFRL_INTERNAL_ENABLED
-#include "MessageAttributesModifierTestService.h"
-#include "RangeBandwidthReceiveTestService.h"
-#include "RangeBandwidthSendTestService.h"
-#include "Test_DiscreteEventSimulation.h"
-#endif
 
 // general services
 #include "AssignmentTreeBranchBoundService.h"
@@ -128,18 +104,6 @@
 #include "SensorManagerService.h"
 #include "WaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
-#ifdef AFRL_INTERNAL_ENABLED
-#include "AssignmentPISR_LengthConstrainedMTSP.h"
-#include "AssignmentPISR_MWRRP.h"
-#include "HoustonRadarFilterService.h"
-#include "PlanRepairService.h"
-#include "RRTStarPlanningService.h"
-#include "RoutePlannerTripath.h"
-#include "SendIsolationStatusService.h"
-#include "VicsInterfaceService.h"
-#include "VicsService.h"
-#endif
-
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -164,29 +128,10 @@
 
 // adapter
 {auto svc = uxas::stduxas::make_unique<uxas::service::adapter::TcpBridge>();}   //TEST ONLY
-#ifdef AFRL_INTERNAL_ENABLED
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::AxisVideoAdapterService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::GarminGpsAdapterService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::HoustonRadarAdapterService>(); }
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::PiccoloAutopilotAdapterService>(); }
-#endif
-
-#ifndef _WIN32  // adapters not used with windows OS
-#ifdef AFRL_INTERNAL_ENABLED
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::KestrelAutopilotAdapterService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::TrilliumOrionAdapter>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::VideoStreamCapture>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::MjpegVideoCapture>();}
-#endif
-#endif
 
 // data
 {auto svc = uxas::stduxas::make_unique<uxas::service::data::MessageLoggerDataService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::data::AutomationDiagramDataService>();}
-
-#ifdef AFRL_INTERNAL_ENABLED
-{auto svc = uxas::stduxas::make_unique<uxas::service::data::VicsLoggerDataService>();}
-#endif
 
 // task
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::AssignmentCoordinatorTaskService>();}
@@ -206,24 +151,10 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskTrackerService>();}
 
-#ifdef AFRL_INTERNAL_ENABLED
-{auto svc = uxas::stduxas::make_unique<uxas::service::task::CommTransferTaskService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::task::DepotTaskService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::task::PisrTaskService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::task::UgsManagementTaskService>();}
-#endif
-
 // test
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SendMessagesService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SerialAutomationRequestTestService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::Test_SimulationTime>();}
-
-#ifdef AFRL_INTERNAL_ENABLED
-{auto svc = uxas::stduxas::make_unique<uxas::service::test::MessageAttributesModifierTestService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::test::RangeBandwidthReceiveTestService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::test::RangeBandwidthSendTestService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::test::Test_DiscreteEventSimulation>();}
-#endif
 
 // general services
 {auto svc = uxas::stduxas::make_unique<uxas::service::AssignmentTreeBranchBoundService>();}
@@ -237,18 +168,6 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
-
-#ifdef AFRL_INTERNAL_ENABLED
-{auto svc = uxas::stduxas::make_unique<uxas::service::AssignmentPISR_LengthConstrainedMTSP>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::AssignmentPISR_MWRRP>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::HoustonRadarFilterService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::PlanRepairService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::RRTStarPlanningService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerTripath>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::SendIsolationStatusService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::VicsInterfaceService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::VicsService>();}
-#endif
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////
