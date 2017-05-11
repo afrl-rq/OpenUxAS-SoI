@@ -92,6 +92,27 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Reboot VM
 7. Follow Ubuntu instructions for remainder of configuration
 
+If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
+
+To set this up:
+1. Update to the Windows 10 Creators Update
+2. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
+3. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
+   - `echo "export DISPLAY=:0" >> ~/.bashrc`
+   - `sudo apt update & sudo apt install gedit`
+
+...but this is currently not supported. Attempt at your own peril! :)
+
+### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X
+
+The following is a bash script that helps to partially-automate the "installing prerequisite tools" processes that are documented in this README.md file below.
+
+This is under development (only tested on Ubuntu 16.04), so use at your own peril!
+
+1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (install_most_deps.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
+2. Run the script at the terminal: `./install_most_deps.sh`
+3. Follow the on-screen instructions
+
 ### Installing Prerequisite Tools on Ubuntu Linux
 
 1. Install `git`: in terminal
@@ -179,18 +200,58 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
 
 # Configure UxAS and Related Projects
 
-1. Checkout, compile OR download *OpenAMASE* (**optional**)
-   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS*
-   - Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
-   - Compile: Load provided NetBeans project, click `Build`
-   - OR Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar), place in `dist` folder
-2. Checkout, compile OR download *LmcpGen*
-   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS*
-   - Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
-   - Compile: Load provided NetBeans project, click `Build`
-   - OR Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar), place in `dist` folder
+Expected file system layout:
+```
+./
+  OpenAMASE
+          /OpenAMASE
+                    /config
+                    /data
+                    /dist
+                         OpenAMASE.jar <-- add this here to avoid compilation
+                    /docs
+                    /example scenarios
+                    /lib
+                    /native
+                    /nbproject
+                    /run
+                    /src
+  LcmpGen
+          /dist
+               LmcpGen.jar <-- add this here to avoid compilation
+          /nbproject
+          /src
+  OpenUxAS
+          /3rd
+          /doc
+          /examples
+          /mdms
+          /resources
+          /src
+          /tests
+          /wrap_patches
+```  
+
+1. EITHER Checkout + compile *OpenAMASE* (**optional**)
+   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
+   1. Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
+   2. Compile: Load provided Netbeans project, click `Build`  
+   
+   OR Download *OpenAMASE* (**optional**)
+   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
+   1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar)
+   2. Place `OpenAMASE.jar` in `OpenAMASE/OpenAMASE/dist` folder
+2. EITHER Checkout + compile *LmcpGen*
+   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
+   1. Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
+   2. Compile: Load provided Netbeans project, click `Build`  
+   
+   OR Download *LmcpGen*
+   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
+   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar)
+   2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
-   - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS`
+   - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
    - ``` sh RunLmcpGen.sh ```
 4. Prepare UxAS specific patches to external libraries: in terminal in `OpenUxAS` directory
    - ``` ./prepare ```
@@ -322,8 +383,18 @@ unexpected trouble may arise on other platforms.
    
 # Building the Documentation
 
+The following is a bash script that help to partially automate the "building the docuemntation" processes that are documented in this README.md file below.
+
+1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
+2. Run the script at the terminal: `./build_documentation.sh`
+3. Follow the on-screen instructions
+
+Note that 
+
+If you'd like to do this process manually, then:
+
 1. The User Manual can be generated by running:
-   `pdflatex UxAS_UserManual.tex` in the folder `doc/doxygen/reference/UserManual/`
+   `pdflatex UxAS_UserManual.tex` in the folder `doc/reference/UserManual/`
 2. Create HTML Doxygen reference documenation:
    - Open terminal in directory `doc/doxygen`
    - ``` sh RunDoxygen.sh ```
