@@ -85,8 +85,7 @@ subdir('src/Services')
 
 subdir('src/Utilities')
 
-sub_lmcp                = subproject('src/LMCP')
-lib_lmcp                = sub_lmcp.get_variable('lib')
+subdir('src/LMCP')
 
 dep_thread              = dependency('threads')
 dep_uuid                = dependency('uuid')
