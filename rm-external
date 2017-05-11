@@ -4,11 +4,12 @@ from pathlib import Path
 import os
 import shutil
 
-pd = Path('.')
+cwd = Path.cwd()
+pd = cwd / Path('3rd')
 for p in pd.glob('*_patch.tar'):
-	d = str(p)[0:-10]
-	if Path(d).is_dir():
-		shutil.rmtree(d)
-pc = Path('./packagecache')
+        d = str(p)[0:-10]
+        if Path(d).is_dir():
+                shutil.rmtree(d)
+pc = pd / 'packagecache'
 for c in pc.glob('*'):
-	os.remove(str(c))
+        os.remove(str(c))

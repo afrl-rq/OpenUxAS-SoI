@@ -20,10 +20,10 @@ inc_test = [
     '../src/Services',
     '../src/Utilities',
     '../3rd/PugiXML/src',
-    '../cppzmq-4.2.1',
-    '../zeromq-4.1.1/include',
-    '../sqlite-amalgamation-3120200',
-    '../SQLiteCpp-1.3.1/include',
+    '../3rd/cppzmq-4.2.1',
+    '../3rd/zeromq-4.1.1/include',
+    '../3rd/sqlite-amalgamation-3120200',
+    '../3rd/SQLiteCpp-1.3.1/include',
   ),
   sub_gtest.get_variable('incdir'),
 ]
@@ -39,7 +39,6 @@ libs_test = [
   lib_sqlitecpp,
   lib_sqlite3,
   lib_pugixml,
-  lib_boostlibs,
   lib_visilibity,
   lib_serial,
   lib_plans,
@@ -50,16 +49,8 @@ libs_test = [
 ]
 
 if get_option('afrl_internal')
-  inc_test += [
-    '../src/Services/afrl_internal',
-  ]
-  libs_test += [
-    subproject('src/Kestrel').get_variable('lib'),
-    subproject('src/Piccolo').get_variable('lib'),
-    subproject('3rd/TrilliumSDK').get_variable('lib'),
-    subproject('3rd/Tripath').get_variable('lib'),
-    subproject('src/UGSManagement').get_variable('lib'),
-  ]
+  inc_test += incs_internal
+  libs_test += libs_internal
 endif
 
 link_args_test = link_args
