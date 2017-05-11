@@ -1,0 +1,49 @@
+dist: trusty
+sudo: false
+
+os:
+  - linux
+
+language:
+  - cpp
+
+addons:
+  apt:
+    packages:
+      - libglu1-mesa-dev
+      - uuid-dev
+      - libboost-filesystem-dev
+      - libboost-regex-dev
+      - libboost-system-dev
+      - ant
+      - oracle-java8-set-default
+
+before_install:
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  # install newer Meson than is packaged in repos
+  - pip3 install --user meson
+  - meson --version
+  # download newer Ninja than is packaged in repos
+  - curl -L -s https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip -o ninja-linux.zip
+  - unzip ninja-linux.zip
+  - mv ninja ~/.local/bin
+  - ninja --version
+  # run help to see what it thinks -j should be
+  - ninja --help
+
+install:
+  # clone, build, and run LmcpGen
+  - git clone -b $TRAVIS_BRANCH git@github.com:afrl-rq/LmcpGen.git ../LmcpGen
+  - (cd ../LmcpGen; ant jar)
+  - sh RunLmcpGen.sh
+  # process the wraps and their patches
+  - ./prepare
+
+before_script:
+  - meson build
+
+script:
+  # build with -j1, get some weird failures otherwise, possibly due to running out of memory
+  - ninja -C build test -j1
+  
