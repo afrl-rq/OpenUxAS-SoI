@@ -1,8 +1,8 @@
 project('czmq', 'c')
 
 cc = meson.get_compiler('c')
-cpp_args = [
-  '-std=c++11',
+c_args = [
+  '-std=c11',
   '-DZMQ_USE_EPOLL',
   '-D_GNU_SOURCE',
   '-D_REENTRANT',
@@ -64,9 +64,9 @@ subdir('src')
 
 os = target_machine.system()
 if os == 'linux'
-  cpp_args += ['-D_GNU_SOURCE', '-DLINUX', '-DCZMQ_HAVE_LINUX=1']
+  c_args += ['-D_GNU_SOURCE', '-DLINUX', '-DCZMQ_HAVE_LINUX=1']
 elif os == 'darwin'
-  cpp_args += ['-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
+  c_args += ['-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
 endif
 
 lib = static_library(
@@ -116,7 +116,7 @@ lib = static_library(
     'src/zthread.c',
     'src/zuuid.c',
   ],
-  cpp_args: cpp_args,
+  c_args: c_args,
   include_directories: include_directories(
     'include',
     'src',
