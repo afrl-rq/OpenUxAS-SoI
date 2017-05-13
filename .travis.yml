@@ -29,8 +29,6 @@ before_install:
   - unzip ninja-linux.zip
   - mv ninja ~/.local/bin
   - ninja --version
-  # run help to see what it thinks -j should be
-  - ninja --help
 
 install:
   # clone, build, and run LmcpGen
@@ -44,6 +42,6 @@ before_script:
   - meson build
 
 script:
-  # build with -j1, get some weird failures otherwise, possibly due to running out of memory
-  - ninja -C build test -j1
+  # build with -j2; Travis has 2 "cores"
+  - ninja -C build test -j2
   
