@@ -32,8 +32,10 @@ before_install:
 
 install:
   # clone, build, and run LmcpGen
-  - git clone -b $TRAVIS_BRANCH git@github.com:afrl-rq/LmcpGen.git ../LmcpGen
-  - (cd ../LmcpGen; ant jar)
+  - git clone git@github.com:afrl-rq/LmcpGen.git ../LmcpGen
+  # tries to check out the same branch as the one we're building if it's
+  # available, so that development can proceed in tandem
+  - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)
   - sh RunLmcpGen.sh
   # process the wraps and their patches
   - ./prepare
