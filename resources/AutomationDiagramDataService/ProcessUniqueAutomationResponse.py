@@ -13,17 +13,17 @@ def ProcessMissionCommand(missionCommand):
 		firstWaypoint = 0
 		elements = missionCommand.getElementsByTagName('FirstWaypoint')
 		if len(elements):
-			firstWaypoint = long(elements[0].firstChild.data)
+			firstWaypoint = int(elements[0].firstChild.data)
 
 		commandID = 0
 		elements = missionCommand.getElementsByTagName('CommandID')
 		if len(elements):
-			commandID = long(elements[0].firstChild.data)
+			commandID = int(elements[0].firstChild.data)
 
 		vehicleID = 0
 		elements = missionCommand.getElementsByTagName('VehicleID')
 		if len(elements):
-			vehicleID = long(elements[0].firstChild.data)
+			vehicleID = int(elements[0].firstChild.data)
 
 		status = 'Cancelled'
 		elements = missionCommand.getElementsByTagName('Status')
@@ -38,7 +38,7 @@ def ProcessMissionCommand(missionCommand):
 				number = -1
 				elements1 = elementWaypoint.getElementsByTagName('Number')
 				if len(elements1):
-					number = long(elements1[0].firstChild.data)
+					number = int(elements1[0].firstChild.data)
 				altitude = -1
 				elements1 = elementWaypoint.getElementsByTagName('Altitude')
 				if len(elements1):

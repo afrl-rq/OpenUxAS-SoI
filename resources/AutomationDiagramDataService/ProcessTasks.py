@@ -13,7 +13,7 @@ def ProcessAngledAreaSearchTask(angledAreaSearchTaskNode):
 	taskID = 0
 	elements = angledAreaSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = angledAreaSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -40,12 +40,12 @@ def ProcessAngledAreaSearchTask(angledAreaSearchTaskNode):
 	searchAreaId = 0
 	searchAreaIdNode = angledAreaSearchTaskNode.getElementsByTagName('SearchAreaID')
 	if len(searchAreaIdNode):
-		searchAreaId = long(searchAreaIdNode[0].firstChild.data)
+		searchAreaId = int(searchAreaIdNode[0].firstChild.data)
 		# find the area of interest
 		isFoundFile = False
 		for areaOfInterestFile in glob.glob('AreaOfInterest_Id*'):
 			#	AreaOfInterest_Id_100.xml
-			fileId = long(re.search(r'\d+',areaOfInterestFile).group())
+			fileId = int(re.search(r'\d+',areaOfInterestFile).group())
 			if fileId == searchAreaId:
 				isFoundFile = True
 				docFileId = xml.dom.minidom.parse(areaOfInterestFile)
@@ -110,7 +110,7 @@ def ProcessWatchTask(watchTaskNode):
 	taskID = 0
 	elements = watchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = watchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -122,13 +122,13 @@ def ProcessWatchTask(watchTaskNode):
 	watchedEntityID = 0
 	watchedEntityIDNode = watchTaskNode.getElementsByTagName('WatchedEntityID')
 	if len(watchedEntityIDNode):
-		watchedEntityID = long(watchedEntityIDNode[0].firstChild.data)
+		watchedEntityID = int(watchedEntityIDNode[0].firstChild.data)
 	if watchedEntityID > 0:
 		# find the point of interest
 		isFoundFile = False
 		for entityStateFile in glob.glob('WatchedEntity_Id*'):
 			#	WatchedEntity_Id_1002.xml
-			fileId = long(re.search(r'\d+',entityStateFile).group())
+			fileId = int(re.search(r'\d+',entityStateFile).group())
 			if fileId == watchedEntityID:
 				isFoundFile = True
 				docFileId = xml.dom.minidom.parse(entityStateFile)
@@ -185,7 +185,7 @@ def ProcessImpactPointSearchTask(impactPointSearchTaskNode):
 	taskID = 0
 	elements = impactPointSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = impactPointSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -197,13 +197,13 @@ def ProcessImpactPointSearchTask(impactPointSearchTaskNode):
 	searchLocationID = 0
 	searchLocationIDNode = impactPointSearchTaskNode.getElementsByTagName('SearchLocationID')
 	if len(searchLocationIDNode):
-		searchLocationID = long(searchLocationIDNode[0].firstChild.data)
+		searchLocationID = int(searchLocationIDNode[0].firstChild.data)
 	if searchLocationID > 0:
 		# find the point of interest
 		isFoundFile = False
 		for pointOfInterestFile in glob.glob('PointOfInterest_Id*'):
 			#	PointOfInterest_Id_102.xml
-			fileId = long(re.search(r'\d+',pointOfInterestFile).group())
+			fileId = int(re.search(r'\d+',pointOfInterestFile).group())
 			if fileId == searchLocationID:
 				isFoundFile = True
 				docFileId = xml.dom.minidom.parse(pointOfInterestFile)
@@ -261,7 +261,7 @@ def ProcessImpactLineSearchTask(impactLineSearchTaskNode):
 	taskID = 0
 	elements = impactLineSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = impactLineSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -272,12 +272,12 @@ def ProcessImpactLineSearchTask(impactLineSearchTaskNode):
 	lineId = 0
 	lineIdNode = impactLineSearchTaskNode.getElementsByTagName('LineID')
 	if len(lineIdNode):
-		lineId = long(lineIdNode[0].firstChild.data)
+		lineId = int(lineIdNode[0].firstChild.data)
 		# find the line of interest
 		isFoundFile = False
 		for lineOfInterestFile in glob.glob('LineOfInterest_Id*'):
 			#	LineOfInterest_Id_101.xml
-			fileId = long(re.search(r'\d+',lineOfInterestFile).group())
+			fileId = int(re.search(r'\d+',lineOfInterestFile).group())
 			if fileId == lineId:
 				isFoundFile = True
 				docFileId = xml.dom.minidom.parse(lineOfInterestFile)
@@ -316,7 +316,7 @@ def ProcessPatternSearchTask(patternSearchTaskNode):
 	taskID = 0
 	elements = patternSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = patternSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -331,12 +331,12 @@ def ProcessPatternSearchTask(patternSearchTaskNode):
 	searchLocationID = 0
 	searchLocationIDNode = patternSearchTaskNode.getElementsByTagName('SearchLocationID')
 	if len(searchLocationIDNode):
-		searchLocationID = long(searchLocationIDNode[0].firstChild.data)
+		searchLocationID = int(searchLocationIDNode[0].firstChild.data)
 	if searchLocationID > 0:
 		# find the point of interest
 		for pointOfInterestFile in glob.glob('PointOfInterest_Id*'):
 			#	PointOfInterest_Id_102.xml
-			fileId = long(re.search(r'\d+',pointOfInterestFile).group())
+			fileId = int(re.search(r'\d+',pointOfInterestFile).group())
 			if fileId == searchLocationID:
 				isFoundFile = True
 				docFileId = xml.dom.minidom.parse(pointOfInterestFile)
@@ -409,7 +409,7 @@ def ProcessPointSearchTask(pointSearchTaskNode):
 	taskID = 0
 	elements = pointSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = pointSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -447,7 +447,7 @@ def ProcessLineSearchTask(lineSearchTaskNode):
 	taskID = 0
 	elements = lineSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = lineSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
@@ -489,7 +489,7 @@ def ProcessAreaSearchTask(areaSearchTaskNode):
 	taskID = 0
 	elements = areaSearchTaskNode.getElementsByTagName('TaskID')
 	if elements and elements[0].childNodes:
-		taskID = long(elements[0].firstChild.data)
+		taskID = int(elements[0].firstChild.data)
 	label = ''
 	elements = areaSearchTaskNode.getElementsByTagName('Label')
 	if elements and elements[0].childNodes:
