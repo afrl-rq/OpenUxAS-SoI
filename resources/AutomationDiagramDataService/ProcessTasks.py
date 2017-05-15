@@ -52,12 +52,12 @@ def ProcessAngledAreaSearchTask(angledAreaSearchTaskNode):
 				if docFileId.hasChildNodes():
 					fileNode = docFileId.firstChild
 					areaNode = fileNode.getElementsByTagName('Area')
-					# print 'areaNode[' + str(areaNode[0].nodeName) + ']'
+					# print('areaNode[' + str(areaNode[0].nodeName) + ']')
 					if len(areaNode):
 						circleNode = areaNode[0].getElementsByTagName('Circle')
 						polygonNode = areaNode[0].getElementsByTagName('Polygon')
 						rectangleNode = areaNode[0].getElementsByTagName('Rectangle')
-						# print 'searchAreaNode[' + str(searchAreaNode[0].firstChild) + ']'
+						# print('searchAreaNode[' + str(searchAreaNode[0].firstChild) + ']')
 						searchAreaType = str('Circle')
 						if len(circleNode):
 							centerPointNode = circleNode[0].getElementsByTagName('CenterPoint')
@@ -90,16 +90,16 @@ def ProcessAngledAreaSearchTask(angledAreaSearchTaskNode):
 								searchAreaPoints.append([searchPointLatLong[0],searchPointLatLong[1],altitude])
 								heading = heading + headingStep
 						elif len(polygonNode):
-							print 'WARNING:: Polygon search not implemented!!!'
+							print('WARNING:: Polygon search not implemented!!!')
 						elif len(rectangleNode):
-							print 'WARNING:: Rectangle search not implemented!!!'
+							print('WARNING:: Rectangle search not implemented!!!')
 						else:
-							print 'ERROR:: Unknown search area type[' + searchAreaType +'] encountered!!!'
+							print('ERROR:: Unknown search area type[' + searchAreaType +'] encountered!!!')
 						if not isFoundFile:
-							print 'ERROR:: AngledAreaSearchTask could not find AreaOfInterest File for Id[' + str(searchAreaId) + '!!!'
+							print('ERROR:: AngledAreaSearchTask could not find AreaOfInterest File for Id[' + str(searchAreaId) + '!!!')
 
 	else:
-		print 'ERROR:: AngledAreaSearchTask could not parse SearchAreaID!!!'
+		print('ERROR:: AngledAreaSearchTask could not parse SearchAreaID!!!')
 
 	
 	searchAreaLocationPd = pd.DataFrame(data = searchAreaPoints,columns=['latitude','longitude','altitude'])
@@ -152,11 +152,11 @@ def ProcessWatchTask(watchTaskNode):
 								altitude = float(elements[0].firstChild.data)
 							watchedEntityLocation.append([latitude,longitude,altitude])
 						else:
-							print 'ERROR:: processing [' + entityStateFile +'] !!!'
+							print('ERROR:: processing [' + entityStateFile +'] !!!')
 					else:		
-						print 'ERROR:: processing [' + entityStateFile +'] !!!'
+						print('ERROR:: processing [' + entityStateFile +'] !!!')
 				else:
-					print 'ERROR:: processing [' + entityStateFile +'] !!!'
+					print('ERROR:: processing [' + entityStateFile +'] !!!')
 				break
 	else:
 		watchedEntityLocationNode = patternSearchTaskNode.getElementsByTagName('SearchLocation')
@@ -178,7 +178,7 @@ def ProcessWatchTask(watchTaskNode):
 				watchedEntityLocation.append([latitude,longitude,altitude])
 
 	watchedEntityLocationPd = pd.DataFrame(data = watchedEntityLocation,columns=['latitude','longitude','altitude'])
-	# print 'RESULT:: ProcessImpactPointSearchTask->watchedEntityLocationPd [' + str(watchedEntityLocationPd) +'] !!!'
+	# print('RESULT:: ProcessImpactPointSearchTask->watchedEntityLocationPd [' + str(watchedEntityLocationPd) +'] !!!')
 	return [taskID,label,watchedEntityLocationPd]
 
 def ProcessImpactPointSearchTask(impactPointSearchTaskNode):
@@ -227,11 +227,11 @@ def ProcessImpactPointSearchTask(impactPointSearchTaskNode):
 								altitude = float(elements[0].firstChild.data)
 							searchLocation.append([latitude,longitude,altitude])
 						else:
-							print 'ERROR:: processing [' + pointOfInterestFile +'] !!!'
+							print('ERROR:: processing [' + pointOfInterestFile +'] !!!')
 					else:		
-						print 'ERROR:: processing [' + pointOfInterestFile +'] !!!'
+						print('ERROR:: processing [' + pointOfInterestFile +'] !!!')
 				else:
-					print 'ERROR:: processing [' + pointOfInterestFile +'] !!!'
+					print('ERROR:: processing [' + pointOfInterestFile +'] !!!')
 				break
 	else:
 		searchLocationNode = impactPointSearchTaskNode.getElementsByTagName('SearchLocation')
@@ -253,7 +253,7 @@ def ProcessImpactPointSearchTask(impactPointSearchTaskNode):
 				searchLocation.append([latitude,longitude,altitude])
 
 	searchLocationPd = pd.DataFrame(data = searchLocation,columns=['latitude','longitude','altitude'])
-	# print 'RESULT:: ProcessImpactPointSearchTask->searchLocationPd [' + str(searchLocationPd) +'] !!!'
+	# print('RESULT:: ProcessImpactPointSearchTask->searchLocationPd [' + str(searchLocationPd) +'] !!!')
 	return [taskID,label,searchLocationPd]
 
 
@@ -284,7 +284,7 @@ def ProcessImpactLineSearchTask(impactLineSearchTaskNode):
 				if docFileId.hasChildNodes():
 					fileNode = docFileId.firstChild
 					pointListNode = fileNode.getElementsByTagName('Line')
-					# print 'pointListNode[' + str(pointListNode[0].nodeName) + ']'
+					# print('pointListNode[' + str(pointListNode[0].nodeName) + ']')
 					if len(pointListNode):
 						pointsNode = pointListNode[0].getElementsByTagName('Location3D')
 						for point in pointsNode:
@@ -303,10 +303,10 @@ def ProcessImpactLineSearchTask(impactLineSearchTaskNode):
 									altitude = float(elements[0].firstChild.data)
 							pointList.append([latitude,longitude,altitude])
 		if not isFoundFile:
-			print 'ERROR:: ImpactLineSearchTask could not find LineOfInterest File for Id[' + str(lineId) + '!!!'
+			print('ERROR:: ImpactLineSearchTask could not find LineOfInterest File for Id[' + str(lineId) + '!!!')
 
 	else:
-		print 'ERROR:: ImpactLineSearchTask could not parse LineID!!!'
+		print('ERROR:: ImpactLineSearchTask could not parse LineID!!!')
 
 	pointListPd = pd.DataFrame(data = pointList,columns=['latitude','longitude','altitude'])
 	return [taskID,label,pointListPd]
@@ -357,11 +357,11 @@ def ProcessPatternSearchTask(patternSearchTaskNode):
 								altitude = float(elements[0].firstChild.data)
 							isGoodSearchLocation = True
 						else:
-							print 'ERROR:: processing [' + pointOfInterestFile +'] !!!'
+							print('ERROR:: processing [' + pointOfInterestFile +'] !!!')
 					else:		
-						print 'ERROR:: processing [' + pointOfInterestFile +'] !!!'
+						print('ERROR:: processing [' + pointOfInterestFile +'] !!!')
 				else:
-					print 'ERROR:: processing [' + pointOfInterestFile +'] !!!'
+					print('ERROR:: processing [' + pointOfInterestFile +'] !!!')
 				break
 	else:
 		searchLocationNode = patternSearchTaskNode.getElementsByTagName('SearchLocation')
@@ -396,7 +396,7 @@ def ProcessPatternSearchTask(patternSearchTaskNode):
 			heading = heading + headingStep
 
 	searchLocationPd = pd.DataFrame(data = searchLocation,columns=['latitude','longitude','altitude'])
-	# print 'RESULT:: ProcessPatternSearchTask->searchLocationPd [' + str(searchLocationPd) +'] !!!'
+	# print('RESULT:: ProcessPatternSearchTask->searchLocationPd [' + str(searchLocationPd) +'] !!!')
 	return [taskID,label,searchLocationPd]
 
 def ProcessPointSearchTask(pointSearchTaskNode):
@@ -456,7 +456,7 @@ def ProcessLineSearchTask(lineSearchTaskNode):
 
 	pointList = []
 	pointListNode = lineSearchTaskNode.getElementsByTagName('PointList')
-	# print 'pointListNode[' + str(pointListNode[0].nodeName) + ']'
+	# print('pointListNode[' + str(pointListNode[0].nodeName) + ']')
 	if len(pointListNode):
 		pointsNode = pointListNode[0].getElementsByTagName('Location3D')
 		for point in pointsNode:
@@ -498,12 +498,12 @@ def ProcessAreaSearchTask(areaSearchTaskNode):
 
 	searchAreaPoints = []
 	areaNode = areaSearchTaskNode.getElementsByTagName('SearchArea')
-	# print 'areaNode[' + str(areaNode[0].nodeName) + ']'
+	# print('areaNode[' + str(areaNode[0].nodeName) + ']')
 	if len(areaNode):
 		circleNode = areaNode[0].getElementsByTagName('Circle')
 		polygonNode = areaNode[0].getElementsByTagName('Polygon')
 		rectangleNode = areaNode[0].getElementsByTagName('Rectangle')
-		# print 'searchAreaNode[' + str(searchAreaNode[0].firstChild) + ']'
+		# print('searchAreaNode[' + str(searchAreaNode[0].firstChild) + ']')
 		searchAreaType = str('Circle')
 		if len(circleNode):
 			centerPointNode = circleNode[0].getElementsByTagName('CenterPoint')
@@ -536,11 +536,11 @@ def ProcessAreaSearchTask(areaSearchTaskNode):
 				searchAreaPoints.append([searchPointLatLong[0],searchPointLatLong[1],altitude])
 				heading = heading + headingStep
 		elif len(polygonNode):
-			print 'WARNING:: Polygon search not implemented!!!'
+			print('WARNING:: Polygon search not implemented!!!')
 		elif len(rectangleNode):
-			print 'WARNING:: Rectangle search not implemented!!!'
+			print('WARNING:: Rectangle search not implemented!!!')
 		else:
-			print 'ERROR:: Unknown search area type[' + searchAreaType +'] encountered!!!'
+			print('ERROR:: Unknown search area type[' + searchAreaType +'] encountered!!!')
 
 		searchBoundaryPd = pd.DataFrame(data = searchAreaPoints,columns=['latitude','longitude','altitude'])
 	return [taskID,label,searchBoundaryPd]
@@ -556,47 +556,47 @@ def ProcessTaskFile(filename):
 		taskType = str(taskTypeNode.nodeName)
 
 		if taskType == 'PointSearchTask':
-			print 'processing PointSearchTask ...'
+			print('processing PointSearchTask ...')
 			taskData = ProcessPointSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'LineSearchTask':
-			print 'processing LineSearchTask ...'
+			print('processing LineSearchTask ...')
 			taskData = ProcessLineSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'AreaSearchTask':
-			print 'processing AreaSearchTask ...'
+			print('processing AreaSearchTask ...')
 			taskData = ProcessAreaSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'AngledAreaSearchTask':
-			print 'processing AngledAreaSearchTask ...'
+			print('processing AngledAreaSearchTask ...')
 			taskData = ProcessAngledAreaSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'ImpactPointSearchTask':
-			print 'processing ImpactPointSearchTask ...'
+			print('processing ImpactPointSearchTask ...')
 			taskData = ProcessImpactPointSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'ImpactLineSearchTask':
-			print 'processing ImpactLineSearchTask ...'
+			print('processing ImpactLineSearchTask ...')
 			taskData = ProcessImpactLineSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'PatternSearchTask':
-			print 'processing PatternSearchTask ...'
+			print('processing PatternSearchTask ...')
 			taskData = ProcessPatternSearchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		elif taskType == 'WatchTask':
-			print 'processing WatchTask ...'
+			print('processing WatchTask ...')
 			taskData = ProcessWatchTask(taskTypeNode)
 			if len(taskData):
 				searchTask.append(taskData)
 		else:
-			print 'ERROR:: Unknown task type[' + taskType +'] encountered!!!'
+			print('ERROR:: Unknown task type[' + taskType +'] encountered!!!')
 	return searchTask
 
 def main():

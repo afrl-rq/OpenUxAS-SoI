@@ -40,10 +40,10 @@ def ProcessEntityStateFile(filename):
 				heading = float(elements[0].firstChild.data)
 
 		except StandardError:
-			print '### Error encountered while processing the EnityState ###'
+			print('### Error encountered while processing the EnityState ###')
 			isGoodMessage = False
 		except:
-			print '### Error encountered while processing the EnityState ###Unexpected error:', sys.exc_info()[0]
+			print('### Error encountered while processing the EnityState ###Unexpected error:', sys.exc_info()[0])
 			isGoodMessage = False
 	if isGoodMessage:
 		return [entityId,latitude,longitude,altitude,heading]
@@ -53,10 +53,10 @@ def ProcessEntityStateFile(filename):
 def main():
 	vehicleStateArray = []
 	for entityStateFile in glob.glob('EnityState_Id*'):
-		print 'loading [' + entityStateFile + ']'
+		print('loading [' + entityStateFile + ']')
 		vehicleStateArray.append(ProcessEntityStateFile(entityStateFile))
 	vehicleStatesPd = pd.DataFrame(data = vehicleStateArray,columns=['vehicleID','latitude','longitude','altitude','heading'])
-	print 'saving [VehicleStates.pkl]'
+	print('saving [VehicleStates.pkl]')
 	vehicleStatesPd.to_pickle('VehicleStates.pkl')
 
 if __name__ == '__main__':

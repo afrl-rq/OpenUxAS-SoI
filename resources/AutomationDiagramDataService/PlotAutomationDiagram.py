@@ -67,7 +67,7 @@ def main():
 		vehicleColor = cmapVehicles(normVehicles(vehicleID))
 		for vehicleState in vehicleStatesPd.itertuples():
 			if vehicleID == vehicleState.vehicleID:
-				# print '[' + str(vehicleState) + ']'
+				# print('[' + str(vehicleState) + ']')
 				vehicleLabel = 'V[' + str(vehicleState.vehicleID) + ']'
 				labelStrings.append(vehicleLabel)
 				NorthEast_m = LocalCoords.LatLong_degToNorthEast_m(vehicleState.latitude,vehicleState.longitude)
@@ -97,7 +97,7 @@ def main():
 		labelStrings.append(str(taskLabel))
 		North_m = []
 		East_m = []
-		# print 'task.searchBoundaryPd.size[' + str(task.searchBoundaryPd.size) + ']'
+		# print('task.searchBoundaryPd.size[' + str(task.searchBoundaryPd.size) + ']')
 		if task.searchBoundaryPd.shape[0] != 1:
 			for boundary in task.searchBoundaryPd.itertuples():
 				NorthEast_m = LocalCoords.LatLong_degToNorthEast_m(boundary.latitude,boundary.longitude)
@@ -130,7 +130,7 @@ def main():
 
 		North_m = []
 		East_m = []
-		# print 'zone.boundaryPd.size[' + str(zone.boundaryPd.shape) + ']'
+		# print('zone.boundaryPd.size[' + str(zone.boundaryPd.shape) + ']')
 		for boundary in zone.boundaryPd.itertuples():
 			NorthEast_m = LocalCoords.LatLong_degToNorthEast_m(boundary.latitude,boundary.longitude)
 			North_m.append(NorthEast_m[0])
