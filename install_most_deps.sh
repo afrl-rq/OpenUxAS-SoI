@@ -99,6 +99,7 @@ if [ "$(uname)" == "Darwin" ]; then
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
     sudo apt update
+    sudo apt upgrade
     sudo apt install firefox
 
     echo "Installing Prerequisite Tools on Ubuntu Linux (/ ...Bash on Ubuntu on Windows?)"
