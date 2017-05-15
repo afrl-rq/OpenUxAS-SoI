@@ -26,3 +26,17 @@ examples/**/datawork/**
 # Mac OS X file system
 **.DS_Store
 /UxAS-afrl_internal/
+
+# 3rd party files/directories
+boost*
+cppzmq*
+czmq*
+googletest-release-*
+minizip*
+packagecache/*
+serial*
+sqlite*
+SQLiteCpp*
+zeromq*
+zlib*
+zyre*
