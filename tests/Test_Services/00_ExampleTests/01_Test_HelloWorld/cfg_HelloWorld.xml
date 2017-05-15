@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <UxAS EntityID="100" FormatVersion="1.0" EntityType="None">
 
-    <Service Type="HelloWorld" StringToSend="Hello from #1" SendPeriod_ms="2000"/>
-    <Service Type="HelloWorld" StringToSend="Hello from #2" SendPeriod_ms="5100"/>
-
-    <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1" FilesPerSubDirectory="1000">
+	<Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1" FilesPerSubDirectory="1000">
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
     </Service>
+
+    <Service Type="HelloWorld" StringToSend="Hello from #1" SendPeriod_ms="2000"/>
+    <Service Type="HelloWorld" StringToSend="Hello from #2" SendPeriod_ms="5100"/>
 
 </UxAS>
 
