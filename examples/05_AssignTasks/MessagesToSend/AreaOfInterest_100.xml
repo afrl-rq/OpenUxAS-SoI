@@ -1,0 +1,15 @@
+<AreaOfInterest Series="IMPACT">
+  <AreaID>100</AreaID>
+  <Area>
+  <Circle Series="CMASI">
+  <CenterPoint>
+     <Location3D Series="CMASI">
+       <Latitude>-22.71</Latitude>
+       <Longitude>150.60</Longitude>
+     </Location3D>
+  </CenterPoint>
+  <Radius>1500.0</Radius>
+  </Circle>
+  </Area>
+</AreaOfInterest>
+

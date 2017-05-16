@@ -1,0 +1,18 @@
+<TaskImplementationRequest Series="UXTASK">
+  <StartingWaypointId>12000000000</StartingWaypointId>
+  <TaskImplementationId>1002</TaskImplementationId>
+  <EntityId>1000</EntityId>
+  <StartPosition>
+   <Location3D Series="CMASI">
+     <Altitude>20</Altitude>
+     <Latitude>-22.712</Latitude>
+     <Longitude>150.60</Longitude>
+   </Location3D>
+  </StartPosition>
+  <StartHeading>270</StartHeading>
+  <StartTime>0</StartTime>
+  <RegionId></RegionId>
+  <TaskId>12</TaskId>
+  <OptionId>5</OptionId>
+  <TimeThreshold>1</TimeThreshold>
+</TaskImplementationRequest>
