@@ -173,7 +173,7 @@ void rpvs_processReceivedLmcpMessage()
 void rpvs_service()
 {
   rpvs_configure();
-  for(;;)
+  while(1)
       rpvs_processReceivedLmcpMessage();
 }
 

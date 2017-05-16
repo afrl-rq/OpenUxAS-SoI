@@ -318,7 +318,7 @@ void ras_service()
 {
     struct LmcpMessage msg;
     ras_configure();
-    for(;;)
+    while(1)
         ras_processReceivedLmcpMessage(&msg);
 }
 
