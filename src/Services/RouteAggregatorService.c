@@ -251,6 +251,9 @@ void ras_CheckAllRoutePlans()
         {
             ras_SendRouteResponse(i->first);
             i = m_pendingRoute.erase(i);
+#ifdef COPPER
+            return;
+#endif
         }
         else
         {
