@@ -249,7 +249,7 @@ void ras_CheckAllRoutePlans()
 
         if (isFulfilled)
         {
-            SendRouteResponse(i->first);
+            ras_SendRouteResponse(i->first);
             i = m_pendingRoute.erase(i);
         }
         else
