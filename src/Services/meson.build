@@ -21,6 +21,7 @@ srcs_services = [
   'Test_SimulationTime.cpp',
   'RoutePlannerVisibilityService.cpp',
   'WaypointPlanManagerService.cpp',
+  'Challenge_TelemetryReceiver.cpp',
 ]
 
 incs_services = [

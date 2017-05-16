@@ -95,6 +95,7 @@ subdir('src/Plans')
 
 dep_thread              = dependency('threads')
 dep_uuid                = dependency('uuid')
+dep_zsrmv		= dependency('zsrmv')
 
 libs = [
   lib_services,
@@ -126,6 +127,7 @@ endif
 subdir('src/Includes')
 
 deps = [
+  dep_zsrmv,
   dep_thread,
   dep_uuid,
   dep_boost,

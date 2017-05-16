@@ -530,6 +530,45 @@ private:
 
     uxas::communications::LmcpObjectMessageSenderPipe m_lmcpObjectMessageSenderPipe;
     
+    
+    /**
+     * Section for ZSRM Time Budget Reservations
+     */
+    bool zs_isReserveAttached = false;
+    bool zs_isReservationEnabled = false;
+    int zs_rid = 0;
+    int zs_schedfd=0;
+    
+    /** 
+     * Reservation Parameters
+     */
+    long zs_period_secs;
+    long zs_period_nsecs;
+    long zs_zero_slack_secs;
+    long zs_zero_slack_nsecs;
+    long zs_nominal_wcet_secs;
+    long zs_nominal_wcet_nsecs;
+    long zs_overload_wcet_secs;
+    long zs_overload_wcet_nsecs;
+    int zs_criticality;
+    
+    
+public:
+    void 
+    budget_enforcement_handler(int rid);
+    
+    void
+    set_budget_reservation_parameters(
+    long period_secs,
+    long period_nsecs,
+    long zero_slack_secs,
+    long zero_slack_nsecs,
+    long nominal_wcet_secs,
+    long nominal_wcet_nsecs,
+    long overload_wcet_secs,
+    long overload_wcet_nsecs,
+    int criticality
+    );
 };
 
 }; //namespace communications

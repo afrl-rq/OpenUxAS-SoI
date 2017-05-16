@@ -19,6 +19,21 @@
 
 #include "stdUniquePtr.h"
 
+/**
+ * ZSRM includes
+ */
+extern "C" {
+#include <zsrmvapi.h>
+}
+
+namespace
+{
+    void zs_budget_enforcement_helper(void *param, int rid)
+    {
+        (static_cast<uxas::communications::LmcpObjectNetworkClientBase*>(param))->budget_enforcement_handler(rid);
+    }
+}
+
 namespace uxas
 {
 namespace communications
@@ -43,6 +58,16 @@ LmcpObjectNetworkClientBase::~LmcpObjectNetworkClientBase()
     if (m_networkClientThread && m_networkClientThread->joinable())
     {
         m_networkClientThread->detach();
+    }
+
+    if (zs_isReservationEnabled){
+        if (zsv_delete_reserve(zs_schedfd, zs_rid) <0){
+            std::cout << "Failed to delete reserve\n";
+        }
+    
+        if (zsv_close_scheduler(zs_schedfd) <0){
+            std::cout << "Failed to close the scheduler\n";
+        }
     }
 };
 
@@ -269,6 +294,38 @@ LmcpObjectNetworkClientBase::initializeNetworkClient()
     m_lmcpObjectMessageSenderPipe.initializePush(m_messageSourceGroup, m_entityId, m_networkId);
 
     LOG_DEBUGGING(m_networkClientTypeName, "::initializesendAddressedAttributedMessageNetworkClient method END");
+    
+    /**
+     * ZSRM calls
+     * 
+     */
+    if (zs_isReservationEnabled){
+        if ((zs_schedfd = zsv_open_scheduler())<0){
+            std::cout << "Error opening the scheduler\n";
+        }
+
+    
+        if ((zs_rid = zsv_create_reserve(zs_schedfd,
+				zs_period_secs, // period_secs
+				zs_period_nsecs, // period_nsecs
+				zs_zero_slack_secs, // zsinstant_sec -- same as period = disabled
+				zs_zero_slack_nsecs, // zsinstant_nsec -- same as period = disabled
+				zs_overload_wcet_secs, // exectime _secs
+				zs_overload_wcet_nsecs, // exectime_nsecs
+				zs_nominal_wcet_secs, // nominal_exectime_sec -- same as overloaded
+				zs_nominal_wcet_nsecs, // nominal_exectime_nsec -- same as overloaded
+				1, // priority -- will be changed internally so setting it to 1 is enough
+				zs_criticality  // criticality
+				))<0){
+            std::cout << "error calling create reserve\n";
+        }
+
+    
+        if (zsv_fork_enforcement_handler(zs_schedfd,zs_rid,zs_budget_enforcement_helper,this)<0){
+            std::cout << "::initializesendAddressedAttributedMessageNetworkClient method COULD NOT REGISTER budget enforcement handler helper\n" ;
+        }
+    }
+    
     return (true);
 };
 
@@ -284,10 +341,22 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
         {
             try
             {
+                // The first time we do not call wait for period but let the task wait for the first 
+                // message, this way we "sync" the wait for next period with the message sender
+                if (zs_isReservationEnabled && zs_isReserveAttached){
+                    zsv_wait_period(zs_schedfd,zs_rid);
+                }
                 // get the next LMCP message (if any) from the LMCP network server
                 LOG_DEBUG_VERBOSE_MESSAGING(m_networkClientTypeName, "::executeNetworkClient calling m_lmcpObjectMessageReceiverPipe.getNextMessageObject()");
                 std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage
                         = m_lmcpObjectMessageReceiverPipe.getNextMessageObject();
+                if (zs_isReservationEnabled && !zs_isReserveAttached){
+                    // attach it for the first time
+                      if (zsv_attach_reserve(zs_schedfd, gettid(), zs_rid)<0){
+                          std::cout << "Error attaching the reserve \n";
+                      }
+                      zs_isReserveAttached = true;
+                }
                 LOG_DEBUG_VERBOSE_MESSAGING(m_networkClientTypeName, "::executeNetworkClient completed calling m_lmcpObjectMessageReceiverPipe.getNextMessageObject()");
 
                 if (receivedLmcpMessage)
@@ -361,10 +430,24 @@ LmcpObjectNetworkClientBase::executeSerializedNetworkClient()
         m_isThreadStarted = true;
         while (!m_isTerminateNetworkClient)
         {
+            // The first time we do not call wait for period but let the task wait for the first 
+            // message, this way we "sync" the wait for next period with the message sender
+            if (zs_isReservationEnabled && zs_isReserveAttached){
+                zsv_wait_period(zs_schedfd,zs_rid);
+            }
+
             // get the next serialized LMCP object message (if any) from the LMCP network server
             std::unique_ptr<uxas::communications::data::AddressedAttributedMessage>
                     nextReceivedSerializedLmcpObject
                     = m_lmcpObjectMessageReceiverPipe.getNextSerializedMessage();
+            
+            if (zs_isReservationEnabled && !zs_isReserveAttached){
+                // attach it for the first time
+                if (zsv_attach_reserve(zs_schedfd, gettid(), zs_rid)<0){
+                    std::cout << "Error attaching the reserve \n";
+                }
+                zs_isReserveAttached = true;
+            }
 
             if (nextReceivedSerializedLmcpObject)
             {
@@ -497,5 +580,37 @@ LmcpObjectNetworkClientBase::sendSharedLmcpObjectLimitedCastMessage(const std::s
     m_lmcpObjectMessageSenderPipe.sendSharedLimitedCastMessage(castAddress, lmcpObject);
 };
 
+/**
+ * ZSRM methods
+ */
+void
+LmcpObjectNetworkClientBase::budget_enforcement_handler(int rid)
+{    
+}
+
+void LmcpObjectNetworkClientBase::set_budget_reservation_parameters(
+                                            long period_secs,
+                                            long period_nsecs,
+                                            long zero_slack_secs,
+                                            long zero_slack_nsecs,
+                                            long nominal_wcet_secs,
+                                            long nominal_wcet_nsecs,
+                                            long overload_wcet_secs,
+                                            long overload_wcet_nsecs,
+                                            int criticality)
+{
+    zs_period_secs = period_secs;
+    zs_period_nsecs = period_nsecs;
+    zs_zero_slack_secs = zero_slack_secs;
+    zs_zero_slack_nsecs = zero_slack_nsecs;
+    zs_nominal_wcet_secs = nominal_wcet_secs;
+    zs_nominal_wcet_nsecs = nominal_wcet_nsecs;
+    zs_overload_wcet_secs = overload_wcet_secs;
+    zs_overload_wcet_nsecs = overload_wcet_nsecs;
+    zs_criticality = criticality;
+    zs_isReservationEnabled = true;   
+}
+
 }; //namespace communications
 }; //namespace uxas
+
