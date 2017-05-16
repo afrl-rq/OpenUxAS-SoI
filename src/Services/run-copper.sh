@@ -3,6 +3,7 @@
 function to_pp {
     TMPF="$1.tmp.c"
     rm -f $TMPF && touch $TMPF
+    echo '#define COPPER 1' >> $TMPF
     echo '#define bool int' >> $TMPF
     echo '#define auto int' >> $TMPF
     echo '#define int64_t int' >> $TMPF
@@ -15,7 +16,8 @@ function to_pp {
     cat $TMPF | sed 's/std::string /int /g' > aa ; mv aa $TMPF
     cat $TMPF | sed 's/std::stringstream /int /g' > aa ; mv aa $TMPF
     cat $TMPF | sed -r 's/<([^>]+)>//g' > aa; mv aa $TMPF
-    cat $TMPF | sed -r 's/for/for(;;) \/\//g' > aa; mv aa $TMPF
+    cat $TMPF | sed -r 's/for /while(0) \/\//g' > aa; mv aa $TMPF
+    #cat $TMPF | sed -r 's/for/for(;;) \/\//g' > aa; mv aa $TMPF
     cat $TMPF | sed -r 's/\{true\}/ = true/g' > aa; mv aa $TMPF
     cat $TMPF | sed -r 's/std::shared_ptr /int /g' > aa; mv aa $TMPF
     cat $TMPF | sed -r 's/\(new uxas::messages::route::RoutePlanRequest\)/ = 0/g' > aa; mv aa $TMPF
