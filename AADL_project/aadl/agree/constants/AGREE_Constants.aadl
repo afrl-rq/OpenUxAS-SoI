@@ -1,0 +1,24 @@
+package AGREE_Constants
+public
+	with Data_Types;
+	
+	annex agree {**
+
+		-- This is a simple integer constant whose value is 81.
+		const EXAMPLE_INT: Base_Types::Integer = 81;
+		
+		--Note that the backend analysis tools use rationals (BigFraction),
+		-- so EXAMPLE_REAL defined below is a real for the purpose of analysis.
+		const EXAMPLE_REAL: Base_Types::Float = 3.2;	
+	
+		-- Below is an example of how to define a constant record.
+		-- The type of Example_Record_Type is defined in Data_Types.aadl.
+		const EXAMPLE_RECORD: Data_Types::Example_Record_Type.impl =
+			Data_Types::Example_Record_Type.impl
+				{
+					Example_Field1 = EXAMPLE_INT; 
+					Example_Field2 = EXAMPLE_REAL
+				}; 
+		
+	**};
+end AGREE_Constants;
