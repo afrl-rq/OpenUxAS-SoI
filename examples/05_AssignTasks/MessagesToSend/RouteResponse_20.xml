@@ -1,0 +1,74 @@
+<RouteResponse Series="ROUTE">
+  <Routes>
+    <RoutePlanResponse Series="ROUTE">
+      <AssociatedTaskId>20</AssociatedTaskId>
+      <VehicleId>1000</VehicleId>
+      <OperatingRegion>0</OperatingRegion>
+      <RouteResponses>
+       <RoutePlan Series="ROUTE">
+         <RouteId>20001001</RouteId>
+         <Waypoints>
+          <Waypoint Series="CMASI">
+            <Number>0</Number>
+            <NextWaypoint>0</NextWaypoint>
+            <Speed>0</Speed>
+            <SpeedType>Airspeed</SpeedType>
+            <ClimbRate>0</ClimbRate>
+            <TurnType>TurnShort</TurnType>
+            <VehicleActionList>
+            </VehicleActionList>
+            <ContingencyWaypointA>0</ContingencyWaypointA>
+            <ContingencyWaypointB>0</ContingencyWaypointB>
+            <AssociatedTasks>
+            </AssociatedTasks>
+            <Latitude>39.9999999999924</Latitude>
+            <Longitude>-89.999999999983</Longitude>
+            <Altitude>0</Altitude>
+            <AltitudeType>MSL</AltitudeType>
+          </Waypoint>
+          <Waypoint Series="CMASI">
+            <Number>0</Number>
+            <NextWaypoint>0</NextWaypoint>
+            <Speed>0</Speed>
+            <SpeedType>Airspeed</SpeedType>
+            <ClimbRate>0</ClimbRate>
+            <TurnType>TurnShort</TurnType>
+            <VehicleActionList>
+            </VehicleActionList>
+            <ContingencyWaypointA>0</ContingencyWaypointA>
+            <ContingencyWaypointB>0</ContingencyWaypointB>
+            <AssociatedTasks>
+            </AssociatedTasks>
+            <Latitude>40.0013169522252</Latitude>
+            <Longitude>-89.9983969352697</Longitude>
+            <Altitude>0</Altitude>
+            <AltitudeType>MSL</AltitudeType>
+          </Waypoint>
+          <Waypoint Series="CMASI">
+            <Number>0</Number>
+            <NextWaypoint>0</NextWaypoint>
+            <Speed>0</Speed>
+            <SpeedType>Airspeed</SpeedType>
+            <ClimbRate>0</ClimbRate>
+            <TurnType>TurnShort</TurnType>
+            <VehicleActionList>
+            </VehicleActionList>
+            <ContingencyWaypointA>0</ContingencyWaypointA>
+            <ContingencyWaypointB>0</ContingencyWaypointB>
+            <AssociatedTasks>
+            </AssociatedTasks>
+            <Latitude>40.0195465989756</Latitude>
+            <Longitude>-89.9999618024313</Longitude>
+            <Altitude>0</Altitude>
+            <AltitudeType>MSL</AltitudeType>
+          </Waypoint>
+         </Waypoints>
+         <RouteCost>2220</RouteCost>
+         <RouteError>
+         </RouteError>
+       </RoutePlan>
+      </RouteResponses>
+    </RoutePlanResponse>
+  </Routes>
+</RouteResponse>
+
