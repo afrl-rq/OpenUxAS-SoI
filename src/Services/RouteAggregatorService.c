@@ -1,3 +1,5 @@
+void ras_SendRouteResponse(int64_t routeKey);
+
 void ras_configure()
 {
   std::string strBasePath = m_workDirectoryPath;
