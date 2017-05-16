@@ -4,9 +4,7 @@
     <Service Type="AutomationRequestValidatorService"/>
     <Service Type="SensorManagerService"/>
     <Service Type="RouteAggregatorService"/>
-    <!-- <Service Type="RoutePlanner" />-->
-    <!-- <Service Type="RoutePlannerTripath" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/> -->
-    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0"/>
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
@@ -33,7 +31,6 @@
         <Message MessageFileName="PointOfInterest_104.xml" SendTime_ms="340"/>
 
         <Message MessageFileName="AreaSearchTask_50.xml" SendTime_ms="400"/>
-
         <Message MessageFileName="AngledAreaSearchTask_51.xml" SendTime_ms="410"/>
         
         <Message MessageFileName="ImpactLineSearchTask_21.xml" SendTime_ms="490"/>
@@ -52,15 +49,12 @@
     </Service>
     
     <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000">
-        <LogMessage MessageType="uxas.messages.task.AssignmentCostMatrix" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="e" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="AircraftPathPlanner" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="uxas.messages.task.AssignmentCostMatrix" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="AircraftPathPlanner" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="RoutePlanner" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:ROUTE" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:UXTASK" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:CMASI" NumberMessagesToSkip="0"/>
     </Service>
 </UxAS>
 
