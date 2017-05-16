@@ -55,6 +55,7 @@ void ras_processReceivedLmcpMessage(struct LmcpMessage *receivedLmcpMessage)
   if (uxas_messages_route_isRoutePlanResponse(receivedLmcpMessage->m_object))
   {
       auto rplan = std_static_pointer_cast<uxas_messages_route_RoutePlanResponse>(receivedLmcpMessage->m_object);
+      __COPPER_HANDSHAKE__("route_plan_response");
       m_routePlanResponses[rplan->getResponseID()] = rplan;
       for (auto p : rplan->getRouteResponses())
       {
@@ -64,48 +65,56 @@ void ras_processReceivedLmcpMessage(struct LmcpMessage *receivedLmcpMessage)
   }
   else if (uxas_messages_route_isRouteRequest(receivedLmcpMessage->m_object))
   {
+      __COPPER_HANDSHAKE__("route_request");
       //auto rreq = std_static_pointer_cast<uxas_messages_route_RouteRequest>(receivedLmcpMessage->m_object);
       ras_HandleRouteRequest(rreq);
   }
   else if (afrl_cmasi_isAirVehicleState(receivedLmcpMessage->m_object))
   {
       int64_t id = std_static_pointer_cast<afrl_cmasi_EntityState>(receivedLmcpMessage->m_object)->getID();
+      __COPPER_HANDSHAKE__("air_vehicle_state");
       m_entityStates[id] = std_static_pointer_cast<afrl_cmasi_EntityState>(receivedLmcpMessage->m_object);
       m_airVehicles.insert(id);
   }
   else if (afrl_impact_isGroundVehicleState(receivedLmcpMessage->m_object))
   {
       int64_t id = std_static_pointer_cast<afrl_cmasi_EntityState>(receivedLmcpMessage->m_object)->getID();
+      __COPPER_HANDSHAKE__("ground_vehicle_state");
       m_entityStates[id] = std_static_pointer_cast<afrl_cmasi_EntityState>(receivedLmcpMessage->m_object);
       m_groundVehicles.insert(id);
   }
   else if (afrl_impact_isSurfaceVehicleState(receivedLmcpMessage->m_object))
   {
       int64_t id = std_static_pointer_cast<afrl_cmasi_EntityState>(receivedLmcpMessage->m_object)->getID();
+      __COPPER_HANDSHAKE__("surface_vehicle_state");
       m_entityStates[id] = std_static_pointer_cast<afrl_cmasi_EntityState>(receivedLmcpMessage->m_object);
       m_surfaceVehicles.insert(id);
   }
   else if (afrl_cmasi_isAirVehicleConfiguration(receivedLmcpMessage->m_object))
   {
       int64_t id = std_static_pointer_cast<afrl_cmasi_EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
+      __COPPER_HANDSHAKE__("air_vehicle_configuration");
       m_entityConfigurations[id] = std_static_pointer_cast<afrl_cmasi_EntityConfiguration>(receivedLmcpMessage->m_object);
       m_airVehicles.insert(id);
   }
   else if (afrl_impact_isGroundVehicleConfiguration(receivedLmcpMessage->m_object))
   {
       int64_t id = std_static_pointer_cast<afrl_cmasi_EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
+      __COPPER_HANDSHAKE__("ground_vehicle_configuration");
       m_entityConfigurations[id] = std_static_pointer_cast<afrl_cmasi_EntityConfiguration>(receivedLmcpMessage->m_object);
       m_groundVehicles.insert(id);
   }
   else if (afrl_impact_isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object))
   {
       int64_t id = std_static_pointer_cast<afrl_cmasi_EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
+      __COPPER_HANDSHAKE__("surface_vehicle_configuration");
       m_entityConfigurations[id] = std_static_pointer_cast<afrl_cmasi_EntityConfiguration>(receivedLmcpMessage->m_object);
       m_surfaceVehicles.insert(id);
   }
   else if (uxas_messages_task_isUniqueAutomationRequest(receivedLmcpMessage->m_object))
   {
       auto areq = std_static_pointer_cast<uxas_messages_task_UniqueAutomationRequest>(receivedLmcpMessage->m_object);
+      __COPPER_HANDSHAKE__("unique_automation_request");
       m_uniqueAutomationRequests[m_autoRequestId++] = areq;
       //ResetTaskOptions(areq); // clear m_taskOptions and wait for refresh from tasks
       ras_CheckAllTaskOptionsReceived();
@@ -114,6 +123,7 @@ void ras_processReceivedLmcpMessage(struct LmcpMessage *receivedLmcpMessage)
   {
       auto sreq = std_static_pointer_cast<afrl_impact_ImpactAutomationRequest>(receivedLmcpMessage->m_object);
       auto areq = std_shared_ptr<uxas_messages_task_UniqueAutomationRequest>();
+      __COPPER_HANDSHAKE__("impact_automation_request");
       areq->setOriginalRequest(sreq->getTrialRequest()->clone());
       m_uniqueAutomationRequests[m_autoRequestId++] = areq;
       areq->setRequestID(m_autoRequestId);
@@ -123,6 +133,7 @@ void ras_processReceivedLmcpMessage(struct LmcpMessage *receivedLmcpMessage)
   else if (uxas_messages_task_isTaskPlanOptions(receivedLmcpMessage->m_object))
   {
       auto taskOptions = std_static_pointer_cast<uxas_messages_task_TaskPlanOptions>(receivedLmcpMessage->m_object);
+      __COPPER_HANDSHAKE__("task_plan_options");
       m_taskOptions[taskOptions->getTaskID()] = taskOptions;
       ras_CheckAllTaskOptionsReceived();
   }
@@ -200,12 +211,14 @@ void ras_HandleRouteRequest(int request)
             {
                 // send externally
                 sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::GroundPathPlanner(), pRequest);
+                __COPPER_HANDSHAKE__("route_plan_request");
             }
         }
         else
         {
             // send to aircraft planner
             sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::AircraftPathPlanner(), pRequest);
+            __COPPER_HANDSHAKE__("route_plan_request");
         }
     }
 
