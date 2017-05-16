@@ -25,6 +25,10 @@ function to_pp {
     gcc -E -o $1.pp $TMPF
 }
 
-for i in RouteAggregatorService.c  RoutePlannerVisibilityService.c; do to_pp $i; done
+for i in RouteAggregatorService.c RoutePlannerVisibilityService.c uxas_env.c; do to_pp $i; done
 
-copper --stat --assign --return --noParAssign --specification test RouteAggregatorService.c.pp RoutePlannerVisibilityService.c.pp uxas.spec --drawPredAbsLTS --inline --cegar --eager --silentTrans
+#copper --stat --assign --return --noParAssign --specification test RouteAggregatorService.c.pp RoutePlannerVisibilityService.c.pp uxas_env.c.pp uxas.spec --drawPredAbsLTS --inline --cegar --eager --silentTrans
+
+#copper --stat --assign --return --noParAssign --reach --specification test_reach RouteAggregatorService.c.pp RoutePlannerVisibilityService.c.pp uxas_env.c.pp uxas.spec --drawPredAbsLTS --inline --cegar --eager --silentTrans
+
+copper --stat --assign --return --noParAssign RouteAggregatorService.c.pp RoutePlannerVisibilityService.c.pp uxas_env.c.pp uxas.spec --drawPredAbsLTS --inline --cegar --eager --silentTrans $*
