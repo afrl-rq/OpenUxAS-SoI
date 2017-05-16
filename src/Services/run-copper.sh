@@ -9,6 +9,7 @@ function to_pp {
     echo '#define uint32_t int' >> $TMPF
     echo '#define true 1' >> $TMPF
     echo '#define false 0' >> $TMPF
+    echo '#define std_chrono_duration int' >> $TMPF
     cat $1 >> $TMPF
 
     cat $TMPF | sed 's/std::string /int /g' > aa ; mv aa $TMPF
