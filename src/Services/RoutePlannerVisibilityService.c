@@ -11,6 +11,7 @@ void rpvs_processReceivedLmcpMessage()
 void rpvs_service()
 {
   rpvs_configure();
-  for(;;) rpvs_processReceivedLmcpMessage();
+  for(;;)
+      rpvs_processReceivedLmcpMessage();
 }
 
