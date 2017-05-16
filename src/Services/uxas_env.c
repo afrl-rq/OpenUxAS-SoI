@@ -1,8 +1,10 @@
 int uxas_env()
 {
-    for(;;)
+    int x;
+    while(1)
     {
-        if(__COPPER_NONDET__())
+        x = __COPPER_NONDET__();
+        if(x)
             __COPPER_HANDSHAKE__("route_request");
         else
             __COPPER_HANDSHAKE__("route_response");
