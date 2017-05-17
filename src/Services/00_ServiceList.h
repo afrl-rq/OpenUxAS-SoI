@@ -168,8 +168,6 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::Challenge_TelemetryReceiver>();}
-
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////
 /// END -- SERVICE REGISTRATION SECTION                ///
