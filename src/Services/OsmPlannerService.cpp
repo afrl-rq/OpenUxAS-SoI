@@ -180,6 +180,7 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
 		{
 
 			auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
+                        routePlanResponse->setResponseID(request->getRequestID());
 			if (bProcessRoutePlanRequest(request, routePlanResponse))
 			{
 				auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
