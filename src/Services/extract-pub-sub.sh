@@ -3,7 +3,10 @@
 
 function extract_sub {
     BCF=$(basename $1 .cpp).bc
-    clang++ -Wno-uninitialized -Wno-return-type -Wno-comment -std=c++11 \
+    clang++ -Wno-uninitialized -Wno-return-type -Wno-comment -Wno-empty-body -std=c++11 \
+            -I../../czmq-3.0.1/include -I../../src/Tasks \
+            -I../../build/src/Includes -I../../SQLiteCpp-1.3.1/include \
+            -I../../resources/AutomationDiagramDataService \
             -I../../src/Plans -I../../src/DPSS -I../../src/VisilibityLib \
             -I../../zeromq-4.1.1/include -I../../cppzmq-4.2.1 -I../../src/LMCP \
             -I../../src/Includes -I../../src/Communications -I../../src/Utilities \
