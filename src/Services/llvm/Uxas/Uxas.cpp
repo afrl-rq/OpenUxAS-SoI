@@ -97,11 +97,19 @@ namespace {
         for(const auto &ins : bb.getInstList()) {
           if(auto *II = dyn_cast<const InvokeInst>(&ins)) {
             const Function *cf = II->getCalledFunction();
-            if(cf == NULL || !cf->getName().contains("sendSharedLmcpObjectBroadcastMessage")) continue;   
+            if(cf == NULL) continue;
 
+            //-- get the argument that corresponds to the message
+            //-- being sent
+            Value *arg = NULL;
+            if(cf->getName().contains("sendSharedLmcpObjectBroadcastMessage"))
+              arg = II->getArgOperand(1);
+            else if(cf->getName().contains("sendSharedLmcpObjectLimitedCastMessage"))
+              arg = II->getArgOperand(2);
+            if(!arg) continue;
+            
             //-- the first argument to a method call is always the
             //-- this pointer. so get the second argument.
-            auto *arg = II->getArgOperand(1);
             for(auto u : arg->users()) {
               if(auto *CI = dyn_cast<CallInst>(u)) {
                 if(Function *CF = CI->getCalledFunction()) {
