@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cxxabi.h>
 #include "llvm/ADT/Statistic.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
@@ -29,16 +30,38 @@ namespace {
     static char ID; // Pass identification, replacement for typeid
     Uxas() : FunctionPass(ID) {}
 
+    //-- return the class name given a method of the class
+    StringRef getClassName(Function &F)
+    {
+      auto pt = dyn_cast<PointerType>(F.getFunctionType()->getParamType(0));
+      assert(pt);
+      auto st = dyn_cast<StructType>(pt->getElementType());
+      assert(st);
+      //-- the name always starts with "class.", so get rid of that
+      return st->getName().substr(6);
+    }
+
+    //-- return demangled name
+    std::string demangle(const StringRef &mangled)
+    {
+      int status = 0;
+      std::string res(abi::__cxa_demangle(mangled.data(), 0, 0, &status));
+      return res.substr(0, res.length() - 11);
+    }
+
     bool runOnFunction(Function &F) override {
       ++UxasCounter;
 
       //-- ignore non-configure
       if(!F.getName().contains("configure")) return false;
       
-      errs() << "Uxas: ";
-      errs().write_escaped(F.getName()) << '\n';
+      //errs() << "Uxas: ";
+      //errs().write_escaped(F.getName()) << '\n';
 
-      errs() << "============ SUBSCRIBES TO ============\n";
+      errs() << "---------------------------------------------------------------------------------\n";
+      errs() << "service : " << getClassName(F);
+      
+      errs() << " === SUBSCRIBES TO ===>\n";
       
       //-- iterate over all basic blocks
       for(const auto &bb : F.getBasicBlockList()) {
@@ -47,8 +70,13 @@ namespace {
           if(auto *II = dyn_cast<const InvokeInst>(&ins)) {
             const Function *cf = II->getCalledFunction();
             if(!cf->getName().contains("addSubscriptionAddress")) continue;            
-            //errs() << F.getName() << " === invokes ==> " << cf->getName() << '\n';
-            errs() << F.getName() << " === subscribes ==> " << II->getArgOperand(1)->getName() << '\n';
+
+            //-- the first argument to a method call is always the
+            //-- this pointer. so get the second argument.
+            auto *arg = II->getArgOperand(1);
+
+            if(auto *c = dyn_cast<Constant>(arg))            
+              errs() << '\t' << demangle(c->getName()) << '\n';
           }          
         }
       }
