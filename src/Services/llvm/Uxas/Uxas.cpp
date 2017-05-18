@@ -69,7 +69,7 @@ namespace {
         for(const auto &ins : bb.getInstList()) {
           if(auto *II = dyn_cast<const InvokeInst>(&ins)) {
             const Function *cf = II->getCalledFunction();
-            if(!cf->getName().contains("addSubscriptionAddress")) continue;            
+            if(cf == NULL || !cf->getName().contains("addSubscriptionAddress")) continue;            
 
             //-- the first argument to a method call is always the
             //-- this pointer. so get the second argument.
