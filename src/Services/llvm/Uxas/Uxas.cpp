@@ -102,9 +102,55 @@ namespace {
             //-- the first argument to a method call is always the
             //-- this pointer. so get the second argument.
             auto *arg = II->getArgOperand(1);
+            for(auto u : arg->users()) {
+              if(auto *CI = dyn_cast<CallInst>(u)) {
+                if(Function *CF = CI->getCalledFunction()) {
+                  if(CF->getName().contains("static_pointer_cast")) {
+                    std::string dn = demangle(CF->getName());
+                    size_t pos1 = dn.find(',');
+                    if(pos1 == std::string::npos) continue;
+                    size_t pos2 = dn.find('>', pos1);
+                    if(pos2 == std::string::npos) continue;
+                    errs() << '\t' << dn.substr(pos1+2, pos2-pos1-2) << '\n';
+                  }
+                  else if(CF->getName().contains("shared_ptr")) {
+                    std::string dn = demangle(CF->getName());
+                    size_t pos1 = dn.find("shared_ptr<");
+                    if(pos1 == std::string::npos) continue;
+
+                    pos1 = dn.find("shared_ptr<", pos1+1);
+                    if(pos1 == std::string::npos) continue;
+
+                    pos1 = dn.find("shared_ptr<", pos1+1);
+                    if(pos1 == std::string::npos) continue;
+
+                    size_t pos2 = dn.find('>', pos1);
+                    if(pos2 == std::string::npos) continue;
+                    errs() << '\t' << dn.substr(pos1+11, pos2-pos1-11) << '\n';
+                  }
+                }
+              }
+            }
+            
+            /*
+            assert(isa<AllocaInst>(arg));
+            auto *ai = dyn_cast<AllocaInst>(arg);
+            errs() << *(ai->getAllocatedType()) << '\n';
+
+            
             auto *type = arg->getType();
-            assert(type);
+            assert(type);            
             errs() << *type << '\n';
+            auto *pt = dyn_cast<PointerType>(type);
+            assert(pt);
+            auto *et = pt->getElementType();
+            errs() << *et << '\n';
+            assert(isa<StructType>(et));
+            auto *st = dyn_cast<StructType>(et);
+            for(auto *t : st->elements()) {
+              errs() << *t << '\n';
+            }
+            */
           }          
         }
       }
