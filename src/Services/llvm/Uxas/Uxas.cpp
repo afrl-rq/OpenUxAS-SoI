@@ -46,7 +46,7 @@ namespace {
     {
       int status = 0;
       std::string res(abi::__cxa_demangle(mangled.data(), 0, 0, &status));
-      return res.substr(0, res.length() - 11);
+      return res.substr(0, res.find('['));
     }
 
     bool runOnFunction(Function &F) override {
@@ -75,8 +75,11 @@ namespace {
             //-- this pointer. so get the second argument.
             auto *arg = II->getArgOperand(1);
 
-            if(auto *c = dyn_cast<Constant>(arg))            
-              errs() << '\t' << demangle(c->getName()) << '\n';
+            if(auto *Const = dyn_cast<Constant>(arg))            
+              errs() << '\t' << demangle(Const->getName()) << '\n';
+            else if(auto *II = dyn_cast<InvokeInst>(arg)) {
+              errs() << '\t' << demangle(II->getCalledFunction()->getName()) << "()\n";
+            } else assert(0);
           }          
         }
       }
