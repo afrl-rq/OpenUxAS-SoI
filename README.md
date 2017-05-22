@@ -128,6 +128,7 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
    - ``` sudo apt-get install doxygen ```
    - ``` sudo apt-get install graphviz ```
    - ``` sudo apt-get install texlive ```
+   - ``` sudo apt-get install texlive-latex-extra ```
 1. Install pip3: in terminal
    - ``` sudo apt install python3-pip ```
    - ``` sudo -H pip3 install --upgrade pip ```
