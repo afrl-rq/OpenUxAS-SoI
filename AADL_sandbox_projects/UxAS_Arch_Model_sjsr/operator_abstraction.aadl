@@ -1,0 +1,18 @@
+package operator_abstraction_pkg
+public
+	system operator_abstraction
+		features
+			--Inputs
+			automation_response : in event data port;
+			task_complete : in event data port;
+			--Outputs
+			keep_in_out_zones : out event data port;
+			operating_regions : out event data port;
+			task : out event data port;
+			automation_request : out event data port;
+	end operator_abstraction;
+	
+	system implementation operator_abstraction.impl
+		
+	end operator_abstraction.impl;
+end operator_abstraction_pkg;

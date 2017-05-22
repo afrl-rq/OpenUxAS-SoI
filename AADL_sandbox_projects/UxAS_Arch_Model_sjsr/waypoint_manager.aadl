@@ -1,0 +1,17 @@
+package waypoint_manager_pkg
+public
+	system waypoint_manager
+		features
+			--Inputs
+			entity_configuration : in event data port;
+			entity_state : in event data port;
+			air_vehicle_state : in event data port;
+			mission_command : in event data port;
+			automation_response : in event data port;
+			--Outputs
+			mission_command_out : out event data port;
+	end waypoint_manager;
+	system implementation waypoint_manager.impl
+		
+	end waypoint_manager.impl;
+end waypoint_manager_pkg;

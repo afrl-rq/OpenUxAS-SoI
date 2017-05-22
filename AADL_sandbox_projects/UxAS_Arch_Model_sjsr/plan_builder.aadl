@@ -1,0 +1,17 @@
+package plan_builder_pkg
+public
+	system plan_builder
+		features
+			--Inputs
+			entity_state : in event data port;
+			unique_automation_request : in event data port;
+			task_assignment_summary : in event data port;
+			task_implementation_response : in event data port;
+			--Outputs
+			task_implementation_request : out event data port;
+			unique_automation_response : out event data port;
+	end plan_builder;
+	system implementation plan_builder.impl
+		
+	end plan_builder.impl;
+end plan_builder_pkg;

@@ -1,0 +1,94 @@
+package uxas_modelv2_pkg
+public
+	with assignment_pkg;
+	with automation_request_validator_pkg;
+	with generic_task_pkg;
+	--with operator_abstraction_pkg;
+	with plan_builder_pkg;
+	with planner_pkg;
+	with route_aggregator_pkg;
+	with sensor_manager_pkg;
+	with task_manager_pkg;
+	with vehicle_interface_pkg;
+	with waypoint_manager_pkg;
+	
+	system uxas_modelv2
+		features
+			--Inputs
+			oa_keep_in_out_zones : in event data port;
+			oa_operating_regions : in event data port;
+			oa_task : in event data port;
+			oa_automation_request : in event data port;
+			--Outputs
+			oa_automation_response : out event data port;
+			oa_task_complete : out event data port;
+			
+			
+	end uxas_modelv2;
+	
+	system implementation uxas_modelv2.impl
+		subcomponents
+			assignment_sub : system assignment_pkg::assignment.impl;
+			automation_request_validator_sub : system automation_request_validator_pkg::automation_request_validator.impl;
+			generic_task_sub : system generic_task_pkg::generic_task.impl;
+		--	operator_abstraction_sub : system operator_abstraction_pkg::operator_abstraction.impl;
+			plan_builder_sub : system plan_builder_pkg::plan_builder.impl;
+			planner_sub : system planner_pkg::planner.impl;
+			route_aggregator_sub : system route_aggregator_pkg::route_aggregator.impl;
+			sensor_manager_sub : system sensor_manager_pkg::sensor_manager.impl;
+			task_manager_sub : system task_manager_pkg::task_manager.impl;
+			vehicle_interface_sub : system vehicle_interface_pkg::vehicle_interface.impl;
+			waypoint_manager_sub : system waypoint_manager_pkg::waypoint_manager.impl;
+		connections
+			--operator abstraction
+			oa_keep_in_out_zones_to_p_keep_in_out_zones : port oa_keep_in_out_zones -> planner_sub.keep_in_out_zones;
+			oa_operating_regions_to_p_operating_regions : port oa_operating_regions -> planner_sub.operating_regions;
+			oa_task_to_tm_task : port oa_task ->task_manager_sub.task;
+			oa_automation_request_to_arv_automation_request : port oa_automation_request -> automation_request_validator_sub.automation_request;
+			--vehicle interface abstraction
+			vi_entity_configuration_to_tm_entity_configuration : port vehicle_interface_sub.entity_configuration -> task_manager_sub.entity_configuration;
+			vi_entity_configuraton_to_ra_entity_configuration : port vehicle_interface_sub.entity_configuration -> route_aggregator_sub.entity_configuration;
+			vi_entity_configuration_to_p_entity_configuration : port vehicle_interface_sub.entity_configuration -> planner_sub.entity_configuration;
+			vi_entity_configuration_to_wm_entity_configuration: port vehicle_interface_sub.entity_configuration -> waypoint_manager_sub.entity_configuration;
+			vi_entity_state_to_tm_entity_state : port vehicle_interface_sub.entity_state -> task_manager_sub.entity_state;
+			vi_entity_state_to_p_entity_state : port vehicle_interface_sub.entity_state -> planner_sub.entity_state;
+			vi_entity_state_to_pb_entity_state : port vehicle_interface_sub.entity_state -> plan_builder_sub.entity_state;
+			vi_entity_state_to_wm_entity_state : port vehicle_interface_sub.entity_state -> waypoint_manager_sub.entity_state;
+			vi_air_vehicle_state_to_wm_air_vehicle_state : port vehicle_interface_sub.air_vehicle_state -> waypoint_manager_sub.air_vehicle_state;
+			vi_air_vehicle_state_to_gt_air_vehicle_state : port vehicle_interface_sub.air_vehicle_state -> generic_task_sub.air_vehicle_state;
+			--task manager
+			tm_new_task_message_to_gt_new_task_message : port task_manager_sub.new_task_message -> generic_task_sub.new_task_message;
+			--automation request validator
+			arv_unique_automation_request_to_tm_unique_automation_request : port automation_request_validator_sub.unique_automation_request -> task_manager_sub.unique_automation_request;
+			arv_unique_automation_request_to_ra_unique_automation_request : port automation_request_validator_sub.unique_automation_request -> route_aggregator_sub.unique_automation_request;
+			arv_unique_automation_request_to_a_unique_automation_request : port automation_request_validator_sub.unique_automation_request -> assignment_sub.unique_automation_request;
+			arv_unique_automation_request_to_pb_unique_automation_request: port automation_request_validator_sub.unique_automation_request -> plan_builder_sub.unique_automation_request;
+			arv_unique_automation_request_to_gt_unique_automation_request: port automation_request_validator_sub.unique_automation_request -> generic_task_sub.unique_automation_request;
+			arv_automation_response_to_wm_automation_response : port automation_request_validator_sub.automation_response -> waypoint_manager_sub.automation_response;
+			arv_automation_response_to_oa_automation_response : port automation_request_validator_sub.automation_response -> oa_automation_response;
+			--sensor manager
+			sm_sensor_footprint_response_to_gt_sensor_footprint_response : port sensor_manager_sub.sensor_footprint_response -> generic_task_sub.sensor_footprint_response;
+			--route aggregator
+			ra_route_plan_request_to_p_route_plan_request : port route_aggregator_sub.route_plan_request -> planner_sub.route_plan_request;
+			ra_route_response_to_gt_route_response : port route_aggregator_sub.route_response -> generic_task_sub.route_response;
+			ra_assignment_cost_matrix_to_a_assignment_cost_matrix : port route_aggregator_sub.assignment_cost_matrix -> assignment_sub.assignment_cost_matrix;
+			--planner
+			p_route_plan_response_to_ra_route_plan_response : port planner_sub.route_plan_response -> route_aggregator_sub.route_plan_response;
+			--assignment
+			a_task_assignment_summary_to_pb_task_assignment_summary : port assignment_sub.task_assignment_summary -> plan_builder_sub.task_assignment_summary;
+			--plan builder
+			pb_task_implementation_request_to_gt_task_implementation_request : port plan_builder_sub.task_implementation_request -> generic_task_sub.task_implementation_request;
+			--waypoint manager
+			wm_mission_commmand_to_vi_mission_command : port waypoint_manager_sub.mission_command_out -> vehicle_interface_sub.mission_command;
+			--generic task
+			gt_sensor_footprint_request_to_sm_sensor_footprint_request : port generic_task_sub.sensor_footprint_request -> sensor_manager_sub.sensor_footprint_request;
+			gt_route_request_to_ra_route_request : port generic_task_sub.route_request ->route_aggregator_sub.route_request;
+			gt_task_plan_options_to_ra_task_plan_options : port generic_task_sub.task_plan_options -> route_aggregator_sub.task_plan_options;
+			gt_task_plan_options_to_a_task_plan_options : port generic_task_sub.task_plan_options -> assignment_sub.task_plan_options;
+			gt_task_implementation_response_to_pb_task_implementation_response : port generic_task_sub.task_implementation_response -> plan_builder_sub.task_implementation_response;
+			gt_vehicle_action_commmand_to_vi_vehicle_action_command : port generic_task_sub.vehicle_action_command -> vehicle_interface_sub.vehicle_action_command;
+			gt_mission_command_to_wm_mission_command : port generic_task_sub.mission_command -> waypoint_manager_sub.mission_command;
+			gt_task_complete_to_oa_task_complete : port generic_task_sub.task_complete -> oa_task_complete;
+		
+	end uxas_modelv2.impl;
+end uxas_modelv2_pkg;
