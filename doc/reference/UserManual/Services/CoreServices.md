@@ -178,6 +178,7 @@ mission efficiency is the role of the assignment service.
 A general *Task* is comprised of up to nine states with each state corresponding to a place
 in the message sequence that carries out the task assignment pipeline. The states for a *Task*
 are:
+
   - **Init**: This is the state that all *Tasks* start in and remain until all internal
 initialization is complete. For example, a *Task* may need to load complex terrain or weather
 data upon creation and will require some (possibly significant) start-up time. When a *Task*
@@ -235,30 +236,38 @@ transitions to the **Idle** state.
 +----------------------------+---------------------------------------------------------------+
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
-| *Task*                     | Primary message that describes a particular task. The task    |
-|                            | manager will make the appropriate service creation message    |
-|                            | to build a service that directly handles this requested Task. |
+| *UniqueAutomationRequest*  | Indicates which *Tasks* are to be considered as well as the   |
+|                            | set of vehicles that can be used to fulfill those *Tasks*.    |
+|                            | Upon reception of this message, if a *Task* ID is included,   |
+|                            | it will publish *TaskPlanOptions*.                            |
 +----------------------------+---------------------------------------------------------------+
-| *RemoveTasks*              | Indicates that Task is no longer needed and will not be       |
-|                            | included in future *AutomationRequest* messages. Task manager |
-|                            | will send the proper *KillService* message to remove the      |
-|                            | service that was constructed to handle the requested Task.    |
+|*TaskImplementationRequest* | After an assignment has been made, each *Task* involved is    |
+|                            | requested to build the final set of waypoints that complete   |
+|                            | the *Task* and corresponding selected option. A *Task* must   |
+|                            | build the route **to** the *Task* as well as waypoints that   |
+|                            | implement the *Task*. For each on-task waypoint, the          |
+|                            | *AssociatedTaskList* must include the *Task* ID.              |
 +----------------------------+---------------------------------------------------------------+
 | *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
-|                            | by entity configuration messages. New Tasks are informed of   |
-|                            | all known entities upon creation.                             |
+|                            | by entity configuration messages. *Tasks* can reason over     |
+|                            | sensor and vehicle capabilites to present the proper options  |
+|                            | to other parts of the system. If a vehicle does not have the  |
+|                            | capability to fulfill the *Task* (e.g. does not have a proper |
+|                            | sensor), then the *Task* shall not include that vehicle ID in |
+|                            | the list of eligible entities reported as part of an option.  |
 +----------------------------+---------------------------------------------------------------+
 | *EntityState*              | Describes the actual state of a vehicle in the system         |
-|                            | including position, speed, and fuel status. New Tasks are     |
-|                            | informed of all known entity states upon creation.            |
+|                            | including position, speed, and fuel status. This message is   |
+|                            | primary feedback mechanism used for *Tasks* to switch to an   |
+|                            | **Active** state. When a *Task* ID is listed in the           |
+|                            | *AssociatedTaskList* of an *EntityState* message, the *Task*  |
+|                            | is allowed to update waypoints and sensor commands at will.   |
 +----------------------------+---------------------------------------------------------------+
-| *AreaOfInterest*           | Describes known geometries of areas, lines, and points. New   |
-| *LineOfInterest*           | Tasks are informed of all such named areas upon creation.     |
-| *PointOfInterest*          |                                                               |
-+----------------------------+---------------------------------------------------------------+
-| *MissionCommand*           | Describes current set of waypoints that a vehicle is          |
-|                            | following. New Tasks are informed of all known current        |
-|                            | waypoint routes upon creation.                                |
+| *RouteResponse*            | Collection of route plans that fulfill a set of requests for  |
+|                            | navigation through an *OperatingRegion*. A *Task* must        |
+|                            | request the waypoints to route a vehicle from its last        |
+|                            | to the start of the *Task*. Additionally, this message        |
+|                            | can be used to obtain on-task waypoints.                      |
 +----------------------------+---------------------------------------------------------------+
 
 
@@ -268,12 +277,31 @@ transitions to the **Idle** state.
 +----------------------------+---------------------------------------------------------------+
 | Message Publication        | Description                                                   |
 +============================+===============================================================+
-| *CreateNewService*         | Primary message published by the Task Manager to dynamically  |
-|                            | build a new Task from an outside description of such a Task.  |
+| *TaskPlanOptions*          | Primary message published by a *Task* to indicate the         |
+|                            | potential different ways a *Task* could be completed. Each    |
+|                            | possible way to fulfill a *Task* is listed as an *option*.    |
+|                            | *TaskOptions* can also be related to each other via Process   |
+|                            | Algebra.                                                      |
 +----------------------------+---------------------------------------------------------------+
-| *KillService*              | When Tasks are no longer needed, the Task Manager will        |
-|                            | correctly clean up and destroy the service that was built to  |
-|                            | handle the original Task.                                     |
+|*TaskImplementationResponse*| Primary message published by a *Task* that reports the final  |
+|                            | set of waypoints to both navigate the selected vehicle to the |
+|                            | *Task* as well as the waypoints necessary to complete the     |
+|                            | *Task* using the selected option.                             |
++----------------------------+---------------------------------------------------------------+
+| *RouteRequest*             | Collection of route plan requests to leverage the route       |
+|                            | planner capability of constructing waypoints that adhere to   |
+|                            | the designated *OperatingRegion*. This request is made for    |
+|                            | waypoints en-route to the *Task* as well as on-task waypoints.|
++----------------------------+---------------------------------------------------------------+
+| *VehicleActionCommand*     | When a *Task* is **Active**, it is allowed to update sensor   |
+|                            | navigation commands to on-task vehicles. This message is used |
+|                            | to directly command the vehicle to use the updated behaviors  |
+|                            | calculated by the *Task*.                                     |
++----------------------------+---------------------------------------------------------------+
+| *TaskComplete*             | Once a *Task* has met its goal or if a vehicle reports that   |
+|                            | it is no longer on-task, a previously **Active** *Task* must  |
+|                            | send a *TaskComplete* message to inform the system of this    |
+|                            | change.                                                       |
 +----------------------------+---------------------------------------------------------------+
 
 ## RoutePlannerVisibilityService
