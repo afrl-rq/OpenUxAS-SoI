@@ -17,7 +17,7 @@ Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agre
 Agreement Verion 1.3.
 
 
-# Quick Start (only if you already have Ubuntu 16.04 installed):
+# Quick Start (only if you already have Ubuntu 16.04 LTS installed!!):
 
 Try:
 
@@ -236,15 +236,17 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - Select `C/C++` and click `Install`
 
 
-# Configure UxAS and Related Projects + Building at the Command Line on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
+# Configure and Build UxAS and Related Projects
+
+## Configure UxAS and Related Projects + Building at the Command Line on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
 
 The following is a bash script that helps to partially-automate the "configure UxAS and related projects" and "building at the command line" processes that are documented in this README.md file below.
 
 This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
 
 1. Download these two scripts from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) OR `cd` to your `git clone`d *OpenUxAS* directory
-    - checkout_plus_config.sh
-    - get_dlvsco_wd_f.sh
+    - `checkout_plus_config.sh`
+    - `get_dlvsco_wd_f.sh`
 1. Run the `checkout_plus_config.sh` script at the terminal:
     - If you want to download the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -d`
     - If you want to compile the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -c`
@@ -253,7 +255,7 @@ This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
 Note that this sets up your UxAS workspace under a default directory (`/home/$USER/UxAS_pulls`). If you want to specify a workspace other than the default, then pass the absolute path to the script as a second argument when calling the script (e.g., `./checkout_plus_config.sh -d /home/$USER/my_checkout_dir`).
 
 
-# Configure UxAS and Related Projects
+## Configure UxAS and Related Projects
 
 Expected file system layout:
 ```
@@ -316,7 +318,7 @@ time a file is modified in one of the `/3rd/wrap_patches` subdirectories or the 
 
 This also needs to be done any time you move or rename your source tree.
 
-# Building at the Command Line
+## Building at the Command Line
 1. Configure for release build: in terminal
    - ``` meson build --buildtype=release ```
 1. Configure for debug build: in terminal
@@ -335,7 +337,7 @@ command: `ninja -C build clean`
    - ``` ninja -C build test ```
    - Confirm all tests passed
    
-## Compiling using NetBeans (Debug Mode)
+### Compiling using NetBeans (Debug Mode)
 
 1. Open NetBeans
 1. Select File->New Project
@@ -352,7 +354,7 @@ command: `ninja -C build clean`
 For Linux systems, Netbeans will automatically use the `gdb` debugger. On Mac OS X,
 `gdb` must be installed and signed (see [Neil Traft's guide](http://ntraft.com/installing-gdb-on-os-x-mavericks/)).
 
-## Removing External Dependencies
+### Removing External Dependencies
 
 If you ever feel the need to refresh external dependencies, you'll need
 to remove both the downloaded files and the expanded directories:
