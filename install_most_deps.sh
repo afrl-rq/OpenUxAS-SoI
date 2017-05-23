@@ -137,29 +137,31 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     echo " (So, download from website manually to your ~/Downloads directory.)"
     # as of 2017-05-08, this is: jdk-8u131-nb-8_w-linux-x64.sh
     # as of 2017-05-09, this is: jdk-8u131-nb-8_2-linux-x64.sh
-    firefox http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html &
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    firefox http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html &
     echo " "
     echo "Running downloaded install script: in terminal"
     cd ~/Downloads
     JDK_FILE=`ls -t jdk-*-linux-x64.sh | head -1` # bash script will find newest downloaded script in directory to run
-    chmod +x $JDK_FILE; sh $JDK_FILE
+    chmod +x $JDK_FILE
     echo "* Click Next three times, then Install"
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    sh $JDK_FILE
     echo " "
     echo "Enable C/C++ plug-in in NetBeans (optional)"
     #echo "* Open NetBeans (in Ubuntu search, type NetBeans, or from commandline type:)"
     # command modified from: https://askubuntu.com/questions/440245/how-do-i-run-netbeans-from-the-terminal/440257#440257
-    #echo "  /bin/sh \"/usr/local/netbeans-7.4/bin/netbeans\" &"  # if sudo install
-    ~/netbeans-8.2/bin/netbeans & # if non-sudo install
     echo "* Choose Tools->Plugins from the top menu"
     echo "* In the Available Plugins tab, search for C++"
     echo "* Select C/C++ and click Install"
     echo "Once you've done this..."
     read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    #echo "  /bin/sh \"/usr/local/netbeans-7.4/bin/netbeans\" &"  # if sudo install
+    ~/netbeans-8.2/bin/netbeans & # if non-sudo install
     # Install Oracle Java run-time (required for LmcpGen): in terminal
+    echo " "
     sudo add-apt-repository ppa:webupd8team/java
     sudo apt update; sudo apt -y install oracle-java8-installer
     sudo apt -y install oracle-java8-set-default
