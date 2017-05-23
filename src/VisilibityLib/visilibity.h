@@ -67,19 +67,7 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #define M_PI 3.141592653589793238462643
 #endif
 
-/*
-#ifndef LINUX
-#ifndef and
-#define and &&
-#endif
-#endif//#ifndef LINUX
-
-#ifndef LINUX
-#ifndef or
-#define or ||
-#endif
-#endif//#ifndef LINUX
-*/
+#include <iso646.h>   //aliases for boolean operators
 
 #include <cmath>      //math functions in std namespace
 #include <vector>
