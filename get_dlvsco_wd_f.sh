@@ -57,7 +57,7 @@ echo "(note: optional input arguments in [])"
 echo "(note: there is no default DOWNLOAD_VS_COMPILE. Acceptable inputs are: -h --help -d -c)"
 echo "(      -h, --help = show help text only and then exit script)"
 echo "(      -d = download jar files, -c = compile jar files via NetBeans projects)"
-echo "(note: default [WORKSPACEDIR] is \"~/UxAS_pulls\")"
+echo "(note: default [WORKSPACEDIR] is \"/home/$USER/UxAS_pulls\")"
 echo "WORKSPACEDIR must specify the absolute path of the directory"
 echo "-f sets FORCE=-f and will force a (re)install of all compiled-from-source components."
 
@@ -111,7 +111,7 @@ else # at least 1 (possibly 4) argument(s) at commandline...
 fi
 echo "Will be setting up UxAS workspace under $WORKSPACEDIR..."
 if [ "$FORCE" == "-f" ]; then
-    echo "Forcing install of all compiled-from-source components."
+    echo "Will be forcing install of all compiled-from-source components."
 fi
 
 echo "End of get_dlvsco_wd_f.sh script!"
