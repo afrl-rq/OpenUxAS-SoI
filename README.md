@@ -244,7 +244,7 @@ Expected file system layout:
    
    OR Download *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/cmcghan/LmcpGen/releases/download/v1.0.1/LmcpGen.jar)
+   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.1.0/LmcpGen.jar)
    2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
    - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
