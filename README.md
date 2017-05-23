@@ -30,13 +30,16 @@ Try:
     ./build_documentation
     
 To test OpenUxAS 'example 2', try:
-1. In terminal 1:  
-```cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch
-./runAMASE_WaterwaySearch.sh```
+1. In terminal 1:
+
+    `cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch`  
+    `./runAMASE_WaterwaySearch.sh`
+
 1. Press the 'play' button in the AMASE simulation player.
-1. In terminal 2:  
-```cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch
-./runUxAS_WaterwaySearch.sh```
+1. In terminal 2:
+
+    `cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch`  
+    `./runUxAS_WaterwaySearch.sh`
 
 If you need to recompile OpenUxAS later, try:
 
