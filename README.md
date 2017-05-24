@@ -16,6 +16,42 @@ The LMCP specification and all source code for *OpenUxAS* is publicaly released 
 Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agreement closely follows the NASA Open Source
 Agreement Verion 1.3.
 
+
+# Quick Start (only if you already have Ubuntu 16.04 LTS installed!!):
+
+Try:
+
+    mkdir -p /home/$USER/UxAS_pulls
+    cd /home/$USER/UxAS_pulls
+    git clone https://github.com/afrl-rq/OpenUxAS.git
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    ./install_most_deps.sh
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+    ./build_documentation
+    
+To test OpenUxAS 'example 2', try:
+1. In terminal 1:
+
+    `cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch`  
+    `./runAMASE_WaterwaySearch.sh`
+
+1. Press the 'play' button in the AMASE simulation player.
+1. In terminal 2:
+
+    `cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch`  
+    `./runUxAS_WaterwaySearch.sh`
+
+If you need to recompile OpenUxAS later, try:
+
+    cd ~/UxAS_pulls/OpenUxAS
+    ninja -C build all
+
+If you need to pull the newest versions of the UxAS code from the server and recompile, try:
+
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+
+
 # Prerequisites and Dependencies
 
 The primary tools and dependencies to obtain, build, document, and simulate UxAS are:
@@ -49,7 +85,22 @@ Libraries for XML and GPS message parsing have numerous forks without centralize
 
 ## Supported Operating Systems
 
-For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. Support for Windows is planned, but is not yet available. We recommend an Ubuntu virtual machine for Windows users. 
+For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. We recommend an Ubuntu virtual machine for Windows users. 
+
+Support for Windows is available on Windows 10, with some caveats.
+
+### For Windows 10 users only: Install "Bash on Ubuntu on Windows", Windows Subsystem for Linux (Optional)
+
+If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
+
+To set this up:
+1. Update to the Windows 10 Creators Update
+1. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
+1. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
+   - `echo "export DISPLAY=:0" >> ~/.bashrc`
+   - `sudo apt update & sudo apt install gedit`
+
+This has been tested-working for the UxAS project, but may not work for other packages or programs (such as ROS). :)
 
 ### Windows: Install Ubuntu in Virtual Machine
 
@@ -92,26 +143,17 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Reboot VM
 1. Follow Ubuntu instructions for remainder of configuration
 
-If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
-
-To set this up:
-1. Update to the Windows 10 Creators Update
-1. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
-1. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
-   - `echo "export DISPLAY=:0" >> ~/.bashrc`
-   - `sudo apt update & sudo apt install gedit`
-
-...but this is currently not supported. Attempt at your own peril! :)
-
-### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X
+### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
 
 The following is a bash script that helps to partially-automate the "installing prerequisite tools" processes that are documented in this README.md file below.
 
-This is under development (only tested on Ubuntu 16.04), so use at your own peril!
+This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (install_most_deps.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./install_most_deps.sh`
 1. Follow the on-screen instructions
+
+Note that the most up-to-date instructions on the dependencies-needed for UxAS are available below.
 
 ### Installing Prerequisite Tools on Ubuntu Linux
 
@@ -128,6 +170,7 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
    - ``` sudo apt-get install doxygen ```
    - ``` sudo apt-get install graphviz ```
    - ``` sudo apt-get install texlive ```
+   - ``` sudo apt-get install texlive-latex-extra ```
 1. Install pip3: in terminal
    - ``` sudo apt install python3-pip ```
    - ``` sudo -H pip3 install --upgrade pip ```
@@ -193,7 +236,26 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
    - Select `C/C++` and click `Install`
 
 
-# Configure UxAS and Related Projects
+# Configure and Build UxAS and Related Projects
+
+## Configure UxAS and Related Projects + Building at the Command Line on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
+
+The following is a bash script that helps to partially-automate the "configure UxAS and related projects" and "building at the command line" processes that are documented in this README.md file below.
+
+This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
+
+1. Download these two scripts from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) OR `cd` to your `git clone`d *OpenUxAS* directory
+    - `checkout_plus_config.sh`
+    - `get_dlvsco_wd_f.sh`
+1. Run the `checkout_plus_config.sh` script at the terminal:
+    - If you want to download the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -d`
+    - If you want to compile the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -c`
+1. Follow the on-screen instructions
+
+Note that this sets up your UxAS workspace under a default directory (`/home/$USER/UxAS_pulls`). If you want to specify a workspace other than the default, then pass the absolute path to the script as a second argument when calling the script (e.g., `./checkout_plus_config.sh -d /home/$USER/my_checkout_dir`).
+
+
+## Configure UxAS and Related Projects
 
 Expected file system layout:
 ```
@@ -243,7 +305,7 @@ Expected file system layout:
    
    OR Download *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.0.0/LmcpGen.jar)
+   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.1.0/LmcpGen.jar)
    2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
    - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
@@ -256,7 +318,7 @@ time a file is modified in one of the `/3rd/wrap_patches` subdirectories or the 
 
 This also needs to be done any time you move or rename your source tree.
 
-# Building at the Command Line
+## Building at the Command Line
 1. Configure for release build: in terminal
    - ``` meson build --buildtype=release ```
 1. Configure for debug build: in terminal
@@ -275,7 +337,7 @@ command: `ninja -C build clean`
    - ``` ninja -C build test ```
    - Confirm all tests passed
    
-## Compiling using NetBeans (Debug Mode)
+### Compiling using NetBeans (Debug Mode)
 
 1. Open NetBeans
 1. Select File->New Project
@@ -292,7 +354,7 @@ command: `ninja -C build clean`
 For Linux systems, Netbeans will automatically use the `gdb` debugger. On Mac OS X,
 `gdb` must be installed and signed (see [Neil Traft's guide](http://ntraft.com/installing-gdb-on-os-x-mavericks/)).
 
-## Removing External Dependencies
+### Removing External Dependencies
 
 If you ever feel the need to refresh external dependencies, you'll need
 to remove both the downloaded files and the expanded directories:
@@ -381,13 +443,21 @@ unexpected trouble may arise on other platforms.
    
 # Building the Documentation
 
-The following is a bash script that help to partially automate the "building the docuemntation" processes that are documented in this README.md file below.
+## Building the Documentation on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
+
+The following is a bash script that helps to partially-automate the "building the documentation" processes that are documented in this README.md file below.
+
+This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./build_documentation.sh`
 1. Follow the on-screen instructions
 
-Note that if you'd like to do this process manually, then:
+Note that this will pop open two html files in your webbrowser and also the pdf manual when run.
+
+## Building the Documentation Manually
+
+If you'd like to do this process manually, then:
 
 1. The User Manual can be generated by running:
    `pdflatex UxAS_UserManual.tex` in the folder `doc/reference/UserManual/`
@@ -399,3 +469,158 @@ Note that if you'd like to do this process manually, then:
    - Copy the line from `ExtraLineToFixLatex.txt` into `doc/doxygen/latex/refman.tex` just above the line `%===== C O N T E N T S =====`
    - In the folder `doc/doxygen/latex` run the command `pdflatex refman.tex`
    - The complete reference manual can be found at `doc/doxygen/latex/refman.pdf`
+
+# Branching and Repository Management
+
+The OpenUxAS branching model addresses the following concerns:
+
+- We have a stable branch that always builds and passes tests
+- Multiple collaborative teams can proceed with their development
+  independently
+- Discrete features can be contributed to the main line of OpenUxAS
+  development, and these can be integrated into other teams' ongoing
+  work
+- Until OpenUxAS is public, all teams can use the `afrl-rq`
+  organization's Travis-CI account for continuous integration
+
+To address these concerns, OpenUxAS uses a variant on
+the [Git Flow][git-flow], [GitLab Flow][gitlab-flow],
+and [GitHub flow][github-flow] models.
+
+[git-flow]: http://nvie.com/posts/a-successful-git-branching-model/
+[gitlab-flow]: https://docs.gitlab.com/ee/workflow/gitlab_flow.html
+[github-flow]: https://guides.github.com/introduction/flow/
+
+Because OpenUxAS does not yet have a fixed cycle of releases, we do
+not need the additional complexity of `hotfix/` and `release/`
+branches present in Git Flow. However, since a number of collaborating
+teams work on OpenUxAS simultaneously, it makes sense to have
+long-lived branches for each team, rather than only having feature
+branches and a stable branch.
+
+This README does not go into detail about the various Flow models, but
+instead provides instructions for common scenarios. We encourage you
+to read about the Flow models to get more of a sense for the "why";
+here we are focusing on the "how".
+
+## Quick Overview
+
+The repository will typically have a branching structure like the following:
+
+- `master`
+  - very stable, only updated by pull request from `develop`
+- `develop`
+  - stable, only updated by pull request from feature branches
+- `teamA`
+  - team branch for Team A
+  - stable at the discretion of Team A
+  - updated by merging in feature branches and `develop`
+- `teamA-feature1`
+  - feature branch for Team A
+  - when finished, merged into `develop` via pull request
+- `teamB`
+- `teamB-feature1`
+- etc.
+
+## Team Branches
+
+The team branch is the branch off of which your team will work. It
+serves the role of the `develop` branch of Git Flow or the `master`
+branch of GitLab and GitHub Flow. This branch is never intended to be
+directly merged back into `develop`, but feature branches based off of
+it will be.
+
+If you have experience with these models, this concept probably seems
+odd. Eventually, we would like to replace these team branches with
+entire repo forks for each team, but until OpenUxAS is public, this
+would prevent forks from using the `afrl-rq` Travis-CI account.
+
+### Creating
+
+Start by creating a new branch that will serve as the active
+development branch for your team. This step should only be necessary
+once for your team; this branch is meant to be long-lived as opposed to a
+feature branch that is quickly merged in and deleted.
+
+```shell
+$ git checkout develop
+$ git checkout -b teamA
+```
+
+### Updating
+
+You will want to regularly incorporate the latest changes from the
+`develop` branch in your team branch. This reduces the pain when
+merging your team's changes back into `develop`.
+
+Start by making sure your local `develop` branch is up-to-date:
+
+```shell
+$ git checkout develop
+$ git pull
+```
+
+Then merge the updated `develop` with your team branch:
+
+```shell
+$ git checkout teamA
+$ git merge develop
+```
+
+## Feature Branches
+
+Feature branches are shorter-lived branches meant to encompass a
+particular effort or feature addition. These branches will be the
+means for you to incorporate your team's changes into the main
+`develop` branch via pull requests.
+
+Feature branches will always be based off of your team branch, so if
+your team branch has commits you would like to see in `develop`, you
+can simply create a new feature branch and begin the pull request
+process right away.
+
+### Naming
+
+To help the OpenUxAS maintainers know which branches belong to which
+teams, feature branches should be named using your team name as a
+prefix, for example `teamA-feature1`.
+
+### Creating
+
+Create a feature branch by checking it out off of your team
+branch. Note that it will save you some effort at the later merge to
+update your team branch from `develop` first.
+
+```shell
+$ git checkout teamA
+$ get checkout -b teamA/feature1
+```
+
+### Merging to Team Branch
+
+For a long-running feature branch, you may want to occasionally merge
+it back into your team branch so it can be shared within your team
+before it's ready to be merged into `develop`.
+
+```shell
+$ git checkout teamA
+$ git merge teamA/feature1
+```
+
+### Merging to `develop`
+
+You cannot directly merge a feature branch into `develop`, because it
+is protected. Instead, open a pull request from the feature branch
+into `develop`, and your changes will be merged after review.
+
+It is a good idea to update your team branch and delete your feature
+branch once it is merged into `develop`.
+
+```shell
+$ git checkout develop
+$ git pull
+$ git checkout teamA
+$ git merge develop
+$ git push origin --delete teamA/feature1
+$ git branch -d teamA/feature1
+```
