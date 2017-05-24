@@ -393,6 +393,146 @@ responsive and efficient.
 
 ## RouteAggregatorService
 
+The *RouteAggregatorService* fills two primary roles: 1) it acts as a helper service to make
+route requests for large numbers of heterogenous vehicles; and 2) it constructs the 
+task-to-task route-cost table that is used by the assignment service to order the tasks as
+efficiently as possible. Each functional role acts independently and can be modeled as two
+different state machines.
+
+The *Aggregator* role orchestrates large numbers of route requests (possibly to multiple
+route planners). This allows other services in the system (such as *Tasks*) to make a single
+request for routes and receive a single reply with the complete set of routes for numerous
+vehicles.
+
+For every aggregate route request (specified by a *RouteRequest* message), the *Aggregator*
+makes a series of *RoutePlanRequests* to the appropriate route planners (i.e. sending route
+plan requests for ground vehicles to the ground vehicle planner and route plan requests for
+aircraft to the aircraft planner). Each request is marked with a request ID and a list of all
+request IDs that must have matching replies is created. The *Aggregator* then enters a
+**pending** state in which all received plan replies are stored and then checked off the
+list of expected replies. When all of the expected replies have been received, the
+*Aggregator* publishes the completed *RouteResponse* and returns to the **idle** state.
+
+Note that every aggregate route request corresponds to a separate internal checklist of
+expected responses that will fulfill the original aggregate request. The *Aggregator* is
+designed to service each aggregate route request even if a previous one is in the process
+of being fulfilled. When the *Aggregator* receives any response from a route planner, it
+checks each of the many checklists to determine if all expected responses for a particuarl
+list have been met. In this way, the *Aggregator* is in a different **pending** state for
+each aggregate request made to it.
+
+
+: Table of messages that the *RouteAggregatorService* receives and processes in its *Aggregator* role.
+
++----------------------------+---------------------------------------------------------------+
+| Message Subscription       | Description                                                   |
++============================+===============================================================+
+| *RouteRequest*             | Primary message that requests a large number of routes for    |
+|                            | potentially heterogeneous vehicles. The *Aggregator* will     |
+|                            | make a series of *RoutePlanRequests* to the appropriate       |
+|                            | planners to fulfill this request.                             |
++----------------------------+---------------------------------------------------------------+
+| *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
+|                            | by entity configuration messages. This service uses the       |
+|                            | *EntityConfiguration* to determine which type of vehicle      |
+|                            | corresponds to a specific ID so that ground planners are used |
+|                            | for ground vehicles and air planners are used for aircraft.   | 
++----------------------------+---------------------------------------------------------------+
+| *RoutePlanResponse*        | This message is the fulfillment of a single vehicle route     |
+|                            | plan request which the *Aggregator* catalogues until the      |
+|                            | complete set of expected responses is received.               |
++----------------------------+---------------------------------------------------------------+
+
+
+: Table of messages that the *RouteAggregatorService* publishes in its *Aggregator* role.
+
++----------------------------+---------------------------------------------------------------+
+| Message Publication        | Description                                                   |
++============================+===============================================================+
+| *RouteResponse*            | Once the *Aggregator* has a complete set of responses         |
+|                            | collected from the route planners, the message is built as a  |
+|                            | reply to the original *RouteRequest*.                         |
++----------------------------+---------------------------------------------------------------+
+| *RoutePlanRequest*         | The *Aggregator* publishes a series of these requests in      |
+|                            | order to fulfill an aggregate route request. These messages   |
+|                            | are published in batch, without waiting for a reply. It is    |
+|                            | expected that eventually all requests made will be fulfilled. |
++----------------------------+---------------------------------------------------------------+
+
+
+The *RouteAggregatorService* also acts in the role of creating the *AssignmentCostMatrix*
+which is a key input to the assignment service. For simplicity, this role will be labeled as
+the *Collector* role. This role is triggered by the *UniqueAutomationRequest* message and
+begins the process of collecting a complete set of on-task and between-task costs.
+
+The *Collector* starts in the **Idle** state and upon reception of a *UniqueAutomationRequest*
+message, it creates a list of *Task* IDs that are involved in the request and then moves to the
+**OptionsWait** state. In this state, the *Collector* stores all *TaskPlanOptions* and matches
+them to the IDs of the *Task* IDs that were requested in the *UniqueAutomationRequest*. When
+the expected list of *Tasks* is associated with a corresponding *TaskPlanOptions*, the
+*Collector* moves to the **RoutePending** state. In this state, the *Collector* makes a series
+of route plan requests from 1) initial conditions of all vehicles to all tasks and 2) route
+plans between the end of each *Task* and start of all other *Tasks*. Similar to the
+*Aggregator*, the *Collector* creates a checklist of expected route plan responses and uses
+that checklist to determine when the complete set of routes has been returned from the route
+planners. The *Collector* remains in the **RoutePending** state until all route requests have
+been fulfilled, at which point it colates the responses into a complete *AssignmentCostMatrix*.
+The *AssignmentCostMatrix* message is published and the *Collector* returns to the **Idle**
+state.
+
+Note that the *AutomationValidatorService* ensures that only a single *UniqueAutomationRequest*
+is handled by the system at a time. However, the design of the *Collector* does allow for
+multiple simultaneous requests as all checklists (for pending route and task option messages)
+are associated with the unique ID from each *UniqueAutomationRequest*.
+
+
+: Table of messages that the *RouteAggregatorService* receives and processes in its *Collector* role.
+
++----------------------------+---------------------------------------------------------------+
+| Message Subscription       | Description                                                   |
++============================+===============================================================+
+| *UniqueAutomationRequest*  | Primary message that initiates the collection of options sent |
+|                            | from each *Task* via the *TaskPlanOptions* message. A list of |
+|                            | all *Tasks* included in the *UniqueAutomationRequest* is made |
+|                            | upon reception of this message and later used to ensure that  |
+|                            | all included *Tasks* have responded.                          |
++----------------------------+---------------------------------------------------------------+
+| *TaskPlanOptions*          | Primary message from *Tasks* that prescribe available start   |
+|                            | and end locations for each option as well as cost to complete |
+|                            | the option. In the **RoutePending** state, the *Collector*    |
+|                            | will use the current location of the vehicle to create paths  |
+|                            | from each vehicle to each task option and from each task      |
+|                            | option to every other task option.                            |
++----------------------------+---------------------------------------------------------------+
+| *EntityState*              | Describes the actual state of a vehicle in the system         |
+|                            | including position, speed, and fuel status. This message is   |
+|                            | used to create routes and cost estimates from the associated  |
+|                            | vehicle position and heading to the task option start         |
+|                            | locations.                                                    |
++----------------------------+---------------------------------------------------------------+
+| *RoutePlanResponse*        | This message is the fulfillment of a single vehicle route     |
+|                            | plan request which the *Collector* catalogues until the       |
+|                            | complete set of expected responses is received.               |
++----------------------------+---------------------------------------------------------------+
+
+
+: Table of messages that the *RouteAggregatorService* publishes in its *Collector* role.
+
++----------------------------+---------------------------------------------------------------+
+| Message Publication        | Description                                                   |
++============================+===============================================================+
+| *AssignmentCostMatrix*     | Once the *Collector* has a complete set of *TaskPlanOptions*  |
+|                            | as well as routes between tasks and vehicles, this message is |
+|                            | built to inform the next step in the task assignment          |
+|                            | pipeline: the *AssignmentTreeBranchBoundService*.             |
++----------------------------+---------------------------------------------------------------+
+| *RoutePlanRequest*         | The *Collector* publishes a series of these requests in       |
+|                            | order to compute the vehicle-to-task and task-to-task route   |
+|                            | costs. These messages are published in batch, without waiting |
+|                            | for a reply. It is expected that eventually all requests made |
+|                            | will be fulfilled.                                            |
++----------------------------+---------------------------------------------------------------+
+
 ## AssignmentTreeBranchBoundService
 
 ## PlanBuilderService
