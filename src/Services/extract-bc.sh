@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function extract_sub {
     BCF=$(basename $1 .cpp).bc
     clang++ -Wno-uninitialized -Wno-return-type -Wno-comment -std=c++11 -w \
