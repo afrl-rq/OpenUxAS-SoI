@@ -53,7 +53,9 @@ foreach f : check_functions
   endif
 endforeach
 
+c = meson.get_compiler('c')
 c_args = []
+deps = []
 
 os = target_machine.system()
 if os == 'linux'
@@ -61,9 +63,16 @@ if os == 'linux'
 elif os == 'darwin'
   c_args += ['-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
 elif os == 'windows'
-  c_args += ['-DLIBCZMQ_STATIC']
+  c_args += [
+    '-DZMQ_STATIC',
+	'-DLIBCZMQ_STATIC',
+  ]
   cdata.set('CZMQ_HAVE_WINDOWS', 1)
   cdata.set('HAVE_LIBUUID', 1)
+  deps += [
+    c.find_library('Iphlpapi'),
+	c.find_library('WS2_32'),
+  ]
 endif
 
 subdir('src')
@@ -115,6 +124,7 @@ lib = static_library(
     'src/zthread.c',
     'src/zuuid.c',
   ],
+  dependencies: deps,
   c_args: c_args,
   include_directories: include_directories(
     'include',

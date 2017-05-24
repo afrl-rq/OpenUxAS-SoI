@@ -1,3 +1,22 @@
+cpp_args = []
+cpp = meson.get_compiler('cpp')
+
+if cpp.get_id() == 'msvc'
+  cpp_args += [
+  	'/std:c++14',
+	'-DZMQ_DEFINED_STDINT',
+	'-DZMQ_STATIC',
+	'-DLIBCZMQ_STATIC',
+	'-DLIBZYRE_STATIC',
+  ]
+else
+  cpp_args += [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
+endif
+
 lib_uxas_communications = static_library(
   'uxas_messages',
   [
@@ -27,11 +46,7 @@ lib_uxas_communications = static_library(
     'ZeroMqSenderBase.cpp',
     'ZeroMqZyreBridge.cpp',
   ],
-  cpp_args: [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
-  ],
+  cpp_args: cpp_args,
   include_directories: [
     include_directories(
       '../../src/Includes',

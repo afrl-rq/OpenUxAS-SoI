@@ -17,9 +17,9 @@
 #include "SerialAutomationRequestTestService.h"
 
 #include "UxAS_Log.h"
+#include "TimeUtilities.h"
 #include "UxAS_TimerManager.h"
 #include "pugixml.hpp"
-#include "TimeUtilities.h"
 
 #define STRING_COMPONENT_NAME "SerialAutomationRequest"
 #define STRING_XML_COMPONENT_TYPE STRING_COMPONENT_NAME

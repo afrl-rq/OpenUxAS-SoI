@@ -32,6 +32,17 @@ else
   srcs_utilities_internal = files()
 endif
 
+cpp_args = []
+
+cpp = meson.get_compiler('cpp')
+if cpp.get_id() != 'msvc'
+  cpp_args += [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
+endif
+
 lib_utilities = static_library(
   'utilities',
   srcs_utilities,
@@ -39,10 +50,6 @@ lib_utilities = static_library(
   dependencies: [
     dep_boost,
   ],
-  cpp_args: [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
-  ],
+  cpp_args: cpp_args,
   include_directories: incs_utilities,
 )
