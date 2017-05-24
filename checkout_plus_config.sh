@@ -89,6 +89,7 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     echo "Checkout OpenAMASE:" # as of 2017-05-23, also seem to need a checkout of OpenAMASE for examples to run
     if [ ! -d "OpenAMASE" ]; then # pull down the repo for the first time
         git clone https://github.com/$REPO_SOURCE_OA/OpenAMASE.git
+        FIRST_TIME=1
     else # update the local repo
         cd OpenAMASE
         git pull
@@ -96,6 +97,11 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     fi
     echo "Download OpenAMASE jar file:"
     mkdir -p $WORKSPACEDIR/OpenAMASE/OpenAMASE/dist
+    if [ ! -f "$WORKSPACEDIR/OpenAMASE/OpenAMASE/dist/OpenAMASE.jar" ]; then
+        FIRST_TIME=1
+    else
+        :
+    fi
     echo "Please log into your github account in the webbroswer."
     echo "(You will see a 404 error at first, but once you've logged in, the download should automatically start.)"
     echo "Then save the file (OpenAMASE.jar) to $WORKSPACEDIR/OpenAMASE/OpenAMASE/dist"
@@ -115,6 +121,7 @@ elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
     echo "Checkout + compile OpenAMASE:"
     if [ ! -d "OpenAMASE" ]; then # pull down the repo for the first time
         git clone https://github.com/$REPO_SOURCE_OA/OpenAMASE.git
+        FIRST_TIME=1
     else # update the local repo
         cd OpenAMASE
         git pull
@@ -142,6 +149,11 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     cd $WORKSPACEDIR
     echo "Download LmcpGen jar file:"
     mkdir -p $WORKSPACEDIR/LmcpGen/dist
+    if [ ! -f "$WORKSPACEDIR/LmcpGen/dist/LmcpGen.jar" ]; then
+        FIRST_TIME=1
+    else
+        :
+    fi
     echo "Please log into your github account in the webbroswer."
     echo "(You will see a 404 error at first, but once you've logged in, the download should automatically start.)"
     echo "Then save the file (LmcpGen.jar) to $WORKSPACEDIR/LmcpGen/dist"
@@ -161,6 +173,7 @@ elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
     echo "Checkout + compile LmcpGen:"
     if [ ! -d "LmcpGen" ]; then # pull down the repo for the first time
         git clone https://github.com/$REPO_SOURCE_LG/LmcpGen.git
+        FIRST_TIME=1
     else # update the local repo
         cd LmcpGen
         git pull
