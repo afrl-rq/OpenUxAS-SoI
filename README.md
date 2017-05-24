@@ -28,6 +28,8 @@ Try:
     ./install_most_deps.sh
     ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
     ./build_documentation
+
+Make sure you follow the instructions in the terminal window, and press a key once you're ready to move to the next set of instructions.
     
 To test OpenUxAS 'example 2', try:
 1. In terminal 1:
@@ -50,6 +52,21 @@ If you need to pull the newest versions of the UxAS code from the server and rec
 
     cd /home/$USER/UxAS_pulls/OpenUxAS
     ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+
+## Installing OSATE2
+
+If you want to install 'AADL - OSATE2' (version 2.2.2), try:
+
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    ./install_AADL_stuff.sh
+
+Note that there are a lot of terminal window instructions here (this one isn't very "automated"). Make sure you follow the instructions in the terminal window, and press a key once you're ready to move to the next set of instructions.
+
+Also note that the newest set of instructions -- with pictures!! -- for installing OSATE2 is located in the 'architecture' branch of the repository. Try:
+
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    git checkout architecture
+    libreoffice --writer ./AADL_project/doc/Tool_Installation_and_Setup_Instructions.docx
 
 
 # Prerequisites and Dependencies
