@@ -16,6 +16,42 @@ The LMCP specification and all source code for *OpenUxAS* is publicaly released 
 Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agreement closely follows the NASA Open Source
 Agreement Verion 1.3.
 
+
+# Quick Start (only if you already have Ubuntu 16.04 LTS installed!!):
+
+Try:
+
+    mkdir -p /home/$USER/UxAS_pulls
+    cd /home/$USER/UxAS_pulls
+    git clone https://github.com/afrl-rq/OpenUxAS.git
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    ./install_most_deps.sh
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+    ./build_documentation
+    
+To test OpenUxAS 'example 2', try:
+1. In terminal 1:
+
+    `cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch`  
+    `./runAMASE_WaterwaySearch.sh`
+
+1. Press the 'play' button in the AMASE simulation player.
+1. In terminal 2:
+
+    `cd /home/$USER/UxAS_pulls/OpenUxAS/examples/02_Example_WaterwaySearch`  
+    `./runUxAS_WaterwaySearch.sh`
+
+If you need to recompile OpenUxAS later, try:
+
+    cd ~/UxAS_pulls/OpenUxAS
+    ninja -C build all
+
+If you need to pull the newest versions of the UxAS code from the server and recompile, try:
+
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+
+
 # Prerequisites and Dependencies
 
 The primary tools and dependencies to obtain, build, document, and simulate UxAS are:
@@ -49,7 +85,22 @@ Libraries for XML and GPS message parsing have numerous forks without centralize
 
 ## Supported Operating Systems
 
-For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. Support for Windows is planned, but is not yet available. We recommend an Ubuntu virtual machine for Windows users. 
+For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. We recommend an Ubuntu virtual machine for Windows users. 
+
+Support for Windows is available on Windows 10, with some caveats.
+
+### For Windows 10 users only: Install "Bash on Ubuntu on Windows", Windows Subsystem for Linux (Optional)
+
+If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
+
+To set this up:
+1. Update to the Windows 10 Creators Update
+1. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
+1. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
+   - `echo "export DISPLAY=:0" >> ~/.bashrc`
+   - `sudo apt update & sudo apt install gedit`
+
+This has been tested-working for the UxAS project, but may not work for other packages or programs (such as ROS). :)
 
 ### Windows: Install Ubuntu in Virtual Machine
 
@@ -92,26 +143,17 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Reboot VM
 1. Follow Ubuntu instructions for remainder of configuration
 
-If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
-
-To set this up:
-1. Update to the Windows 10 Creators Update
-1. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
-1. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
-   - `echo "export DISPLAY=:0" >> ~/.bashrc`
-   - `sudo apt update & sudo apt install gedit`
-
-...but this is currently not supported. Attempt at your own peril! :)
-
-### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X
+### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
 
 The following is a bash script that helps to partially-automate the "installing prerequisite tools" processes that are documented in this README.md file below.
 
-This is under development (only tested on Ubuntu 16.04), so use at your own peril!
+This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (install_most_deps.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./install_most_deps.sh`
 1. Follow the on-screen instructions
+
+Note that the most up-to-date instructions on the dependencies-needed for UxAS are available below.
 
 ### Installing Prerequisite Tools on Ubuntu Linux
 
@@ -194,7 +236,26 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
    - Select `C/C++` and click `Install`
 
 
-# Configure UxAS and Related Projects
+# Configure and Build UxAS and Related Projects
+
+## Configure UxAS and Related Projects + Building at the Command Line on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
+
+The following is a bash script that helps to partially-automate the "configure UxAS and related projects" and "building at the command line" processes that are documented in this README.md file below.
+
+This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
+
+1. Download these two scripts from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) OR `cd` to your `git clone`d *OpenUxAS* directory
+    - `checkout_plus_config.sh`
+    - `get_dlvsco_wd_f.sh`
+1. Run the `checkout_plus_config.sh` script at the terminal:
+    - If you want to download the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -d`
+    - If you want to compile the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -c`
+1. Follow the on-screen instructions
+
+Note that this sets up your UxAS workspace under a default directory (`/home/$USER/UxAS_pulls`). If you want to specify a workspace other than the default, then pass the absolute path to the script as a second argument when calling the script (e.g., `./checkout_plus_config.sh -d /home/$USER/my_checkout_dir`).
+
+
+## Configure UxAS and Related Projects
 
 Expected file system layout:
 ```
@@ -257,7 +318,7 @@ time a file is modified in one of the `/3rd/wrap_patches` subdirectories or the 
 
 This also needs to be done any time you move or rename your source tree.
 
-# Building at the Command Line
+## Building at the Command Line
 1. Configure for release build: in terminal
    - ``` meson build --buildtype=release ```
 1. Configure for debug build: in terminal
@@ -276,7 +337,7 @@ command: `ninja -C build clean`
    - ``` ninja -C build test ```
    - Confirm all tests passed
    
-## Compiling using NetBeans (Debug Mode)
+### Compiling using NetBeans (Debug Mode)
 
 1. Open NetBeans
 1. Select File->New Project
@@ -293,7 +354,7 @@ command: `ninja -C build clean`
 For Linux systems, Netbeans will automatically use the `gdb` debugger. On Mac OS X,
 `gdb` must be installed and signed (see [Neil Traft's guide](http://ntraft.com/installing-gdb-on-os-x-mavericks/)).
 
-## Removing External Dependencies
+### Removing External Dependencies
 
 If you ever feel the need to refresh external dependencies, you'll need
 to remove both the downloaded files and the expanded directories:
@@ -382,13 +443,21 @@ unexpected trouble may arise on other platforms.
    
 # Building the Documentation
 
-The following is a bash script that help to partially automate the "building the docuemntation" processes that are documented in this README.md file below.
+## Building the Documentation on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
+
+The following is a bash script that helps to partially-automate the "building the documentation" processes that are documented in this README.md file below.
+
+This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./build_documentation.sh`
 1. Follow the on-screen instructions
 
-Note that if you'd like to do this process manually, then:
+Note that this will pop open two html files in your webbrowser and also the pdf manual when run.
+
+## Building the Documentation Manually
+
+If you'd like to do this process manually, then:
 
 1. The User Manual can be generated by running:
    `pdflatex UxAS_UserManual.tex` in the folder `doc/reference/UserManual/`
