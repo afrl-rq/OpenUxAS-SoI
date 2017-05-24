@@ -62,11 +62,11 @@ next in the queue or transition to **idle** if the queue is empty.
 |                            | the *AutomationRequest* must be initialized before a          |
 |                            | *UniqueAutomationRequest* is published.                       |
 +----------------------------+---------------------------------------------------------------+
-| *KeepInZone*               | Polygon description of a region in which vehicles must not    |
+| *KeepOutZone*              | Polygon description of a region in which vehicles must not    |
 |                            | travel. If referenced by the *OperatingRegion* in the         |
 |                            | *AutomationRequest*, zone must exist for request to be valid. |
 +----------------------------+---------------------------------------------------------------+
-| *KeepOutZone*              | Polygon description of a region in which vehicles must remain |
+| *KeepInZone*               | Polygon description of a region in which vehicles must remain |
 |                            | during travel. If referenced by the *OperatingRegion* in the  |
 |                            | *AutomationRequest*, zone must exist for request to be valid. |
 +----------------------------+---------------------------------------------------------------+
@@ -305,6 +305,91 @@ transitions to the **Idle** state.
 +----------------------------+---------------------------------------------------------------+
 
 ## RoutePlannerVisibilityService
+
+The *RoutePlannerVisibilityService* is a service that provides route planning using a visibility
+heuristic. One of the fundamental architectural decisions in UxAS is separation of
+route planning from task assignment. This service is an example of a route planning service
+for aircraft. Ground vehicle route planning (based on Open Street Maps data) can be found in
+the *OsmPlannerService*.
+
+The design of the *RoutePlannerVisibilityService* message interface is intended to be as
+simple as possible: a route planning service considers routes only in fixed environments for
+known vehicles and handles requests for single vehicles. The logic necessary to plan for
+multiple (possibly heterogeneous) vehicles is handled in the *RouteAggregatorService*.
+
+In two dimensional environments composed of polygons, the shortest distance between points
+lies on the visibility graph. The *RoutePlannerVisibilityService* creates such a graph and,
+upon request, adds desired start/end locations to quickly approximate a distance-optimal
+route through the environment. With the straight-line route created by the searching the
+visibility graph, a smoothing operation is applied to ensure that minimum turn rate
+constraints of vehicles are satisfied. Note, this smoothing operation can violate
+the prescribed keep-out zones and is not guaranteed to smooth arbitrary straight-line routes
+(in particular, path segments shorter than the minimum turn radius can be problematic).
+
+Due to the need to search over many possible orderings of *Tasks* during an assignment
+calculation, the route planner must very quickly compute routes. Even for small problems,
+hundreds of routes must be calculated before the assignment algorithm can start searching
+over the possible ordering. For this reason it is imperative that the route planner be
+responsive and efficient.
+
+
+: Table of messages that the *RoutePlannerVisibilityService* receives and processes.
+
++----------------------------+---------------------------------------------------------------+
+| Message Subscription       | Description                                                   |
++============================+===============================================================+
+| *RoutePlanRequest*         | Primary message that describes a route plan request. A        |
+|                            | request considers only a single vehicle in a single           |
+|                            | *OperatingRegion* although it can request multiple pairs of   |
+|                            | start and end locations with a single message.                |
++----------------------------+---------------------------------------------------------------+
+| *KeepOutZone*              | Polygon description of a region in which vehicles must not    |
+|                            | travel. This service will track all *KeepOutZones* to compose |
+|                            | them upon reception of an *OperatingRegion*.                  |
++----------------------------+---------------------------------------------------------------+
+| *KeepInZone*               | Polygon description of a region in which vehicles must remain |
+|                            | during travel. This service will track all *KeepInZones* to   |
+|                            | compose them upon reception of an *OperatingRegion*.          |
++----------------------------+---------------------------------------------------------------+
+| *OperatingRegion*          | Collection of *KeepIn* and *KeepOut* zones that describe the  |
+|                            | allowable space for vehicular travel. When received, this     |
+|                            | service creates a visibility graph considering the zones      |
+|                            | referenced by this *OperatingRegion*. Upon *RoutePlanRequest* |
+|                            | the visibility graph corresponding to the *OperatingRegion*   |
+|                            | ID is retreived and manipulated to add start/end locations    |
+|                            | and perform the shortest path search.                         |
++----------------------------+---------------------------------------------------------------+
+| *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
+|                            | by entity configuration messages. This service calculates the |
+|                            | minimum turn radius of the entity by using the max bank angle |
+|                            | and nominal speed. Requested routes are then returned at the  |
+|                            | nominal speed and with turns approximating the minimum turn   |
+|                            | radius.                                                       | 
++----------------------------+---------------------------------------------------------------+
+| "AircraftPathPlanner"      | In addition to subscribing to the above broadcasted messages, |
+|                            | this service also subscribes to the group mailbox for         |
+|                            | path planners that service aircraft requests. Upon reception  |
+|                            | of a message on this channel, the service will check for one  |
+|                            | of the above messages and process it as if it came from over  |
+|                            | the broadcast channel. In either case, the return message     |
+|                            | always uses return-to-sender addressing.                      |
++----------------------------+---------------------------------------------------------------+
+
+
+
+: Table of messages that the *RoutePlannerVisibilityService* publishes.
+
++----------------------------+---------------------------------------------------------------+
+| Message Publication        | Description                                                   |
++============================+===============================================================+
+| *RoutePlanResponse*        | This message contains the waypoints and time cost that        |
+|                            | fulfills the route request. This message is the only one      |
+|                            | published by the *RoutePlannerVisibilityService* and is       |
+|                            | always sent using the return-to-sender addressing which       |
+|                            | ensures that only the original requester receives the         |
+|                            | response.                                                     |
++----------------------------+---------------------------------------------------------------+
+
 
 ## RouteAggregatorService
 
