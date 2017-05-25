@@ -26,7 +26,7 @@ function extract_sub {
             -I../../build/src/Includes \
             -I../../resources/AutomationDiagramDataService \
             -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch \
-            -Wnon-virtual-dtor -O3 -DLINUX -fPIC -std=c++11 -Wno-unused-function \
+            -Wnon-virtual-dtor -O0 -DLINUX -fPIC -std=c++11 -Wno-unused-function \
             -Wno-unused-variable -emit-llvm -c -o $BCF $1
 }
 
