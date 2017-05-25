@@ -1,3 +1,8 @@
+-------------------------------------------------------------------
+-- This package contains constants that are used by AGREE (i.e.,
+--  constants that are referenced in AGREE contracts).
+-------------------------------------------------------------------
+
 package AGREE_Constants
 public
 	with Data_Types;
