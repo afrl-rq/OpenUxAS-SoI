@@ -12,5 +12,247 @@
 
 package UxAS
 public
-	
+  with CMASI;
+  with UXTASK; 
+  with IMPACT;
+  with ROUTE;
+  with UXNATIVE;
+
+process AssignmentTreeBranchBoundBase
+    features
+        TaskPlanOptions_in : in event data port uxtask::TaskPlanOptions.i;
+        AssignmentCostMatrix_in : in event data port uxtask::AssignmentCostMatrix.i;
+        UniqueAutomationRequest_in : in event data port uxtask::UniqueAutomationRequest.i;
+        ServiceStatus_out : out event data port cmasi::ServiceStatus.i;
+        TaskAssignmentSummary_out : out event data port uxtask::TaskAssignmentSummary.i;
+end AssignmentTreeBranchBoundBase;
+
+
+process AssignmentTreeBranchBoundService
+end AssignmentTreeBranchBoundService;
+
+
+process AutomationDiagramDataService
+    features
+        KeepOutZone_in : in event data port cmasi::KeepOutZone.i;
+        UniqueAutomationResponse_in : in event data port uxtask::UniqueAutomationResponse.i;
+        AreaOfInterest_in : in event data port impact::AreaOfInterest.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        KeepInZone_in : in event data port cmasi::KeepInZone.i;
+        PointOfInterest_in : in event data port impact::PointOfInterest.i;
+        UniqueAutomationRequest_in : in event data port uxtask::UniqueAutomationRequest.i;
+        OperatingRegion_in : in event data port cmasi::OperatingRegion.i;
+        Task_in : in event data port cmasi::Task.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        LineOfInterest_in : in event data port impact::LineOfInterest.i;
+end AutomationDiagramDataService;
+
+
+process AutomationRequestValidatorService
+    features
+        TaskInitialized_in : in event data port uxtask::TaskInitialized.i;
+        KeepOutZone_in : in event data port cmasi::KeepOutZone.i;
+        SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
+        AirVehicleConfiguration_in : in event data port cmasi::AirVehicleConfiguration.i;
+        AreaOfInterest_in : in event data port impact::AreaOfInterest.i;
+        AutomationRequest_in : in event data port cmasi::AutomationRequest.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        TaskAutomationRequest_in : in event data port uxtask::TaskAutomationRequest.i;
+        UniqueAutomationResponse_in : in event data port uxtask::UniqueAutomationResponse.i;
+        PointOfInterest_in : in event data port impact::PointOfInterest.i;
+        RemoveTasks_in : in event data port cmasi::RemoveTasks.i;
+        Task_in : in event data port cmasi::Task.i;
+        OperatingRegion_in : in event data port cmasi::OperatingRegion.i;
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        KeepInZone_in : in event data port cmasi::KeepInZone.i;
+        ImpactAutomationRequest_in : in event data port impact::ImpactAutomationRequest.i;
+        LineOfInterest_in : in event data port impact::LineOfInterest.i;
+        ServiceStatus_out : out event data port cmasi::ServiceStatus.i;
+        ImpactAutomationResponse_out : out event data port impact::ImpactAutomationResponse.i;
+        AutomationResponse_out : out event data port cmasi::AutomationResponse.i;
+        TaskAutomationResponse_out : out event data port uxtask::TaskAutomationResponse.i;
+        UniqueAutomationRequest_out : out event data port uxtask::UniqueAutomationRequest.i;
+end AutomationRequestValidatorService;
+
+
+process BatchSummaryService
+    features
+        RadioTowerState_in : in event data port impact::RadioTowerState.i;
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        EntityConfiguration_in : in event data port cmasi::EntityConfiguration.i;
+        SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
+        AirVehicleConfiguration_in : in event data port cmasi::AirVehicleConfiguration.i;
+        BatchSummaryRequest_in : in event data port impact::BatchSummaryRequest.i;
+        EntityState_in : in event data port cmasi::EntityState.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        PointOfInterest_in : in event data port impact::PointOfInterest.i;
+        RadioTowerConfiguration_in : in event data port impact::RadioTowerConfiguration.i;
+        Task_in : in event data port cmasi::Task.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        RoutePlanResponse_in : in event data port route::RoutePlanResponse.i;
+        AreaOfInterest_in : in event data port impact::AreaOfInterest.i;
+        EgressRouteResponse_in : in event data port route::EgressRouteResponse.i;
+        LineOfInterest_in : in event data port impact::LineOfInterest.i;
+        EgressRouteRequest_out : out event data port route::EgressRouteRequest.i;
+        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+        BatchSummaryResponse_out : out event data port impact::BatchSummaryResponse.i;
+end BatchSummaryService;
+
+
+process Challenge_TelemetryReceiver
+    features
+        VideoRecord_in : in event data port uxnative::VideoRecord.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+end Challenge_TelemetryReceiver;
+
+
+process MessageLoggerDataService
+end MessageLoggerDataService;
+
+
+process OperatingRegionStateService
+    features
+        KeepInZone_in : in event data port cmasi::KeepInZone.i;
+        RemoveZones_in : in event data port cmasi::RemoveZones.i;
+        KeepOutZone_in : in event data port cmasi::KeepOutZone.i;
+        OperatingRegion_out : out event data port cmasi::OperatingRegion.i;
+end OperatingRegionStateService;
+
+
+process OsmPlannerService
+	features
+		--subscribes to the "GroundPathPlanner" mailbox. it could receive any message from this mailbox
+--        GroundPathPlanner_in : in event data port MessageGroup::GroundPathPlanner.i;
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        RoutePlanRequest_in : in event data port route::RoutePlanRequest.i;
+        EgressRouteRequest_in : in event data port route::EgressRouteRequest.i;
+        RoutePlanResponse_out : out event data port route::RoutePlanResponse.i;
+        EgressRouteResponse_out : out event data port route::EgressRouteResponse.i;
+end OsmPlannerService;
+
+
+process PlanBuilderService
+    features
+        TaskImplementationResponse_in : in event data port uxtask::TaskImplementationResponse.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        UniqueAutomationRequest_in : in event data port uxtask::UniqueAutomationRequest.i;
+        TaskAssignmentSummary_in : in event data port uxtask::TaskAssignmentSummary.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        ServiceStatus_out : out event data port cmasi::ServiceStatus.i;
+        UniqueAutomationResponse_out : out event data port uxtask::UniqueAutomationResponse.i;
+        TaskImplementationRequest_out : out event data port uxtask::TaskImplementationRequest.i;
+end PlanBuilderService;
+
+
+process RouteAggregatorService
+    features
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
+        AirVehicleConfiguration_in : in event data port cmasi::AirVehicleConfiguration.i;
+        RouteRequest_in : in event data port route::RouteRequest.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        UniqueAutomationRequest_in : in event data port uxtask::UniqueAutomationRequest.i;
+        RoutePlanResponse_in : in event data port route::RoutePlanResponse.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        TaskPlanOptions_in : in event data port uxtask::TaskPlanOptions.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        ServiceStatus_out : out event data port cmasi::ServiceStatus.i;
+        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+        AssignmentCostMatrix_out : out event data port uxtask::AssignmentCostMatrix.i;
+        RouteResponse_out : out event data port route::RouteResponse.i;
+end RouteAggregatorService;
+
+
+process RoutePlannerService
+    features
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        EntityConfiguration_in : in event data port cmasi::EntityConfiguration.i;
+        KeepOutZone_in : in event data port cmasi::KeepOutZone.i;
+        SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
+        AirVehicleConfiguration_in : in event data port cmasi::AirVehicleConfiguration.i;
+        RoutePlanRequest_in : in event data port route::RoutePlanRequest.i;
+        EntityState_in : in event data port cmasi::EntityState.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        KeepInZone_in : in event data port cmasi::KeepInZone.i;
+        OperatingRegion_in : in event data port cmasi::OperatingRegion.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        WaterZone_in : in event data port impact::WaterZone.i;
+        RoutePlanResponse_out : out event data port route::RoutePlanResponse.i;
+end RoutePlannerService;
+
+
+process RoutePlannerVisibilityService
+    features
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
+        KeepOutZone_in : in event data port cmasi::KeepOutZone.i;
+        AirVehicleConfiguration_in : in event data port cmasi::AirVehicleConfiguration.i;
+        RoutePlanRequest_in : in event data port route::RoutePlanRequest.i;
+        RouteRequest_in : in event data port route::RouteRequest.i;
+        GroundVehicleState_in : in event data port impact::GroundVehicleState.i;
+        KeepInZone_in : in event data port cmasi::KeepInZone.i;
+        --subscribes to the "AircraftPathPlanner" mailbox. It can receive any message type of this mailbox
+--        AircraftPathPlanner_in : in event data port MessageGroup::AircraftPathPlanner.i;
+        OperatingRegion_in : in event data port cmasi::OperatingRegion.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        SurfaceVehicleState_in : in event data port impact::SurfaceVehicleState.i;
+        RoutePlanResponse_out : out event data port route::RoutePlanResponse.i;
+end RoutePlannerVisibilityService;
+
+
+process SendMessagesService
+    features
+        StartupComplete_in : in event data port uxnative::StartupComplete.i;
+end SendMessagesService;
+
+
+process SensorManagerService
+    features
+        GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
+        RemoveTasks_in : in event data port cmasi::RemoveTasks.i;
+        AirVehicleConfiguration_in : in event data port cmasi::AirVehicleConfiguration.i;
+        SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
+        SensorFootprintRequests_in : in event data port uxtask::SensorFootprintRequests.i;
+        SensorFootprintResponse_out : out event data port uxtask::SensorFootprintResponse.i;
+end SensorManagerService;
+
+
+process SerialAutomationRequestTestService
+    features
+        ImpactAutomationResponse_in : in event data port impact::ImpactAutomationResponse.i;
+        ImpactAutomationRequest_in : in event data port impact::ImpactAutomationRequest.i;
+        AutomationResponse_in : in event data port cmasi::AutomationResponse.i;
+        AutomationRequest_in : in event data port cmasi::AutomationRequest.i;
+end SerialAutomationRequestTestService;
+
+
+process ServiceBase
+	-- this service can receive any arbitrary LMCP messages
+end ServiceBase;
+
+
+process TcpBridge
+	-- this service can receive and send arbitrary LMCP messages
+end TcpBridge;
+
+
+process Test_SimulationTime
+    features
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+end Test_SimulationTime;
+
+
+process WaypointPlanManagerService
+    features
+        MissionCommand_in : in event data port cmasi::MissionCommand.i;
+        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+        IncrementWaypoint_in : in event data port uxnative::IncrementWaypoint.i;
+        AutomationResponse_in : in event data port cmasi::AutomationResponse.i;
+end WaypointPlanManagerService;
 end UxAS;
