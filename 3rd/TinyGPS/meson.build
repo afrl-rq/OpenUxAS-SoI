@@ -8,6 +8,7 @@ endif
 dep_boost = dependency(
   'boost',
   modules: ['filesystem', 'regex', 'system'],
+  static: true,
   fallback: ['boost', 'dep_boost'],
 )
 
