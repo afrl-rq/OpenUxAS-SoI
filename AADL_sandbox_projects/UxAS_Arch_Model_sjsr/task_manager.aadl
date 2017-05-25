@@ -1,0 +1,21 @@
+package task_manager_pkg
+public
+	--with config;
+	
+	system task_manager
+		features
+		--inputs
+		entity_configuration : in event data port;
+		entity_state : in event data port;
+		task : in event data port;
+		unique_automation_request : in event data port;
+		--outputs
+		new_task_message : out event data port;
+	end task_manager;
+	system implementation task_manager.impl
+		
+	end task_manager.impl;
+end task_manager_pkg;
+
+
+

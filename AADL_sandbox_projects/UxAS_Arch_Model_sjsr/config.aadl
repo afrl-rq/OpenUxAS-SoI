@@ -1,0 +1,8 @@
+package config
+public
+	annex agree{**
+			-- set time representation; dtu=delta time unit; 1.0 = 1 second per time unit
+		const delta_time_unit : real = 1.0;
+		
+	**};
+end config;

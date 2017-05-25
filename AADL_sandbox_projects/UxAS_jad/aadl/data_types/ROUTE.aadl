@@ -1,0 +1,209 @@
+package ROUTE
+public
+	with CMASI;
+	with Common_Data;
+	renames Common_Data::all;
+
+	with Data_Model;
+
+data GraphNode
+end GraphNode;
+
+--Defines a base graph node for a geo-spatial graph.
+	data implementation GraphNode.i
+    subcomponents
+        --Unique ID for the node, used to build edges between nodes
+        NodeID: data int64.i;
+        --Lat/Lon coordinates of node
+        Coordinates: data CMASI::Location3D.i;
+        --IDs of edges that have this node as an endpoint
+        AssociatedEdges: data int64.i {Data_Model::Data_Representation => Array;};
+end GraphNode.i;
+
+data GraphEdge
+end GraphEdge;
+
+--Defines an edge for a geo-spatial graph. An edge must connect two
+--nodes defined by GraphNodes. Each edge consists of a set of waypoints
+--connecting the two endpoints. All edges are considered bi-directional
+--(i.e. one-way roads are not defined)
+	data implementation GraphEdge.i
+    subcomponents
+        --Unique ID for the edge
+        EdgeID: data int64.i;
+        --GraphNode ID which defines the start point of the edge
+        StartNode: data int64.i;
+        --GraphNode ID which defines the end point of the edge
+        EndNode: data int64.i;
+        --Optional waypoints describing physical edge in lat/lon coordinates
+        Waypoints: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+end GraphEdge.i;
+
+data GraphRegion
+end GraphRegion;
+
+--Defines a complete geo-spatial graph
+	data implementation GraphRegion.i
+    subcomponents
+        --ID for full region data structure
+        ID: data int64.i;
+        --List of all nodes that represent the network
+        NodeList: data GraphNode.i {Data_Model::Data_Representation => Array;};
+        --List of all edges that represent the network
+        EdgeList: data GraphEdge.i {Data_Model::Data_Representation => Array;};
+end GraphRegion.i;
+
+data RouteConstraints
+end RouteConstraints;
+
+--Start/end points and associated heading constraints for a route
+--request
+	data implementation RouteConstraints.i
+    subcomponents
+        --ID denoting this set of route constraints
+        RouteID: data int64.i;
+        --Location from which the planned route will start
+        StartLocation: data CMASI::Location3D.i;
+        --Heading of entity at the start of the route
+        StartHeading: data real32.i;
+        --If "true" the heading value in StartHeading must be used to start
+        --the route. If not, any starting heading can be used.
+        UseStartHeading: data bool.i;
+        --Location to which the planned route will end
+        EndLocation: data CMASI::Location3D.i;
+        --Heading of entity at the end of the route
+        EndHeading: data real32.i;
+        --If "true" the heading value in EndHeading must be used to end the
+        --route. If not, ant ending heading can be used.
+        UseEndHeading: data bool.i;
+end RouteConstraints.i;
+
+data RouteRequest
+end RouteRequest;
+
+--Route request: macro route request for a list of available vehicles
+	data implementation RouteRequest.i
+    subcomponents
+        --Request ID for correlating with response
+        RequestID: data int64.i;
+        --Associated Task ID (0 if no associated task) for this set of
+        --requests
+        AssociatedTaskID: data int64.i;
+        --Vehicles to consider when planning. If list is empty, route planner
+        --plans for all known vehicles.
+        VehicleID: data int64.i {Data_Model::Data_Representation => Array;};
+        --Operating region to be considered during planning
+        OperatingRegion: data int64.i;
+        --List of all requests for this vehicle set + operating region
+        --situation
+        RouteRequests: data RouteConstraints.i {Data_Model::Data_Representation => Array;};
+        --Request that planner only return costs of routes rather than
+        --complete waypoint plans
+        IsCostOnlyRequest: data bool.i;
+end RouteRequest.i;
+
+data RoutePlanRequest
+end RoutePlanRequest;
+
+--Route plan request: find route from the current vehicle position to
+--a point of interest or world location
+	data implementation RoutePlanRequest.i
+    subcomponents
+        --Request ID for correlating with response
+        RequestID: data int64.i;
+        --Associated Task ID (0 if no associated task) for this set of
+        --requests
+        AssociatedTaskID: data int64.i;
+        --Vehicle to consider when planning
+        VehicleID: data int64.i;
+        --Operating region to be considered during planning
+        OperatingRegion: data int64.i;
+        --List of all requests for this vehicle + operating region situation
+        RouteRequests: data RouteConstraints.i {Data_Model::Data_Representation => Array;};
+        --Request that planner only return costs of routes rather than
+        --complete waypoint plans
+        IsCostOnlyRequest: data bool.i;
+end RoutePlanRequest.i;
+
+data RoutePlan
+end RoutePlan;
+
+--Individual route plan
+	data implementation RoutePlan.i
+    subcomponents
+        --ID denoting this plan corresponding with requested route constraint
+        --pair
+        RouteID: data int64.i;
+        --Waypoints that connect the start location with the end location.
+        --Empty if only costs were requested
+        Waypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+        --Time cost of route. If less than zero, a planning error has occurred
+        RouteCost: data int64.i;
+        --Error messages, if applicable
+        RouteError: data CMASI::KeyValuePair.i {Data_Model::Data_Representation => Array;};
+end RoutePlan.i;
+
+data RoutePlanResponse
+end RoutePlanResponse;
+
+--Route plan response: list of all fulfilled route requests
+	data implementation RoutePlanResponse.i
+    subcomponents
+        --Response ID matching ID from request ({@link RoutePlanRequest})
+        ResponseID: data int64.i;
+        --Associated Task ID (0 if no associated task) that this set of
+        --responses corresponds to
+        AssociatedTaskID: data int64.i;
+        --Vehicle that was considered during planning
+        VehicleID: data int64.i;
+        --Operating region that was considered during planning
+        OperatingRegion: data int64.i;
+        --List of all responses for this vehicle + operating region situation
+        RouteResponses: data RoutePlan.i {Data_Model::Data_Representation => Array;};
+end RoutePlanResponse.i;
+
+data RouteResponse
+end RouteResponse;
+
+--Route response: list of all fulfilled route requests for a complete
+--list of vehicles (see {@link RouteRequest})
+	data implementation RouteResponse.i
+    subcomponents
+        --Response ID matching ID from request ({@link RouteRequest})
+        ResponseID: data int64.i;
+        --Corresponding route responses for all requested vehicles
+        Routes: data RoutePlanResponse.i {Data_Model::Data_Representation => Array;};
+end RouteResponse.i;
+
+data EgressRouteRequest
+end EgressRouteRequest;
+
+--Egress route request: find all egress routes (nearby intersections)
+--from a point
+	data implementation EgressRouteRequest.i
+    subcomponents
+        --Request ID for correlating with response
+        RequestID: data int64.i;
+        --Location from which to calculate the routes
+        StartLocation: data CMASI::Location3D.i;
+        --The radius of the area of concern
+        Radius: data real32.i;
+end EgressRouteRequest.i;
+
+data EgressRouteResponse
+end EgressRouteResponse;
+
+--Egress route response: returns egress routes (nearby intersections)
+--from a point
+	data implementation EgressRouteResponse.i
+    subcomponents
+        --Response ID matching ID from request ({@link EgressRouteRequest})
+        ResponseID: data int64.i;
+        --The route locations
+        NodeLocations: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+        --The orientations
+        Headings: data real32.i {Data_Model::Data_Representation => Array;};
+end EgressRouteResponse.i;
+
+
+end ROUTE;

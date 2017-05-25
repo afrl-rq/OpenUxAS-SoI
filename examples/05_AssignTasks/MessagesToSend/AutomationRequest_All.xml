@@ -31,12 +31,7 @@
       <!-- PatternSearchTask -->
       <int64>60</int64> 
       <!-- PatternSearchTask -->
-      <int64>61</int64> 
-      
-      <!-- WatchTask -->
-      <int64>70</int64>   
-      <!-- BlockadeTask -->
-      <int64>71</int64> 
+      <int64>61</int64>
       
       </TaskList>
       <TaskRelationships></TaskRelationships>
