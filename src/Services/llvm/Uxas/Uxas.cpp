@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <set>
 #include <cxxabi.h>
 #include "llvm/ADT/Statistic.h"
 #include "llvm/IR/Module.h"
@@ -67,24 +68,49 @@ namespace {
       for(const auto &bb : F.getBasicBlockList()) {
         //-- iterate over statements
         for(const auto &ins : bb.getInstList()) {
+          Function *cf = NULL;
+          Value *arg = NULL;
+          
+          //-- extract called function and argument. the first
+          //-- argument to a method call is always the this
+          //-- pointer. so get the second argument.
           if(auto *II = dyn_cast<const InvokeInst>(&ins)) {
-            const Function *cf = II->getCalledFunction();
-            if(cf == NULL || !cf->getName().contains("addSubscriptionAddress")) continue;            
+            cf = II->getCalledFunction();
+            if(II->getNumArgOperands() > 1) arg = II->getArgOperand(1);
+          } else if(auto *CI = dyn_cast<const CallInst>(&ins)) {
+            cf = CI->getCalledFunction();
+            if(CI->getNumArgOperands() > 1) arg = CI->getArgOperand(1);
+          }
+          
+          if(cf == NULL || !cf->getName().contains("addSubscriptionAddress")) continue;
+          assert(arg);
 
-            //-- the first argument to a method call is always the
-            //-- this pointer. so get the second argument.
-            auto *arg = II->getArgOperand(1);
-
-            if(auto *Const = dyn_cast<Constant>(arg))            
-              errs() << '\t' << demangle(Const->getName()) << '\n';
-            else if(auto *II = dyn_cast<InvokeInst>(arg)) {
-              errs() << '\t' << demangle(II->getCalledFunction()->getName()) << "()\n";
-            }
-          }          
+          //errs() << "found potential sub: " << ins << '\n';
+          
+          if(auto *Const = dyn_cast<Constant>(arg))            
+            errs() << '\t' << demangle(Const->getName()) << '\n';
+          else if(auto *II = dyn_cast<InvokeInst>(arg)) {
+            errs() << '\t' << demangle(II->getCalledFunction()->getName()) << "()\n";
+          }
         }
       }
     }
 
+    //-- find all users of a value recursively
+    std::set<Value*> allUsers(Value *v)
+    {
+      std::set<Value*> res;
+      bool repeat = true;
+      while(repeat) {
+        repeat = false;
+        for(auto u : v->users()) {
+          if(Value *v = dyn_cast<Value>(u))
+            if(res.insert(v).second) repeat = true;
+        }
+      }
+      return res;
+    }
+    
     //-- print all messages that function F publishes
     void printPubs(Function &F)
     {
@@ -107,10 +133,13 @@ namespace {
             else if(cf->getName().contains("sendSharedLmcpObjectLimitedCastMessage"))
               arg = II->getArgOperand(2);
             if(!arg) continue;
-            
+
+            //errs() << "found potential pub: " << *II << '\n';
+
             //-- the first argument to a method call is always the
             //-- this pointer. so get the second argument.
-            for(auto u : arg->users()) {
+            for(auto u : allUsers(arg)) {
+              //errs() << "user " << *u << '\n';
               if(auto *CI = dyn_cast<CallInst>(u)) {
                 if(Function *CF = CI->getCalledFunction()) {
                   if(CF->getName().contains("static_pointer_cast")) {
