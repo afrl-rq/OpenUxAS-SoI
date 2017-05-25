@@ -257,6 +257,8 @@ process WaypointPlanManagerService
 end WaypointPlanManagerService;
 
 system uxas
+	features
+		AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
 end uxas;
 
 system implementation uxas.i
@@ -306,11 +308,22 @@ system implementation uxas.i
 		conn21 : port OsmPlannerService.EgressRouteResponse_out -> BatchSummaryService.EgressRouteResponse_in;
 		conn22 : port AutomationRequestValidatorService.AutomationResponse_out -> SerialAutomationRequestTestService.AutomationResponse_in;
 		conn23 : port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService.AutomationResponse_in;
-		conn24 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentTreeBranchBoundBase.UniqueAutomationRequest_in;
-		conn25 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
-		conn26 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
-		conn27 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> RouteAggregatorService.UniqueAutomationRequest_in;
-		conn28 : port RouteAggregatorService.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundBase.AssignmentCostMatrix_in;
+		conn24 : port AirVehicleState_in -> AutomationDiagramDataService.AirVehicleState_in;
+		conn25 : port AirVehicleState_in -> AutomationRequestValidatorService.AirVehicleState_in;
+		conn26 : port AirVehicleState_in -> BatchSummaryService.AirVehicleState_in;
+		conn27 : port AirVehicleState_in -> Challenge_TelemetryReceiver.AirVehicleState_in;
+		conn28 : port AirVehicleState_in -> PlanBuilderService.AirVehicleState_in;
+		conn29 : port AirVehicleState_in -> RouteAggregatorService.AirVehicleState_in;
+		conn30 : port AirVehicleState_in -> RoutePlannerService.AirVehicleState_in;
+		conn31 : port AirVehicleState_in -> RoutePlannerVisibilityService.AirVehicleState_in;
+		conn32 : port AirVehicleState_in -> Test_SimulationTime.AirVehicleState_in;
+		conn33 : port AirVehicleState_in -> WaypointPlanManagerService.AirVehicleState_in;
+		conn34 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentTreeBranchBoundBase.UniqueAutomationRequest_in;
+		conn35 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
+		conn36 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
+		conn37 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> RouteAggregatorService.UniqueAutomationRequest_in;
+		conn38 : port RouteAggregatorService.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundBase.AssignmentCostMatrix_in;
+
 
 end uxas.i;
 
