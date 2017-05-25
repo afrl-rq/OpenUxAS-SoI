@@ -255,4 +255,5 @@ process WaypointPlanManagerService
         IncrementWaypoint_in : in event data port uxnative::IncrementWaypoint.i;
         AutomationResponse_in : in event data port cmasi::AutomationResponse.i;
 end WaypointPlanManagerService;
+
 end UxAS;
