@@ -256,4 +256,62 @@ process WaypointPlanManagerService
         AutomationResponse_in : in event data port cmasi::AutomationResponse.i;
 end WaypointPlanManagerService;
 
+system uxas
+end uxas;
+
+system implementation uxas.i
+	subcomponents
+		AssignmentTreeBranchBoundBase : process AssignmentTreeBranchBoundBase;
+		AssignmentTreeBranchBoundService : process AssignmentTreeBranchBoundService;
+		AutomationDiagramDataService : process AutomationDiagramDataService;
+		AutomationRequestValidatorService : process AutomationRequestValidatorService;
+		BatchSummaryService : process BatchSummaryService;
+		Challenge_TelemetryReceiver : process Challenge_TelemetryReceiver;
+		MessageLoggerDataService : process MessageLoggerDataService;
+		OperatingRegionStateService : process OperatingRegionStateService;
+		OsmPlannerService : process OsmPlannerService;
+		PlanBuilderService : process PlanBuilderService;
+		RouteAggregatorService : process RouteAggregatorService;
+		RoutePlannerService : process RoutePlannerService;
+		RoutePlannerVisibilityService : process RoutePlannerVisibilityService;
+		SendMessagesService : process SendMessagesService;
+		SensorManagerService : process SensorManagerService;
+		SerialAutomationRequestTestService : process SerialAutomationRequestTestService;
+		ServiceBase : process ServiceBase;
+		TcpBridge : process TcpBridge;
+		Test_SimulationTime : process Test_SimulationTime;
+		WaypointPlanManagerService : process WaypointPlanManagerService;
+	connections
+		conn0 : port PlanBuilderService.UniqueAutomationResponse_out -> AutomationDiagramDataService.UniqueAutomationResponse_in;
+		conn1 : port PlanBuilderService.UniqueAutomationResponse_out -> AutomationRequestValidatorService.UniqueAutomationResponse_in;
+		conn2 : port AutomationRequestValidatorService.ImpactAutomationResponse_out -> SerialAutomationRequestTestService.ImpactAutomationResponse_in;
+		conn3 : port OsmPlannerService.RoutePlanResponse_out -> BatchSummaryService.RoutePlanResponse_in;
+		conn4 : port OsmPlannerService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
+		conn5 : port RoutePlannerService.RoutePlanResponse_out -> BatchSummaryService.RoutePlanResponse_in;
+		conn6 : port RoutePlannerService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
+		conn7 : port RoutePlannerVisibilityService.RoutePlanResponse_out -> BatchSummaryService.RoutePlanResponse_in;
+		conn8 : port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
+		conn9 : port BatchSummaryService.RoutePlanRequest_out -> OsmPlannerService.RoutePlanRequest_in;
+		conn10 : port BatchSummaryService.RoutePlanRequest_out -> RoutePlannerService.RoutePlanRequest_in;
+		conn11 : port BatchSummaryService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+		conn12 : port RouteAggregatorService.RoutePlanRequest_out -> OsmPlannerService.RoutePlanRequest_in;
+		conn13 : port RouteAggregatorService.RoutePlanRequest_out -> RoutePlannerService.RoutePlanRequest_in;
+		conn14 : port RouteAggregatorService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+		conn15 : port AssignmentTreeBranchBoundBase.TaskAssignmentSummary_out -> PlanBuilderService.TaskAssignmentSummary_in;
+		conn16 : port OperatingRegionStateService.OperatingRegion_out -> AutomationDiagramDataService.OperatingRegion_in;
+		conn17 : port OperatingRegionStateService.OperatingRegion_out -> AutomationRequestValidatorService.OperatingRegion_in;
+		conn18 : port OperatingRegionStateService.OperatingRegion_out -> RoutePlannerService.OperatingRegion_in;
+		conn19 : port OperatingRegionStateService.OperatingRegion_out -> RoutePlannerVisibilityService.OperatingRegion_in;
+		conn20 : port BatchSummaryService.EgressRouteRequest_out -> OsmPlannerService.EgressRouteRequest_in;
+		conn21 : port OsmPlannerService.EgressRouteResponse_out -> BatchSummaryService.EgressRouteResponse_in;
+		conn22 : port AutomationRequestValidatorService.AutomationResponse_out -> SerialAutomationRequestTestService.AutomationResponse_in;
+		conn23 : port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService.AutomationResponse_in;
+		conn24 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentTreeBranchBoundBase.UniqueAutomationRequest_in;
+		conn25 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
+		conn26 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
+		conn27 : port AutomationRequestValidatorService.UniqueAutomationRequest_out -> RouteAggregatorService.UniqueAutomationRequest_in;
+		conn28 : port RouteAggregatorService.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundBase.AssignmentCostMatrix_in;
+
+end uxas.i;
+
 end UxAS;
