@@ -476,7 +476,7 @@ plans between the end of each *Task* and start of all other *Tasks*. Similar to 
 *Aggregator*, the *Collector* creates a checklist of expected route plan responses and uses
 that checklist to determine when the complete set of routes has been returned from the route
 planners. The *Collector* remains in the **RoutePending** state until all route requests have
-been fulfilled, at which point it colates the responses into a complete *AssignmentCostMatrix*.
+been fulfilled, at which point it collates the responses into a complete *AssignmentCostMatrix*.
 The *AssignmentCostMatrix* message is published and the *Collector* returns to the **Idle**
 state.
 
@@ -534,6 +534,94 @@ are associated with the unique ID from each *UniqueAutomationRequest*.
 +----------------------------+---------------------------------------------------------------+
 
 ## AssignmentTreeBranchBoundService
+
+The *AssignmentTreeBranchBoundService* is a service that does the primary computation to determine
+an efficient ordering and assignment of all *Tasks* to the available vehicles. The assignment
+algorithm reasons only at the cost level; in other words, the assignment itself does not
+directly consider vehicle motion but rather it uses estimates of that motion cost. The 
+cost estimates are provided by the *Tasks* (for on-task costs) and by the
+*RouteAggregatorService* for task-to-task travel costs.
+
+The *AssignmentTreeBranchBoundService* can be configured to optimize based on cumulative team
+cost (i.e. sum total of time required from each vehicle) or the maximium time of final task
+completion (i.e. only the final time of total mission completion is minimized). For either
+optimization type, this service will first find a feasible solution by executing a 
+depth-first, greedy search. Although it is possible to request a mission for which **no**
+feasible solution exists, the vast majority of missions are underconstrained and have
+an exponential (relative to numbers of vehicles and tasks) number of solutions from
+which an efficient one must be discovered.
+
+After the *AssignmentTreeBranchBoundService* obtains a greedy solution to the assignment
+problem, it will continue to search the space of possibilities via backtracking up the tree
+of possibilities and *branching* at descision points. The cost of the 
+greedy solution acts as a *bound* beyond which no solution is be considered. In other words,
+as more efficient solutions are discovered, any partial solution that exeeds the cost
+of the current best solution will immediately be abandoned (cut) to focus search effort
+in the part of the space that could possibly lead to better solutions. In this way, 
+solution search progresses until all possibilities have been exhausted or a pre-determined
+tree size has been searched. By placing an upper limit on the size of the tree to search,
+worst-case bounds on computation time can be made to ensure desired responsiveness from
+the *AssignmentTreeBranchBoundService*.
+
+General assignment problems do not normally allow for specification of *Task* relationships.
+However, the *AssignmentTreeBranchBoundService* relies on the ability to specify *Task*
+relationships via Process Algebra constraints. This enables creation of moderately complex
+missions from simple atomic *Tasks*. Adherence to Process Algebra constraints also allows
+*Tasks* to describe their *option* relationships. The Process Algebra relationships of a
+particular *Task* option are directly substituted into and replace the original *Task* in
+the mission-level Process Algebra specification. Due to the heavy reliance on Process
+Algebra specifications, any assignment service that replaces *AssignmentTreeBranchBoundService*
+must also guarantee satisfaction of such specifications.
+
+The behavior of the *AssignmentTreeBranchBoundService* is straight-foward. Upon reception
+of a *UniqueAutomationRequest*, this service enters the **wait** state and remains in this
+state until a complete set of *TaskPlanOptions* and an *AssignmentCostMatrix* message have
+been received. In the **wait** state, a running list of the expected *TaskPlanOptions* is
+maintained and checked off when received. Upon receiving the *AssignmentCostMatrix* (which
+should be received strictly after the *TaskPlanOptions* due to the behavior of the 
+*RouteAggregatorService*), this service conducts the branch-and-bound search to determine
+the proper ordering and assignment of *Tasks* to vehicles. The results of the optimization
+are packaged into the *TaskAssignmentSummary* and published, at which point this service
+returns to the **idle** state.
+
+
+: Table of messages that the *AssignmentTreeBranchBoundService* receives and processes.
+
++----------------------------+---------------------------------------------------------------+
+| Message Subscription       | Description                                                   |
++============================+===============================================================+
+| *UniqueAutomationRequest*  | Sentinel message that initiates the collection of options sent|
+|                            | from each *Task* via the *TaskPlanOptions* message. A list of |
+|                            | all *Tasks* included in the *UniqueAutomationRequest* is made |
+|                            | upon reception of this message and later used to ensure that  |
+|                            | all included *Tasks* have responded.                          |
++----------------------------+---------------------------------------------------------------+
+| *TaskPlanOptions*          | Primary message from *Tasks* that prescribe available start   |
+|                            | and end locations for each option as well as cost to complete |
+|                            | the option. In the **wait** state, this service will store    |
+|                            | all reported options for use in calculating mission cost for  |
+|                            | vehicles when considering possible assignments.               |
++----------------------------+---------------------------------------------------------------+
+| *AssignmentCostMatrix*     | Primary message that initiates the task assignment            |
+|                            | optimization. This message contains the task-to-task routing  |
+|                            | cost estimates and is a key factor in determining which       |
+|                            | vehicle could most efficiently reach a *Task*. Coupled with   |
+|                            | the on-task costs captured in the *TaskPlanOptions*, a        |
+|                            | complete reasoning over both traveling to and completing a    |
+|                            | *Task* can be looked up during the search over possible       |
+|                            | *Task* orderings.                                             |
++----------------------------+---------------------------------------------------------------+
+
+
+: Table of messages that the *AssignmentTreeBranchBoundService* publishes.
+
++----------------------------+---------------------------------------------------------------+
+| Message Publication        | Description                                                   |
++============================+===============================================================+
+| *TaskAssignmentSummary*    | The singular message published by this service which          |
+|                            | precisely describes the proper ordering of *Tasks* and the    |
+|                            | vehicles that are assigned to complete each *Task*.           |
++----------------------------+---------------------------------------------------------------+
 
 ## PlanBuilderService
 

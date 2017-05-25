@@ -872,7 +872,7 @@ checklist of expected route plan responses and uses that checklist to
 determine when the complete set of routes has been returned from the
 route planners. The \emph{Collector} remains in the
 \textbf{RoutePending} state until all route requests have been
-fulfilled, at which point it colates the responses into a complete
+fulfilled, at which point it collates the responses into a complete
 \emph{AssignmentCostMatrix}. The \emph{AssignmentCostMatrix} message is
 published and the \emph{Collector} returns to the \textbf{Idle} state.
 
@@ -987,5 +987,158 @@ eventually all requests made will be fulfilled.
 \end{longtable}
 
 \subsection{AssignmentTreeBranchBoundService}\label{assignmenttreebranchboundservice}
+
+The \emph{AssignmentTreeBranchBoundService} is a service that does the
+primary computation to determine an efficient ordering and assignment of
+all \emph{Tasks} to the available vehicles. The assignment algorithm
+reasons only at the cost level; in other words, the assignment itself
+does not directly consider vehicle motion but rather it uses estimates
+of that motion cost. The cost estimates are provided by the \emph{Tasks}
+(for on-task costs) and by the \emph{RouteAggregatorService} for
+task-to-task travel costs.
+
+The \emph{AssignmentTreeBranchBoundService} can be configured to
+optimize based on cumulative team cost (i.e.~sum total of time required
+from each vehicle) or the maximium time of final task completion
+(i.e.~only the final time of total mission completion is minimized). For
+either optimization type, this service will first find a feasible
+solution by executing a depth-first, greedy search. Although it is
+possible to request a mission for which \textbf{no} feasible solution
+exists, the vast majority of missions are underconstrained and have an
+exponential (relative to numbers of vehicles and tasks) number of
+solutions from which an efficient one must be discovered.
+
+After the \emph{AssignmentTreeBranchBoundService} obtains a greedy
+solution to the assignment problem, it will continue to search the space
+of possibilities via backtracking up the tree of possibilities and
+\emph{branching} at descision points. The cost of the greedy solution
+acts as a \emph{bound} beyond which no solution is be considered. In
+other words, as more efficient solutions are discovered, any partial
+solution that exeeds the cost of the current best solution will
+immediately be abandoned (cut) to focus search effort in the part of the
+space that could possibly lead to better solutions. In this way,
+solution search progresses until all possibilities have been exhausted
+or a pre-determined tree size has been searched. By placing an upper
+limit on the size of the tree to search, worst-case bounds on
+computation time can be made to ensure desired responsiveness from the
+\emph{AssignmentTreeBranchBoundService}.
+
+General assignment problems do not normally allow for specification of
+\emph{Task} relationships. However, the
+\emph{AssignmentTreeBranchBoundService} relies on the ability to specify
+\emph{Task} relationships via Process Algebra constraints. This enables
+creation of moderately complex missions from simple atomic \emph{Tasks}.
+Adherence to Process Algebra constraints also allows \emph{Tasks} to
+describe their \emph{option} relationships. The Process Algebra
+relationships of a particular \emph{Task} option are directly
+substituted into and replace the original \emph{Task} in the
+mission-level Process Algebra specification. Due to the heavy reliance
+on Process Algebra specifications, any assignment service that replaces
+\emph{AssignmentTreeBranchBoundService} must also guarantee satisfaction
+of such specifications.
+
+The behavior of the \emph{AssignmentTreeBranchBoundService} is
+straight-foward. Upon reception of a \emph{UniqueAutomationRequest},
+this service enters the \textbf{wait} state and remains in this state
+until a complete set of \emph{TaskPlanOptions} and an
+\emph{AssignmentCostMatrix} message have been received. In the
+\textbf{wait} state, a running list of the expected
+\emph{TaskPlanOptions} is maintained and checked off when received. Upon
+receiving the \emph{AssignmentCostMatrix} (which should be received
+strictly after the \emph{TaskPlanOptions} due to the behavior of the
+\emph{RouteAggregatorService}), this service conducts the
+branch-and-bound search to determine the proper ordering and assignment
+of \emph{Tasks} to vehicles. The results of the optimization are
+packaged into the \emph{TaskAssignmentSummary} and published, at which
+point this service returns to the \textbf{idle} state.
+
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Table of messages that the
+\emph{AssignmentTreeBranchBoundService} receives and
+processes.}\tabularnewline
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Subscription
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Subscription
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{UniqueAutomationRequest}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Sentinel message that initiates the collection of options sent from each
+\emph{Task} via the \emph{TaskPlanOptions} message. A list of all
+\emph{Tasks} included in the \emph{UniqueAutomationRequest} is made upon
+reception of this message and later used to ensure that all included
+\emph{Tasks} have responded.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{TaskPlanOptions}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Primary message from \emph{Tasks} that prescribe available start and end
+locations for each option as well as cost to complete the option. In the
+\textbf{wait} state, this service will store all reported options for
+use in calculating mission cost for vehicles when considering possible
+assignments.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{AssignmentCostMatrix}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Primary message that initiates the task assignment optimization. This
+message contains the task-to-task routing cost estimates and is a key
+factor in determining which vehicle could most efficiently reach a
+\emph{Task}. Coupled with the on-task costs captured in the
+\emph{TaskPlanOptions}, a complete reasoning over both traveling to and
+completing a \emph{Task} can be looked up during the search over
+possible \emph{Task} orderings.
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Table of messages that the
+\emph{AssignmentTreeBranchBoundService} publishes.}\tabularnewline
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Publication
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Publication
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{TaskAssignmentSummary}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+The singular message published by this service which precisely describes
+the proper ordering of \emph{Tasks} and the vehicles that are assigned
+to complete each \emph{Task}.
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsection{PlanBuilderService}\label{planbuilderservice}
