@@ -625,3 +625,77 @@ returns to the **idle** state.
 
 ## PlanBuilderService
 
+The final step in the task assignment pipeline is converting the decisions made by the 
+*AssignmentTreeBranchBoundService* into waypoint paths that can be sent to each of the vehicles.
+Using the ordering of *Tasks* and the assigned vehicle(s) for each *Task*, the 
+*PlanBuilderService* will query each *Task* in turn to construct enroute and on-task waypoints 
+to complete the mission.
+
+Similar to both the *RouteAggregator* and the *AssignmentTreeBranchBoundService*, the
+*PlanBuilderService* utilizes a received *UniqueAutomationRequest* to detect that a new mission
+request has been made to the system. The *UniqueAutomationRequest* is stored until a
+*TaskAssignmentSummary* that corresponds to the unique ID is received. At this point, the
+*PlanBuilderService* transitions from the **idle** state to the **busy** state.
+
+Using the list of ordered *Tasks* dictated by the *TaskAssignmentSummary*, the
+*PlanBuilderService* sends a *TaskImplementationRequest* to each *Task* in order and waits
+for a *TaskImplementationResponse* from each *Task* before moving to the next. This is
+necessary as the ending location of a previous *Task* becomes the starting location for
+a subsequent *Task*. Since each *Task* is allowed to refine its final waypoint plan at this
+stage, the exact ending location may be different that was was originally indicated during
+the *TaskPlanOptions* phase. By working through the *Task* list in assignment order, all 
+uncertainty about timing and location is elminated and each *Task* is allowed to make a
+final determination on the waypoints to be used.
+
+Once all *Tasks* have reponded with a *TaskImplementationResponse*, the *PlanBuilderService*
+links all waypoints for each vehicle into a complete *MissionCommand*. The total set of
+*MissionCommands* are collected into the *UniqueAutomationResponse* which is broadcast to
+the system and represents a complete solution to the original *AutomationRequest*. At this
+point, the *PlanBuilderService* returns to the **idle** state.
+
+: Table of messages that the *PlanBuilderService* receives and processes.
+
++----------------------------+---------------------------------------------------------------+
+| Message Subscription       | Description                                                   |
++============================+===============================================================+
+| *TaskAssignmentSummary*    | Primary message that dictates the proper order and vehicle    |
+|                            | assignment to efficiently carry out the requested mission.    |
+|                            | Upon reception of this messsage, the *PlanBuilderService*     |
+|                            | queries each *Task* in order for the final waypoint paths.    |
++----------------------------+---------------------------------------------------------------+
+| *EntityState*              | Describes the actual state of a vehicle in the system         |
+|                            | including position, speed, and fuel status. This message is   |
+|                            | used to inform the first *Task* of the location of the        |
+|                            | vehicles. Subsequent *Tasks* use the predicted positions and  |
+|                            | headings of vehicles after previous *Tasks* have reported     |
+|                            | waypoints earlier in the mission.                             |
++----------------------------+---------------------------------------------------------------+
+|*TaskImplementationResponse*| Primary message that each *Task* reports to inform this       |
+|                            | service of the precise waypoints that need to be followed to  |
+|                            | reach the *Task* and carry it out correctly. The ordered      |
+|                            | collection of these messages are used to build the final      |
+|                            | *UniqueAutomationResponse*.                                   |
++----------------------------+---------------------------------------------------------------+
+| *UniqueAutomationRequest*  | Informs this service of a new mission request in the system.  |
+|                            | Contains the desired starting locations and headings of the   |
+|                            | vehicles that are to be considered as part of the solution.   |
++----------------------------+---------------------------------------------------------------+
+
+
+: Table of messages that the *PlanBuilderService* publishes.
+
++----------------------------+---------------------------------------------------------------+
+| Message Publication        | Description                                                   |
++============================+===============================================================+
+|*TaskImplementationRequest* | The primary message used to query each *Task* for the proper  |
+|                            | waypoints that both reach and carry out the *Task*. Once the  |
+|                            | *PlanBuilderService* receives a corresponding response from   |
+|                            | each *Task*, it can construct a final set of waypoints for    |
+|                            | each vehicle.                                                 |
++----------------------------+---------------------------------------------------------------+
+| *UniqueAutomationResponse* | This message contains a list of waypoints for each vehicle    |
+|                            | that was considered during the automation request. This       |
+|                            | collection of complete waypoints for the team fulfills the    |
+|                            | original request.                                             |
++----------------------------+---------------------------------------------------------------+
+

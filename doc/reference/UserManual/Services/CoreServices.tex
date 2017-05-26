@@ -1142,3 +1142,143 @@ to complete each \emph{Task}.
 \end{longtable}
 
 \subsection{PlanBuilderService}\label{planbuilderservice}
+
+The final step in the task assignment pipeline is converting the
+decisions made by the \emph{AssignmentTreeBranchBoundService} into
+waypoint paths that can be sent to each of the vehicles. Using the
+ordering of \emph{Tasks} and the assigned vehicle(s) for each
+\emph{Task}, the \emph{PlanBuilderService} will query each \emph{Task}
+in turn to construct enroute and on-task waypoints to complete the
+mission.
+
+Similar to both the \emph{RouteAggregator} and the
+\emph{AssignmentTreeBranchBoundService}, the \emph{PlanBuilderService}
+utilizes a received \emph{UniqueAutomationRequest} to detect that a new
+mission request has been made to the system. The
+\emph{UniqueAutomationRequest} is stored until a
+\emph{TaskAssignmentSummary} that corresponds to the unique ID is
+received. At this point, the \emph{PlanBuilderService} transitions from
+the \textbf{idle} state to the \textbf{busy} state.
+
+Using the list of ordered \emph{Tasks} dictated by the
+\emph{TaskAssignmentSummary}, the \emph{PlanBuilderService} sends a
+\emph{TaskImplementationRequest} to each \emph{Task} in order and waits
+for a \emph{TaskImplementationResponse} from each \emph{Task} before
+moving to the next. This is necessary as the ending location of a
+previous \emph{Task} becomes the starting location for a subsequent
+\emph{Task}. Since each \emph{Task} is allowed to refine its final
+waypoint plan at this stage, the exact ending location may be different
+that was was originally indicated during the \emph{TaskPlanOptions}
+phase. By working through the \emph{Task} list in assignment order, all
+uncertainty about timing and location is elminated and each \emph{Task}
+is allowed to make a final determination on the waypoints to be used.
+
+Once all \emph{Tasks} have reponded with a
+\emph{TaskImplementationResponse}, the \emph{PlanBuilderService} links
+all waypoints for each vehicle into a complete \emph{MissionCommand}.
+The total set of \emph{MissionCommands} are collected into the
+\emph{UniqueAutomationResponse} which is broadcast to the system and
+represents a complete solution to the original \emph{AutomationRequest}.
+At this point, the \emph{PlanBuilderService} returns to the
+\textbf{idle} state.
+
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Table of messages that the \emph{PlanBuilderService} receives
+and processes.}\tabularnewline
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Subscription
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Subscription
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{TaskAssignmentSummary}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Primary message that dictates the proper order and vehicle assignment to
+efficiently carry out the requested mission. Upon reception of this
+messsage, the \emph{PlanBuilderService} queries each \emph{Task} in
+order for the final waypoint paths.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{EntityState}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Describes the actual state of a vehicle in the system including
+position, speed, and fuel status. This message is used to inform the
+first \emph{Task} of the location of the vehicles. Subsequent
+\emph{Tasks} use the predicted positions and headings of vehicles after
+previous \emph{Tasks} have reported waypoints earlier in the mission.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{TaskImplementationResponse}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Primary message that each \emph{Task} reports to inform this service of
+the precise waypoints that need to be followed to reach the \emph{Task}
+and carry it out correctly. The ordered collection of these messages are
+used to build the final \emph{UniqueAutomationResponse}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{UniqueAutomationRequest}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Informs this service of a new mission request in the system. Contains
+the desired starting locations and headings of the vehicles that are to
+be considered as part of the solution.
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Table of messages that the \emph{PlanBuilderService}
+publishes.}\tabularnewline
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Publication
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{0.29\columnwidth}\raggedright\strut
+Message Publication
+\strut\end{minipage} &
+\begin{minipage}[b]{0.65\columnwidth}\raggedright\strut
+Description
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{TaskImplementationRequest}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+The primary message used to query each \emph{Task} for the proper
+waypoints that both reach and carry out the \emph{Task}. Once the
+\emph{PlanBuilderService} receives a corresponding response from each
+\emph{Task}, it can construct a final set of waypoints for each vehicle.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{UniqueAutomationResponse}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+This message contains a list of waypoints for each vehicle that was
+considered during the automation request. This collection of complete
+waypoints for the team fulfills the original request.
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
