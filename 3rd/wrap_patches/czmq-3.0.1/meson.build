@@ -59,13 +59,13 @@ deps = []
 
 os = target_machine.system()
 if os == 'linux'
-  c_args += ['-D_GNU_SOURCE', '-DLINUX', '-DCZMQ_HAVE_LINUX=1']
+  c_args += ['-std=c11', '-D_GNU_SOURCE', '-DLINUX', '-DCZMQ_HAVE_LINUX=1']
 elif os == 'darwin'
-  c_args += ['-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
+  c_args += ['-std=c11', '-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
 elif os == 'windows'
   c_args += [
     '-DZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
   ]
   cdata.set('CZMQ_HAVE_WINDOWS', 1)
   cdata.set('HAVE_LIBUUID', 1)
