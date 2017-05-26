@@ -204,10 +204,10 @@ The native Windows build is currently experimental. See below for caveats, and c
 1. Use the Visual Studio Team Explorer to check out OpenUxAS; this is easiest by entering your GitHub credentials.
 1. Open the OpenUxAS folder in the Solution Explorer, right click it, and open a developer command prompt.
 1. In the command prompt, type:
-```
-python prepare
-meson.py build --backend=vs
-```
+   ```
+   python prepare
+   meson.py build --backend=vs
+   ```
 1. Back in the Solution Explorer, you should now see a `build` directory containing a UxAS solution. Open that solution.
 1. In the Solution Explorer, right-click the `uxas` project, and click Build.
 1. To test your build, try running the `.bat` scripts in the `examples` directories (you will need to build OpenAMASE using NetBeans and a JDK for some of the examples).
