@@ -48,6 +48,7 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>       //gives C-string manipulation
 #include <string>        //string class
 #include <cassert>       //assertions
+#include <iso646.h>      //aliases for boolean operators
 
 
 ///Hide helping functions in unnamed namespace (local to .C file).

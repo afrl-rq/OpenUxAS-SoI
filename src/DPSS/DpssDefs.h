@@ -13,9 +13,13 @@
 #define DPSS_API 
 
 #else//_WIN32
+#ifndef DPSS_STATIC
 #ifdef DPSS_EXPORTS
 #define DPSS_API __declspec(dllexport)
 #else
 #define DPSS_API __declspec(dllimport)
-#endif
+#endif//DPSS_EXPORTS
+#else
+#define DPSS_API
+#endif//DPSS_STATIC
 #endif//_WIN32
