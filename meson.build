@@ -95,7 +95,6 @@ subdir('src/Utilities')
 subdir('src/Plans')
 
 dep_thread              = dependency('threads')
-#dep_uuid                = dependency('uuid')
 
 libs = [
   lib_services,
@@ -128,15 +127,22 @@ subdir('src/Includes')
 
 deps = [
   dep_thread,
-#  dep_uuid,
   dep_boost,
-  dependency('gl'),
 ]
 
+# OpenGL, specifically the GLU library
+deps += [dependency('gl')]
 if os == 'linux'
   deps += [dependency('glu')]
 elif os == 'windows'
-  deps += cpp.find_library('glu32')
+  deps += [cpp.find_library('glu32')]
+endif
+
+cpp_args = []
+if cpp.get_id() == 'msvc'
+  cpp_args += ['/std:c++14']
+else
+  cpp_args += ['-std=c++11']
 endif
 
 executable(
@@ -144,9 +150,7 @@ executable(
   'src/UxAS_Main.cpp',
   dependencies: deps,
   link_args: link_args,
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args,
   include_directories: [
     include_directories(
       'src/Utilities',
