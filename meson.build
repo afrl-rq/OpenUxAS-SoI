@@ -9,7 +9,7 @@ if os == 'linux'
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
-  link_args += ['-framework', 'OpenGL', '-ldl']
+  link_args += ['-ldl']
 elif os == 'windows'
   link_args += []
 endif
