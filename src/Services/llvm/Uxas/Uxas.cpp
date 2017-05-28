@@ -35,6 +35,12 @@ namespace {
     //-- name of the service class being analyzed
     StringRef serviceName;
 
+    //-- set of pubs extracted
+    std::set<std::string> allPubs;
+    
+    //-- set of subs extracted
+    std::set<std::string> allSubs;
+    
     /*****************************************************************/
     //-- return the class name given a method of the class. if F does
     //-- not belong to a class return an empty string as name.
@@ -63,15 +69,12 @@ namespace {
     }
 
     /*****************************************************************/
-    //-- print all messages that function F subscribes to
+    //-- extract all messages that function F subscribes to
     /*****************************************************************/
-    void printSubs(Function &F)
+    void extractSubs(Function &F)
     {
       StringRef className = getClassName(F);
       if(className == "") return;
-      
-      errs() << "---------------------------------------------------------------------------------\n";
-      errs() << "service : " << className << " === SUBSCRIBES TO ===>\n";
       
       //-- iterate over all basic blocks
       for(const auto &bb : F.getBasicBlockList()) {
@@ -96,10 +99,10 @@ namespace {
 
           //errs() << "found potential sub: " << ins << '\n';
           
-          if(auto *Const = dyn_cast<Constant>(arg))            
-            errs() << '\t' << demangle(Const->getName()) << '\n';
+          if(auto *Const = dyn_cast<Constant>(arg))
+            allSubs.insert(demangle(Const->getName()));
           else if(auto *II = dyn_cast<InvokeInst>(arg)) {
-            errs() << '\t' << demangle(II->getCalledFunction()->getName()) << "()\n";
+            allSubs.insert(demangle(II->getCalledFunction()->getName()) + "()");
           }
         }
       }
@@ -123,9 +126,9 @@ namespace {
     }
     
     /*****************************************************************/
-    //-- print all messages that function F publishes
+    //-- extract all messages that function F publishes
     /*****************************************************************/
-    void printPubs(Function &F)
+    void extractPubs(Function &F)
     {
       StringRef className = getClassName(F);
       if(className != serviceName) return;
@@ -161,7 +164,7 @@ namespace {
                     if(pos1 == std::string::npos) continue;
                     size_t pos2 = dn.find('>', pos1);
                     if(pos2 == std::string::npos) continue;
-                    errs() << '\t' << dn.substr(pos1+2, pos2-pos1-2) << '\n';
+                    allPubs.insert(dn.substr(pos1+2, pos2-pos1-2));
                   }
                   else if(CF->getName().contains("shared_ptr")) {
                     std::string dn = demangle(CF->getName());
@@ -176,7 +179,7 @@ namespace {
 
                     size_t pos2 = dn.find('>', pos1);
                     if(pos2 == std::string::npos) continue;
-                    errs() << '\t' << dn.substr(pos1+11, pos2-pos1-11) << '\n';
+                    allPubs.insert(dn.substr(pos1+11, pos2-pos1-11));
                   }
                 }
               }
@@ -212,24 +215,33 @@ namespace {
     bool runOnModule(Module &M) override
     {
       //-- first get the name of the service class by looking for the
-      //-- configure method and seeing which class it belongs to
+      //-- configure method and seeing which class it belongs to. also
+      //-- process the configure method to extract the sub
+      //-- information.
       for(Function &F : M.getFunctionList()) {
         if(!F.getName().contains("configure")) continue;
         StringRef className = getClassName(F);
         if(className == "") continue;
         serviceName = className;
         errs() << "got service name " << serviceName << '\n';
-        printSubs(F);
+        extractSubs(F);
         break;
       }
       
+      //-- now extract the pub information
+      for(Function &F : M.getFunctionList()) {
+        if(!F.getName().contains("configure")) extractPubs(F);
+      }
+
+      //-- print sub information
+      errs() << "---------------------------------------------------------------------------------\n";
+      errs() << "service : " << serviceName << " === SUBSCRIBES TO ===>\n";
+      for(const auto &s : allSubs) errs() << '\t' << s << '\n';
+      
+      //-- print pub information
       errs() << "---------------------------------------------------------------------------------\n";
       errs() << "service : " << serviceName << " === PUBLISHES TO ===>\n";
-      
-      //-- now extract the pub-sub information
-      for(Function &F : M.getFunctionList()) {
-        if(!F.getName().contains("configure")) printPubs(F);
-      }      
+      for(const auto &p : allPubs) errs() << '\t' << p << '\n';      
       
       return false;
     }
