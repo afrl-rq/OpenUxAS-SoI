@@ -32,8 +32,13 @@ namespace {
     static char ID; // Pass identification, replacement for typeid
     Uxas() : ModulePass(ID) {}
 
+    //-- name of the service class being analyzed
+    StringRef serviceName;
+
+    /*****************************************************************/
     //-- return the class name given a method of the class. if F does
     //-- not belong to a class return an empty string as name.
+    /*****************************************************************/
     StringRef getClassName(Function &F)
     {
       if(F.getFunctionType()->getNumParams()) {
@@ -47,7 +52,9 @@ namespace {
       return "";
     }
 
+    /*****************************************************************/
     //-- return demangled name
+    /*****************************************************************/
     std::string demangle(const StringRef &mangled)
     {
       int status = 0;
@@ -55,7 +62,9 @@ namespace {
       return res.substr(0, res.find('['));
     }
 
+    /*****************************************************************/
     //-- print all messages that function F subscribes to
+    /*****************************************************************/
     void printSubs(Function &F)
     {
       StringRef className = getClassName(F);
@@ -96,7 +105,9 @@ namespace {
       }
     }
 
+    /*****************************************************************/
     //-- find all users of a value recursively
+    /*****************************************************************/
     std::set<Value*> allUsers(Value *v)
     {
       std::set<Value*> res;
@@ -111,7 +122,9 @@ namespace {
       return res;
     }
     
+    /*****************************************************************/
     //-- print all messages that function F publishes
+    /*****************************************************************/
     void printPubs(Function &F)
     {
       StringRef className = getClassName(F);
@@ -193,10 +206,9 @@ namespace {
       }
     }
 
-    //-- name of the service class being analyzed
-    StringRef serviceName;
-
+    /*****************************************************************/
     //-- the top level method
+    /*****************************************************************/
     bool runOnModule(Module &M) override
     {
       //-- first get the name of the service class by looking for the
