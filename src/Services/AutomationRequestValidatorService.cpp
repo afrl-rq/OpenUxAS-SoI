@@ -16,9 +16,9 @@
 
 #include "AutomationRequestValidatorService.h"
 
+#include "TimeUtilities.h"
 #include "UxAS_Log.h"
 #include "UxAS_TimerManager.h"
-#include "TimeUtilities.h"
 
 #include "uxas/messages/task/TaskInitialized.h"
 #include "uxas/messages/task/TaskAutomationRequest.h"

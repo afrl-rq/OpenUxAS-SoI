@@ -1,13 +1,6 @@
 project('czmq', 'c')
 
 cc = meson.get_compiler('c')
-c_args = [
-  '-std=c11',
-  '-DZMQ_USE_EPOLL',
-  '-D_GNU_SOURCE',
-  '-D_REENTRANT',
-  '-D_THREAD_SAFE',
-]
 
 cdata = configuration_data()
 check_headers = [
@@ -60,14 +53,29 @@ foreach f : check_functions
   endif
 endforeach
 
-subdir('src')
+c = meson.get_compiler('c')
+c_args = []
+deps = []
 
 os = target_machine.system()
 if os == 'linux'
-  c_args += ['-D_GNU_SOURCE', '-DLINUX', '-DCZMQ_HAVE_LINUX=1']
+  c_args += ['-std=c11', '-D_GNU_SOURCE', '-DLINUX', '-DCZMQ_HAVE_LINUX=1']
 elif os == 'darwin'
-  c_args += ['-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
+  c_args += ['-std=c11', '-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
+elif os == 'windows'
+  c_args += [
+    '-DZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+  ]
+  cdata.set('CZMQ_HAVE_WINDOWS', 1)
+  cdata.set('HAVE_LIBUUID', 1)
+  deps += [
+    c.find_library('Iphlpapi'),
+	c.find_library('WS2_32'),
+  ]
 endif
+
+subdir('src')
 
 lib = static_library(
   'czmq',
@@ -116,6 +124,7 @@ lib = static_library(
     'src/zthread.c',
     'src/zuuid.c',
   ],
+  dependencies: deps,
   c_args: c_args,
   include_directories: include_directories(
     'include',

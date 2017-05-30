@@ -17,8 +17,8 @@
 
 #include "TcpBridge.h"
 
-#include "UxAS_TimerManager.h"
 #include "TimeUtilities.h"
+#include "UxAS_TimerManager.h"
 #include "UxAS_ZeroMQ.h" // zmq-> s_send, s_sendmore, ...
 
 #include "avtas/lmcp/Factory.h" // getObject (from serial buffer)

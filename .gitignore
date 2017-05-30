@@ -26,3 +26,7 @@ examples/**/datawork/**
 # Mac OS X file system
 **.DS_Store
 /UxAS-afrl_internal/
+
+# Visual Studio
+/.vs
+/regen-temp

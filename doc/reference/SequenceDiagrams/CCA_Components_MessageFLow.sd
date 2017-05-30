@@ -1,28 +1,27 @@
 #!>>
-#! Message Flow: Task Planning, Assignment, and Execution (3/18/2016)
+#! Message Flow: Task Planning, Assignment, and Execution (5/24/2017)
 #!
 #!<<
 
 #    PM:Plan Manager[pr] "PlanManager"
 
 CI:Actor[pr] "ControlInterface"
-AV:AutomationRequestValidator[pr] "Automation Request Validator"
+AV:AutomationRequestValidator[pr] "AutomationRequestValidator"
 TM:TaskManager[pr] "TaskManager"
 /TK01:Task01[tvar] "Task"
-RA:RouteAggregator[pr] "Route Aggregator"
-PR:Planner[pr] "Planner"
-AS:Assignment[pr] "Assignment"
+RA:RouteAggregator[pr] "RouteAggregator"
+PR:Planner[pr] "RoutePlannerVisibility"
+AS:Assignment[pr] "AssignmentTreeBranchBound"
 PB:PlanBuilder[pr] "PlanBuilder"
-SM:SensorManager[pr] "Sensor Manager"
 WM:WaypointManager[pr] "WaypointManager"
-VI:VehicleInterface [pr] "VehicleInterface"
+VI:VehicleInterface [pr] "AMASE"
 
 [c Initialization]
-VI:={PR,RA,TM}.[Entity Configurations]
-VI:={PR,WM,PB,TM}.[Entity States]
-CI:=PR.[Keep In/Out Zones]
-CI:=PR.[Operating RegionS]
-CI:=TM.[Task]
+VI:={PR,RA,TM,AV}.[Entity Configurations]
+VI:={PR,RA,WM,PB,TM,AV}.[Entity States]
+CI:={PR,AV}.[Keep In/Out Zones]
+CI:={PR,AV}.[Operating RegionS]
+CI:={TM,AV}.[Task]
 *1 TM
 New Tasks are sent:
 - TaskConfiguration
@@ -32,11 +31,11 @@ New Tasks are sent:
   of interest, when required
 *1
 TM:=TK01.new(Task)&
+TK01:=AV.[TaskInitialized]&
 [/c]
 
 [c Assignment]
 CI:AV.[AutomationRequest]&
-CI:AV.[SandboxAutomationRequest]&
 AV:{TM,AS,TK01,RA,PB}.[UniqueAutomationRequest]&
 *1 TK01
 For each eligible entity, calculate the
@@ -44,16 +43,12 @@ planning points required to calculate
 task costs:
 1) Request sensor footprint information
 for all eligible vehicles (if required)
+2) Find task options and composition.
+3) For each option, calculate planning
 *1
 *1 RA 
 Store AutomationRequest for future
 cost matrix calculations.
-*1
-TK01:=SM.[SensorFootprintRequest]&
-SM:=TK01.[SensorFootprintResponse]&
-*1 TK01
-2) Find task options and composition.
-3) For each option, calculate planning
 points.
 *1
 TK01:=RA.[RouteRequest](cost only)&
@@ -113,7 +108,6 @@ send automation response.
 
 PB:AV.[UniqueAutomationResponse]&
 AV:{CI,WM}.[AutomationResponse]&
-AV:CI.[SandboxAutomationResponse]&
 [/c]
 
 [c Execution]
@@ -126,7 +120,6 @@ e.g., starts recording video based
 on vehicle state
 *1
 TK01:=VI.[VehicleActionCommand](UAV01)&
-TK01:=WM.[MissionCommand](UAV01)&
 TK01:=CI.[TaskComplete]&
 
 [/c]

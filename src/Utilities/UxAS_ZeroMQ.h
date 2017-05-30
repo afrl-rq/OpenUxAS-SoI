@@ -8,11 +8,7 @@
 #ifndef UXAS_ZERO_MQ_H
 #define	UXAS_ZERO_MQ_H
 
-#ifdef _WIN32
-#include "../../../Win3rd/zeromq/cppzeromq/zmq.hpp"
-#else
 #include "zmq.hpp"
-#endif
 
 namespace n_ZMQ
 {

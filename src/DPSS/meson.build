@@ -15,6 +15,7 @@ lib_dpss = static_library(
   ],
   cpp_args: [
     '-std=c++11',
+	'-DDPSS_STATIC',
   ],
   include_directories: include_directories(
     '../../src/Includes',
