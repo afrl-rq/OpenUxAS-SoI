@@ -70,11 +70,60 @@ process AutomationRequestValidatorService
         KeepInZone_in : in event data port cmasi::KeepInZone.i;
         ImpactAutomationRequest_in : in event data port impact::ImpactAutomationRequest.i;
         LineOfInterest_in : in event data port impact::LineOfInterest.i;
+        --note that the code does not acually subscribe to "ServiceStatus" currently
+        ServiceStatus_in : in event data port cmasi::ServiceStatus.i;
+        
+        --the source code subscribes to all descendants of task:
+        SearchTask_in : in event data port cmasi::SearchTask.i;
+        AreaSearchTask_in : in event data port cmasi::AreaSearchTask.i;
+        LineSearchTask_in : in event data port cmasi::LineSearchTask.i;
+        LoiterTask_in : in event data port cmasi::LoiterTask.i;
+        MustFlyTask_in : in event data port cmasi::MustFlyTask.i;
+        PointSearchTask_in : in event data port cmasi::PointSearchTask.i;
+        
         ServiceStatus_out : out event data port cmasi::ServiceStatus.i;
         ImpactAutomationResponse_out : out event data port impact::ImpactAutomationResponse.i;
         AutomationResponse_out : out event data port cmasi::AutomationResponse.i;
         TaskAutomationResponse_out : out event data port uxtask::TaskAutomationResponse.i;
         UniqueAutomationRequest_out : out event data port uxtask::UniqueAutomationRequest.i;
+        
+        annex agree {**
+        		
+        	--POSSIBLE REQ: the queue is never decremented past 0
+        		
+        	const IDLE : int = 0;
+        	const BUSY : int = 1;
+        	eq state : int;
+        	
+        	-- a non-deterministic variable used to model whether or not 
+        	-- the requested task, vehicle, or operating region has been defined.
+        	eq taskVehicleOrRegionIsDefined : bool;
+        	        	
+        	eq numTasksInQ : int;
+        	
+        	guarantee "Initially the task queue is empty" :
+        		numTasksInQ = 0 -> true;
+        	
+        	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
+        		pre(event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined) => 
+        			event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2 and numTasksInQ = pre(numTasksInQ);
+        			--TODO: apparently the code sets the status type to "information" rather than "error"
+        		
+        	guarantee "if automation request is received and resource is defined produce unique automation request": true ->
+        	    pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
+        	    	if pre(state = IDLE) then 
+        	    		event(UniqueAutomationRequest_out) and state = BUSY and numTasksInQ = pre(numTasksInQ)
+        	    	else --state = BUSY
+        	    	   state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
+        	    	   
+        	guarantee "task receives error message behavior" : true ->
+        		pre(event(UniqueAutomationResponse_in)) => 
+        			((event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2) or
+        			(not event(ServiceStatus_out))) and
+        			numTasksInQ = pre(numTasksInQ) - 1;
+        	
+        **};
+        
 end AutomationRequestValidatorService;
 
 
@@ -220,6 +269,12 @@ process SensorManagerService
         SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
         SensorFootprintRequests_in : in event data port uxtask::SensorFootprintRequests.i;
         SensorFootprintResponse_out : out event data port uxtask::SensorFootprintResponse.i;
+        
+    annex agree {**
+    	guarantee "footporint response" : true ->
+    	  pre(event(SensorFootprintRequests_in)) = event(SensorFootprintResponse_out);
+    **};
+        
 end SensorManagerService;
 
 
@@ -256,19 +311,20 @@ process WaypointPlanManagerService
         AutomationResponse_in : in event data port cmasi::AutomationResponse.i;
 end WaypointPlanManagerService;
 
-process AngledAreaSearchTaskService
+process AngledAreaSearchTaskService  extends TaskServiceBase
     features
         SensorFootprintResponse_in : in event data port uxtask::SensorFootprintResponse.i;
         RouteResponse_in : in event data port route::RouteResponse.i;
-        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+--        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
         SensorFootprintRequests_out : out event data port uxtask::SensorFootprintRequests.i;
+        
 end AngledAreaSearchTaskService;
 
 
-process AssignmentCoordinatorTaskService
+process AssignmentCoordinatorTaskService  extends TaskServiceBase
     features
-        UniqueAutomationResponse_in : in event data port uxtask::UniqueAutomationResponse.i;
-        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
+--        UniqueAutomationResponse_in : in event data port uxtask::UniqueAutomationResponse.i;
+--        AirVehicleState_in : in event data port cmasi::AirVehicleState.i;
         AssignmentCoordination_in : in event data port uxtask::AssignmentCoordination.i;
         CoordinatedAutomationRequest_in : in event data port uxtask::CoordinatedAutomationRequest.i;
         AutomationResponse_out : out event data port cmasi::AutomationResponse.i;
@@ -277,99 +333,99 @@ process AssignmentCoordinatorTaskService
 end AssignmentCoordinatorTaskService;
 
 
-process BlockadeTaskService
-    features
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+process BlockadeTaskService extends TaskServiceBase
+--    features
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
 end BlockadeTaskService;
 
 
-process CmasiAreaSearchTaskService
+process CmasiAreaSearchTaskService extends TaskServiceBase
     features
         SensorFootprintResponse_in : in event data port uxtask::SensorFootprintResponse.i;
         RouteResponse_in : in event data port route::RouteResponse.i;
-        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+--        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
         VideoRecord_out : out event data port uxnative::VideoRecord.i;
         SensorFootprintRequests_out : out event data port uxtask::SensorFootprintRequests.i;
 end CmasiAreaSearchTaskService;
 
 
-process CmasiLineSearchTaskService
+process CmasiLineSearchTaskService extends TaskServiceBase
     features
         VideoRecord_out : out event data port uxnative::VideoRecord.i;
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
 end CmasiLineSearchTaskService;
 
 
-process CmasiPointSearchTaskService
+process CmasiPointSearchTaskService extends TaskServiceBase
     features
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
 end CmasiPointSearchTaskService;
 
 
-process CommRelayTaskService
-    features
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+process CommRelayTaskService extends TaskServiceBase
+--    features
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
 end CommRelayTaskService;
 
 
-process CordonTaskService
+process CordonTaskService extends TaskServiceBase
     features
         EgressRouteResponse_in : in event data port route::EgressRouteResponse.i;
         RouteResponse_in : in event data port route::RouteResponse.i;
         EgressRouteRequest_out : out event data port route::EgressRouteRequest.i;
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
 end CordonTaskService;
 
 
-process EscortTaskService
+process EscortTaskService extends TaskServiceBase
     features
         MissionCommand_in : in event data port cmasi::MissionCommand.i;
         FollowPathCommand_in : in event data port cmasi::FollowPathCommand.i;
         AutomationResponse_in : in event data port cmasi::AutomationResponse.i;
         LineOfInterest_in : in event data port impact::LineOfInterest.i;
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
 end EscortTaskService;
 
 
-process ImpactLineSearchTaskService
+process ImpactLineSearchTaskService extends TaskServiceBase
     features
         VideoRecord_out : out event data port uxnative::VideoRecord.i;
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
 end ImpactLineSearchTaskService;
 
 
-process ImpactPointSearchTaskService
+process ImpactPointSearchTaskService extends TaskServiceBase
     features
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
 end ImpactPointSearchTaskService;
 
 
-process MultiVehicleWatchTaskService
+process MultiVehicleWatchTaskService extends TaskServiceBase
     features
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
 end MultiVehicleWatchTaskService;
 
 
-process OverwatchTaskService
+process OverwatchTaskService extends TaskServiceBase
     features
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
 end OverwatchTaskService;
 
 
-process PatternSearchTaskService
+process PatternSearchTaskService extends TaskServiceBase
     features
         SensorFootprintResponse_in : in event data port uxtask::SensorFootprintResponse.i;
         RouteResponse_in : in event data port route::RouteResponse.i;
-        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+--        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
         VehicleActionCommand_out : out event data port cmasi::VehicleActionCommand.i;
-        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
+--        TaskPlanOptions_out : out event data port uxtask::TaskPlanOptions.i;
         VideoRecord_out : out event data port uxnative::VideoRecord.i;
         SensorFootprintRequests_out : out event data port uxtask::SensorFootprintRequests.i;
 end PatternSearchTaskService;
@@ -396,11 +452,22 @@ process TaskManagerService
         UniqueAutomationRequest_out : out event data port uxtask::UniqueAutomationRequest.i;
         KillService_out : out event data port uxnative::KillService.i;
         CreateNewService_out : out event data port uxnative::CreateNewService.i;
+        
+        annex agree {**
+        	guarantee "creates new task" : true ->
+        		pre(event(Task_in)) => event(CreateNewService_out);
+        		
+        	
+        	guarantee "kills a task" : true ->
+        		pre(event(RemoveTasks_in)) => event(KillService_out);
+        **};
+        
 end TaskManagerService;
 
 
 process TaskServiceBase
-    features
+	features
+		CreateNewService_in : in event data port uxnative::CreateNewService.i;
         GroundVehicleConfiguration_in : in event data port impact::GroundVehicleConfiguration.i;
         EntityConfiguration_in : in event data port cmasi::EntityConfiguration.i;
         SurfaceVehicleConfiguration_in : in event data port impact::SurfaceVehicleConfiguration.i;
