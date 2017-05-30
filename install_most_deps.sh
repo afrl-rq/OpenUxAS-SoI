@@ -21,6 +21,8 @@ if [ "$(uname)" == "Darwin" ]; then
     echo "* Get yourself a developer account and grab the file from: https://developer.apple.com/xcode/"
     echo " (This cannot be downloaded automatically due to the need to agree to license &etc. terms.)"
     echo " (So, download from website manually and install the .dmg file.)"
+    echo "Once you've done this..."
+    echo "Press any key to continue..."
     # as of 2017-05-08, this is: ????.dmg
     # ref: https://superuser.com/questions/689315/run-safari-from-terminal-with-given-url-address-without-open-command
     # ref: https://www.macissues.com/2014/09/18/how-to-launch-and-quit-applications-in-os-x-using-the-terminal/
@@ -28,8 +30,8 @@ if [ "$(uname)" == "Darwin" ]; then
     #echo "* Install .dmg"
     # command modified from: http://stackoverflow.com/questions/22934083/install-dmg-package-on-mac-os-from-terminal
     #MOUNTDIR=$(echo `hdiutil mount ???.dmg | tail -1 | awk '{$1=$2=""; print $0}'` | xargs -0 echo) && sudo installer -pkg "${MOUNTDIR}/"*.pkg -target / 
-    echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
+    echo " "
     # Enable commandline tools: in terminal
     xcode-select --install
     # Install homebrew (must be administrator): in terminal
@@ -75,6 +77,8 @@ if [ "$(uname)" == "Darwin" ]; then
     echo "* Grab the .dmg file from: http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html"
     echo " (This cannot be downloaded automatically due to the need to agree to license &etc. terms.)"
     echo " (So, download from website manually and install.)"
+    echo "Once you've done this..."
+    echo "Press any key to continue..."
     # as of 2017-05-08, this is: jdk-8u131-nb-8_2-macosx-x64.dmg
     # ref: https://superuser.com/questions/689315/run-safari-from-terminal-with-given-url-address-without-open-command
     # ref: https://www.macissues.com/2014/09/18/how-to-launch-and-quit-applications-in-os-x-using-the-terminal/
@@ -82,25 +86,35 @@ if [ "$(uname)" == "Darwin" ]; then
 #echo "* Install .dmg"
     # command modified from: http://stackoverflow.com/questions/22934083/install-dmg-package-on-mac-os-from-terminal
     #MOUNTDIR=$(echo `hdiutil mount jdk-8u131-nb-8_2-macosx-x64.dmg | tail -1 | awk '{$1=$2=""; print $0}'` | xargs -0 echo) && sudo installer -pkg "${MOUNTDIR}/"*.pkg -target / 
-    echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Enable C/C++ plug-in in NetBeans (optional)"
     # echo "* Open NetBeans"
     # command modified from: http://stackoverflow.com/questions/1272920/run-terminal-command-on-startup-of-netbeans-in-mac-osx
-    /Applications/NetBeans/NetBeans.app/MacOS/Contents/NetBeans # or `open -a NetBeans.app`
     echo "* Choose Tools->Plugins from the top menu"
     echo "* In the Available Plugins tab, search for C++"
     echo "* Select C/C++ and click Install"
     echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    echo "Press any key to continue..."
+    /Applications/NetBeans/NetBeans.app/MacOS/Contents/NetBeans # or `open -a NetBeans.app`
+    read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
+    echo " "
     echo "...Congratulations! You're done with the dependencies installation!"
     
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
-    sudo apt update
-    sudo apt upgrade
-    sudo apt install firefox
+    # run an 'apt update' check without sudo
+    # ref: https://askubuntu.com/questions/391983/software-updates-from-terminal-without-sudo
+    aptdcon --refresh
+    NUMBER_UPGRADEABLE=`apt-get -s upgrade | grep "upgraded," | cut -d' ' -f1`
+    if [ $NUMBER_UPGRADEABLE -gt 0 ]
+    then
+        echo "Some packages require updating, running apt update-upgrade as sudo now..."
+        sudo apt -y update
+        sudo apt -y upgrade
+        echo "Done with apt update-upgrade!"
+    fi
+    sudo apt -y install firefox
 
     echo "Installing Prerequisite Tools on Ubuntu Linux (/ ...Bash on Ubuntu on Windows?)"
     # Install git: in terminal
@@ -138,8 +152,9 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     # as of 2017-05-08, this is: jdk-8u131-nb-8_w-linux-x64.sh
     # as of 2017-05-09, this is: jdk-8u131-nb-8_2-linux-x64.sh
     echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    echo "Press any key to continue..."
     firefox http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html &
+    read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Running downloaded install script: in terminal"
     cd ~/Downloads
@@ -147,8 +162,9 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     chmod +x $JDK_FILE
     echo "* Click Next three times, then Install"
     echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
-    sh $JDK_FILE
+    echo "Press any key to continue..."
+    ./$JDK_FILE #once chmodded, shouldn't have to 'sh $JDK_FILE', just tell Ubuntu to run it...
+    read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Enable C/C++ plug-in in NetBeans (optional)"
     #echo "* Open NetBeans (in Ubuntu search, type NetBeans, or from commandline type:)"
@@ -157,11 +173,12 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     echo "* In the Available Plugins tab, search for C++"
     echo "* Select C/C++ and click Install"
     echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
+    echo "Press any key to continue..."
     #echo "  /bin/sh \"/usr/local/netbeans-7.4/bin/netbeans\" &"  # if sudo install
     ~/netbeans-8.2/bin/netbeans & # if non-sudo install
-    # Install Oracle Java run-time (required for LmcpGen): in terminal
+    read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
+    # Install Oracle Java run-time (required for LmcpGen): in terminal
     sudo add-apt-repository ppa:webupd8team/java
     sudo apt update; sudo apt -y install oracle-java8-installer
     sudo apt -y install oracle-java8-set-default
