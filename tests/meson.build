@@ -16,7 +16,6 @@ inc_test = [
     'Test_Utilities',
     '../src/Communications',
     '../src/Includes',
-    '../src/LMCP',
     '../src/Services',
     '../src/Utilities',
     '../3rd/PugiXML/src',
@@ -25,6 +24,7 @@ inc_test = [
     '../3rd/sqlite-amalgamation-3120200',
     '../3rd/SQLiteCpp-1.3.1/include',
   ),
+  incs_lmcp,
   sub_gtest.get_variable('incdir'),
 ]
 
