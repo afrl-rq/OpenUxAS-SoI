@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        Defines messages to allow services to utilize MADARA
+-->
+<MDM>
+    
+    <SeriesName>MADARA</SeriesName>
+    <Namespace>uxas/madara</Namespace>
+    <Version>1</Version>
+
+    <StructList>
+        
+      <!-- Primary message for reporting MADARA state -->
+      <Struct Name="MadaraState">
+          <!-- Contents of MADARA state -->
+          <Field Name="Contents" Type="byte[]" LargeArray="true" />
+      </Struct>
+      
+    </StructList>
+    
+</MDM>
+
+
+
+
