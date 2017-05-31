@@ -101,9 +101,10 @@ namespace {
           
           if(auto *Const = dyn_cast<Constant>(arg))
             allSubs.insert(demangle(Const->getName()));
-          else if(auto *II = dyn_cast<InvokeInst>(arg)) {
+          else if(auto *II = dyn_cast<InvokeInst>(arg))
             allSubs.insert(demangle(II->getCalledFunction()->getName()) + "()");
-          }
+          else
+            errs() << "Warning: could not handle potential sub in " << className << '\n';
         }
       }
     }
@@ -154,6 +155,7 @@ namespace {
 
             //-- the first argument to a method call is always the
             //-- this pointer. so get the second argument.
+            bool foundPub = false;
             for(auto u : allUsers(arg)) {
               //errs() << "user " << *u << '\n';
               if(auto *CI = dyn_cast<CallInst>(u)) {
@@ -165,6 +167,8 @@ namespace {
                     size_t pos2 = dn.find('>', pos1);
                     if(pos2 == std::string::npos) continue;
                     allPubs.insert(dn.substr(pos1+2, pos2-pos1-2));
+                    foundPub = true;
+                    break;
                   }
                   else if(CF->getName().contains("shared_ptr")) {
                     std::string dn = demangle(CF->getName());
@@ -180,30 +184,15 @@ namespace {
                     size_t pos2 = dn.find('>', pos1);
                     if(pos2 == std::string::npos) continue;
                     allPubs.insert(dn.substr(pos1+11, pos2-pos1-11));
+                    foundPub = true;
+                    break;
                   }
                 }
               }
             }
-            
-            /*
-            assert(isa<AllocaInst>(arg));
-            auto *ai = dyn_cast<AllocaInst>(arg);
-            errs() << *(ai->getAllocatedType()) << '\n';
 
-            
-            auto *type = arg->getType();
-            assert(type);            
-            errs() << *type << '\n';
-            auto *pt = dyn_cast<PointerType>(type);
-            assert(pt);
-            auto *et = pt->getElementType();
-            errs() << *et << '\n';
-            assert(isa<StructType>(et));
-            auto *st = dyn_cast<StructType>(et);
-            for(auto *t : st->elements()) {
-              errs() << *t << '\n';
-            }
-            */
+            if(!foundPub)
+              errs() << "Warning: could not handle potential pub in " << className << '\n';
           }          
         }
       }
