@@ -105,6 +105,9 @@
 #include "WaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
 
+// realtime/gams
+#include "GamsService.h"
+
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
 
@@ -168,6 +171,9 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
+
+// realtime/gams
+{auto svc = uxas::stduxas::make_unique<uxas::service::GamsService>();}
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////

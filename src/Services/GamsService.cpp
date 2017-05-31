@@ -60,7 +60,7 @@ bool
 GamsService::configure(const pugi::xml_node& ndComponent)
 {
 
-    return (bSucceeded);
+    return true;
 }
 
 bool
@@ -81,7 +81,7 @@ GamsService::terminate()
 bool
 GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    return (isSucceeded);
+    return false;
 };
 
 }; //namespace service

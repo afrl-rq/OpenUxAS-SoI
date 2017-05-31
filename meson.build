@@ -1,5 +1,27 @@
 project('UxAS', 'c', 'cpp', subproject_dir: '3rd')
 
+# get environment variables
+pymodule = import('python3')
+python3 = pymodule.find_python()
+
+gams_root = '../gams'
+res = run_command(python3, '-c', 'import os; import sys; sys.stdout.write(os.environ["GAMS_ROOT"])')
+if res.returncode() == 0
+  gams_root = res.stdout()
+endif
+
+ace_root = '../ace/ACE_wrappers'
+res = run_command(python3, '-c', 'import os; import sys; sys.stdout.write(os.environ["ACE_ROOT"])')
+if res.returncode() == 0
+  ace_root = res.stdout()
+endif
+
+madara_root = '../madara'
+res = run_command(python3, '-c', 'import os; import sys; sys.stdout.write(os.environ["MADARA_ROOT"])')
+if res.returncode() == 0
+  madara_root = res.stdout()
+endif
+
 conf = configuration_data()
 
 link_args = []
@@ -137,6 +159,11 @@ if os == 'linux'
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
+
+# ACE, MADARA, GAMS
+deps += cpp.find_library('ACE', dirs: ace_root+'/lib')
+deps += cpp.find_library('MADARA', dirs: madara_root+'/lib')
+deps += cpp.find_library('GAMS', dirs: gams_root+'/lib')
 
 cpp_args = []
 if cpp.get_id() == 'msvc'

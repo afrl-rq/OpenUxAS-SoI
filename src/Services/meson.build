@@ -21,6 +21,7 @@ srcs_services = [
   'Test_SimulationTime.cpp',
   'RoutePlannerVisibilityService.cpp',
   'WaypointPlanManagerService.cpp',
+  'GamsService.cpp',
 ]
 
 incs_services = [
@@ -46,6 +47,9 @@ incs_services = [
     '../../3rd/TinyGPS',
     '../../3rd/zlib-1.2.8/contrib/minizip',
     '../../3rd/zlib-1.2.8',
+    ace_root,
+    madara_root,
+    gams_root,
   ),
   incs_lmcp,
 ]
@@ -63,7 +67,7 @@ if cpp.get_id() == 'msvc'
   cpp_args += [
   	'/std:c++14',
 	'-DZMQ_DEFINED_STDINT',
-    '-DZMQ_STATIC',
+	'-DZMQ_STATIC',
 	'-DLIBCZMQ_STATIC',
   ]
 else
