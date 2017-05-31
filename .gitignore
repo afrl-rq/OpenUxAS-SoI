@@ -2,6 +2,9 @@
 build
 build_debug
 
+# afrl internal directories
+UxAS-afrl_internal
+
 # generated documentation
 doc/LMCP
 doc/doxygen/html

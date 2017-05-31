@@ -77,10 +77,7 @@ subdir('src/DPSS')
 
 subdir('src/VisilibityLib')
 
-if get_option('afrl_internal')
-  lib_lmcp = lib_lmcp_internal
-  incs_lmcp = incs_lmcp_internal
-else
+if not get_option('afrl_internal')
   subdir('src/LMCP')
 endif
 
