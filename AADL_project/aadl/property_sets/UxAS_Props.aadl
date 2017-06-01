@@ -1,0 +1,14 @@
+property set UxAS_Props is
+
+--Dispatch_Protocol: Supported_Dispatch_Protocols
+--        applies to (thread, device, virtual processor);
+
+
+    OS_type: type enumeration (SeL4, Linux);
+    
+    OS : UxAS_Props::OS_Type applies to (all);
+    
+    Interarrival_Time : Time applies to (thread);
+    
+
+end UxAS_Props;
