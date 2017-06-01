@@ -27,7 +27,6 @@ incs_services = [
   include_directories(
     '../../src/Utilities',
     '../../resources/AutomationDiagramDataService',
-    '../../src/LMCP',
     '../../src/Communications',
     '../../src/Includes',
     '../../src/Services',
