@@ -128,11 +128,13 @@ deps = [
 ]
 
 # OpenGL, specifically the GLU library
-deps += [dependency('gl')]
-if os == 'linux'
-  deps += [dependency('glu')]
-elif os == 'windows'
-  deps += [cpp.find_library('glu32')]
+if not meson.is_cross_build()
+  deps += [dependency('gl')]
+  if os == 'linux'
+    deps += [dependency('glu')]
+  elif os == 'windows'
+    deps += [cpp.find_library('glu32')]
+  endif
 endif
 
 cpp_args = []
