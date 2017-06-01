@@ -24,13 +24,18 @@ Try:
     mkdir -p /home/$USER/UxAS_pulls
     cd /home/$USER/UxAS_pulls
     git clone https://github.com/afrl-rq/OpenUxAS.git
-    cd /home/$USER/UxAS_pulls/OpenUxAS
+    cd OpenUxAS
+    git checkout BRANCH
     ./install_most_deps.sh
-    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls BRANCH
     ./build_documentation
 
+replacing ***BRANCH*** with the branch of OpenUxAS that you want (e.g., develop, architecture, rta ...). (It's recommended that you use `/home/$USER/UxAS_arch` for the directory if you're using the `archtiecture` branch, rather than `/home/$USER/UxAS_pulls` for the `develop` branch.)
+
 Make sure you follow the instructions in the terminal window, and press a key once you're ready to move to the next set of instructions.
-    
+
+(Note that if you see a '$' prompt during install_most_deps.sh, that you'll need to type 'Ctrl-C' and 'Ctrl-D' once each to continue running the script.)
+
 To test OpenUxAS 'example 2', try:
 1. In terminal 1:
 
@@ -51,7 +56,14 @@ If you need to recompile OpenUxAS later, try:
 If you need to pull the newest versions of the UxAS code from the server and recompile, try:
 
     cd /home/$USER/UxAS_pulls/OpenUxAS
-    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls BRANCH
+    
+replacing ***BRANCH*** with the branch of OpenUxAS that you want (e.g., develop, architecture, rta ...).
+
+Alternately, if you change your mind after the fact and want to use (e.g.) the architecture branch for things, try:
+
+    cd /home/$USER/UxAS_pulls/OpenUxAS
+    ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls architecture
 
 ## Installing OSATE2
 

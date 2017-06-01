@@ -1,0 +1,514 @@
+package Waterways
+public
+    with CMASI;
+
+    with UXTASK;
+
+    with IMPACT;
+
+    with ROUTE;
+
+    with UXNATIVE;
+
+	with UxAS_Props;
+
+    thread TaskManagerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            FollowPathCommand_in: in event data port cmasi::FollowPathCommand.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            EntityState_in: in event data port cmasi::EntityState.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+            UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
+            KillService_out: out event data port uxnative::KillService.i;
+            CreateNewService_out: out event data port uxnative::CreateNewService.i;
+    	properties
+    		Dispatch_Protocol => Sporadic;
+    end TaskManagerService;
+
+    thread AutomationRequestValidatorService
+        features
+            TaskInitialized_in: in event data port uxtask::TaskInitialized.i;
+            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            TaskAutomationRequest_in: in event data port uxtask::TaskAutomationRequest.i;
+            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
+            Task_in: in event data port cmasi::Task.i;
+            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            KeepInZone_in: in event data port cmasi::KeepInZone.i;
+            ImpactAutomationRequest_in: in event data port impact::ImpactAutomationRequest.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+                    --note that the code does not acually subscribe to "ServiceStatus" currently
+            ServiceStatus_in: in event data port cmasi::ServiceStatus.i;
+                    --the source code subscribes to all descendants of task:
+            SearchTask_in: in event data port cmasi::SearchTask.i;
+            AreaSearchTask_in: in event data port cmasi::AreaSearchTask.i;
+            LineSearchTask_in: in event data port cmasi::LineSearchTask.i;
+            LoiterTask_in: in event data port cmasi::LoiterTask.i;
+            MustFlyTask_in: in event data port cmasi::MustFlyTask.i;
+            PointSearchTask_in: in event data port cmasi::PointSearchTask.i;
+            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+            ImpactAutomationResponse_out: out event data port impact::ImpactAutomationResponse.i;
+            AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
+            TaskAutomationResponse_out: out event data port uxtask::TaskAutomationResponse.i;
+            UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end AutomationRequestValidatorService;
+
+    thread RoutePlannerVisibilityService
+        features
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            RoutePlanRequest_in: in event data port route::RoutePlanRequest.i;
+            RouteRequest_in: in event data port route::RouteRequest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            KeepInZone_in: in event data port cmasi::KeepInZone.i;
+            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            RoutePlanResponse_out: out event data port route::RoutePlanResponse.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end RoutePlannerVisibilityService;
+
+    thread AssignmentTreeBranchBoundService
+    end AssignmentTreeBranchBoundService;
+
+    thread AutomationDiagramDataService
+        features
+            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
+            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            KeepInZone_in: in event data port cmasi::KeepInZone.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end AutomationDiagramDataService;
+
+    thread WaypointPlanManagerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            IncrementWaypoint_in: in event data port uxnative::IncrementWaypoint.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end WaypointPlanManagerService;
+
+    thread PlanBuilderService
+        features
+            TaskImplementationResponse_in: in event data port uxtask::TaskImplementationResponse.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            TaskAssignmentSummary_in: in event data port uxtask::TaskAssignmentSummary.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+            UniqueAutomationResponse_out: out event data port uxtask::UniqueAutomationResponse.i;
+            TaskImplementationRequest_out: out event data port uxtask::TaskImplementationRequest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end PlanBuilderService;
+
+    thread SendMessagesService
+        features
+            StartupComplete_in: in event data port uxnative::StartupComplete.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end SendMessagesService;
+
+    thread MessageLoggerDataService
+    end MessageLoggerDataService;
+
+    thread AngledAreaSearchTaskService extends TaskServiceBase
+        features
+            SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
+            RouteResponse_in: in event data port route::RouteResponse.i;
+            SensorFootprintRequests_out: out event data port uxtask::SensorFootprintRequests.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end AngledAreaSearchTaskService;
+
+    thread AssignmentCoordinatorTaskService extends TaskServiceBase
+        features
+            AssignmentCoordination_in: in event data port uxtask::AssignmentCoordination.i;
+            CoordinatedAutomationRequest_in: in event data port uxtask::CoordinatedAutomationRequest.i;
+            AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
+            AssignmentCoordination_out: out event data port uxtask::AssignmentCoordination.i;
+            TaskAutomationRequest_out: out event data port uxtask::TaskAutomationRequest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end AssignmentCoordinatorTaskService;
+
+    thread BlockadeTaskService extends TaskServiceBase
+    end BlockadeTaskService;
+
+    thread CmasiAreaSearchTaskService extends TaskServiceBase
+        features
+            SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
+            RouteResponse_in: in event data port route::RouteResponse.i;
+--        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+            VideoRecord_out: out event data port uxnative::VideoRecord.i;
+            SensorFootprintRequests_out: out event data port uxtask::SensorFootprintRequests.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end CmasiAreaSearchTaskService;
+
+    thread CmasiLineSearchTaskService extends TaskServiceBase
+        features
+            VideoRecord_out: out event data port uxnative::VideoRecord.i;
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end CmasiLineSearchTaskService;
+
+    thread CmasiPointSearchTaskService extends TaskServiceBase
+        features
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end CmasiPointSearchTaskService;
+
+    thread CommRelayTaskService extends TaskServiceBase
+    end CommRelayTaskService;
+
+    thread CordonTaskService extends TaskServiceBase
+        features
+            EgressRouteResponse_in: in event data port route::EgressRouteResponse.i;
+            RouteResponse_in: in event data port route::RouteResponse.i;
+            EgressRouteRequest_out: out event data port route::EgressRouteRequest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end CordonTaskService;
+
+    thread EscortTaskService extends TaskServiceBase
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            FollowPathCommand_in: in event data port cmasi::FollowPathCommand.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end EscortTaskService;
+
+    thread ImpactLineSearchTaskService extends TaskServiceBase
+        features
+            VideoRecord_out: out event data port uxnative::VideoRecord.i;
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end ImpactLineSearchTaskService;
+
+    thread ImpactPointSearchTaskService extends TaskServiceBase
+        features
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end ImpactPointSearchTaskService;
+
+    thread MultiVehicleWatchTaskService extends TaskServiceBase
+        features
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end MultiVehicleWatchTaskService;
+
+    thread OverwatchTaskService extends TaskServiceBase
+        features
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end OverwatchTaskService;
+
+    thread PatternSearchTaskService extends TaskServiceBase
+        features
+            SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
+            RouteResponse_in: in event data port route::RouteResponse.i;
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+            VideoRecord_out: out event data port uxnative::VideoRecord.i;
+            SensorFootprintRequests_out: out event data port uxtask::SensorFootprintRequests.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end PatternSearchTaskService;
+
+    thread TaskServiceBase
+        features
+            CreateNewService_in: in event data port uxnative::CreateNewService.i;
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            EntityState_in: in event data port cmasi::EntityState.i;
+            TaskImplementationRequest_in: in event data port uxtask::TaskImplementationRequest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
+            RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            TaskInitialized_out: out event data port uxtask::TaskInitialized.i;
+            RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
+            TaskActive_out: out event data port uxtask::TaskActive.i;
+            TaskImplementationResponse_out: out event data port uxtask::TaskImplementationResponse.i;
+            TaskComplete_out: out event data port uxtask::TaskComplete.i;
+            TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end TaskServiceBase;
+
+    thread TaskTrackerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end TaskTrackerService;
+
+    process waterways
+        features
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+    end waterways;
+
+    process implementation waterways.i
+        subcomponents
+            TaskManagerService: thread TaskManagerService;
+            AutomationRequestValidatorService: thread AutomationRequestValidatorService;
+            RoutePlannerVisibilityService: thread RoutePlannerVisibilityService;
+            AssignmentTreeBranchBoundService: thread AssignmentTreeBranchBoundService;
+            AutomationDiagramDataService: thread AutomationDiagramDataService;
+            WaypointPlanManagerService1: thread WaypointPlanManagerService;
+            WaypointPlanManagerService2: thread WaypointPlanManagerService;
+            PlanBuilderService: thread PlanBuilderService;
+            SendMessagesService: thread SendMessagesService;
+            MessageLoggerDataService: thread MessageLoggerDataService;
+            AngledAreaSearchTaskService: thread AngledAreaSearchTaskService;
+            AssignmentCoordinatorTaskService: thread AssignmentCoordinatorTaskService;
+            BlockadeTaskService: thread BlockadeTaskService;
+            CmasiAreaSearchTaskService: thread CmasiAreaSearchTaskService;
+            CmasiLineSearchTaskService: thread CmasiLineSearchTaskService;
+            CmasiPointSearchTaskService: thread CmasiPointSearchTaskService;
+            CommRelayTaskService: thread CommRelayTaskService;
+            CordonTaskService: thread CordonTaskService;
+            EscortTaskService: thread EscortTaskService;
+            ImpactLineSearchTaskService: thread ImpactLineSearchTaskService;
+            ImpactPointSearchTaskService: thread ImpactPointSearchTaskService;
+            MultiVehicleWatchTaskService: thread MultiVehicleWatchTaskService;
+            OverwatchTaskService: thread OverwatchTaskService;
+            PatternSearchTaskService: thread PatternSearchTaskService;
+            TaskTrackerService: thread TaskTrackerService;
+        connections
+            conn0: port AngledAreaSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn1: port AssignmentCoordinatorTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn2: port BlockadeTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn3: port CmasiAreaSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn4: port CmasiLineSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn5: port CmasiPointSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn6: port CommRelayTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn7: port CordonTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn8: port EscortTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn9: port ImpactLineSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn10: port ImpactPointSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn11: port MultiVehicleWatchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn12: port OverwatchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn13: port PatternSearchTaskService.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            conn15: port RoutePlannerVisibilityService.RoutePlanResponse_out -> AngledAreaSearchTaskService.RoutePlanResponse_in;
+            conn16: port RoutePlannerVisibilityService.RoutePlanResponse_out -> AssignmentCoordinatorTaskService.RoutePlanResponse_in;
+            conn17: port RoutePlannerVisibilityService.RoutePlanResponse_out -> BlockadeTaskService.RoutePlanResponse_in;
+            conn18: port RoutePlannerVisibilityService.RoutePlanResponse_out -> CmasiAreaSearchTaskService.RoutePlanResponse_in;
+            conn19: port RoutePlannerVisibilityService.RoutePlanResponse_out -> CmasiLineSearchTaskService.RoutePlanResponse_in;
+            conn20: port RoutePlannerVisibilityService.RoutePlanResponse_out -> CmasiPointSearchTaskService.RoutePlanResponse_in;
+            conn21: port RoutePlannerVisibilityService.RoutePlanResponse_out -> CommRelayTaskService.RoutePlanResponse_in;
+            conn22: port RoutePlannerVisibilityService.RoutePlanResponse_out -> CordonTaskService.RoutePlanResponse_in;
+            conn23: port RoutePlannerVisibilityService.RoutePlanResponse_out -> EscortTaskService.RoutePlanResponse_in;
+            conn24: port RoutePlannerVisibilityService.RoutePlanResponse_out -> ImpactLineSearchTaskService.RoutePlanResponse_in;
+            conn25: port RoutePlannerVisibilityService.RoutePlanResponse_out -> ImpactPointSearchTaskService.RoutePlanResponse_in;
+            conn26: port RoutePlannerVisibilityService.RoutePlanResponse_out -> MultiVehicleWatchTaskService.RoutePlanResponse_in;
+            conn27: port RoutePlannerVisibilityService.RoutePlanResponse_out -> OverwatchTaskService.RoutePlanResponse_in;
+            conn28: port RoutePlannerVisibilityService.RoutePlanResponse_out -> PatternSearchTaskService.RoutePlanResponse_in;
+            conn30: port AirVehicleState_in -> TaskManagerService.AirVehicleState_in;
+            conn31: port AirVehicleState_in -> AutomationRequestValidatorService.AirVehicleState_in;
+            conn32: port AirVehicleState_in -> RoutePlannerVisibilityService.AirVehicleState_in;
+            conn33: port AirVehicleState_in -> AutomationDiagramDataService.AirVehicleState_in;
+            conn34: port AirVehicleState_in -> WaypointPlanManagerService1.AirVehicleState_in;
+            conn234: port AirVehicleState_in -> WaypointPlanManagerService2.AirVehicleState_in;
+            conn35: port AirVehicleState_in -> PlanBuilderService.AirVehicleState_in;
+            conn36: port AirVehicleState_in -> AngledAreaSearchTaskService.AirVehicleState_in;
+            conn37: port AirVehicleState_in -> AssignmentCoordinatorTaskService.AirVehicleState_in;
+            conn38: port AirVehicleState_in -> BlockadeTaskService.AirVehicleState_in;
+            conn39: port AirVehicleState_in -> CmasiAreaSearchTaskService.AirVehicleState_in;
+            conn40: port AirVehicleState_in -> CmasiLineSearchTaskService.AirVehicleState_in;
+            conn41: port AirVehicleState_in -> CmasiPointSearchTaskService.AirVehicleState_in;
+            conn42: port AirVehicleState_in -> CommRelayTaskService.AirVehicleState_in;
+            conn43: port AirVehicleState_in -> CordonTaskService.AirVehicleState_in;
+            conn44: port AirVehicleState_in -> EscortTaskService.AirVehicleState_in;
+            conn45: port AirVehicleState_in -> ImpactLineSearchTaskService.AirVehicleState_in;
+            conn46: port AirVehicleState_in -> ImpactPointSearchTaskService.AirVehicleState_in;
+            conn47: port AirVehicleState_in -> MultiVehicleWatchTaskService.AirVehicleState_in;
+            conn48: port AirVehicleState_in -> OverwatchTaskService.AirVehicleState_in;
+            conn49: port AirVehicleState_in -> PatternSearchTaskService.AirVehicleState_in;
+            conn51: port AirVehicleState_in -> TaskTrackerService.AirVehicleState_in;
+            conn52: port PlanBuilderService.UniqueAutomationResponse_out -> AutomationRequestValidatorService.UniqueAutomationResponse_in;
+            conn53: port PlanBuilderService.UniqueAutomationResponse_out -> AutomationDiagramDataService.UniqueAutomationResponse_in;
+            conn54: port PlanBuilderService.UniqueAutomationResponse_out -> AngledAreaSearchTaskService.UniqueAutomationResponse_in;
+            conn55: port PlanBuilderService.UniqueAutomationResponse_out -> AssignmentCoordinatorTaskService.UniqueAutomationResponse_in;
+            conn56: port PlanBuilderService.UniqueAutomationResponse_out -> BlockadeTaskService.UniqueAutomationResponse_in;
+            conn57: port PlanBuilderService.UniqueAutomationResponse_out -> CmasiAreaSearchTaskService.UniqueAutomationResponse_in;
+            conn58: port PlanBuilderService.UniqueAutomationResponse_out -> CmasiLineSearchTaskService.UniqueAutomationResponse_in;
+            conn59: port PlanBuilderService.UniqueAutomationResponse_out -> CmasiPointSearchTaskService.UniqueAutomationResponse_in;
+            conn60: port PlanBuilderService.UniqueAutomationResponse_out -> CommRelayTaskService.UniqueAutomationResponse_in;
+            conn61: port PlanBuilderService.UniqueAutomationResponse_out -> CordonTaskService.UniqueAutomationResponse_in;
+            conn62: port PlanBuilderService.UniqueAutomationResponse_out -> EscortTaskService.UniqueAutomationResponse_in;
+            conn63: port PlanBuilderService.UniqueAutomationResponse_out -> ImpactLineSearchTaskService.UniqueAutomationResponse_in;
+            conn64: port PlanBuilderService.UniqueAutomationResponse_out -> ImpactPointSearchTaskService.UniqueAutomationResponse_in;
+            conn65: port PlanBuilderService.UniqueAutomationResponse_out -> MultiVehicleWatchTaskService.UniqueAutomationResponse_in;
+            conn66: port PlanBuilderService.UniqueAutomationResponse_out -> OverwatchTaskService.UniqueAutomationResponse_in;
+            conn67: port PlanBuilderService.UniqueAutomationResponse_out -> PatternSearchTaskService.UniqueAutomationResponse_in;
+            conn69: port AssignmentCoordinatorTaskService.TaskAutomationRequest_out -> AutomationRequestValidatorService.TaskAutomationRequest_in;
+            conn70: port AngledAreaSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn71: port AssignmentCoordinatorTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn72: port BlockadeTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn73: port CmasiAreaSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn74: port CmasiLineSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn75: port CmasiPointSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn76: port CommRelayTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn77: port CordonTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn78: port EscortTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn79: port ImpactLineSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn80: port ImpactPointSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn81: port MultiVehicleWatchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn82: port OverwatchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn83: port PatternSearchTaskService.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            conn85: port AngledAreaSearchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn86: port AssignmentCoordinatorTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn87: port BlockadeTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn91: port CmasiPointSearchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn92: port CommRelayTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn93: port CordonTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn94: port EscortTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn95: port ImpactLineSearchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn96: port ImpactPointSearchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn97: port MultiVehicleWatchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn98: port OverwatchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn99: port PatternSearchTaskService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            conn101: port TaskManagerService.CreateNewService_out -> AngledAreaSearchTaskService.CreateNewService_in;
+            conn102: port TaskManagerService.CreateNewService_out -> AssignmentCoordinatorTaskService.CreateNewService_in;
+            conn103: port TaskManagerService.CreateNewService_out -> BlockadeTaskService.CreateNewService_in;
+            conn104: port TaskManagerService.CreateNewService_out -> CmasiAreaSearchTaskService.CreateNewService_in;
+            conn105: port TaskManagerService.CreateNewService_out -> CmasiLineSearchTaskService.CreateNewService_in;
+            conn106: port TaskManagerService.CreateNewService_out -> CmasiPointSearchTaskService.CreateNewService_in;
+            conn107: port TaskManagerService.CreateNewService_out -> CommRelayTaskService.CreateNewService_in;
+            conn108: port TaskManagerService.CreateNewService_out -> CordonTaskService.CreateNewService_in;
+            conn109: port TaskManagerService.CreateNewService_out -> EscortTaskService.CreateNewService_in;
+            conn110: port TaskManagerService.CreateNewService_out -> ImpactLineSearchTaskService.CreateNewService_in;
+            conn111: port TaskManagerService.CreateNewService_out -> ImpactPointSearchTaskService.CreateNewService_in;
+            conn112: port TaskManagerService.CreateNewService_out -> MultiVehicleWatchTaskService.CreateNewService_in;
+            conn113: port TaskManagerService.CreateNewService_out -> OverwatchTaskService.CreateNewService_in;
+            conn114: port TaskManagerService.CreateNewService_out -> PatternSearchTaskService.CreateNewService_in;
+            conn116: port AssignmentCoordinatorTaskService.AssignmentCoordination_out -> AssignmentCoordinatorTaskService.AssignmentCoordination_in;
+            conn117: port AutomationRequestValidatorService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
+            conn118: port PlanBuilderService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
+            conn119: port TaskManagerService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
+            conn120: port TaskManagerService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
+            conn121: port TaskManagerService.UniqueAutomationRequest_out -> AngledAreaSearchTaskService.UniqueAutomationRequest_in;
+            conn122: port TaskManagerService.UniqueAutomationRequest_out -> AssignmentCoordinatorTaskService.UniqueAutomationRequest_in;
+            conn123: port TaskManagerService.UniqueAutomationRequest_out -> BlockadeTaskService.UniqueAutomationRequest_in;
+            conn124: port TaskManagerService.UniqueAutomationRequest_out -> CmasiAreaSearchTaskService.UniqueAutomationRequest_in;
+            conn125: port TaskManagerService.UniqueAutomationRequest_out -> CmasiLineSearchTaskService.UniqueAutomationRequest_in;
+            conn126: port TaskManagerService.UniqueAutomationRequest_out -> CmasiPointSearchTaskService.UniqueAutomationRequest_in;
+            conn127: port TaskManagerService.UniqueAutomationRequest_out -> CommRelayTaskService.UniqueAutomationRequest_in;
+            conn128: port TaskManagerService.UniqueAutomationRequest_out -> CordonTaskService.UniqueAutomationRequest_in;
+            conn129: port TaskManagerService.UniqueAutomationRequest_out -> EscortTaskService.UniqueAutomationRequest_in;
+            conn130: port TaskManagerService.UniqueAutomationRequest_out -> ImpactLineSearchTaskService.UniqueAutomationRequest_in;
+            conn131: port TaskManagerService.UniqueAutomationRequest_out -> ImpactPointSearchTaskService.UniqueAutomationRequest_in;
+            conn132: port TaskManagerService.UniqueAutomationRequest_out -> MultiVehicleWatchTaskService.UniqueAutomationRequest_in;
+            conn133: port TaskManagerService.UniqueAutomationRequest_out -> OverwatchTaskService.UniqueAutomationRequest_in;
+            conn134: port TaskManagerService.UniqueAutomationRequest_out -> PatternSearchTaskService.UniqueAutomationRequest_in;
+            conn136: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
+            conn137: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
+            conn138: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AngledAreaSearchTaskService.UniqueAutomationRequest_in;
+            conn139: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentCoordinatorTaskService.UniqueAutomationRequest_in;
+            conn140: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> BlockadeTaskService.UniqueAutomationRequest_in;
+            conn141: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> CmasiAreaSearchTaskService.UniqueAutomationRequest_in;
+            conn142: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> CmasiLineSearchTaskService.UniqueAutomationRequest_in;
+            conn143: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> CmasiPointSearchTaskService.UniqueAutomationRequest_in;
+            conn144: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> CommRelayTaskService.UniqueAutomationRequest_in;
+            conn145: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> CordonTaskService.UniqueAutomationRequest_in;
+            conn146: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> EscortTaskService.UniqueAutomationRequest_in;
+            conn147: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> ImpactLineSearchTaskService.UniqueAutomationRequest_in;
+            conn148: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> ImpactPointSearchTaskService.UniqueAutomationRequest_in;
+            conn149: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> MultiVehicleWatchTaskService.UniqueAutomationRequest_in;
+            conn150: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> OverwatchTaskService.UniqueAutomationRequest_in;
+            conn151: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PatternSearchTaskService.UniqueAutomationRequest_in;
+            conn153: port AutomationRequestValidatorService.AutomationResponse_out -> TaskManagerService.AutomationResponse_in;
+            conn154: port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService1.AutomationResponse_in;
+            conn2154: port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService2.AutomationResponse_in;
+            conn155: port AutomationRequestValidatorService.AutomationResponse_out -> EscortTaskService.AutomationResponse_in;
+            conn156: port AutomationRequestValidatorService.AutomationResponse_out -> TaskTrackerService.AutomationResponse_in;
+            conn157: port AssignmentCoordinatorTaskService.AutomationResponse_out -> TaskManagerService.AutomationResponse_in;
+            conn158: port AssignmentCoordinatorTaskService.AutomationResponse_out -> WaypointPlanManagerService1.AutomationResponse_in;
+            conn2158: port AssignmentCoordinatorTaskService.AutomationResponse_out -> WaypointPlanManagerService2.AutomationResponse_in;
+            conn159: port AssignmentCoordinatorTaskService.AutomationResponse_out -> EscortTaskService.AutomationResponse_in;
+            conn160: port AssignmentCoordinatorTaskService.AutomationResponse_out -> TaskTrackerService.AutomationResponse_in;
+            conn161: port PlanBuilderService.TaskImplementationRequest_out -> AngledAreaSearchTaskService.TaskImplementationRequest_in;
+            conn162: port PlanBuilderService.TaskImplementationRequest_out -> AssignmentCoordinatorTaskService.TaskImplementationRequest_in;
+            conn163: port PlanBuilderService.TaskImplementationRequest_out -> BlockadeTaskService.TaskImplementationRequest_in;
+            conn164: port PlanBuilderService.TaskImplementationRequest_out -> CmasiAreaSearchTaskService.TaskImplementationRequest_in;
+            conn165: port PlanBuilderService.TaskImplementationRequest_out -> CmasiLineSearchTaskService.TaskImplementationRequest_in;
+            conn166: port PlanBuilderService.TaskImplementationRequest_out -> CmasiPointSearchTaskService.TaskImplementationRequest_in;
+            conn167: port PlanBuilderService.TaskImplementationRequest_out -> CommRelayTaskService.TaskImplementationRequest_in;
+            conn168: port PlanBuilderService.TaskImplementationRequest_out -> CordonTaskService.TaskImplementationRequest_in;
+            conn169: port PlanBuilderService.TaskImplementationRequest_out -> EscortTaskService.TaskImplementationRequest_in;
+            conn170: port PlanBuilderService.TaskImplementationRequest_out -> ImpactLineSearchTaskService.TaskImplementationRequest_in;
+            conn171: port PlanBuilderService.TaskImplementationRequest_out -> ImpactPointSearchTaskService.TaskImplementationRequest_in;
+            conn172: port PlanBuilderService.TaskImplementationRequest_out -> MultiVehicleWatchTaskService.TaskImplementationRequest_in;
+            conn173: port PlanBuilderService.TaskImplementationRequest_out -> OverwatchTaskService.TaskImplementationRequest_in;
+            conn174: port PlanBuilderService.TaskImplementationRequest_out -> PatternSearchTaskService.TaskImplementationRequest_in;
+            
+    	properties
+    		UxAS_Props::OS => Linux;
+        annex resolute {**
+            prove might_be_schedulable(this)
+            prove isolation(this) 
+        **};
+            
+    end waterways.i;
+
+end Waterways;

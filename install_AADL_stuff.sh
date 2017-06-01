@@ -65,10 +65,10 @@ if [ "$(uname)" == "Darwin" ]; then
     wget -O osate2-2.2.2-vfinal-linux.gtk.x86_64.tar.gz http://aadl.info/aadl/osate/stable/2.2.2/products/osate2-2.2.2-vfinal-linux.gtk.x86_64.tar.gz
     tar -xvzf osate2-2.2.2-vfinal-linux.gtk.x86_64.tar.gz
     echo "Running OSATE2, v.2.2.2..."
-    ./osate &
     echo "* Choose a workspace, then press 'OK'."
     echo "Once you're done..."
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
+    ./osate &
     read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Install the Z3 Plugin inside OSATE2 (used by AGREE)"
@@ -119,8 +119,17 @@ if [ "$(uname)" == "Darwin" ]; then
 
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
-    sudo apt update
-    sudo apt upgrade
+    # run an 'apt update' check without sudo
+    # ref: https://askubuntu.com/questions/391983/software-updates-from-terminal-without-sudo
+    aptdcon --refresh
+    NUMBER_UPGRADEABLE=`apt-get -s upgrade | grep "upgraded," | cut -d' ' -f1`
+    if [ $NUMBER_UPGRADEABLE -gt 0 ]
+    then
+        echo "Some packages require updating, running apt update-upgrade as sudo now..."
+        sudo apt -y update
+        sudo apt -y upgrade
+        echo "Done with apt update-upgrade!"
+    fi
     sudo apt -y install firefox wget tar unzip sed
     
     mkdir -p /home/$USER/osate2-2.2.2
@@ -148,10 +157,10 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         sed -i.orig '3s/--launcher.library/--launcher.GTK_version\n2\n--launcher.library/' osate.ini
     fi
     echo "Running OSATE2, v.2.2.2..."
-    ./osate &
     echo "* Choose a workspace, check 'Use this as the default and do not ask again', then press 'OK'."
     echo "Once you're done..."
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
+    ./osate &
     read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
     echo "Install the Z3 Plugin inside OSATE2 (used by AGREE)"

@@ -37,9 +37,9 @@ echo "PATH of current script ($0) is: $ABSOLUTE_PATH"
 # parse input vars (set to appropriate vars or default vars)
 #
 echo "Commandline arguments are: '$@'"
-source $ABSOLUTE_PATH/get_dlvsco_wd_f.sh "$@"
+source $ABSOLUTE_PATH/get_dlvsco_wd_b_f.sh "$@"
 # when source'd, sets these vars at this level: DOWNLOAD_VS_COMPILE WORKSPACEDIR FORCE
-echo "Switches are: DOWNLOAD_VS_COMPILE='$DOWNLOAD_VS_COMPILE', WORKSPACEDIR='$WORKSPACEDIR', FORCE='$FORCE'..."
+echo "Switches are: DOWNLOAD_VS_COMPILE='$DOWNLOAD_VS_COMPILE', WORKSPACEDIR='$WORKSPACEDIR', BRANCH='$BRANCH', FORCE='$FORCE'..."
 echo " "
 
 # change these arguments if you want to get your repositories from a different fork
@@ -54,7 +54,7 @@ else
     echo "Bad switch for DOWNLOAD_VS_COMPILE(=$DOWNLOAD_VS_COMPILE), exiting."
     exit -1
 fi
-echo "* https;//github.com/$REPO_SOURCE_OU/OpenUxAS"
+echo "* https;//github.com/$REPO_SOURCE_OU/OpenUxAS , branch=$BRANCH"
 echo "* https;//github.com/$REPO_SOURCE_OA/OpenAMASE"
 echo "* https;//github.com/$REPO_SOURCE_LG/LmcpGen"
 echo " "
@@ -77,10 +77,14 @@ cd $WORKSPACEDIR
 echo "Grabbing the main UxAS codeset (OpenUxAS)"
 if [ ! -d "OpenUxAS" ]; then # pull down the repo for the first time
     git clone https://github.com/$REPO_SOURCE_OU/OpenUxAS.git
+    cd OpenUxAS
+    git checkout $BRANCH
+    cd ..
     FIRST_TIME=1
 else # update the local repo
     cd OpenUxAS
     git pull
+    git checkout $BRANCH
     cd ..
 fi
 

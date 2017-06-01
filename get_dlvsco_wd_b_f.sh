@@ -50,15 +50,18 @@
 #    top-level script
 # see: http://stackoverflow.com/questions/9772036/pass-all-variables-from-one-shellscript-to-another
 
-echo "Start of get_dlvsco_wd_f.sh script!"
-echo "(sets DOWNLOAD_VS_COMPILE, WORKSPACEDIR, FORCE environment variable for a script 'source'ing it)"
-echo "input arguments: DOWNLOAD_VS_COMPILE [WORKSPACEDIR] [-f]"
+echo "Start of get_dlvsco_wd_b_f.sh script!"
+echo "(sets DOWNLOAD_VS_COMPILE, WORKSPACEDIR, BRANCH, FORCE environment variable for a script 'source'ing it)"
+echo "input arguments: DOWNLOAD_VS_COMPILE [WORKSPACEDIR] [BRANCH] [-f]"
 echo "(note: optional input arguments in [])"
+
 echo "(note: there is no default DOWNLOAD_VS_COMPILE. Acceptable inputs are: -h --help -d -c)"
 echo "(      -h, --help = show help text only and then exit script)"
 echo "(      -d = download jar files, -c = compile jar files via NetBeans projects)"
 echo "(note: default [WORKSPACEDIR] is \"/home/$USER/UxAS_pulls\")"
 echo "WORKSPACEDIR must specify the absolute path of the directory"
+echo "(note: default [BRANCH] is \"develop\")"
+echo "BRANCH must specify a branch that already exists (e.g., architecture, copper. develop, galois-teas, rta)"
 echo "-f sets FORCE=-f and will force a (re)install of all compiled-from-source components."
 
 # note:
@@ -68,17 +71,18 @@ echo "-f sets FORCE=-f and will force a (re)install of all compiled-from-source 
 # INPUT ARGUMENT PARSING:
 #
 
+ACCEPTABLE_BRANCHES="architecture copper develop galois-teas galois-teas-windows master rta"
+
 # set defaults for input arguments
 DOWNLOAD_VS_COMPILE=
 WORKSPACEDIR="/home/$USER/UxAS_pulls"
+BRANCH="develop"
 FORCE=
-# if we get an input parameter (username) then use it, else use default 'vagrant'
 # get -f (force) if given
 if [ $# -lt 1 ]; then
     echo "ERROR: No switch specifying download (-d) vs. compile (-c) given as commandline argument. Exiting."
     exit
 else # at least 1 (possibly 4) argument(s) at commandline...
-    echo "Commandline argument 1 is: $1"
     if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then # early exit
         echo "Descriptive-text-only requested."
         echo "Exiting."
@@ -92,26 +96,47 @@ else # at least 1 (possibly 4) argument(s) at commandline...
         exit -1
     fi
     echo "Switch given is $DOWNLOAD_VS_COMPILE."
+
     if [ $# -lt 2 ]; then
         echo "Workspace directory not given as commandline argument. Using default of '$WORKSPACEDIR'."
     else # at least 2 (possibly more) arguments at commandline...
         if [ "$2" == "-f" ]; then # -f is last argument at commandline...
             echo "-f (force) commandline argument given."
             FORCE=$2
-            echo "Default workspace directory path will be used."
+            echo "Default workspace directory path and branch will be used."
         else # WORKSPACEDIR should be argument #2
-            # but we need to / should check against the users that have home directories / can log in
             WORKSPACEDIR=$2
-            if [ $# -gt 2 ] && [ "$3" == "-f" ]; then # at least 3 (possibly more) arguments at commandline...
-                echo "-f (force) commandline argument given."
-                FORCE=$3
+            if [ $# -lt 3 ]; then
+                echo "Branch not given as commandline argument. Using default of '$BRANCH' for OpenUxAS pull."
+            else # at least 3 (possibly more) arguments at commandline...
+                if [ "$3" == "-f" ]; then # -f is last argument at commandline...
+                    echo "-f (force) commandline argument given."
+                    FORCE=$3
+                    echo "Default branch will be used for OpenUxAS."
+                else # BRANCH should be argument #3
+                    BRANCHFOROPENUXAS_FOUND=`echo $ACCEPTABLE_BRANCHES | grep -m 1 -o "$3" | wc -l`
+                    # grep should find a match and repeat it
+                    # and wc -l should give 1 if argument #3 is an "acceptable branch" of OpenUxAS
+                    if [ $BRANCHFOROPENUXAS_FOUND -eq 1 ]; then
+                        echo "Branch given as commandline argument."
+                        BRANCH=$3
+                    else # already checked for a -f, and not a user... (note: WORKSPACEDIR not allowed to be given without SCRIPTUSER argument)
+                        echo "Bad branch given as commandline argument. Using default branch."
+                    fi
+                    if [ $# -gt 3 ] && [ "$4" == "-f" ]; then # at least 4 (possibly more) arguments at commandline...
+                        echo "-f (force) commandline argument given."
+                        FORCE=$4
+                    fi
+                fi
             fi
         fi
     fi
 fi
+
 echo "Will be setting up UxAS workspace under $WORKSPACEDIR..."
+echo "Will be using branch $BRANCH for OpenUxAS pull..."
 if [ "$FORCE" == "-f" ]; then
     echo "Will be forcing install of all compiled-from-source components."
 fi
 
-echo "End of get_dlvsco_wd_f.sh script!"
+echo "End of get_dlvsco_wd_b_f.sh script!"

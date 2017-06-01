@@ -1,0 +1,49 @@
+package Resolute
+public
+    annex resolute {**
+       
+        might_be_schedulable(c : component) <=
+          ** c **
+          forall(s : subcomponents(c)) . 
+            is_periodically_scheduled(c) or is_bounded_sporadic(c)
+          
+          
+        is_bounded_sporadic(c : component) <= 
+          ** "the component " c " is sporadic and has a bounded interarrival time" **
+            has_property(c, Dispatch_Protocol) and property(c, Dispatch_Protocol) = "Sporadic"
+            and has_specified_interarrival_time(c)
+            
+        has_specified_interarrival_time(c : component) <=
+          ** "the component " c " has a specified interarrival time" **
+          has_property(c, UxAS_Props::Interarrival_Time)
+            
+        is_periodically_scheduled(c : component) <=
+          ** "The component " c " is periodically scheduled and has a specified period" **
+            has_property(c, Dispatch_Protocol) and property(c, Dispatch_Protocol) = "Periodic"
+            and has_specified_period(c)
+          
+        has_specified_period(c : component) <=
+          ** "the component " c " has a specified interarrival time" **
+          has_property(c, Period)
+          
+        isolation(c : component) <=
+          ** "all subcomponents of " c " are unable to alter the memory of other subcomponents" **
+          let s : {component} = subcomponents(c);
+            (forall(sub : s) . memory_safe(sub)) or
+            has_safe_os(c)
+          
+        
+        has_safe_os(c : component) <=
+          ** "The component " c " is running on an OS with formally proved isolation" **
+          (has_property(c, UxAS_Props::OS) and property(c, UxAS_Props::OS) = "SeL4")
+        
+          
+        memory_safe(c : component) <=
+            ** "component " c " is memory safe" **
+            false
+          
+          
+          
+    **};
+	
+end Resolute;
