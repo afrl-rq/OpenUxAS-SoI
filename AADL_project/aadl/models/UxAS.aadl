@@ -85,38 +85,38 @@ public
             UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
         annex agree {**
         		
-            --POSSIBLE REQ: the queue is never decremented past 0
+        	--POSSIBLE REQ: the queue is never decremented past 0
         		
-            const IDLE : int = 0;
-            const BUSY : int = 1;
-            eq state : int;
+        	const IDLE : int = 0;
+        	const BUSY : int = 1;
+        	eq state : int;
         	
-            -- a non-deterministic variable used to model whether or not 
+        	-- a non-deterministic variable used to model whether or not 
         	-- the requested task, vehicle, or operating region has been defined.
-            eq taskVehicleOrRegionIsDefined : bool;
+        	eq taskVehicleOrRegionIsDefined : bool;
         	        	
-            eq numTasksInQ : int;
+        	eq numTasksInQ : int;
         	
-            guarantee "Initially the task queue is empty" :
-                numTasksInQ = 0 -> true;
+        	guarantee "Initially the task queue is empty" :
+        		numTasksInQ = 0 -> true;
         	
-            guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
-                pre(event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined) => 
-                    event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2 and numTasksInQ = pre(numTasksInQ);
-                    --TODO: apparently the code sets the status type to "information" rather than "error"
+        	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
+        		pre(event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined) => 
+        			event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2 and numTasksInQ = pre(numTasksInQ);
+        			--TODO: apparently the code sets the status type to "information" rather than "error"
         		
-            guarantee "if automation request is received and resource is defined produce unique automation request": true ->
-                pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
-                    if pre(state = IDLE) then 
-                        event(UniqueAutomationRequest_out) and state = BUSY and numTasksInQ = pre(numTasksInQ)
-                    else --state = BUSY
-                        state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
+        	guarantee "if automation request is received and resource is defined produce unique automation request": true ->
+        	    pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
+        	    	if pre(state = IDLE) then 
+        	    		event(UniqueAutomationRequest_out) and state = BUSY and numTasksInQ = pre(numTasksInQ)
+        	    	else --state = BUSY
+        	    	   state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
         	    	   
-            guarantee "task receives error message behavior" : true ->
-                pre(event(UniqueAutomationResponse_in)) => 
-                    ((event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2) or
-                    (not event(ServiceStatus_out))) and
-                    numTasksInQ = pre(numTasksInQ) - 1;
+        	guarantee "task receives error message behavior" : true ->
+        		pre(event(UniqueAutomationResponse_in)) => 
+        			((event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2) or
+        			(not event(ServiceStatus_out))) and
+        			numTasksInQ = pre(numTasksInQ) - 1;
         	
         **};
     end AutomationRequestValidatorService;
@@ -254,11 +254,9 @@ public
             SensorFootprintRequests_in: in event data port uxtask::SensorFootprintRequests.i;
             SensorFootprintResponse_out: out event data port uxtask::SensorFootprintResponse.i;
         annex agree {**
-    	
-            guarantee "footporint response" : true ->
-    	       pre(event(SensorFootprintRequests_in)) = event(SensorFootprintResponse_out);
-        **};
-        
+    	guarantee "footporint response" : true ->
+    	  pre(event(SensorFootprintRequests_in)) = event(SensorFootprintResponse_out);
+    **};
     end SensorManagerService;
 
     process SerialAutomationRequestTestService
@@ -418,11 +416,11 @@ public
             CreateNewService_out: out event data port uxnative::CreateNewService.i;
         annex agree {**
         	guarantee "creates new task" : true ->
-        	   pre(event(Task_in)) => event(CreateNewService_out);
+        		pre(event(Task_in)) => event(CreateNewService_out);
         		
         	
-            guarantee "kills a task" : true ->
-        	   pre(event(RemoveTasks_in)) => event(KillService_out);
+        	guarantee "kills a task" : true ->
+        		pre(event(RemoveTasks_in)) => event(KillService_out);
         **};
     end TaskManagerService;
 
@@ -447,9 +445,6 @@ public
             TaskImplementationResponse_out: out event data port uxtask::TaskImplementationResponse.i;
             TaskComplete_out: out event data port uxtask::TaskComplete.i;
             TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
-        annex agree {**
-    	
-    **};
     end TaskServiceBase;
 
     process TaskTrackerService
