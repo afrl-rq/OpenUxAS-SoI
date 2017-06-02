@@ -99,10 +99,7 @@ subdir('src/DPSS')
 
 subdir('src/VisilibityLib')
 
-if get_option('afrl_internal')
-  lib_lmcp = lib_lmcp_internal
-  incs_lmcp = incs_lmcp_internal
-else
+if not get_option('afrl_internal')
   subdir('src/LMCP')
 endif
 
@@ -153,11 +150,13 @@ deps = [
 ]
 
 # OpenGL, specifically the GLU library
-deps += [dependency('gl')]
-if os == 'linux'
-  deps += [dependency('glu')]
-elif os == 'windows'
-  deps += [cpp.find_library('glu32')]
+if not meson.is_cross_build()
+  deps += [dependency('gl')]
+  if os == 'linux'
+    deps += [dependency('glu')]
+  elif os == 'windows'
+    deps += [cpp.find_library('glu32')]
+  endif
 endif
 
 # ACE, MADARA, GAMS
