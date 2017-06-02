@@ -163,6 +163,7 @@ executable(
     incs_lmcp,
   ],
   link_with: libs,
+  install: true,
 )
 
 subdir('tests')

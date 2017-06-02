@@ -158,7 +158,9 @@ select(1, &t_rfds, NULL, NULL, &tv);
 
 if cpp.links(kqueue, name: 'kqueue links')
   cpp_args += ['-DZMQ_USE_KQUEUE']
-elif cpp.run(epoll, name: 'epoll runs').returncode() == 0
+elif meson.is_cross_build() and cpp.links(epoll, name: 'epoll links')
+  cpp_args += ['-DZMQ_USE_EPOLL']
+elif not meson.is_cross_build() and cpp.run(epoll, name: 'epoll runs').returncode() == 0
   cpp_args += ['-DZMQ_USE_EPOLL']
 elif cpp.links(devpoll, name: 'devpoll links')
   cpp_args += ['-DZMQ_USE_DEVPOLL']

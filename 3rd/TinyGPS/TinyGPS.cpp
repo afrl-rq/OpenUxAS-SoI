@@ -31,8 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "TimeUtilities.h"
 #include "Constants/Convert.h"
 #include <cmath>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 unsigned long millis(){return(static_cast<unsigned long>(uxas::common::utilities::c_TimeUtilities::uiGetTimeSinceStart_s()*1000.0));};
 float radians(float fArgument){return(fArgument*n_Const::c_Convert::dDegreesToRadians());};
 float degrees(float fArgument){return(fArgument*n_Const::c_Convert::dRadiansToDegrees());};
