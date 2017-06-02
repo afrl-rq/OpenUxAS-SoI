@@ -71,11 +71,11 @@ namespace service
      **/
     UxASMadaraTransport (const std::string & id,
       transport::TransportSettings & new_settings,
-      knowledge::KnowledgeBase & context)
+      knowledge::KnowledgeBase & knowledge)
     : transport::Base (id, new_settings, knowledge.get_context ())
     {
       // populate variables like buffer_ based on transport settings
-      Base::setup ();
+      transport::Base::setup ();
     }
 
     /**
@@ -127,7 +127,7 @@ GamsService::configure(const pugi::xml_node& ndComponent)
     // and load algorithms
     
     // attach the MadaraTransport for knowledge modifications to UxAS messages
-    s_knowledgeBase.attach (
+    s_knowledgeBase.attach_transport (
       new UxASMadaraTransport (uniqueId, transportSettings, s_knowledgeBase));
     
     
@@ -201,7 +201,7 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
             sendMonitor, receiveMonitor, rebroadcastRecords,
             onDataReceived,
             printPrefix,
-            receivedLmcpMessage.m_attributes.getSourceEntityId ().c_str (),
+            receivedLmcpMessage->m_attributes.getSourceEntityId ().c_str (),
             header);
     }
     
