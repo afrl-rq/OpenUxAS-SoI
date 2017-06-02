@@ -60,54 +60,69 @@ namespace service
   /**
    * Transport for UxAS GamsService to convert knowledge to UxAS Messages
    **/
-  class UxASMadaraTransport : public madara::transport::Base
+  class UxASMadaraTransport : public transport::Base
   {
   public:
-    /**
-     * Constructor
-     * @param   id                unique identifier (generally host:port)
-     * @param   new_settings      settings to apply to the transport
-     * @param   context           the knowledge record context
-     **/
-    UxASMadaraTransport (const std::string & id,
-      transport::TransportSettings & new_settings,
-      knowledge::KnowledgeBase & knowledge)
-    : transport::Base (id, new_settings, knowledge.get_context ())
-    {
-      // populate variables like buffer_ based on transport settings
-      transport::Base::setup ();
-    }
+      /**
+       * Constructor
+       * @param   id                unique identifier (generally host:port)
+       * @param   new_settings      settings to apply to the transport
+       * @param   context           the knowledge record context
+       * @param   service           the calling GamsService
+       **/
+      UxASMadaraTransport (const std::string & id,
+        transport::TransportSettings & new_settings,
+        knowledge::KnowledgeBase & knowledge,
+        GamsService * service)
+      : transport::Base (id, new_settings, knowledge.get_context ()),
+        m_service (service)
+      {
+        // populate variables like buffer_ based on transport settings
+        transport::Base::setup ();
+      }
 
-    /**
-     * Destructor
-     **/
-    virtual ~UxASMadaraTransport ()
-    {
-        
-    }
+      /**
+       * Destructor
+       **/
+      virtual ~UxASMadaraTransport ()
+      {
+
+      }
     
-    /**
-     * Sends a list of updates to the UxAS system
-     * @param  modifieds  a list of keys to values of all records that have
-     *          been updated and could be sent.
-     * @return  result of operation or -1 if we are shutting down
-     **/
-    long send_data (const knowledge::KnowledgeRecords & modifieds)
-    {
       /**
-       * Return number of bytes sent or negative for error
+       * Sends a list of updates to the UxAS system
+       * @param  modifieds  a list of keys to values of all records that have
+       *          been updated and could be sent.
+       * @return  result of operation or -1 if we are shutting down
        **/
-      long result (0);
+      virtual long send_data (const knowledge::KnowledgeRecords & modifieds)
+      {
+        ///Return number of bytes sent or negative for error
+        long result (0);
+        
+        /// Prefix for printing purposes in madara logger
+        const char * printPrefix = "UxASMadaraTransport::send_data";
 
-      /**
-       * This is where you should do your custom transport sending logic/actions
-       **/
+        /// prepare the buffer for sending by filling in all modifieds
+        result = prep_send (modifieds, printPrefix);
 
-      return result;
-    }
+        /// if the service exists (which it should), send the MadaraState
+        if (m_service)
+        {
+            m_service->sendBuffer(buffer_.get (), (size_t)result);
+            
+            /// add the bytes sent to the send bandwidth monitor
+            send_monitor_.add ((uint32_t)result);
+        }
+
+        /// return the buffer size that was sent
+        return result;
+      }
     
   protected:
       
+      /// handle to the GamsService so we can use sendBuffer
+      GamsService * m_service;
   };
     
     
@@ -128,7 +143,8 @@ GamsService::configure(const pugi::xml_node& ndComponent)
     
     // attach the MadaraTransport for knowledge modifications to UxAS messages
     s_knowledgeBase.attach_transport (
-      new UxASMadaraTransport (uniqueId, transportSettings, s_knowledgeBase));
+      new UxASMadaraTransport (m_uniqueId, m_transportSettings, s_knowledgeBase,
+            this));
     
     
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
@@ -151,6 +167,32 @@ GamsService::terminate()
 {
 
     return true;
+}
+
+
+void
+GamsService::sendBuffer (char * buffer, size_t length)
+{
+    uxas::madara::MadaraState * newMessage = new uxas::madara::MadaraState ();
+    
+    // @DEREK
+    // MadaraState has declared __Contents as protected and there is no
+    // setter. How am I supposed to get my buffer to the MadaraState message?
+    // In KeyValue pair, there appears to be a generated setter. How do I get
+    // this for a byte array as we do in MadaraState?
+    
+    std::vector <uint8_t> contents;
+    contents.resize (length);
+    for (size_t i = 0; i < length; ++i)
+    {
+        contents[i] = (uint8_t)buffer[i];
+    }
+    
+    // we should be able to set the contents, otherwise, no way to create
+    // message
+    newMessage->setContents (contents);
+    
+    this->sendLmcpObjectBroadcastMessage(newMessage);
 }
 
 bool
@@ -195,16 +237,16 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
         
         transport::process_received_update (buffer,
             (ssize_t)bufferVector.size (),
-            uniqueId,
-            *context,
-            transportSettings,
-            sendMonitor, receiveMonitor, rebroadcastRecords,
-            onDataReceived,
+            m_uniqueId,
+            *m_context,
+            m_transportSettings,
+            m_sendMonitor, m_receiveMonitor, rebroadcastRecords,
+            m_onDataReceived,
             printPrefix,
-            receivedLmcpMessage->m_attributes.getSourceEntityId ().c_str (),
+            receivedLmcpMessage->m_attributes->getSourceEntityId ().c_str (),
             header);
     }
-    
+
     return false;
 };
 

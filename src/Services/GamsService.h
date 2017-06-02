@@ -103,6 +103,16 @@ public:
     /** knowledge base pre-configured with UxAS integration **/
     static ::madara::knowledge::KnowledgeBase s_knowledgeBase;
     
+    /**
+     * Sends a MadaraState message through the existing UxAS system. This
+     * is extremely dirty, but I need a way to interact from the
+     * UxASMadaraTransport, and I can't think of a different way to
+     * interact with the sendLmcpObjectBroadcastMessage protected function.
+     * @param  buffer    encoded MADARA character buffer
+     * @param  length    length of the character buffer in bytes
+     **/
+    void sendBuffer (char * buffer, size_t length);
+    
 private:
 
     static
@@ -130,25 +140,25 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
     /// unique agent id (by default generated from ephemeral bindings)
-    std::string uniqueId;
+    std::string m_uniqueId;
     
     /// transport settings 
-    madara::transport::QoSTransportSettings transportSettings;
+    madara::transport::QoSTransportSettings m_transportSettings;
     
     /// convenience handle to the thread safe context in the knowledge base
-    madara::knowledge::ThreadSafeContext * context;
+    madara::knowledge::ThreadSafeContext * m_context;
     
     /// data received rules, defined in Transport settings
-    madara::knowledge::CompiledExpression  onDataReceived;
+    madara::knowledge::CompiledExpression  m_onDataReceived;
       
     /// monitor for sending bandwidth usage
-    madara::transport::BandwidthMonitor   sendMonitor;
+    madara::transport::BandwidthMonitor   m_sendMonitor;
       
     /// monitor for receiving bandwidth usage
-    madara::transport::BandwidthMonitor   receiveMonitor;
+    madara::transport::BandwidthMonitor   m_receiveMonitor;
 
     /// scheduler for mimicking target network conditions
-    madara::transport::PacketScheduler    packetScheduler;
+    madara::transport::PacketScheduler    m_packetScheduler;
 };
 
 }; //namespace service
