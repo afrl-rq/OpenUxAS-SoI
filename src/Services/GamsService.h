@@ -22,6 +22,8 @@
 #include "TypeDefs/UxAS_TypeDefs_String.h"
 #include "CallbackTimer.h"
 
+#include "madara/knowledge/KnowledgeBase.h"
+
 
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/TurnType.h"
@@ -36,7 +38,8 @@ namespace service
 
 
 /*! \class GamsService
- *   \brief A service that provides interfaces to GAMS and MADARA middlewares.
+ *   \brief A service that provides interfaces to a GAMS-compliant
+ *          MADARA knowledge base.
  *
  * 
  * 
@@ -49,12 +52,13 @@ namespace service
  * Subscribed Messages:
  *  - afrl::cmasi::AirVehicleState
  *  - afrl::cmasi::GroundVehicleState
+ *  - uxas::madara::MadaraState
  * 
  * Sent Messages:
  *  - afrl::cmasi::AirVehicleState
  *  - afrl::cmasi::GroundVehicleState
  *  - afrl::cmasi::MissionCommand
- * 
+ *  - uxas::madara::MadaraState
  */
 
 
@@ -95,6 +99,10 @@ public:
     virtual
     ~GamsService();
 
+    
+    /** knowledge base pre-configured with UxAS integration **/
+    static ::madara::knowledge::KnowledgeBase s_knowledgeBase;
+    
 private:
 
     static
@@ -121,6 +129,26 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
+    /// unique agent id (by default generated from ephemeral bindings)
+    std::string uniqueId;
+    
+    /// transport settings 
+    madara::transport::QoSTransportSettings transportSettings;
+    
+    /// convenience handle to the thread safe context in the knowledge base
+    madara::knowledge::ThreadSafeContext * context;
+    
+    /// data received rules, defined in Transport settings
+    madara::knowledge::CompiledExpression  onDataReceived;
+      
+    /// monitor for sending bandwidth usage
+    madara::transport::BandwidthMonitor   sendMonitor;
+      
+    /// monitor for receiving bandwidth usage
+    madara::transport::BandwidthMonitor   receiveMonitor;
+
+    /// scheduler for mimicking target network conditions
+    madara::transport::PacketScheduler    packetScheduler;
 };
 
 }; //namespace service
