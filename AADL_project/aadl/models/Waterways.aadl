@@ -505,7 +505,7 @@ public
     	properties
     		UxAS_Props::OS => Linux;
         annex resolute {**
-            prove might_be_schedulable(this)
+        	prove rate_monotonic_schedulable()
             prove isolation(this) 
         **};
             

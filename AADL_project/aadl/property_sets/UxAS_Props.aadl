@@ -8,7 +8,5 @@ property set UxAS_Props is
     
     OS : UxAS_Props::OS_Type applies to (all);
     
-    Interarrival_Time : Time applies to (thread);
-    
 
 end UxAS_Props;
