@@ -48,8 +48,8 @@ incs_services = [
     '../../3rd/zlib-1.2.8/contrib/minizip',
     '../../3rd/zlib-1.2.8',
     ace_root,
-    madara_root,
-    gams_root,
+    madara_root + '/include',
+    gams_root + '/src',
   ),
   incs_lmcp,
 ]
