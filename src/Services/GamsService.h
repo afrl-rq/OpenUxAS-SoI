@@ -23,6 +23,10 @@
 #include "CallbackTimer.h"
 
 #include "madara/knowledge/KnowledgeBase.h"
+#include "madara/threads/Threader.h"
+#include "gams/controllers/BaseController.h"
+#include "gams/pose/GPSFrame.h"
+#include "gams/pose/CartesianFrame.h"
 
 
 #include "afrl/cmasi/Waypoint.h"
@@ -113,6 +117,19 @@ public:
      **/
     void sendBuffer (char * buffer, size_t length);
     
+    /**
+     * Retrieves the UxAS platform for GAMS interactions
+     * @return if non-zero, the valid UxAS platform 
+     */
+    gams::platforms::BasePlatform * getPlatform (void);
+    
+    /**
+     * Sets the logic rate and update send rate.
+     * @param hertz      the hertz to execute logic at
+     * @param sendHertz  the hertz to send updates at
+     **/
+    void controllerRun (double hertz, double sendHertz);
+    
 private:
 
     static
@@ -159,6 +176,11 @@ private:
 
     /// scheduler for mimicking target network conditions
     madara::transport::PacketScheduler    m_packetScheduler;
+    
+    /// controller for GAMS agent
+    gams::controllers::BaseController *   m_controller;
+    
+    madara::threads::Threader m_threader;
 };
 
 }; //namespace service
