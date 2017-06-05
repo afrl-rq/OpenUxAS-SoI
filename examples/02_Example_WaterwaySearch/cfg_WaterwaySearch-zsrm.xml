@@ -16,14 +16,14 @@
     <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"
-	     zsPeriodSecs="0" zsPeriodNsecs = "100000000" zsZeroSlackSecs="1" zsZeroSlackNsecs="0"
-	     zsNominalWCETSecs="0" zsNominalWCETNsecs="10000000" zsOverloadWCETSecs="0" zsOverloadWCETNsecs="10000000"
+	     zsPeriodSecs="0" zsPeriodNsecs = "500000000" zsZeroSlackSecs="1" zsZeroSlackNsecs="0"
+	     zsNominalWCETSecs="0" zsNominalWCETNsecs="100000000" zsOverloadWCETSecs="0" zsOverloadWCETNsecs="100000000"
 	     zsCriticality="1"/>
     <Service Type="WaypointPlanManagerService" VehicleID="500" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"
-	     zsPeriodSecs="0" zsPeriodNsecs = "100000000" zsZeroSlackSecs="1" zsZeroSlackNsecs="0"
-	     zsNominalWCETSecs="0" zsNominalWCETNsecs="10000000" zsOverloadWCETSecs="0" zsOverloadWCETNsecs="10000000"
+	     zsPeriodSecs="0" zsPeriodNsecs = "500000000" zsZeroSlackSecs="1" zsZeroSlackNsecs="0"
+	     zsNominalWCETSecs="0" zsNominalWCETNsecs="100000000" zsOverloadWCETSecs="0" zsOverloadWCETNsecs="100000000"
 	     zsCriticality="1"/>
     <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">

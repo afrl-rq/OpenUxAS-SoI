@@ -555,10 +555,10 @@ private:
     
 public:
     void 
-    budget_enforcement_handler(int rid);
+    zs_budget_enforcement_handler(int rid);
     
     void
-    set_budget_reservation_parameters(
+    zs_set_budget_reservation_parameters(
     long period_secs,
     long period_nsecs,
     long zero_slack_secs,

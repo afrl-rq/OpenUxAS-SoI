@@ -420,6 +420,96 @@ ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node&
     if (newService)
     {
         LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully instantiated ", newService->m_serviceType, " service ID ", newService->m_networkId, " and work directory name [", newService->m_workDirectoryName, "]");
+        // TODO: extract time enforcement parameters from XML string and call 'zs_set_budget_reservation_parameters'
+        
+        /* ZSRM extraction parameters
+         */
+        int64_t zsPeriod_secs = 0;
+        int64_t zsPeriod_nsecs = 0;
+        int64_t zsZeroSlack_secs = 0;
+        int64_t zsZeroSlack_nsecs = 0;
+        int64_t zsNominalWCET_secs =0;
+        int64_t zsNominalWCET_nsecs = 0;
+        int64_t zsOverloadWCET_secs = 0;
+        int64_t zsOverloadWCET_nsecs = 0;
+        int32_t zsCriticality = 0;
+        bool isReserveEnabled = false;
+
+        if (!serviceXmlNode.attribute("zsPeriodSecs").empty())
+        {
+            zsPeriod_secs = serviceXmlNode.attribute("zsPeriodSecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsPeriodNsecs").empty())
+        {
+            zsPeriod_nsecs = serviceXmlNode.attribute("zsPeriodNsecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsZeroSlackSecs").empty())
+        {
+            zsZeroSlack_secs = serviceXmlNode.attribute("zsZeroSlackSecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsZeroSlackNsecs").empty())
+        {
+            zsZeroSlack_nsecs = serviceXmlNode.attribute("zsZeroSlackNsecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsNominalWCETSecs").empty())
+        {
+            zsNominalWCET_secs = serviceXmlNode.attribute("zsNominalWCETSecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsNominalWCETNsecs").empty())
+        {
+            zsNominalWCET_nsecs = serviceXmlNode.attribute("zsNominalWCETNsecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsOverloadWCETSecs").empty())
+        {
+            zsOverloadWCET_secs = serviceXmlNode.attribute("zsOverloadWCETSecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsOverloadWCETNsecs").empty())
+        {
+            zsOverloadWCET_nsecs = serviceXmlNode.attribute("zsOverloadWCETNsecs").as_int64();
+            isReserveEnabled=true;
+        }
+        if (!serviceXmlNode.attribute("zsCriticality").empty())
+        {
+            zsCriticality = serviceXmlNode.attribute("zsCriticality").as_int();
+            isReserveEnabled=true;
+        }
+
+        if (isReserveEnabled){
+            if ( (zsPeriod_secs != 0       || zsPeriod_nsecs != 0) && 
+                 (zsZeroSlack_secs !=0     || zsZeroSlack_nsecs != 0) &&
+                 (zsOverloadWCET_secs != 0 || zsOverloadWCET_nsecs != 0) && 
+                 (zsNominalWCET_secs != 0  || zsNominalWCET_nsecs != 0) &&
+                  zsCriticality >0 ){
+                newService->zs_set_budget_reservation_parameters(zsPeriod_secs,
+                                                                 zsPeriod_nsecs,
+                                                                 zsZeroSlack_secs,
+                                                                 zsZeroSlack_nsecs,
+                                                                 zsNominalWCET_secs,
+                                                                 zsNominalWCET_nsecs,
+                                                                 zsOverloadWCET_secs,
+                                                                 zsOverloadWCET_nsecs,
+                                                                 zsCriticality);
+            } else {
+                std::cout << "Wrong ZSRM Reservation Parameters: \n" <<
+                        "PeriodSecs: " << zsPeriod_secs << "\n" <<
+                        "PeriodNsecs: " << zsPeriod_nsecs << "\n" <<
+                        "ZeroSlackSecs: " << zsZeroSlack_secs << "\n" <<
+                        "ZeroSlackNsecs: " << zsZeroSlack_nsecs << "\n" <<
+                        "OverloadWCETsecs: " << zsOverloadWCET_secs << "\n" <<
+                        "OverloadWCETnsecs: " << zsOverloadWCET_nsecs << "\n" <<
+                        "NominalWCETsecs: " << zsNominalWCET_secs << "\n" <<
+                        "NominalWCETnsecs: " << zsNominalWCET_nsecs << "\n" <<
+                        "Criticality: " << zsCriticality << "\n";
+            }
+        }
+        
         if (newService->configureService(uxas::common::ConfigurationManager::getInstance().getRootDataWorkDirectory(), serviceXmlNode))
         {
             //TODO - consider friend of clientBase (protect m_entityId and m_entityIdString)
@@ -451,6 +541,8 @@ ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node&
                 LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService re-configuring ", newService->m_networkClientTypeName, " entity ID ", newService->m_entityId, " service ID ", newService->m_networkId);
             }
             LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully configured ", newService->m_networkClientTypeName, " entity ID ", newService->m_entityId, " service ID ", newService->m_networkId);
+            // ZSRM: initializeAndStartService() calls LmcpObjectNetworkClientBase.initializeAndStart() 
+            //       which calls LmcpNetworkClientBase.initializeNetworkClient() that has the calls to create the reserve 
             if (newService->initializeAndStartService())
             {
                 newServiceFinal = std::move(newService);

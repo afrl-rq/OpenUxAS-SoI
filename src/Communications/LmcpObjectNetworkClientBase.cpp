@@ -30,7 +30,7 @@ namespace
 {
     void zs_budget_enforcement_helper(void *param, int rid)
     {
-        (static_cast<uxas::communications::LmcpObjectNetworkClientBase*>(param))->budget_enforcement_handler(rid);
+        (static_cast<uxas::communications::LmcpObjectNetworkClientBase*>(param))->zs_budget_enforcement_handler(rid);
     }
 }
 
@@ -320,10 +320,9 @@ LmcpObjectNetworkClientBase::initializeNetworkClient()
             std::cout << "error calling create reserve\n";
         }
 
-    
-        if (zsv_fork_enforcement_handler(zs_schedfd,zs_rid,zs_budget_enforcement_helper,this)<0){
-            std::cout << "::initializesendAddressedAttributedMessageNetworkClient method COULD NOT REGISTER budget enforcement handler helper\n" ;
-        }
+//        if (zsv_fork_enforcement_handler(zs_schedfd,zs_rid,zs_budget_enforcement_helper,this)<0){
+//            std::cout << "::initializesendAddressedAttributedMessageNetworkClient method COULD NOT REGISTER budget enforcement handler helper\n" ;
+//        }
     }
     
     return (true);
@@ -337,6 +336,10 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
         LOG_DEBUGGING(m_networkClientTypeName, "::executeNetworkClient method START");
         LOG_DEBUGGING(m_networkClientTypeName, "::executeNetworkClient method START infinite while loop");
         m_isThreadStarted = true;
+
+        // ZSRM debug
+        std::cout << "Started tid(" << gettid() << ")\n";
+
         while (!m_isTerminateNetworkClient)
         {
             try
@@ -344,18 +347,48 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
                 // The first time we do not call wait for period but let the task wait for the first 
                 // message, this way we "sync" the wait for next period with the message sender
                 if (zs_isReservationEnabled && zs_isReserveAttached){
-                    zsv_wait_period(zs_schedfd,zs_rid);
+                    std::cout << "Calling end_period tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;
+                    zsv_end_period(zs_schedfd,zs_rid);
+                    //zsv_wait_period(zs_schedfd,zs_rid);
                 }
                 // get the next LMCP message (if any) from the LMCP network server
                 LOG_DEBUG_VERBOSE_MESSAGING(m_networkClientTypeName, "::executeNetworkClient calling m_lmcpObjectMessageReceiverPipe.getNextMessageObject()");
-                std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage
-                        = m_lmcpObjectMessageReceiverPipe.getNextMessageObject();
-                if (zs_isReservationEnabled && !zs_isReserveAttached){
-                    // attach it for the first time
-                      if (zsv_attach_reserve(zs_schedfd, gettid(), zs_rid)<0){
+                std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage;
+                // ZSRM: loop while we keep being enforced
+                bool zsInterruptionException =false;
+                do {
+                    zsInterruptionException = false;
+                    try
+                    {
+                        //std::unique_ptr<uxas::communications::data::LmcpMessage> 
+                        receivedLmcpMessage
+                            = m_lmcpObjectMessageReceiverPipe.getNextMessageObject();
+                    } 
+                    catch (std::exception& intrException)
+                    {
+                        std::string exName = std::string(intrException.what());
+                        if (exName == "Interrupted system call"){
+                            zsInterruptionException = true;
+                        } else {
+                            // not the exception we are interested in
+                            // keep propagating
+                            throw intrException;
+                        }
+                        zsInterruptionException = true;
+                    }
+                } while (zsInterruptionException);
+                if (zs_isReservationEnabled){
+                    if (!zs_isReserveAttached){
+                        // attach it for the first time
+                        if (zsv_attach_reserve(zs_schedfd, gettid(), zs_rid)<0){
                           std::cout << "Error attaching the reserve \n";
-                      }
-                      zs_isReserveAttached = true;
+                        }
+                        zs_isReserveAttached = true;
+                        std::cout << "Attached reserved rid("<<zs_rid<<") \n";
+                    } else {
+                        std::cout << "Calling wait_release tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;    
+                        zsv_wait_release(zs_schedfd,zs_rid);
+                    }
                 }
                 LOG_DEBUG_VERBOSE_MESSAGING(m_networkClientTypeName, "::executeNetworkClient completed calling m_lmcpObjectMessageReceiverPipe.getNextMessageObject()");
 
@@ -384,6 +417,9 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
                 LOG_ERROR(m_networkClientTypeName, "::executeNetworkClient continuing infinite while loop after EXCEPTION: ", ex.what());
             }
         }
+        
+        // ZSRM debug
+        std::cout << "Finished tid(" << gettid() << ")\n";
         
         LOG_DEBUGGING(m_networkClientTypeName, "::executeNetworkClient method END infinite while loop");
 
@@ -584,11 +620,11 @@ LmcpObjectNetworkClientBase::sendSharedLmcpObjectLimitedCastMessage(const std::s
  * ZSRM methods
  */
 void
-LmcpObjectNetworkClientBase::budget_enforcement_handler(int rid)
+LmcpObjectNetworkClientBase::zs_budget_enforcement_handler(int rid)
 {    
 }
 
-void LmcpObjectNetworkClientBase::set_budget_reservation_parameters(
+void LmcpObjectNetworkClientBase::zs_set_budget_reservation_parameters(
                                             long period_secs,
                                             long period_nsecs,
                                             long zero_slack_secs,
