@@ -1,7 +1,7 @@
 package Resolute
 public
     annex resolute {**
-       
+
        rate_monotonic_schedulable() <=
        	**"All threads are rate-monotonic schedulable"**
        	rms_well_formed() and
@@ -12,6 +12,8 @@ public
        		** "All threads combine to satisfy the rate-monotonic schedulability property: the sum of max_compute_time/period for all threads is <= 0.693147" **
        		sum({upper_bound(property(t,Compute_Execution_Time))/property(t,Period) for (t: thread)}) <= 0.693147
        	 
+       	 --Note: This goal checks all threads that are defined in the project (potentially including threads that are not yet used/connected). 
+       	 -- In principle, all defined threads should be used, but it is generally possible this analysis, being based on all threads, is overly sound. 
    		rms_well_formed() <=
    			** "All threads have the appropriate and consistent properties for rate-monotonic schedulability." **
    			forall(t : thread) .
@@ -19,7 +21,7 @@ public
    					and is_computation_bound(t)
    					and has_rms_consistent_deadline(t)
    					and not_prioritized(t))
-   				
+   					
    		--Note: we could check that any static priority is consistent with RMS
    		--But that seems unnecessarily difficult, i.e., by including a priority in the model
    		--it likely suggests a problem that should be addressed, and we should opt to flag it

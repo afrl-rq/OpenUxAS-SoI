@@ -35,6 +35,19 @@ public
             CreateNewService_out: out event data port uxnative::CreateNewService.i;
     	properties
     		Dispatch_Protocol => Sporadic;
+    		
+    	annex agree{**
+    		
+    		guarantee "Upon reception of a Task message, it will send the appropriate CreateNewService message." :
+    			event(Task_in) => 
+    				event(CreateNewService_out);
+    				
+    		guarantee "When TaskManagerService receives a RemoveTasks message, it will form the appropriate KillService 
+    			message to properly destroy the service that was created to fulfill the original Task.":
+    			event(RemoveTasks_in) =>
+    				true; --TBD
+    	**};
+    	
     end TaskManagerService;
 
     thread AutomationRequestValidatorService
@@ -74,7 +87,104 @@ public
             UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
         properties
             Dispatch_Protocol => Sporadic;
+            
+            
+        annex agree {**
+        --Questions: 
+        	--Is the system idle when waiting for a response?
+        		--Busy defined with respect to "servicing" a request, not the queue size? 
+        	--Does the system move on to the next task before receiving a response? 
+        	--Is it possible to recieve a response that does not match the request? 
+        		--Is this an error? 
+        	--What is an error message?
+        		
+        	const IDLE : int = 0;
+        	const BUSY : int = 1;
+        	
+        	eq timer : int;
+        	eq timeout_val : int;
+        	eq timeout_option : bool;
+        	eq state : int;
+    		
+        	-- a non-deterministic variable used to model whether or not 
+        	-- the requested task, vehicle, or operating region has been defined.
+        	eq taskVehicleOrRegionIsDefined : bool;
+        	
+        	eq numTasksInQ : int;
+        	
+        	guarantee "Initially the task queue is empty" :
+        		numTasksInQ = 0 -> true;
+	
+			guarantee "Implied Spec: Initially, the service is idle" :
+				state = IDLE -> true;
+				
+			--TODO make error message a new variable. 
+        	
+        	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
+        		pre(event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined) => 
+        			event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2 and numTasksInQ = pre(numTasksInQ);
+        			--TODO: apparently the code sets the status type to "information" rather than "error"
+        		
+        	--Note: the original wording of this guarantee implies the unique automation request is only sent
+        	--out when the system is IDLE. I am manually altering the original "spec" to speak to what I believe
+        	--was intended
+        	guarantee "if automation request is received and resource is defined produce unique automation request": true ->
+--        	    pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
+--        	    	state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
+        	    	if pre(state = IDLE) then 
+        	    		event(UniqueAutomationRequest_out) and state = BUSY --and numTasksInQ = 0
+        	    	else --state = BUSY
+        	    	   state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
+        	    	   
+        	--Note: forcing an incrementing timer for now
+        	guarantee "Service includes an optional timeout. When a UniqueAutomationRequest is published, a timer begins" : true ->
+        		timeout_option => 
+        			if event(UniqueAutomationRequest_out) or 
+        				state=IDLE or 
+        				(event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = pre(UniqueAutomationRequest_out.RequestID)) then
+        				timer = 0
+        			else 
+        				timer > pre(0->timer);
+        				
+        				
+        	guarantee "Implied Requirement: process next message only if IDLE or a response has been received":
+        		((state= BUSY and event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = pre(UniqueAutomationRequest_out.RequestID)) or
+        		(state=BUSY and timeout_option and timeout_val=timer)) =>
+        			if numTasksInQ > 0 then
+        				event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1
+        			else
+        				state = IDLE;   	
+        	
+        	--TODO: unclear if ths is the error message behavior specified
+        	guarantee "task receives error message behavior" : true ->
+        		pre(event(UniqueAutomationResponse_in)) => 
+        			((event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2) or
+        			(not event(ServiceStatus_out))) and
+        			numTasksInQ = pre(numTasksInQ) - 1;
+        			
+        	--Cannot formalize in AGREE
+        	guarantee "The request ID of unique automation responses are unique" :
+        		true;
+        		
+	
+        	--Not sure if there is a way to model this property in agree
+        	guarantee "tasks are fed into 'the system' one at a time" : 
+        		true;
+        			
+        **};
     end AutomationRequestValidatorService;
+    
+    thread implementation AutomationRequestValidatorService.impl
+    	annex agree {**
+    		lemma "It is not possible to have a negative number of tasks queued" : 
+    		numTasksInQ >= 0;
+    		
+    		lemma "There are only two system states (busy and idle)" :
+    		state = BUSY or state = IDLE;
+
+    	**};
+    	
+    end AutomationRequestValidatorService.impl;
 
     thread RoutePlannerVisibilityService
         features
@@ -505,6 +615,7 @@ public
     	properties
     		UxAS_Props::OS => Linux;
         annex resolute {**
+        	--TODO: can we have resolute provide a complete enuemration of everything that is and is not verifiable. 
         	prove rate_monotonic_schedulable()
             prove isolation(this) 
         **};
