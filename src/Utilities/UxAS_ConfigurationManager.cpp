@@ -130,7 +130,7 @@ ConfigurationManager::loadXml(const std::string& xml, bool isFile, bool isBaseXm
 #ifdef DEBUG_VERBOSE_LOGGING_ENABLED
         std::stringstream baseXmlNd{""};
         m_baseXmlDoc.print(baseXmlNd);
-        LOG_DEBUG_VERBOSE(s_typeName(), "::loadXml loaded base XML ", baseXmlNd.str());
+        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::loadXml loaded base XML ", baseXmlNd.str());
 #endif
     }
 
@@ -148,7 +148,7 @@ ConfigurationManager::loadXml(const std::string& xml, bool isFile, bool isBaseXm
 
     if (isSuccess)
     {
-        LOG_INFORM(s_typeName(), "::loadXml loaded ", (isBaseXml ? "base" : "extension"), " XML ", (isFile ? "file " : "string "), xml);
+        UXAS_LOG_INFORM(s_typeName(), "::loadXml loaded ", (isBaseXml ? "base" : "extension"), " XML ", (isFile ? "file " : "string "), xml);
     }
     else
     {
@@ -156,7 +156,7 @@ ConfigurationManager::loadXml(const std::string& xml, bool isFile, bool isBaseXm
         {
             m_isBaseXmlDocLoaded = false;
         }
-        LOG_ERROR(s_typeName(), "::loadXml failed to load ", (isBaseXml ? "base" : "extension"), " XML ", (isFile ? "file " : "string "), xml);
+        UXAS_LOG_ERROR(s_typeName(), "::loadXml failed to load ", (isBaseXml ? "base" : "extension"), " XML ", (isFile ? "file " : "string "), xml);
     }
     return (isSuccess);
 };
@@ -169,8 +169,8 @@ ConfigurationManager::getDefaultServiceXmlNode(const std::string& serviceType)
     {
         for (pugi::xml_node childNode = m_baseXmlDoc.child(StringConstant::UxAS().c_str()).first_child(); childNode; childNode = childNode.next_sibling())
         {
-            LOG_DEBUG_VERBOSE(s_typeName(), "::getDefaultServiceXmlNode childNode.name() ", childNode.name());
-            LOG_DEBUG_VERBOSE(s_typeName(), "::getDefaultServiceXmlNode childNode.attribute(StringConstant::Type().c_str()).value() ", childNode.attribute(StringConstant::Type().c_str()).value());
+            UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::getDefaultServiceXmlNode childNode.name() ", childNode.name());
+            UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::getDefaultServiceXmlNode childNode.attribute(StringConstant::Type().c_str()).value() ", childNode.attribute(StringConstant::Type().c_str()).value());
             if (StringConstant::Service().compare(childNode.name()) == 0
                     && (serviceType.empty()
                     || serviceType.compare(childNode.attribute(StringConstant::Type().c_str()).value()) == 0))
@@ -179,12 +179,12 @@ ConfigurationManager::getDefaultServiceXmlNode(const std::string& serviceType)
                 break;
             }
         }
-        LOG_INFORM(s_typeName(), "::getDefaultServiceXmlNode responding to ", serviceType, " XML request - returning:");
-        LOG_INFORM(svcXmlNode.str().empty() ? "\"\" (empty XML string)" : svcXmlNode.str());
+        UXAS_LOG_INFORM(s_typeName(), "::getDefaultServiceXmlNode responding to ", serviceType, " XML request - returning:");
+        UXAS_LOG_INFORM(svcXmlNode.str().empty() ? "\"\" (empty XML string)" : svcXmlNode.str());
     }
     else
     {
-        LOG_WARN(s_typeName(), "::getDefaultServiceXmlNode service XML node not available - base XML is not loaded!");
+        UXAS_LOG_WARN(s_typeName(), "::getDefaultServiceXmlNode service XML node not available - base XML is not loaded!");
     }
     return (svcXmlNode.str());
 };
@@ -202,7 +202,7 @@ ConfigurationManager::getEnabledBridges()
 #ifdef DEBUG_LOGGING_ENABLED
         std::stringstream bridgeXmlNd{""};
         m_enabledServicesXmlDoc.print(bridgeXmlNd);
-        LOG_DEBUGGING(s_typeName(), "::getEnabledBridges built bridge XML: ", bridgeXmlNd.str());
+        UXAS_LOG_DEBUGGING(s_typeName(), "::getEnabledBridges built bridge XML: ", bridgeXmlNd.str());
 #endif
     }
     return (m_enabledBridgesXmlDoc.child(uxas::common::StringConstant::UxAS().c_str()));
@@ -221,7 +221,7 @@ ConfigurationManager::getEnabledServices()
 #ifdef DEBUG_LOGGING_ENABLED
         std::stringstream svcXmlNd{""};
         m_enabledServicesXmlDoc.print(svcXmlNd);
-        LOG_DEBUGGING(s_typeName(), "::getEnabledServices built service XML: ", svcXmlNd.str());
+        UXAS_LOG_DEBUGGING(s_typeName(), "::getEnabledServices built service XML: ", svcXmlNd.str());
 #endif
     }
     return (m_enabledServicesXmlDoc.child(uxas::common::StringConstant::UxAS().c_str()));
@@ -244,7 +244,7 @@ ConfigurationManager::populateEnabledComponentXmlNode(pugi::xml_node& uxasNode, 
         {
             // add copy of base XML component node to the enabled XML
             pugi::xml_node newCmpntNode = uxasNode.append_copy(baseNode);
-//            LOG_DEBUGGING(s_typeName(), "::populateEnabledComponentXmlNode appended new copy of base ", cmpntType->first, " XML node");
+//            UXAS_LOG_DEBUGGING(s_typeName(), "::populateEnabledComponentXmlNode appended new copy of base ", cmpntType->first, " XML node");
         }
     }
 };
@@ -260,30 +260,30 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
         if (!entityInfoXmlNode.attribute(StringConstant::EntityID().c_str()).empty())
         {
             s_entityId = entityInfoXmlNode.attribute(StringConstant::EntityID().c_str()).as_uint();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set entity ID ", s_entityId);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set entity ID ", s_entityId);
         }
         else
         {
             isSuccess = false;
-            LOG_ERROR(s_typeName(), "::setEntityFromXmlNode failed to set entity ID from XML");
+            UXAS_LOG_ERROR(s_typeName(), "::setEntityFromXmlNode failed to set entity ID from XML");
         }
 
         if (isSuccess && !entityInfoXmlNode.attribute(StringConstant::EntityType().c_str()).empty())
         {
             s_entityType = entityInfoXmlNode.attribute(StringConstant::EntityType().c_str()).value();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set entity type ", s_entityType);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set entity type ", s_entityType);
         }
         else
         {
             isSuccess = false;
-            LOG_ERROR(s_typeName(), "::setEntityFromXmlNode failed to set entity type from XML");
+            UXAS_LOG_ERROR(s_typeName(), "::setEntityFromXmlNode failed to set entity type from XML");
         }
 
         if (isSuccess && !entityInfoXmlNode.attribute(StringConstant::ConsoleLoggerSeverityLevel().c_str()).empty())
         {
             bool isValidLogSeverityLevel{true};
             std::string consoleLoggerSeverityLevel = entityInfoXmlNode.attribute(StringConstant::ConsoleLoggerSeverityLevel().c_str()).value();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode processing ", StringConstant::ConsoleLoggerSeverityLevel(), " [", consoleLoggerSeverityLevel, "] from XML");
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode processing ", StringConstant::ConsoleLoggerSeverityLevel(), " [", consoleLoggerSeverityLevel, "] from XML");
             if (uxas::common::log::LogSeverityLevelString::LOGDEBUG().compare(consoleLoggerSeverityLevel) == 0)
             {
                 uxas::common::log::LogManager::getInstance().setLoggersSeverityLevelByName(uxas::common::log::ConsoleLogger::s_defaultUxasConsoleLoggerName(), uxas::common::log::LogSeverityLevel::UXASDEBUG);
@@ -306,23 +306,23 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
             }
             if (isValidLogSeverityLevel)
             {
-                LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set ", StringConstant::ConsoleLoggerSeverityLevel(), " [", consoleLoggerSeverityLevel, "] from XML");
+                UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set ", StringConstant::ConsoleLoggerSeverityLevel(), " [", consoleLoggerSeverityLevel, "] from XML");
             }
             else
             {
-                LOG_WARN(s_typeName(), "::setEntityFromXmlNode ignoring invalid ", StringConstant::ConsoleLoggerSeverityLevel(), " [", consoleLoggerSeverityLevel, "] from XML");
+                UXAS_LOG_WARN(s_typeName(), "::setEntityFromXmlNode ignoring invalid ", StringConstant::ConsoleLoggerSeverityLevel(), " [", consoleLoggerSeverityLevel, "] from XML");
             }
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default ", StringConstant::ConsoleLoggerSeverityLevel());
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default ", StringConstant::ConsoleLoggerSeverityLevel());
         }
 
         if (isSuccess && !entityInfoXmlNode.attribute(StringConstant::MainFileLoggerSeverityLevel().c_str()).empty())
         {
             bool isValidLogSeverityLevel{true};
             std::string mainFileLoggerSeverityLevel = entityInfoXmlNode.attribute(StringConstant::MainFileLoggerSeverityLevel().c_str()).value();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode processing ", StringConstant::MainFileLoggerSeverityLevel(), " [", mainFileLoggerSeverityLevel, "] from XML");
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode processing ", StringConstant::MainFileLoggerSeverityLevel(), " [", mainFileLoggerSeverityLevel, "] from XML");
             if (uxas::common::log::LogSeverityLevelString::LOGDEBUG().compare(mainFileLoggerSeverityLevel) == 0)
             {
                 uxas::common::log::LogManager::getInstance().setLoggersSeverityLevelByName(uxas::common::log::HeadLogDataDatabaseLogger::s_defaultUxasMainHeadLogDataDatabaseLoggerName(), uxas::common::log::LogSeverityLevel::UXASINFO); //info is lowest DB log level
@@ -349,46 +349,46 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
             }
             if (isValidLogSeverityLevel)
             {
-                LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set ", StringConstant::MainFileLoggerSeverityLevel(), " [", mainFileLoggerSeverityLevel, "] from XML");
+                UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set ", StringConstant::MainFileLoggerSeverityLevel(), " [", mainFileLoggerSeverityLevel, "] from XML");
             }
             else
             {
-                LOG_WARN(s_typeName(), "::setEntityFromXmlNode ignoring invalid ", StringConstant::MainFileLoggerSeverityLevel(), " [", mainFileLoggerSeverityLevel, "] from XML");
+                UXAS_LOG_WARN(s_typeName(), "::setEntityFromXmlNode ignoring invalid ", StringConstant::MainFileLoggerSeverityLevel(), " [", mainFileLoggerSeverityLevel, "] from XML");
             }
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default ", StringConstant::MainFileLoggerSeverityLevel());
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default ", StringConstant::MainFileLoggerSeverityLevel());
         }
 
         if (isSuccess && !entityInfoXmlNode.attribute(StringConstant::StartDelay_ms().c_str()).empty())
         {
             s_startDelay_ms = entityInfoXmlNode.attribute(StringConstant::StartDelay_ms().c_str()).as_uint();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set start delay milliseconds ", s_startDelay_ms);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set start delay milliseconds ", s_startDelay_ms);
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default start delay milliseconds ", s_startDelay_ms);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default start delay milliseconds ", s_startDelay_ms);
         }
 
         if (isSuccess && !entityInfoXmlNode.attribute(StringConstant::RunDuration_s().c_str()).empty())
         {
             s_runDuration_s = entityInfoXmlNode.attribute(StringConstant::RunDuration_s().c_str()).as_uint();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set run duration seconds ", s_runDuration_s);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode set run duration seconds ", s_runDuration_s);
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default run duration seconds ", s_runDuration_s);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default run duration seconds ", s_runDuration_s);
         }
 
         if (isSuccess && !entityInfoXmlNode.attribute(StringConstant::isLoggingThreadId().c_str()).empty())
         {
             s_isLoggingThreadId = entityInfoXmlNode.attribute(StringConstant::isLoggingThreadId().c_str()).as_bool();
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode setting isLoggingThreadId ", s_isLoggingThreadId);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode setting isLoggingThreadId ", s_isLoggingThreadId);
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default isLoggingThreadId ", s_isLoggingThreadId);
+            UXAS_LOG_INFORM(s_typeName(), "::setEntityFromXmlNode retained default isLoggingThreadId ", s_isLoggingThreadId);
         }
         uxas::common::log::LogManager::getInstance().m_isLoggingThreadId = s_isLoggingThreadId;
     }
@@ -481,19 +481,19 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 //        if (xmlParseSuccess)
 //        {
 ////            std::string xmlDocRootNm = xmlDoc.root().name();
-////            LOG_INFORM(s_typeName(), "::buildUxasMasterFile xmlDoc.root().name() ", xmlDoc.root().name());
+////            UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile xmlDoc.root().name() ", xmlDoc.root().name());
 //            pugi::xml_node uxasNode = xmlDoc.child(StringConstant::UxAS().c_str());
-//            LOG_INFORM(s_typeName(), "::buildUxasMasterFile uxasNode.name() ", uxasNode.name(), " FILE ", path); // GOOD
+//            UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile uxasNode.name() ", uxasNode.name(), " FILE ", path); // GOOD
 ////            pugi::xml_node t_cmpntsNode = uxasNode.child(StringConstant::Components().c_str());
-////            LOG_INFORM(s_typeName(), "::buildUxasMasterFile t_cmpntsNode.name() ", t_cmpntsNode.name(), " FILE ", path); // GOOD
+////            UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile t_cmpntsNode.name() ", t_cmpntsNode.name(), " FILE ", path); // GOOD
 ////            pugi::xml_node t_firstCmpntNode = t_cmpntsNode.first_child();
-////            LOG_INFORM(s_typeName(), "::buildUxasMasterFile t_firstCmpntNode.name() ", t_firstCmpntNode.name(), " FILE ", path); // GOOD
+////            UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile t_firstCmpntNode.name() ", t_firstCmpntNode.name(), " FILE ", path); // GOOD
 //            
 //            pugi::xml_node cmpntNodes = xmlDoc.child(StringConstant::UxAS().c_str()).child(StringConstant::Components().c_str());            
 //
 //            for (pugi::xml_node uxasChildNode = uxasNode.first_child(); uxasChildNode; uxasChildNode = uxasChildNode.next_sibling())
 //            {
-//                LOG_INFORM(s_typeName(), "::buildUxasMasterFile uxasChildNode.name() ", uxasChildNode.name(), " FILE ", path);
+//                UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile uxasChildNode.name() ", uxasChildNode.name(), " FILE ", path);
 ////                if (StringConstant::Components().compare(uxasChildNode.name()) == 0)
 ////                {
 //
@@ -516,7 +516,7 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 //                            //uniqueSingleCmpntXmlByType
 //                            cmpntTypes.emplace(cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
 //                            cmpntTypesStrStrm << cmpntsChildNode.attribute(StringConstant::Type().c_str()).value() << ",";
-//                            LOG_INFORM(s_typeName(), "::buildUxasMasterFile found type ", cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
+//                            UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile found type ", cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
 //                            auto unqCmpntTypeXml = uniqueSingleCmpntXmlByType.find(cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
 //                            if (unqCmpntTypeXml == uniqueSingleCmpntXmlByType.end())
 //                            {
@@ -538,12 +538,12 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 //                            if (cmpntXml == cmpntXmlByType.end()) // not expected
 //                            {
 //                                cmpntXmlByType.emplace(cmpntsChildNode.attribute(StringConstant::Type().c_str()).value(), svcXmlNode.str());
-//                                LOG_WARN(s_typeName(), "::buildUxasMasterFile unexpectedly found type ", cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
+//                                UXAS_LOG_WARN(s_typeName(), "::buildUxasMasterFile unexpectedly found type ", cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
 //                            }
 //                            else
 //                            {
 //                                cmpntXml->second = (cmpntXml->second + svcXmlNode.str());
-//                                LOG_INFORM(s_typeName(), "::buildUxasMasterFile appending XML for type ", cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
+//                                UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile appending XML for type ", cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
 //                            }
 //                            auto unqCmpntTypeXml = uniqueSingleCmpntXmlByType.find(cmpntsChildNode.attribute(StringConstant::Type().c_str()).value());
 //                            if (unqCmpntTypeXml == uniqueSingleCmpntXmlByType.end())
@@ -559,7 +559,7 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 //                        std::stringstream svcXmlNodeRaw{""};
 //                        cmpntsChildNode.print(svcXmlNodeRaw);
 //                        svcXmlNodeRaw; // << std::endl;
-//                        LOG_INFORM(s_typeName(), "::buildUxasMasterFile XML ", svcXmlNodeRaw.str());
+//                        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile XML ", svcXmlNodeRaw.str());
 //                    }
 //                }
 //                //                }
@@ -567,76 +567,76 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 //        }
 //        else
 //        {
-//            LOG_WARN(s_typeName(), "::buildUxasMasterFile failed to parse XML from ", path);
+//            UXAS_LOG_WARN(s_typeName(), "::buildUxasMasterFile failed to parse XML from ", path);
 //        }
 //    }
 // 
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY START ");
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY START ");
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY START ");
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component types ", cmpntTypesStrStrm.str());
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY START ");
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY START ");
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY START ");
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component types ", cmpntTypesStrStrm.str());
 //
-//    LOG_INFORM("");
+//    UXAS_LOG_INFORM("");
 //    
 //    for (auto itCmpntCnt = cmpntCntByType.cbegin(), itEndCmpntCnt = cmpntCntByType.cend(); itCmpntCnt != itEndCmpntCnt; itCmpntCnt++)
 //    {
-//        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component type ", itCmpntCnt->first, " occurrence count is ", itCmpntCnt->second);
+//        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component type ", itCmpntCnt->first, " occurrence count is ", itCmpntCnt->second);
 //    }
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY END ");
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY END ");
-//    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY END ");
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY END ");
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY END ");
+//    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML SUMMARY END ");
 //    
-//    LOG_INFORM("");
+//    UXAS_LOG_INFORM("");
 //    
 ////    std::unordered_map<std::string, uint32_t> uniqueCmpntXmlCnt;
 ////    for (auto itCmpntXml = cmpntXmlByType.cbegin(), itEndCmpntXml = cmpntXmlByType.cend(); itCmpntXml != itEndCmpntXml; itCmpntXml++)
 ////    {
-//////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML START START START for type ", itCmpntXml->first);
-//////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML START START START for type ", itCmpntXml->first);
-//////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML START START START for type ", itCmpntXml->first);
+//////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML START START START for type ", itCmpntXml->first);
+//////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML START START START for type ", itCmpntXml->first);
+//////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML START START START for type ", itCmpntXml->first);
 ////        auto uniqueCmpntXmlIt = uniqueCmpntXmlCnt.find(itCmpntXml->second);
 ////        if (uniqueCmpntXmlIt == uniqueCmpntXmlCnt.end())
 ////        {
 ////            uniqueCmpntXmlCnt.emplace(itCmpntXml->second, 1);
-////            LOG_INFORM(itCmpntXml->second);
+////            UXAS_LOG_INFORM(itCmpntXml->second);
 ////        }
 ////        else
 ////        {
 ////            uniqueCmpntXmlIt->second++;
 ////        }
-//////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML END END END ");
-//////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML END END END ");
-//////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML END END END ");
+//////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML END END END ");
+//////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML END END END ");
+//////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML END END END ");
 ////    }
 ////
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION START ");
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION START ");
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION START ");
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component types ", cmpntTypesStrStrm.str());
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION START ");
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION START ");
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION START ");
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component types ", cmpntTypesStrStrm.str());
 ////
-////    LOG_INFORM("");
+////    UXAS_LOG_INFORM("");
 ////    
 ////    for (auto itUniqueXmlCnt = uniqueCmpntXmlCnt.cbegin(), itUniqueXmlCntEnd = cmpntCntByType.cend(); itUniqueXmlCnt != itUniqueXmlCntEnd; itUniqueXmlCnt++)
 ////    {
-////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML unique occurrence count is ", itUniqueXmlCnt->second);
+////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML unique occurrence count is ", itUniqueXmlCnt->second);
 ////    }
-////    LOG_INFORM("");
+////    UXAS_LOG_INFORM("");
 ////    
 ////    for (auto itUniqueXmlCnt = uniqueCmpntXmlCnt.cbegin(), itUniqueXmlCntEnd = cmpntCntByType.cend(); itUniqueXmlCnt != itUniqueXmlCntEnd; itUniqueXmlCnt++)
 ////    {
-////        LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML unique occurrence count is ", itUniqueXmlCnt->second, " for XML ", itUniqueXmlCnt->first);
+////        UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML unique occurrence count is ", itUniqueXmlCnt->second, " for XML ", itUniqueXmlCnt->first);
 ////    }
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION END ");
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION END ");
-////    LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION END ");
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION END ");
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION END ");
+////    UXAS_LOG_INFORM(s_typeName(), "::buildUxasMasterFile component XML CONCLUSION END ");
 ////    
-////    LOG_INFORM("");
+////    UXAS_LOG_INFORM("");
 //
 //    for (auto _cTypeIt = uniqueSingleCmpntXmlByType.cbegin(), _cTypeItEnd = uniqueSingleCmpntXmlByType.cend(); _cTypeIt != _cTypeItEnd; _cTypeIt++)
 //    {
 //        for (auto _cTypeXmlIt = _cTypeIt->second.cbegin(), _cTypeXmlItEnd = _cTypeIt->second.cend(); _cTypeXmlIt != _cTypeXmlItEnd; _cTypeXmlIt++)
 //        {
-//            LOG_INFORM(_cTypeXmlIt->first);
+//            UXAS_LOG_INFORM(_cTypeXmlIt->first);
 //        }
 //    }
 //

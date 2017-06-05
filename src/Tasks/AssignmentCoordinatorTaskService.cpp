@@ -58,7 +58,7 @@ AssignmentCoordinatorTaskService::AssignmentCoordinatorTaskService()
 
 AssignmentCoordinatorTaskService::~AssignmentCoordinatorTaskService()
 {
-    LOG_INFORM_ASSIGNMENT(s_typeName(), "::~PisrTaskService()");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~PisrTaskService()");
 };
 
 bool
@@ -72,13 +72,13 @@ AssignmentCoordinatorTaskService::configureTask(const pugi::xml_node& ndComponen
         m_assignmentCoordinatorTask = std::static_pointer_cast<uxas::messages::task::AssignmentCoordinatorTask>(m_task);
         if (!m_assignmentCoordinatorTask)
         {
-            LOG_ERROR(s_typeName(), "::bConfigure failed to cast a AssignmentCoordinatorTaskService from the task pointer.");
+            UXAS_LOG_ERROR(s_typeName(), "::bConfigure failed to cast a AssignmentCoordinatorTaskService from the task pointer.");
             isSuccess = false;
         }
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::bConfigure failed: taskObject[", m_task->getFullLmcpTypeName(), "] is not a AssignmentCoordinatorTaskService.");
+        UXAS_LOG_ERROR(s_typeName(), "::bConfigure failed: taskObject[", m_task->getFullLmcpTypeName(), "] is not a AssignmentCoordinatorTaskService.");
         isSuccess = false;
     }
 
@@ -177,7 +177,7 @@ bool AssignmentCoordinatorTaskService::processReceivedLmcpMessageTask(std::share
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::HAVE NOT RECEIVED AN ENTITY STATE");
+            UXAS_LOG_ERROR(s_typeName(), "::HAVE NOT RECEIVED AN ENTITY STATE");
         }
         // SET the assignment timer to expire at current time + coordinatedAutomationRequest->getMaximumResponseTime();
 //        COUT_FILE_LINE_MSG("")
@@ -205,7 +205,7 @@ void AssignmentCoordinatorTaskService::CheckAssignmentReady(const int64_t& reque
     auto itCoordinationElements = m_requestIdVsCoordinationElements.find(requestId);
     if (itCoordinationElements == m_requestIdVsCoordinationElements.end())
     {
-        LOG_ERROR(s_typeName(), "::CheckOnAssignment::isAssignmentReady could not find requestId[", requestId, "]");
+        UXAS_LOG_ERROR(s_typeName(), "::CheckOnAssignment::isAssignmentReady could not find requestId[", requestId, "]");
     }
     else
     {

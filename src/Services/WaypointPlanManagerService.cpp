@@ -166,7 +166,7 @@ WaypointPlanManagerService::terminate()
     uint64_t delayTime_ms{1000};
     if (m_sendNewMissionTimerId && !uxas::common::TimerManager::getInstance().destroyTimer(m_sendNewMissionTimerId, delayTime_ms))
     {
-        LOG_WARN("WaypointPlanManagerService::terminate failed to destroy new mission sender timer "
+        UXAS_LOG_WARN("WaypointPlanManagerService::terminate failed to destroy new mission sender timer "
                  "(m_sendNewMissionTimerId) with timer ID ", m_sendNewMissionTimerId, " within ", delayTime_ms, " millisecond timeout");
     }
     return true;

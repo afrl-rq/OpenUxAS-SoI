@@ -143,11 +143,11 @@ TcpBridge::terminate()
     if (m_receiveTcpMessagesThread && m_receiveTcpMessagesThread->joinable())
     {
         m_receiveTcpMessagesThread->join();
-        LOG_INFORM(s_typeName(), "::terminate calling thread completed m_receiveTcpMessagesThread join");
+        UXAS_LOG_INFORM(s_typeName(), "::terminate calling thread completed m_receiveTcpMessagesThread join");
     }
     else
     {
-        LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_receiveTcpMessagesThread");
+        UXAS_LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_receiveTcpMessagesThread");
     }
 
     if (m_ptr_ZsckTcpConnection)

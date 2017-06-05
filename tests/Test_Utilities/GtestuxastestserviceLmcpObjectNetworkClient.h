@@ -60,7 +60,7 @@ GtestuxastestserviceLmcpObjectNetworkClient::~GtestuxastestserviceLmcpObjectNetw
 bool
 GtestuxastestserviceLmcpObjectNetworkClient::configureLmcpObjectNetworkClient()
 {
-    LOG_DEBUG_VERBOSE_TESTFRAMEWORK(s_typeName(), "::configure method START");
+    UXAS_LOG_DEBUG_VERBOSE_TESTFRAMEWORK(s_typeName(), "::configure method START");
     bool isSuccess{false};
     pugi::xml_node dummyXmlNode;
     isSuccess = configureNetworkClient(s_typeName(), uxas::communications::LmcpObjectNetworkClientBase::ReceiveProcessingType::SERIALIZED_LMCP, dummyXmlNode);
@@ -70,7 +70,7 @@ GtestuxastestserviceLmcpObjectNetworkClient::configureLmcpObjectNetworkClient()
 bool
 GtestuxastestserviceLmcpObjectNetworkClient::initializeLmcpObjectNetworkClient()
 {
-    LOG_DEBUG_VERBOSE_TESTFRAMEWORK(s_typeName(), "::initializeLmcpObjectNetworkClient method START");
+    UXAS_LOG_DEBUG_VERBOSE_TESTFRAMEWORK(s_typeName(), "::initializeLmcpObjectNetworkClient method START");
     m_isInitialized = initializeAndStart();
     return (m_isInitialized);
 };
@@ -89,7 +89,7 @@ GtestuxastestserviceLmcpObjectNetworkClient::sendVicsMessagesWithUniqueId(std::s
         for (size_t sendCnt = 0; sendCnt < sendCount; sendCnt++)
         {
             int64_t uniqueMsgId = getUniqueEntitySendMessageId();
-            LOG_DEBUG_VERBOSE_TESTFRAMEWORK(s_typeName(), ":: sendVicsMessagesWithUniqueId sending VICS ", vicsBase->getLmcpTypeName(), " with message ID ", uniqueMsgId);
+            UXAS_LOG_DEBUG_VERBOSE_TESTFRAMEWORK(s_typeName(), ":: sendVicsMessagesWithUniqueId sending VICS ", vicsBase->getLmcpTypeName(), " with message ID ", uniqueMsgId);
             vicsBase->setMessageID(uniqueMsgId);
             sendSharedLmcpObjectBroadcastMessage(vicsBase);
             std::this_thread::sleep_for(delay_ms);
@@ -97,6 +97,6 @@ GtestuxastestserviceLmcpObjectNetworkClient::sendVicsMessagesWithUniqueId(std::s
     }
     else
     {
-        LOG_WARN(s_typeName(), ":: sendVicsMessagesWithUniqueId failed to send VICS ", vicsBase->getLmcpTypeName(), " messages since not initialize");
+        UXAS_LOG_WARN(s_typeName(), ":: sendVicsMessagesWithUniqueId failed to send VICS ", vicsBase->getLmcpTypeName(), " messages since not initialize");
     }
 };

@@ -43,11 +43,11 @@ LmcpObjectNetworkSerialBridge::configure(const pugi::xml_node& bridgeXmlNode)
     {
         m_serialPortAddress = bridgeXmlNode.attribute(uxas::common::StringConstant::SerialPortAddress().c_str()).value();
         isSuccess = true;
-        LOG_INFORM(s_typeName(), "::configure setting serial port address to ", m_serialPortAddress, " from XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting serial port address to ", m_serialPortAddress, " from XML configuration");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::configure failed to find serial port address in XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find serial port address in XML configuration");
     }
 
     if (isSuccess)
@@ -56,11 +56,11 @@ LmcpObjectNetworkSerialBridge::configure(const pugi::xml_node& bridgeXmlNode)
         if (!baudRate.empty())
         {
             m_serialBaudRate = bridgeXmlNode.attribute(uxas::common::StringConstant::BaudRate().c_str()).as_uint();
-            LOG_INFORM(s_typeName(), "::configure set baud rate to ", baudRate, " from XML configuration ");
+            UXAS_LOG_INFORM(s_typeName(), "::configure set baud rate to ", baudRate, " from XML configuration ");
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::configure did not find baud rate in XML configuration; retaining default value ", m_serialBaudRate);
+            UXAS_LOG_INFORM(s_typeName(), "::configure did not find baud rate in XML configuration; retaining default value ", m_serialBaudRate);
         }
 
         for (pugi::xml_node currentXmlNode = bridgeXmlNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
@@ -85,7 +85,7 @@ LmcpObjectNetworkSerialBridge::configure(const pugi::xml_node& bridgeXmlNode)
         //
 
         // do not forward uni-cast messages addressed to this bridge
-        LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
         m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
         m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
     }
@@ -103,11 +103,11 @@ LmcpObjectNetworkSerialBridge::initialize()
     if (m_serialConnection->isOpen())
     {
         isSuccess = true;
-        LOG_INFORM(s_typeName(), "::initialize opened serial connection with serial port address ", m_serialPortAddress, ", baud rate ", m_serialBaudRate, " and timeout ", m_serialTimeout_ms);
+        UXAS_LOG_INFORM(s_typeName(), "::initialize opened serial connection with serial port address ", m_serialPortAddress, ", baud rate ", m_serialBaudRate, " and timeout ", m_serialTimeout_ms);
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::initialize failed to open serial connection with serial port address ", m_serialPortAddress, ", baud rate ", m_serialBaudRate, " and timeout ", m_serialTimeout_ms);
+        UXAS_LOG_ERROR(s_typeName(), "::initialize failed to open serial connection with serial port address ", m_serialPortAddress, ", baud rate ", m_serialBaudRate, " and timeout ", m_serialTimeout_ms);
     }
     
     return (isSuccess);
@@ -117,7 +117,7 @@ bool
 LmcpObjectNetworkSerialBridge::start()
 {
     m_serialProcessingThread = uxas::stduxas::make_unique<std::thread>(&LmcpObjectNetworkSerialBridge::executeSerialReceiveProcessing, this);
-    LOG_INFORM(s_typeName(), "::start serial receive processing thread [", m_serialProcessingThread->get_id(), "]");
+    UXAS_LOG_INFORM(s_typeName(), "::start serial receive processing thread [", m_serialProcessingThread->get_id(), "]");
     return (true);
 };
 
@@ -128,11 +128,11 @@ LmcpObjectNetworkSerialBridge::terminate()
     if (m_serialProcessingThread && m_serialProcessingThread->joinable())
     {
         m_serialProcessingThread->join();
-        LOG_INFORM(s_typeName(), "::terminate calling thread completed m_serialProcessingThread join");
+        UXAS_LOG_INFORM(s_typeName(), "::terminate calling thread completed m_serialProcessingThread join");
     }
     else
     {
-        LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_serialProcessingThread");
+        UXAS_LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_serialProcessingThread");
     }
     return (true);
 };
@@ -142,7 +142,7 @@ LmcpObjectNetworkSerialBridge::processReceivedSerializedLmcpMessage(std::unique_
                                                                    receivedLmcpMessage)
 {
     // send message to the external entity
-    LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage [", m_entityIdNetworkIdUnicastString, 
+    UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage [", m_entityIdNetworkIdUnicastString, 
             "] before processing serialized message having address ", receivedLmcpMessage->getAddress(),
                   " and size ", receivedLmcpMessage->getPayload().size());
 
@@ -151,7 +151,7 @@ LmcpObjectNetworkSerialBridge::processReceivedSerializedLmcpMessage(std::unique_
     {
         if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
             try
             {
                 m_serialConnection->write(uxas::common::SentinelSerialBuffer::createSentinelizedString(receivedLmcpMessage->getString()));
@@ -163,17 +163,17 @@ LmcpObjectNetworkSerialBridge::processReceivedSerializedLmcpMessage(std::unique_
                         ::createLmcpMessageObjectSerialConnectionFailure(s_typeName(), uxas::communications::data::SerialConnectionAction::WRITE,
                                                                          m_serialPortAddress, m_serialBaudRate, ex, errorMessage);
                 sendLmcpObjectBroadcastMessage(std::move(lmcpServiceStatus));
-                LOG_ERROR(errorMessage, " EXCEPTION: ", ex.what());
+                UXAS_LOG_ERROR(errorMessage, " EXCEPTION: ", ex.what());
             }
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
         }
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
     }
 
     return (false); // always false implies never terminating bridge from here
@@ -189,20 +189,20 @@ LmcpObjectNetworkSerialBridge::executeSerialReceiveProcessing()
             try
             {
                 // check serial connection for inputs
-                LOG_DEBUG_VERBOSE(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString,
+                UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString,
                                   "] port [", m_serialConnection->getPort(), "] BEFORE serial connection read");
                 std::string serialInput = m_serialConnection->read(static_cast<size_t> (m_serialMaxBytesReadCount));
-                LOG_DEBUG_VERBOSE(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString,
+                UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString,
                                   "] port [", m_serialConnection->getPort(), "] AFTER serial connection read value [", serialInput, "]");
                 if (!serialInput.empty())
                 {
-                    LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", serialInput, "] before processing received serial string");
+                    UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", serialInput, "] before processing received serial string");
                     std::string recvdSerialDataSegment = m_receiveSerialDataBuffer.getNextPayloadString(serialInput);
                     while (true)
                     {
                         if (!recvdSerialDataSegment.empty())
                         {
-                            LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString, "] processing complete object string segment retrieved from serial buffer");
+                            UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString, "] processing complete object string segment retrieved from serial buffer");
                             std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
                             if (recvdAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdSerialDataSegment)))
                             {
@@ -215,30 +215,30 @@ LmcpObjectNetworkSerialBridge::executeSerialReceiveProcessing()
                                     }
                                     else
                                     {
-                                        LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
+                                        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
                                     }
                                 }
                                 else
                                 {
-                                    LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
                                 }
                             }
                             else
                             {
-                                LOG_WARN(s_typeName(), "::executeSerialReceiveProcessing failed to create AddressedAttributedMessage object from serial data buffer string segment");
+                                UXAS_LOG_WARN(s_typeName(), "::executeSerialReceiveProcessing failed to create AddressedAttributedMessage object from serial data buffer string segment");
                             }
                             recvdSerialDataSegment = m_receiveSerialDataBuffer.getNextPayloadString("");
                         }
                         else
                         {
-                            LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing serial buffer did not contain a complete object string segment");
+                            UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing serial buffer did not contain a complete object string segment");
                             break;
                         }
                     }
                 }
                 else
                 {
-                    LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring received serial message with empty payload string");
+                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring received serial message with empty payload string");
                 }
             }
             catch (std::exception& ex2)
@@ -248,16 +248,16 @@ LmcpObjectNetworkSerialBridge::executeSerialReceiveProcessing()
                         ::createLmcpMessageObjectSerialConnectionFailure(s_typeName(), uxas::communications::data::SerialConnectionAction::READ, 
                                                                          m_serialPortAddress, m_serialBaudRate, ex2, errorMessage);
                 sendLmcpObjectBroadcastMessage(std::move(lmcpServiceStatus));
-                LOG_ERROR(errorMessage, " EXCEPTION: ", ex2.what());
+                UXAS_LOG_ERROR(errorMessage, " EXCEPTION: ", ex2.what());
             }
               
 //            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR(s_typeName(), "::executeSerialReceiveProcessing EXCEPTION: ", ex.what());
+        UXAS_LOG_ERROR(s_typeName(), "::executeSerialReceiveProcessing EXCEPTION: ", ex.what());
     }
 };
 

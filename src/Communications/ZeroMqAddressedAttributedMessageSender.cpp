@@ -35,13 +35,13 @@ ZeroMqAddressedAttributedMessageSender::sendMessage(const std::string& address, 
             if (message.isValid())
             {
                 std::string sentinelStr = uxas::common::SentinelSerialBuffer::createSentinelizedString(message.getString());
-                LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage BEFORE sending TCP stream single-part message");
+                UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage BEFORE sending TCP stream single-part message");
                 zmq_send(*m_zmqSocket, sentinelStr.c_str(), sentinelStr.size(), ZMQ_SNDMORE);
-                LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage AFTER sending TCP stream single-part message");
+                UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage AFTER sending TCP stream single-part message");
             }
             else
             {
-                LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendMessage failed to create AddressedAttributedMessage object - did not send TCP stream single-part message");
+                UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendMessage failed to create AddressedAttributedMessage object - did not send TCP stream single-part message");
             }
         }
         else
@@ -50,7 +50,7 @@ ZeroMqAddressedAttributedMessageSender::sendMessage(const std::string& address, 
             {
                 if (message.isValid())
                 {
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage BEFORE sending multi-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage BEFORE sending multi-part message");
                     // address
                     n_ZMQ::s_sendmore(*m_zmqSocket, message.getAddress());
 
@@ -71,24 +71,24 @@ ZeroMqAddressedAttributedMessageSender::sendMessage(const std::string& address, 
 
                     // message payload)
                     n_ZMQ::s_send(*m_zmqSocket, message.getPayload());
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage AFTER sending multi-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage AFTER sending multi-part message");
                 }
                 else
                 {
-                    LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send Zero MQ multi-part message");
+                    UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send Zero MQ multi-part message");
                 }
             }
             else
             {
                 if (message.isValid())
                 {
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage BEFORE sending single-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage BEFORE sending single-part message");
                     n_ZMQ::s_send(*m_zmqSocket, message.getString());
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage AFTER sending single-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendMessage AFTER sending single-part message");
                 }
                 else
                 {
-                    LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage failed to create AddressedAttributedMessage object - did not send Zero MQ single-part message");
+                    UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage failed to create AddressedAttributedMessage object - did not send Zero MQ single-part message");
                 }
             }
         }
@@ -116,13 +116,13 @@ ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage(std::uniq
                 zmq_send(*m_zmqSocket, id, idSize, ZMQ_SNDMORE);
 
                 std::string sentinelStr = uxas::common::SentinelSerialBuffer::createSentinelizedString(message->getString());
-                LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage BEFORE sending TCP stream single-part message");
+                UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage BEFORE sending TCP stream single-part message");
                 zmq_send(*m_zmqSocket, sentinelStr.c_str(), sentinelStr.size(), ZMQ_SNDMORE);
-                LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage AFTER sending TCP stream single-part message");
+                UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage AFTER sending TCP stream single-part message");
             }
             else
             {
-                LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send TCP stream single-part message");
+                UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send TCP stream single-part message");
             }
         }
         else
@@ -131,7 +131,7 @@ ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage(std::uniq
             {
                 if (message->isValid())
                 {
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage BEFORE sending multi-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage BEFORE sending multi-part message");
                     // address
                     n_ZMQ::s_sendmore(*m_zmqSocket, message->getAddress());
 
@@ -152,25 +152,25 @@ ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage(std::uniq
 
                     // message payload)
                     n_ZMQ::s_send(*m_zmqSocket, message->getPayload());
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage AFTER sending multi-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage AFTER sending multi-part message");
                 }
                 else
                 {
-                    LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send Zero MQ multi-part message");
+                    UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send Zero MQ multi-part message");
                 }
             }
             else
             {
                 if (message->isValid())
                 {
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage BEFORE sending single-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage BEFORE sending single-part message");
                     std::string msg = message->getString();
                     n_ZMQ::s_send(*m_zmqSocket, message->getString());
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage AFTER sending single-part message");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage AFTER sending single-part message");
                 }
                 else
                 {
-                    LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send Zero MQ single-part message");
+                    UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageSender::sendAddressedAttributedMessage ignoring invalid AddressedAttributedMessage object - did not send Zero MQ single-part message");
                 }
             }
         }
