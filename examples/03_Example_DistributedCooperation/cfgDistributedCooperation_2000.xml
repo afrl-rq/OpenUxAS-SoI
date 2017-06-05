@@ -3,11 +3,24 @@
 
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
     <!-- on Linux, type 'ifconfig' to find interface name -->
-    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="enp0s3">
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="wlp3s0">
         <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
         <SubscribeToExternalMessage MessageType="uxas.messages.task.AssignmentCoordination"/>
     </Bridge>
 
+    <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9900" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.impact.ImpactLineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.impact.AngledAreaSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.AreaSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
+        <SubscribeToMessage MessageType="afrl.cmasi.KeepOutZone" />
+    </Bridge>
+
+    <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
     <Service Type="SensorManagerService"/>
@@ -16,6 +29,11 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
+
+    <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1" />
+
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
 
         <Message MessageFileName="AirVehicleConfiguration_V1000.xml" SendTime_ms="50"/>
@@ -40,7 +58,7 @@
 
         <!-- The assignment coordinator -->
         <Message MessageFileName="AssignmentCoordinatorTask.xml" SendTime_ms="1000"/>
-        <Message MessageFileName="AirVehicleState_V2000.xml" SendTime_ms="2000"/>
+        <!-- <Message MessageFileName="AirVehicleState_V2000.xml" SendTime_ms="2000"/> -->
         <!-- coordniation request to perform the tasks -->
         <Message MessageFileName="CoordinatedAutomationRequest.xml" SendTime_ms="5000"/>
     </Service>
@@ -48,6 +66,7 @@
     <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000" LogFileName="testfile">
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
     </Service>
 </UxAS>
 

@@ -272,7 +272,14 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
             {
                 if (m_nonImportForwardAddresses.find(receivedTcpMessage->getAddress()) == m_nonImportForwardAddresses.end())
                 {
-                    sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
+                    //sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
+                    avtas::lmcp::ByteBuffer buf;
+                    buf.allocate(receivedTcpMessage->getPayload().size());
+                    uint8_t* msgbytes = (uint8_t*) (receivedTcpMessage->getPayload().c_str());
+                    buf.put(msgbytes, receivedTcpMessage->getPayload().size(), 0);
+                    buf.rewind();
+                    auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::Factory::getObject(buf));
+                    sendSharedLmcpObjectBroadcastMessage(obj);
                 }
                 else
                 {

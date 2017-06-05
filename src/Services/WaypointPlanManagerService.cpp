@@ -28,6 +28,7 @@
 #include "uxas/messages/uxnative/IncrementWaypoint.h"
 
 #include "pugixml.hpp"
+#include "uxas/messages/task/TaskAutomationResponse.h"
 
 #include <iostream>
 
@@ -140,6 +141,7 @@ WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
     }
 
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
+    addSubscriptionAddress(uxas::messages::task::TaskAutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::IncrementWaypoint::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription); // for direct implementation outside of automation response
@@ -205,6 +207,26 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     else if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object.get()))
     {
         auto automationResponse = std::static_pointer_cast<afrl::cmasi::AutomationResponse> (receivedLmcpMessage->m_object);
+        for (auto mission : automationResponse->getMissionCommandList())
+        {
+            if (mission->getVehicleID() == m_vehicleID)
+            {
+                //TODO:: initialize plan should initialize and get an initial plan
+                std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(mission->clone());
+                if (isInitializePlan(ptr_MissionCommand))
+                {
+                    int64_t waypointIdCurrent = {ptr_MissionCommand->getWaypointList().front()->getNumber()};
+                    int64_t idMissionSegmentTemp = {-1};
+                    isGetCurrentSegment(waypointIdCurrent, _nextMissionCommandToSend, idMissionSegmentTemp);
+                }
+                break;
+            }
+        }
+    }
+    else if (uxas::messages::task::isTaskAutomationResponse(receivedLmcpMessage->m_object.get()))
+    {
+        auto taskautomationResponse = std::static_pointer_cast<uxas::messages::task::TaskAutomationResponse> (receivedLmcpMessage->m_object);
+        auto automationResponse = taskautomationResponse->getOriginalResponse();
         for (auto mission : automationResponse->getMissionCommandList())
         {
             if (mission->getVehicleID() == m_vehicleID)
