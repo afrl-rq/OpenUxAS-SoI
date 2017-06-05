@@ -25,6 +25,9 @@
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
 #include "afrl/cmasi/LoiterAction.h"
+
+#include "afrl/impact/GroundVehicleState.h"
+
 #include "uxas/messages/uxnative/IncrementWaypoint.h"
 
 #include "uxas/madara/MadaraState.h"
@@ -173,13 +176,7 @@ GamsService::terminate()
 void
 GamsService::sendBuffer (char * buffer, size_t length)
 {
-    uxas::madara::MadaraState * newMessage = new uxas::madara::MadaraState ();
-    
-    // @DEREK
-    // MadaraState has declared __Contents as protected and there is no
-    // setter. How am I supposed to get my buffer to the MadaraState message?
-    // In KeyValue pair, there appears to be a generated setter. How do I get
-    // this for a byte array as we do in MadaraState?
+    auto newMessage = std::shared_ptr<uxas::madara::MadaraState>(new uxas::madara::MadaraState);
     
     std::vector <uint8_t> contents;
     contents.resize (length);
@@ -188,11 +185,11 @@ GamsService::sendBuffer (char * buffer, size_t length)
         contents[i] = (uint8_t)buffer[i];
     }
     
-    // we should be able to set the contents, otherwise, no way to create
-    // message
-    newMessage->setContents (contents);
+    // direct access to vectors in LMCP, so directly assign to message contents
+    newMessage->getContents().assign(contents.begin(), contents.end());
     
-    this->sendLmcpObjectBroadcastMessage(newMessage);
+    // only send shared pointers to LMCP objects
+    sendSharedLmcpObjectBroadcastMessage(newMessage);
 }
 
 bool
