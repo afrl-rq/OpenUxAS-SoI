@@ -34,6 +34,7 @@
 #include "afrl/cmasi/MissionCommand.h"
 
 #include <cstdint> // uint32_t
+#include <atomic>
 
 namespace uxas
 {
@@ -104,9 +105,6 @@ public:
     ~GamsService();
 
     
-    /** knowledge base pre-configured with UxAS integration **/
-    static ::madara::knowledge::KnowledgeBase s_knowledgeBase;
-    
     /**
      * Sends a MadaraState message through the existing UxAS system. This
      * is extremely dirty, but I need a way to interact from the
@@ -129,6 +127,12 @@ public:
      * @param sendHertz  the hertz to send updates at
      **/
     void controllerRun (double hertz, double sendHertz);
+    
+    /** knowledge base pre-configured with UxAS integration **/
+    static ::madara::knowledge::KnowledgeBase s_knowledgeBase;
+    
+    /// current platform (protect usage with knowledgeBase locks)
+    static std::atomic <gams::platforms::BasePlatform *> s_platform;
     
 private:
 

@@ -22,6 +22,8 @@
 #include "UxAS_TimerManager.h"
 
 #include "madara/threads/Threader.h"
+#include "madara/knowledge/ContextGuard.h"
+
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
@@ -58,6 +60,8 @@ namespace platforms = gams::platforms;
 /// static knowledge base which is configured with UxAS transport
 knowledge::KnowledgeBase uxas::service::GamsService::s_knowledgeBase;
 
+std::atomic <gams::platforms::BasePlatform *>
+    uxas::service::GamsService::s_platform;
 
 namespace uxas
 {
@@ -520,6 +524,11 @@ GamsService::initialize()
     m_controller->init_platform(new UxASGamsPlatform(this));
     m_controller->init_algorithm("null");
     
+    {
+        ::madara::knowledge::ContextGuard lock (s_knowledgeBase);
+        s_platform = m_controller->get_platform ();
+    }
+    
     // run at 2hz, sending at 1hz, forever (-1)
     m_threader.run ("controller", new service::ControllerLoop (m_controller,
         2, 1));
@@ -529,6 +538,12 @@ GamsService::initialize()
 bool
 GamsService::terminate()
 {
+    // lock the knowledge base and set platform to null
+    {
+        ::madara::knowledge::ContextGuard lock (s_knowledgeBase);
+        s_platform = 0;
+    }
+    
     m_threader.terminate();
     m_threader.wait ();
     
@@ -556,19 +571,6 @@ GamsService::sendBuffer (char * buffer, size_t length)
     
     // only send shared pointers to LMCP objects
     sendSharedLmcpObjectBroadcastMessage(newMessage);
-}
-
-gams::platforms::BasePlatform *
-GamsService::getPlatform (void)
-{
-    gams::platforms::BasePlatform * result (0);
-    
-    if (m_controller != 0)
-    {
-        result = m_controller->get_platform();
-    }
-    
-    return result;
 }
 
 void
