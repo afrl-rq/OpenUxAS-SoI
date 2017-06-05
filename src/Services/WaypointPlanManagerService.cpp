@@ -154,9 +154,9 @@ WaypointPlanManagerService::initialize()
     bool bSuccess(true);
 
     // create and start periodic timer
-    m_sendNewMissionTimerId = uxas::common::TimerManager::getInstance().createTimer(
-                                                                                    std::bind(&WaypointPlanManagerService::OnSendNewMissionTimer, this), "WaypointPlanManagerService::OnSendNewMissionTimer");
-    uxas::common::TimerManager::getInstance().startPeriodicTimer(m_sendNewMissionTimerId, _timeBetweenMissionCommandsMin_ms, _timeBetweenMissionCommandsMin_ms);
+    //m_sendNewMissionTimerId = uxas::common::TimerManager::getInstance().createTimer(
+    //                                                                                std::bind(&WaypointPlanManagerService::OnSendNewMissionTimer, this), "WaypointPlanManagerService::OnSendNewMissionTimer");
+    //uxas::common::TimerManager::getInstance().startPeriodicTimer(m_sendNewMissionTimerId, _timeBetweenMissionCommandsMin_ms, _timeBetweenMissionCommandsMin_ms);
 
     return (bSuccess);
 };
@@ -285,10 +285,14 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     {
         //CERR_FILE_LINE_MSG("WARNING:: Unknown message encountered: [" << receivedLmcpMessage->m_object->getLmcpTypeName() << "]")
     }
-    if (pMissionCommand_Out)
+    
+    if(_nextMissionCommandToSend)
     {
-        sendSharedLmcpObjectBroadcastMessage(pMissionCommand_Out);
+        std::cout << "1: " <<_nextMissionCommandToSend->toXML() << "\n";
+        sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
+        _nextMissionCommandToSend.reset();
     }
+    
     return (false); // always false implies never terminating service from here
 };
 
@@ -550,6 +554,8 @@ void WaypointPlanManagerService::OnSendNewMissionTimer()
     if (_nextMissionCommandToSend)
     {
         sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
+        
+        std::cout << "2: " <<_nextMissionCommandToSend << "\n";
 
         _nextMissionCommandToSend.reset();
     }
