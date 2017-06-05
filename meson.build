@@ -5,7 +5,7 @@ conf = configuration_data()
 link_args = []
 
 os = target_machine.system()
-if os == 'linux'
+if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
@@ -129,7 +129,7 @@ deps = [
 
 # OpenGL, specifically the GLU library
 deps += [dependency('gl')]
-if os == 'linux'
+if os.startswith('linux')
   deps += [dependency('glu')]
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
