@@ -48,31 +48,31 @@ LmcpObjectNetworkSubscribePushBridge::configure(const pugi::xml_node& bridgeXmlN
     if (!bridgeXmlNode.attribute(STRING_XML_ADDRESS_SUB).empty())
     {
         m_externalSubscribeSocketAddress = bridgeXmlNode.attribute(STRING_XML_ADDRESS_SUB).value();
-        LOG_INFORM(s_typeName(), "::configure setting external subscribe socket address to ", m_externalSubscribeSocketAddress, " from XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting external subscribe socket address to ", m_externalSubscribeSocketAddress, " from XML configuration");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::configure failed to find external subscribe socket address in XML configuration; external subscribe socket address is ", m_externalSubscribeSocketAddress);
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find external subscribe socket address in XML configuration; external subscribe socket address is ", m_externalSubscribeSocketAddress);
     }
 
     if (!bridgeXmlNode.attribute(STRING_XML_ADDRESS_PUSH).empty())
     {
         m_externalPushSocketAddress = bridgeXmlNode.attribute(STRING_XML_ADDRESS_PUSH).value();
-        LOG_INFORM(s_typeName(), "::configure setting external push socket address to ", m_externalPushSocketAddress, " from XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting external push socket address to ", m_externalPushSocketAddress, " from XML configuration");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::configure failed to find external push socket in XML configuration; external push socket is ", m_externalPushSocketAddress);
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find external push socket in XML configuration; external push socket is ", m_externalPushSocketAddress);
     }
 
     if (!bridgeXmlNode.attribute(uxas::common::StringConstant::Server().c_str()).empty())
     {
         m_isServer = bridgeXmlNode.attribute(uxas::common::StringConstant::Server().c_str()).as_bool();
-        LOG_INFORM(s_typeName(), "::configure setting server boolean to ", m_isServer, " from XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting server boolean to ", m_isServer, " from XML configuration");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::configure failed to find server boolean in XML configuration; server boolean is ", m_isServer);
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find server boolean in XML configuration; server boolean is ", m_isServer);
     }
     
     // TODO review IMPACT messaging requirements (need to modify object before sending?)
@@ -104,11 +104,11 @@ LmcpObjectNetworkSubscribePushBridge::configure(const pugi::xml_node& bridgeXmlN
     //   (TCP and serial bridges do not have external subscription)
     //
     // subscribe to external messages addressed to this entity
-    LOG_INFORM(s_typeName(), "::configure externally subscribing to entity cast address [", getEntityCastAddress(m_entityId), "]");
+    UXAS_LOG_INFORM(s_typeName(), "::configure externally subscribing to entity cast address [", getEntityCastAddress(m_entityId), "]");
     m_externalSubscriptionAddresses.emplace(getEntityCastAddress(m_entityId));
 
     // do not forward any uni-cast messages addressed to this bridge
-    LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
+    UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
     m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
     m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
 
@@ -120,25 +120,25 @@ LmcpObjectNetworkSubscribePushBridge::initialize()
 {
     m_externalLmcpObjectMessageReceiverPipe.initializeExternalSubscription(m_entityId, m_networkId,
                                                                            m_externalSubscribeSocketAddress, m_isServer);
-    LOG_INFORM(s_typeName(), " external subscribe socket address is ", m_externalSubscribeSocketAddress);
+    UXAS_LOG_INFORM(s_typeName(), " external subscribe socket address is ", m_externalSubscribeSocketAddress);
 
     if (m_externalSubscriptionAddresses.size() > 0)
     {
         for (const auto& lmcpExternalSubAddress : m_externalSubscriptionAddresses)
         {
             addSubscriptionAddress(lmcpExternalSubAddress);
-            LOG_INFORM(s_typeName(), " subscribing to external LMCP address [", lmcpExternalSubAddress, "]");
+            UXAS_LOG_INFORM(s_typeName(), " subscribing to external LMCP address [", lmcpExternalSubAddress, "]");
         }
     }
     else
     {
-        LOG_WARN(s_typeName(), " subscribing to zero LMCP addresses");
+        UXAS_LOG_WARN(s_typeName(), " subscribing to zero LMCP addresses");
     }
 
     m_externalLmcpObjectMessageSenderPipe.initializeExternalPush(m_messageSourceGroup, m_entityId, m_networkId,
                                                                  m_externalPushSocketAddress, m_isServer);
-    LOG_INFORM(s_typeName(), " external push socket address is ", m_externalPushSocketAddress);
-    LOG_INFORM(s_typeName(), "::initialize succeeded");
+    UXAS_LOG_INFORM(s_typeName(), " external push socket address is ", m_externalPushSocketAddress);
+    UXAS_LOG_INFORM(s_typeName(), "::initialize succeeded");
     return (true);
 };
 
@@ -147,7 +147,7 @@ LmcpObjectNetworkSubscribePushBridge::start()
 {
     m_externalReceiveProcessingThread = uxas::stduxas::make_unique<std::thread>(&LmcpObjectNetworkSubscribePushBridge
             ::executeExternalSerializedLmcpObjectReceiveProcessing, this);
-    LOG_INFORM(s_typeName(), "::start subscribe receive processing thread [", m_externalReceiveProcessingThread->get_id(), "]");
+    UXAS_LOG_INFORM(s_typeName(), "::start subscribe receive processing thread [", m_externalReceiveProcessingThread->get_id(), "]");
     return (true);
 };
 
@@ -158,11 +158,11 @@ LmcpObjectNetworkSubscribePushBridge::terminate()
     if (m_externalReceiveProcessingThread && m_externalReceiveProcessingThread->joinable())
     {
         m_externalReceiveProcessingThread->join();
-        LOG_INFORM(s_typeName(), "::terminate calling thread completed m_externalReceiveProcessingThread join");
+        UXAS_LOG_INFORM(s_typeName(), "::terminate calling thread completed m_externalReceiveProcessingThread join");
     }
     else
     {
-        LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_externalReceiveProcessingThread");
+        UXAS_LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_externalReceiveProcessingThread");
     }
     return (true);
 };
@@ -185,7 +185,7 @@ LmcpObjectNetworkSubscribePushBridge::processReceivedSerializedLmcpMessage(std::
 //        }
         
     // send message to the external entity
-    LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage before sending serialized message ",
+    UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage before sending serialized message ",
               "having address ", receivedLmcpMessage->getAddress(),
               " and size ", receivedLmcpMessage->getPayload().size());
 
@@ -194,17 +194,17 @@ LmcpObjectNetworkSubscribePushBridge::processReceivedSerializedLmcpMessage(std::
     {
         if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
             m_externalLmcpObjectMessageSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
         }
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
     }
 
     return (false); // always false implies never terminating bridge from here
@@ -223,12 +223,12 @@ LmcpObjectNetworkSubscribePushBridge::executeExternalSerializedLmcpObjectReceive
 
             if (recvdAddAttMsg == NULL)
             {
-                LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing NULL message");
+                UXAS_LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing NULL message");
                 continue;
             }
             
             // send message to the external entity
-            LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing before sending serialized message ",
+            UXAS_LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing before sending serialized message ",
                           "having address ", recvdAddAttMsg->getAddress(),
                           " and size ", recvdAddAttMsg->getPayload().size());
             if (recvdAddAttMsg->isValid())
@@ -242,24 +242,24 @@ LmcpObjectNetworkSubscribePushBridge::executeExternalSerializedLmcpObjectReceive
                     }
                     else
                     {
-                        LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
+                        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
                     }
                 }
                 else
                 {
-                    LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
                 }
             }
             else
             {
-                LOG_WARN(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing ignoring received, invalid AddressedAttributedMessage object");
+                UXAS_LOG_WARN(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing ignoring received, invalid AddressedAttributedMessage object");
             }
         }
-        LOG_INFORM(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing EXCEPTION: ", ex.what());
+        UXAS_LOG_ERROR(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing EXCEPTION: ", ex.what());
     }
 };
 

@@ -76,21 +76,21 @@ ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string&
     if (!zyreNetworkDevice.empty())
     {
         m_zyreNetworkDevice = zyreNetworkDevice;
-        LOG_INFORM(s_typeName(), "::start set Zyre network device to ", m_zyreNetworkDevice);
+        UXAS_LOG_INFORM(s_typeName(), "::start set Zyre network device to ", m_zyreNetworkDevice);
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::start failed due to invalid Zyre network device function parameter");
+        UXAS_LOG_ERROR(s_typeName(), "::start failed due to invalid Zyre network device function parameter");
         return (false);
     }
     if (!zyreNodeId.empty())
     {
         m_zyreNodeId = zyreNodeId;
-        LOG_INFORM(s_typeName(), "::start set Zyre node ID to ", m_zyreNodeId);
+        UXAS_LOG_INFORM(s_typeName(), "::start set Zyre node ID to ", m_zyreNodeId);
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::start failed due to invalid Zyre node ID function parameter");
+        UXAS_LOG_ERROR(s_typeName(), "::start failed due to invalid Zyre node ID function parameter");
         return (false);
     }
     
@@ -101,13 +101,13 @@ ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string&
     lock.lock();
     terminateZyreNodeAndThread();
 
-    LOG_INFORM(s_typeName(), "::start creating new Zyre node with node ID ", m_zyreNodeId, " and network device ", m_zyreNetworkDevice);
+    UXAS_LOG_INFORM(s_typeName(), "::start creating new Zyre node with node ID ", m_zyreNodeId, " and network device ", m_zyreNetworkDevice);
     m_zyreNode = zyre_new(m_zyreNodeId.c_str());
     zyre_set_interface(m_zyreNode, m_zyreNetworkDevice.c_str()); // associate node with network device
 
     for (auto hdrKvPairsIt = headerKeyValuePairs->cbegin(), hdrKvPairsItEnd = headerKeyValuePairs->cend(); hdrKvPairsIt != hdrKvPairsItEnd; hdrKvPairsIt++)
     {
-        LOG_INFORM(s_typeName(), "::start adding header key/value pair KEY [", hdrKvPairsIt->first, "] VALUE [", hdrKvPairsIt->second, "]");
+        UXAS_LOG_INFORM(s_typeName(), "::start adding header key/value pair KEY [", hdrKvPairsIt->first, "] VALUE [", hdrKvPairsIt->second, "]");
         n_ZMQ::zyreSetHeaderEntry(m_zyreNode, hdrKvPairsIt->first, hdrKvPairsIt->second);
         m_receivedMessageHeaderKeys.emplace(hdrKvPairsIt->first.substr());
     }
@@ -118,18 +118,18 @@ ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string&
         m_isStarted = true;
         m_isTerminate = false;
         m_zyreEventProcessingThread = uxas::stduxas::make_unique<std::thread>(&ZeroMqZyreBridge::executeZyreEventProcessing, this);
-        LOG_INFORM(s_typeName(), "::start Zyre event processing thread [", m_zyreEventProcessingThread->get_id(), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::start Zyre event processing thread [", m_zyreEventProcessingThread->get_id(), "]");
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::start failed at Zyre node zyre_start function call");
+        UXAS_LOG_ERROR(s_typeName(), "::start failed at Zyre node zyre_start function call");
         return (false);
     }
     
     // un-comment the following line for debugging Zyre
     //zyre_set_verbose(m_zyreNode);
     //n_ZMQ::zyreJoin(m_zyreNode, m_zyreGroup); // group enables Zyre multicast, m_zyreNode is unique ID for a single Zyre node
-    LOG_INFORM(s_typeName(), "::start started Zyre node with node ID ", m_zyreNodeId, " and network device ", m_zyreNetworkDevice);
+    UXAS_LOG_INFORM(s_typeName(), "::start started Zyre node with node ID ", m_zyreNodeId, " and network device ", m_zyreNetworkDevice);
     return (true);
 };
 
@@ -154,22 +154,22 @@ ZeroMqZyreBridge::terminateZyreNodeAndThread()
         {
             zyre_destroy(&m_zyreNode);
             m_zyreNode = nullptr;
-            LOG_INFORM(s_typeName(), "::terminateZyreNodeAndThread destroyed Zyre node");
+            UXAS_LOG_INFORM(s_typeName(), "::terminateZyreNodeAndThread destroyed Zyre node");
         }
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR(s_typeName(), "::terminateZyreNodeAndThread destroying Zyre node EXCEPTION: ", ex.what());
+        UXAS_LOG_ERROR(s_typeName(), "::terminateZyreNodeAndThread destroying Zyre node EXCEPTION: ", ex.what());
     }
 
     if (m_zyreEventProcessingThread && m_zyreEventProcessingThread->joinable())
     {
         m_zyreEventProcessingThread->detach();
-        LOG_INFORM(s_typeName(), "::terminateZyreNodeAndThread detached m_zyreEventProcessingThread");
+        UXAS_LOG_INFORM(s_typeName(), "::terminateZyreNodeAndThread detached m_zyreEventProcessingThread");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::terminateZyreNodeAndThread did not detach m_zyreEventProcessingThread");
+        UXAS_LOG_INFORM(s_typeName(), "::terminateZyreNodeAndThread did not detach m_zyreEventProcessingThread");
     }
 };
 
@@ -199,7 +199,7 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                     {
                         // <editor-fold defaultstate="collapsed" desc="ZYRE_EVENT_ENTER">
                         std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_sender(zyre_event)));
-                        LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_ENTER event from ", zyreRemoteUuid);
+                        UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_ENTER event from ", zyreRemoteUuid);
                         if (!zyreRemoteUuid.empty())
                         {
                             if (m_isZyreEnterMessageHandler)
@@ -212,33 +212,33 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                                     {
                                         std::string value;
                                         n_ZMQ::ZhashLookup(headers, hdrKeysIt->substr(), value);
-                                        LOG_INFORM(s_typeName(), "::executeZyreEventProcessing received ZYRE_EVENT_ENTER header key/value pair KEY [", hdrKeysIt->substr(), "] VALUE [", value, "]");
+                                        UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing received ZYRE_EVENT_ENTER header key/value pair KEY [", hdrKeysIt->substr(), "] VALUE [", value, "]");
                                         headerKeyValuePairs.emplace(std::move(hdrKeysIt->substr()), std::move(value));
                                     }
                                 }
                                 headers = nullptr; // release borrowed headers (hash) object
-                                LOG_DEBUGGING(s_typeName(), "::executeZyreEventProcessing invoking Zyre enter message handler");
+                                UXAS_LOG_DEBUGGING(s_typeName(), "::executeZyreEventProcessing invoking Zyre enter message handler");
                                 processReceivedZyreEnterMessage(zyreRemoteUuid, headerKeyValuePairs);
                             }
                             else
                             {
-                                LOG_WARN(s_typeName(), "::executeZyreEventProcessing not invoking Zyre enter message handler - callback function not set");
+                                UXAS_LOG_WARN(s_typeName(), "::executeZyreEventProcessing not invoking Zyre enter message handler - callback function not set");
                             }
                         }
                         else
                         {
-                            LOG_WARN(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_EXIT event having empty remote UUID");
+                            UXAS_LOG_WARN(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_EXIT event having empty remote UUID");
                         }
                         // </editor-fold>
                     }
                     else if (zyre_event_type(zyre_event) == ZYRE_EVENT_JOIN)
                     {
-                        LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_JOIN event from ",
+                        UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_JOIN event from ",
                                  static_cast<const char*> (zyre_event_sender(zyre_event)));
                     }
                     else if (zyre_event_type(zyre_event) == ZYRE_EVENT_LEAVE)
                     {
-                        LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_LEAVE event from ",
+                        UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_LEAVE event from ",
                                  static_cast<const char*> (zyre_event_sender(zyre_event)));
                     }
                     else if (zyre_event_type(zyre_event) == ZYRE_EVENT_EXIT)
@@ -249,23 +249,23 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                         {
                             if (m_isZyreExitMessageHandler)
                             {
-                                LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_EXIT event from ", zyreRemoteUuid, " invoking Zyre exit message handler");
+                                UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_EXIT event from ", zyreRemoteUuid, " invoking Zyre exit message handler");
                                 processReceivedZyreExitMessage(zyreRemoteUuid);
                             }
                             else
                             {
-                                LOG_WARN(s_typeName(), "::executeZyreEventProcessing not invoking Zyre exit message handler - callback function not set");
+                                UXAS_LOG_WARN(s_typeName(), "::executeZyreEventProcessing not invoking Zyre exit message handler - callback function not set");
                             }
                         }
                         else
                         {
-                            LOG_WARN(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_EXIT event having empty remote UUID");
+                            UXAS_LOG_WARN(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_EXIT event having empty remote UUID");
                         }
                         // </editor-fold>
                     }
                     else if (zyre_event_type(zyre_event) == ZYRE_EVENT_SHOUT)
                     {
-                        LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_SHOUT event from ",
+                        UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_SHOUT event from ",
                                  static_cast<const char*> (zyre_event_sender(zyre_event)));
                     }
                     else if (zyre_event_type(zyre_event) == ZYRE_EVENT_WHISPER)
@@ -280,27 +280,27 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                             msg = nullptr; // release borrowed message object
                             if (!messagePayload.empty())
                             {
-                                LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_WHISPER event from ", zyreRemoteUuid);
-                                LOG_DEBUGGING(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_WHISPER event from ",
+                                UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_WHISPER event from ", zyreRemoteUuid);
+                                UXAS_LOG_DEBUGGING(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_WHISPER event from ",
                                               zyreRemoteUuid, " with message payload ", messagePayload);
                                 if (m_isZyreWhisperMessageHandler)
                                 {
-                                    LOG_DEBUGGING(s_typeName(), "::executeZyreEventProcessing invoking Zyre whisper message handler");
+                                    UXAS_LOG_DEBUGGING(s_typeName(), "::executeZyreEventProcessing invoking Zyre whisper message handler");
                                     processReceivedZyreWhisperMessage(zyreRemoteUuid, messagePayload);
                                 }
                                 else
                                 {
-                                    LOG_WARN(s_typeName(), "::executeZyreEventProcessing not invoking Zyre whisper message handler - callback function not set");
+                                    UXAS_LOG_WARN(s_typeName(), "::executeZyreEventProcessing not invoking Zyre whisper message handler - callback function not set");
                                 }
                             }
                             else
                             {
-                                LOG_ERROR(s_typeName(), "::executeZyreEventProcessing ignoring invalid ZYRE_EVENT_WHISPER event having empty message payload");
+                                UXAS_LOG_ERROR(s_typeName(), "::executeZyreEventProcessing ignoring invalid ZYRE_EVENT_WHISPER event having empty message payload");
                             }
                         }
                         else
                         {
-                            LOG_WARN(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_WHISPER event having empty remote UUID");
+                            UXAS_LOG_WARN(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_WHISPER event having empty remote UUID");
                         }
                         // </editor-fold>
                     }
@@ -315,39 +315,39 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                 break;
             }
         }
-        LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR(s_typeName(), "::executeZyreEventProcessing EXCEPTION: ", ex.what());
+        UXAS_LOG_ERROR(s_typeName(), "::executeZyreEventProcessing EXCEPTION: ", ex.what());
     }
 };
 
 void
 ZeroMqZyreBridge::processReceivedZyreEnterMessage(const std::string& zyreRemoteUuid, const std::unordered_map<std::string, std::string>& headerKeyValuePairs)
 {
-    LOG_INFORM(s_typeName(), "::processReceivedZyreEnterMessage invoking registered handler");
+    UXAS_LOG_INFORM(s_typeName(), "::processReceivedZyreEnterMessage invoking registered handler");
     m_zyreEnterMessageHandler(zyreRemoteUuid, headerKeyValuePairs);
 };
 
 void
 ZeroMqZyreBridge::processReceivedZyreExitMessage(const std::string& zyreRemoteUuid)
 {
-    LOG_INFORM(s_typeName(), "::processReceivedZyreExitMessage invoking registered handler");
+    UXAS_LOG_INFORM(s_typeName(), "::processReceivedZyreExitMessage invoking registered handler");
     m_zyreExitMessageHandler(zyreRemoteUuid);
 };
 
 void
 ZeroMqZyreBridge::processReceivedZyreWhisperMessage(const std::string& zyreRemoteUuid, const std::string& messagePayload)
 {
-    LOG_INFORM(s_typeName(), "::processReceivedZyreWhisperMessage invoking registered handler");
+    UXAS_LOG_INFORM(s_typeName(), "::processReceivedZyreWhisperMessage invoking registered handler");
     m_zyreWhisperMessageHandler(zyreRemoteUuid, messagePayload);
 };
 
 void
 ZeroMqZyreBridge::sendZyreWhisperMessage(const std::string& zyreRemoteUuid, const std::string& messagePayload)
 {
-    LOG_INFORM(s_typeName(), "::sendZyreWhisperMessage sending Zyre whisper message");
+    UXAS_LOG_INFORM(s_typeName(), "::sendZyreWhisperMessage sending Zyre whisper message");
     n_ZMQ::zyreWhisper2(m_zyreNode, zyreRemoteUuid, messagePayload);
 };
 

@@ -160,7 +160,7 @@ LmcpObjectMessageReceiverPipe::deserializeMessage(const std::string& payload)
     lmcpObject.reset(avtas::lmcp::Factory::getObject(lmcpByteBuffer));
     if (!lmcpObject)
     {
-        LOG_ERROR("LmcpObjectMessageReceiverPipe::deserializeMessage failed to convert message payload string into an LMCP object");
+        UXAS_LOG_ERROR("LmcpObjectMessageReceiverPipe::deserializeMessage failed to convert message payload string into an LMCP object");
     }
 
     return (lmcpObject);

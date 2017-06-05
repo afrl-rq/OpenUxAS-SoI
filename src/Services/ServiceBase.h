@@ -151,7 +151,7 @@ protected:
             auto it = createFunctionByServiceType().find(serviceTypeName);
             if (it != createFunctionByServiceType().end())
             {
-                LOG_WARN("ServiceBase::registerServiceCreationFunctionPointers is overwriting existing service creation function pointer ", serviceTypeName);
+                UXAS_LOG_WARN("ServiceBase::registerServiceCreationFunctionPointers is overwriting existing service creation function pointer ", serviceTypeName);
             }
             createFunctionByServiceType()[serviceTypeName] = functionPointer;
         }

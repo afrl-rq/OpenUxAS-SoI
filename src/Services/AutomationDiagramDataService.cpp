@@ -227,7 +227,7 @@ AutomationDiagramDataService::processReceivedLmcpMessage(std::unique_ptr<uxas::c
     }
     if (!isMessageProcessed)
     {
-        //        LOG_WARN("WARNING::AutomationDiagramDataService::ProcessMessage: MessageType [" 
+        //        UXAS_LOG_WARN("WARNING::AutomationDiagramDataService::ProcessMessage: MessageType [" 
         //                , receivedLmcpMessage->m_object->getFullLmcpTypeName() 
         //                , "] serviceId[" , m_serviceId
         //                , "] SourceEntityId[" , receivedLmcpMessage->m_attributes->getSourceEntityId()

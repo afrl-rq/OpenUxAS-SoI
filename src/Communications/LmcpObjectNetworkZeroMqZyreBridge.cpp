@@ -69,11 +69,11 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
     if (!bridgeXmlNode.attribute(uxas::common::StringConstant::NetworkDevice().c_str()).empty())
     {
         m_zyreNetworkDevice = bridgeXmlNode.attribute(uxas::common::StringConstant::NetworkDevice().c_str()).value();
-        LOG_INFORM(s_typeName(), "::configure reading Zyre network device value ", m_zyreNetworkDevice, " from XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure reading Zyre network device value ", m_zyreNetworkDevice, " from XML configuration");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::configure setting Zyre network device value to ", m_zyreNetworkDevice, " default value");
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting Zyre network device value to ", m_zyreNetworkDevice, " default value");
     }
 
     std::set<std::string> extSubAddDupChk; // prevent dup external address subscription
@@ -85,7 +85,7 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
             std::string messageType = currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value();
             if (!messageType.empty())
             {
-                LOG_INFORM(s_typeName(), "::configure adding local subscription address ", messageType);
+                UXAS_LOG_INFORM(s_typeName(), "::configure adding local subscription address ", messageType);
                 addSubscriptionAddress(messageType);
                 m_initialPersistentLocalSubscriptionAddresses.emplace(messageType);
             }
@@ -98,7 +98,7 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
                 auto extSubAdd = extSubAddDupChk.find(messageType);
                 if (extSubAdd == extSubAddDupChk.end())
                 {
-                    LOG_INFORM(s_typeName(), "::configure adding external subscription address ", messageType);
+                    UXAS_LOG_INFORM(s_typeName(), "::configure adding external subscription address ", messageType);
                     if (delimitedExtSubAddresses.size() > 0)
                     {
                         delimitedExtSubAddresses.append(m_extSubAddressDelimiter);
@@ -122,7 +122,7 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
     auto enCastAdd = extSubAddDupChk.find(entityCastAddress);
     if (enCastAdd == extSubAddDupChk.end())
     {
-        LOG_INFORM(s_typeName(), "::configure adding external subscription address ", entityCastAddress);
+        UXAS_LOG_INFORM(s_typeName(), "::configure adding external subscription address ", entityCastAddress);
         if (delimitedExtSubAddresses.size() > 0)
         {
             delimitedExtSubAddresses.append(m_extSubAddressDelimiter);
@@ -132,7 +132,7 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
     }
 
     // do not forward uni-cast messages addressed to this bridge
-    LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
+    UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
     m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
     m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
 
@@ -182,7 +182,7 @@ LmcpObjectNetworkZeroMqZyreBridge::processReceivedSerializedLmcpMessage(std::uni
     //AirVehicleState (content))
 
     // send message to the external entity
-    LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage [", m_entityIdNetworkIdUnicastString, 
+    UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage [", m_entityIdNetworkIdUnicastString, 
             "] before processing serialized message having address ", receivedLmcpMessage->getAddress(),
                   " and size ", receivedLmcpMessage->getPayload().size());
 
@@ -191,7 +191,7 @@ LmcpObjectNetworkZeroMqZyreBridge::processReceivedSerializedLmcpMessage(std::uni
     {
         if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
             std::unique_lock<std::mutex> lock(m_mutex);
             std::set<std::string> uuidsSentMsg; // avoid sending message out to an entity more than once
             for (const auto& addressAndUuids : m_remoteZyreUuidsBySubscriptionAddress)
@@ -206,7 +206,7 @@ LmcpObjectNetworkZeroMqZyreBridge::processReceivedSerializedLmcpMessage(std::uni
                         {
                             uuidsSentMsg.emplace(uuid);
                             m_zeroMqZyreBridge.sendZyreWhisperMessage(uuid, uxas::common::SentinelSerialBuffer::createSentinelizedString(receivedLmcpMessage->getString()));
-                            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage sent ", receivedLmcpMessage->getMessageAttributesReference()->getDescriptor(), " message to Zyre UUID ", uuid, " associated with ", m_remoteEntityTypeIdsByZyreUuids[uuid].first, " with ID ", m_remoteEntityTypeIdsByZyreUuids[uuid].second);
+                            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage sent ", receivedLmcpMessage->getMessageAttributesReference()->getDescriptor(), " message to Zyre UUID ", uuid, " associated with ", m_remoteEntityTypeIdsByZyreUuids[uuid].first, " with ID ", m_remoteEntityTypeIdsByZyreUuids[uuid].second);
                         }
                     }
                 }
@@ -214,12 +214,12 @@ LmcpObjectNetworkZeroMqZyreBridge::processReceivedSerializedLmcpMessage(std::uni
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
         }
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
     }
     
     return (false); // always false implies never terminating bridge from here
@@ -228,7 +228,7 @@ LmcpObjectNetworkZeroMqZyreBridge::processReceivedSerializedLmcpMessage(std::uni
 void
 LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zyreRemoteUuid, const std::unordered_map<std::string, std::string>& headerKeyValuePairs)
 {
-    LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler - START");
+    UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler - START");
     bool isSuccess{true};
     
     // check validity of input parameters
@@ -237,24 +237,24 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
     if (entityIdKvPairIt == headerKeyValuePairs.end())
     {
         isSuccess = false;
-        LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::EntityID(), " key/value pair in the Zyre header map");
+        UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::EntityID(), " key/value pair in the Zyre header map");
     }
     
     auto entityTypeKvPairIt = headerKeyValuePairs.find(uxas::common::StringConstant::EntityType());
     if (entityTypeKvPairIt == headerKeyValuePairs.end())
     {
         isSuccess = false;
-        LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::EntityType(), " key/value pair in the Zyre header map");
+        UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::EntityType(), " key/value pair in the Zyre header map");
     }
     
     auto subAddsKvPairIt = headerKeyValuePairs.find(uxas::common::StringConstant::SubscribeToMessage());
     if (subAddsKvPairIt == headerKeyValuePairs.end())
     {
-        LOG_WARN(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::SubscribeToMessage(), " key/value pair in the Zyre header map");
+        UXAS_LOG_WARN(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::SubscribeToMessage(), " key/value pair in the Zyre header map");
     }
     if (!isSuccess)
     {
-        LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to process Zyre enter message with UUID ", zyreRemoteUuid);
+        UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to process Zyre enter message with UUID ", zyreRemoteUuid);
         return;
     }
 
@@ -263,19 +263,19 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
     if (uuidEntityIdPairIt != m_remoteEntityTypeIdsByZyreUuids.end())
     {
         m_remoteEntityTypeIdsByZyreUuids.erase(uuidEntityIdPairIt);
-        LOG_WARN(s_typeName(), "::zyreEnterMessageHandler unexpectedly removed existing Zyre UUID/entity ID map pair");
+        UXAS_LOG_WARN(s_typeName(), "::zyreEnterMessageHandler unexpectedly removed existing Zyre UUID/entity ID map pair");
     }
     m_remoteEntityTypeIdsByZyreUuids.emplace(zyreRemoteUuid, std::make_pair(entityTypeKvPairIt->second, entityIdKvPairIt->second));
-    LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler added Zyre UUID ", zyreRemoteUuid, " to entity map for ", entityTypeKvPairIt->second, " with ID ", entityIdKvPairIt->second);
+    UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler added Zyre UUID ", zyreRemoteUuid, " to entity map for ", entityTypeKvPairIt->second, " with ID ", entityIdKvPairIt->second);
 
     std::vector<std::string> addresses = uxas::common::StringUtil::split(subAddsKvPairIt->second, *(m_extSubAddressDelimiter.c_str()));
     if (addresses.size() > 0)
     {
-        LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler processing Zyre enter message having ", addresses.size(), " subscription addresses");
+        UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler processing Zyre enter message having ", addresses.size(), " subscription addresses");
     }
     else
     {
-        LOG_WARN(s_typeName(), "::zyreEnterMessageHandler processing Zyre enter message having zero subscription addresses");
+        UXAS_LOG_WARN(s_typeName(), "::zyreEnterMessageHandler processing Zyre enter message having zero subscription addresses");
     }
     
     for (const auto& address : addresses)
@@ -285,38 +285,38 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
         {
             addSubscriptionAddress(address);
             m_remoteZyreUuidsBySubscriptionAddress.emplace(address, std::set<std::string>{zyreRemoteUuid});
-            LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler bridge locally subscribed to address ", address, " mapped to UUID ", zyreRemoteUuid);
+            UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler bridge locally subscribed to address ", address, " mapped to UUID ", zyreRemoteUuid);
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler bridge already subscribed to address ", address);
+            UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler bridge already subscribed to address ", address);
             const auto& uuidIt = addUuidsPairIt->second.find(zyreRemoteUuid);
             if (uuidIt == addUuidsPairIt->second.end())
             {
                 addUuidsPairIt->second.emplace(zyreRemoteUuid);
-                LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler mapped UUID ", zyreRemoteUuid, ", to address ", address);
+                UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler mapped UUID ", zyreRemoteUuid, ", to address ", address);
             }
             else
             {
-                LOG_WARN(s_typeName(), "::zyreEnterMessageHandler unexpectedly already contains address [", address, "] UUID [", zyreRemoteUuid, "pair");
+                UXAS_LOG_WARN(s_typeName(), "::zyreEnterMessageHandler unexpectedly already contains address [", address, "] UUID [", zyreRemoteUuid, "pair");
             }
         }
     }
 
     // broadcast entity join message
-    LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler broadcasting EntityJoin for type [", entityTypeKvPairIt->second, "] ID [", entityIdKvPairIt->second, "]");
+    UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler broadcasting EntityJoin for type [", entityTypeKvPairIt->second, "] ID [", entityIdKvPairIt->second, "]");
     std::unique_ptr<uxas::messages::uxnative::EntityJoin> entityJoin = uxas::stduxas::make_unique<uxas::messages::uxnative::EntityJoin>();
     entityJoin->setEntityID(std::stoi(entityIdKvPairIt->second));
     entityJoin->setLabel(entityTypeKvPairIt->second);
     sendLmcpObjectBroadcastMessage(std::move(entityJoin));
 
-    LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler - END");
+    UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler - END");
 };
 
 void
 LmcpObjectNetworkZeroMqZyreBridge::zyreExitMessageHandler(const std::string& zyreRemoteUuid)
 {
-    LOG_INFORM(s_typeName(), "::zyreExitMessageHandler - START");
+    UXAS_LOG_INFORM(s_typeName(), "::zyreExitMessageHandler - START");
     std::unique_lock<std::mutex> lock(m_mutex);
     // update subscription addresses and UUIDs
     for (auto addressUuidsIt = m_remoteZyreUuidsBySubscriptionAddress.begin(); addressUuidsIt != m_remoteZyreUuidsBySubscriptionAddress.end();)
@@ -325,11 +325,11 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreExitMessageHandler(const std::string& zyr
         if (uuidIt != addressUuidsIt->second.end())
         {
             addressUuidsIt->second.erase(uuidIt);
-            LOG_INFORM(s_typeName(), "::zyreExitMessageHandler removed UUID ", zyreRemoteUuid, " from address [", addressUuidsIt->first, "] in address/UUID map for exiting ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].first, " with ID ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].second);
+            UXAS_LOG_INFORM(s_typeName(), "::zyreExitMessageHandler removed UUID ", zyreRemoteUuid, " from address [", addressUuidsIt->first, "] in address/UUID map for exiting ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].first, " with ID ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].second);
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::zyreExitMessageHandler UUID ", zyreRemoteUuid, " was not mapped to address ", addressUuidsIt->first, " (no change to map)");
+            UXAS_LOG_INFORM(s_typeName(), "::zyreExitMessageHandler UUID ", zyreRemoteUuid, " was not mapped to address ", addressUuidsIt->first, " (no change to map)");
         }
         
         if (!addressUuidsIt->second.empty())
@@ -341,7 +341,7 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreExitMessageHandler(const std::string& zyr
             auto persisentLocAdd = m_initialPersistentLocalSubscriptionAddresses.find(addressUuidsIt->first);
             if (persisentLocAdd == m_initialPersistentLocalSubscriptionAddresses.end())
             {
-                LOG_INFORM(s_typeName(), "::zyreExitMessageHandler removing local subscription to address [", addressUuidsIt->first, "]");
+                UXAS_LOG_INFORM(s_typeName(), "::zyreExitMessageHandler removing local subscription to address [", addressUuidsIt->first, "]");
                 removeSubscriptionAddress(addressUuidsIt->first);
             }
             addressUuidsIt = m_remoteZyreUuidsBySubscriptionAddress.erase(addressUuidsIt);
@@ -352,20 +352,20 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreExitMessageHandler(const std::string& zyr
     if (uuidEntityTypeIdPairIt != m_remoteEntityTypeIdsByZyreUuids.end())
     {
         // broadcast entity exit message
-        LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler broadcasting EntityExit for type [", uuidEntityTypeIdPairIt->second.first, "] ID [", uuidEntityTypeIdPairIt->second.second, "]");
+        UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler broadcasting EntityExit for type [", uuidEntityTypeIdPairIt->second.first, "] ID [", uuidEntityTypeIdPairIt->second.second, "]");
         std::unique_ptr<uxas::messages::uxnative::EntityExit> entityExit = uxas::stduxas::make_unique<uxas::messages::uxnative::EntityExit>();
         entityExit->setEntityID(std::stoi(uuidEntityTypeIdPairIt->second.second));
         entityExit->setLabel(uuidEntityTypeIdPairIt->second.first);
         sendLmcpObjectBroadcastMessage(std::move(entityExit));
-        LOG_INFORM(s_typeName(), "::zyreExitMessageHandler removing Zyre UUID ", zyreRemoteUuid, " for ", uuidEntityTypeIdPairIt->second.first, " with ID ", uuidEntityTypeIdPairIt->second.second);
+        UXAS_LOG_INFORM(s_typeName(), "::zyreExitMessageHandler removing Zyre UUID ", zyreRemoteUuid, " for ", uuidEntityTypeIdPairIt->second.first, " with ID ", uuidEntityTypeIdPairIt->second.second);
         m_remoteEntityTypeIdsByZyreUuids.erase(uuidEntityTypeIdPairIt);
     }
     else
     {
-        LOG_WARN(s_typeName(), "::zyreExitMessageHandler unexpectedly did not find (so did not remove) Zyre UUID/entity ID map pair; not sending internal EntityExit message");
+        UXAS_LOG_WARN(s_typeName(), "::zyreExitMessageHandler unexpectedly did not find (so did not remove) Zyre UUID/entity ID map pair; not sending internal EntityExit message");
     }
 
-    LOG_INFORM(s_typeName(), "::zyreExitMessageHandler - END");
+    UXAS_LOG_INFORM(s_typeName(), "::zyreExitMessageHandler - END");
 };
 
 void
@@ -379,12 +379,12 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreWhisperMessageHandler(const std::string& 
         std::string recvdZyreDataSegment = m_receiveZyreDataBuffer.getNextPayloadString(messagePayload);
         if (!recvdZyreDataSegment.empty())
         {
-            LOG_DEBUG_VERBOSE(s_typeName(), "::zyreWhisperMessageHandler processing received Zyre data string segment");
+            UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::zyreWhisperMessageHandler processing received Zyre data string segment");
             std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg
                     = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
             if (recvdAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdZyreDataSegment)))
             {
-                LOG_INFORM(s_typeName(), "::zyreWhisperMessageHandler processing ", recvdAddAttMsg->getMessageAttributesReference()->getDescriptor(),
+                UXAS_LOG_INFORM(s_typeName(), "::zyreWhisperMessageHandler processing ", recvdAddAttMsg->getMessageAttributesReference()->getDescriptor(),
                            " message from ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].first, " with ID ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].second);
 
                 // process messages from an external service (only)
@@ -396,34 +396,34 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreWhisperMessageHandler(const std::string& 
                     }
                     else
                     {
-                        LOG_INFORM(s_typeName(), "::zyreWhisperMessageHandler ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
+                        UXAS_LOG_INFORM(s_typeName(), "::zyreWhisperMessageHandler ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
                     }
                 }
                 else
                 {
-                    LOG_INFORM(s_typeName(), "::zyreWhisperMessageHandler ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                    UXAS_LOG_INFORM(s_typeName(), "::zyreWhisperMessageHandler ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
                 }
             }
             else
             {
-                LOG_WARN(s_typeName(), "::zyreWhisperMessageHandler failed to create AddressedAttributedMessage object from Zyre data buffer string segment");
+                UXAS_LOG_WARN(s_typeName(), "::zyreWhisperMessageHandler failed to create AddressedAttributedMessage object from Zyre data buffer string segment");
             }
         }
         else
         {
-            LOG_WARN(s_typeName(), "::zyreWhisperMessageHandler data appended to serial buffer, but serial buffer unexpectedly does not contain a complete object string segment");
+            UXAS_LOG_WARN(s_typeName(), "::zyreWhisperMessageHandler data appended to serial buffer, but serial buffer unexpectedly does not contain a complete object string segment");
         }
     }
     else
     {
         try
         {
-            LOG_WARN(s_typeName(), "::zyreWhisperMessageHandler ignoring external message with empty payload string from ",
+            UXAS_LOG_WARN(s_typeName(), "::zyreWhisperMessageHandler ignoring external message with empty payload string from ",
                      m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].first, " with ID ", m_remoteEntityTypeIdsByZyreUuids[zyreRemoteUuid].second);
         }
         catch (std::exception& ex)
         {
-            LOG_ERROR(s_typeName(), "::zyreWhisperMessageHandler EXCEPTION: ", ex.what());
+            UXAS_LOG_ERROR(s_typeName(), "::zyreWhisperMessageHandler EXCEPTION: ", ex.what());
         }
     }
 };

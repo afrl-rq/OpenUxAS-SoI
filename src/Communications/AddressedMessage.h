@@ -56,12 +56,12 @@ public:
         std::string::size_type sz = address.find(*(s_addressAttributesDelimiter().c_str()));
         if (address.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::isValidAddress address must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::isValidAddress address must be non-empty");
             return (false);
         }
         else if (address.find(*(s_addressAttributesDelimiter().c_str())) != std::string::npos)
         {
-            LOG_ERROR(s_typeName(), "::isValidAddress address cannot contain delimiter character ", s_addressAttributesDelimiter());
+            UXAS_LOG_ERROR(s_typeName(), "::isValidAddress address cannot contain delimiter character ", s_addressAttributesDelimiter());
             return (false);
         }
 
@@ -84,7 +84,7 @@ public:
 
         if (payload.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::setAddressAndPayload payload must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAndPayload payload must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
@@ -110,7 +110,7 @@ public:
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::setAddressAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressMessageStringLength);
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressMessageStringLength);
             m_isValid = false;
             return (m_isValid);
         }
@@ -172,7 +172,7 @@ protected:
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::parseAddressedMessageStringAndSetFields delimited string must contain delimiter and have non-empty payload");
+            UXAS_LOG_ERROR(s_typeName(), "::parseAddressedMessageStringAndSetFields delimited string must contain delimiter and have non-empty payload");
             m_isValid = false;
             return (m_isValid);
         }

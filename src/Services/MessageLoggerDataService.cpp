@@ -67,11 +67,11 @@ MessageLoggerDataService::configure(const pugi::xml_node& serviceXmlNode)
         if (logFileMsgCntLimFromXml > 0 && logFileMsgCntLimFromXml <= UINT32_MAX)
         {
             m_logFileMessageCountLimit = logFileMsgCntLimFromXml;
-            LOG_INFORM(s_typeName(), "::configure set m_logFileMessageCountLimit value to ", m_logFileMessageCountLimit, " from XML");
+            UXAS_LOG_INFORM(s_typeName(), "::configure set m_logFileMessageCountLimit value to ", m_logFileMessageCountLimit, " from XML");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::configure retaining m_logFileMessageCountLimit value ", m_logFileMessageCountLimit, "; ignoring invalid value from XML");
+            UXAS_LOG_WARN(s_typeName(), "::configure retaining m_logFileMessageCountLimit value ", m_logFileMessageCountLimit, "; ignoring invalid value from XML");
         }
     }
     
@@ -124,11 +124,11 @@ MessageLoggerDataService::initialize()
 
         if (isDatabaseLoggerSuccess)
         {
-            LOG_INFORM(s_typeName(), "::initialize instantiated DatabaseLogger");
+            UXAS_LOG_INFORM(s_typeName(), "::initialize instantiated DatabaseLogger");
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::initialize failed to instantiate DatabaseLogger");
+            UXAS_LOG_ERROR(s_typeName(), "::initialize failed to instantiate DatabaseLogger");
         }
     }
     
@@ -145,11 +145,11 @@ MessageLoggerDataService::initialize()
 
         if (isFileLoggerSuccess)
         {
-            LOG_INFORM(s_typeName(), "::initialize instantiated FileLogger");
+            UXAS_LOG_INFORM(s_typeName(), "::initialize instantiated FileLogger");
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::initialize failed to instantiate FileLogger");
+            UXAS_LOG_ERROR(s_typeName(), "::initialize failed to instantiate FileLogger");
         }
     }
     
@@ -159,7 +159,7 @@ MessageLoggerDataService::initialize()
 bool
 MessageLoggerDataService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    LOG_DEBUG_VERBOSE(s_typeName(), "::processReceivedLmcpMessage BEFORE logging received message");
+    UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::processReceivedLmcpMessage BEFORE logging received message");
     
     if (m_databaseLogger)
     {
@@ -180,7 +180,7 @@ MessageLoggerDataService::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
         m_fileLogger->outputTextToStream(receivedLmcpMessage->m_object->toXML());
     }
     
-    LOG_DEBUG_VERBOSE(s_typeName(), "::processReceivedLmcpMessage AFTER logging received message");
+    UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::processReceivedLmcpMessage AFTER logging received message");
 
     return (false); // always false implies never terminating service from here
 };

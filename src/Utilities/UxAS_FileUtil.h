@@ -68,11 +68,11 @@ public:
         std::ifstream inFile(inputFilePath);
         if (inFile.is_open())
         {
-            LOG_DEBUGGING(s_typeName(), "::readTextLines open input file [", inputFilePath, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::readTextLines open input file [", inputFilePath, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::readTextLines failed to open input file [", inputFilePath, "]");
+            UXAS_LOG_WARN(s_typeName(), "::readTextLines failed to open input file [", inputFilePath, "]");
             return (std::move(lines));
         }
         std::string oneLine;
@@ -89,11 +89,11 @@ public:
         std::ofstream outFile(outputFilePath, std::ios::ate);
         if (outFile.is_open())
         {
-            LOG_DEBUGGING(s_typeName(), "::writeTextLines opened output file [", outputFilePath, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::writeTextLines opened output file [", outputFilePath, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::writeTextLines failed to open output file [", outputFilePath, "]");
+            UXAS_LOG_WARN(s_typeName(), "::writeTextLines failed to open output file [", outputFilePath, "]");
             return (false);
         }
 
@@ -109,7 +109,7 @@ public:
     static std::vector<uint8_t>
     readBinaryFile(const std::string& inputFilePath)
     {
-        LOG_DEBUGGING(s_typeName(), "::readBinaryFile inputFilePath [", inputFilePath, "]");
+        UXAS_LOG_DEBUGGING(s_typeName(), "::readBinaryFile inputFilePath [", inputFilePath, "]");
 
         std::vector<uint8_t> failedReadZeroBytes;
 
@@ -118,11 +118,11 @@ public:
 
         if (inFile.is_open())
         {
-            LOG_DEBUGGING(s_typeName(), "::readBinaryFile opened input file [", inputFilePath, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::readBinaryFile opened input file [", inputFilePath, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::readBinaryFile failed to open input file [", inputFilePath, "]");
+            UXAS_LOG_WARN(s_typeName(), "::readBinaryFile failed to open input file [", inputFilePath, "]");
             return (failedReadZeroBytes);
         }
 
@@ -133,11 +133,11 @@ public:
         size_t len = end - start;
         if (len > 0)
         {
-            LOG_DEBUGGING(s_typeName(), "::readBinaryFile input file [", inputFilePath, "] has length [", len, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::readBinaryFile input file [", inputFilePath, "] has length [", len, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::readBinaryFile input file [", inputFilePath, "] unexpectedly has length [", len, "]");
+            UXAS_LOG_WARN(s_typeName(), "::readBinaryFile input file [", inputFilePath, "] unexpectedly has length [", len, "]");
             return (failedReadZeroBytes);
         }
 
@@ -145,11 +145,11 @@ public:
         char* buffer = new char[len];
         if (inFile.read(buffer, len))
         {
-            LOG_DEBUGGING(s_typeName(), "::readBinaryFile read input file [", inputFilePath, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::readBinaryFile read input file [", inputFilePath, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::readBinaryFile failed to read input file [", inputFilePath, "] - inFile.gcount() [", inFile.gcount(), "]");
+            UXAS_LOG_WARN(s_typeName(), "::readBinaryFile failed to read input file [", inputFilePath, "] - inFile.gcount() [", inFile.gcount(), "]");
             return (failedReadZeroBytes);
         }
         
@@ -165,21 +165,21 @@ public:
         std::ofstream outFile(outputFilePath, std::ios::out | std::ofstream::binary); // std::ios::ate ??
         if (outFile.is_open())
         {
-            LOG_DEBUGGING(s_typeName(), "::writeBinaryFile opened output file [", outputFilePath, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::writeBinaryFile opened output file [", outputFilePath, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::writeBinaryFile failed to open output file [", outputFilePath, "]");
+            UXAS_LOG_WARN(s_typeName(), "::writeBinaryFile failed to open output file [", outputFilePath, "]");
             return (false);
         }
 
         if (outFile.write((char*)&bytes[0], bytes.size()))
         {
-            LOG_DEBUGGING(s_typeName(), "::writeBinaryFile wrote output file [", outputFilePath, "]");
+            UXAS_LOG_DEBUGGING(s_typeName(), "::writeBinaryFile wrote output file [", outputFilePath, "]");
         }
         else
         {
-            LOG_WARN(s_typeName(), "::writeBinaryFile failed to write output file [", outputFilePath, "] - outFile.rdstate() [", outFile.rdstate(), "]");
+            UXAS_LOG_WARN(s_typeName(), "::writeBinaryFile failed to write output file [", outputFilePath, "] - outFile.rdstate() [", outFile.rdstate(), "]");
             return (false);
         }
 

@@ -46,14 +46,14 @@ ZeroMqFabric::~ZeroMqFabric()
 {
     if(m_zmqContext)
     {
-        LOG_INFORM_ASSIGNMENT("****** ZeroMqFabric::~ZeroMqFabric() - Starting to shut down m_zmqContext !!! ******");
+        UXAS_LOG_INFORM_ASSIGNMENT("****** ZeroMqFabric::~ZeroMqFabric() - Starting to shut down m_zmqContext !!! ******");
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         m_zmqContext->close();
         zmq_ctx_destroy(m_zmqContext.get());
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         m_zmqContext.reset();
     }
-    LOG_INFORM_ASSIGNMENT("****** ZeroMqFabric::~ZeroMqFabric() - Finished shutting down m_zmqContext !!! ******");
+    UXAS_LOG_INFORM_ASSIGNMENT("****** ZeroMqFabric::~ZeroMqFabric() - Finished shutting down m_zmqContext !!! ******");
 };
 
 std::unique_ptr<zmq::socket_t>

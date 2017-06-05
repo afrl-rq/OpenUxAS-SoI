@@ -75,7 +75,7 @@ AutomationRequestValidatorService::~AutomationRequestValidatorService()
     uint64_t delayTime_ms{1000};
     if (m_responseTimerId && !uxas::common::TimerManager::getInstance().destroyTimer(m_responseTimerId, delayTime_ms))
     {
-        LOG_WARN("AutomationRequestValidatorService::~AutomationRequestValidatorService failed to destroy response timer "
+        UXAS_LOG_WARN("AutomationRequestValidatorService::~AutomationRequestValidatorService failed to destroy response timer "
                 "(m_responseTimerId) with timer ID ", m_responseTimerId, " within ", delayTime_ms, " millisecond timeout");
     }
 };
@@ -363,7 +363,7 @@ void AutomationRequestValidatorService::checkToSendNextRequest()
                 // automation request ID not sent
                 std::stringstream reasonForFailure;
                 reasonForFailure << "- automation request ID[" << uniqueAutomationRequest->getRequestID() << "] was not ready in time and was not sent." << std::endl;
-                LOG_WARN(reasonForFailure.str());
+                UXAS_LOG_WARN(reasonForFailure.str());
                 COUT_INFO_MSG(reasonForFailure.str());
                 auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
                 serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Information);
@@ -575,7 +575,7 @@ bool AutomationRequestValidatorService::isCheckAutomationRequestRequirements(con
 
     if (!isReady)
     {
-        LOG_WARN(reasonForFailure.str());
+        UXAS_LOG_WARN(reasonForFailure.str());
         COUT_INFO_MSG(reasonForFailure.str());
         auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
         serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Information);

@@ -138,7 +138,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
             m_idVsAssigmentPrerequisites.insert(std::make_pair(uniqueAutomationRequest->getRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
         m_idVsAssigmentPrerequisites[uniqueAutomationRequest->getRequestID()]->m_uniqueAutomationRequest = uniqueAutomationRequest;
-        LOG_INFORM_ASSIGNMENT(s_typeName(), "uniqueAutomationRequest->getRequestID()[", uniqueAutomationRequest->getRequestID(), "]");
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "uniqueAutomationRequest->getRequestID()[", uniqueAutomationRequest->getRequestID(), "]");
         if (m_idVsAssigmentPrerequisites[uniqueAutomationRequest->getRequestID()]->isAssignmentReady(m_isUsingAssignmentTypes))
         {
             assigmentPrerequisites = m_idVsAssigmentPrerequisites[uniqueAutomationRequest->getRequestID()];
@@ -188,7 +188,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
             assigmentPrerequisites = m_idVsAssigmentPrerequisites[pisrAssignmentType->getAutomationRequestID()];
             m_idVsAssigmentPrerequisites.erase(pisrAssignmentType->getAutomationRequestID());
         }
-        LOG_INFORM_ASSIGNMENT(s_typeName(), "!!! Received an AssigmentType for automation Id [", pisrAssignmentType->getAutomationRequestID(), "]");
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "!!! Received an AssigmentType for automation Id [", pisrAssignmentType->getAutomationRequestID(), "]");
     }
 #endif
     else
@@ -236,7 +236,7 @@ bool AssignmentTreeBranchBoundBase::AssigmentPrerequisites::isAssignmentReady(co
                 if (m_taskIdVsTaskPlanOptions.find(*itTaskId) == m_taskIdVsTaskPlanOptions.end())
                 {
                     isHavePrerequisites = false;
-                    LOG_INFORM_ASSIGNMENT(s_typeName(), "isAssignmentReady:: NO!, Don't Have the options for TaskId[", *itTaskId, "], yet");
+                    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "isAssignmentReady:: NO!, Don't Have the options for TaskId[", *itTaskId, "], yet");
                     break;
                 }
                 else
@@ -722,7 +722,7 @@ void c_Node_Base::printStatus(const std::string& Message)
                   << "] numberNodesPruned[" << m_staticAssignmentParameters->m_numberNodesPruned
 
                   << "]" << std::endl)
-            LOG_INFORM_ASSIGNMENT("timeSinceStart_s[", timeSinceStart_s,
+            UXAS_LOG_INFORM_ASSIGNMENT("timeSinceStart_s[", timeSinceStart_s,
                                   "] cost[", m_staticAssignmentParameters->m_minimumAssignmentCostCandidate,
                                   "] numberNodesVisited[", m_staticAssignmentParameters->m_numberNodesVisited, "]");
 }
@@ -924,7 +924,7 @@ void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehi
         }
         else
         {
-            LOG_ERROR("ASSIGNMENT_ERROR:: required prerequisite TaskOptionId[", prerequisiteTaskOptionId, "] not found");
+            UXAS_LOG_ERROR("ASSIGNMENT_ERROR:: required prerequisite TaskOptionId[", prerequisiteTaskOptionId, "] not found");
             m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_ERROR:: required prerequisite TaskOptionId[" << prerequisiteTaskOptionId << "] not found!" << std::endl;
             isError = true;
         }
@@ -1026,7 +1026,7 @@ void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehi
         }
         else //if (travelTime_ms > 0)
         {
-            //LOG_WARN("ASSIGNMENT_WARNING:: No TravelTime_ms[", startingLocationId, ",", taskOptionId, "] found.");
+            //UXAS_LOG_WARN("ASSIGNMENT_WARNING:: No TravelTime_ms[", startingLocationId, ",", taskOptionId, "] found.");
             m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_WARNING:: No TravelTime_ms[" << startingLocationId << "," << taskOptionId << "] found.!" << std::endl;
         } //if (travelTime_ms > 0)
     }

@@ -100,7 +100,7 @@ main(int argc, char** argv)
     bool isConsoleLoggerInitialized = uxas::common::log::LogManagerDefaultInitializer::initializeConsoleLogger();
     if (isConsoleLoggerInitialized)
     {
-        LOG_INFORM("UxAS_Main initialized console logger");
+        UXAS_LOG_INFORM("UxAS_Main initialized console logger");
     }
     else
     {
@@ -110,7 +110,7 @@ main(int argc, char** argv)
     //    bool isDatabaseLoggerInitialized = uxas::common::log::LogManagerDefaultInitializer::initializeMainDatabaseLogger();
     //    if (isDatabaseLoggerInitialized)
     //    {
-    //        LOG_INFORM("UxAS_Main initialized main file logger");
+    //        UXAS_LOG_INFORM("UxAS_Main initialized main file logger");
     //    }
     //    else
     //    {
@@ -120,7 +120,7 @@ main(int argc, char** argv)
     bool isMainFileLoggerInitialized = uxas::common::log::LogManagerDefaultInitializer::initializeMainFileLogger();
     if (isMainFileLoggerInitialized)
     {
-        LOG_INFORM("UxAS_Main initialized main file logger");
+        UXAS_LOG_INFORM("UxAS_Main initialized main file logger");
     }
     else
     {
@@ -130,7 +130,7 @@ main(int argc, char** argv)
     //
     // log thread id
     //
-    LOG_INFORM("UxAS_Main running on main thread [", std::this_thread::get_id(), "]");
+    UXAS_LOG_INFORM("UxAS_Main running on main thread [", std::this_thread::get_id(), "]");
 
     /* NOTES:
      * (a) Configurations are determined from two files - details:
@@ -159,11 +159,11 @@ main(int argc, char** argv)
     //
     if (uxas::common::ConfigurationManager::getInstance().loadBaseXmlFile(cfgPath))
     {
-        LOG_INFORM("UxAS_Main loaded base XML configuration from [", cfgPath, "]");
+        UXAS_LOG_INFORM("UxAS_Main loaded base XML configuration from [", cfgPath, "]");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to load base XML configuration from [", cfgPath, "]");
+        UXAS_LOG_ERROR("UxAS_Main failed to load base XML configuration from [", cfgPath, "]");
         return (100);
     }
 
@@ -174,31 +174,31 @@ main(int argc, char** argv)
 
     if (networkServer)
     {
-        LOG_INFORM("UxAS_Main created networkServer");
+        UXAS_LOG_INFORM("UxAS_Main created networkServer");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to create networkServer");
+        UXAS_LOG_ERROR("UxAS_Main failed to create networkServer");
         return (200);
     }
 
     if (networkServer->configure())
     {
-        LOG_INFORM("UxAS_Main configured networkServer");
+        UXAS_LOG_INFORM("UxAS_Main configured networkServer");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to configure networkServer");
+        UXAS_LOG_ERROR("UxAS_Main failed to configure networkServer");
         return (210);
     }
 
     if (networkServer->initializeAndStart())
     {
-        LOG_INFORM("UxAS_Main initialized and started networkServer");
+        UXAS_LOG_INFORM("UxAS_Main initialized and started networkServer");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to initialize and start networkServer");
+        UXAS_LOG_ERROR("UxAS_Main failed to initialize and start networkServer");
         return (220);
     }
 
@@ -207,11 +207,11 @@ main(int argc, char** argv)
     //
     if (uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().initialize())
     {
-        LOG_INFORM("UxAS_Main initialized bridge manager");
+        UXAS_LOG_INFORM("UxAS_Main initialized bridge manager");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to initialize bridge manager");
+        UXAS_LOG_ERROR("UxAS_Main failed to initialize bridge manager");
         return (300);
     }
 
@@ -220,25 +220,25 @@ main(int argc, char** argv)
     //
     if (uxas::service::ServiceManager::getInstance().configureServiceManager())
     {
-        LOG_INFORM("UxAS_Main configured ServiceManager");
+        UXAS_LOG_INFORM("UxAS_Main configured ServiceManager");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to configure ServiceManager");
+        UXAS_LOG_ERROR("UxAS_Main failed to configure ServiceManager");
         return (400);
     }
 
     if (uxas::service::ServiceManager::getInstance().initializeAndStartService())
     {
-        LOG_INFORM("UxAS_Main initialized and started ServiceManager");
+        UXAS_LOG_INFORM("UxAS_Main initialized and started ServiceManager");
     }
     else
     {
-        LOG_ERROR("UxAS_Main failed to initialize and start ServiceManager");
+        UXAS_LOG_ERROR("UxAS_Main failed to initialize and start ServiceManager");
         return (410);
     }
 
-    LOG_INFORM("UxAS_Main running ServiceManager");
+    UXAS_LOG_INFORM("UxAS_Main running ServiceManager");
     uxas::service::ServiceManager::getInstance().runUntil(uxas::common::ConfigurationManager::getInstance().getRunDuration_s());
 
     uxas::service::ServiceManager::getInstance().destroyServiceManager();

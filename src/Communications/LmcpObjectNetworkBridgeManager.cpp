@@ -64,25 +64,25 @@ LmcpObjectNetworkBridgeManager::initialize()
                 {
                     addedBridgeXmlNodeCount++;
                     m_bridgesByNetworkId.emplace(newBridge->m_networkId, std::move(newBridge));
-                    LOG_INFORM(s_typeName(), "::initialize number of added bridges is ", addedBridgeXmlNodeCount);
+                    UXAS_LOG_INFORM(s_typeName(), "::initialize number of added bridges is ", addedBridgeXmlNodeCount);
                 }
                 else
                 {
                     failedBridgeXmlNodeCount++;
-                    LOG_WARN(s_typeName(), "::initialize number of failed bridge add attempts is ", failedBridgeXmlNodeCount);
+                    UXAS_LOG_WARN(s_typeName(), "::initialize number of failed bridge add attempts is ", failedBridgeXmlNodeCount);
                 }
             }
         }
         else
         {
-            LOG_WARN(s_typeName(), "::initialize did not find any enabled bridges");
+            UXAS_LOG_WARN(s_typeName(), "::initialize did not find any enabled bridges");
         }
         m_isInitializedBridges = true;
         isSuccess = true;
     }
     else
     {
-        LOG_WARN(s_typeName(), "::initialize ignoring second attempt to instantiate bridges from XML");
+        UXAS_LOG_WARN(s_typeName(), "::initialize ignoring second attempt to instantiate bridges from XML");
     }
 
     return (isSuccess);
@@ -92,7 +92,7 @@ std::unordered_map<uint32_t, std::unique_ptr<LmcpObjectNetworkClientBase>>
 LmcpObjectNetworkBridgeManager::createTestBridges(const std::string& cfgXmlFilePath, uint32_t entityId, uint32_t firstNetworkId)
 {
     std::unordered_map<uint32_t, std::unique_ptr<LmcpObjectNetworkClientBase>> testBridgesByNetworkIdMap;
-    LOG_INFORM(s_typeName(), "::createTestBridges - START");
+    UXAS_LOG_INFORM(s_typeName(), "::createTestBridges - START");
 //#ifdef GOOGLE_TEST_BRIDGES_ENABLED
     uint32_t networkId = firstNetworkId;
     std::ifstream cfgXmlInputStream(cfgXmlFilePath);
@@ -110,21 +110,21 @@ LmcpObjectNetworkBridgeManager::createTestBridges(const std::string& cfgXmlFileP
                 networkId++;
                 if (newTestBridge)
                 {
-                    LOG_INFORM(s_typeName(), "::createTestBridges added ", newTestBridge->m_networkClientTypeName, " bridge with entity ID ", newTestBridge->m_entityId," and network ID ", newTestBridge->m_networkId, " from XML configuration ", cfgXmlFilePath);
+                    UXAS_LOG_INFORM(s_typeName(), "::createTestBridges added ", newTestBridge->m_networkClientTypeName, " bridge with entity ID ", newTestBridge->m_entityId," and network ID ", newTestBridge->m_networkId, " from XML configuration ", cfgXmlFilePath);
                     testBridgesByNetworkIdMap.emplace(newTestBridge->m_networkId, std::move(newTestBridge));
                 }
                 else
                 {
-                    LOG_ERROR(s_typeName(), "::createTestBridges failed to add a bridge from XML configuration ", cfgXmlFilePath);
+                    UXAS_LOG_ERROR(s_typeName(), "::createTestBridges failed to add a bridge from XML configuration ", cfgXmlFilePath);
                 }
             }
         }
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::createTestBridges failed to load configuration XML from location ", cfgXmlFilePath);
+        UXAS_LOG_ERROR(s_typeName(), "::createTestBridges failed to load configuration XML from location ", cfgXmlFilePath);
     }
-    LOG_INFORM(s_typeName(), "::createTestBridges - END");
+    UXAS_LOG_INFORM(s_typeName(), "::createTestBridges - END");
 
 //#endif // GOOGLE_TEST_BRIDGES_ENABLED
     return (testBridgesByNetworkIdMap);
@@ -138,7 +138,7 @@ LmcpObjectNetworkBridgeManager::createBridge(const pugi::xml_node& bridgeXmlNode
     if (uxas::common::StringConstant::Bridge().compare(bridgeXmlNode.name()) == 0)
     {
         std::string bridgeType = bridgeXmlNode.attribute(uxas::common::StringConstant::Type().c_str()).value();
-        LOG_INFORM(s_typeName(), "::createBridge adding ", bridgeType);
+        UXAS_LOG_INFORM(s_typeName(), "::createBridge adding ", bridgeType);
         
         std::unique_ptr<LmcpObjectNetworkClientBase> newBridge;
         if (LmcpObjectNetworkSerialBridge::s_typeName().compare(bridgeType) == 0)
@@ -167,12 +167,12 @@ LmcpObjectNetworkBridgeManager::createBridge(const pugi::xml_node& bridgeXmlNode
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::createBridge cannot construct ", bridgeType);
+            UXAS_LOG_ERROR(s_typeName(), "::createBridge cannot construct ", bridgeType);
         }
 
         if (newBridge)
         {
-            LOG_INFORM(s_typeName(), "::createBridge instantiated bridge ", bridgeType, " network ID ", newBridge->m_networkId);
+            UXAS_LOG_INFORM(s_typeName(), "::createBridge instantiated bridge ", bridgeType, " network ID ", newBridge->m_networkId);
             if (newBridge->configureNetworkClient(bridgeType, LmcpObjectNetworkClientBase::ReceiveProcessingType::SERIALIZED_LMCP, bridgeXmlNode))
             {
                 //TODO - consider friend of clientBase (protect m_entityId and m_entityIdString)
@@ -185,33 +185,33 @@ LmcpObjectNetworkBridgeManager::createBridge(const pugi::xml_node& bridgeXmlNode
                     newBridge->m_networkId = networkId;
                     newBridge->removeSubscriptionAddress(originalUnicastAddress);
                     newBridge->addSubscriptionAddress(LmcpObjectNetworkClientBase::getNetworkClientUnicastAddress(newBridge->m_entityId, newBridge->m_networkId));
-                    LOG_WARN(s_typeName(), "::createBridge re-configuring ", newBridge->m_networkClientTypeName, " entity ID ", newBridge->m_entityId, " network ID ", newBridge->m_networkId);
+                    UXAS_LOG_WARN(s_typeName(), "::createBridge re-configuring ", newBridge->m_networkClientTypeName, " entity ID ", newBridge->m_entityId, " network ID ", newBridge->m_networkId);
                 }
-                LOG_INFORM(s_typeName(), "::createBridge configured ", newBridge->m_networkClientTypeName, " entity ID ", newBridge->m_entityId, " network ID ", newBridge->m_networkId);
+                UXAS_LOG_INFORM(s_typeName(), "::createBridge configured ", newBridge->m_networkClientTypeName, " entity ID ", newBridge->m_entityId, " network ID ", newBridge->m_networkId);
                 if (newBridge->initializeAndStart())
                 {
                     newBridgeFinal = std::move(newBridge);
-                    LOG_INFORM(s_typeName(), "::createBridge initialized and started ", newBridgeFinal->m_networkClientTypeName, " network ID ", newBridgeFinal->m_networkId);
+                    UXAS_LOG_INFORM(s_typeName(), "::createBridge initialized and started ", newBridgeFinal->m_networkClientTypeName, " network ID ", newBridgeFinal->m_networkId);
                 }
                 else
                 {
-                    LOG_ERROR(s_typeName(), "::createBridge failed to initialize and start ", newBridge->m_networkClientTypeName, " network ID ", newBridge->m_networkId);
+                    UXAS_LOG_ERROR(s_typeName(), "::createBridge failed to initialize and start ", newBridge->m_networkClientTypeName, " network ID ", newBridge->m_networkId);
                     newBridge.reset();
                 }
             }
             else
             {
-                LOG_ERROR(s_typeName(), "::createBridge failed to configure ", newBridge->m_networkClientTypeName, " network ID ", newBridge->m_networkId);
+                UXAS_LOG_ERROR(s_typeName(), "::createBridge failed to configure ", newBridge->m_networkClientTypeName, " network ID ", newBridge->m_networkId);
             }
         }
         else
         {
-            LOG_WARN(s_typeName(), "::createBridge failed to instantiate ", bridgeType);
+            UXAS_LOG_WARN(s_typeName(), "::createBridge failed to instantiate ", bridgeType);
         }
     }
     else
     {
-        LOG_WARN(s_typeName(), "::createBridge ignoring ", bridgeXmlNode.name(), " XML node - expecting ", uxas::common::StringConstant::Bridge(), " XML node");
+        UXAS_LOG_WARN(s_typeName(), "::createBridge ignoring ", bridgeXmlNode.name(), " XML node - expecting ", uxas::common::StringConstant::Bridge(), " XML node");
     }
 
     return (newBridgeFinal);

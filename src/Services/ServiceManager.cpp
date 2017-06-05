@@ -54,7 +54,7 @@ ServiceManager::getInstance()
     // first time/one time creation
     if (ServiceManager::s_instance == nullptr)
     {
-        LOG_INFORM(s_typeName(), "::getInstance static ServiceBase subclass initialization started");
+        UXAS_LOG_INFORM(s_typeName(), "::getInstance static ServiceBase subclass initialization started");
         // force initialization of classes and their static class members
 
         //// <editor-fold defaultstate="collapsed" desc="trigger static Service class initialization"> 
@@ -63,7 +63,7 @@ ServiceManager::getInstance()
         #include "00_ServiceList.h"        
         //// </editor-fold>
         
-        LOG_INFORM(s_typeName(), "::getInstance static Service class initialization succeeded");
+        UXAS_LOG_INFORM(s_typeName(), "::getInstance static Service class initialization succeeded");
 
         s_instance.reset(new ServiceManager);
     }
@@ -74,7 +74,7 @@ ServiceManager::getInstance()
 bool
 ServiceManager::configureServiceManager()
 {
-    LOG_DEBUGGING(s_typeName(), "::configureServiceManager - START");
+    UXAS_LOG_DEBUGGING(s_typeName(), "::configureServiceManager - START");
 
     m_isBaseClassKillServiceProcessingPermitted = true;
     // increase service manager termination time-outs
@@ -90,14 +90,14 @@ ServiceManager::configureServiceManager()
     {
         addSubscriptionAddress(uxas::messages::uxnative::CreateNewService::Subscription);
         m_isConfigured = true;
-        LOG_INFORM(s_typeName(), "::configureServiceManager succeeded configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configureServiceManager succeeded configuration");
     }
     else
     {
-        LOG_WARN(s_typeName(), "::configureServiceManager failed configuration");
+        UXAS_LOG_WARN(s_typeName(), "::configureServiceManager failed configuration");
     }
 
-    LOG_DEBUGGING(s_typeName(), "::configureServiceManager - END");
+    UXAS_LOG_DEBUGGING(s_typeName(), "::configureServiceManager - END");
     return (isSuccess);
 };
 
@@ -110,7 +110,7 @@ ServiceManager::run()
 void
 ServiceManager::runUntil(uint32_t duration_s)
 {
-    LOG_DEBUGGING(s_typeName(), "::runUntil - START");
+    UXAS_LOG_DEBUGGING(s_typeName(), "::runUntil - START");
     auto startTime = std::chrono::system_clock::now();
     while (std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::now() - startTime).count() < duration_s)
@@ -120,13 +120,13 @@ ServiceManager::runUntil(uint32_t duration_s)
             uint32_t runningSvcCnt = removeTerminatedServices();
             if (m_isServiceManagerTermination && runningSvcCnt < 1)
             {
-                LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager has been Requested To Terminate !!! ******");
+                UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager has been Requested To Terminate !!! ******");
                 break;
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager has started Terminating Services !!! ******");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager has started Terminating Services !!! ******");
     if (!m_isServiceManagerTermination) // run duration exit
     {
         terminateAllServices();
@@ -146,57 +146,57 @@ ServiceManager::runUntil(uint32_t duration_s)
         }
         if (runningSvcCnt < 1)
         {
-            LOG_INFORM(s_typeName(), "::runUntil all services terminated after [", checkTerminateAttemptCount, "] check termination attempts (run duration exit)");
+            UXAS_LOG_INFORM(s_typeName(), "::runUntil all services terminated after [", checkTerminateAttemptCount, "] check termination attempts (run duration exit)");
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::runUntil [", runningSvcCnt, "] services remain after [", checkTerminateAttemptCount, "] check termination attempts (run duration exit)");
+            UXAS_LOG_INFORM(s_typeName(), "::runUntil [", runningSvcCnt, "] services remain after [", checkTerminateAttemptCount, "] check termination attempts (run duration exit)");
         }
     }
-    LOG_INFORM_ASSIGNMENT(s_typeName(),"****** All Services have been Terminated !!! ******");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(),"****** All Services have been Terminated !!! ******");
 
     // terminate my client thread
     m_isTerminateNetworkClient = true;
     uint32_t checkBaseTerminateCount{0};
     while (!m_isBaseClassTerminationFinished && checkBaseTerminateCount++ < 20)
     {
-        LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager is Terminating it's Client Thread !!! ******");
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager is Terminating it's Client Thread !!! ******");
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     if (m_isServiceManagerTermination) // service manager termination exit
     {
         if (m_isBaseClassTerminationFinished)
         {
-            LOG_INFORM(s_typeName(), "::runUntil found base class terminated after [", checkBaseTerminateCount, "] attempts (service manager termination exit)");
+            UXAS_LOG_INFORM(s_typeName(), "::runUntil found base class terminated after [", checkBaseTerminateCount, "] attempts (service manager termination exit)");
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::runUntil aborted effort to terminate base class after [", checkBaseTerminateCount, "] attempts (service manager termination exit)");
+            UXAS_LOG_INFORM(s_typeName(), "::runUntil aborted effort to terminate base class after [", checkBaseTerminateCount, "] attempts (service manager termination exit)");
         }
-        LOG_INFORM(s_typeName(), "::runUntil invoking shutdownProcessor method (service manager termination exit)");
-        LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager is Running the Processor Shutdown Routine !!! ******");
+        UXAS_LOG_INFORM(s_typeName(), "::runUntil invoking shutdownProcessor method (service manager termination exit)");
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager is Running the Processor Shutdown Routine !!! ******");
         shutdownProcessor();
     }
     else
     {
         if (m_isBaseClassTerminationFinished)
         {
-            LOG_INFORM(s_typeName(), "::runUntil found base class terminated after [", checkBaseTerminateCount, "] attempts (run duration exit)");
+            UXAS_LOG_INFORM(s_typeName(), "::runUntil found base class terminated after [", checkBaseTerminateCount, "] attempts (run duration exit)");
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::runUntil aborted effort to terminate base class after [", checkBaseTerminateCount, "] attempts (run duration exit)");
+            UXAS_LOG_INFORM(s_typeName(), "::runUntil aborted effort to terminate base class after [", checkBaseTerminateCount, "] attempts (run duration exit)");
         }
     }
 
-    LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager is Finished Shutting Down !!! ******");
-    LOG_DEBUGGING(s_typeName(), "::runUntil - END");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(),"****** ServiceManager is Finished Shutting Down !!! ******");
+    UXAS_LOG_DEBUGGING(s_typeName(), "::runUntil - END");
 };
 
 bool
 ServiceManager::initialize()
 {
-    LOG_DEBUGGING(s_typeName(), "::initialize - START");
+    UXAS_LOG_DEBUGGING(s_typeName(), "::initialize - START");
     bool isSuccess{false};
     if (m_isConfigured)
     {
@@ -211,7 +211,7 @@ ServiceManager::initialize()
             {
                 if (s_typeName().compare(svcNode.attribute(uxas::common::StringConstant::Type().c_str()).value()) == 0)
                 {
-                    LOG_INFORM(s_typeName(), "::initialize ignoring ", s_typeName(), " XML configuration node");
+                    UXAS_LOG_INFORM(s_typeName(), "::initialize ignoring ", s_typeName(), " XML configuration node");
                     continue;
                 }
 
@@ -232,30 +232,30 @@ ServiceManager::initialize()
         {
             if (serviceCreationSuccessCount > 0)
             {
-                LOG_INFORM(s_typeName(), "::initialize successfully initialized and started all ", serviceCreationSuccessCount, " services");
+                UXAS_LOG_INFORM(s_typeName(), "::initialize successfully initialized and started all ", serviceCreationSuccessCount, " services");
             }
             else
             {
-                LOG_WARN(s_typeName(), "::initialize unexpectedly initialized and started zero services");
+                UXAS_LOG_WARN(s_typeName(), "::initialize unexpectedly initialized and started zero services");
             }
             std::unique_ptr<uxas::messages::uxnative::StartupComplete> startupComplete = uxas::stduxas::make_unique<uxas::messages::uxnative::StartupComplete>();
             sendLmcpObjectBroadcastMessage(std::move(startupComplete));
         }
         else if (uxasEnabledSvcsXml.empty())
         {
-            LOG_ERROR(s_typeName(), "::initialize failed to get non-empty XML configuration node");
+            UXAS_LOG_ERROR(s_typeName(), "::initialize failed to get non-empty XML configuration node");
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::initialize failed to initialize and start ", serviceCreationFailureCount, " services; successfully started ", serviceCreationSuccessCount, " services");
+            UXAS_LOG_ERROR(s_typeName(), "::initialize failed to initialize and start ", serviceCreationFailureCount, " services; successfully started ", serviceCreationSuccessCount, " services");
         }
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::initialize failed - must invoke configure method BEFORE calling initialize");
+        UXAS_LOG_ERROR(s_typeName(), "::initialize failed - must invoke configure method BEFORE calling initialize");
     }
 
-    LOG_DEBUGGING(s_typeName(), "::initialize - END");
+    UXAS_LOG_DEBUGGING(s_typeName(), "::initialize - END");
     return (isSuccess);
 };
 
@@ -268,18 +268,18 @@ ServiceManager::removeTerminatedServices() // lock m_servicesByIdMutex before in
     {
         if (svcIt->second->getIsTerminationFinished())
         {
-            LOG_INFORM(s_typeName(), "::removeTerminatedServices removing reference to terminated ", svcIt->second->m_networkClientTypeName, " ID ", svcIt->second->m_networkId);
+            UXAS_LOG_INFORM(s_typeName(), "::removeTerminatedServices removing reference to terminated ", svcIt->second->m_networkClientTypeName, " ID ", svcIt->second->m_networkId);
             terminatedSvcCnt++;
             svcIt = m_servicesById.erase(svcIt); // remove finished service (enables destruction)
         }
         else
         {
-            LOG_DEBUGGING(s_typeName(), "::removeTerminatedServices retaining reference to non-terminated ", svcIt->second->m_networkClientTypeName, " ID ", svcIt->second->m_networkId);
+            UXAS_LOG_DEBUGGING(s_typeName(), "::removeTerminatedServices retaining reference to non-terminated ", svcIt->second->m_networkClientTypeName, " ID ", svcIt->second->m_networkId);
             runningSvcCnt++;
             svcIt++;
         }
     }
-    LOG_INFORM(s_typeName(), "::removeTerminatedServices retained [", runningSvcCnt, "] services and removed [", terminatedSvcCnt, "] services");
+    UXAS_LOG_INFORM(s_typeName(), "::removeTerminatedServices retained [", runningSvcCnt, "] services and removed [", terminatedSvcCnt, "] services");
     return (runningSvcCnt);
 };
 
@@ -316,7 +316,7 @@ ServiceManager::createService(const std::string& serviceXml, int64_t newServiceI
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::createService failed to parse XML string [", serviceXml, "]");
+        UXAS_LOG_ERROR(s_typeName(), "::createService failed to parse XML string [", serviceXml, "]");
     }
 
     return (isSuccess);
@@ -330,23 +330,23 @@ ServiceManager::createService(const pugi::xml_node& serviceXmlNode, int64_t newS
     // (b) "Service" node (new service code)
     if (uxas::common::StringConstant::Service().compare(serviceXmlNode.name()) == 0)
     {
-        LOG_INFORM(s_typeName(), "::createService received ", serviceXmlNode.name(), " XML node");
+        UXAS_LOG_INFORM(s_typeName(), "::createService received ", serviceXmlNode.name(), " XML node");
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::createService received ", serviceXmlNode.name(), " XML node - expecting ", uxas::common::StringConstant::Service(), " XML node");
+        UXAS_LOG_INFORM(s_typeName(), "::createService received ", serviceXmlNode.name(), " XML node - expecting ", uxas::common::StringConstant::Service(), " XML node");
     }
 
     std::unique_ptr<ServiceBase> newService = instantiateConfigureInitializeStartService(serviceXmlNode, 0, newServiceId);
     if (newService)
     {
-        LOG_INFORM(s_typeName(), "::createService successfully created ", newService->m_networkClientTypeName, " service ID ", newService->m_networkId);
+        UXAS_LOG_INFORM(s_typeName(), "::createService successfully created ", newService->m_networkClientTypeName, " service ID ", newService->m_networkId);
         m_servicesById.emplace(newService->m_networkId, std::move(newService));
         return (true);
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::createService failed to create a service");
+        UXAS_LOG_ERROR(s_typeName(), "::createService failed to create a service");
         return (false);
     }
 };
@@ -355,7 +355,7 @@ std::unordered_map<uint32_t, std::unique_ptr<ServiceBase>>
 ServiceManager::createTestServices(const std::string& cfgXmlFilePath, uint32_t entityId, int64_t firstNetworkId)
 {
     std::unordered_map<uint32_t, std::unique_ptr<ServiceBase>> testServicesByNetworkIdMap;
-    LOG_INFORM(s_typeName(), "::createTestServices - START");
+    UXAS_LOG_INFORM(s_typeName(), "::createTestServices - START");
 //#ifdef GOOGLE_TEST_BRIDGES_ENABLED
 
     int64_t networkId = firstNetworkId;
@@ -374,21 +374,21 @@ ServiceManager::createTestServices(const std::string& cfgXmlFilePath, uint32_t e
                 networkId++;
                 if (newTestService)
                 {
-                    LOG_INFORM(s_typeName(), "::createTestServices added ", newTestService->m_networkClientTypeName, " service with entity ID ", newTestService->m_entityId," and service ID ", newTestService->m_networkId, " from XML configuration ", cfgXmlFilePath);
+                    UXAS_LOG_INFORM(s_typeName(), "::createTestServices added ", newTestService->m_networkClientTypeName, " service with entity ID ", newTestService->m_entityId," and service ID ", newTestService->m_networkId, " from XML configuration ", cfgXmlFilePath);
                     testServicesByNetworkIdMap.emplace(newTestService->m_networkId, std::move(newTestService));
                 }
                 else
                 {
-                    LOG_ERROR(s_typeName(), "::createTestServices failed to add a service from XML configuration ", cfgXmlFilePath);
+                    UXAS_LOG_ERROR(s_typeName(), "::createTestServices failed to add a service from XML configuration ", cfgXmlFilePath);
                 }
             }
         }
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::createTestServices failed to load configuration XML from location ", cfgXmlFilePath);
+        UXAS_LOG_ERROR(s_typeName(), "::createTestServices failed to load configuration XML from location ", cfgXmlFilePath);
     }
-    LOG_INFORM(s_typeName(), "::createTestServices - END");
+    UXAS_LOG_INFORM(s_typeName(), "::createTestServices - END");
 
 //#endif // GOOGLE_TEST_BRIDGES_ENABLED
     return (testServicesByNetworkIdMap);
@@ -397,7 +397,7 @@ ServiceManager::createTestServices(const std::string& cfgXmlFilePath, uint32_t e
 std::unique_ptr<ServiceBase>
 ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node& serviceXmlNode, uint32_t entityId, int64_t networkId)
 {
-    LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService - START");
+    UXAS_LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService - START");
     std::unique_ptr<ServiceBase> newServiceFinal;
     
     std::string serviceType;
@@ -407,11 +407,11 @@ ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node&
             && (s_typeName().compare(serviceXmlNode.attribute(uxas::common::StringConstant::Type().c_str()).value()) != 0)) // type is not ServiceManager
     {
         serviceType = serviceXmlNode.attribute(uxas::common::StringConstant::Type().c_str()).value();
-        LOG_INFORM(s_typeName(), "::createService processing ", serviceXmlNode.name(), " XML node for type ", serviceType);
+        UXAS_LOG_INFORM(s_typeName(), "::createService processing ", serviceXmlNode.name(), " XML node for type ", serviceType);
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::createService not processing ", serviceXmlNode.name(), " XML node since node name is empty, invalid or disallowed", uxas::common::StringConstant::Type());
+        UXAS_LOG_ERROR(s_typeName(), "::createService not processing ", serviceXmlNode.name(), " XML node since node name is empty, invalid or disallowed", uxas::common::StringConstant::Type());
         return (newServiceFinal);
     }
     
@@ -419,7 +419,7 @@ ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node&
 
     if (newService)
     {
-        LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully instantiated ", newService->m_serviceType, " service ID ", newService->m_networkId, " and work directory name [", newService->m_workDirectoryName, "]");
+        UXAS_LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully instantiated ", newService->m_serviceType, " service ID ", newService->m_networkId, " and work directory name [", newService->m_workDirectoryName, "]");
         if (newService->configureService(uxas::common::ConfigurationManager::getInstance().getRootDataWorkDirectory(), serviceXmlNode))
         {
             //TODO - consider friend of clientBase (protect m_entityId and m_entityIdString)
@@ -448,30 +448,30 @@ ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node&
                 newService->m_serviceId = networkIdLocal;
                 newService->removeSubscriptionAddress(originalUnicastAddress);
                 newService->addSubscriptionAddress(LmcpObjectNetworkClientBase::getNetworkClientUnicastAddress(newService->m_entityId, newService->m_networkId));
-                LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService re-configuring ", newService->m_networkClientTypeName, " entity ID ", newService->m_entityId, " service ID ", newService->m_networkId);
+                UXAS_LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService re-configuring ", newService->m_networkClientTypeName, " entity ID ", newService->m_entityId, " service ID ", newService->m_networkId);
             }
-            LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully configured ", newService->m_networkClientTypeName, " entity ID ", newService->m_entityId, " service ID ", newService->m_networkId);
+            UXAS_LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully configured ", newService->m_networkClientTypeName, " entity ID ", newService->m_entityId, " service ID ", newService->m_networkId);
             if (newService->initializeAndStartService())
             {
                 newServiceFinal = std::move(newService);
-                LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully initialized and started ", newServiceFinal->m_networkClientTypeName, " service ID ", newServiceFinal->m_networkId);
+                UXAS_LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService successfully initialized and started ", newServiceFinal->m_networkClientTypeName, " service ID ", newServiceFinal->m_networkId);
             }
             else
             {
-                LOG_ERROR(s_typeName(), "::instantiateConfigureInitializeStartService failed to initialize and start ", newService->m_networkClientTypeName, " service ID ", newService->m_networkId);
+                UXAS_LOG_ERROR(s_typeName(), "::instantiateConfigureInitializeStartService failed to initialize and start ", newService->m_networkClientTypeName, " service ID ", newService->m_networkId);
             }
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::instantiateConfigureInitializeStartService failed to configure ", newService->m_networkClientTypeName, " service ID ", newService->m_networkId);
+            UXAS_LOG_ERROR(s_typeName(), "::instantiateConfigureInitializeStartService failed to configure ", newService->m_networkClientTypeName, " service ID ", newService->m_networkId);
         }
     }
     else
     {
-        LOG_ERROR(s_typeName(), "::instantiateConfigureInitializeStartService failed to instantiate ", serviceType);
+        UXAS_LOG_ERROR(s_typeName(), "::instantiateConfigureInitializeStartService failed to instantiate ", serviceType);
     }
     
-    LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService - END");
+    UXAS_LOG_INFORM(s_typeName(), "::instantiateConfigureInitializeStartService - END");
     return (newServiceFinal);
 };
 
@@ -489,11 +489,11 @@ ServiceManager::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
         }
         if (createService(xmlConfig,createNewService->getServiceID()))
         {
-            LOG_INFORM(s_typeName(), "::processReceivedLmcpMessage created service using XML configuration from message payload");
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedLmcpMessage created service using XML configuration from message payload");
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::processReceivedLmcpMessage failed to create service request via messaging");
+            UXAS_LOG_ERROR(s_typeName(), "::processReceivedLmcpMessage failed to create service request via messaging");
         }
     }
     else if (uxas::messages::uxnative::isKillService(receivedLmcpMessage->m_object.get()))
@@ -526,7 +526,7 @@ ServiceManager::terminateAllServices()
     {
         if (svcIt->second && !svcIt->second->getIsTerminationFinished())
         {
-            LOG_INFORM(s_typeName(), "::terminateAllServices sending [", uxas::messages::uxnative::KillService::TypeName, "] message to ", svcIt->second->m_serviceType, " having entity ID [", svcIt->second->m_entityId, "] and service ID [", svcIt->second->m_serviceId, "]");
+            UXAS_LOG_INFORM(s_typeName(), "::terminateAllServices sending [", uxas::messages::uxnative::KillService::TypeName, "] message to ", svcIt->second->m_serviceType, " having entity ID [", svcIt->second->m_entityId, "] and service ID [", svcIt->second->m_serviceId, "]");
 
             std::cout << std::endl << s_typeName() << "::terminateAllServices sending [" << uxas::messages::uxnative::KillService::TypeName << "] message to " << svcIt->second->m_serviceType << " having entity ID [" << svcIt->second->m_entityId << "] and service ID [" << svcIt->second->m_serviceId << "]" << std::endl;
             auto killService = uxas::stduxas::make_unique<uxas::messages::uxnative::KillService>();
@@ -535,7 +535,7 @@ ServiceManager::terminateAllServices()
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::terminateAllServices unexpectedly found empty pointer (hosting a service object)");
+            UXAS_LOG_INFORM(s_typeName(), "::terminateAllServices unexpectedly found empty pointer (hosting a service object)");
         }
     }
 };
@@ -543,9 +543,9 @@ ServiceManager::terminateAllServices()
 void
 ServiceManager::shutdownProcessor()
 {
-    LOG_INFORM(s_typeName(), "::shutdownProcessor - START");
+    UXAS_LOG_INFORM(s_typeName(), "::shutdownProcessor - START");
 #ifdef ICET_ARM // only shutdown ARM processors
-    LOG_INFORM(s_typeName(), "::shutdownProcessor synchronization and reboot - START");
+    UXAS_LOG_INFORM(s_typeName(), "::shutdownProcessor synchronization and reboot - START");
     sync();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #ifndef OSX
@@ -553,9 +553,9 @@ ServiceManager::shutdownProcessor()
 #else
     reboot(RB_AUTOBOOT);
 #endif
-    LOG_INFORM(s_typeName(), "::shutdownProcessor synchronization and reboot - END");
+    UXAS_LOG_INFORM(s_typeName(), "::shutdownProcessor synchronization and reboot - END");
 #endif
-    LOG_INFORM(s_typeName(), "::shutdownProcessor - END");
+    UXAS_LOG_INFORM(s_typeName(), "::shutdownProcessor - END");
 };
 
 

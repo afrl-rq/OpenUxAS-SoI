@@ -69,10 +69,10 @@ Time::getInstance()
 bool
 Time::calibrateWithReferenceUtcTime(int year, int month, int day, int hour, int minutes, int seconds, int milliseconds)
 {
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime y, M, d, h, m, s, ms[", year, ",", month, ",", day, ",", hour, ",", minutes, ",", seconds, ",", milliseconds, "]");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime y, M, d, h, m, s, ms[", year, ",", month, ",", day, ",", hour, ",", minutes, ",", seconds, ",", milliseconds, "]");
     if (year < m_minimumCalibrationYear)
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime invalid year [", year, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime invalid year [", year, "]");
         return (false);
     }
     return (calibrateWithReferenceUtcTimeImpl(year, month, day, -1, hour, minutes, seconds, milliseconds));
@@ -81,10 +81,10 @@ Time::calibrateWithReferenceUtcTime(int year, int month, int day, int hour, int 
 bool
 Time::calibrateWithReferenceUtcTime(int year, int month, int day, int weeks, int milliseconds)
 {
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime y, M, d, weeks, ms[", year, ",", month, ",", day, ",", weeks, ",", milliseconds, "]");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime y, M, d, weeks, ms[", year, ",", month, ",", day, ",", weeks, ",", milliseconds, "]");
     if (weeks < 0)
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime invalid weeks [", weeks, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTime invalid weeks [", weeks, "]");
         return (false);
     }
     return (calibrateWithReferenceUtcTimeImpl(year, month, day, weeks, 0, 0, 0, milliseconds));
@@ -93,11 +93,11 @@ Time::calibrateWithReferenceUtcTime(int year, int month, int day, int weeks, int
 bool
 Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks, int hour, int minutes, int seconds, int milliseconds)
 {
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl - START");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl - START");
 
     int64_t nowTimeSinceEpoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>
             (std::chrono::system_clock::now().time_since_epoch()).count();
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl nowTimeSinceEpoch_ms [", nowTimeSinceEpoch_ms, "]");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl nowTimeSinceEpoch_ms [", nowTimeSinceEpoch_ms, "]");
 
     std::tm dateTm = {0};
     dateTm.tm_isdst = -1;
@@ -111,27 +111,27 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
     std::tm* tmNow = gmtime(&tmtNow);
 #endif
 
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_year [", dateTm.tm_year, "]");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_year [", dateTm.tm_year, "]");
 
     if (month > 0 && month < 13)
     {
         dateTm.tm_mon = month - 1; // 0-11
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_mon [", dateTm.tm_mon, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_mon [", dateTm.tm_mon, "]");
     }
     else
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid month [", month, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid month [", month, "]");
         return (false);
     }
 
     if (day > 0 && day < 32)
     {
         dateTm.tm_mday = day; // 1-31
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_mday [", dateTm.tm_mday, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_mday [", dateTm.tm_mday, "]");
     }
     else
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid day [", day, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid day [", day, "]");
         return (false);
     }
 
@@ -140,39 +140,39 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
         if (hour > -1 && hour < 24)
         {
             dateTm.tm_hour = hour; // 00-23
-            LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_hour [", dateTm.tm_hour, "]");
+            UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_hour [", dateTm.tm_hour, "]");
         }
         else
         {
-            LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid hour [", hour, "]");
+            UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid hour [", hour, "]");
             return (false);
         }
 
         if (minutes > -1 && minutes < 60)
         {
             dateTm.tm_min = minutes; // 00-59
-            LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_min [", dateTm.tm_min, "]");
+            UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_min [", dateTm.tm_min, "]");
         }
         else
         {
-            LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid minutes [", minutes, "]");
+            UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid minutes [", minutes, "]");
             return (false);
         }
 
         if (seconds > -1 && seconds < 61)
         {
             dateTm.tm_sec = seconds; // 00-60
-            LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_sec [", dateTm.tm_sec, "]");
+            UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl dateTm.tm_sec [", dateTm.tm_sec, "]");
         }
         else
         {
-            LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid seconds [", seconds, "]");
+            UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid seconds [", seconds, "]");
             return (false);
         }
     }
     else // use weeks (later); ignore hour, minutes, seconds; 
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl weeks [", weeks, "]; ignoring hour, minutes, seconds");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl weeks [", weeks, "]; ignoring hour, minutes, seconds");
         dateTm.tm_hour = 0;
         dateTm.tm_min = 0;
         dateTm.tm_sec = 0;
@@ -192,18 +192,18 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
     int64_t refTimeSinceEpoch_ms;
     if (weeks < 0) // ignore weeks
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl hour, minutes, seconds calculation");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl hour, minutes, seconds calculation");
         refTimeSinceEpoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>
                 (refTime.time_since_epoch()).count() + milliseconds;
     }
     else // use weeks
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl weeks calculation");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl weeks calculation");
         uint64_t weeks_ms = static_cast<int64_t> (weeks) * 7 * 24 * 3600 * 1000;
         refTimeSinceEpoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>
                 (refTime.time_since_epoch()).count() + weeks_ms + milliseconds;
     }
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl refTimeSinceEpoch_ms [", refTimeSinceEpoch_ms, "]");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl refTimeSinceEpoch_ms [", refTimeSinceEpoch_ms, "]");
 
     uint64_t refTimeSinceEpoch_s = refTimeSinceEpoch_ms / 1000;
     std::chrono::time_point<std::chrono::system_clock> epochTm;
@@ -213,7 +213,7 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
 
     if ((refCalTmNoMs->tm_year + 1900) < m_minimumCalibrationYear)
     {
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid year [", year, "]");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl invalid year [", year, "]");
         return (false);
     }
 
@@ -243,10 +243,10 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
         }
         else
         {
-            LOG_INFORM("Time::calibrateWithReferenceUtcTimeImpl m_timeExternalCalibrationDelta_ms [", m_timeExternalCalibrationDelta_ms, "]");
+            UXAS_LOG_INFORM("Time::calibrateWithReferenceUtcTimeImpl m_timeExternalCalibrationDelta_ms [", m_timeExternalCalibrationDelta_ms, "]");
             m_timeExternalCalibrationLogCount = 0;
         }
-        LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl - END (delta calculation)");
+        UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl - END (delta calculation)");
         return (true);
     }
 
@@ -293,11 +293,11 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
 
     if (m_isSetSwHdwDateTime && !m_isSetSwHdwDateTimeLogged)
     {
-        LOG_INFORM("Time::calibrateWithReferenceUtcTimeImpl invoked system call with date time string [", m_setSwHdwDateTime, "]");
+        UXAS_LOG_INFORM("Time::calibrateWithReferenceUtcTimeImpl invoked system call with date time string [", m_setSwHdwDateTime, "]");
         m_isSetSwHdwDateTimeLogged = true;
     }
 
-    LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl - END (update system)");
+    UXAS_LOG_DEBUG_VERBOSE_TIME("Time::calibrateWithReferenceUtcTimeImpl - END (update system)");
     return (true);
 };
 
