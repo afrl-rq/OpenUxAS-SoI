@@ -1,5 +1,15 @@
 project('UxAS', 'c', 'cpp', subproject_dir: '3rd')
 
+# get environment variables
+pymodule = import('python3')
+python3 = pymodule.find_python()
+
+stac_root = '../stac'
+res = run_command(python3, '-c', 'import os; import sys; sys.stdout.write(os.environ["STAC_ROOT"])')
+if res.returncode() == 0
+  stac_root = res.stdout()
+endif
+
 conf = configuration_data()
 
 link_args = [

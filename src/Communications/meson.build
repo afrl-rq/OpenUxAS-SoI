@@ -42,7 +42,7 @@ lib_uxas_communications = static_library(
       '../../3rd/zyre-1.1.0/include',
       '../../3rd/PugiXML/src',
       '../../3rd/serial-1.2.1/include',
-      '../../../../stac/zsrmvmodule',
+      stac_root + '/zsrmvmodule',
     ),
     incs_lmcp,
   ]
