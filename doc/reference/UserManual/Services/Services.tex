@@ -79,28 +79,121 @@ Bridge Elements configure bridges, which are services that create communication 
 
 
 
+\section{Core Services}\label{core-services}
 
-\section{Core Services}
+The core services of UxAS work in concert to carry out the \emph{task assignment pipeline}
+which automates the calculation of the proper vehicle-task orderings for efficient overall
+mission completion. The design choice to seperate each of these services is motivated by
+consideration of computational complexity as well as availability in the literature for
+parts of the process (i.e. route planners and task assignment algorithms).
+
+\begin{figure*}
+	\includegraphics[width=1.0\linewidth]{\CCAFiguresPath//CCA_Components_MessageFLow}
+	\caption{Message Flow for Task Assignment Pipeline}
+	\label{fig:CoreServiceMessageFlow}
+\end{figure*}
+
+The message flow between the core services is captured in Figure~\ref{fig:CoreServiceMessageFlow}
+and indicates the temporal relationship between the core services in carrying out a complete
+automation request. Time proceeds from the top of the diagram to the bottom with
+each horizontal arrow representing a single LMCP message of the specified type.
+
 \begin{description}
+\item
+  \textbf{\textit{AutomationRequestValidatorService}} - This service will check an outside
+  automation request for feasibility. If any task, vehicle, or operating region in the request
+  has not yet been described to the system, this service will return an error indicating that
+  the request cannot be fulfilled. If all necessary parts of the request are available to the
+  system, then this service will attach a unique identifier to the request and start the
+  sequence of steps necessary to fulfill that request. If any other outside requests are made
+  while the system is in the process of fulfilling an existing request, this service will queue
+  those additional requests, ensuring that the system only handles one request at a time. 
+\item
+  \textbf{\textit{TaskManagerService}} - This service dynamically creates new task services as
+  their descriptions are sent into the system. When a new \textit{Task} is described, this service
+  will send the proper configuration message for construction of a new service that adheres to
+  the general task interface specification for that particular \textit{Task}. As part of the task
+  service construction, this service will pass along all relevant details that a \textit{Task}
+  needs for calculation of its behavior (i.e. current vehicle states, defined areas of interest, etc).
+\item
+  \textbf{\textit{Task}} - Tasks make up the atomic building blocks of automation requests. The
+  composition of tasks and the assignment of particular vehicles to tasks comprises an automation
+  response. When included as part of an automation request, a \textit{Task} reports a set of
+  possible \emph{options} which represent the possible ways that the task can be completed. Each
+  option is precisely a start and end location for applicable vehicles as well as the cost to
+  complete the task using that option. The location and cost information for each option is used
+  by the assignment service to select an option for each task that completes the overall mission
+  efficiently. Once an option is selected by the assignment service, each \textit{Task} also
+  reports the set of waypoints that a vehicle should use to complete the task.
+\item
+  \textbf{\textit{RoutePlannerVisibilityService}} - One of potentially many route planners, this
+  service fulfills simple requests for routing in complex environments. For a given environment
+  (described by sets of \textit{KeepIn} and \textit{KeepOut} polygons), a route planner will
+  calculate the appropriate waypoints to guide a vehicle from a prescribed start location to a
+  desired end location, ensuring that no waypoint is placed in an invalid area. This particular
+  route planner uses a visibility graph as a basis to create distance-minimizing routes in two
+  dimensions. Route planning services have a simple request-reply interface with each request
+  corresponding to a single vehicle in a single environment.
+\item
+  \textbf{\textit{RouteAggregatorService}} - This service works with a set of route planners,
+  requesting routes from the appropriate planner based on the situation. Additionally, this service
+  provides the capability to make large-scale route planning requests involving multiple vehicles
+  and multiple start/end locations. A primary use of this service is to calculate routes for all
+  vehicles to travel between task locations. By orchestrating the cost-to-go calculations
+  between tasks, this service acts as the bookkeeper for the complete cost map required by
+  assignment algorithms.
+\item
+  \textbf{\textit{AssignmentTreeBranchBoundService}} - This service provides a resource allocation
+  algorithm to determine an efficient use of the vehicle assets to fulfill tasks in the system. By
+  design, the resource allocation is de-coupled from route planning and only uses the costs
+  provided by the \textit{RouteAggregatorService}. The ultimate output of this service is an ordered
+  list of tasks for each vehicle. This ordering must account for the process algebra relationship
+  between tasks. This particular assignment service builds a tree of possible assignment orderings
+  and prunes that tree based on the prescribed task relationships. The algorithm proceeds in two phases:
+  1) greedy, depth-first search to find a feasible plan; 2) backtracking up the tree in a
+  branch-and-bound manner to discover plans that are lower cost than the initial greedy plan. Once a
+  predetermined amount of the tree has been searched (to ensure worst-case execution time), the
+  assignment service will return the most efficient task ordering discovered.
+\item
+  \textbf{\textit{PlanBuilderService}} - With a task ordering determined by the assignment service,
+  the \textit{PlanBuilderService} will organize the final set of waypoints that each vehicle should
+  follow to complete the assignment. Working through the task ordering, this service requests the
+  appropriate \textit{Tasks} in the assigned order to build a complete set of waypoints for each
+  vehicle to carry out the mission. By stitching each part of the mission together in the proper
+  order, this service provides the automation response that fulfills the original, outside
+  automation request.
+\end{description}
+
+What follows are details for each of the core services and a rough description of the state machines
+that each follows to complete its part of the overall task assignment process. See the auto-generated
+LMCP documentation for precise details of each message.
+
+
+%% use pandoc output of CoreServices.md `pandoc -o CoreServices.tex CoreServices.md`  %%
+\input{CoreServices.tex}
+
+
+\section{Additional Services}
+\begin{description}
+\item
+  \textbf{\textit{SensorManagerService}} - A service that constructs
+  sensor footprints, calculates GSDs, determine sensor settings.
+\item
+  \textbf{\textit{WaypointPlanManagerService}} - Serves waypoint plans to
+  the vehicle interface.
 	\item[\textbf{\textit{00\_ServiceTemplate}}] - This is a basic service that can be used as a template when constructing new services.
 	\item[\textbf{\textit{01\_HelloWorld}}] - This is a basic example of a UxAS service that sends/receives KeyValuePair messages and prints out the results.
-	\item[\textbf{\textit{AssignmentTreeBranchBoundService}}] - This service calculates assignments of vehicles to tasks based on cost inputs. 
-	\item[\textbf{\textit{AutomationRequestValidatorService}}] - Checks all elements of automation requests to make sure they are present before sending out a UniqueAutomationRequest. 
 	\item[\textbf{\textit{BatchSummaryService}}] - 
 	\item[\textbf{\textit{MessageLoggerDataService}}] - This service logs messages received from other UxAS services to a SQLite database.  Logging can be configured to log either all or a subset of service messages.
 	\item[\textbf{\textit{OperatingRegionStateService}}] - 
 	\item[\textbf{\textit{OsmPlannerService}}] - loads an Open Street Map file and constructs ground plans/costs to be used for assignments.
-	\item[\textbf{\textit{PlanBuilderService}}] - constructs plans from assignments. 
-	\item[\textbf{\textit{RouteAggregatorService}}] - incrementally queries the route planner to build a matrix of plans between all tasks and entity initial points 
-	\item[\textbf{\textit{RoutePlannerVisibilityService}}] - A component that constructs plans/costs to be used for assignments.
 	\item[\textbf{\textit{SendMessagesService}}] - sends out messages, loaded from files, at a given time or periodically.
-	\item[\textbf{\textit{SensorManagerService}}] - A service that constructs sensor footprints, calculates GSDs, determine sensor settings.
 	\item[\textbf{\textit{ServiceBase}}] - the base class for all UxAS service classes. Service class constructors are registered in the \textit{ServiceBase} creation registry.
 	\item[\textbf{\textit{ServiceManager}}] - a singleton class that inherits from the  \textit{ServiceBase}  class. It performs initial service creation for the UxAS entity at startup. After entity startup, it creates services per requests received from other services via messaging.  The ServiceManager  exclusively uses the  \textit{ServiceBase} creation registry to create services.
-	\item[\textbf{\textit{WaypointPlanManagerService}}] -serves waypoint plans to the vehicle interface.
 \end{description}
 
-\section{Core Tasks}
+
+\section{Task Services}
 \begin{description}
 	\item[\textbf{\textit{00\_TaskTemplate}}] - This is a basic task that can be used as a template when constructing new tasks
 	\item[\textbf{\textit{AngledAreaSearchTaskService}}] - Area search task with specified direction 

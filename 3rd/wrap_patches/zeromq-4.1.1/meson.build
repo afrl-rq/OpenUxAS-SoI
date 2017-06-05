@@ -2,7 +2,8 @@ project('zeromq', 'cpp')
 
 os = target_machine.system()
 cpp = meson.get_compiler('cpp')
-cpp_args = ['-D_REENTRANT', '-D_THREAD_SAFE']
+cpp_args = []
+deps = []
 cdata = configuration_data()
 
 if os == 'linux'
@@ -10,10 +11,21 @@ if os == 'linux'
   if cpp.get_id() == 'g++'
     cpp_args += ['-D_GNU_SOURCE']
   endif
-endif
-
-if os == 'darwin'
+elif os == 'darwin'
   cpp_args += ['-D_DARWIN_C_SOURCE', '-DZMQ_HAVE_OSX=1']
+elif os == 'windows'
+  cpp_args += [
+    '-D_CRT_SECURE_NO_WARNINGS',
+	'-DFD_SETSIZE=4096',
+	'-DZMQ_USE_SELECT',
+	'-DZMQ_STATIC',
+	'-DZMQ_HAVE_WINDOWS=1',
+  ]
+  deps += [
+    cpp.find_library('Advapi32'),
+	cpp.find_library('Ws2_32'),
+	cpp.find_library('Rpcrt4'),
+  ]
 endif
 
 check_headers = [
@@ -144,16 +156,21 @@ select(1, &t_rfds, NULL, NULL, &tv);
 }
 '''
 
-if cpp.links(kqueue, name: 'kqueue links')
-  cpp_args += ['-DZMQ_USE_KQUEUE']
-elif cpp.run(epoll, name: 'epoll runs').returncode() == 0
+# force EPOLL on cross compile
+if meson.is_cross_build()
   cpp_args += ['-DZMQ_USE_EPOLL']
-elif cpp.links(devpoll, name: 'devpoll links')
-  cpp_args += ['-DZMQ_USE_DEVPOLL']
-elif cpp.links(poll, name: 'poll links')
-  cpp_args += ['-DZMQ_USE_POLL']
-elif cpp.links(select, name: 'select links')
-  cpp_args += ['-DZMQ_USE_SELECT']
+else
+  if cpp.links(kqueue, name: 'kqueue links')
+    cpp_args += ['-DZMQ_USE_KQUEUE']
+  elif cpp.run(epoll, name: 'epoll runs').returncode() == 0
+    cpp_args += ['-DZMQ_USE_EPOLL']
+  elif cpp.links(devpoll, name: 'devpoll links')
+    cpp_args += ['-DZMQ_USE_DEVPOLL']
+  elif cpp.links(poll, name: 'poll links')
+    cpp_args += ['-DZMQ_USE_POLL']
+  elif cpp.links(select, name: 'select links')
+    cpp_args += ['-DZMQ_USE_SELECT']
+  endif
 endif
 
 foreach f : check_functions
@@ -165,13 +182,14 @@ endforeach
 dep_libsodium = dependency('libsodium', required: false)
 if dep_libsodium.found()
   cdata.set('HAVE_LIBSODIUM', 1)
+  deps += [dep_libsodium]
 endif
 
 if cpp.has_header_symbol('stdbool.h', '_Bool')
   cdata.set('HAVE__BOOL', 1)
 endif
 
-dep_threads = dependency('threads')
+deps += [dependency('threads')]
 
 subdir('src')
 
@@ -258,10 +276,7 @@ lib = static_library(
     'src/zmq.cpp',
     'src/zmq_utils.cpp',
   ],
-  dependencies: [
-    dep_threads,
-    dep_libsodium,
-  ],
+  dependencies: deps,
   cpp_args: cpp_args,
   include_directories: include_directories(
     'include',

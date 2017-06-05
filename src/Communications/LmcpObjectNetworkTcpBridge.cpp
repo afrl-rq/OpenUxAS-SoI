@@ -58,12 +58,12 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
     if (!bridgeXmlNode.attribute(uxas::common::StringConstant::TcpAddress().c_str()).empty())
     {
         m_tcpReceiveSendAddress = bridgeXmlNode.attribute(uxas::common::StringConstant::TcpAddress().c_str()).value();
-        LOG_INFORM(s_typeName(), "::configure setting TCP address to ", m_tcpReceiveSendAddress, " from XML configuration");
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting TCP address to ", m_tcpReceiveSendAddress, " from XML configuration");
     }
     else
     {
         isSuccess = false;
-        LOG_ERROR(s_typeName(), "::configure failed to find TCP address in XML configuration");
+        UXAS_LOG_ERROR(s_typeName(), "::configure failed to find TCP address in XML configuration");
     }
 
     if (isSuccess)
@@ -71,11 +71,11 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
         if (!bridgeXmlNode.attribute(uxas::common::StringConstant::Server().c_str()).empty())
         {
             m_isServer = bridgeXmlNode.attribute(uxas::common::StringConstant::Server().c_str()).as_bool();
-            LOG_INFORM(s_typeName(), "::configure setting server boolean to ", m_isServer, " from XML configuration");
+            UXAS_LOG_INFORM(s_typeName(), "::configure setting server boolean to ", m_isServer, " from XML configuration");
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::configure did not find server boolean in XML configuration; server boolean is ", m_isServer);
+            UXAS_LOG_INFORM(s_typeName(), "::configure did not find server boolean in XML configuration; server boolean is ", m_isServer);
         }
     }
     
@@ -103,7 +103,7 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
         //
 
         // do not forward any uni-cast messages addressed to this bridge
-        LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
         m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
         m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
     }
@@ -114,9 +114,9 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
 bool
 LmcpObjectNetworkTcpBridge::initialize()
 {
-    LOG_INFORM(s_typeName(), "::initialize - START");
+    UXAS_LOG_INFORM(s_typeName(), "::initialize - START");
     m_externalLmcpObjectMessageTcpReceiverSenderPipe.initializeStream(m_entityId, m_networkId, m_tcpReceiveSendAddress, m_isServer);
-    LOG_INFORM(s_typeName(), "::initialize succeeded");
+    UXAS_LOG_INFORM(s_typeName(), "::initialize succeeded");
     return (true);
 };
 
@@ -124,7 +124,7 @@ bool
 LmcpObjectNetworkTcpBridge::start()
 {
     m_tcpProcessingThread = uxas::stduxas::make_unique<std::thread>(&LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing, this);
-    LOG_INFORM(s_typeName(), "::start TCP receive processing thread [", m_tcpProcessingThread->get_id(), "]");
+    UXAS_LOG_INFORM(s_typeName(), "::start TCP receive processing thread [", m_tcpProcessingThread->get_id(), "]");
     return (true);
 };
 
@@ -135,11 +135,11 @@ LmcpObjectNetworkTcpBridge::terminate()
     if (m_tcpProcessingThread && m_tcpProcessingThread->joinable())
     {
         m_tcpProcessingThread->join();
-        LOG_INFORM(s_typeName(), "::terminate calling thread completed m_tcpProcessingThread join");
+        UXAS_LOG_INFORM(s_typeName(), "::terminate calling thread completed m_tcpProcessingThread join");
     }
     else
     {
-        LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_tcpProcessingThread");
+        UXAS_LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_tcpProcessingThread");
     }
     return (true);
 };
@@ -148,19 +148,19 @@ bool
 LmcpObjectNetworkTcpBridge::processReceivedSerializedLmcpMessage(std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> receivedLmcpMessage)
 {
     // send message to the external entity
-    LOG_DEBUG_VERBOSE_BRIDGE("LmcpObjectNetworkTcpBridge::processReceivedSerializedLmcpMessage RECEIVED INTERNAL serialized message");
-    LOG_DEBUG_VERBOSE_BRIDGE("Address:          [", receivedLmcpMessage->getAddress(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("ContentType:      [", receivedLmcpMessage->getMessageAttributesReference()->getContentType(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("Descriptor:       [", receivedLmcpMessage->getMessageAttributesReference()->getDescriptor(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("SourceGroup:      [", receivedLmcpMessage->getMessageAttributesReference()->getSourceGroup(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("SourceEntityId:   [", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("SourceServiceId:  [", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("AttributesString: [", receivedLmcpMessage->getMessageAttributesReference()->getString(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("getPayload:       [", receivedLmcpMessage->getPayload(), "]");
-    LOG_DEBUG_VERBOSE_BRIDGE("getString:        [", receivedLmcpMessage->getString(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("LmcpObjectNetworkTcpBridge::processReceivedSerializedLmcpMessage RECEIVED INTERNAL serialized message");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("Address:          [", receivedLmcpMessage->getAddress(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("ContentType:      [", receivedLmcpMessage->getMessageAttributesReference()->getContentType(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("Descriptor:       [", receivedLmcpMessage->getMessageAttributesReference()->getDescriptor(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("SourceGroup:      [", receivedLmcpMessage->getMessageAttributesReference()->getSourceGroup(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("SourceEntityId:   [", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("SourceServiceId:  [", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("AttributesString: [", receivedLmcpMessage->getMessageAttributesReference()->getString(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("getPayload:       [", receivedLmcpMessage->getPayload(), "]");
+    UXAS_LOG_DEBUG_VERBOSE_BRIDGE("getString:        [", receivedLmcpMessage->getString(), "]");
 
     // send message to the external entity
-    LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage [", m_entityIdNetworkIdUnicastString, 
+    UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage [", m_entityIdNetworkIdUnicastString, 
             "] before processing serialized message having address ", receivedLmcpMessage->getAddress(),
                   " and size ", receivedLmcpMessage->getPayload().size());
 
@@ -169,24 +169,24 @@ LmcpObjectNetworkTcpBridge::processReceivedSerializedLmcpMessage(std::unique_ptr
     {
         if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
             try
             {
                 m_externalLmcpObjectMessageTcpReceiverSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
             }
             catch (std::exception& ex)
             {
-                LOG_ERROR(s_typeName(), "::processReceivedSerializedLmcpMessage failed to process serialized LMCP object; EXCEPTION: ", ex.what());
+                UXAS_LOG_ERROR(s_typeName(), "::processReceivedSerializedLmcpMessage failed to process serialized LMCP object; EXCEPTION: ", ex.what());
             }
         }
         else
         {
-            LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
         }
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
     }
     
     return (false); // always false implies never terminating bridge from here
@@ -199,20 +199,20 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
     {
         while (!m_isTerminate)
         {
-            LOG_DEBUG_VERBOSE_BRIDGE("LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing BEFORE calling receivedTcpMessage");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing BEFORE calling receivedTcpMessage");
             std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> receivedTcpMessage 
                     = m_externalLmcpObjectMessageTcpReceiverSenderPipe.getNextSerializedMessage();
 
-            LOG_DEBUG_VERBOSE_BRIDGE("LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing RECEIVED EXTERNAL serialized message");
-            LOG_DEBUG_VERBOSE_BRIDGE("Address:          [", receivedTcpMessage->getAddress(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("ContentType:      [", receivedTcpMessage->getMessageAttributesReference()->getContentType(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("Descriptor:       [", receivedTcpMessage->getMessageAttributesReference()->getDescriptor(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("SourceGroup:      [", receivedTcpMessage->getMessageAttributesReference()->getSourceGroup(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("SourceEntityId:   [", receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("SourceServiceId:  [", receivedTcpMessage->getMessageAttributesReference()->getSourceServiceId(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("AttributesString: [", receivedTcpMessage->getMessageAttributesReference()->getString(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("getPayload:       [", receivedTcpMessage->getPayload(), "]");
-            LOG_DEBUG_VERBOSE_BRIDGE("getString:        [", receivedTcpMessage->getString(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing RECEIVED EXTERNAL serialized message");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("Address:          [", receivedTcpMessage->getAddress(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("ContentType:      [", receivedTcpMessage->getMessageAttributesReference()->getContentType(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("Descriptor:       [", receivedTcpMessage->getMessageAttributesReference()->getDescriptor(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("SourceGroup:      [", receivedTcpMessage->getMessageAttributesReference()->getSourceGroup(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("SourceEntityId:   [", receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("SourceServiceId:  [", receivedTcpMessage->getMessageAttributesReference()->getSourceServiceId(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("AttributesString: [", receivedTcpMessage->getMessageAttributesReference()->getString(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("getPayload:       [", receivedTcpMessage->getPayload(), "]");
+            UXAS_LOG_DEBUG_VERBOSE_BRIDGE("getString:        [", receivedTcpMessage->getString(), "]");
 
 // 20151203 dbk, rjt how much firewall, spam protection is necessary ??
 #ifdef IMPACT_BUILD
@@ -239,7 +239,7 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
                     }
                     else
                     {
-                        LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
                     }
                     s_entityConfiguration.insert(entityCfg->getID());
                 }
@@ -263,7 +263,7 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
                 }
                 else
                 {
-                    LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
                 }
             }
 #else
@@ -283,20 +283,20 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
                 }
                 else
                 {
-                    LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing ignoring non-import message with address ", receivedTcpMessage->getAddress(), ", source entity ID ", receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedTcpMessage->getMessageAttributesReference()->getSourceServiceId());
+                    UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing ignoring non-import message with address ", receivedTcpMessage->getAddress(), ", source entity ID ", receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedTcpMessage->getMessageAttributesReference()->getSourceServiceId());
                 }
             }
             else
             {
-                LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
             }
 #endif
         }
-        LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
+        UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR(s_typeName(), "::executeTcpReceiveProcessing EXCEPTION: ", ex.what());
+        UXAS_LOG_ERROR(s_typeName(), "::executeTcpReceiveProcessing EXCEPTION: ", ex.what());
     }
 };
 

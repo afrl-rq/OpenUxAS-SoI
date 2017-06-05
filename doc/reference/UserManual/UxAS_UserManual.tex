@@ -40,7 +40,12 @@
 
 \usepackage{makeidx} % Used to generate the index
 
+\usepackage{longtable}
+
 \usepackage[dvipsnames]{xcolor}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 % redefine \VerbatimInput
 \RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
@@ -231,6 +236,7 @@
 \stepcounter{chapter}
 \chapter{Services}
 \renewcommand{\FiguresPath}{./Services/figures}
+\newcommand{\CCAFiguresPath}{./../SequenceDiagrams}
 \import{./Services/}{Services}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -27,7 +27,6 @@ incs_services = [
   include_directories(
     '../../src/Utilities',
     '../../resources/AutomationDiagramDataService',
-    '../../src/LMCP',
     '../../src/Communications',
     '../../src/Includes',
     '../../src/Services',
@@ -56,6 +55,24 @@ else
   srcs_services_internal = files()
 endif
 
+cpp_args = []
+cpp = meson.get_compiler('cpp')
+
+if cpp.get_id() == 'msvc'
+  cpp_args += [
+  	'/std:c++14',
+	'-DZMQ_DEFINED_STDINT',
+    '-DZMQ_STATIC',
+	'-DLIBCZMQ_STATIC',
+  ]
+else
+  cpp_args += [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
+endif
+
 lib_services = static_library(
   'services',
   srcs_services,
@@ -63,10 +80,6 @@ lib_services = static_library(
   dependencies: [
     dep_boost,
   ],
-  cpp_args: [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
-  ],
+  cpp_args: cpp_args,
   include_directories: incs_services,
 )

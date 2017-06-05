@@ -59,7 +59,7 @@ public:
 
         if (payload.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::setAddressAndPayload payload must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAndPayload payload must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
@@ -77,7 +77,7 @@ public:
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayload failed to initialize message attributes");
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayload failed to initialize message attributes");
             m_isValid = false;
             return (m_isValid);
         }
@@ -92,7 +92,7 @@ public:
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressAttributeMessageStringLength);
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressAttributeMessageStringLength);
             m_isValid = false;
             return (false);
         }
@@ -113,7 +113,7 @@ public:
         }
         else
         {
-            LOG_WARN(s_typeName(), "::getString returning empty string since message attributes have been detached");
+            UXAS_LOG_WARN(s_typeName(), "::getString returning empty string since message attributes have been detached");
             return (s_emptyString);
         }
     };
@@ -147,7 +147,7 @@ protected:
         if (endOfAddressDelimIndex == std::string::npos
             || endOfAddressDelimIndex > (delimitedString.length() - s_minimumDelimitedAddressAttributeMessageStringLength))
         {
-            LOG_ERROR(s_typeName(), "::parseAddressedAttributedMessageStringAndSetFields failed to parse address from delimited string ", delimitedString);
+            UXAS_LOG_ERROR(s_typeName(), "::parseAddressedAttributedMessageStringAndSetFields failed to parse address from delimited string ", delimitedString);
             m_isValid = false;
             return (m_isValid);
         }
@@ -155,13 +155,13 @@ protected:
         std::string::size_type endOfMessageAttributesDelimIndex = delimitedString.find(*(s_addressAttributesDelimiter().c_str()), (endOfAddressDelimIndex + 1));
         if (endOfMessageAttributesDelimIndex == std::string::npos)
         {
-            LOG_ERROR(s_typeName(), "::parseAddressedAttributedMessageStringAndSetFields failed to parse message attribute string from delimited string ", delimitedString);
+            UXAS_LOG_ERROR(s_typeName(), "::parseAddressedAttributedMessageStringAndSetFields failed to parse message attribute string from delimited string ", delimitedString);
             m_isValid = false;
             return (m_isValid);
         }
         else if (endOfMessageAttributesDelimIndex == (delimitedString.length() - 1))
         {
-            LOG_ERROR(s_typeName(), "::parseAddressedAttributedMessageStringAndSetFields payload must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::parseAddressedAttributedMessageStringAndSetFields payload must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
@@ -170,7 +170,7 @@ protected:
         if (!m_messageAttributes->setAttributesFromDelimitedString(
             std::move(delimitedString.substr(endOfAddressDelimIndex + 1, endOfMessageAttributesDelimIndex - (endOfAddressDelimIndex + 1)))))
         {
-            LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayload failed to initialize message attributes");
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayload failed to initialize message attributes");
             m_isValid = false;
             return (m_isValid);
         }

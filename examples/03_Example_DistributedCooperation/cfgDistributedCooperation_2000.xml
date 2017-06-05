@@ -3,6 +3,7 @@
 
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
     <!-- on Linux, type 'ifconfig' to find interface name -->
+    <!-- on Windows, type 'netsh interface show interface' to find interface name -->
     <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="wlp3s0">
         <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
         <SubscribeToExternalMessage MessageType="uxas.messages.task.AssignmentCoordination"/>

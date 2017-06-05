@@ -66,7 +66,7 @@ void c_Node_TreeBranchAndBound::calculateAssignmentCost(std::unique_ptr<c_Vehicl
     evaluationOrderCost = nodeCost;
 
 #ifdef AFRL_INTERNAL_ENABLED
-    LOG_ERROR("ERROR:: calculateAssignmentCost was called for a  m_assignmentType[", m_assignmentType, "] that was not implemented for this [",AssignmentTreeBranchBoundService::s_typeName(),"] service.");
+    UXAS_LOG_ERROR("ERROR:: calculateAssignmentCost was called for a  m_assignmentType[", m_assignmentType, "] that was not implemented for this [",AssignmentTreeBranchBoundService::s_typeName(),"] service.");
 #endif
     
 }

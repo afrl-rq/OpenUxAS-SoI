@@ -12,16 +12,16 @@ endif
 
 conf = configuration_data()
 
-link_args = [
-  '-ldl',
-]
+link_args = []
 
 os = target_machine.system()
 if os == 'linux'
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-  link_args += ['-lrt']
+  link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
-  link_args += ['-framework', 'OpenGL']
+  link_args += ['-ldl']
+elif os == 'windows'
+  link_args += []
 endif
 
 if get_option('afrl_internal')
@@ -63,6 +63,7 @@ lib_minizip             = sub_minizip.get_variable('lib')
 dep_boost = dependency(
   'boost',
   modules: ['filesystem', 'regex', 'system'],
+  static: true,
   fallback: ['boost', 'dep_boost'],
 )
 
@@ -86,10 +87,7 @@ subdir('src/DPSS')
 
 subdir('src/VisilibityLib')
 
-if get_option('afrl_internal')
-  lib_lmcp = lib_lmcp_internal
-  incs_lmcp = incs_lmcp_internal
-else
+if not get_option('afrl_internal')
   subdir('src/LMCP')
 endif
 
@@ -139,12 +137,24 @@ subdir('src/Includes')
 deps = [
   dep_zsrmv,
   dep_thread,
-  dep_uuid,
   dep_boost,
 ]
 
-if os == 'linux'
-  deps += [dependency('glu')]
+# OpenGL, specifically the GLU library
+if not meson.is_cross_build()
+  deps += [dependency('gl')]
+  if os == 'linux'
+    deps += [dependency('glu')]
+  elif os == 'windows'
+    deps += [cpp.find_library('glu32')]
+  endif
+endif
+
+cpp_args = []
+if cpp.get_id() == 'msvc'
+  cpp_args += ['/std:c++14']
+else
+  cpp_args += ['-std=c++11']
 endif
 
 executable(
@@ -152,9 +162,7 @@ executable(
   'src/UxAS_Main.cpp',
   dependencies: deps,
   link_args: link_args,
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args,
   include_directories: [
     include_directories(
       'src/Utilities',

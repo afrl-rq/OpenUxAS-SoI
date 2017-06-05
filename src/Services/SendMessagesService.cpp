@@ -90,7 +90,7 @@ SendMessagesService::configure(const pugi::xml_node& serviceXmlNode)
                 // load the message
 //                std::unique_ptr<avtas::lmcp::Object> lmcpObject;
                 std::string filePath = pathToMessages + fileName;
-                LOG_INFORM(s_typeName(), "::configure loading file ", filePath);
+                UXAS_LOG_INFORM(s_typeName(), "::configure loading file ", filePath);
                 std::ifstream file(filePath.c_str());
                 std::string fulltxt;
                 if (file.is_open())
@@ -106,24 +106,24 @@ SendMessagesService::configure(const pugi::xml_node& serviceXmlNode)
                             fulltxt += line + "\n";
                         }
                     }
-                    LOG_DEBUGGING(s_typeName(), "::configure loaded XML ", fulltxt);
+                    UXAS_LOG_DEBUGGING(s_typeName(), "::configure loaded XML ", fulltxt);
                     avtas::lmcp::Object* lmcpObj = avtas::lmcp::xml::readXML(fulltxt);
                     isGoodMessage = (lmcpObj != nullptr);
                     if (isGoodMessage)
                     {
-                        LOG_INFORM(s_typeName(), "::configure created LMCP object from loaded XML");
+                        UXAS_LOG_INFORM(s_typeName(), "::configure created LMCP object from loaded XML");
                         newMessage->m_lmcpObjectPayload.reset(lmcpObj);
                         lmcpObj = nullptr;
 
                         if (uxas::messages::route::isGraphRegion(newMessage->m_lmcpObjectPayload))
                         {
                             uxas::messages::route::GraphRegion* pGraphRegion = static_cast<uxas::messages::route::GraphRegion*> (newMessage->m_lmcpObjectPayload.get());
-                            LOG_DEBUGGING(s_typeName(), "::configure loaded ", uxas::messages::route::GraphRegion::TypeName, 
+                            UXAS_LOG_DEBUGGING(s_typeName(), "::configure loaded ", uxas::messages::route::GraphRegion::TypeName, 
                                           " object with node list size ", pGraphRegion->getNodeList().size(), 
                                           " and edge list size ", pGraphRegion->getEdgeList().size());
                             if (pGraphRegion->getEdgeList().size() > 0)
                             {
-                                LOG_DEBUGGING(s_typeName(), "::configure loaded ", uxas::messages::route::GraphRegion::TypeName,
+                                UXAS_LOG_DEBUGGING(s_typeName(), "::configure loaded ", uxas::messages::route::GraphRegion::TypeName,
                                               " with pGraphRegion->getEdgeList()[0]->getEdgeID() ", pGraphRegion->getEdgeList()[0]->getEdgeID());
                             }
                             pGraphRegion = 0;
@@ -138,18 +138,18 @@ SendMessagesService::configure(const pugi::xml_node& serviceXmlNode)
                             std::ofstream fileOut(fileOutPath);
                             fileOut << strMessageToSave;
                             fileOut.close();
-                            LOG_DEBUGGING(s_typeName(), "::configure output ", uxas::project::isolate::UgsManagementTask::TypeName, " to file ", fileOutPath);
+                            UXAS_LOG_DEBUGGING(s_typeName(), "::configure output ", uxas::project::isolate::UgsManagementTask::TypeName, " to file ", fileOutPath);
                         }
 #endif
                     }
                     else
                     {
-                        LOG_ERROR(s_typeName(), "::configure failed to create LMCP object from loaded XML");
+                        UXAS_LOG_ERROR(s_typeName(), "::configure failed to create LMCP object from loaded XML");
                     }
                 }
                 else
                 {
-                    LOG_ERROR(s_typeName(), "::configure failed to load file ", filePath);
+                    UXAS_LOG_ERROR(s_typeName(), "::configure failed to load file ", filePath);
                     isGoodMessage = false;
                 }
             }
@@ -188,7 +188,7 @@ SendMessagesService::configure(const pugi::xml_node& serviceXmlNode)
     }
     if (!isFoundMessages)
     {
-        LOG_WARN(s_typeName(), "::configure failed to load messages to be sent");
+        UXAS_LOG_WARN(s_typeName(), "::configure failed to load messages to be sent");
     }
     
     addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);
@@ -229,15 +229,15 @@ SendMessagesService::sendMessages()
                 {
                     if ((*itMessage)->m_messageAddress.empty())
                     { 
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending single-shot broadcast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending single-shot broadcast");
                         sendSharedLmcpObjectBroadcastMessage((*itMessage)->m_lmcpObjectPayload);
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending single-shot broadcast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending single-shot broadcast");
                     }
                     else
                     {
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending single-shot limited-cast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending single-shot limited-cast");
                         sendSharedLmcpObjectLimitedCastMessage((*itMessage)->m_messageAddress, (*itMessage)->m_lmcpObjectPayload);
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending single-shot limited-cast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending single-shot limited-cast");
                     }
                     itMessage = m_messagesToSend.erase(itMessage); // remove single-shot send message
                 }
@@ -252,15 +252,15 @@ SendMessagesService::sendMessages()
                 {
                     if ((*itMessage)->m_messageAddress.empty())
                     {
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending periodic broadcast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending periodic broadcast");
                         sendSharedLmcpObjectBroadcastMessage((*itMessage)->m_lmcpObjectPayload);
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending periodic broadcast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending periodic broadcast");
                     }
                     else
                     {
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending periodic limited-cast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages BEFORE sending periodic limited-cast");
                         sendSharedLmcpObjectLimitedCastMessage((*itMessage)->m_messageAddress, (*itMessage)->m_lmcpObjectPayload);
-                        LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending periodic limited-cast");
+                        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::sendMessages AFTER sending periodic limited-cast");
                     }
                     (*itMessage)->m_messageSendTime_ms += (*itMessage)->m_messageSendPeriod_ms;
                     (*itMessage)->m_numberTimesSent++;

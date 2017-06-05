@@ -42,7 +42,7 @@ SentinelSerialBuffer::createSentinelizedString(const std::string& data)
     std::unique_ptr<std::string> detectedSentinelBaseStrings = getDetectSentinelBaseStringsMessage(data);
     if (detectedSentinelBaseStrings)
     {
-        LOG_INFORM(s_typeName(), "::createSentinelizedString creating payload string containing sentinel substrings.  ", detectedSentinelBaseStrings->c_str());
+        UXAS_LOG_INFORM(s_typeName(), "::createSentinelizedString creating payload string containing sentinel substrings.  ", detectedSentinelBaseStrings->c_str());
     }
     return (std::move(getSerialSentinelBeforePayloadSize() + std::to_string(data.size())
                       + getSerialSentinelAfterPayloadSize() + data + getSerialSentinelBeforeChecksum()
@@ -105,14 +105,14 @@ SentinelSerialBuffer::getDetectSentinelBaseStringsMessage(const std::string& dat
 std::string
 SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
 {
-    LOG_DEBUGGING(s_typeName(), "::getNextPayloadString BEFORE appending [newDataChunk]", newDataChunk);
-    LOG_DEBUGGING(s_typeName(), "::getNextPayloadString BEFORE append [m_data]", m_data);
+    UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString BEFORE appending [newDataChunk]", newDataChunk);
+    UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString BEFORE append [m_data]", m_data);
     m_data.append(newDataChunk);
-    LOG_DEBUGGING(s_typeName(), "::getNextPayloadString AFTER  append [m_data]", m_data);
+    UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString AFTER  append [m_data]", m_data);
     auto aftChecksum = m_data.find(getSerialSentinelAfterChecksum());
     if (aftChecksum == std::string::npos)
     {
-        LOG_INFORM(s_typeName(), "::getNextPayloadString does not contain complete data segment");
+        UXAS_LOG_INFORM(s_typeName(), "::getNextPayloadString does not contain complete data segment");
         return (std::move(std::string("")));
     }
     auto inspectLength = aftChecksum + getSerialSentinelAfterChecksumSize();
@@ -121,25 +121,25 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
     if (befChecksum == std::string::npos)
     {
         isValid = false;
-        LOG_WARN(s_typeName(), "::getNextPayloadString before-checksum marker is missing");
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString before-checksum marker is missing");
     }
     auto aftPayloadSz = m_data.rfind(getSerialSentinelAfterPayloadSize(), befChecksum);
     if (aftPayloadSz == std::string::npos)
     {
         isValid = false;
-        LOG_WARN(s_typeName(), "::getNextPayloadString after-payload marker is missing");
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString after-payload marker is missing");
     }
     auto befPayloadSz = m_data.rfind(getSerialSentinelBeforePayloadSize(), aftPayloadSz);
     if (befPayloadSz == std::string::npos)
     {
         isValid = false;
-        LOG_WARN(s_typeName(), "::getNextPayloadString before-payload marker is missing");
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString before-payload marker is missing");
     }
     if (!isValid)
     {
-        LOG_WARN(s_typeName(), "::getNextPayloadString erasing invalid data segment: ", m_data.substr(0, inspectLength));
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString erasing invalid data segment: ", m_data.substr(0, inspectLength));
         m_data.erase(0, inspectLength);
-        LOG_DEBUGGING(s_typeName(), "::getNextPayloadString buffer contents (after erasure): ", m_data);
+        UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString buffer contents (after erasure): ", m_data);
         return (std::move(std::string("")));
     }
 
@@ -155,9 +155,9 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
         std::unique_ptr<std::string> detectedSentinelBaseStrings = getDetectSentinelBaseStringsMessage(invalidData);
         if (detectedSentinelBaseStrings)
         {
-            LOG_INFORM(s_typeName(), "::getNextPayloadString detected partial sentinel markers in disregarded data: ", detectedSentinelBaseStrings->c_str());
+            UXAS_LOG_INFORM(s_typeName(), "::getNextPayloadString detected partial sentinel markers in disregarded data: ", detectedSentinelBaseStrings->c_str());
         }
-        LOG_INFORM(s_typeName(), "::getNextPayloadString erased disregarded data from front of data queue: ", invalidData);
+        UXAS_LOG_INFORM(s_typeName(), "::getNextPayloadString erased disregarded data from front of data queue: ", invalidData);
 
         // update indices for use with valid data
         aftPayloadSz = aftPayloadSz - befPayloadSz;
@@ -167,27 +167,27 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
     }
 
     std::string payloadSzStr = wholeStr.substr(getSerialSentinelBeforePayloadSizeSize(), aftPayloadSz - getSerialSentinelBeforePayloadSizeSize());
-    LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString payloadSzStr=", payloadSzStr);
+    UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString payloadSzStr=", payloadSzStr);
     std::string chksumStr = wholeStr.substr(befChecksum + getSerialSentinelBeforeChecksumSize(), aftChecksum - befChecksum - getSerialSentinelBeforeChecksumSize());
-    LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString chksumStr=", chksumStr);
+    UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString chksumStr=", chksumStr);
     
     bool isValidPayloadSzStr = true;
     if (payloadSzStr.find_first_not_of(getValidIntegerDigits()) != std::string::npos)
     {
         isValidPayloadSzStr = false;
-        LOG_WARN(s_typeName(), "::getNextPayloadString detected invalid payload size string: ", payloadSzStr);
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString detected invalid payload size string: ", payloadSzStr);
     }
     bool isValidChecksumStr = true;
     if (chksumStr.find_first_not_of(getValidIntegerDigits()) != std::string::npos)
     {
         isValidChecksumStr = false;
-        LOG_WARN(s_typeName(), "::getNextPayloadString detected invalid checksum string: ", chksumStr);
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString detected invalid checksum string: ", chksumStr);
     }
 
     if (isValidPayloadSzStr && isValidChecksumStr)
     {
         std::string payload = wholeStr.substr(aftPayloadSz + getSerialSentinelAfterPayloadSizeSize(), befChecksum - aftPayloadSz - getSerialSentinelAfterPayloadSizeSize());
-        LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString payload=", payload);
+        UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString payload=", payload);
 
         if (payload.size() == std::stoi(payloadSzStr))
         {
@@ -195,47 +195,47 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
             if (calcChksum == std::stoi(chksumStr))
             {
                 m_validDeserializeCount++;
-                LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_validDeserializeCount=", m_validDeserializeCount);
-                LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
+                UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_validDeserializeCount=", m_validDeserializeCount);
+                UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
                 return (std::move(payload));
             }
             else
             {
                 m_invalidDeserializeCount++;
-                LOG_WARN(s_typeName(), "::getNextPayloadString ignoring invalid data segment since calculated checksum=", calcChksum, " does not equal chksumStr=", chksumStr, " for payload=", payload);
+                UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString ignoring invalid data segment since calculated checksum=", calcChksum, " does not equal chksumStr=", chksumStr, " for payload=", payload);
             }
         }
         else
         {
             m_invalidDeserializeCount++;
-            LOG_WARN(s_typeName(), "::getNextPayloadString ignoring invalid data segment since calculated payload size=", payload.size(), " does not equal payloadSzStr=", payloadSzStr, " for payload=", payload);
+            UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString ignoring invalid data segment since calculated payload size=", payload.size(), " does not equal payloadSzStr=", payloadSzStr, " for payload=", payload);
         }
     }
     else
     {
         m_invalidDeserializeCount++;
-        LOG_WARN(s_typeName(), "::getNextPayloadString ignoring invalid data segment having invalid ", 
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString ignoring invalid data segment having invalid ", 
                  (!isValidPayloadSzStr && !isValidChecksumStr ? "payload size and checksum strings" 
                 : (isValidPayloadSzStr ? "payload size string" : "checksum string")));
     }
 
-    LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_validDeserializeCount=", m_validDeserializeCount);
+    UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_validDeserializeCount=", m_validDeserializeCount);
     if (m_invalidDeserializeCount < 1)
     {
-        LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
+        UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
     }
     else
     {
-        LOG_WARN(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
+        UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
     }
     
     if (m_disregardedDataCount < 1)
     {
-        LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_disregardedDataCount=", m_disregardedDataCount);
+        UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_disregardedDataCount=", m_disregardedDataCount);
     }
     else
     {
-        LOG_INFORM(s_typeName(), "::getNextPayloadString m_disregardedDataCount=", m_disregardedDataCount);
+        UXAS_LOG_INFORM(s_typeName(), "::getNextPayloadString m_disregardedDataCount=", m_disregardedDataCount);
     }
 
     return (std::move(std::string("")));

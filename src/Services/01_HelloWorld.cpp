@@ -92,7 +92,7 @@ bool HelloWorld::terminate()
     uint64_t delayTime_ms{1000};
     if (m_sendMessageTimerId && !uxas::common::TimerManager::getInstance().destroyTimer(m_sendMessageTimerId, delayTime_ms))
     {
-        LOG_WARN(s_typeName(), "::HelloWorld::terminate() failed to destroy message send timer ",
+        UXAS_LOG_WARN(s_typeName(), "::HelloWorld::terminate() failed to destroy message send timer ",
                  "with timer ID ", m_sendMessageTimerId, " within ", delayTime_ms, " millisecond timeout");
     }
     

@@ -128,7 +128,7 @@ namespace utilities
                         }
                         catch (std::exception& ex)
                         {
-                            LOG_ERROR("c_FileSystemUtilities","::GetTaskIdFromStringId failed to directory prefix in itDirectory->path() [",itDirectory->path().filename().string(),"]; EXCEPTION: ",ex.what());
+                            UXAS_LOG_ERROR("c_FileSystemUtilities","::GetTaskIdFromStringId failed to directory prefix in itDirectory->path() [",itDirectory->path().filename().string(),"]; EXCEPTION: ",ex.what());
                         }
                         if (iDirectoryNumberTemp > iDirectoryNumberMax)
                         {
@@ -240,7 +240,7 @@ namespace utilities
                         }
                         catch (std::exception& ex)
                         {
-                            LOG_ERROR("c_FileSystemUtilities","::GetTaskIdFromStringId failed to directory prefix in itDirectory->path() [",itDirectory->path().filename().string(),"]; EXCEPTION: ",ex.what());
+                            UXAS_LOG_ERROR("c_FileSystemUtilities","::GetTaskIdFromStringId failed to directory prefix in itDirectory->path() [",itDirectory->path().filename().string(),"]; EXCEPTION: ",ex.what());
                         }
                         if (iDirectoryNumberTemp > iDirectoryNumberMax)
                         {

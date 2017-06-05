@@ -1,8 +1,25 @@
 project('zyre', 'c')
 
+c_args = []
+
 os = target_machine.system()
 if os == 'linux'
-  add_project_arguments('-DLINUX', language: ['c', 'cpp'])
+  c_args += [
+    '-std=c11',
+  	'-DLINUX',
+	'-D_GNU_SOURCE',
+  ]
+elif os == 'darwin'
+  c_args += [
+  	'-std=c11',
+  ]
+elif os == 'windows'
+  c_args += [
+    '/std=c++14',
+	'-DZMQ_STATIC',
+	'-DLIBCZMQ_STATIC',
+  	'-DLIBZYRE_STATIC',
+  ]
 endif
 
 lib = static_library('zyre', [
@@ -19,13 +36,7 @@ lib = static_library('zyre', [
 	'src/zyre_peer.c',
 	'src/zyre_selftest.c',
 	],
-	cpp_args: [
-		'-std=c++11',
-		'-DZMQ_USE_EPOLL',
-		'-D_GNU_SOURCE',
-		'-D_REENTRANT',
-		'-D_THREAD_SAFE',
-	],
+	c_args: c_args,
 	include_directories: include_directories(
 		'../czmq-3.0.1/include',
 		'../zeromq-4.1.1/include',

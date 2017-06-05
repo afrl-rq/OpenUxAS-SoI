@@ -48,28 +48,28 @@ public:
     {
         if (contentType.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::setAttributes contentType must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::setAttributes contentType must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
 
         if (descriptor.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::setAttributes descriptor must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::setAttributes descriptor must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
 
         if (sourceEntityId.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::setAttributes sourceEntityId must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::setAttributes sourceEntityId must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
 
         if (sourceServiceId.length() < 1)
         {
-            LOG_ERROR(s_typeName(), "::setAttributes sourceServiceId must be non-empty");
+            UXAS_LOG_ERROR(s_typeName(), "::setAttributes sourceServiceId must be non-empty");
             m_isValid = false;
             return (m_isValid);
         }
@@ -106,7 +106,7 @@ public:
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::setAddressAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressAttributeMessageStringLength);
+            UXAS_LOG_ERROR(s_typeName(), "::setAddressAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressAttributeMessageStringLength);
             m_isValid = false;
         }
     };
@@ -198,7 +198,7 @@ protected:
         }
         else
         {
-            LOG_ERROR(s_typeName(), "::parseMessageAttributesStringAndSetFields string must consist of ",  s_attributeCount, " delimited fields");
+            UXAS_LOG_ERROR(s_typeName(), "::parseMessageAttributesStringAndSetFields string must consist of ",  s_attributeCount, " delimited fields");
             m_isValid = false;
             return (m_isValid);
         }

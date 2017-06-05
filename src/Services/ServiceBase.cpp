@@ -26,12 +26,12 @@ namespace service
     : m_serviceType(serviceType), m_workDirectoryName(workDirectoryName)
     {
         m_serviceId = m_networkId;
-        LOG_INFORM(m_serviceType, "::ServiceBase set service ID to LMCP network ID value ", m_networkId);
+        UXAS_LOG_INFORM(m_serviceType, "::ServiceBase set service ID to LMCP network ID value ", m_networkId);
     };
 
     ServiceBase::~ServiceBase()
     {
-//        LOG_INFORM_ASSIGNMENT(m_serviceType, "::~ServiceBase()");     
+//        UXAS_LOG_INFORM_ASSIGNMENT(m_serviceType, "::~ServiceBase()");     
     };
 
 
@@ -46,7 +46,7 @@ ServiceBase::configureService(const std::string& parentOfWorkDirectory, const st
 bool
 ServiceBase::configureService(const std::string& parentWorkDirectory, const pugi::xml_node& serviceXmlNode)
 {
-    LOG_DEBUGGING(m_serviceType, "::configureService method START");
+    UXAS_LOG_DEBUGGING(m_serviceType, "::configureService method START");
     bool isSuccess{false};
 
     if (!m_workDirectoryName.empty())
@@ -54,11 +54,11 @@ ServiceBase::configureService(const std::string& parentWorkDirectory, const pugi
         if (!serviceXmlNode.attribute(uxas::common::StringConstant::isDataTimestamp().c_str()).empty())
         {
             m_isDataTimestamp = serviceXmlNode.attribute(uxas::common::StringConstant::isDataTimestamp().c_str()).as_bool();
-            LOG_INFORM(m_serviceType, "::configureService setting timestamp boolean to [", m_isDataTimestamp, "] from XML configuration");
+            UXAS_LOG_INFORM(m_serviceType, "::configureService setting timestamp boolean to [", m_isDataTimestamp, "] from XML configuration");
         }
         else
         {
-            LOG_INFORM(m_serviceType, "::configureService did not find ", uxas::common::StringConstant::isDataTimestamp(), " in XML; retaining default value m_isDataTimestamp [", m_isDataTimestamp, "]");
+            UXAS_LOG_INFORM(m_serviceType, "::configureService did not find ", uxas::common::StringConstant::isDataTimestamp(), " in XML; retaining default value m_isDataTimestamp [", m_isDataTimestamp, "]");
         }
         
         m_workDirectoryPath = parentWorkDirectory + ((*(parentWorkDirectory.rbegin()) == '/') ? "" : "/")
@@ -84,7 +84,7 @@ ServiceBase::configureService(const std::string& parentWorkDirectory, const pugi
     {
         // set source group value that will be assigned to source group field of sent messages
         m_messageSourceGroup = serviceXmlNode.attribute(uxas::common::StringConstant::MessageGroup().c_str()).value();
-        LOG_INFORM(m_serviceType, "::configureService setting m_messageSourceGroup to [", m_messageSourceGroup, "] from XML configuration");
+        UXAS_LOG_INFORM(m_serviceType, "::configureService setting m_messageSourceGroup to [", m_messageSourceGroup, "] from XML configuration");
         // subscribe to messages addressed to non-empty source group value
         if (!m_messageSourceGroup.empty())
         {
@@ -93,20 +93,20 @@ ServiceBase::configureService(const std::string& parentWorkDirectory, const pugi
     }
     else
     {
-        LOG_INFORM(m_serviceType, "::configureService did not find ", uxas::common::StringConstant::MessageGroup(), " value in XML configuration");
+        UXAS_LOG_INFORM(m_serviceType, "::configureService did not find ", uxas::common::StringConstant::MessageGroup(), " value in XML configuration");
     }
     
     if (isSuccess)
     {
         m_isConfigured = true;
-        LOG_INFORM(m_serviceType, "::configureService succeeded - service ID ", m_serviceId);
+        UXAS_LOG_INFORM(m_serviceType, "::configureService succeeded - service ID ", m_serviceId);
     }
     else
     {
-        LOG_ERROR(m_serviceType, "::configureService failed - service ID ", m_serviceId);
+        UXAS_LOG_ERROR(m_serviceType, "::configureService failed - service ID ", m_serviceId);
     }
 
-    LOG_DEBUGGING(m_serviceType, "::configureService method END");
+    UXAS_LOG_DEBUGGING(m_serviceType, "::configureService method END");
     return (isSuccess);
 };
 
@@ -123,17 +123,17 @@ ServiceBase::initializeAndStartService()
             isSuccess = uxas::common::utilities::c_FileSystemUtilities::bCreateDirectory(m_workDirectoryPath, errors);
             if (isSuccess)
             {
-                LOG_INFORM(m_serviceType, "::initializeAndStartService created work directory ", m_workDirectoryPath, " - service ID ", m_serviceId);
+                UXAS_LOG_INFORM(m_serviceType, "::initializeAndStartService created work directory ", m_workDirectoryPath, " - service ID ", m_serviceId);
             }
             else
             {
-                LOG_ERROR(m_serviceType, "::initializeAndStartService failed to create work directory ", m_workDirectoryPath, " - service ID ", m_serviceId);
+                UXAS_LOG_ERROR(m_serviceType, "::initializeAndStartService failed to create work directory ", m_workDirectoryPath, " - service ID ", m_serviceId);
             }
         }
         else
         {
             isSuccess = true;
-            LOG_INFORM(m_serviceType, "::initializeAndStartService skipping work directory creation - service ID ", m_serviceId);
+            UXAS_LOG_INFORM(m_serviceType, "::initializeAndStartService skipping work directory creation - service ID ", m_serviceId);
         }
 
         if (isSuccess)
@@ -143,16 +143,16 @@ ServiceBase::initializeAndStartService()
 
         if (isSuccess)
         {
-            LOG_INFORM(m_serviceType, "::initializeAndStartService succeeded - service ID ", m_serviceId);
+            UXAS_LOG_INFORM(m_serviceType, "::initializeAndStartService succeeded - service ID ", m_serviceId);
         }
         else
         {
-            LOG_ERROR(m_serviceType, "::initializeAndStartService failed - service ID ", m_serviceId);
+            UXAS_LOG_ERROR(m_serviceType, "::initializeAndStartService failed - service ID ", m_serviceId);
         }
     }
     else
     {
-        LOG_ERROR(m_serviceType, "::initializeAndStartService failed since configure method has not been invoked");
+        UXAS_LOG_ERROR(m_serviceType, "::initializeAndStartService failed since configure method has not been invoked");
     }
 
     return (isSuccess);

@@ -17,9 +17,9 @@
 #include "SerialAutomationRequestTestService.h"
 
 #include "UxAS_Log.h"
+#include "TimeUtilities.h"
 #include "UxAS_TimerManager.h"
 #include "pugixml.hpp"
-#include "TimeUtilities.h"
 
 #define STRING_COMPONENT_NAME "SerialAutomationRequest"
 #define STRING_XML_COMPONENT_TYPE STRING_COMPONENT_NAME
@@ -46,7 +46,7 @@ SerialAutomationRequestTestService::~SerialAutomationRequestTestService()
     uint64_t delayTime_ms{1000};
     if (m_responseTimerId && !uxas::common::TimerManager::getInstance().destroyTimer(m_responseTimerId, delayTime_ms))
     {
-        LOG_WARN("SerialAutomationRequestTestService::~SerialAutomationRequestTestService failed to destroy response timer "
+        UXAS_LOG_WARN("SerialAutomationRequestTestService::~SerialAutomationRequestTestService failed to destroy response timer "
                 "(m_responseTimerId) with timer ID ", m_responseTimerId, " within ", delayTime_ms, " millisecond timeout");
     }
 };

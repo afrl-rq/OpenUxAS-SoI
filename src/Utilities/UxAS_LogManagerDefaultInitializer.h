@@ -70,12 +70,12 @@ public:
         }
         catch (std::exception& ex)
         {
-            LOG_ERROR("LogManagerDefaultInitializer::initializeMainFileLogger EXCEPTION: ", ex.what());
+            UXAS_LOG_ERROR("LogManagerDefaultInitializer::initializeMainFileLogger EXCEPTION: ", ex.what());
         }
         
         if (isCreateDirSuccess)
         {
-            LOG_INFORM("LogManagerDefaultInitializer::initializeMainDatabaseLogger created log directory ", logDir);
+            UXAS_LOG_INFORM("LogManagerDefaultInitializer::initializeMainDatabaseLogger created log directory ", logDir);
             std::string logFilePath;    //not used??
             return (uxas::common::log::LogManager::getInstance().addLogger(uxas::common::log::HeadLogDataDatabaseLogger::s_defaultUxasMainHeadLogDataDatabaseLoggerName(),
                                                                            uxas::common::log::HeadLogDataDatabaseLogger::s_typeName(),
@@ -83,7 +83,7 @@ public:
         }
         else
         {
-            LOG_ERROR("LogManagerDefaultInitializer::initializeMainDatabaseLogger failed to create log directory ", logDir);
+            UXAS_LOG_ERROR("LogManagerDefaultInitializer::initializeMainDatabaseLogger failed to create log directory ", logDir);
             return (false);
         }
     };
@@ -108,12 +108,12 @@ public:
         }
         catch (std::exception& ex)
         {
-            LOG_ERROR("LogManagerDefaultInitializer::initializeMainFileLogger EXCEPTION: ", ex.what());
+            UXAS_LOG_ERROR("LogManagerDefaultInitializer::initializeMainFileLogger EXCEPTION: ", ex.what());
         }
         
         if (isCreateDirSuccess)
         {
-            LOG_INFORM("LogManagerDefaultInitializer::initializeMainFileLogger created log directory ", logDir);
+            UXAS_LOG_INFORM("LogManagerDefaultInitializer::initializeMainFileLogger created log directory ", logDir);
             return (uxas::common::log::LogManager::getInstance().addLogger(uxas::common::log::FileLogger::s_defaultUxasMainFileLoggerName(),
                                                                            uxas::common::log::FileLogger::s_typeName(),
                                                                            uxas::common::log::LogSeverityLevel::UXASDEBUG, logDir + "log",
@@ -121,7 +121,7 @@ public:
         }
         else
         {
-            LOG_ERROR("LogManagerDefaultInitializer::initializeMainFileLogger failed to create log directory ", logDir);
+            UXAS_LOG_ERROR("LogManagerDefaultInitializer::initializeMainFileLogger failed to create log directory ", logDir);
             return (false);
         }
     };
