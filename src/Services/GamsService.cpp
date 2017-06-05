@@ -28,6 +28,8 @@
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
 #include "afrl/cmasi/LoiterAction.h"
+#include "afrl/cmasi/MissionCommand.h"
+#include "afrl/cmasi/Waypoint.h"
 
 #include "afrl/impact/GroundVehicleState.h"
 
@@ -330,8 +332,18 @@ namespace service
     virtual int move (const gams::pose::Position & location,
       double epsilon)
     {
-        // FIXME: definitely not what we want to do here
-        return platforms::PLATFORM_OK;
+        gams::pose::Position current;
+        current.from_container(self_->agent.location);
+        
+        if (location.approximately_equal(current, epsilon))
+        {
+            return platforms::PLATFORM_ARRIVED;
+        }
+        else
+        {
+            m_service->sendWaypoint(location);
+            return platforms::PLATFORM_MOVING;
+        }
     }
 
     /**
@@ -364,11 +376,10 @@ namespace service
      * @param   rot_epsilon   approximation value for the rotation
      * @return the status of the operation, @see PlatformReturnValues
      **/
-    virtual int pose (const gams::utility::Pose & target,
+    virtual int pose (const gams::pose::Pose & target,
       double loc_epsilon = 0.1, double rot_epsilon = M_PI/16)
     {
-        // FIXME: definitely not what we want to do here
-        return platforms::PLATFORM_OK;
+        return move (gams::pose::Position(target), loc_epsilon);
     }
 
     /**
@@ -571,6 +582,29 @@ GamsService::sendBuffer (char * buffer, size_t length)
     
     // only send shared pointers to LMCP objects
     sendSharedLmcpObjectBroadcastMessage(newMessage);
+}
+
+void
+GamsService::sendWaypoint (const gams::pose::Position & location)
+{
+    // create the next waypoint
+    afrl::cmasi::Waypoint * nextPoint = new afrl::cmasi::Waypoint ();
+    nextPoint->setLatitude(location.lat());
+    nextPoint->setLongitude(location.lng());
+    nextPoint->setAltitude(location.alt());
+    nextPoint->setNumber(1);
+    nextPoint->setNextWaypoint(1);
+    nextPoint->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
+    
+    // create a mission with the waypoint as its only member
+    auto newMission = std::shared_ptr<afrl::cmasi::MissionCommand>(new afrl::cmasi::MissionCommand);
+    newMission->getWaypointList().push_back (nextPoint);
+        
+    // indicate that the first waypoint is the waypoint to use
+    newMission->setFirstWaypoint(1);
+        
+    // only send shared pointers to LMCP objects
+    sendSharedLmcpObjectBroadcastMessage(newMission);
 }
 
 void

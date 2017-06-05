@@ -116,6 +116,12 @@ public:
     void sendBuffer (char * buffer, size_t length);
     
     /**
+     * Sends a MissionCommand with a waypoint to UxAS
+     * @param  location  location to move to
+     **/
+    void sendWaypoint (const gams::pose::Position & location);
+    
+    /**
      * Retrieves the UxAS platform for GAMS interactions
      * @return if non-zero, the valid UxAS platform 
      */
