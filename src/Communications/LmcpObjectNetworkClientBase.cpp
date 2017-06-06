@@ -347,7 +347,7 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
                 // The first time we do not call wait for period but let the task wait for the first 
                 // message, this way we "sync" the wait for next period with the message sender
                 if (zs_isReservationEnabled && zs_isReserveAttached){
-                    std::cout << "Calling end_period tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;
+                    //std::cout << "Calling end_period tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;
                     zsv_end_period(zs_schedfd,zs_rid);
                     //zsv_wait_period(zs_schedfd,zs_rid);
                 }
@@ -386,7 +386,7 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
                         zs_isReserveAttached = true;
                         std::cout << "Attached reserved rid("<<zs_rid<<") \n";
                     } else {
-                        std::cout << "Calling wait_release tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;    
+                        //std::cout << "Calling wait_release tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;    
                         zsv_wait_release(zs_schedfd,zs_rid);
                     }
                 }

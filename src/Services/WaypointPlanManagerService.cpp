@@ -288,13 +288,82 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     
     if(_nextMissionCommandToSend)
     {
-        std::cout << "1: " <<_nextMissionCommandToSend->toXML() << "\n";
-        sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
+        //std::cout << "1: " <<_nextMissionCommandToSend->toXML() << "\n";
+        rta_sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
         _nextMissionCommandToSend.reset();
     }
     
     return (false); // always false implies never terminating service from here
 };
+
+static int cmdCounter = 0;
+
+void WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject)
+{
+    afrl::cmasi::Waypoint beginBorder;
+    afrl::cmasi::Waypoint endBorder;
+    
+    beginBorder.setLatitude(45.2898);
+    beginBorder.setLongitude(-121.01294);
+    endBorder.setLatitude(45.32789);
+    endBorder.setLongitude(-120.91681);
+    
+    auto missionCmd = static_cast<afrl::cmasi::MissionCommand *>(lmcpObject.get());
+//    if(cmdCounter == 6)
+//    {
+        std::vector<afrl::cmasi::Waypoint*> &wpl = missionCmd->getWaypointList();
+        std::vector<afrl::cmasi::Waypoint*> newWpl;
+
+        for (size_t i=0;i<wpl.size();i++)
+        {
+            if(allowedWayPoint(&beginBorder,&endBorder,wpl[i]))
+            {
+                if (newWpl.size())
+                    newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
+                newWpl.push_back(wpl[i]);
+            }
+        }
+        
+//        for(size_t i = 0;i < 3;i++) {
+//            if(newWpl.size()) newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
+//            newWpl.push_back(wpl[i]);
+//        }
+//        for(size_t i = wpl.size() - 3; i < wpl.size();++i)
+//        {
+//            if(newWpl.size()) newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
+//            newWpl.push_back(wpl[i]);
+//        }
+        
+        if(newWpl.size()) newWpl.back()->setNextWaypoint(newWpl.back()->getNumber());
+        wpl = newWpl;
+//    }
+    
+    std::cout << "Command number " << cmdCounter++ << '\n';
+    for(const auto &wp : missionCmd->getWaypointList())
+    {
+        std::cout << "waypoint : " << wp->toXML() << '\n';
+    }
+    std::cout << "3: " << lmcpObject<< '\n';
+    
+    
+    
+    sendSharedLmcpObjectBroadcastMessage(lmcpObject);
+}
+
+bool WaypointPlanManagerService::allowedWayPoint(afrl::cmasi::Waypoint *startBorder, afrl::cmasi::Waypoint *endBorder, afrl::cmasi::Waypoint* wp)
+{
+    double d;
+    double x1 = startBorder->getLatitude();
+    double y1 = startBorder->getLongitude();
+    double x2 = endBorder->getLatitude();
+    double y2 = endBorder->getLongitude();
+    double x = wp->getLatitude();
+    double y = wp->getLongitude();
+    
+    d = (x-x1)*(y2-y1)-(y-y1)*(x2-x1);
+    
+    return d>0;
+}
 
 bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand)
 {
@@ -554,9 +623,6 @@ void WaypointPlanManagerService::OnSendNewMissionTimer()
     if (_nextMissionCommandToSend)
     {
         sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
-        
-        std::cout << "2: " <<_nextMissionCommandToSend << "\n";
-
         _nextMissionCommandToSend.reset();
     }
 }

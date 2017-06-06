@@ -143,6 +143,8 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
 protected:
+    bool allowedWayPoint(afrl::cmasi::Waypoint *startBorder, afrl::cmasi::Waypoint *endBorder, afrl::cmasi::Waypoint* wp);
+    void rta_sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject);
     bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand>& ptr_MissionCommand);
     bool isGetCurrentSegment(const int64_t& waypointIdCurrent, std::shared_ptr<avtas::lmcp::Object>& segmentCurrent, int64_t& idMissionSegmentCurrent);
     bool isGetNextWaypointId(const int64_t& waypointIdCurrent, int64_t& waypointIdNext);
