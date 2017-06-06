@@ -17,7 +17,7 @@ def ProcessEntityStateFile(filename):
 			entityId = 0
 			elements = doc2.getElementsByTagName('ID')
 			if len(elements):
-				entityId = long(elements[0].firstChild.data)
+				entityId = int(elements[0].firstChild.data)
 			latitude = 0.0
 			longitude = 0.0
 			altitude = 0.0
@@ -39,7 +39,7 @@ def ProcessEntityStateFile(filename):
 			if len(elements):
 				heading = float(elements[0].firstChild.data)
 
-		except StandardError:
+		except Exception:
 			print('### Error encountered while processing the EnityState ###')
 			isGoodMessage = False
 		except:

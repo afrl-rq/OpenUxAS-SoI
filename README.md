@@ -24,7 +24,7 @@ The primary tools and dependencies to obtain, build, document, and simulate UxAS
 - OpenGL
 - UUID library
 - Boost
-- Python 2.7 and Python 3.5
+- Python 3
 - Meson
 - Ninja
 - [LmcpGen](https://github.com/afrl-rq/LmcpGen)
@@ -54,8 +54,8 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
 ### Windows: Install Ubuntu in Virtual Machine
 
 1. Download and install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-2. Download long term [stable Ubuntu release](https://www.ubuntu.com/download/desktop)
-3. Add virtual machine: in VirtualBox, select `New`
+1. Download long term [stable Ubuntu release](https://www.ubuntu.com/download/desktop)
+1. Add virtual machine: in VirtualBox, select `New`
    - In the `Name` field, type a name (e.g. UbuntuVM)
    - With the `Type` drop-down, select `Linux`
    - Confirm `Version` is `Ubuntu (64-bit)` and click `Next`
@@ -66,7 +66,7 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Keep the name the same as the virtual machine name
    - Select size (note: this is the max size) of virtual disk using slider
     (required 12GB, recommended 50+ GB) and click `Create`
-4. With the virtual machine selected in VirtualBox, click `Start` arrow
+1. With the virtual machine selected in VirtualBox, click `Start` arrow
    - In the `Select start-up disk` window, click the file folder icon
    - Navigate to the downloaded Ubuntu `.iso` file and click `Open`
    - Click `Install Ubuntu`
@@ -81,23 +81,23 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
    - Upon reboot, open the search menu (top left icon) and type `updates`
    - Select `Software Updater` and allow all updates
    - Shutdown virtual machine (select gear/power icon on top right)
-5. In VirtualBox, select virtual machine then click `Settings` gear icon
+1. In VirtualBox, select virtual machine then click `Settings` gear icon
    - In the `Display` menu (3rd down, left side), select `Enable 3d Acceleration` and click `OK`
    - In the `General` menu (1st on left), go to `Advanced` tab and choose
     `Bidirectional` in `Shared Clipboard` drop-down menu then click `OK`
-6. Re-open virtual machine by clicking the `Start` arrow again
+1. Re-open virtual machine by clicking the `Start` arrow again
    - In the VirtualBox menu (of the window containing the virtual machine), select Devices->Insert Guest Additions CD Image
    - Click `Run` in the warning box
    - Type password and click `Authenticate`
    - Reboot VM
-7. Follow Ubuntu instructions for remainder of configuration
+1. Follow Ubuntu instructions for remainder of configuration
 
 If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
 
 To set this up:
 1. Update to the Windows 10 Creators Update
-2. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
-3. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
+1. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
+1. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
    - `echo "export DISPLAY=:0" >> ~/.bashrc`
    - `sudo apt update & sudo apt install gedit`
 
@@ -110,8 +110,8 @@ The following is a bash script that helps to partially-automate the "installing 
 This is under development (only tested on Ubuntu 16.04), so use at your own peril!
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (install_most_deps.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
-2. Run the script at the terminal: `./install_most_deps.sh`
-3. Follow the on-screen instructions
+1. Run the script at the terminal: `./install_most_deps.sh`
+1. Follow the on-screen instructions
 
 ### Installing Prerequisite Tools on Ubuntu Linux
 
@@ -131,16 +131,14 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
 1. Install pip3: in terminal
    - ``` sudo apt install python3-pip ```
    - ``` sudo -H pip3 install --upgrade pip ```
-1. Install pip2: in terminal
-   - ``` sudo apt install python-pip ```
 1. Install ninja build system: in terminal
    - ``` sudo -H pip3 install ninja ```
 1. Install meson build configuration: in terminal
    - ``` sudo -H pip3 install meson ```
 1. Install python plotting capabilities (**optional**): in terminal
-   - ``` sudo apt install python-tk ```
-   - ``` sudo -H pip2 install matplotlib ```
-   - ``` sudo -H pip2 install pandas ```
+   - ``` sudo apt install python3-tk ```
+   - ``` sudo -H pip3 install matplotlib ```
+   - ``` sudo -H pip3 install pandas ```
 1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
    - Download the Linux x64 version
    - Run downloaded install script: in terminal
@@ -174,9 +172,6 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
    - ``` brew cask install mactex ```
 1. Install pip3: in terminal
    - ``` brew install python3 ```
-1. Install pip2: in terminal
-   - ``` curl -O https://bootstrap.pypa.io/get-pip.py ```
-   - ``` sudo -H python get-pip.py ```
 1. Install ninja build system: in terminal
    - ``` brew install cmake ```
    - ``` brew install pkg-config ```
@@ -185,8 +180,8 @@ This is under development (only tested on Ubuntu 16.04), so use at your own peri
 1. Install meson build configuration: in terminal
    - ``` sudo -H pip3 install meson ```
 1. Install python plotting capabilities (**optional**): in terminal
-   - ``` sudo -H pip2 install matplotlib ```
-   - ``` sudo -H pip2 install pandas ```
+   - ``` sudo -H pip3 install matplotlib ```
+   - ``` sudo -H pip3 install pandas ```
 1. Install [Oracle Java run-time](https://java.com/en/download/mac_download.jsp) (required for *LmcpGen*)
 1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
    - Download the Mac OSX version
@@ -264,42 +259,45 @@ This also needs to be done any time you move or rename your source tree.
 # Building at the Command Line
 1. Configure for release build: in terminal
    - ``` meson build --buildtype=release ```
-2. Configure for debug build: in terminal
+1. Configure for debug build: in terminal
    - ``` meson build_debug --buildtype=debug ```
    - These two steps only need to be done prior to the first build. If you
 modify the Meson files, just build as normal in step 3 and the changes
 will be automatically incorporated.
-3. Build UxAS: in terminal
+1. Build UxAS: in terminal
    - ``` ninja -C build all ```
    - This step is the only step necessary in day-to-day development work. It's
 the Meson equivalent of `make all`. Note that the name of `ninja` may differ by distro. On Fedora, for example,
 it's `ninja-build`.
    - To clean the build, add the `clean` target at the end of your ninja
 command: `ninja -C build clean`
-4. Run UxAS tests: in terminal
+1. Run UxAS tests: in terminal
    - ``` ninja -C build test ```
    - Confirm all tests passed
    
 ## Compiling using NetBeans (Debug Mode)
 
 1. Open NetBeans
-2. Select File->New Project
-3. Choose `C/C++ Project with Existing Sources` and click `Next`
-4. Specify the `OpenUxAS/src` folder
-5. Select the `Custom` option under `Select Configuration Mode` and click `Next`
-6. No changes under `Pre-Build Action`, click `Next`
-7. Set the `Clean Command` to ``` ninja -C build_debug clean ```
-8. Set the `Build Command` to ``` ninja -C build_debug ``` and click `Next`
-9. No changes under `Source Files`, click `Next`
-10. No changes under `Code Assistance Configuration`, click `Next`
-11. Change `Project Name` to ``` UxAS ``` and click `Finish`
+1. Select File->New Project
+1. Choose `C/C++ Project with Existing Sources` and click `Next`
+1. Specify the `OpenUxAS` folder
+1. Select the `Custom` option under `Select Configuration Mode` and click `Next`
+1. No changes under `Pre-Build Action`, click `Next`
+1. Set the `Clean Command` to ``` ninja -C build_debug clean ```
+1. Set the `Build Command` to ``` ninja -C build_debug uxas ``` and click `Next`
+1. No changes under `Source Files`, click `Next`
+1. No changes under `Code Assistance Configuration`, click `Next`
+1. Change `Project Name` to ``` UxAS ``` and click `Finish`
+
+For Linux systems, Netbeans will automatically use the `gdb` debugger. On Mac OS X,
+`gdb` must be installed and signed (see [Neil Traft's guide](http://ntraft.com/installing-gdb-on-os-x-mavericks/)).
 
 ## Removing External Dependencies
 
 If you ever feel the need to refresh external dependencies, you'll need
 to remove both the downloaded files and the expanded directories:
 
-$ ./rm-external
+``` ./rm-external ```
 
 This script depends upon the presence of the patch tarballs installed
 in the `/3rd` directory by `./prepare`.
@@ -375,9 +373,9 @@ unexpected trouble may arise on other platforms.
 # Running the Examples
 
 1. Assuming that in the file system, *OpenAMASE* is at the same level as `OpenUxAS`
-2. Add python package for UxAS plotting (src/Utilities/localcoords)
-   - ``` sudo -H python setup.py install ```
-3. Run examples
+1. Add python package for UxAS plotting (src/Utilities/localcoords)
+   - ``` sudo -H python3 setup.py install ```
+1. Run examples
    - Example 2: Follow README.md in `examples/02_Example_WaterwaySearch`
    - Example 3: Follow README.md in `examples/03_Example_DistributedCooperation`
    
@@ -386,20 +384,18 @@ unexpected trouble may arise on other platforms.
 The following is a bash script that help to partially automate the "building the docuemntation" processes that are documented in this README.md file below.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
-2. Run the script at the terminal: `./build_documentation.sh`
-3. Follow the on-screen instructions
+1. Run the script at the terminal: `./build_documentation.sh`
+1. Follow the on-screen instructions
 
-Note that 
-
-If you'd like to do this process manually, then:
+Note that if you'd like to do this process manually, then:
 
 1. The User Manual can be generated by running:
    `pdflatex UxAS_UserManual.tex` in the folder `doc/reference/UserManual/`
-2. Create HTML Doxygen reference documenation:
+1. Create HTML Doxygen reference documenation:
    - Open terminal in directory `doc/doxygen`
    - ``` sh RunDoxygen.sh ```
    - In newly created `html` folder, open index.html
-3. Doxygen PDF reference manual can be created by:
+1. Doxygen PDF reference manual can be created by:
    - Copy the line from `ExtraLineToFixLatex.txt` into `doc/doxygen/latex/refman.tex` just above the line `%===== C O N T E N T S =====`
    - In the folder `doc/doxygen/latex` run the command `pdflatex refman.tex`
    - The complete reference manual can be found at `doc/doxygen/latex/refman.pdf`

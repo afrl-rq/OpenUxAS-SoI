@@ -18,7 +18,7 @@ file << "" << std::endl;
 file << "\tzoneID = 0" << std::endl;
 file << "\telements = zoneNode.getElementsByTagName('ZoneID')" << std::endl;
 file << "\tif len(elements):" << std::endl;
-file << "\t\tzoneID = long(elements[0].firstChild.data)" << std::endl;
+file << "\t\tzoneID = int(elements[0].firstChild.data)" << std::endl;
 file << "\tprint('zoneID[' + str(zoneID) + ']')" << std::endl;
 file << "\tlabel = ''" << std::endl;
 file << "\telements = zoneNode.getElementsByTagName('Label')" << std::endl;

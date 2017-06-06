@@ -18,7 +18,7 @@ def ProcessZone(zoneNode,zoneType):
 	zoneID = 0
 	elements = zoneNode.getElementsByTagName('ZoneID')
 	if len(elements):
-		zoneID = long(elements[0].firstChild.data)
+		zoneID = int(elements[0].firstChild.data)
 	print('zoneID[' + str(zoneID) + ']')
 	label = ''
 	elements = zoneNode.getElementsByTagName('Label')
