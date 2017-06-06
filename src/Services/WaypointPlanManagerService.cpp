@@ -296,8 +296,6 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     return (false); // always false implies never terminating service from here
 };
 
-static int cmdCounter = 0;
-
 void WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject)
 {
     afrl::cmasi::Waypoint beginBorder;
@@ -309,7 +307,6 @@ void WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage(const 
     endBorder.setLongitude(-120.91681);
     
     auto missionCmd = static_cast<afrl::cmasi::MissionCommand *>(lmcpObject.get());
-//    if(cmdCounter == 6)
 //    {
         std::vector<afrl::cmasi::Waypoint*> &wpl = missionCmd->getWaypointList();
         std::vector<afrl::cmasi::Waypoint*> newWpl;
@@ -338,7 +335,6 @@ void WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage(const 
         wpl = newWpl;
 //    }
     
-    std::cout << "Command number " << cmdCounter++ << '\n';
     for(const auto &wp : missionCmd->getWaypointList())
     {
         std::cout << "waypoint : " << wp->toXML() << '\n';
