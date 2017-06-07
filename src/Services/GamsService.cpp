@@ -21,8 +21,10 @@
 #include "UnitConversions.h"
 #include "UxAS_TimerManager.h"
 
+#include "madara/logger/GlobalLogger.h"
 #include "madara/threads/Threader.h"
 #include "madara/knowledge/ContextGuard.h"
+#include "madara/knowledge/containers/Map.h"
 
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AutomationResponse.h"
@@ -62,8 +64,16 @@ namespace platforms = gams::platforms;
 /// static knowledge base which is configured with UxAS transport
 knowledge::KnowledgeBase uxas::service::GamsService::s_knowledgeBase;
 
-std::atomic <gams::platforms::BasePlatform *>
-    uxas::service::GamsService::s_platform;
+// static knowledge base that serves as a local file mutex that does not
+// conflict with the s_knowledgeBase
+knowledge::KnowledgeBase gamsServiceMutex;
+
+// file local maps stored in the gamsServiceMutex knowledge base
+knowledge::containers::Map agentToEntity;
+knowledge::containers::Map entityToAgent;
+
+// handle to the gamsServicePlatform
+gams::platforms::BasePlatform * gamsServicePlatform (0);
 
 namespace uxas
 {
@@ -203,7 +213,9 @@ namespace service
      **/
     virtual ~UxASGamsPlatform ()
     {
-        
+        // lock the mutex to ensure we can't destroy platform
+        // while moving
+        knowledge::ContextGuard guard (gamsServiceMutex);
     }
 
     /**
@@ -481,8 +493,8 @@ gams::pose::GPSFrame  UxASGamsPlatform::gps_frame;
       **/
     virtual void run (void)
     {
-        // always run the hertz loop for 10s, so we can kill it eventually
-        m_controller->run_hz(m_hertz, 10.0, m_sendHertz);
+        // run from the controller configuration settings
+        m_controller->run();
     }
 
   private:
@@ -496,28 +508,206 @@ gams::pose::GPSFrame  UxASGamsPlatform::gps_frame;
       double m_sendHertz;
   };
 
+void GamsService::mapAgent (const std::string & agentPrefix, int64_t entityId)
+{
+    if (agentPrefix != "" && entityId > 0)
+    {
+        std::stringstream entityString;
+        entityString << entityId;
+
+        agentToEntity.set (agentPrefix, entityId);
+        entityToAgent.set (entityString.str (), agentPrefix);
+    }
+}
+  
+int64_t GamsService::getEntityId (const std::string & agentPrefix)
+{
+    return agentToEntity[agentPrefix].to_integer ();
+}
+    
+std::string GamsService::getAgentPrefix (int64_t entityId)
+{
+    std::stringstream index;
+    index << entityId;
+    return agentToEntity[index.str ()].to_string ();
+}
+    
+int GamsService::move (const gams::pose::Position & location,
+      double epsilon)
+{
+    knowledge::ContextGuard guard (gamsServiceMutex);
+    
+    // default is set to an error (platform doesn't exist)
+    int result = gams::platforms::PLATFORM_ERROR;
+    
+    if (gamsServicePlatform)
+    {
+        result = gamsServicePlatform->move (location, epsilon);
+    }
+    
+    return result;
+}
     
 GamsService::ServiceBase::CreationRegistrar<GamsService>
 GamsService::s_registrar(GamsService::s_registryServiceTypeNames());
 
 GamsService::GamsService()
 : ServiceBase(GamsService::s_typeName(), GamsService::s_directoryName()),
-  m_controller (0), m_threader () { };
+  m_context (&(s_knowledgeBase.get_context())),
+  m_controller (0), m_threader (s_knowledgeBase) {
+
+    UXAS_LOG_ERROR("GamsService::constr:: sanity check");
+};
 
 GamsService::~GamsService() { };
 
 bool
-GamsService::configure(const pugi::xml_node& ndComponent)
+GamsService::configure(const pugi::xml_node& serviceXmlNode)
 {
-    // in the future, XML parameters to configure new transports
-    // and load algorithms
+    
+    UXAS_LOG_ERROR("GamsService::configure:: starting configure");
+    // set some reasonable defaults (2hz, same send rate, 10s runtime)
+    m_controllerSettings.loop_hertz = 2;
+    m_controllerSettings.run_time = 10;
+    m_controllerSettings.send_hertz = -1;
+    
+    gams::loggers::global_logger->add_file("GamsService.log");
+    
+    gams::loggers::global_logger->log(0, "GamsService::Starting configure\n");
+    
+    // set the prefixes for the global maps of agents to entities
+    agentToEntity.set_name("agent", gamsServiceMutex);
+    entityToAgent.set_name("entity", gamsServiceMutex);
+    
+    gams::loggers::global_logger->log(0, "GamsService::Iterating config XML\n");
+    
+    
+    // load settings from the XML file
+    for (pugi::xml_node currentXmlNode = serviceXmlNode.first_child();
+         currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
+    {
+        // if we need to load initial knowledge
+        if (std::string("InitialKnowledge") == currentXmlNode.name())
+        {
+            if (!currentXmlNode.attribute("BinaryFile").empty())
+            {
+                s_knowledgeBase.load_context(
+                    currentXmlNode.attribute("BinaryFile").as_string());
+            }
+            
+            if (!currentXmlNode.attribute("KarlFile").empty())
+            {
+                knowledge::EvalSettings settings;
+                settings.treat_globals_as_locals = true;
+                s_knowledgeBase.evaluate(
+                    currentXmlNode.attribute("KarlFile").as_string(), settings);
+            }
+        }
+        // if we need to setup the GamsController
+        else if(std::string("GamsController") == currentXmlNode.name())
+        {
+            // retrieve the agent prefix/id
+            if (!currentXmlNode.attribute("AgentPrefix").empty())
+            {
+                m_controllerSettings.agent_prefix =
+                        currentXmlNode.attribute("AgentPrefix").as_string();
+            }
+            
+            // retrieve the checkpoint file prefix (includes directories)
+            if (!currentXmlNode.attribute("CheckpointPrefix").empty())
+            {
+                m_controllerSettings.checkpoint_prefix =
+                        currentXmlNode.attribute("CheckpointPrefix").as_string();
+            }
+            
+            // checkpoint strategy (0==NONE, 1==ON_LOOP, 2==ON_SEND)
+            if (!currentXmlNode.attribute("CheckpointStrategy").empty())
+            {
+                m_controllerSettings.checkpoint_strategy =
+                        currentXmlNode.attribute("CheckpointStrategy").as_int();
+            }
+            
+            // set the GAMS logging level
+            if (!currentXmlNode.attribute("GamsLogLevel").empty())
+            {
+                gams::loggers::global_logger->set_level(
+                        currentXmlNode.attribute("GamsLogLevel").as_int());
+            }
+            
+            // set the MADARA logging level
+            if (!currentXmlNode.attribute("MadaraLogLevel").empty())
+            {
+                ::madara::logger::global_logger->set_level(
+                        currentXmlNode.attribute("MadaraLogLevel").as_int());
+            }
+            
+            // set the loop hertz
+            if (!currentXmlNode.attribute("LoopHertz").empty())
+            {
+                m_controllerSettings.loop_hertz =
+                        currentXmlNode.attribute("LoopHertz").as_double();
+            }
+            
+            // set the send hertz
+            if (!currentXmlNode.attribute("SendHertz").empty())
+            {
+                m_controllerSettings.send_hertz =
+                        currentXmlNode.attribute("SendHertz").as_double();
+            }
+            
+            // set the send hertz
+            if (!currentXmlNode.attribute("RunTime").empty())
+            {
+                m_controllerSettings.run_time =
+                        currentXmlNode.attribute("RunTime").as_double();
+            }
+        }
+        // if we need to setup the agent mappings
+        else if(std::string("Agents") == currentXmlNode.name())
+        {
+            // iterate through agent mappings
+            for (pugi::xml_node agentNode = currentXmlNode.first_child();
+                 agentNode; agentNode = agentNode.next_sibling())
+            {
+                int64_t entityId = 0;
+                std::string agentPrefix = "agent.0";
+                
+                // retrieve the agent prefix/id
+                if (!currentXmlNode.attribute("Prefix").empty())
+                {
+                    agentPrefix =
+                        currentXmlNode.attribute("Prefix").as_string();
+                }
+
+                // retrieve the checkpoint file prefix (includes directories)
+                if (!currentXmlNode.attribute("EntityId").empty())
+                {
+                    entityId =
+                            currentXmlNode.attribute("EntityId").as_int64();
+                }
+            
+                mapAgent (agentPrefix, entityId);
+            }
+            
+            // save the agent mapping for forensics
+            gamsServiceMutex.save_context(
+                m_controllerSettings.checkpoint_prefix + "_initmappings.kb");
+        }
+        // if we need to setup the agent mappings
+        else if(std::string("Groups") == currentXmlNode.name())
+        {
+            
+        }
+    }
+
     
     // attach the MadaraTransport for knowledge modifications to UxAS messages
     s_knowledgeBase.attach_transport (
       new UxASMadaraTransport (m_uniqueId, m_transportSettings, s_knowledgeBase,
             this));
     
-    m_controller = new gams::controllers::BaseController (s_knowledgeBase);
+    m_controller = new gams::controllers::BaseController (s_knowledgeBase,
+        m_controllerSettings);
     
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
@@ -531,13 +721,16 @@ GamsService::initialize()
 {
     bool bSuccess(true);
 
+    UXAS_LOG_ERROR("GamsService::initialize:: starting init");
+    gams::loggers::global_logger->log(0, "GamsService::initialize\n");
+    
     // create the UxAS platform
     m_controller->init_platform(new UxASGamsPlatform(this));
     m_controller->init_algorithm("null");
     
     {
-        ::madara::knowledge::ContextGuard lock (s_knowledgeBase);
-        s_platform = m_controller->get_platform ();
+        ::madara::knowledge::ContextGuard lock (gamsServiceMutex);
+        gamsServicePlatform = m_controller->get_platform ();
     }
     
     // run at 2hz, sending at 1hz, forever (-1)
@@ -551,8 +744,8 @@ GamsService::terminate()
 {
     // lock the knowledge base and set platform to null
     {
-        ::madara::knowledge::ContextGuard lock (s_knowledgeBase);
-        s_platform = 0;
+        ::madara::knowledge::ContextGuard lock (gamsServiceMutex);
+        gamsServicePlatform = 0;
     }
     
     m_threader.terminate();
@@ -611,6 +804,9 @@ void
 GamsService::controllerRun (double hertz,
     double sendHertz)
 {
+    m_controllerSettings.loop_hertz = hertz;
+    m_controllerSettings.send_hertz = sendHertz;
+    
     if (m_controller != 0)
     {
         m_controller->get_platform ()->get_self()->agent.loop_hz = hertz;
@@ -621,6 +817,7 @@ GamsService::controllerRun (double hertz,
 bool
 GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
+    UXAS_LOG_ERROR("GamsService::processReceivedLmcpMessage:: executing");
     if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
     {
         // we do not currently process this

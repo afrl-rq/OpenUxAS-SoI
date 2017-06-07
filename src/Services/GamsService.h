@@ -122,10 +122,35 @@ public:
     void sendWaypoint (const gams::pose::Position & location);
     
     /**
-     * Retrieves the UxAS platform for GAMS interactions
-     * @return if non-zero, the valid UxAS platform 
+     * Moves the agent platform to a location. Optional.
+     * @param   target    the coordinates to move to
+     * @param   epsilon   approximation value
+     * @return the status of the move operation,
+     *         @see gams::platforms::PlatformReturnValues
+     **/
+    static int move (const gams::pose::Position & location,
+      double epsilon);
+    
+    /**
+     * Adds a mapping of an agent prefix to an entity id
+     * @param agentPrefix the prefix of GAMS agent
+     * @param entityId the entity id of UxAS
      */
-    gams::platforms::BasePlatform * getPlatform (void);
+    static void mapAgent (const std::string & agentPrefix, int64_t entityId);
+    
+    /**
+     * Retrieves the entityId equivalent for an agent prefix
+     * @param agentPrefix the prefix to lookup
+     * @return the corresponding entityId
+     */
+    static int64_t getEntityId (const std::string & agentPrefix);
+    
+    /**
+     * Retrieves the agent prefix equivalent for an entity id
+     * @param entityId the entity to lookup
+     * @return the corresponding agent prefix
+     */
+    static std::string getAgentPrefix (int64_t entityId);
     
     /**
      * Sets the logic rate and update send rate.
@@ -136,9 +161,6 @@ public:
     
     /** knowledge base pre-configured with UxAS integration **/
     static ::madara::knowledge::KnowledgeBase s_knowledgeBase;
-    
-    /// current platform (protect usage with knowledgeBase locks)
-    static std::atomic <gams::platforms::BasePlatform *> s_platform;
     
 private:
 
@@ -189,6 +211,9 @@ private:
     
     /// controller for GAMS agent
     gams::controllers::BaseController *   m_controller;
+    
+    /// settings for the GAMS controller
+    gams::controllers::ControllerSettings m_controllerSettings;
     
     madara::threads::Threader m_threader;
 };
