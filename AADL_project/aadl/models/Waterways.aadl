@@ -11,6 +11,8 @@ public
     with UXNATIVE;
 
 	with UxAS_Props;
+	
+	with PLTL;
 
     thread TaskManagerService
         features
@@ -120,6 +122,8 @@ public
 				
 			--TODO make error message a new variable. 
         	
+        	--TODO: check request resource definition instead of non deterministic boolean? 
+        	--TODO: is it worth modeling the local state of what the service maintains? 
         	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
         		pre(event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined) => 
         			event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2 and numTasksInQ = pre(numTasksInQ);
@@ -146,11 +150,16 @@ public
         			else 
         				timer > pre(0->timer);
         				
-        				
+        		
+        	--TODO: is this service validating "requests" while queued or only when requests are being actively serviced.
+        	
+        			
         	guarantee "Implied Requirement: process next message only if IDLE or a response has been received":
         		((state= BUSY and event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = pre(UniqueAutomationRequest_out.RequestID)) or
         		(state=BUSY and timeout_option and timeout_val=timer)) =>
         			if numTasksInQ > 0 then
+        			--NOTE: no checking that the event is for the next item in the queue.
+        			--TODO: can mimic queue if the ID's are incremented by one, I can force what the message refers to (1 minus current)
         				event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1
         			else
         				state = IDLE;   	
@@ -162,7 +171,7 @@ public
         			(not event(ServiceStatus_out))) and
         			numTasksInQ = pre(numTasksInQ) - 1;
         			
-        	--Cannot formalize in AGREE
+        	--Cannot formalize in AGREE (unlesse I create a counter)
         	guarantee "The request ID of unique automation responses are unique" :
         		true;
         		
@@ -395,6 +404,123 @@ public
             TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
         properties
             Dispatch_Protocol => Sporadic;
+            
+        --NOTE: agree might not be able to handle inheritance, might require copy/paste
+       	annex agree{**
+       		eq state : int;
+       		eq init_complete : bool;
+       		--TODO: can I use an uninterpretted function or approximation?
+       		eq entity_state_task_id_present : bool;
+       		eq unique_automation_request_task_id_present : bool;
+       		
+       		const INIT : 				int = 1;
+       		const IDLE : 				int = 2;
+       		const SENSOR_REQUEST : 		int = 3;
+       		const OPTION_ROUTES :		int = 4;
+       		const OPTIONS_PUBLISHED : 	int = 5;
+       		const FINAL_ROUTES : 		int = 6;
+       		const OPTION_SELECTED : 	int = 7;
+       		const ACTIVE : 				int = 8;
+       		const COMPLETED :			int = 9;
+       		
+       		guarantee  " all Tasks start in the init state ":
+       			state = INIT->true;
+       			
+       		guarantee "all tasks remain in init until all internal initialization is complete, transitioning to idle after.
+       		When a Task has completed its internal initialization, it must report transition from this state 
+       		via the TaskInitialized message." :
+       			pre(state) = INIT and init_complete => 
+       				state = IDLE and 
+       				event(TaskInitialized_out);
+
+       		guarantee "UniqueAutomationRequest messages trigger a transition from the idle state into the SensorRequest state." :
+       			pre(state) = IDLE and event(UniqueAutomationRequest_in) => 
+       				state = SENSOR_REQUEST;
+       			
+--       		guarantee "When a Task is notified of its inclusion (by noting the presence of its ID in the Tasks list of an 
+--       			UniqueAutomationRequest message), it can request calculations that pertain to the sensors onboard the vehicles 
+--       			that are also included in the UniqueAutomationRequest message." :
+--       			event(UniqueAutomationRequest_in) and task_id_present => 
+--       				event(<TBD>) and 
+--       				<TBD: has certain values set>;
+--       		
+--       		guarantee "While waiting for a response from the SensorManagerService, a Task is in the SensorRequest state and 
+--       			will remain so until the response from the SensorManagerService is received.":
+--       			not event(<TBD: sensor manager service?>) and state = SENSOR_REQUEST => 
+--       				state = SENSOR_REQUEST;
+--       			
+--       		--TODO: should I use "once"?
+--       		guarantee "After the SensorManagerService has replied with the appropriate sensor calculations 
+--       			[IMPLIED: the service will then be in OptionRoutes state]" :
+--       			event(<TBD: sensor manager service replied>) => 
+--       				state = OPTION_ROUTES and <TBD>; --TBD
+--       		
+--       		guarantee "[IMPLIED: in OPTION_RULES state] the Task can request waypoints from the RouteAggregatorService that carry out the on-Task goals." :
+--       			state = OPTION_RULES => 
+--       				<TBD: "can" request waypoints from RouteAggregatorService>;
+--       		
+--       		
+--       		guarantee "The Task remains in the OptionRoutes state until the RouteAggregatorService replies.
+--       		When routes are returned [IMPLIED: from the route aggregator service the service will be in the OPTIONS_PUBLISHED state] ":
+--       			<TBD: response from route aggregator> => state = OPTIONS_PUBLISHED ;
+--       			
+--       		guarantee "[IMPLIED: in OPTIONS_PUBLISHED state the service] will utilize all route and sensor 
+--       		information to identify and publish the applicable TaskOptions. "
+--       			state = OPTIONS_PUBLISHED => 
+--       				<TBD: utilize route/sensor info to send TASKOPTIONS>;
+--       			
+--       		--TODO: check use of once here
+--       		guarantee "After publication of the options, a Task waits in the OptionsPublished state until the TaskImplementationRequest
+--       		 message is received, whereupon it switches to FinalRoutes.": 
+--       			pre(state)= OPTIONS_PUBLISHED and PLTL.Once(event(TaskPlanOptions_out)) and event(TaskImplementationRequest_in) =>
+--       				state = FINAL_ROUTES;
+--       			
+--       		guarantee "When a Task is Active, it is allowed to update sensor navigation commands to on-task vehicles." :
+--       		--TODO: VehicleActionCommand appears to be missing from the spec. 
+--       			state = ACTIVE =>
+--       				event(<VehicleActionCommand>) or not event(<VehicleActionCommand>) ;
+--       				
+--       		
+--       		guarantee "Upon reception of a TaskImplementationRequest, a Task is informed of the option that was selected by the assignment service. 
+--       		At this point, a Task must create the final set of waypoints that include both enroute and on-task waypoints from the specified vehicle 
+--       		location. The Task is required to create the enroute waypoints since a route refinement is possible, taking advantage of the concrete prior 
+--       		position of the selected vehicle." :
+--       			true; --TBD:
+--       			
+--       		guarantee "The Task remains in the FinalRoutes state until the route request is fulfilled by the RouteAggregatorService
+--       		[IMPLIED: at which point the task transitions to OptionSelected]." :
+--       			pre(state)=FINAL_ROUTES and event(<TBD>) =>
+--       				state = OPTION_SELECTED;
+--       				
+--       		guarantee "[Implied: when in OPTION_SELECTED and ] When the final waypoints are returned from the RouteAggregatorService, 
+--       		the Task publishes a complete TaskImplementationResponse message. " :
+--       			state = OPTION_SELECTED and event(<TBD>) =>
+--       				event(TaskComplete_out);
+--       				
+--       		
+--       		guarantee "If the Task is in the OptionSelected state and an EntityState message is received which includes the Task ID 
+--       		in the AssociatedTaskList, then the Task switches to the Activestate. ":
+--       			pre(state) = OPTION_SELECTED and event(EntityState_in) and entity_state_task_id_present(EntityState_in.tasks) =>
+--       				state = ACTIVE;
+       				
+       		guarantee "A Task remains in the Active state until a subsequent EntityState message does not list the Task ID in its AssociatedTaskList. 
+       		At which point, a transition to Completed is made. " : 
+       			pre(state) = ACTIVE and event(EntityState_in) and not entity_state_task_id_present =>
+       				state = COMPLETED;
+       		
+       		guarantee "If a UniqueAutomationRequest message that includes this TaskID is received in the Active state, it transitions to the Completed state." :
+       			pre(state) = ACTIVE and event(UniqueAutomationRequest_in) and unique_automation_request_task_id_present =>
+       				state = COMPLETED;
+       		
+       		guarantee "In the completed state, the Task publishes a TaskComplete message." :
+       			state = COMPLETED =>
+       				event(TaskComplete_out);
+       		
+       		guarantee "In the completed state, [IMPLIED: once the task complete message is sent] then immediately transition to the Idle state." :
+       			pre(state) = COMPLETED and pre(event(TaskComplete_out)) =>
+       				state = IDLE;
+       	**};
+       	
     end TaskServiceBase;
 
     thread TaskTrackerService
