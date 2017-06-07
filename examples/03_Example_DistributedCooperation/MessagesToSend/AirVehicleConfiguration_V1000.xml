@@ -1,32 +1,28 @@
 <AirVehicleConfiguration Series="CMASI">
-  <MinimumSpeed>24</MinimumSpeed>
-  <MaximumSpeed>24</MaximumSpeed>
+  <MinimumSpeed>15</MinimumSpeed>
+  <MaximumSpeed>30</MaximumSpeed>
   <NominalFlightProfile>
    <FlightProfile Series="CMASI">
      <Name>Nominal</Name>
      <Airspeed>24</Airspeed>
      <PitchAngle>0</PitchAngle>
      <VerticalSpeed>0</VerticalSpeed>
-     <MaxBankAngle>15</MaxBankAngle>
+     <MaxBankAngle>20</MaxBankAngle>
      <EnergyRate>0.00687171705067158</EnergyRate>
    </FlightProfile>
   </NominalFlightProfile>
-  <AlternateFlightProfiles>
-  </AlternateFlightProfiles>
   <AvailableLoiterTypes>
   <LoiterType>VehicleDefault</LoiterType>
   </AvailableLoiterTypes>
   <AvailableTurnTypes>
-  <TurnType>TurnShort</TurnType>
+    <TurnType>TurnShort</TurnType>
   </AvailableTurnTypes>
   <MinimumAltitude>0</MinimumAltitude>
   <MinAltitudeType>AGL</MinAltitudeType>
   <MaximumAltitude>3048</MaximumAltitude>
   <MaxAltitudeType>MSL</MaxAltitudeType>
   <ID>1000</ID>
-  <Affiliation>Unknown</Affiliation>
-  <EntityType></EntityType>
-  <Label>SuperBat-?</Label>
+  <Label>SuperBat-1000</Label>
   <NominalSpeed>24</NominalSpeed>
   <NominalAltitude>300</NominalAltitude>
   <NominalAltitudeType>AGL</NominalAltitudeType>
@@ -56,8 +52,6 @@
      </ContainedPayloadList>
      <PayloadID>1</PayloadID>
      <PayloadKind>1680-01-7000008</PayloadKind>
-     <Parameters>
-     </Parameters>
    </GimbalConfiguration>
    <CameraConfiguration Series="CMASI">
      <SupportedWavelengthBand>EO</SupportedWavelengthBand>
@@ -71,8 +65,6 @@
      <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
      <PayloadID>2</PayloadID>
      <PayloadKind>6710-01-7000006</PayloadKind>
-     <Parameters>
-     </Parameters>
    </CameraConfiguration>
    <CameraConfiguration Series="CMASI">
      <SupportedWavelengthBand>SWIR</SupportedWavelengthBand>
@@ -86,8 +78,6 @@
      <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
      <PayloadID>3</PayloadID>
      <PayloadKind>6710-01-7000007</PayloadKind>
-     <Parameters>
-     </Parameters>
    </CameraConfiguration>
    <VideoStreamConfiguration Series="CMASI">
      <AvailableSensorList>
@@ -96,10 +86,6 @@
      </AvailableSensorList>
      <PayloadID>101</PayloadID>
      <PayloadKind></PayloadKind>
-     <Parameters>
-     </Parameters>
    </VideoStreamConfiguration>
   </PayloadConfigurationList>
-  <Info>
-  </Info>
 </AirVehicleConfiguration>

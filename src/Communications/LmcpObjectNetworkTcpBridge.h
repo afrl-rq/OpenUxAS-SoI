@@ -18,6 +18,7 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+#include <set>
 
 //MIGRATION source
 //n_UxAS_Components::c_Component_TcpBridge
@@ -133,9 +134,15 @@ private:
 //    std::string m_tcpReceiveAddress{"tcp://*:5555"};
 //    std::string m_tcpSendAddress{"tcp://*:5556"};
     std::string m_tcpReceiveSendAddress = std::string("tcp://*:5555");
-    /** \brief  If this is set to true the the TcpBridge connects (binds) as a server. 
+    /** \brief  If this is set to true the TcpBridge connects (binds) as a server. 
      If it is false the TcpBridge connects as a client. Defaults to true */
     bool m_isServer{true};
+    /** \brief  If this is set to `true`, the TcpBridge service will report all received
+     * messages as if they originated from the vehicle hosting the TcpBridge rather
+     * than the external sender. This can be used when connected directly to a vehicle 
+     * simulation where the messages received would be considered self-generated in
+     * normal operation. */
+    bool m_isConsideredSelfGenerated{false};
     
 };
 
