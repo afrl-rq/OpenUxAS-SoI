@@ -317,25 +317,16 @@ WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage
     //-- get the next set of waypoints created by the service
     auto missionCmd = static_cast<afrl::cmasi::MissionCommand *>(lmcpObject.get());
     std::vector<afrl::cmasi::Waypoint*> &wpl = missionCmd->getWaypointList();
-    std::vector<afrl::cmasi::Waypoint*> newWpl;
 
-    //-- remove all waypoints that are in the unsafe region
+    //-- project all unsafe waypoints on to the border
     for (size_t i=0;i<wpl.size();i++)
     {
-        if(allowedWayPoint(beginBorder,endBorder,*(wpl[i])))
-        {
-            if (newWpl.size())
-                newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
-            newWpl.push_back(wpl[i]);
-        }
+        //-- if this waypoint is in the unsafe zone, project it on the
+        //-- border
+        if(!allowedWayPoint(beginBorder,endBorder,*(wpl[i])))
+            projectWayPoint(beginBorder,endBorder,*(wpl[i]));
     }
 
-    //-- make sure that the next waypoint of the last waypoint is itself
-    if(newWpl.size()) newWpl.back()->setNextWaypoint(newWpl.back()->getNumber());
-
-    //-- update the set of waypoints
-    wpl = newWpl;
-    
     /*
     for(const auto &wp : missionCmd->getWaypointList())
     {
@@ -363,6 +354,48 @@ WaypointPlanManagerService::allowedWayPoint(const afrl::cmasi::Waypoint &startBo
     double y = wp.getLongitude();
     
     return (((x-x1)*(y2-y1)-(y-y1)*(x2-x1)) > 0);
+}
+
+/*********************************************************************/
+//-- project the third point on to the border defined by the first two
+//-- points. the third point is changed as a side effect.
+/*********************************************************************/
+void
+WaypointPlanManagerService::projectWayPoint(const afrl::cmasi::Waypoint &startBorder,
+                                            const afrl::cmasi::Waypoint &endBorder,
+                                            afrl::cmasi::Waypoint &wp)
+{
+    double x1 = startBorder.getLatitude();
+    double y1 = startBorder.getLongitude();
+    double x2 = endBorder.getLatitude();
+    double y2 = endBorder.getLongitude();
+    double x = wp.getLatitude();
+    double y = wp.getLongitude();
+
+    //-- border endpoints have same latitude
+    if(x1 == x2)
+    {
+        wp.setLatitude(x1);
+        return;
+    }
+
+    //-- border endpoints have same longitude
+    if(y1 == y2)
+    {
+        wp.setLongitude(y1);
+        return;
+    }
+
+    //-- otherwise solve equations y = m1.x+c1 and y = m2.x+c2
+    double m1 = (y2 - y1) / (x2 -x1);
+    double m2 = -1.0 / m1;
+    double c2 = y - m2 * x;
+    double c1 = y1 - m1 * x1;
+
+    double yp = (c1*m2 - c2*m1) / (m2 - m1);
+    double xp = (yp - c1) / m1;
+    wp.setLatitude(xp);
+    wp.setLongitude(yp);
 }
 
 bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand)

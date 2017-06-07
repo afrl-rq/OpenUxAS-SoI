@@ -146,6 +146,9 @@ protected:
     bool allowedWayPoint(const afrl::cmasi::Waypoint &startBorder,
                          const afrl::cmasi::Waypoint &endBorder,
                          const afrl::cmasi::Waypoint &wp);
+    void projectWayPoint(const afrl::cmasi::Waypoint &startBorder,
+                         const afrl::cmasi::Waypoint &endBorder,
+                         afrl::cmasi::Waypoint &wp);
     void rta_sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject);
     bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand>& ptr_MissionCommand);
     bool isGetCurrentSegment(const int64_t& waypointIdCurrent, std::shared_ptr<avtas::lmcp::Object>& segmentCurrent, int64_t& idMissionSegmentCurrent);
