@@ -1,49 +1,73 @@
 package Resolute
 public
     annex resolute {**
-       
-        might_be_schedulable(c : component) <=
-          ** c **
-          forall(s : subcomponents(c)) . 
-            is_periodically_scheduled(c) or is_bounded_sporadic(c)
-          
+
+       rate_monotonic_schedulable() <=
+       	**"All threads are rate-monotonic schedulable"**
+       	rms_well_formed() and
+       	rms_property_verified()
+       	
+       	-- TODO: Do we need to be concerned if this computation uses the same units and scale of time? 
+       	rms_property_verified() <=
+       		** "All threads combine to satisfy the rate-monotonic schedulability property: the sum of max_compute_time/period for all threads is <= 0.693147" **
+       		sum({upper_bound(property(t,Compute_Execution_Time))/property(t,Period) for (t: thread)}) <= 0.693147
+       	 
+       	 --Note: This goal checks all threads that are defined in the project (potentially including threads that are not yet used/connected). 
+       	 -- In principle, all defined threads should be used, but it is generally possible this analysis, being based on all threads, is overly sound. 
+   		rms_well_formed() <=
+   			** "All threads have the appropriate and consistent properties for rate-monotonic schedulability." **
+   			forall(t : thread) .
+   				((is_periodically_scheduled(t) or is_bounded_sporadic(t)) 
+   					and is_computation_bound(t)
+   					and has_rms_consistent_deadline(t)
+   					and not_prioritized(t))
+   					
+   		--Note: we could check that any static priority is consistent with RMS
+   		--But that seems unnecessarily difficult, i.e., by including a priority in the model
+   		--it likely suggests a problem that should be addressed, and we should opt to flag it
+   		--rather than attempt further analyses to verify these priorities are consistent
+   		--with the desired scheduling properties. 
+   		not_prioritized(c : component) <=
+   			**" The component " c " has not been statically prioritized for scheduling" **
+   			not has_property(c, Criticality)
+   			and not has_property(c, Priority)
+   		
+   		--Note: page 45 "Model-Based Engineering with AADL":
+       		-- "The default value in the AADL standard for the deadline is the value of the period."
+       		-- but this can be overridden
+   		has_rms_consistent_deadline(c : component) <=
+   			**"The component " c " has no specified deadline or the deadline equals the period"**
+   			not has_property(c,Deadline) or property(c, Deadline) = property(c, Period)
           
         is_bounded_sporadic(c : component) <= 
-          ** "the component " c " is sporadic and has a bounded interarrival time" **
+          ** "The component " c " is sporadic and has a defined minimum dispatch interval (period)" **
             has_property(c, Dispatch_Protocol) and property(c, Dispatch_Protocol) = "Sporadic"
-            and has_specified_interarrival_time(c)
-            
-        has_specified_interarrival_time(c : component) <=
-          ** "the component " c " has a specified interarrival time" **
-          has_property(c, UxAS_Props::Interarrival_Time)
+            and has_property(c,Period)
             
         is_periodically_scheduled(c : component) <=
           ** "The component " c " is periodically scheduled and has a specified period" **
-            has_property(c, Dispatch_Protocol) and property(c, Dispatch_Protocol) = "Periodic"
-            and has_specified_period(c)
-          
-        has_specified_period(c : component) <=
-          ** "the component " c " has a specified interarrival time" **
-          has_property(c, Period)
-          
+            has_property(c, Dispatch_Protocol) 
+            and property(c, Dispatch_Protocol) = "Periodic"
+            and has_property(c,Period)
+            
+        is_computation_bound(c: component) <=
+        	** "The component " c " has a specified compute execution time bound" **
+        	has_property(c, Compute_Execution_Time)
+            
         isolation(c : component) <=
           ** "all subcomponents of " c " are unable to alter the memory of other subcomponents" **
           let s : {component} = subcomponents(c);
             (forall(sub : s) . memory_safe(sub)) or
             has_safe_os(c)
           
-        
         has_safe_os(c : component) <=
           ** "The component " c " is running on an OS with formally proved isolation" **
           (has_property(c, UxAS_Props::OS) and property(c, UxAS_Props::OS) = "SeL4")
         
-          
         memory_safe(c : component) <=
             ** "component " c " is memory safe" **
             false
-          
-          
-          
+
     **};
 	
 end Resolute;
