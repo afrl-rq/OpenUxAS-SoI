@@ -288,7 +288,8 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     
     if(_nextMissionCommandToSend)
     {
-        //std::cout << "1: " <<_nextMissionCommandToSend->toXML() << "\n";
+        //-- we wrap the sending of the message in a function call
+        //-- that implements the logical enforcer
         rta_sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
         _nextMissionCommandToSend.reset();
     }
@@ -296,69 +297,72 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     return (false); // always false implies never terminating service from here
 };
 
-void WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject)
+/*********************************************************************/
+//-- this method performs logical enforcement and sends out a set of
+//-- waypoints that are safe to be followed.
+/*********************************************************************/
+void
+WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage
+(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject)
 {
+    //-- create the border between the safe and unsafe areas. this is
+    //-- defined in terms of two endpoints
     afrl::cmasi::Waypoint beginBorder;
-    afrl::cmasi::Waypoint endBorder;
-    
     beginBorder.setLatitude(45.2898);
     beginBorder.setLongitude(-121.01294);
+    afrl::cmasi::Waypoint endBorder;
     endBorder.setLatitude(45.32789);
     endBorder.setLongitude(-120.91681);
-    
-    auto missionCmd = static_cast<afrl::cmasi::MissionCommand *>(lmcpObject.get());
-//    {
-        std::vector<afrl::cmasi::Waypoint*> &wpl = missionCmd->getWaypointList();
-        std::vector<afrl::cmasi::Waypoint*> newWpl;
 
-        for (size_t i=0;i<wpl.size();i++)
+    //-- get the next set of waypoints created by the service
+    auto missionCmd = static_cast<afrl::cmasi::MissionCommand *>(lmcpObject.get());
+    std::vector<afrl::cmasi::Waypoint*> &wpl = missionCmd->getWaypointList();
+    std::vector<afrl::cmasi::Waypoint*> newWpl;
+
+    //-- remove all waypoints that are in the unsafe region
+    for (size_t i=0;i<wpl.size();i++)
+    {
+        if(allowedWayPoint(beginBorder,endBorder,*(wpl[i])))
         {
-            if(allowedWayPoint(&beginBorder,&endBorder,wpl[i]))
-            {
-                if (newWpl.size())
-                    newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
-                newWpl.push_back(wpl[i]);
-            }
+            if (newWpl.size())
+                newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
+            newWpl.push_back(wpl[i]);
         }
-        
-//        for(size_t i = 0;i < 3;i++) {
-//            if(newWpl.size()) newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
-//            newWpl.push_back(wpl[i]);
-//        }
-//        for(size_t i = wpl.size() - 3; i < wpl.size();++i)
-//        {
-//            if(newWpl.size()) newWpl.back()->setNextWaypoint(wpl[i]->getNumber());
-//            newWpl.push_back(wpl[i]);
-//        }
-        
-        if(newWpl.size()) newWpl.back()->setNextWaypoint(newWpl.back()->getNumber());
-        wpl = newWpl;
-//    }
+    }
+
+    //-- make sure that the next waypoint of the last waypoint is itself
+    if(newWpl.size()) newWpl.back()->setNextWaypoint(newWpl.back()->getNumber());
+
+    //-- update the set of waypoints
+    wpl = newWpl;
     
+    /*
     for(const auto &wp : missionCmd->getWaypointList())
     {
         std::cout << "waypoint : " << wp->toXML() << '\n';
     }
-    std::cout << "3: " << lmcpObject<< '\n';
-    
-    
-    
+    */
+
     sendSharedLmcpObjectBroadcastMessage(lmcpObject);
 }
 
-bool WaypointPlanManagerService::allowedWayPoint(afrl::cmasi::Waypoint *startBorder, afrl::cmasi::Waypoint *endBorder, afrl::cmasi::Waypoint* wp)
+/*********************************************************************/
+//-- return true if the last argument is on the "positive" side of the
+//-- border defined by the first two points.
+/*********************************************************************/
+bool
+WaypointPlanManagerService::allowedWayPoint(const afrl::cmasi::Waypoint &startBorder,
+                                            const afrl::cmasi::Waypoint &endBorder,
+                                            const afrl::cmasi::Waypoint &wp)
 {
-    double d;
-    double x1 = startBorder->getLatitude();
-    double y1 = startBorder->getLongitude();
-    double x2 = endBorder->getLatitude();
-    double y2 = endBorder->getLongitude();
-    double x = wp->getLatitude();
-    double y = wp->getLongitude();
+    double x1 = startBorder.getLatitude();
+    double y1 = startBorder.getLongitude();
+    double x2 = endBorder.getLatitude();
+    double y2 = endBorder.getLongitude();
+    double x = wp.getLatitude();
+    double y = wp.getLongitude();
     
-    d = (x-x1)*(y2-y1)-(y-y1)*(x2-x1);
-    
-    return d>0;
+    return (((x-x1)*(y2-y1)-(y-y1)*(x2-x1)) > 0);
 }
 
 bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand)
