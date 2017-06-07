@@ -190,6 +190,8 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
    - `sudo -H pip3 install meson`
+1. Ensure dependency search for meson is supported: in terminal
+   - `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
    - `sudo apt install python3-tk`
    - `sudo -H pip3 install matplotlib`
