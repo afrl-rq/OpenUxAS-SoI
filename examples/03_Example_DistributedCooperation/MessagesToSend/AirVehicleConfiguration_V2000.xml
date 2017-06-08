@@ -4,30 +4,26 @@
   <NominalFlightProfile>
    <FlightProfile Series="CMASI">
      <Name>Nominal</Name>
-     <Airspeed>28</Airspeed>
+     <Airspeed>24</Airspeed>
      <PitchAngle>0</PitchAngle>
      <VerticalSpeed>0</VerticalSpeed>
      <MaxBankAngle>20</MaxBankAngle>
      <EnergyRate>0.00687171705067158</EnergyRate>
    </FlightProfile>
   </NominalFlightProfile>
-  <AlternateFlightProfiles>
-  </AlternateFlightProfiles>
   <AvailableLoiterTypes>
   <LoiterType>VehicleDefault</LoiterType>
   </AvailableLoiterTypes>
   <AvailableTurnTypes>
-  <TurnType>TurnShort</TurnType>
+    <TurnType>TurnShort</TurnType>
   </AvailableTurnTypes>
   <MinimumAltitude>0</MinimumAltitude>
   <MinAltitudeType>AGL</MinAltitudeType>
   <MaximumAltitude>3048</MaximumAltitude>
   <MaxAltitudeType>MSL</MaxAltitudeType>
   <ID>2000</ID>
-  <Affiliation>Unknown</Affiliation>
-  <EntityType></EntityType>
-  <Label>SuperBat-?</Label>
-  <NominalSpeed>28</NominalSpeed>
+  <Label>SuperBat-2000</Label>
+  <NominalSpeed>24</NominalSpeed>
   <NominalAltitude>300</NominalAltitude>
   <NominalAltitudeType>AGL</NominalAltitudeType>
   <PayloadConfigurationList>
@@ -71,8 +67,6 @@
      <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
      <PayloadID>2</PayloadID>
      <PayloadKind>6710-01-7000006</PayloadKind>
-     <Parameters>
-     </Parameters>
    </CameraConfiguration>
    <CameraConfiguration Series="CMASI">
      <SupportedWavelengthBand>SWIR</SupportedWavelengthBand>
@@ -86,8 +80,6 @@
      <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
      <PayloadID>3</PayloadID>
      <PayloadKind>6710-01-7000007</PayloadKind>
-     <Parameters>
-     </Parameters>
    </CameraConfiguration>
    <VideoStreamConfiguration Series="CMASI">
      <AvailableSensorList>
@@ -96,10 +88,6 @@
      </AvailableSensorList>
      <PayloadID>101</PayloadID>
      <PayloadKind></PayloadKind>
-     <Parameters>
-     </Parameters>
    </VideoStreamConfiguration>
   </PayloadConfigurationList>
-  <Info>
-  </Info>
 </AirVehicleConfiguration>

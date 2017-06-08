@@ -54,9 +54,9 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
 {
     std::string logPath = outputPath + "/log/";
     gtestuxascommonLogManagerInitialize(logPath);
-    LOG_INFORM("START gtestuxastestserviceServiceManagerStartAndRun");
-    LOG_INFORM("isCalledgtestuxastestserviceServiceManagerStartAndRun=", isCalledgtestuxastestserviceServiceManagerStartAndRun);
-    LOG_INFORM("duration_s=", duration_s);
+    UXAS_LOG_INFORM("START gtestuxastestserviceServiceManagerStartAndRun");
+    UXAS_LOG_INFORM("isCalledgtestuxastestserviceServiceManagerStartAndRun=", isCalledgtestuxastestserviceServiceManagerStartAndRun);
+    UXAS_LOG_INFORM("duration_s=", duration_s);
 
     if (!isCalledgtestuxastestserviceServiceManagerStartAndRun)
     {
@@ -64,24 +64,24 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
 
         uxas::common::ConfigurationManager::s_rootDataWorkDirectory = outputPath + "/SavedData/";
 
-        LOG_INFORM("Base cfg XML path parameter is: ", baseCfgXmlPath);
+        UXAS_LOG_INFORM("Base cfg XML path parameter is: ", baseCfgXmlPath);
         ASSERT_TRUE((baseCfgXmlPath.empty() ?
                     uxas::common::ConfigurationManager::getInstance().loadBaseXmlFile() :
                     uxas::common::ConfigurationManager::getInstance().loadBaseXmlFile(baseCfgXmlPath)) ? true : false);
 
         std::unique_ptr<uxas::communications::LmcpObjectNetworkServer> networkServer = uxas::stduxas::make_unique<uxas::communications::LmcpObjectNetworkServer>();
         ASSERT_TRUE(networkServer ? true : false);
-        LOG_INFORM("Created network server");
+        UXAS_LOG_INFORM("Created network server");
         ASSERT_TRUE(networkServer->configure() ? true : false);
-        LOG_INFORM("Configured network server");
+        UXAS_LOG_INFORM("Configured network server");
         ASSERT_TRUE(networkServer->initializeAndStart() ? true : false);
-        LOG_INFORM("Initialized and started network server");
+        UXAS_LOG_INFORM("Initialized and started network server");
 
         ASSERT_TRUE(uxas::service::ServiceManager::getInstance().configureServiceManager() ? true : false);
-        LOG_INFORM("Configured service manager");
+        UXAS_LOG_INFORM("Configured service manager");
         ASSERT_TRUE(uxas::service::ServiceManager::getInstance().initializeAndStartService() ? true : false);
-        LOG_INFORM("Initialized and started service manager");
-        LOG_INFORM("Retrieving Message Log Path");
+        UXAS_LOG_INFORM("Initialized and started service manager");
+        UXAS_LOG_INFORM("Retrieving Message Log Path");
         for (auto& service : uxas::service::ServiceManager::getInstance().getServicesById())
         {
             if (service.second->m_serviceType == std::string("MessageLoggerDataService"))
@@ -90,9 +90,9 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
                 logFilePath = messageLoggerDataService->m_logFilePath;
             }
         }
-        LOG_INFORM("Started Timed Run");
+        UXAS_LOG_INFORM("Started Timed Run");
         uxas::service::ServiceManager::getInstance().runUntil(duration_s);
-        LOG_INFORM("Finished Timed Run");
+        UXAS_LOG_INFORM("Finished Timed Run");
         uxas::service::ServiceManager::getInstance().destroyServiceManager();
         networkServer->terminate();
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -100,7 +100,7 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
         //uxas::communications::transport::ZeroMqFabric::getInstance().~ZeroMqFabric();
         uxas::communications::transport::ZeroMqFabric::Destroy();
     }
-    LOG_INFORM("END gtestuxastestserviceServiceManagerStartAndRun");
+    UXAS_LOG_INFORM("END gtestuxastestserviceServiceManagerStartAndRun");
 };
 
 int32_t CountMessagesInLogDb(const std::string& logFilePath, const std::string& message)

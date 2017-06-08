@@ -50,11 +50,11 @@ CmasiPointSearchTaskService::s_registrar(CmasiPointSearchTaskService::s_registry
 
 CmasiPointSearchTaskService::CmasiPointSearchTaskService()
 : TaskServiceBase(CmasiPointSearchTaskService::s_typeName(), CmasiPointSearchTaskService::s_directoryName()) {
-    //LOG_INFORM_ASSIGNMENT("*** CONSTRUCTOR m_networkId[",m_networkId,"] ***");
+    //UXAS_LOG_INFORM_ASSIGNMENT("*** CONSTRUCTOR m_networkId[",m_networkId,"] ***");
 };
 
 CmasiPointSearchTaskService::~CmasiPointSearchTaskService() {
-    //LOG_INFORM_ASSIGNMENT("*** DESTRUCTOR ***");
+    //UXAS_LOG_INFORM_ASSIGNMENT("*** DESTRUCTOR ***");
 };
 
 bool

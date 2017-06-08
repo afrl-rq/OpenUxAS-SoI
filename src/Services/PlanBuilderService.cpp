@@ -128,7 +128,7 @@ PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
     }
     else
     {
-        //        LOG_WARN("WARNING::PlanBuilderService::ProcessMessage: MessageType [" 
+        //        UXAS_LOG_WARN("WARNING::PlanBuilderService::ProcessMessage: MessageType [" 
         //                , receivedLmcpMessage->m_object->getFullLmcpTypeName() 
         //                , "] serviceId[" , m_serviceId
         //                , "] SourceEntityId[" , receivedLmcpMessage->m_attributes->getSourceEntityId()
@@ -384,7 +384,7 @@ void PlanBuilderService::buildAndSendThePlan()
         serviceStatus->getInfo().push_back(keyValuePair);
         keyValuePair = nullptr;
         sendSharedLmcpObjectBroadcastMessage(serviceStatus);
-        LOG_ERROR("PlanBuilderService::buildAndSendThePlan(): no saved UniqueAutomationRequest!!");
+        UXAS_LOG_ERROR("PlanBuilderService::buildAndSendThePlan(): no saved UniqueAutomationRequest!!");
     }
 };
 

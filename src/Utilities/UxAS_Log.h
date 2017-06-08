@@ -12,190 +12,190 @@
 
 #include "UxAS_LogManager.h"
 
-//#define DEBUG_VERBOSE_LOGGING_ENABLED_BRIDGE
-//#define DEBUG_VERBOSE_LOGGING_ENABLED_CCA
-//#define DEBUG_VERBOSE_LOGGING_ENABLED_KESTREL
-//#define DEBUG_VERBOSE_LOGGING_ENABLED_MESSAGING
-//#define DEBUG_VERBOSE_LOGGING_ENABLED_TESTFRAMEWORK
-//#define DEBUG_VERBOSE_LOGGING_ENABLED_TIME
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_BRIDGE
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_CCA
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_KESTREL
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_MESSAGING
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_TESTFRAMEWORK
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_TIME
 
-//#define DEBUG_VERBOSE_LOGGING_ENABLED
-//#define DEBUG_LOGGING_ENABLED
-//#define INFO_LOGGING_ENABLED
-#define WARN_LOGGING_ENABLED
-#define ERROR_LOGGING_ENABLED
+//#define UXAS_DEBUG_VERBOSE_LOGGING_ENABLED
+//#define UXAS_DEBUG_LOGGING_ENABLED
+//#define UXAS_INFO_LOGGING_ENABLED
+#define UXAS_WARN_LOGGING_ENABLED
+#define UXAS_ERROR_LOGGING_ENABLED
 
-#define INFO_LOGGING_FUNCTIONAL_TEST
-#ifdef INFO_LOGGING_FUNCTIONAL_TEST
+#define UXAS_INFO_LOGGING_FUNCTIONAL_TEST
+#ifdef UXAS_INFO_LOGGING_FUNCTIONAL_TEST
 /** \brief Log information message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_INFORM_FUNCTIONAL_TEST uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASINFO>
+#define UXAS_LOG_INFORM_FUNCTIONAL_TEST uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASINFO>
 #else
 /** \brief Log information message function disabled.
  */
-#define LOG_INFORM_FUNCTIONAL_TEST(...)
+#define UXAS_LOG_INFORM_FUNCTIONAL_TEST(...)
 #endif
 
-#define INFO_LOGGING_ASSIGNMENT
-#ifdef INFO_LOGGING_ASSIGNMENT
+#define UXAS_INFO_LOGGING_ASSIGNMENT
+#ifdef UXAS_INFO_LOGGING_ASSIGNMENT
 /** \brief Log information message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_INFORM_ASSIGNMENT uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASINFO>
+#define UXAS_LOG_INFORM_ASSIGNMENT uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASINFO>
 #else
 /** \brief Log information message function disabled.
  */
-#define LOG_INFORM_ASSIGNMENT(...)
+#define UXAS_LOG_INFORM_ASSIGNMENT(...)
 #endif
 
 
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED_BRIDGE
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_BRIDGE
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE_BRIDGE uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE_BRIDGE uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE_BRIDGE(...)
+#define UXAS_LOG_DEBUG_VERBOSE_BRIDGE(...)
 #endif
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED_CCA
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_CCA
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE_CCA uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE_CCA uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE_CCA(...)
+#define UXAS_LOG_DEBUG_VERBOSE_CCA(...)
 #endif
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED_KESTREL
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_KESTREL
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE_KESTREL uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE_KESTREL uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE_KESTREL(...)
+#define UXAS_LOG_DEBUG_VERBOSE_KESTREL(...)
 #endif
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED_MESSAGING
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_MESSAGING
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE_MESSAGING uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE_MESSAGING uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE_MESSAGING(...)
+#define UXAS_LOG_DEBUG_VERBOSE_MESSAGING(...)
 #endif
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED_TESTFRAMEWORK
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_TESTFRAMEWORK
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE_TESTFRAMEWORK uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE_TESTFRAMEWORK uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE_TESTFRAMEWORK(...)
+#define UXAS_LOG_DEBUG_VERBOSE_TESTFRAMEWORK(...)
 #endif
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED_TIME
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED_TIME
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE_TIME uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE_TIME uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE_TIME(...)
+#define UXAS_LOG_DEBUG_VERBOSE_TIME(...)
 #endif
 
-#ifdef DEBUG_VERBOSE_LOGGING_ENABLED
+#ifdef UXAS_DEBUG_VERBOSE_LOGGING_ENABLED
 /** \brief Log highly-detailed debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUG_VERBOSE uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUG_VERBOSE uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug details message function disabled.
  */
-#define LOG_DEBUG_VERBOSE(...)
+#define UXAS_LOG_DEBUG_VERBOSE(...)
 #endif
-        
-#ifdef DEBUG_LOGGING_ENABLED
+
+#ifdef UXAS_DEBUG_LOGGING_ENABLED
 /** \brief Log debug message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_DEBUGGING uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
+#define UXAS_LOG_DEBUGGING uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASDEBUG>
 #else
 /** \brief Log debug message function disabled.
  */
-#define LOG_DEBUGGING(...)
+#define UXAS_LOG_DEBUGGING(...)
 #endif
 
-#ifdef INFO_LOGGING_ENABLED
+#ifdef UXAS_INFO_LOGGING_ENABLED
 /** \brief Log information message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_INFORM uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASINFO>
+#define UXAS_LOG_INFORM uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASINFO>
 #else
 /** \brief Log information message function disabled.
  */
-#define LOG_INFORM(...)
+#define UXAS_LOG_INFORM(...)
 #endif
 
-#ifdef WARN_LOGGING_ENABLED
+#ifdef UXAS_WARN_LOGGING_ENABLED
 /** \brief Log warning message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_WARN uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASWARNING>
+#define UXAS_LOG_WARN uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASWARNING>
 #else
 /** \brief Log warning message function disabled.
  */
-#define LOG_WARN(...)
+#define UXAS_LOG_WARN(...)
 #endif
 
-#ifdef ERROR_LOGGING_ENABLED
+#ifdef UXAS_ERROR_LOGGING_ENABLED
 /** \brief Log error message consisting of one-many arguments.  
  * Arguments can be of type string, integer, double or an expression 
  * (e.g., totalCount + loopCount).  Recommended first argument is 
  * class and function name (e.g., ServiceBase::initialize).
  */
-#define LOG_ERROR uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASERROR>
+#define UXAS_LOG_ERROR uxas::common::log::LogManager::getInstance().log<uxas::common::log::LogSeverityLevel::UXASERROR>
 #else
 /** \brief Log error message function disabled.
  */
-#define LOG_ERROR(...)
+#define UXAS_LOG_ERROR(...)
 #endif
 
-#endif	/* UXAS_COMMON_LOG_LOG_H */
+#endif /* UXAS_COMMON_LOG_LOG_H */

@@ -18,19 +18,19 @@ gtestuxascommonLogManagerInitialize(const std::string& logPath,bool isReInitiali
     GTEST_LOG_MANAGER_INITIALIZE_MESSAGE("isCalledGtestuxascommonLogManagerInitialize=" << isCalledGtestuxascommonLogManagerInitialize);
     if (isCalledGtestuxascommonLogManagerInitialize)
     {
-        LOG_INFORM("START GtestuxascommonLogManagerInitialize");
-        LOG_INFORM("isCalledGtestuxascommonLogManagerInitialize=", isCalledGtestuxascommonLogManagerInitialize);
+        UXAS_LOG_INFORM("START GtestuxascommonLogManagerInitialize");
+        UXAS_LOG_INFORM("isCalledGtestuxascommonLogManagerInitialize=", isCalledGtestuxascommonLogManagerInitialize);
     }
     else
     {
         isCalledGtestuxascommonLogManagerInitialize = true;
         ASSERT_TRUE(uxas::common::log::LogManagerDefaultInitializer::initializeConsoleLogger() ? true : false);
-        LOG_INFORM("Console logger initialized");
+        UXAS_LOG_INFORM("Console logger initialized");
         std::string logFilePath;
         ASSERT_TRUE(uxas::common::log::LogManagerDefaultInitializer::initializeMainFileLogger(logPath,logFilePath) ? true : false);
-        LOG_INFORM("Main file logger initialized");
+        UXAS_LOG_INFORM("Main file logger initialized");
     }
-    LOG_INFORM("END GtestuxascommonLogManagerInitialize");
+    UXAS_LOG_INFORM("END GtestuxascommonLogManagerInitialize");
 };
 
 void

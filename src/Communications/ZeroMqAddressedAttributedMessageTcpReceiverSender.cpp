@@ -32,11 +32,11 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
 
     if (m_zmqSocket)
     {
-        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE zmq::pollitem_t");
+        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE zmq::pollitem_t");
         zmq::pollitem_t pollItems [] = {
             { *m_zmqSocket, 0, ZMQ_POLLIN, 0},
         };
-        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage AFTER zmq::pollitem_t");
+        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage AFTER zmq::pollitem_t");
 
         // http://api.zeromq.org/2-1:zmq-poll    
         // If none of the requested events have occurred on any zmq_pollitem_t item, 
@@ -53,20 +53,20 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
                 while (true)
                 {
                     // single-part AddressedAttributedMessage)
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP zframe_recv");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP zframe_recv");
                     zframe_t* frameData = zframe_recv(*m_zmqSocket);
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP zframe_data");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP zframe_data");
                     byte* payloadData = zframe_data(frameData);
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP zframe_size");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP zframe_size");
                     size_t payloadSize = zframe_size(frameData);
 
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP framePayload");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE TCP framePayload");
                     std::string framePayload(reinterpret_cast<const char*> (payloadData), payloadSize);
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage TCP framePayload is: [", framePayload, "]");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage TCP framePayload is: [", framePayload, "]");
                     std::string recvdTcpDataSegment = m_receiveTcpDataBuffer.getNextPayloadString(framePayload);
                     if (!recvdTcpDataSegment.empty())
                     {
-                        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage processing complete object string segment");
+                        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage processing complete object string segment");
                         std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdTcpAddAttMsg
                                 = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
                         if (recvdTcpAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdTcpDataSegment)))
@@ -78,19 +78,19 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
                             }
                             else
                             {
-                                LOG_INFORM("ZeroMqAddressedAttributedMessageReceiver::getNextMessage ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                                UXAS_LOG_INFORM("ZeroMqAddressedAttributedMessageReceiver::getNextMessage ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
                             }
                         }
                         else
                         {
-                            LOG_WARN("ZeroMqAddressedAttributedMessageReceiver::getNextMessage failed to create AddressedAttributedMessage object from TCP stream serial buffer string segment");
+                            UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageReceiver::getNextMessage failed to create AddressedAttributedMessage object from TCP stream serial buffer string segment");
                         }
                     }
                     else
                     {
-                        LOG_DEBUGGING("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage data appended to serial buffer, but serial buffer does not yet contain a complete object string segment");
+                        UXAS_LOG_DEBUGGING("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage data appended to serial buffer, but serial buffer does not yet contain a complete object string segment");
                     }
-                    LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE zframe_destroy");
+                    UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE zframe_destroy");
                     zframe_destroy(&frameData);
                     if (nextMsg || uxas::common::ConfigurationManager::getZeroMqReceiveSocketPollWaitTime_ms() > -1)
                     {
@@ -100,7 +100,7 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
             }
             catch (std::exception& ex)
             {
-                LOG_ERROR("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage EXCEPTION: ", ex.what());
+                UXAS_LOG_ERROR("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage EXCEPTION: ", ex.what());
             }
         }
     } //if(m_zmqSocket)
@@ -117,9 +117,9 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::sendMessage(const std::string
         message.setAddressAttributesAndPayload(address, contentType, descriptor, m_sourceGroup,
                                                m_entityIdString, m_serviceIdString, std::move(payload));
         std::string sentinelStr = uxas::common::SentinelSerialBuffer::createSentinelizedString(message.getString());
-        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendMessage BEFORE sending TCP stream single-part message");
+        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendMessage BEFORE sending TCP stream single-part message");
         zmq_send(*m_zmqSocket, sentinelStr.c_str(), sentinelStr.size(), ZMQ_SNDMORE);
-        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendMessage AFTER sending TCP stream single-part message");
+        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendMessage AFTER sending TCP stream single-part message");
     } //if(m_zmqSocket)
 };
 
@@ -140,9 +140,9 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessag
         zmq_send(*m_zmqSocket, id, idSize, ZMQ_SNDMORE);
 
         std::string sentinelStr = uxas::common::SentinelSerialBuffer::createSentinelizedString(message->getString());
-        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessage BEFORE sending TCP stream single-part message");
+        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessage BEFORE sending TCP stream single-part message");
         zmq_send(*m_zmqSocket, sentinelStr.c_str(), sentinelStr.size(), ZMQ_SNDMORE);
-        LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessage AFTER sending TCP stream single-part message");
+        UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessage AFTER sending TCP stream single-part message");
     }
 };
 

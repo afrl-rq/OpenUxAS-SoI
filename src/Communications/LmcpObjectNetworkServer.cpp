@@ -45,7 +45,7 @@ LmcpObjectNetworkServer::initializeAndStart()
     if (isStarted)
     {
         m_thread = uxas::stduxas::make_unique<std::thread>(&LmcpObjectNetworkServer::executeNetworkServer, this);
-        LOG_INFORM("LmcpObjectNetworkServer::initializeAndStart started LMCP network server processing thread [", m_thread->get_id(), "]");
+        UXAS_LOG_INFORM("LmcpObjectNetworkServer::initializeAndStart started LMCP network server processing thread [", m_thread->get_id(), "]");
     }
     return (isStarted);
 }
@@ -61,7 +61,7 @@ LmcpObjectNetworkServer::initialize()
 {
     m_lmcpObjectMessageReceiverPipe.initializePull(m_entityId, m_networkId);
     m_lmcpObjectMessageSenderPipe.initializePublish("", m_entityId, m_networkId);
-    LOG_INFORM("LmcpObjectNetworkServer initialized LMCP network pull receiver and publish sender pipes");
+    UXAS_LOG_INFORM("LmcpObjectNetworkServer initialized LMCP network pull receiver and publish sender pipes");
 
     return (true);
 };
@@ -74,24 +74,24 @@ LmcpObjectNetworkServer::executeNetworkServer()
         // get the next LMCP object message (if any) sent to the LMCP network hub
         std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> receivedLmcpMessage 
                 = m_lmcpObjectMessageReceiverPipe.getNextSerializedMessage();
-        LOG_DEBUG_VERBOSE_MESSAGING("LmcpObjectNetworkServer::executeNetworkServer RECEIVED serialized message");
-        LOG_DEBUG_VERBOSE_MESSAGING("Address:          [", receivedLmcpMessage->getAddress(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("ContentType:      [", receivedLmcpMessage->getMessageAttributesReference()->getContentType(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("Descriptor:       [", receivedLmcpMessage->getMessageAttributesReference()->getDescriptor(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("SourceGroup:      [", receivedLmcpMessage->getMessageAttributesReference()->getSourceGroup(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("SourceEntityId:   [", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("SourceServiceId:  [", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("AttributesString: [", receivedLmcpMessage->getMessageAttributesReference()->getString(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("getPayload:       [", receivedLmcpMessage->getPayload(), "]");
-        LOG_DEBUG_VERBOSE_MESSAGING("getString:        [", receivedLmcpMessage->getString(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("LmcpObjectNetworkServer::executeNetworkServer RECEIVED serialized message");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("Address:          [", receivedLmcpMessage->getAddress(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("ContentType:      [", receivedLmcpMessage->getMessageAttributesReference()->getContentType(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("Descriptor:       [", receivedLmcpMessage->getMessageAttributesReference()->getDescriptor(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("SourceGroup:      [", receivedLmcpMessage->getMessageAttributesReference()->getSourceGroup(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("SourceEntityId:   [", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("SourceServiceId:  [", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("AttributesString: [", receivedLmcpMessage->getMessageAttributesReference()->getString(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("getPayload:       [", receivedLmcpMessage->getPayload(), "]");
+        UXAS_LOG_DEBUG_VERBOSE_MESSAGING("getString:        [", receivedLmcpMessage->getString(), "]");
 
         if (receivedLmcpMessage)
         {
             m_lmcpObjectMessageSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
-            LOG_DEBUG_VERBOSE_MESSAGING("LmcpObjectNetworkServer::executeNetworkServer SENT serialized message");
+            UXAS_LOG_DEBUG_VERBOSE_MESSAGING("LmcpObjectNetworkServer::executeNetworkServer SENT serialized message");
         }
     }
-    LOG_INFORM("LmcpObjectNetworkServer::executeSerializedNetworkClient exiting infinite loop thread [", std::this_thread::get_id(), "]");
+    UXAS_LOG_INFORM("LmcpObjectNetworkServer::executeSerializedNetworkClient exiting infinite loop thread [", std::this_thread::get_id(), "]");
 };
 
 }; //namespace communications
