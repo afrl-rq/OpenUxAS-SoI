@@ -1,3 +1,10 @@
+# License
+
+*OpenUxAS* is developed by the Air Force Research Laboratory, Aerospace System Directorate, Power and Control Division. 
+The LMCP specification and all source code for *OpenUxAS* is publicaly released under the Air Force Open Source Agreement
+Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agreement closely follows the NASA Open Source
+Agreement Verion 1.3. **NOTE the terms of the license include registering use of the software by emailing <a href="mailto:afrl.rq.opensource@us.af.mil?subject=OpenUxAS Registration&body=Please register me for use of OpenUxAS. Name: ____________">afrl.rq.opensource@us.af.mil</a>.**
+
 # Introduction
 
 UxAS consists of a collection of modular services that interact via a common message passing architecture. Similar in design to Robot Operating System (ROS), each service subscribes to messages in the system and responds to queries. UxAS uses the open-source library ZeroMQ to connect all services to each other. The content of each message conforms to the Light-weight Message Control Protocol (LMCP) format. Software classes providing LMCP message creation, access, and serialization/deserialization are automatically generated from simple XML description documents (see the *LmcpGen* project). These same XML descriptions detail the exact data fields, units, and default values for each message. Since all UxAS services communicate with LMCP formatted messages, a developer can quickly determine the input/output data for each service. In a very real sense, the message traffic in the system exposes the interaction of the services that are required to achieve autonomous behavior.
@@ -7,15 +14,6 @@ Consider a simple example: the automated construction of the flight pattern to c
 In addition to surveillance pattern automation, UxAS contains services that automate route planning, coordinate behavior among multiple vehicles, connect with external software, validate mission requests, log and diagram message traffic, and optimize task ordering. In all, UxAS has approximately 30 services.
 
 A core functionality provided by UxAS is the mechanism to calculate near-optimal task allocation across teams of unmanned vehicles. With a collection of tasks that require servicing and a pool of vehicles available to service those tasks, UxAS is able to determine which vehicle should do which task in the proper order. This task assignment pipeline is carried out by a series of services working together in a complex sequence.
-
-
-# License
-
-*OpenUxAS* is developed by the Air Force Research Laboratory, Aerospace System Directorate, Power and Control Division.
-The LMCP specification and all source code for *OpenUxAS* is publicaly released under the Air Force Open Source Agreement
-Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agreement closely follows the NASA Open Source
-Agreement Verion 1.3.
-
 
 # Quick Start (only if you already have Ubuntu 16.04 LTS installed!!):
 
@@ -192,6 +190,8 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
    - `sudo -H pip3 install meson`
+1. Ensure dependency search for meson is supported: in terminal
+   - `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
    - `sudo apt install python3-tk`
    - `sudo -H pip3 install matplotlib`

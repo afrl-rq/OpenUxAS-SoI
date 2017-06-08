@@ -38,6 +38,7 @@
 
 #define ARG_CFG_PATH "-cfgPath"
 #define ARG_VERSION "-version"
+#define ARG_RUN_UNTIL "-runUntil"
 
 #define MAJOR_VERSION "3"
 #define MINOR_VERSION "1"
@@ -66,6 +67,7 @@ main(int argc, char** argv)
     // example arguments: -cfgBasePath ./cfg/cfgbase2.xml
     //
     std::string cfgPath{"cfg.xml"};
+	uint32_t runUntil_sec = 0;
 
     for (int i = 1; i < argc; i++)
     {
@@ -73,6 +75,11 @@ main(int argc, char** argv)
         {
             i++;
             cfgPath = std::string(argv[i]);
+        }
+        else if (strcmp((const char *) argv[i], ARG_RUN_UNTIL) == 0)
+        {
+            i++;
+            runUntil_sec = std::atoi(argv[i]);
         }
         else if (strcmp((const char *) argv[i], ARG_VERSION) == 0)
         {
@@ -239,7 +246,14 @@ main(int argc, char** argv)
     }
 
     UXAS_LOG_INFORM("UxAS_Main running ServiceManager");
-    uxas::service::ServiceManager::getInstance().runUntil(uxas::common::ConfigurationManager::getInstance().getRunDuration_s());
+	if(!runUntil_sec)
+	{
+        uxas::service::ServiceManager::getInstance().runUntil(uxas::common::ConfigurationManager::getInstance().getRunDuration_s());
+	}
+	else
+	{
+        uxas::service::ServiceManager::getInstance().runUntil(runUntil_sec);
+	}
 
     uxas::service::ServiceManager::getInstance().destroyServiceManager();
     networkServer->terminate();

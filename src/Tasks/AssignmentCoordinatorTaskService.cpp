@@ -24,7 +24,6 @@
 
 
 #include "afrl/cmasi/AirVehicleState.h"
-#include "uxas/messages/task/UniqueAutomationRequest.h"
 #include "uxas/messages/task/TaskAutomationRequest.h"
 #include "uxas/messages/task/TaskAutomationResponse.h"
 
@@ -87,7 +86,7 @@ AssignmentCoordinatorTaskService::configureTask(const pugi::xml_node& ndComponen
     //    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::task::CoordinatedAutomationRequest::Subscription);
-    addSubscriptionAddress(uxas::messages::task::UniqueAutomationResponse::Subscription);
+    addSubscriptionAddress(uxas::messages::task::TaskAutomationResponse::Subscription);
     addSubscriptionAddress(uxas::messages::task::AssignmentCoordination::Subscription);
 
     return (isSuccess);
@@ -125,7 +124,10 @@ bool AssignmentCoordinatorTaskService::processReceivedLmcpMessageTask(std::share
     if (afrl::cmasi::isAirVehicleState(receivedLmcpObject))
     {
         auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpObject);
-        m_lastLocalEntityState.reset(airVehicleState->clone());
+        if(airVehicleState->getID() == m_entityId)
+        {
+            m_lastLocalEntityState.reset(airVehicleState->clone());
+        }
     }
     else if (uxas::messages::task::isAssignmentCoordination(receivedLmcpObject))
     {
@@ -185,16 +187,16 @@ bool AssignmentCoordinatorTaskService::processReceivedLmcpMessageTask(std::share
     }
     else if (uxas::messages::task::isTaskAutomationResponse(receivedLmcpObject))
     {
-        std::lock_guard<std::mutex> lock(m_timerThreadLock);
         auto taskAutomationResponse = std::static_pointer_cast<uxas::messages::task::TaskAutomationResponse> (receivedLmcpObject);
         // send out an AutomationResponse (for the waypoint manager)
         auto response = std::shared_ptr<afrl::cmasi::AutomationResponse>(taskAutomationResponse->getOriginalResponse()->clone());
         sendSharedLmcpObjectBroadcastMessage(response);
+        
+        std::lock_guard<std::mutex> lock(m_timerThreadLock);
         if (m_requestIdVsCoordinationElements.find(taskAutomationResponse->getResponseID()) != m_requestIdVsCoordinationElements.end())
         {
             m_requestIdVsCoordinationElements.erase(taskAutomationResponse->getResponseID());
         }
-//        COUT_FILE_LINE_MSG("")
     }
 
     return false;
