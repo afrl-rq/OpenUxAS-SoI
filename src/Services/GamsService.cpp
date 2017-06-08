@@ -26,6 +26,10 @@
 #include "madara/knowledge/ContextGuard.h"
 #include "madara/knowledge/containers/Map.h"
 
+#include "gams/groups/GroupFixedList.h"
+#include "gams/loggers/GlobalLogger.h"
+
+#include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
@@ -272,7 +276,7 @@ namespace service
     {
         // we're currently reading location from knowledge base
         // this should be set by the UxAS LMCP processing logic
-        gams::pose::Position result;
+        gams::pose::Position result (gps_frame);
         result.from_container(self_->agent.location);
         
         return result;
@@ -319,7 +323,7 @@ namespace service
     virtual int home (void)
     {
         // once we figure out the 
-        gams::pose::Position next;
+        gams::pose::Position next (gps_frame);
         next.from_container(self_->agent.home);
         
         return this->move(next, get_accuracy ());
@@ -438,16 +442,17 @@ namespace service
         return gps_frame;
     }
     
-  protected:
-      
-    /// handle to the GamsService so we can use sendBuffer
-    GamsService * m_service;
     
     // a default GPS frame
     static gams::pose::GPSFrame  gps_frame;
     
     // a default Cartesian frame
     static gams::pose::CartesianFrame  cartesian_frame;
+    
+  protected:
+      
+    /// handle to the GamsService so we can use sendBuffer
+    GamsService * m_service;
     
   }; // end UxASGamsPlatform class
   
@@ -527,9 +532,22 @@ int64_t GamsService::getEntityId (const std::string & agentPrefix)
     
 std::string GamsService::getAgentPrefix (int64_t entityId)
 {
-    std::stringstream index;
-    index << entityId;
-    return agentToEntity[index.str ()].to_string ();
+    std::string result;
+    
+    if (entityId > 0)
+    {
+        std::stringstream index;
+        index << entityId;
+    
+        knowledge::KnowledgeRecord record = entityToAgent[index.str ()];
+        
+        if (record.exists())
+        {
+            result = record.to_string ();
+        }
+    }
+    
+    return result;
 }
     
 int GamsService::move (const gams::pose::Position & location,
@@ -571,15 +589,15 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
     m_controllerSettings.run_time = 10;
     m_controllerSettings.send_hertz = -1;
     
-    gams::loggers::global_logger->add_file("GamsService.log");
-    
-    gams::loggers::global_logger->log(0, "GamsService::Starting configure\n");
+    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+        "GamsService::Starting configure\n");
     
     // set the prefixes for the global maps of agents to entities
     agentToEntity.set_name("agent", gamsServiceMutex);
     entityToAgent.set_name("entity", gamsServiceMutex);
     
-    gams::loggers::global_logger->log(0, "GamsService::Iterating config XML\n");
+    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+        "GamsService::Iterating config XML\n");
     
     
     // load settings from the XML file
@@ -596,7 +614,7 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
             }
             
             if (!currentXmlNode.attribute("KarlFile").empty())
-            {
+            {;
                 knowledge::EvalSettings settings;
                 settings.treat_globals_as_locals = true;
                 s_knowledgeBase.evaluate(
@@ -673,33 +691,97 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
                 std::string agentPrefix = "agent.0";
                 
                 // retrieve the agent prefix/id
-                if (!currentXmlNode.attribute("Prefix").empty())
+                if (!agentNode.attribute("Prefix").empty())
                 {
                     agentPrefix =
-                        currentXmlNode.attribute("Prefix").as_string();
+                        agentNode.attribute("Prefix").as_string();
                 }
 
                 // retrieve the checkpoint file prefix (includes directories)
-                if (!currentXmlNode.attribute("EntityId").empty())
+                if (!agentNode.attribute("EntityId").empty())
                 {
                     entityId =
-                            currentXmlNode.attribute("EntityId").as_int64();
+                            agentNode.attribute("EntityId").as_int64();
                 }
             
                 mapAgent (agentPrefix, entityId);
             }
             
-            // save the agent mapping for forensics
-            gamsServiceMutex.save_context(
-                m_controllerSettings.checkpoint_prefix + "_initmappings.kb");
+        }
+        // if we have logging to setup
+        else if(std::string("Logging") == currentXmlNode.name())
+        {
+            pugi::xml_node madaraNode = currentXmlNode.child("Madara");
+            pugi::xml_node gamsNode = currentXmlNode.child("Gams");
+            
+            if (madaraNode)
+            {
+                if (!madaraNode.attribute("Level").empty())
+                {
+                    ::madara::logger::global_logger->set_level (
+                        madaraNode.attribute("Level").as_int());
+                }
+                
+                if (!madaraNode.attribute("File").empty())
+                {
+                    ::madara::logger::global_logger->add_file (
+                        madaraNode.attribute("File").as_string());
+                }
+            }
+            if (gamsNode)
+            {
+                if (!gamsNode.attribute("Level").empty())
+                {
+                    gams::loggers::global_logger->set_level (
+                        gamsNode.attribute("Level").as_int());
+                }
+                
+                if (!gamsNode.attribute("File").empty())
+                {
+                    gams::loggers::global_logger->add_file (
+                        gamsNode.attribute("File").as_string());
+                }
+            }
         }
         // if we need to setup the agent mappings
         else if(std::string("Groups") == currentXmlNode.name())
         {
+            // iterate through agent mappings
+            for (pugi::xml_node groupNode = currentXmlNode.first_child();
+                 groupNode; groupNode = groupNode.next_sibling())
+            {
+                std::string groupPrefix =
+                    groupNode.attribute("Prefix").as_string();
+                
+                if (groupPrefix != "")
+                {
+                    gams::groups::GroupFixedList group (
+                        groupPrefix, &s_knowledgeBase);
+                    gams::groups::AgentVector members;
+                
+                    // iterate through agent mappings
+                    for (pugi::xml_node memberNode = groupNode.first_child();
+                         memberNode; memberNode = memberNode.next_sibling())
+                    {
+                        if (!memberNode.attribute("Name").empty())
+                        {
+                            members.push_back (
+                                memberNode.attribute("Name").as_string());
+                        }
+                    }
+                    group.add_members(members);
+                }
+            }
             
         }
     }
 
+    // save the agent mapping for forensics
+    gamsServiceMutex.save_context(
+        m_controllerSettings.checkpoint_prefix + "_config_gamsServiceMutex.kb");
+    // save the agent mapping for forensics
+    s_knowledgeBase.save_context(
+        m_controllerSettings.checkpoint_prefix + "_config_knowledgeBase.kb");
     
     // attach the MadaraTransport for knowledge modifications to UxAS messages
     s_knowledgeBase.attach_transport (
@@ -733,9 +815,18 @@ GamsService::initialize()
         gamsServicePlatform = m_controller->get_platform ();
     }
     
+    // save the agent mapping for forensics
+    gamsServiceMutex.save_context(
+        m_controllerSettings.checkpoint_prefix + "_init_gamsServiceMutex.kb");
+    // save the agent mapping for forensics
+    s_knowledgeBase.save_context(
+        m_controllerSettings.checkpoint_prefix + "_init_knowledgeBase.kb");
+    
     // run at 2hz, sending at 1hz, forever (-1)
     m_threader.run ("controller", new service::ControllerLoop (m_controller,
         2, 1));
+    
+    
     return (bSuccess);
 };
 
@@ -750,6 +841,13 @@ GamsService::terminate()
     
     m_threader.terminate();
     m_threader.wait ();
+    
+    // save the agent mapping for forensics
+    gamsServiceMutex.save_context(
+        m_controllerSettings.checkpoint_prefix + "_term_gamsServiceMutex.kb");
+    // save the agent mapping for forensics
+    s_knowledgeBase.save_context(
+        m_controllerSettings.checkpoint_prefix + "_term_knowledgeBase.kb");
     
     // cleanup the GAMS controller
     delete m_controller;
@@ -818,13 +916,68 @@ bool
 GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
     UXAS_LOG_ERROR("GamsService::processReceivedLmcpMessage:: executing");
-    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
+    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()) ||
+        afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()) ||
+        afrl::cmasi::isEntityState(receivedLmcpMessage->m_object.get()))
     {
-        // we do not currently process this
-    }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
-    {
-        // we do not currently process this
+        CERR_FILE_LINE_MSG("GamsService: Found EntityState");
+        // retrieve a EntityState pointer for querying
+        std::shared_ptr<afrl::cmasi::EntityState> message =
+            std::static_pointer_cast<afrl::cmasi::EntityState>(
+                receivedLmcpMessage->m_object);
+        
+        int64_t entityId = message->getID();
+        std::string agentPrefix = getAgentPrefix (entityId);
+
+        ::madara::logger::global_logger->log (0,
+            "GamsService: Processing entity(%d), agent(%s)\n",
+            (int)entityId, agentPrefix.c_str ());
+        
+        variables::Agent agent;
+        if (agentPrefix != "")
+        {
+            variables::AgentMap::iterator found = m_agentMap.find (agentPrefix);
+
+            if (found != m_agentMap.end ())
+            {
+                ::madara::logger::global_logger->log (0,
+                    "GamsService: Found entity(%d), agent(%s)\n",
+                    (int)entityId, agentPrefix.c_str ());
+        
+                agent = found->second;
+            }
+            else
+            {
+                m_agentMap[agentPrefix].init_vars (
+                    s_knowledgeBase, agentPrefix);
+                agent = m_agentMap[agentPrefix];
+            }
+        }
+        else
+        {
+            std::stringstream newprefix;
+            newprefix << "agent.";
+            newprefix << entityId;
+            
+            // build a new entityId <-> agentPrefix mapping
+            GamsService::mapAgent(newprefix.str(), entityId);
+            
+            // create an entry in the knowledge base
+            m_agentMap[newprefix.str()].init_vars (
+                s_knowledgeBase, newprefix.str());
+            agent = m_agentMap[newprefix.str()];
+        }
+        
+        gams::pose::Position currentPosition (UxASGamsPlatform::gps_frame);        
+        afrl::cmasi::Location3D * location = message->getLocation();
+        
+        currentPosition.lat(location->getLatitude());
+        currentPosition.lng(location->getLongitude());
+        currentPosition.alt(location->getAltitude());
+        
+        currentPosition.to_container(agent.location);
+        
+        agent.battery_remaining = message->getEnergyAvailable();
     }
     else if (uxas::madara::isMadaraState (receivedLmcpMessage->m_object.get()))
     {
@@ -867,6 +1020,13 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
             header);
     }
 
+    // save the agent mapping for forensics
+    gamsServiceMutex.save_context(
+        m_controllerSettings.checkpoint_prefix + "_last_gamsServiceMutex.kb");
+    // save the agent mapping for forensics
+    s_knowledgeBase.save_context(
+        m_controllerSettings.checkpoint_prefix + "_last_knowledgeBase.kb");
+    
     return false;
 };
 

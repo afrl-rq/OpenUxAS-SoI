@@ -25,15 +25,20 @@
     -->
     <Service Type="GamsService" >
         <InitialKnowledge KarlFile="" BinaryFile="" />
+        <Logging>
+            <Madara File="Madara.log" Level="6"/>
+            <!--<Gams File="Gams.log" Level="6"/>-->
+        </Logging>
         <GamsController AgentPrefix="agent.0"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
-            GamsLogLevel="1" MadaraLogLevel="1"
+            GamsLogLevel="4" MadaraLogLevel="4"
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
         <Agents>
           <Agent Prefix="agent.0" EntityId="100"/>
           <Agent Prefix="agent.1" EntityId="200"/>
           <Agent Prefix="agent.2" EntityId="300"/>
           <Agent Prefix="agent.3" EntityId="400"/>
+          <!--<Agent Prefix="agent.4" EntityId="500"/>-->
         </Agents>
         <Groups>
           <Group Prefix="group.allies">

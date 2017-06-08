@@ -216,6 +216,8 @@ private:
     gams::controllers::ControllerSettings m_controllerSettings;
     
     madara::threads::Threader m_threader;
+    
+    gams::variables::AgentMap m_agentMap;
 };
 
 }; //namespace service
