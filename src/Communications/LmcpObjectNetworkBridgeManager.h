@@ -102,6 +102,9 @@ public:
     static LmcpObjectNetworkBridgeManager&
     getInstance();
 
+    void terminateAllBridges();
+    void removeTerminatedBridges(uint32_t &runningSvcCnt, uint32_t &terminatedSvcCnt);
+    
     ~LmcpObjectNetworkBridgeManager() { };
 
 private:
@@ -131,7 +134,7 @@ private:
     createBridge(const pugi::xml_node& bridgeXmlNode, uint32_t entityId, uint32_t networkId);
 
     bool m_isInitializedBridges{false};
-    std::unordered_map<uint32_t, std::unique_ptr<LmcpObjectNetworkClientBase>> m_bridgesByNetworkId;
+    std::unordered_map<uint32_t, std::unique_ptr<LmcpObjectNetworkClientBase> > m_bridgesByNetworkId;
 
 };
 

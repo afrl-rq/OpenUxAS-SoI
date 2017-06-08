@@ -8,6 +8,7 @@
 // ===============================================================================
 
 #include "ServiceManager.h"
+#include "LmcpObjectNetworkBridgeManager.h"
 
 #define INCLUDE_SERVICE_HEADERS //this switches 00_ServiceList.h to load the service headers
 #include "00_ServiceList.h"
@@ -261,7 +262,7 @@ ServiceManager::initialize()
 
 uint32_t
 ServiceManager::removeTerminatedServices() // lock m_servicesByIdMutex before invoking
-{
+{   
     uint32_t runningSvcCnt{0};
     uint32_t terminatedSvcCnt{0};
     for (auto svcIt = m_servicesById.begin(); svcIt != m_servicesById.end();)
@@ -279,6 +280,10 @@ ServiceManager::removeTerminatedServices() // lock m_servicesByIdMutex before in
             svcIt++;
         }
     }
+    
+    // check to see if bridges are ready for termination
+    uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().removeTerminatedBridges(runningSvcCnt, terminatedSvcCnt);
+    
     UXAS_LOG_INFORM(s_typeName(), "::removeTerminatedServices retained [", runningSvcCnt, "] services and removed [", terminatedSvcCnt, "] services");
     return (runningSvcCnt);
 };
@@ -520,6 +525,9 @@ ServiceManager::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
 void
 ServiceManager::terminateAllServices()
 {
+    // Kill all bridges first
+    uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().terminateAllBridges();
+    
     // send KillService message to any non-terminated services
     std::lock_guard<std::mutex> lock(m_servicesByIdMutex);
     for (auto svcIt = m_servicesById.cbegin(), serviceItEnd = m_servicesById.cend(); svcIt != serviceItEnd; svcIt++)

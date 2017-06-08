@@ -51,6 +51,7 @@ lib_uxas_communications = static_library(
     include_directories(
       '../../src/Includes',
       '../../src/Utilities',
+      '../../src/Services',
       '../../3rd/cppzmq-4.2.1',
       '../../3rd/zeromq-4.1.1/include',
       '../../3rd/czmq-3.0.1/include',
