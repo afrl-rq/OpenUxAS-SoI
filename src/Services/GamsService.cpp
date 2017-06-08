@@ -471,9 +471,8 @@ gams::pose::GPSFrame  UxASGamsPlatform::gps_frame;
     /**
      * Default constructor
      **/
-    ControllerLoop (gams::controllers::BaseController * controller,
-            double hertz, double sendHertz)
-    : m_controller (controller), m_hertz (hertz), m_sendHertz (sendHertz)
+    ControllerLoop (gams::controllers::BaseController * controller)
+    : m_controller (controller)
     {
         
     }
@@ -505,12 +504,6 @@ gams::pose::GPSFrame  UxASGamsPlatform::gps_frame;
   private:
       /// handle to GAMS controller
       gams::controllers::BaseController * m_controller;
-      
-      /// the rate to execute logic at
-      double m_hertz;
-      
-      /// the hertz to send updates at (-1 means same as the hertz)
-      double m_sendHertz;
   };
 
 void GamsService::mapAgent (const std::string & agentPrefix, int64_t entityId)
@@ -582,8 +575,6 @@ GamsService::~GamsService() { };
 bool
 GamsService::configure(const pugi::xml_node& serviceXmlNode)
 {
-    
-    UXAS_LOG_ERROR("GamsService::configure:: starting configure");
     // set some reasonable defaults (2hz, same send rate, 10s runtime)
     m_controllerSettings.loop_hertz = 2;
     m_controllerSettings.run_time = 10;
@@ -803,7 +794,6 @@ GamsService::initialize()
 {
     bool bSuccess(true);
 
-    UXAS_LOG_ERROR("GamsService::initialize:: starting init");
     gams::loggers::global_logger->log(0, "GamsService::initialize\n");
     
     // create the UxAS platform
@@ -823,8 +813,8 @@ GamsService::initialize()
         m_controllerSettings.checkpoint_prefix + "_init_knowledgeBase.kb");
     
     // run at 2hz, sending at 1hz, forever (-1)
-    m_threader.run ("controller", new service::ControllerLoop (m_controller,
-        2, 1));
+    m_threader.run (1.0/m_controllerSettings.run_time, "controller",
+      new service::ControllerLoop (m_controller));
     
     
     return (bSuccess);
@@ -915,12 +905,10 @@ GamsService::controllerRun (double hertz,
 bool
 GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    UXAS_LOG_ERROR("GamsService::processReceivedLmcpMessage:: executing");
     if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()) ||
         afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()) ||
         afrl::cmasi::isEntityState(receivedLmcpMessage->m_object.get()))
     {
-        CERR_FILE_LINE_MSG("GamsService: Found EntityState");
         // retrieve a EntityState pointer for querying
         std::shared_ptr<afrl::cmasi::EntityState> message =
             std::static_pointer_cast<afrl::cmasi::EntityState>(

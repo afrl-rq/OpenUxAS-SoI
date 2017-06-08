@@ -26,12 +26,12 @@
     <Service Type="GamsService" >
         <InitialKnowledge KarlFile="" BinaryFile="" />
         <Logging>
-            <Madara File="Madara.log" Level="6"/>
-            <!--<Gams File="Gams.log" Level="6"/>-->
+            <Madara File="GamsService.log" Level="1"/>
+            <Gams File="GamsService.log" Level="3" />
         </Logging>
         <GamsController AgentPrefix="agent.0"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
-            GamsLogLevel="4" MadaraLogLevel="4"
+            GamsLogLevel="3" MadaraLogLevel="1"
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
         <Agents>
           <Agent Prefix="agent.0" EntityId="100"/>
