@@ -91,6 +91,7 @@ public
 			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
 			awm2wm: port asset_waypoint_manager.out_waypoint -> waypoint_manager.in_waypoint;
 			awm2vm: port asset_waypoint_manager.out_waypoint -> virtual_machine.in_waypoint;
+			uart2wm: port uart_driver.out_send_success -> waypoint_manager.in_send_success;
 			
 			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
 			
@@ -116,7 +117,7 @@ public
 		features
 			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i;
 			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i;
-			send_success: out event data port Base_Types::Boolean;
+			out_send_success: out event data port Base_Types::Boolean;
 			
 			uartfwd: provides subprogram group access gen_fwd_inf;
 			clkcar: requires subprogram group access clkcar_inf;
@@ -163,6 +164,9 @@ public
 			};
 			in_waypoint: in event data port waypoint.impl {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
+			};
+			in_send_success: in event data port Base_Types::Boolean  {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_send_success");
 			};
 			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_uart_packet");

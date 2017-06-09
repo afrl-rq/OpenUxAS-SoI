@@ -6,6 +6,10 @@ void in_waypoint(const MissionSoftware__waypoint_impl * waypoint) {
 	printf("waypoint_manager.c:in_waypoint -- Received waypoint with address: %x\n",waypoint);
 }
 
+void in_send_success(const bool * success) {
+	printf("waypoint_manager.c:in_send_success -- Received success value of: %i\n",*success);
+}
+
 /* void alarm(const int64_t * periodic_100_m) {} */
 
 void component_entry(const int64_t *n) { }
