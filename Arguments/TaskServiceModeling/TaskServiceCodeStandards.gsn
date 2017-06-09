@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c7a56de19"
+        name="Code Adheres to Standards">
+      Code adheres to appropriate standards
+
+      <c
+          id="__gsn__15c7a57101e"
+          name="Context">
+        Appropriate standards include SEI CERT C++ Coding Standard, …
+      </c>
+
+      <s
+          id="__gsn__15c7a572f39"
+          name="Strategy">
+        Argue over standards
+
+        <g
+            id="__gsn__15c87d4ccd5"
+            name="SEI CERT C Standard">
+          C code adheres to SEI CERT C++ Coding Standard
+
+          <c
+              id="__gsn__15c87db530d"
+              link="http://www.sei.cmu.edu/downloads/sei-cert-c-coding-standard-2016-v01.pdf"
+              name="Standards Documentation">
+            SEI CERT C Coding Standard, 2016 Edition
+          </c>
+
+          <c
+              id="__gsn__15c87dc07c0"
+              link="https://www.securecoding.cert.org/confluence/pages/viewpage.action?pageId=199983140"
+              name="Errata">
+            Errata for for SEI Cert C Coding Standard (2016 Edition)
+          </c>
+
+          <c
+              id="__gsn__15c87dd9895"
+              name="Context">
+            Currently the only C code is 3rd party
+          </c>
+
+          <comment
+              id="__gsn__15c885ed7a6"
+              name="DaCosta">
+            Using AutoCorres would require use of C
+          </comment>
+        </g>
+
+        <g
+            id="__gsn__15c7a572f3a"
+            name="SEI CERT C++ Standard">
+          C++ code adheres to SEI CERT C++ Coding Standard
+
+          <c
+              id="__gsn__15c7a572f3b"
+              link="https://www.cert.org/downloads/secure-coding/assets/sei-cert-cpp-coding-standard-2016-v01.pdf"
+              name="Standards Documentation">
+            SEI CERT C++ Coding Standard, 2016 Edition
+          </c>
+
+          <c
+              id="__gsn__15c87e05a00"
+              link="https://securecoding.cert.org/confluence/pages/viewpage.action?pageId=207355933"
+              name="Errata">
+            Errata for for SEI Cert C++ Coding Standard (2016 Edition)
+          </c>
+
+          <comment
+              id="__gsn__15c88525276"
+              name="Comment">
+            Find tool support
+          </comment>
+        </g>
+
+        <g
+            id="__gsn__15c87f18f5d"
+            name="SEI CERT Oracle Coding Standard for Java">
+          Java code adheres to SEI CERT Oracle Coding Standard for Java
+
+          <c
+              id="__gsn__15c87f26103"
+              link="https://www.securecoding.cert.org/confluence/display/java/SEI+CERT+Oracle+Coding+Standard+for+Java"
+              name="Standards Documentation">
+            SEI CERT Oracle Coding Standard for Java (last modification date 1/5/17)
+          </c>
+
+          <comment
+              id="__gsn__15c88584f8d"
+              name="Comment">
+            LMCP library?
+          </comment>
+        </g>
+
+        <comment
+            id="__gsn__15c8852dd7c"
+            name="Comment">
+          Considerations for choosing language standards: tool support, reputation, safety considerations, certification
+        </comment>
+
+        <comment
+            id="__gsn__15c8ce25175"
+            name="Comment">
+          No one is looking into these considerations
+        </comment>
+      </s>
+    </g>
+  </gsn>
+</argument>

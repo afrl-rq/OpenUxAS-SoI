@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c8848515c"
+        name="Task/Service Code Quality and Correctness">
+      Task and service code adheres to appropriate standards, mitigates potential coding errors, and can statically be shown to match its specification
+
+      <a
+          id="__gsn__15c894e7369"
+          name="Assumption">
+        The kernel and hardware are assumed to be correct
+
+        <c
+            id="__gsn__15c894e736a"
+            name="Context">
+          Possibly supported by sel4/Muen and RISC-V
+        </c>
+
+        <comment
+            id="__gsn__15c894e736b"
+            name="Backes">
+          Arguments about seL4 belong in architecture argument
+        </comment>
+      </a>
+
+      <s
+          id="__gsn__15c894f60c9"
+          name="Strategy">
+        Argue over quality and correctness components
+
+        <g
+            id="__gsn__15c894f60ca"
+            name="Code Adheres to Standards">
+          Task/service code adheres to appropriate standards
+
+          <c
+              id="__gsn__15c894f60cb"
+              name="Context">
+            Appropriate standards include SEI CERT C++ Coding Standard, …
+          </c>
+
+          <m
+              id="__gsn__15c894f60cc"
+              link="CodeStandards.gsn"
+              name="Code Adheres to Standards">
+            Task/service code adheres to appropriate standards
+          </m>
+        </g>
+
+        <g
+            id="__gsn__15c894f60cd"
+            name="Code Mitigates Coding Errors">
+          Code uses availabile methodologies to mitigate potential coding errors
+
+          <c
+              id="__gsn__15c894f60ce"
+              name="Context">
+            Methods for mitigating coding errors include the use of static analysis tools and adherence to coding standards
+          </c>
+
+          <s
+              id="__gsn__15c894f60cf"
+              name="Strategy">
+            Argue over methods for mitigating coding errors
+
+            <g
+                id="__gsn__15c894f60d0"
+                name="Static Analysis Mitigation">
+              Coding errors in tasks and services are mitigated as low as reasonably practicable using state of the art static analysis
+
+              <c
+                  id="__gsn__15c894f60d1"
+                  name="Context">
+                State of the art static analysis includes Cppcheck, …
+              </c>
+
+              <m
+                  id="__gsn__15c894f60d2"
+                  name="Static Analysis Mitigation">
+                Coding errors in tasks and services are mitigated as low as reasonably practicable using state of the art static analysis
+              </m>
+            </g>
+
+            <g
+                id="__gsn__15c894f60d3"
+                name="Dynamic Analysis Mitigation">
+              Coding errors are mitigated as low as reasonably practicable using state of the art dynamic analysis
+
+              <c
+                  id="__gsn__15c894f60d4"
+                  name="Context">
+                State of the art dynamic analysis includes Valgrind, …
+              </c>
+
+              <m
+                  id="__gsn__15c894f60d5"
+                  name="Dynamic Analysis Mitigation">
+                Coding errors are mitigated as low as reasonably practicable using state of the art dynamic analysis
+              </m>
+            </g>
+
+            <g
+                id="__gsn__15c894f60d6"
+                name="Code Adheres to Standards">
+              Code adheres to appropriate standards
+
+              <c
+                  id="__gsn__15c894f60d7"
+                  name="Context">
+                Appropriate standards include SEI CERT C++ Coding Standard, …
+              </c>
+
+              <m
+                  id="__gsn__15c894f60d8"
+                  link="CodeStandards.gsn"
+                  name="Code Adheres to Standards">
+                Code adheres to appropriate standards
+              </m>
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15c894f60d9"
+            name="Code-Specification Correspdonence">
+          Code can statically be shown to correspond to its specification
+
+          <m
+              id="__gsn__15c894f60da"
+              name="Code-Specification Correspdonence">
+            Code can statically be shown to correspond to its specification
+          </m>
+        </g>
+      </s>
+
+      <comment
+          id="__gsn__15c895b098f"
+          name="Hocking">
+        Much of the top-level argument structure is recapitulated in an argument for the testing group dealing with all of OpenUxAS
+      </comment>
+    </g>
+  </gsn>
+</argument>
