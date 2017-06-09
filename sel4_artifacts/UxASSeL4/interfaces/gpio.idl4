@@ -1,0 +1,21 @@
+/*
+ * Copyright 2014, NICTA
+ *
+ * This software may be distributed and modified according to the terms of
+ * the BSD 2-Clause license. Note that NO WARRANTY is provided.
+ * See "LICENSE_BSD2.txt" for details.
+ *
+ * @TAG(NICTA_BSD)
+ */
+
+procedure gpio_inf{
+	int  mmc_config(in int peripheral, in int flags);
+
+	// SPI chip select control
+	void spi_can_nss(in int state);
+	void spi_mpu_nss(in int state);
+	void spi_acc_mag_nss(in int state);
+	void spi_gyro_nss(in int state);
+	void spi_baro_nss(in int state);
+	void spi_ext_nss(in int state);
+};

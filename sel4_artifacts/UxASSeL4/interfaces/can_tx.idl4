@@ -1,0 +1,18 @@
+/*
+ * Copyright 2014, NICTA
+ *
+ * This software may be distributed and modified according to the terms of
+ * the BSD 2-Clause license. Note that NO WARRANTY is provided.
+ * See "LICENSE_BSD2.txt" for details.
+ *
+ * @TAG(NICTA_BSD)
+ */
+
+procedure can_tx_inf {
+	include <can_inf.h>;
+	int setup(in int baudrate);
+	int sendto(in int txb_idx, in can_frame_t frame);
+	void send(in can_frame_t frame);
+	void abort(in int txb_idx);
+	int status(in int txb_idx);
+};

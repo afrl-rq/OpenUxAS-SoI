@@ -1,0 +1,30 @@
+/*
+ * Copyright 2014, NICTA
+ *
+ * This software may be distributed and modified according to the terms of
+ * the GNU General Public License version 2. Note that NO WARRANTY is provided.
+ * See "LICENSE_GPLv2.txt" for details.
+ *
+ * @TAG(NICTA_GPL)
+ */
+
+#include <autoconf.h>
+
+import <gen_fwd.idl4>;
+
+component VM {
+    control;
+
+    uses gen_fwd_inf uartfwd;
+    uses gen_fwd_inf clkcarfwd;
+
+    consumes restart restart_event;
+
+    attribute int base_prio;
+    attribute int num_extra_frame_caps;
+    attribute int extra_frame_map_address;
+
+    include <tb_smaccmpilot_tk1_types.h>;
+    dataport SMACCM_DATA__Camera_Bounding_Box_i bbox;
+    emits NewBoundingBox bbox_notification;
+}
