@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c88134ee2"
+        name="Code-Specification Correspdonence">
+      Code can statically be shown to correspond to its specification
+
+      <c
+          id="__gsn__15c8813db8f"
+          name="Context">
+        Something about using Sagar's or Dan's work on LLVM analysis
+      </c>
+
+      <c
+          id="__gsn__15c8820dc3d"
+          name="Context">
+        Something about IKOS?
+
+        <comment
+            id="__gsn__15c88217f94"
+            name="Comment">
+          (see StatisAnalysisMitigation argument)
+        </comment>
+      </c>
+
+      <comment
+          id="__gsn__15c886aa704"
+          name="Comment">
+        Each service corresponds to its specification
+      </comment>
+
+      <comment
+          id="__gsn__15c886b3077"
+          name="DaCosta">
+        Also ties into AutoCorres
+      </comment>
+
+      <comment
+          id="__gsn__15c886c0e0e"
+          name="Backes">
+        Formal reasoning tools exist for LLVM, something about CVMC, Clie, Boogie, Java Path Finder
+      </comment>
+
+      <comment
+          id="__gsn__15c887501ac"
+          name="Comment">
+        Services in Lustre?
+      </comment>
+
+      <comment
+          id="__gsn__15c887c867c"
+          name="Kingston">
+        Can either synthesize C/C++/etc. code from a formal specification (e.g., PVS/LEAN/Coq), extract a specification from an implementation, perform checks on the implementation, or if we're heretics, we could rely on testing
+      </comment>
+    </g>
+  </gsn>
+</argument>

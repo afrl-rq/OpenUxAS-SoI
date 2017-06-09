@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c88d91f6c"
+        name="Code Coverage">
+      All code and conditionals are exercised in a meaningful way by tests
+
+      <a
+          id="__gsn__15c890bdffb"
+          name="Assumption">
+        LMCP and OpenAmase do not need to be tested
+
+        <j
+            id="__gsn__15c890c490a"
+            name="Justification">
+          Errors in LMCP will be detected by testing its output
+        </j>
+
+        <j
+            id="__gsn__15c890f4cde"
+            name="Justification">
+          OpenAmase is only used for testing and off-line prototyping
+        </j>
+      </a>
+
+      <comment
+          id="__gsn__15c88d9bfb2"
+          name="Comment">
+        Use of Valgrind has been recommended for all tests
+      </comment>
+
+      <comment
+          id="__gsn__15c88da6a52"
+          name="Corina Pasareanu">
+        The Symbolic PathFinder tool http://babelfish.arc.nasa.gov/trac/jpf/wiki/projects/jpf-symbc performs automated test case generation for java programs with heuristics for solving complex non-linear constraints (the Coral solver).
+      </comment>
+
+      <comment
+          id="__gsn__15c88dc98c8"
+          name="Corina Pasareanu">
+        Working on tools for automated test case genertion from Simulink/Stateflow models and also from C code and from Lustre descriptions.
+      </comment>
+
+      <comment
+          id="__gsn__15c88dd2778"
+          name="Sriram Sankaranarayanan">
+        Statistical model checking
+      </comment>
+
+      <comment
+          id="__gsn__15c88e168ac"
+          name="Comment">
+        Currently using lcov to get line/function/branch coverage
+      </comment>
+
+      <comment
+          id="__gsn__15c88e29e11"
+          name="ASU">
+        Integrate coverage guided test generation framework developed in ASU CPSLab
+      </comment>
+
+      <comment
+          id="__gsn__15c890fbc56"
+          name="Comment">
+        Ground station software would need to be tested for complete confidence
+      </comment>
+    </g>
+  </gsn>
+</argument>

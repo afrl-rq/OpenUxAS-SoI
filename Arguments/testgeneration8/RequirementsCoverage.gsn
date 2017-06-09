@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c88de0d3f"
+        name="Requirements Coverage">
+      Every requirement can be traced to tests sufficient for validation or verification of that requirement
+
+      <comment
+          id="__gsn__15c88de3e20"
+          name="Sriram Sankaranarayanan">
+        Statistical model checking
+      </comment>
+
+      <comment
+          id="__gsn__15c88de6b9e"
+          name="Corina Pasareanu">
+        The Symbolic PathFinder tool http://babelfish.arc.nasa.gov/trac/jpf/wiki/projects/jpf-symbc performs automated test case generation for java programs with heuristics for solving complex non-linear constraints (the Coral solver).
+      </comment>
+
+      <comment
+          id="__gsn__15c88de8524"
+          name="Corina Pasareanu">
+        Working on tools for automated test case genertion from Simulink/Stateflow models and also from C code and from Lustre descriptions.
+      </comment>
+
+      <comment
+          id="__gsn__15c89122e37"
+          name="Comment">
+        Requirements -&gt; Req/ConOps/Specs
+      </comment>
+
+      <comment
+          id="__gsn__15c89148ed0"
+          name="Comment">
+        Maybe replace with A/G contracts or add with traceability
+      </comment>
+    </g>
+  </gsn>
+</argument>
