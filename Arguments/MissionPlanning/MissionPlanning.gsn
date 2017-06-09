@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c83b43cd0"
+        name="Timely Mission Planning">
+      In a [reasonable time], (1) it can be determined whether a plan exists that satisfies the [user provided mission specifications], (2) if such a plan exists, a plan satisfying the mission specifications will be provided, and (3) no plan will be provided that does not satisfy the mission specifications
+
+      <c
+          id="__gsn__15c83f95540"
+          name="Definition 1">
+        [Reasonable time] is mission dependent and will vary from x seconds to y hours
+
+        <comment
+            id="__gsn__15c83f95541"
+            name="Hocking">
+          Let's see if we can put in some reasonable guesses for x and y (and determine if "hours" is even an option)
+        </comment>
+      </c>
+
+      <c
+          id="__gsn__15c84288786"
+          name="Definition 2">
+        [User provided mission specifications] will follow syntax *foo*
+      </c>
+
+      <c
+          id="__gsn__15c83eb172a"
+          name="Context">
+        Needs to support heterogeneous vehicles (air/land/water) and cooperative plans
+
+        <a
+            id="__gsn__15c83eb4513"
+            name="Assumption">
+          Cooperative plans require tracking time
+        </a>
+      </c>
+
+      <c
+          id="__gsn__15c83f058c5"
+          name="Context">
+        Only need to support 5-6 vehicles
+
+        <j
+            id="__gsn__15c83f1589d"
+            name="Justification">
+          The Air Force will not need to support more vehicles in the foreseeable future
+        </j>
+
+        <j
+            id="__gsn__15c83f0a18d"
+            name="Justification">
+          Adding more vehicles could make problem intractable
+        </j>
+      </c>
+
+      <c
+          id="__gsn__15c83f183b7"
+          name="Context">
+        Calculations should halt if no plan exists that meets the mission specifications
+      </c>
+
+      <a
+          id="__gsn__15c83f194d7"
+          name="Assumption">
+        Constant speed
+      </a>
+
+      <a
+          id="__gsn__15c83f1ac41"
+          name="Assumption">
+        Constant altitude
+      </a>
+
+      <a
+          id="__gsn__15c83f1be93"
+          name="Assumption">
+        Collision avoidance is unnecessary
+
+        <j
+            id="__gsn__15c83f1be94"
+            name="Justification">
+          Altitude separation (and constant altitude) will eliminate possibility of collision
+        </j>
+      </a>
+
+      <a
+          id="__gsn__15c83f1cbd6"
+          name="Assumption">
+        Dubins Car Path approximation suffices
+      </a>
+
+      <s
+          id="__gsn__15c83b49c38"
+          name="Strategy">
+        Argue over components of timely mission planning
+
+        <j
+            id="__gsn__15c8419236d"
+            name="Justification">
+          False negatives are not considered on their own but as a consequence when 100% reliability is not required. E.g., a reliability of 0.9999 implies allowing a false negative rate of 0.0001.
+        </j>
+
+        <g
+            id="__gsn__15c83b4a6f7"
+            name="Reasonable Calculation Time">
+          The system is able to determine in a [reasonable time] if a plan exists that meets the mission specifications with a reliability as high as reasonably practicable
+        </g>
+
+        <g
+            id="__gsn__15c83b4a340"
+            name="Mission Satisfying Plan">
+          A plan can be calculated that meets [user provided mission specifications] with a reliability as high as reasonably practicable, if such a plan exists with a reliability as high as reasonably practicable
+
+          <c
+              id="__gsn__15c8418aa2e"
+              name="Context">
+            Reliability of finding plan satisfying mission specification is 0.9999.
+
+            <comment
+                id="__gsn__15c841c0d3a"
+                name="Hocking">
+              I totally made up that 0.9999.
+            </comment>
+          </c>
+
+          <m
+              id="__gsn__15c83e9c9ed"
+              link="MissionPlanningExists.gsn"
+              name="Mission Satisfying Plan">
+            A plan can be calculated that meets [user provided mission specifications] with a reliability as high as reasonably practicable
+
+            <c
+                id="__gsn__15c83f632a0"
+                name="Context">
+              Plan exists that satisfies mission specifications
+            </c>
+          </m>
+        </g>
+
+        <g
+            id="__gsn__15c83eee210"
+            name="No False Positives">
+          The system will never be provided with a plan that does not meet mission specifications
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c837c47b0"
+        name="Mission Satisfying Plan">
+      A plan can be calculated that meets [user provided mission specifications] with a reliability as high as reasonably practicable
+
+      <c
+          id="__gsn__15c83f7b6ae"
+          name="Context">
+        Plan exists that satisfies mission specifications
+      </c>
+
+      <s
+          id="__gsn__15c83899aa5"
+          name="Strategy">
+        Argue over approaches for calculating a plan that satisfies the [user provided mission specifications]
+
+        <g
+            id="__gsn__15c8389c4c4"
+            optional="true"
+            name="Optimal Plan Calculation">
+          A plan can be calculated that minimizes the total cost function of the plan, if such a plan exists
+
+          <c
+              id="__gsn__15c838fc786"
+              name="Context">
+            Cost function is currently the maximum amount of time any vehicle requires to complete its plan
+          </c>
+
+          <s
+              id="__gsn__15c83925534"
+              name="Strategy">
+            Argue over methods of calculating optimal paths
+
+            <g
+                id="__gsn__15c83f9cbf5"
+                optional="true"
+                name="Optimal Extended Process Algebra Plan">
+              Process algebra with syntax extended to include delay will calculate optimal plan
+
+              <away-goal
+                  id="__gsn__15c83fc5dc3"
+                  link="ProcessAlgebra.gsn"
+                  name="Optimal Extended Process Algebra Plan">
+                Process algebra with syntax extended to include delay will calculate optimal plan
+              </away-goal>
+            </g>
+
+            <g
+                id="__gsn__15c840242d4"
+                optional="true"
+                repeat="true"
+                name="Other Methods">
+              [Filler]
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15c838d7921"
+            optional="true"
+            name="Near-Optimal Path Calculation">
+          A plan can be calculated that meets the mission specifications and that is better than most other plans, if such a plan exists
+
+          <j
+              id="__gsn__15c83bb5e6c"
+              name="Justification">
+            If optimal plans cannot be discovered in a reasonable time, near-optimal paths might have to suffice
+          </j>
+
+          <s
+              id="__gsn__15c83f8969e"
+              name="Strategy">
+            Argue over heuristics for calculationg near-optimal paths
+
+            <g
+                id="__gsn__15c84031773"
+                name="Simulated Annealing">
+              Non-existent magic heuristic will calculate near optimal path with a reliability as high as reasonably practicable
+
+              <c
+                  id="__gsn__15c840454c2"
+                  name="Context">
+                Quantum Simulated Annealing would be even better!
+              </c>
+            </g>
+
+            <g
+                id="__gsn__15c840322b4"
+                name="Neural Network Planning">
+              Non-existent magic heuristic will calculate near optimal path with a reliability as high as reasonably practicable
+            </g>
+          </s>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
