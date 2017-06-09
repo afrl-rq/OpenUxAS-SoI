@@ -30,6 +30,7 @@
 
 #include "gams/groups/GroupFixedList.h"
 #include "gams/loggers/GlobalLogger.h"
+#include "gams/utility/Position.h"
 
 #include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/AirVehicleState.h"
@@ -82,7 +83,8 @@ namespace service
     /**
      * Default constructor
      **/
-    GamsDriverThread ()
+    GamsDriverThread (const gams::pose::Positions & waypoints)
+    : m_waypoints (waypoints), m_current (0)
     {
         
     }
@@ -107,11 +109,39 @@ namespace service
       **/
     virtual void run (void)
     {
-        
+        gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+            "GamsDriverThread::run: waypoint index is %d of %d\n",
+            (int)m_current, (int)m_waypoints.size ());
+    
+        /// try to move to current waypoint
+        if (m_current < m_waypoints.size () &&
+            GamsService::move (m_waypoints[m_current])
+            == gams::platforms::PLATFORM_ARRIVED)
+        {
+            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                "GamsDriverThread::run: moving to waypoint %d of %d\n",
+                (int)m_current, (int)m_waypoints.size ());
+    
+            ++m_current;
+        }
+        else if (m_current >= m_waypoints.size ())
+        {
+            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                "GamsDriverThread::run: end of waypoint list\n");
+        }
+        else
+        {
+            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                "GamsDriverThread::run: still moving to waypoint\n");
+        }
     }
 
   private:
-      /// handle to GAMS controller
+      /// list of waypoints to go to
+      gams::pose::Positions m_waypoints;
+      
+      /// curWaypoint
+      size_t m_current;
   };
 
     
@@ -172,7 +202,34 @@ GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
                 
                 context->evaluate(karlFile, settings);
             }
-        }   
+        }
+        // if we need to load initial knowledge
+        if (std::string("Waypoint") == currentXmlNode.name())
+        {
+            gams::pose::Position nextPosition (GamsService::frame ());
+            
+            if (!currentXmlNode.attribute("Latitude").empty())
+            {
+                nextPosition.lat(
+                    currentXmlNode.attribute("Latitude").as_double());
+            }
+            if (!currentXmlNode.attribute("Longitude").empty())
+            {
+                nextPosition.lng(
+                    currentXmlNode.attribute("Longitude").as_double());
+            }
+            if (!currentXmlNode.attribute("Altitude").empty())
+            {
+                nextPosition.alt(
+                    currentXmlNode.attribute("Altitude").as_double());
+            }
+
+            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                "GamsServiceDriver::config: adding waypoint [%.4f,%.4f,%.4f]\n",
+                nextPosition.lat(), nextPosition.lng(), nextPosition.alt());
+
+            this->m_waypoints.push_back (nextPosition);
+        }
     }
 
     // save the agent mapping for forensics
@@ -182,6 +239,10 @@ GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
     GamsService::s_knowledgeBase.save_context(
         m_checkpointPrefix + "_gsd_config_staticknowledgeBase.kb");
     
+    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+        "GamsServiceDriver::config: ended up with %d waypoints\n",
+        this->m_waypoints.size());
+
     return true;
 }
 
@@ -202,7 +263,7 @@ GamsServiceDriver::initialize()
     
     // run at 1hz, forever (-1)
     m_threader.run (1.0, "controller",
-      new service::GamsDriverThread ());
+      new GamsDriverThread (this->m_waypoints));
     
     
     return (bSuccess);

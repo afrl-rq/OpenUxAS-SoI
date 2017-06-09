@@ -24,6 +24,7 @@
 
 #include "madara/knowledge/KnowledgeBase.h"
 #include "madara/threads/Threader.h"
+#include "gams/pose/Position.h"
 
 
 #include "afrl/cmasi/Waypoint.h"
@@ -130,6 +131,8 @@ protected:
     /// qos-enabled thread manager
     madara::threads::Threader m_threader;
 
+    /// list of waypoints to move to
+    gams::pose::Positions m_waypoints;
 };
 
 }; //namespace service

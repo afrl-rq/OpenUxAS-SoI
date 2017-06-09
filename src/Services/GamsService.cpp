@@ -348,8 +348,13 @@ namespace service
     virtual int move (const gams::pose::Position & location,
       double epsilon)
     {
-        gams::pose::Position current;
+        gams::pose::Position current (gps_frame);
         current.from_container(self_->agent.location);
+        
+        if (m_last != location)
+        {
+            gams::platforms::BasePlatform::move(location, epsilon);
+        }
         
         if (location.approximately_equal(current, epsilon))
         {
@@ -454,6 +459,9 @@ namespace service
     /// handle to the GamsService so we can use sendBuffer
     GamsService * m_service;
     
+    /// keep track of last unique position
+    gams::pose::Position m_last;
+    
   }; // end UxASGamsPlatform class
   
 /// static reference frames we can use for the UxAS platform (gps preferred)
@@ -542,7 +550,12 @@ std::string GamsService::getAgentPrefix (int64_t entityId)
     
     return result;
 }
-    
+
+gams::pose::ReferenceFrame & GamsService::frame (void)
+{
+    return UxASGamsPlatform::gps_frame;
+}
+
 int GamsService::move (const gams::pose::Position & location,
       double epsilon)
 {

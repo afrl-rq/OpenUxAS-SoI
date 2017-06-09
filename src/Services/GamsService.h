@@ -122,14 +122,21 @@ public:
     void sendWaypoint (const gams::pose::Position & location);
     
     /**
-     * Moves the agent platform to a location. Optional.
+     * Moves the agent platform to a location.
      * @param   target    the coordinates to move to
      * @param   epsilon   approximation value
      * @return the status of the move operation,
      *         @see gams::platforms::PlatformReturnValues
      **/
     static int move (const gams::pose::Position & location,
-      double epsilon);
+      double epsilon = 1.0);
+    
+    /**
+     * Returns the reference frame of the UxAS platform. Use this when
+     * constructing a gams::pose::Position, e.g., for waypoint usage.
+     * @return the reference frame used by the GAMS platform (usually GPS)
+     **/
+    static gams::pose::ReferenceFrame & frame (void);
     
     /**
      * Adds a mapping of an agent prefix to an entity id
