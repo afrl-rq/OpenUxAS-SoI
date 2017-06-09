@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c79f1b816"
+        name="Comprehensive Test Cases">
+      Test cases provide the necessary level of assurance
+
+      <c
+          id="__gsn__15c79f540b1"
+          name="Context">
+        Assurance is provided by code coverage, traceability of validation and verification to requirements, and correctness of tests
+      </c>
+
+      <s
+          id="__gsn__15c79f7d116"
+          name="Strategy">
+        Argue over requirements of assurance
+
+        <g
+            id="__gsn__15c79f95c13"
+            name="Code Coverage">
+          All code and conditionals are exercised in a meaningful way by tests
+
+          <m
+              id="__gsn__15c7a646acf"
+              name="Code Coverage">
+            All code and conditionals are exercised in a meaningful way by tests
+          </m>
+        </g>
+
+        <g
+            id="__gsn__15c79fa11a2"
+            name="Requirements Coverage">
+          Every requirement can be traced to tests sufficient for validation or verification of that requirement
+
+          <a
+              id="__gsn__15c89311971"
+              name="Assumption">
+            Requirements coming from ConOps/Mission Secnarios/Environment Constraints are complete
+          </a>
+
+          <m
+              id="__gsn__15c7a649a26"
+              name="Requirements Coverage">
+            Every requirement can be traced to tests sufficient for validation or verification of that requirement
+          </m>
+        </g>
+
+        <g
+            id="__gsn__15c79faee48"
+            name="Test Correctness">
+          Tests do not generate false positives or false negatives
+
+          <m
+              id="__gsn__15c7a64aa06"
+              name="Test Correctness">
+            Tests do not generate false positives or false negatives
+          </m>
+
+          <comment
+              id="__gsn__15c8922c948"
+              name="Comment">
+            Related to requirements cvoerage and A/G testing
+          </comment>
+        </g>
+      </s>
+
+      <comment
+          id="__gsn__15c891be533"
+          name="Comment">
+        Static analysis (including SPIN, etc.) should be considered
+      </comment>
+    </g>
+  </gsn>
+</argument>

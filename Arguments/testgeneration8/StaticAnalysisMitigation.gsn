@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c87f67e44"
+        name="Static Analysis Mitigation">
+      Coding errors are mitigated as low as reasonably practicable using state of the art static analysis
+
+      <c
+          id="__gsn__15c87fddd8e"
+          name="Context">
+        State of the art static analysis includes Cppcheck, …
+      </c>
+
+      <s
+          id="__gsn__15c87f757fc"
+          name="Strategy">
+        Argue over static analysis tools
+
+        <g
+            id="__gsn__15c87f78166"
+            name="Cppcheck">
+          Cppcheck detects bugs that most compilers do not with a low false positive rate
+
+          <c
+              id="__gsn__15c87f8a328"
+              link="http://cppcheck.sourceforge.net/manual.pdf"
+              name="Documentation">
+            Manual for Cppcheck 1.79
+          </c>
+        </g>
+
+        <g
+            id="__gsn__15c8d000b18"
+            name="SPIN">
+          SPIN …
+
+          <comment
+              id="__gsn__15c8d006a23"
+              name="Comment">
+            Document purpose of using SPIN
+          </comment>
+        </g>
+
+        <g
+            id="__gsn__15c881834e2"
+            name="IKOS">
+          IKOS (Inference Kernel for Open Static Analyzers) facilitates static analyzers based on Abstract Interpretation
+
+          <c
+              id="__gsn__15c881de99f"
+              link="https://ti.arc.nasa.gov/opensource/ikos/"
+              name="Documentation">
+            NASA's page on IKOS
+          </c>
+
+          <c
+              id="__gsn__15c881ec848"
+              link="https://github.com/qsphan/ikos"
+              name="Context">
+            IKOS Github (with documentation)
+
+            <comment
+                id="__gsn__15c88200dc6"
+                name="Comment">
+              The GitHub account shows how it can be used for static analysis, but perhaps we're only interested in using it for building models
+            </comment>
+          </c>
+        </g>
+
+        <g
+            id="__gsn__15c8860afcc"
+            name="AutoCorres">
+          AutoCorres …
+
+          <comment
+              id="__gsn__15c8861102b"
+              name="Comment">
+            Check with Dan DaCosta on how this might be used
+          </comment>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
