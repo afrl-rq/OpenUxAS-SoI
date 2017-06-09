@@ -1,0 +1,58 @@
+package SMACCM_DATA
+public
+	with Data_Model;
+	with Base_Types;
+
+	data UART_Packet
+	end UART_Packet;
+
+	data implementation UART_Packet.i
+		subcomponents
+			buf: data UART_Buffer;
+			buf_len: data Base_Types::Integer_32;
+	end UART_Packet.i;
+
+	data UART_Buffer
+		properties
+			Data_Model::Data_Representation => Array;
+			Data_Model::Base_Type => (classifier (Base_Types::Unsigned_8));
+			Data_Model::Dimension => (255);
+	end UART_Buffer;
+
+	data GIDL
+		properties
+			Data_Model::Data_Representation => Array;
+			Data_Model::Base_Type => (classifier (Base_Types::Unsigned_8));
+			Data_Model::Dimension => (80);
+	end GIDL;
+
+	data Camera_Bounding_Box
+	end Camera_Bounding_Box;
+
+	data implementation Camera_Bounding_Box.i
+		subcomponents
+			left: data Base_Types::Unsigned_16;
+			right: data Base_Types::Unsigned_16;
+			top: data Base_Types::Unsigned_16;
+			bottom: data Base_Types::Unsigned_16;
+	end Camera_Bounding_Box.i;
+
+	data CAN_Frame
+	end CAN_Frame;
+
+	data implementation CAN_Frame.i
+		subcomponents
+			id: data Base_Types::Unsigned_32; -- CAN id (11 bits for standard frame, 29 bits if extended frame)
+			buf: data CAN_Buffer; -- Data field (8 bytes maximum)
+			buf_len: data Base_Types::Unsigned_8; -- Data length code (0 ~ 8)
+
+	end CAN_Frame.i;
+
+	data CAN_Buffer
+		properties
+			Data_Model::Data_Representation => Array;
+			Data_Model::Base_Type => (classifier (Base_Types::Unsigned_8));
+			Data_Model::Dimension => (8);
+	end CAN_Buffer;
+
+end SMACCM_DATA;

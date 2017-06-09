@@ -1,0 +1,22 @@
+/*
+ * Copyright 2014, NICTA
+ *
+ * This software may be distributed and modified according to the terms of
+ * the GNU General Public License version 2. Note that NO WARRANTY is provided.
+ * See "LICENSE_GPLv2.txt" for details.
+ *
+ * @TAG(NICTA_GPL)
+ */
+
+procedure VchanInterface {
+    include <sel4vchan/vchan_copy.h>;
+
+    int new_connection(in vchan_connect_t con);
+    int rem_connection(in vchan_connect_t con);
+    intptr_t get_buf(in vchan_ctrl_t args, in int cmd);
+
+    int status(in vchan_ctrl_t args);
+
+    int data_stats(in vchan_ctrl_t args, inout int data_ready, inout int buffer_space);
+    void ping();
+};

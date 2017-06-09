@@ -1,0 +1,209 @@
+package MissionSoftware
+public
+	with TB_SYS;
+	with SMACCM_DATA;
+	with Base_Types;
+   	with Data_Model;
+
+	system top
+	end top;
+
+	system implementation top.i
+		subcomponents
+			software: process Mission_Software.i;
+			smaccmpilot_tk1: processor tk1_som.camkes;
+		properties
+			actual_processor_binding => (reference (smaccmpilot_tk1)) applies to software;   
+	end top.i;
+
+	processor tk1_som
+	end tk1_som;
+
+	processor implementation tk1_som.camkes
+	   properties
+	      TB_SYS::OS => CAmkES;
+	      TB_SYS::HW => TK1;
+	      TB_SYS::Add_Dummy_Arg_To_Void_Fns => True;
+	end tk1_som.camkes;
+
+	process Mission_Software
+	end Mission_Software;
+
+	data waypoint
+  	properties
+    	Data_Model::Data_Representation => Struct;
+	end waypoint;
+
+	data implementation waypoint.impl
+	subcomponents
+  		latitude: data Base_Types::Float_64;
+  		longitude: data Base_Types::Float_64;
+  		altitude: data Base_Types::Float_32;
+  		altitude_type: data Base_Types::Integer_32;
+  		id: data Base_Types::Integer_64;
+  		nxid: data Base_Types::Integer_64;
+  		speed: data Base_Types::Float_32;
+  		speed_type: data Base_Types::Float_32;
+  		climbrate: data Base_Types::Float_32;
+  		turntype: data Base_Types::Integer_32;
+  		vehicleactionlistsize: data Base_Types::Unsigned_16;
+  		contingencywaypointa: data Base_Types::Integer_64;
+  		contingencywaypointb: data Base_Types::Integer_64;
+  		associatedtasksize: data Base_Types::Unsigned_16;
+	end waypoint.impl;
+
+	data waypoint_array
+	end waypoint_array;
+
+	data implementation waypoint_array.impl
+  	properties
+    	Data_Model::Data_Representation => Array;
+    	Data_Model::Base_Type => (classifier (waypoint.impl));
+    	Data_Model::Dimension => (65536);
+	end waypoint_array.impl;
+
+	data mission
+  	properties
+    	Data_Model::Data_Representation => Struct;
+	end mission;
+
+	data implementation mission.impl
+	subcomponents
+		commandid: data Base_Types::Integer_64;
+        vehicleid: data Base_Types::Integer_64;
+        vehicleactionlistsize: data Base_Types::Unsigned_16;
+        status: data Base_Types::Integer_32;		
+  		waypoints: data waypoint_array.impl;
+  		startingid: data Base_Types::Integer_64;
+	end mission.impl;
+
+	process implementation Mission_Software.i
+		subcomponents
+			clock_driver: thread Clock_Driver;
+			uart_driver: thread UART_Driver;
+			asset_waypoint_manager: thread Asset_Waypoint_Manager;
+			waypoint_manager: thread Waypoint_Manager;
+			virtual_machine: thread Virtual_Machine;
+
+		connections
+			vm2wm: port virtual_machine.out_mission -> waypoint_manager.in_mission;
+			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;
+			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
+			awm2wm: port asset_waypoint_manager.out_waypoint -> waypoint_manager.in_waypoint;
+			awm2vm: port asset_waypoint_manager.out_waypoint -> virtual_machine.in_waypoint;
+			uart2wm: port uart_driver.out_send_success -> waypoint_manager.in_send_success;
+			
+			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
+			
+			vm_clk_fwd: subprogram group access virtual_machine.clkcarfwd -> clock_driver.clkcarfwd;
+			
+			vm_uart_fwd: subprogram group access virtual_machine.uartfwd -> uart_driver.uartfwd;
+			
+	end Mission_Software.i;
+
+	thread Clock_Driver
+		features
+			clkcar: provides subprogram group access clkcar_inf;
+			clkcarfwd: provides subprogram group access gen_fwd_inf;
+		properties
+			TB_SYS::Is_External => true;
+			Priority => 253;
+			Dispatch_Protocol => Sporadic;
+			TB_SYS::Thread_Type => Active;
+			Compute_Execution_Time => 10 us .. 100 us;
+	end Clock_Driver;
+
+	thread UART_Driver
+		features
+			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i;
+			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i;
+			out_send_success: out event data port Base_Types::Boolean;
+			
+			uartfwd: provides subprogram group access gen_fwd_inf;
+			clkcar: requires subprogram group access clkcar_inf;
+		properties
+			TB_SYS::Is_External => true;
+			Priority => 250;
+			Dispatch_Protocol => Sporadic;
+			TB_SYS::Thread_Type => Active;
+			Compute_Execution_Time => 10 us .. 100 us;
+			TB_SYS::Sends_Events_To => "{{}}";
+	end UART_Driver;
+	
+	subprogram group gen_fwd_inf
+		properties
+			TB_SYS::Is_External => true;
+			TB_SYS::CommPrim_Source_Header => "gen_fwd.idl4";
+	end gen_fwd_inf;
+	
+	subprogram group clkcar_inf
+		properties
+			TB_SYS::Is_External => true;
+			TB_SYS::CommPrim_Source_Header => "clkcar.idl4";
+	end clkcar_inf;
+
+	thread Virtual_Machine
+		features
+			out_mission: out event data port mission.impl;
+			in_waypoint: in event data port waypoint.impl;
+			
+			clkcarfwd: requires subprogram group access gen_fwd_inf;
+			uartfwd: requires subprogram group access gen_fwd_inf;
+		properties
+			TB_SYS::Is_External => true;
+			Priority => 100;
+			Dispatch_Protocol => Sporadic;
+			TB_SYS::Thread_Type => Active;
+			Compute_Execution_Time => 10 us .. 100 us;
+	end Virtual_Machine;
+	
+	thread Waypoint_Manager
+		features
+			in_mission: in event data port mission.impl {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_mission");
+			};
+			in_waypoint: in event data port waypoint.impl {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
+			};
+			in_send_success: in event data port Base_Types::Boolean  {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_send_success");
+			};
+			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_uart_packet");
+			};
+		properties
+			Source_Text => ("user_code/waypoint_manager.c");
+			Dispatch_Protocol => Periodic;
+			TB_SYS::Thread_Type => Active;
+			Priority => 150;
+			Stack_Size => 1024 Bytes;
+			Compute_Execution_Time => 10 us .. 100 us;
+			TB_SYS::Sends_Events_To => "{{}}";
+			TB_SYS::Compute_Entrypoint_Source_Text => ("component_entry");
+			Initialize_Entrypoint_Source_Text => "component_init";
+			Period => 1 ms;
+	end Waypoint_Manager;
+	
+	thread Asset_Waypoint_Manager
+		features
+			out_waypoint: out event data port waypoint.impl {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_waypoint");
+			};
+			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i {
+	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_uart_packet");
+			};
+		properties
+			Source_Text => ("user_code/asset_waypoint_manager.c");
+	        Dispatch_Protocol => Periodic;
+		    Period => 100 ms;
+	   		Priority => 10;
+	    	Stack_Size => 256 bytes;
+	    	TB_SYS::Thread_Type => Active ;
+	    	Compute_Execution_Time => 10 us .. 50 us;
+	    	TB_SYS::Sends_Events_To => "{{}}";
+		    TB_SYS::Compute_Entrypoint_Source_Text => ("component_entry");
+			Initialize_Entrypoint_Source_Text => "component_init";
+	end Asset_Waypoint_Manager;
+	
+end MissionSoftware;
+
