@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<instance:SystemInstance xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" name="RouteAggregatorService_Proc_wrapper_Instance" category="thread">
+  <featureInstance name="GroundVehicleConfiguration_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.0"/>
+  </featureInstance>
+  <featureInstance name="SurfaceVehicleConfiguration_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.1"/>
+  </featureInstance>
+  <featureInstance name="AirVehicleConfiguration_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.2"/>
+  </featureInstance>
+  <featureInstance name="RouteRequest_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.3"/>
+  </featureInstance>
+  <featureInstance name="GroundVehicleState_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.4"/>
+  </featureInstance>
+  <featureInstance name="UniqueAutomationRequest_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.5"/>
+  </featureInstance>
+  <featureInstance name="RoutePlanResponse_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.6"/>
+  </featureInstance>
+  <featureInstance name="SurfaceVehicleState_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.7"/>
+  </featureInstance>
+  <featureInstance name="TaskPlanOptions_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.8"/>
+  </featureInstance>
+  <featureInstance name="AirVehicleState_in" category="eventDataPort">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.9"/>
+  </featureInstance>
+  <featureInstance name="ServiceStatus_out" category="eventDataPort" direction="out">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.10"/>
+  </featureInstance>
+  <featureInstance name="RoutePlanRequest_out" category="eventDataPort" direction="out">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.11"/>
+  </featureInstance>
+  <featureInstance name="AssignmentCostMatrix_out" category="eventDataPort" direction="out">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.12"/>
+  </featureInstance>
+  <featureInstance name="RouteResponse_out" category="eventDataPort" direction="out">
+    <feature xsi:type="aadl2:EventDataPort" href="../RouteAggregatorService.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedEventDataPort.13"/>
+  </featureInstance>
+  <systemOperationMode name="No Modes"/>
+  <componentImplementation xsi:type="aadl2:ThreadImplementation" href="../RouteAggregatorService.aadl#RouteAggregatorService_Proc.wrapper"/>
+</instance:SystemInstance>
