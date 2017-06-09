@@ -18,6 +18,17 @@
 
 #include "Waypoint2Sel4Service.h"
 #include "afrl/cmasi/AutomationResponse.h"
+#include "afrl/cmasi/MissionCommand.h"
+
+//includes for writing to sel4
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "pugixml.hpp"
 
@@ -85,30 +96,46 @@ bool Waypoint2Sel4Service::terminate()
     return true;
 }
 
+void Waypoint2Sel4Service::write2Sel4(afrl::cmasi::MissionCommand * mission){
+
+    if (mission->getVehicleID() == m_vehicleID)
+    {
+        avtas::lmcp::ByteBuffer buf;
+        mission->getVehicleActionList().clear();
+        auto waypointList = mission->getWaypointList();
+        for(auto waypoint : waypointList){
+            waypoint->getVehicleActionList().clear();
+            waypoint->getAssociatedTasks().clear();
+        }
+        mission->pack(buf);
+        int fd = open("/dev/mem", O_RDWR | O_SYNC);
+        uint8_t * mem = (uint8_t *)mmap(0, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0xE0000000);
+        while(buf.hasRemaining()){
+            *mem = buf.get();
+        }
+
+        close(fd);
+    }
+}
 
 bool
 Waypoint2Sel4Service::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
 
     COUT_INFO("Got message\n");
-    if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object.get()))
+    if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object))
     {
         auto automationResponse = std::static_pointer_cast<afrl::cmasi::AutomationResponse> (receivedLmcpMessage->m_object);
         for (auto mission : automationResponse->getMissionCommandList())
         {
-            if (mission->getVehicleID() == m_vehicleID)
-            {
-                //TODO write the message
-            }
+            write2Sel4(mission);
         }
     }
-    else if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
+    else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
+    //else if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
     {
-        if (static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->getVehicleID() == m_vehicleID)
-        {
-            //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
-            std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
-        }
+        auto mission = std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object);
+        write2Sel4(mission.get());
     }
     return (false); // always false implies never terminating service from here
 }

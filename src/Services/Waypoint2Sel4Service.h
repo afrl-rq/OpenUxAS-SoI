@@ -97,6 +97,8 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
+    void 
+    write2Sel4(afrl::cmasi::MissionCommand * mission);
 protected:
 
 
