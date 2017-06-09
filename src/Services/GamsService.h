@@ -215,8 +215,10 @@ private:
     /// settings for the GAMS controller
     gams::controllers::ControllerSettings m_controllerSettings;
     
+    /// qos-enabled thread manager
     madara::threads::Threader m_threader;
     
+    /// map of agents to their corresponding GAMS variable containers
     gams::variables::AgentMap m_agentMap;
 };
 

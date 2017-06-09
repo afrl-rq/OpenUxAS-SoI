@@ -52,6 +52,11 @@
         </Groups>
     </Service>
    
+    <Service Type="GamsServiceDriver" >
+        <Knowledge KarlFile="../karl/helloworld.karl" BinaryFile="" Type="local"/>
+        <Knowledge KarlFile="../karl/enemytrack.karl" BinaryFile="" />
+    </Service>
+   
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
         <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
         <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>

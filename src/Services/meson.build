@@ -22,6 +22,7 @@ srcs_services = [
   'RoutePlannerVisibilityService.cpp',
   'WaypointPlanManagerService.cpp',
   'GamsService.cpp',
+  'GamsServiceDriver.cpp',
 ]
 
 incs_services = [
