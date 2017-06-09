@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c83fbdb05"
+        name="Extended Process Algebra">
+      In a reasonable amount of time, process algebra with syntax extended to include delay will determineif a plan exists that satisfies the mission specifications, and if such a plan exists, what that plan is
+
+      <s
+          id="__gsn__15c83fec768"
+          name="Strategy">
+        Argue over components of timely mission planning
+
+        <g
+            id="__gsn__15c83ff0b8e"
+            name="Reasonable Calculation Time">
+          The system is able to determine in a [reasonable time] if a plan exists that meets the mission specifications with a reliability as high as reasonably practicable
+
+          <c
+              id="__gsn__15c83ff0b8f"
+              name="Definition 1">
+            [Reasonable time] is mission dependent and will vary from x seconds to y hours (see also "Definition 1" for MissionPlanning.gsn)
+          </c>
+        </g>
+
+        <public-goal
+            id="__gsn__15c83ff1d0f"
+            name="Optimal Extended Process Algebra Plan">
+          Process algebra with syntax extended to include delay will calculate optimal plan
+
+          <c
+              id="__gsn__15c840179ad"
+              name="Context">
+            Plan exists that satisfies mission specifications
+          </c>
+
+          <s
+              id="__gsn__15c842259bc"
+              name="Strategy">
+            Awesome strategy
+          </s>
+        </public-goal>
+
+        <g
+            id="__gsn__15c8400f485"
+            name="No False Positives">
+          The system will never be provided with a plan that does not meet mission specifications
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
