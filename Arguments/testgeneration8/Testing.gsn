@@ -68,7 +68,8 @@
           </a>
 
           <m
-              id="__gsn__15c7a649a26"
+              id="__gsn__15c9d80ea63"
+              link="RequirementsCoverage.gsn"
               name="Requirements Coverage">
             Every requirement can be traced to tests sufficient for validation or verification of that requirement
           </m>
@@ -86,7 +87,8 @@
           All code and conditionals are exercised in a meaningful way by tests
 
           <m
-              id="__gsn__15c7a646acf"
+              id="__gsn__15c9d803e13"
+              link="CodeCoverage.gsn"
               name="Code Coverage">
             All code and conditionals are exercised in a meaningful way by tests
           </m>
@@ -102,12 +104,6 @@
             id="__gsn__15c79faee48"
             name="Test Correctness">
           Tests do not generate false positives or false negatives
-
-          <m
-              id="__gsn__15c7a64aa06"
-              name="Test Correctness">
-            Tests do not generate false positives or false negatives
-          </m>
 
           <comment
               id="__gsn__15c8922c948"

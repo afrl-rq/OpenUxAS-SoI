@@ -2,7 +2,7 @@
 <argument>
   <properties>
     <title>
-      <![CDATA[New Argument]]>
+      <![CDATA[Dynamic Analysis Mitigation]]>
     </title>
     <author>
       <![CDATA[]]>
@@ -48,12 +48,6 @@
             id="__gsn__15c8cfeba1c"
             name="Comprehensive Test Cases">
           Test cases provide the necessary level of assurance
-
-          <m
-              id="__gsn__15c8cff8c86"
-              name="Comprehensive Test Cases">
-            Test cases provide the necessary level of assurance
-          </m>
         </g>
 
         <g

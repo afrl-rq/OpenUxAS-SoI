@@ -2,7 +2,7 @@
 <argument>
   <properties>
     <title>
-      <![CDATA[New Argument]]>
+      <![CDATA[Static Analysis Mitigation]]>
     </title>
     <author>
       <![CDATA[]]>
@@ -40,71 +40,147 @@
       </c>
 
       <s
-          id="__gsn__15c87f757fc"
+          id="__gsn__15c9d8655ab"
           name="Strategy">
-        Argue over static analysis tools
+        Argue over static analysis methodologies
 
-        <g
-            id="__gsn__15c87f78166"
-            name="Cppcheck">
-          Cppcheck detects bugs that most compilers do not with a low false positive rate
-
-          <c
-              id="__gsn__15c87f8a328"
-              link="http://cppcheck.sourceforge.net/manual.pdf"
-              name="Documentation">
-            Manual for Cppcheck 1.79
-          </c>
-        </g>
-
-        <g
-            id="__gsn__15c8d000b18"
-            name="SPIN">
-          SPIN …
+        <c
+            id="__gsn__15c9d89d3fa"
+            link="https://blog.parasoft.com/bid/114795/The-Static-Analysis-Spectrum-5-Types-of-Static-Code-Analysis"
+            name="Context">
+          In part influenced by "The Static Analysis Spectrum: 5 Types of Static Code Analysis"
 
           <comment
-              id="__gsn__15c8d006a23"
+              id="__gsn__15c9d8a621b"
               name="Comment">
-            Document purpose of using SPIN
+            The fifth type, "Runtime Static Analysis". is ignored, the first type, "Integration-Time Static Analysis", does not seem significantly different from the second type, "Continuous Integration-Time (CI) Static Analysis", and Code-Specification Correspondence is added
           </comment>
+        </c>
+
+        <g
+            id="__gsn__15c9d84cb56"
+            name="Code-Specification Correspdonence">
+          Code can statically be shown to correspond to its specification
+
+          <m
+              id="__gsn__15c9d8567d6"
+              link="CodeSpecificationCorrectness.gsn"
+              name="Code-Specification Correspdonence">
+            Code can statically be shown to correspond to its specification
+          </m>
         </g>
 
         <g
-            id="__gsn__15c881834e2"
-            name="IKOS">
-          IKOS (Inference Kernel for Open Static Analyzers) facilitates static analyzers based on Abstract Interpretation
+            id="__gsn__15c9d86f6fd"
+            name="Continuous Integration-Time (CI) Static Analysis">
+          Identify likely errors based on deviations from coding policies and/or best practices
 
-          <c
-              id="__gsn__15c881de99f"
-              link="https://ti.arc.nasa.gov/opensource/ikos/"
-              name="Documentation">
-            NASA's page on IKOS
-          </c>
+          <s
+              id="__gsn__15c87f757fc"
+              name="Strategy">
+            Argue over CI static analysis tools
 
-          <c
-              id="__gsn__15c881ec848"
-              link="https://github.com/qsphan/ikos"
-              name="Context">
-            IKOS Github (with documentation)
+            <g
+                id="__gsn__15c87f78166"
+                name="Cppcheck">
+              Cppcheck detects bugs that most compilers do not with a low false positive rate
 
-            <comment
-                id="__gsn__15c88200dc6"
-                name="Comment">
-              The GitHub account shows how it can be used for static analysis, but perhaps we're only interested in using it for building models
-            </comment>
-          </c>
+              <c
+                  id="__gsn__15c87f8a328"
+                  link="http://cppcheck.sourceforge.net/manual.pdf"
+                  name="Documentation">
+                Manual for Cppcheck 1.79
+              </c>
+            </g>
+
+            <g
+                id="__gsn__15c8d000b18"
+                name="SPIN">
+              SPIN …
+
+              <comment
+                  id="__gsn__15c8d006a23"
+                  name="Comment">
+                Document purpose of using SPIN
+              </comment>
+            </g>
+
+            <g
+                id="__gsn__15c881834e2"
+                name="IKOS">
+              IKOS (Inference Kernel for Open Static Analyzers) facilitates static analyzers based on Abstract Interpretation
+
+              <c
+                  id="__gsn__15c881de99f"
+                  link="https://ti.arc.nasa.gov/opensource/ikos/"
+                  name="Documentation">
+                NASA's page on IKOS
+              </c>
+
+              <c
+                  id="__gsn__15c881ec848"
+                  link="https://github.com/qsphan/ikos"
+                  name="Context">
+                IKOS Github (with documentation)
+
+                <comment
+                    id="__gsn__15c88200dc6"
+                    name="Comment">
+                  The GitHub account shows how it can be used for static analysis, but perhaps we're only interested in using it for building models
+                </comment>
+              </c>
+            </g>
+
+            <g
+                id="__gsn__15c8860afcc"
+                name="AutoCorres">
+              AutoCorres …
+
+              <comment
+                  id="__gsn__15c8861102b"
+                  name="Comment">
+                Check with Dan DaCosta on how this might be used
+              </comment>
+            </g>
+          </s>
         </g>
 
         <g
-            id="__gsn__15c8860afcc"
-            name="AutoCorres">
-          AutoCorres …
+            id="__gsn__15c9d8e2a40"
+            name="Metrics Analysis">
+          Use metrics such as cyclomatic complexity to identify code that might not be well written
 
-          <comment
-              id="__gsn__15c8861102b"
-              name="Comment">
-            Check with Dan DaCosta on how this might be used
-          </comment>
+          <s
+              id="__gsn__15c9d8fb13e"
+              name="Strategy">
+            Argue over metrics analysis tools
+
+            <g
+                id="__gsn__15c9d8fdd6d"
+                name="CCCC">
+              "C and C++ Code Counter: A free software tool for measurement of source code related metrics by Tim Littlefair"
+
+              <c
+                  id="__gsn__15c9d94113b"
+                  link="http://cccc.sourceforge.net/"
+                  name="Documentation">
+                "CCCC - C and C++ Code Counter"
+              </c>
+
+              <c
+                  id="__gsn__15c9d969890"
+                  link="https://github.com/AlertProject/CCCC"
+                  name="Context">
+                A more recent forked version (1 year since last commit) exists on GitHub
+              </c>
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15c9d9c50a5"
+            name="Edit-Time Static Analysis">
+          The use of a modern IDE mitigates coding errors by providing immediate feedback to software developers
         </g>
       </s>
     </g>
