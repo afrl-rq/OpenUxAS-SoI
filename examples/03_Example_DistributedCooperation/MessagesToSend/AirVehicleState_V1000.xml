@@ -29,7 +29,6 @@
   <EnergyAvailable>100</EnergyAvailable>
   <ActualEnergyRate>0</ActualEnergyRate>
   <PayloadStateList>
-    <PayloadStateList>
         <GimbalState Series="CMASI">
             <PointingMode>AirVehicleRelativeAngle</PointingMode>
             <Azimuth>0.0</Azimuth>
@@ -45,7 +44,6 @@
             <HorizontalFieldOfView>10.3717193603516</HorizontalFieldOfView>
             <PayloadID>3</PayloadID>
         </CameraState>
-    </PayloadStateList>
   </PayloadStateList>
   <CurrentWaypoint>1</CurrentWaypoint>
   <CurrentCommand>100</CurrentCommand>

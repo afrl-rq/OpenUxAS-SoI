@@ -21,8 +21,8 @@
   <MinAltitudeType>AGL</MinAltitudeType>
   <MaximumAltitude>3048</MaximumAltitude>
   <MaxAltitudeType>MSL</MaxAltitudeType>
-  <ID>1000</ID>
-  <Label>SuperBat-1000</Label>
+  <ID>2000</ID>
+  <Label>SuperBat-2000</Label>
   <NominalSpeed>24</NominalSpeed>
   <NominalAltitude>300</NominalAltitude>
   <NominalAltitudeType>AGL</NominalAltitudeType>
@@ -52,6 +52,8 @@
      </ContainedPayloadList>
      <PayloadID>1</PayloadID>
      <PayloadKind>1680-01-7000008</PayloadKind>
+     <Parameters>
+     </Parameters>
    </GimbalConfiguration>
    <CameraConfiguration Series="CMASI">
      <SupportedWavelengthBand>EO</SupportedWavelengthBand>
@@ -59,7 +61,7 @@
      <MinHorizontalFieldOfView>22</MinHorizontalFieldOfView>
      <MaxHorizontalFieldOfView>22</MaxHorizontalFieldOfView>
      <DiscreteHorizontalFieldOfViewList>
-     <real32>0</real32>
+     <real32>18</real32>
      </DiscreteHorizontalFieldOfViewList>
      <VideoStreamHorizontalResolution>640</VideoStreamHorizontalResolution>
      <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
@@ -72,7 +74,7 @@
      <MinHorizontalFieldOfView>10.3717193603516</MinHorizontalFieldOfView>
      <MaxHorizontalFieldOfView>10.3717193603516</MaxHorizontalFieldOfView>
      <DiscreteHorizontalFieldOfViewList>
-     <real32>23</real32>
+     <real32>30</real32>
      </DiscreteHorizontalFieldOfViewList>
      <VideoStreamHorizontalResolution>640</VideoStreamHorizontalResolution>
      <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
