@@ -224,6 +224,15 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
     m_pendingAutoReq[reqId] = std::unordered_set<int64_t>();
     std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendAirPlanRequest;
     std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendGroundPlanRequest;
+    
+    // if the 'EntityList' is empty, then ALL vehicles are considered eligible
+    if(areq->getOriginalRequest()->getEntityList().empty())
+    {
+        for(auto entity : m_entityStates)
+        {
+            areq->getOriginalRequest()->getEntityList().push_back(entity.second->getID());
+        }
+    }
 
     // to minimize network traffic make a separate request for each vehicle
     for (size_t v = 0; v < areq->getOriginalRequest()->getEntityList().size(); v++)
