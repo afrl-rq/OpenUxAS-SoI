@@ -1,11 +1,12 @@
-package RouteAggregatorService
+package RouteAggregatorService_Pkg
 public
 	with CMASI;
     with UXTASK;
     with IMPACT;
     with ROUTE;
+    with UxAS_Node_Lib;
 	
-thread RouteAggregatorService_Proc
+thread RouteAggregatorService
     features
         GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
         SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
@@ -22,8 +23,74 @@ thread RouteAggregatorService_Proc
         AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
    	annex agree{**
-		guarantee "true": true;
-	**};
-end RouteAggregatorService_Proc;
+   		const IDLE : int = 0;
+        const PENDING : int = 1;
 
+		eq state: int;
+		
+		eq num_route_requests_being_serviced : int = 
+			0 -> 
+				(pre(num_route_requests_being_serviced) 
+					+ UxAS_Node_Lib.bool_to_num(event(RouteRequest_in)) 
+					- UxAS_Node_Lib.bool_to_num(event(RoutePlanRequest_out))
+				);
+				
+		-------------------------------------------------------------
+		--State machine support macros
+		eq previous_state: int = prev(state, IDLE);
+		eq some_transition: bool = T_IDLE_TO_PENDING
+									or T_PENDING_TO_IDLE;
+
+		-------------------------------------------------------------	
+		--State transition macros
+		
+		--This is initially false to prevent transition to PENDING on the initial timestep
+		--Note: The documentation seems to say we also need to create a table and send the RoutePlanRequest messages
+		--  before moving to IDLE. We could possibly introduce another state between IDLE and PENDING for "setup"; 
+		--  but since I'm not modeling those details currently, I think it's okay to move to PENDING as soon as we receive
+		--  RouteRequest_in.
+		eq T_IDLE_TO_PENDING : bool = 
+			false -> ((previous_state = IDLE) and event(RouteRequest_in));
+		
+		--Since we may be servicing multiple requests at a time, we stay in pending until all requests have been 
+		-- serviced, in which case we return to IDLE
+		eq T_PENDING_TO_IDLE : bool = 
+			(previous_state = IDLE) and (num_route_requests_being_serviced = 0);
+			
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+		--This guarantee specifies the initial state.
+        guarantee "Initial_State": (state = IDLE) -> true;
+        
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (state = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_IDLE_TO_PENDING_effect" : T_IDLE_TO_PENDING => (state = PENDING);
+        
+        guarantee "T_PENDING_TO_IDLE_effect" : T_PENDING_TO_IDLE => (state = IDLE);
+
+		-------------------------------------------------------------
+		--TODO: We need a guarantee about not producing outputs when nothing is being serviced. 
+		--  Be careful on the timing.
+		
+		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state...
+		-- We probably want our guarantees to say things like the outputs have an ID that matches some prior input ID or something like that.
+		
+		-- Q (Philosophical): Should component contracts include only what we need for architectural level reasoning,
+		--  or should the contracts be sufficiently detailed so that any component satisfying the contract will
+		--  result in a correctly functioning system? Or would one argue that these are in fact the same?
+		--  
+		--  Currently, my contracts on this component are not nearly sufficient to ensure correctness. The output
+		--  messages could be jibberish. Even if I require the response ID to match the request ID, the
+		--  rest of the information could be garbage.  
+
+	**};
 end RouteAggregatorService;
+
+end RouteAggregatorService_Pkg;
