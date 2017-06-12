@@ -2,7 +2,7 @@
 <argument>
   <properties>
     <title>
-      <![CDATA[New Argument]]>
+      <![CDATA[Testing]]>
     </title>
     <author>
       <![CDATA[]]>
@@ -45,15 +45,15 @@
         Argue over requirements of assurance
 
         <g
-            id="__gsn__15c79f95c13"
-            name="Code Coverage">
-          All code and conditionals are exercised in a meaningful way by tests
+            id="__gsn__15c9d5cafe3"
+            name="Unit Tests">
+          Every class/function has a test written specifically for it — tests for higher-level functions/classes can use Mock objects for components were appropriate
+        </g>
 
-          <m
-              id="__gsn__15c7a646acf"
-              name="Code Coverage">
-            All code and conditionals are exercised in a meaningful way by tests
-          </m>
+        <g
+            id="__gsn__15c9d5dee41"
+            name="Specification Coverage">
+          Every aspect of the specification has one or more tests designed for it
         </g>
 
         <g
@@ -72,6 +72,30 @@
               name="Requirements Coverage">
             Every requirement can be traced to tests sufficient for validation or verification of that requirement
           </m>
+
+          <comment
+              id="__gsn__15c9d5f0cd0"
+              name="Comment">
+            Unit/Specification/Requirements testing corresponds to going back up the "V"
+          </comment>
+        </g>
+
+        <g
+            id="__gsn__15c79f95c13"
+            name="Code Coverage">
+          All code and conditionals are exercised in a meaningful way by tests
+
+          <m
+              id="__gsn__15c7a646acf"
+              name="Code Coverage">
+            All code and conditionals are exercised in a meaningful way by tests
+          </m>
+
+          <comment
+              id="__gsn__15c9d5b3058"
+              name="Comment">
+            Which tests do we want to verify code coverage for? 100% code coverage for unit tests is feasible. 90%+ code coverage for integration tests is more meaningful, but 100% test coverage might not be feasible.
+          </comment>
         </g>
 
         <g
