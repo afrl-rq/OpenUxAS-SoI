@@ -98,6 +98,8 @@ bool Waypoint2Sel4Service::terminate()
 
 void Waypoint2Sel4Service::write2Sel4(afrl::cmasi::MissionCommand * mission){
 
+    COUT_INFO("in write2Sel4\n");
+
     if (mission->getVehicleID() == m_vehicleID)
     {
         avtas::lmcp::ByteBuffer buf;
@@ -107,14 +109,18 @@ void Waypoint2Sel4Service::write2Sel4(afrl::cmasi::MissionCommand * mission){
             waypoint->getVehicleActionList().clear();
             waypoint->getAssociatedTasks().clear();
         }
+        buf.allocate(mission->calculatePackedSize());
         mission->pack(buf);
+        #if 1 == 1
         int fd = open("/dev/mem", O_RDWR | O_SYNC);
         uint8_t * mem = (uint8_t *)mmap(0, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0xE0000000);
-        while(buf.hasRemaining()){
-            *mem = buf.get();
-        }
-
+        write(fd,buf.array(),buf.capacity());
         close(fd);
+        #else
+        FILE * f = fopen("/tmp/missioncommands", "wb");
+        fwrite(buf.array(),1,buf.capacity(),f);
+        fclose(f);
+        #endif
     }
 }
 
@@ -122,7 +128,6 @@ bool
 Waypoint2Sel4Service::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
 
-    COUT_INFO("Got message\n");
     if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object))
     {
         auto automationResponse = std::static_pointer_cast<afrl::cmasi::AutomationResponse> (receivedLmcpMessage->m_object);
