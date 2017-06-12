@@ -1,1 +1,4 @@
 .aadlbin-gen/
+diagrams/
+aadl/models/instances
+*.aaxl2
