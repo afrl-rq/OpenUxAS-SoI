@@ -1,15 +1,10 @@
 package Waterways
 public
     with CMASI;
-
     with UXTASK;
-
     with IMPACT;
-
     with ROUTE;
-
     with UXNATIVE;
-
 	with UxAS_Props;
 
     thread TaskManagerService
@@ -37,7 +32,7 @@ public
     		Dispatch_Protocol => Sporadic;
     		
     	annex agree{**
-    		
+    	            		
     		guarantee "Upon reception of a Task message, it will send the appropriate CreateNewService message." :
     			event(Task_in) => 
     				event(CreateNewService_out);
@@ -116,7 +111,7 @@ public
         		numTasksInQ = 0 -> true;
 	
 			guarantee "Implied Spec: Initially, the service is idle" :
-				state = IDLE -> true;
+				(state = IDLE) -> true;
 				
 			--TODO make error message a new variable. 
         	

@@ -11,15 +11,11 @@
 package UxAS
 public
     with CMASI;
-
     with UXTASK;
-
     with IMPACT;
-
     with ROUTE;
-
     with UXNATIVE;
-
+    
     process AssignmentTreeBranchBoundBase
         features
             TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
