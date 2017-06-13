@@ -103,17 +103,8 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
             auto entityConfiguration = generateEntityConfiguration(ndEntityConfiguration);
             if (entityConfiguration)
             {
-                m_idVsEntityConfiguration.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
-                // only add eligible entities, defaults to add all entities
-                if (!m_task->getEligibleEntities().empty())
-                {
-                    {
-                        auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
-                        auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-                        m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
-                    }
-                }
-                else
+                auto foundEntity = std::find(m_task->getEligibleEntities().begin(), m_task->getEligibleEntities().end(), entityConfiguration->getID());
+                if(m_task->getEligibleEntities().empty() || foundEntity != m_task->getEligibleEntities().end())
                 {
                     m_idVsEntityConfiguration.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
                     auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
@@ -338,10 +329,14 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
     }
     else if (entityConfiguration)
     {
-        m_idVsEntityConfiguration.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
-        auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
-        auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-        m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+        auto foundEntity = std::find(m_task->getEligibleEntities().begin(), m_task->getEligibleEntities().end(), entityConfiguration->getID());
+        if(m_task->getEligibleEntities().empty() || foundEntity != m_task->getEligibleEntities().end())
+        {
+            m_idVsEntityConfiguration.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
+            auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
+            auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
+            m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+        }
     }
     else if (uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object))
     {
@@ -799,8 +794,20 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                             }
                             else //if (itEntityConfiguration != m_idVsEntityConfiguration.end())
                             {
+                                // Assignment algorithm selected an invalid vehicle/option combination.
+                                // This should never happen; fallback, send empty task implementation response
                                 CERR_FILE_LINE_MSG("ERROR::c_Task_Base::isProcessedMessageBase: for TaskId[" << m_task->getTaskID()
                                                    << "] there is not an EntityConfiguration for EntityId[" << vehicleId << "].")
+
+                                // send out the blank response
+                                auto taskImplementationResponse = std::make_shared<uxas::messages::task::TaskImplementationResponse>();
+                                taskImplementationResponse->setResponseID(itTaskImplementationRequest->second->getRequestID());
+                                taskImplementationResponse->setTaskID(m_task->getTaskID());
+                                taskImplementationResponse->setOptionID(optionId);
+                                taskImplementationResponse->setVehicleID(vehicleId);
+                                taskImplementationResponse->setFinalLocation(itTaskImplementationRequest->second->getStartPosition()->clone());
+                                taskImplementationResponse->setFinalHeading(itTaskImplementationRequest->second->getStartHeading());
+                                sendSharedLmcpObjectBroadcastMessage(taskImplementationResponse);
                             } //if (itEntityConfiguration != m_idVsEntityConfiguration.end())
                         } //if(itTaskOptionClass->second->m_pendingRouteIds.empty())
                     } //if(itTaskOptionClass->second->m_pendingRouteIds.find(routePlan->getRouteID()) != itTaskOptionClass->second->m_pendingRouteIds.end())

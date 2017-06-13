@@ -225,8 +225,7 @@ bool AssignmentTreeBranchBoundBase::AssigmentPrerequisites::isAssignmentReady(co
     
     if (m_uniqueAutomationRequest && isAssignmentTypeReady && m_assignmentCostMatrix)
     {
-        if (!m_uniqueAutomationRequest->getOriginalRequest()->getEntityList().empty() &&
-                !m_uniqueAutomationRequest->getOriginalRequest()->getTaskList().empty())
+        if (!m_uniqueAutomationRequest->getOriginalRequest()->getTaskList().empty())
         {
             //3 - do we have the required task plan options
             for (auto itTaskId = m_uniqueAutomationRequest->getOriginalRequest()->getTaskList().begin();
@@ -241,13 +240,21 @@ bool AssignmentTreeBranchBoundBase::AssigmentPrerequisites::isAssignmentReady(co
                 }
                 else
                 {
+                    bool hasFeasibleEntity{false};
                     for (auto& option : m_taskIdVsTaskPlanOptions[*itTaskId]->getOptions())
                     {
                         if (option->getEligibleEntities().empty())
                         {
-                            option->getEligibleEntities() = m_uniqueAutomationRequest->getOriginalRequest()->getEntityList();
+                            UXAS_LOG_WARN(s_typeName(), "isAssignmentReady:: TaskId[", *itTaskId, "], Option[", option->getOptionID() , "] has no eligible entities");
+                        }
+                        else
+                        {
+                            hasFeasibleEntity = true;
                         }
                     }
+                    // TODO: check 'hasFeasibleEntity', if false, then no option has a feasible entity and task cannot be completed.
+                    //       Should immediately should return an error reporting that *itTaskId cannot be accomplished as there are
+                    //       no eligible vehicles.
                 }
             }
         }
