@@ -30,7 +30,7 @@
             <Madara File="GamsService.log" Level="1"/>
             <Gams File="GamsService.log" Level="4" />
         </Logging>
-        <GamsController AgentPrefix="agent.3"
+        <GamsController AgentPrefix="agent.4"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
             GamsLogLevel="4" MadaraLogLevel="1"
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
