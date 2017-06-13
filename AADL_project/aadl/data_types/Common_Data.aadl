@@ -2,7 +2,7 @@ package Common_Data
 public
 	with Base_Types;
 	
-	data string
+	data string extends Base_Types::Integer
 	end string;
 	
 	data implementation string.i

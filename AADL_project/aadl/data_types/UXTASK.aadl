@@ -265,6 +265,10 @@ data implementation TaskImplementationRequest.i
     subcomponents
         --Request ID for correlating to matching response
         RequestID: data int64.i;
+        
+        --NOTE: new, Derek told me so
+        CorrespondingAutomationRequestID: data int64.i;
+        
         --Starting waypoint ID that task must use when building response. Note
         --that Plan Builder reserves all values greater than 1,000,000,000.
         --Therefore all *internal* task waypoints must be less than 1e9 and can
@@ -303,6 +307,10 @@ data implementation TaskImplementationResponse.i
     subcomponents
         --Response ID that matches the initial request
         ResponseID: data int64.i;
+        
+        --NOTE: new, Derek told me so
+        CorrespondingAutomationRequestID: data int64.i;
+        
         --Task ID
         TaskID: data int64.i;
         --Option ID that was selected for this task

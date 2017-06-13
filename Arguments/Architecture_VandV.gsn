@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15c8925197f"
+        name="Top-Level Goal">
+      Architecture V&amp;V
+
+      <c
+          id="__gsn__15c8935eb04"
+          name="Context">
+        Architecture Spec.
+      </c>
+
+      <s
+          id="__gsn__15c89253024"
+          name="Strategy">
+
+        <g
+            id="__gsn__15c89264c48"
+            name="Validation">
+
+          <s
+              id="__gsn__15c89266b17"
+              name="Strategy">
+
+            <g
+                id="__gsn__15c89266f0f"
+                name="Complete">
+
+              <s
+                  id="__gsn__15c8929b13c"
+                  name="Strategy">
+
+                <g
+                    id="__gsn__15c892d6c9f"
+                    name="Formal Models">
+                  {all models are validated}
+
+                  <c
+                      id="__gsn__15c894ba535"
+                      name="Context">
+                    TBD: specs based on refined NL
+                  </c>
+
+                  <s
+                      id="__gsn__15c8937bdba"
+                      name="Strategy">
+                    over models
+
+                    <j
+                        id="__gsn__15c893926f3"
+                        name="Justification">
+                      {why more than one model?}
+                    </j>
+
+                    <g
+                        id="__gsn__15c8937c2a9"
+                        name="ASSERT">
+
+                      <s
+                          id="__gsn__15c8937fbe9"
+                          name="Strategy">
+                        {breaking down by components of the model}
+
+                        <g
+                            id="__gsn__15c8930293d"
+                            name="Assert Ontology (itself) is complete">
+
+                          <e
+                              id="__gsn__15c893312b7"
+                              name="Evidence">
+                            {expert}
+                          </e>
+                        </g>
+
+                        <g
+                            id="__gsn__15c89381ec9"
+                            name="Requirements">
+                        </g>
+
+                        <g
+                            id="__gsn__15c89383849"
+                            name="Assumption">
+                        </g>
+
+                        <g
+                            id="__gsn__15c894b4c0e"
+                            name="maps completely to NL">
+                        </g>
+
+                        <g
+                            id="__gsn__15c89390143"
+                            name="etc.">
+                        </g>
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15c8937c5b0"
+                        name="AGREE">
+
+                      <s
+                          id="__gsn__15c89391e4a"
+                          name="Strategy">
+                        {breaking down by components of the model}
+
+                        <g
+                            id="__gsn__15c893a644a"
+                            name="Connections">
+                        </g>
+
+                        <g
+                            id="__gsn__15c893a6c5a"
+                            name="Components">
+
+                          <s
+                              id="__gsn__15c893acf99"
+                              name="Strategy">
+
+                            <g
+                                id="__gsn__15c893ad379"
+                                name="Types">
+                            </g>
+
+                            <g
+                                id="__gsn__15c893ae408"
+                                name="Properties">
+                            </g>
+
+                            <g
+                                id="__gsn__15c893af9a0"
+                                name="Features">
+                            </g>
+                          </s>
+                        </g>
+
+                        <g
+                            id="__gsn__15c893aa4a0"
+                            name="Behavior">
+                        </g>
+
+                        <g
+                            id="__gsn__15c894b84e1"
+                            name="maps completely to NL">
+                        </g>
+
+                        <g
+                            id="__gsn__15c893abb61"
+                            name="etc.">
+                        </g>
+
+                        <comment
+                            id="__gsn__15c89388f27"
+                            name="Comment">
+                          All of these might collapse to one goal and evidence item.
+                        </comment>
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15c8967444b"
+                        name="Resolute Properties">
+                    </g>
+
+                    <g
+                        id="__gsn__15c894a1b4c"
+                        repeat="true"
+                        name="Others?">
+                    </g>
+
+                    <g
+                        id="__gsn__15c8939f3a7"
+                        name="Model Agreement">
+
+                      <s
+                          id="__gsn__15c893a0bd7"
+                          name="Strategy">
+                        {show implication of models?}
+                      </s>
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15c892d85b8"
+                    name="NL Spec">
+                  {refinement of existing NL specs}
+
+                  <s
+                      id="__gsn__15c892da058"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15c8929b60c"
+                        name="Refinement of NL">
+
+                      <c
+                          id="__gsn__15c892a0a35"
+                          name="Context">
+                        &lt;iteration lead to acceptable refinement&gt;
+                      </c>
+
+                      <e
+                          id="__gsn__15c8929d55d"
+                          name="Evidence">
+                      </e>
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15c894ff5a3"
+                    name="Sanity Check?">
+
+                  <j
+                      id="__gsn__15c8951266e"
+                      name="Justification">
+                    The code may have more of the validated meaning, the code acts as a validation oracle.
+                  </j>
+
+                  <comment
+                      id="__gsn__15c89515c2e"
+                      name="Comment">
+                    How far down this rabbit hole?
+                  </comment>
+                </g>
+
+                <g
+                    id="__gsn__15c89476cc8"
+                    name="Composition Sufficiency?">
+
+                  <comment
+                      id="__gsn__15c894816f8"
+                      name="Comment">
+                    Trying to avoid situations where specs are split over multiple files perhaps split based on formal and informal, also, the separation here might not necessarily imply complete coverage.
+                  </comment>
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15c892683b0"
+                name="Accurate">
+
+              <s
+                  id="__gsn__15c892ae1ee"
+                  name="Strategy">
+
+                <g
+                    id="__gsn__15c892ae82e"
+                    name="Realizable">
+                </g>
+
+                <g
+                    id="__gsn__15c895446b7"
+                    name="Manual Check">
+                </g>
+
+                <g
+                    id="__gsn__15c8957370f"
+                    name="Dimensional Analysis">
+
+                  <e
+                      id="__gsn__15c895803e5"
+                      name="Evidence">
+                    PVS check?
+                  </e>
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15c8928eb2c"
+                name="Appropriateness">
+              ???
+
+              <s
+                  id="__gsn__15c89547607"
+                  name="Strategy">
+
+                <g
+                    id="__gsn__15c89547b1e"
+                    name="Feasible">
+                </g>
+
+                <g
+                    id="__gsn__15c895a60dc"
+                    repeat="true"
+                    name="Others?">
+                </g>
+              </s>
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15c89264f07"
+            name="Verification">
+
+          <s
+              id="__gsn__15c8927f9f7"
+              name="Strategy">
+
+            <g
+                id="__gsn__15c892803fe"
+                name="Formal Models">
+
+              <s
+                  id="__gsn__15c89283795"
+                  name="Strategy">
+                formal assessments
+
+                <g
+                    id="__gsn__15c893c98d0"
+                    name="Completeness">
+
+                  <c
+                      id="__gsn__15c893cc120"
+                      name="Context">
+                    {how different from other completeness?}
+                  </c>
+
+                  <s
+                      id="__gsn__15c893e3ee9"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15c893e4952"
+                        name="Ontology Completeness Check (Assert)">
+
+                      <e
+                          id="__gsn__15c893ea6e9"
+                          name="Evidence">
+                      </e>
+                    </g>
+
+                    <g
+                        id="__gsn__15c893e8209"
+                        name="AGREE Witness Check">
+
+                      <s
+                          id="__gsn__15c893ece79"
+                          name="Strategy">
+
+                        <g
+                            id="__gsn__15c893ed379"
+                            name="Witnesses Complete">
+
+                          <e
+                              id="__gsn__15c893f1669"
+                              name="Evidence">
+                            {manual check}
+                          </e>
+                        </g>
+
+                        <g
+                            id="__gsn__15c893efb79"
+                            name="Verified">
+
+                          <e
+                              id="__gsn__15c893f3490"
+                              name="Evidence">
+                            {assert output}
+                          </e>
+                        </g>
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15c894fa79d"
+                        name="ECHO">
+                    </g>
+
+                    <g
+                        id="__gsn__15c8967b7c2"
+                        name="Resolute Entailment">
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15c894301d3"
+                    name="Appropriate">
+
+                  <s
+                      id="__gsn__15c894319e2"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15c89432263"
+                        name="Traceability">
+                    </g>
+
+                    <g
+                        id="__gsn__15c89433e32"
+                        name="Redundancy">
+                    </g>
+
+                    <g
+                        id="__gsn__15c89436553"
+                        name="Contingency Error">
+
+                      <c
+                          id="__gsn__15c8945757b"
+                          name="Context">
+                        get definition
+                      </c>
+
+                      <comment
+                          id="__gsn__15c895bd9e8"
+                          name="Comment">
+                        values that make the statement true and values that make the statement false.
+                      </comment>
+
+                      <comment
+                          id="__gsn__15c89619798"
+                          name="Comment">
+                        May not be useful for some requirements, need to document when useful and when it can be ignored.
+                      </comment>
+                    </g>
+
+                    <g
+                        id="__gsn__15c89630711"
+                        name="why complete?">
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15c894230db"
+                    name="Accuracy/Correctness">
+
+                  <c
+                      id="__gsn__15c89429e1c"
+                      name="Context">
+                    definitions
+                  </c>
+
+                  <s
+                      id="__gsn__15c8942bdcc"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15c893fc198"
+                        name="Realizability">
+
+                      <c
+                          id="__gsn__15c893fdbbf"
+                          name="Context">
+                        {note that this subsumes consistency}
+                      </c>
+
+                      <c
+                          id="__gsn__15c893ff9d8"
+                          name="Context">
+                        Definitions
+                      </c>
+
+                      <s
+                          id="__gsn__15c89400a40"
+                          name="Strategy">
+
+                        <g
+                            id="__gsn__15c8941440c"
+                            name="ASSERT Conflict">
+
+                          <comment
+                              id="__gsn__15c89417c06"
+                              name="Comment">
+                            equivalence to realizability? Need to document what the difference if any is
+                          </comment>
+                        </g>
+
+                        <g
+                            id="__gsn__15c89414806"
+                            name="AGREE Realizability">
+                        </g>
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15c8945f96f"
+                        name="Entailment">
+                    </g>
+
+                    <g
+                        id="__gsn__15c89638460"
+                        name="why complete?">
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15c893d10af"
+                    name="Why these metrics?">
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15c892826cd"
+                name="Informal Specs">
+
+              <s
+                  id="__gsn__15c8928a92d"
+                  name="Strategy">
+                Assessments?
+
+                <g
+                    id="__gsn__15c89658e44"
+                    name="Completeness">
+                </g>
+
+                <g
+                    id="__gsn__15c8965c59b"
+                    name="Appropriateness">
+                </g>
+
+                <g
+                    id="__gsn__15c8965dfa3"
+                    name="Correcntess">
+
+                  <s
+                      id="__gsn__15c8966316d"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15c896643f6"
+                        name="Testing">
+                    </g>
+                  </s>
+                </g>
+              </s>
+            </g>
+          </s>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
