@@ -1,0 +1,4 @@
+apps-$(CONFIG_APP_SMACCMPILOT_TK1) += smaccmpilot_tk1
+smaccmpilot_tk1: common libsel4 libmuslc libsel4vka libsel4allocman libsel4muslcsys \
+libsel4vspace libsel4utils libpci libcpio libsel4vmm libelf libutils libsel4camkes libsel4sync \
+libsel4debug libsel4muslccamkes libsel4simple libsel4simple-default libsel4platsupport libethdrivers liblwip

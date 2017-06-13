@@ -1,0 +1,2 @@
+apps-$(CONFIG_APP_SMACCMPILOT_TK1) += smaccmpilot_tk1
+smaccmpilot_tk1: libsel4 libmuslc libsel4platsupport libsel4muslccamkes libsel4camkes libsel4sync libsel4debug libsel4bench

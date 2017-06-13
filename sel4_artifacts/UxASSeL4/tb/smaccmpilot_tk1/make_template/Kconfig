@@ -1,0 +1,13 @@
+config APP_SMACCMPILOT_TK1
+    bool "smaccmpilot_tk1 (from AADL)"
+    default n
+    select APP_CAMKES_EXECUTIVE
+    help
+        smaccmpilot_tk1 (from AADL).
+
+config APP_SMACCMPILOT_TK1_TB_DEBUG
+    bool "Enable trusted build debugging for the SMACCMPILOT_TK1 application"
+    default n
+    depends on APP_SMACCMPILOT_TK1 && PRINTING
+    help
+        Enable trusted build debugging for the SMACCMPILOT_TK1 application.
