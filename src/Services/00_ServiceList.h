@@ -107,6 +107,7 @@
 
 // realtime/gams
 #include "GamsService.h"
+#include "GamsServiceDriver.h"
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -174,6 +175,7 @@
 
 // realtime/gams
 {auto svc = uxas::stduxas::make_unique<uxas::service::GamsService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::GamsServiceDriver>();}
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////

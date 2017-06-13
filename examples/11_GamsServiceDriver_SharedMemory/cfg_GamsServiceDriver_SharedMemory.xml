@@ -52,6 +52,15 @@
         </Groups>
     </Service>
    
+    <Service Type="GamsServiceDriver" >
+        <Knowledge KarlFile="../karl/helloworld.karl" BinaryFile="" Type="local"/>
+        <Knowledge KarlFile="../karl/enemytrack.karl" BinaryFile="" />
+        <Waypoint Latitude="45.316664" Longitude="-120.990900" Altitude="700.000000" />
+        <Waypoint Latitude="45.316674" Longitude="-120.991000" Altitude="700.000000" />
+        <Waypoint Latitude="45.316684" Longitude="-120.991100" Altitude="700.000000" />
+        <Waypoint Latitude="45.316694" Longitude="-120.991200" Altitude="700.000000" />
+    </Service>
+   
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
         <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
         <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>

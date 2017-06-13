@@ -348,8 +348,13 @@ namespace service
     virtual int move (const gams::pose::Position & location,
       double epsilon)
     {
-        gams::pose::Position current;
+        gams::pose::Position current (gps_frame);
         current.from_container(self_->agent.location);
+        
+        if (m_last != location)
+        {
+            gams::platforms::BasePlatform::move(location, epsilon);
+        }
         
         if (location.approximately_equal(current, epsilon))
         {
@@ -454,6 +459,9 @@ namespace service
     /// handle to the GamsService so we can use sendBuffer
     GamsService * m_service;
     
+    /// keep track of last unique position
+    gams::pose::Position m_last;
+    
   }; // end UxASGamsPlatform class
   
 /// static reference frames we can use for the UxAS platform (gps preferred)
@@ -542,7 +550,12 @@ std::string GamsService::getAgentPrefix (int64_t entityId)
     
     return result;
 }
-    
+
+gams::pose::ReferenceFrame & GamsService::frame (void)
+{
+    return UxASGamsPlatform::gps_frame;
+}
+
 int GamsService::move (const gams::pose::Position & location,
       double epsilon)
 {
@@ -567,7 +580,6 @@ GamsService::GamsService()
   m_context (&(s_knowledgeBase.get_context())),
   m_controller (0), m_threader (s_knowledgeBase) {
 
-    UXAS_LOG_ERROR("GamsService::constr:: sanity check");
 };
 
 GamsService::~GamsService() { };
@@ -596,20 +608,30 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
          currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
         // if we need to load initial knowledge
-        if (std::string("InitialKnowledge") == currentXmlNode.name())
+        if (std::string("Knowledge") == currentXmlNode.name())
         {
             if (!currentXmlNode.attribute("BinaryFile").empty())
             {
+                gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                    "GamsServiceDriver::Loading knowledge base from %s\n",
+                    currentXmlNode.attribute("BinaryFile").as_string());
+    
                 s_knowledgeBase.load_context(
                     currentXmlNode.attribute("BinaryFile").as_string());
             }
             
             if (!currentXmlNode.attribute("KarlFile").empty())
-            {;
+            {
+                gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                    "GamsServiceDriver::Evaluating karl file\n");
+    
                 knowledge::EvalSettings settings;
                 settings.treat_globals_as_locals = true;
-                s_knowledgeBase.evaluate(
-                    currentXmlNode.attribute("KarlFile").as_string(), settings);
+                
+                std::string karlFile = ::madara::utility::file_to_string (
+                   currentXmlNode.attribute("KarlFile").as_string());
+                
+                s_knowledgeBase.evaluate(karlFile, settings);
             }
         }
         // if we need to setup the GamsController
@@ -783,6 +805,7 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         m_controllerSettings);
     
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
     addSubscriptionAddress(uxas::madara::MadaraState::Subscription);
     
