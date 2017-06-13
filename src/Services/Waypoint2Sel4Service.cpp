@@ -125,6 +125,7 @@ void Waypoint2Sel4Service::write2Sel4(afrl::cmasi::MissionCommand * mission){
         fwrite(buf->array(),1,buf->capacity(),f);
         fclose(f);
         #endif
+        delete buf;
     }
 }
 
