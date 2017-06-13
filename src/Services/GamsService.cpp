@@ -265,7 +265,7 @@ namespace service
     virtual double get_accuracy (void) const
     {
         // we're assuming 1M accuracy in positioning
-        return 1.0;
+        return 70.0;
     }
 
     /**
@@ -906,6 +906,8 @@ GamsService::sendWaypoint (const gams::pose::Position & location)
         
     // indicate that the first waypoint is the waypoint to use
     newMission->setFirstWaypoint(1);
+    
+    newMission->setVehicleID(this->m_entityId);
         
     // only send shared pointers to LMCP objects
     sendSharedLmcpObjectBroadcastMessage(newMission);

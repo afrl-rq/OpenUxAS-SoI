@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<UxAS FormatVersion="1.0" EntityID="100"  EntityType="Aircraft">
+<UxAS FormatVersion="1.0" EntityID="400"  EntityType="Aircraft">
     <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.AirVehicleState" />
+        <SubscribeToMessage MessageType="uxas.madara.MadaraState" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
@@ -21,15 +22,15 @@
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
     
-    <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
     -->
+    <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
     <Service Type="GamsService" >
         <Knowledge KarlFile="" BinaryFile="" />
         <Logging>
             <Madara File="GamsService.log" Level="1"/>
             <Gams File="GamsService.log" Level="3" />
         </Logging>
-        <GamsController AgentPrefix="agent.0"
+        <GamsController AgentPrefix="agent.3"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
             GamsLogLevel="3" MadaraLogLevel="1"
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
@@ -38,7 +39,7 @@
           <Agent Prefix="agent.1" EntityId="200"/>
           <Agent Prefix="agent.2" EntityId="300"/>
           <Agent Prefix="agent.3" EntityId="400"/>
-          <!--<Agent Prefix="agent.4" EntityId="500"/>-->
+          <Agent Prefix="agent.4" EntityId="500"/>
         </Agents>
         <Groups>
           <Group Prefix="group.allies">
@@ -55,8 +56,8 @@
     <Service Type="GamsServiceDriver" >
         <Knowledge KarlFile="../karl/helloworld.karl" BinaryFile="" Type="local"/>
         <Knowledge KarlFile="../karl/enemytrack.karl" BinaryFile="" />
-        <Waypoint Latitude="45.316664" Longitude="-120.990900" Altitude="700.000000" />
-        <Waypoint Latitude="45.316674" Longitude="-120.991000" Altitude="700.000000" />
+        <Waypoint Latitude="45.326664" Longitude="-120.980900" Altitude="700.000000" />
+        <Waypoint Latitude="45.326674" Longitude="-120.981000" Altitude="700.000000" />
         <Waypoint Latitude="45.316684" Longitude="-120.991100" Altitude="700.000000" />
         <Waypoint Latitude="45.316694" Longitude="-120.991200" Altitude="700.000000" />
     </Service>
