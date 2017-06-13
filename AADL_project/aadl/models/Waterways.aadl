@@ -103,6 +103,18 @@ public
         	--States
         	const IDLE : int = 0;
         	const BUSY : int = 1;
+        	
+        	--TODO: possible third or intermediate state? 
+        	-- All vehicles requested exist, task requested exists, flight regions actually exist. 
+        	
+        	--previous received an airvehicle ID, airvehicle state
+        		--AirVehicleConfiguration_in and AirVehicleState_in
+        	--task requested exists
+        		--TaskInitialized_in
+        	-- regions
+        		-- OperatingRegion_in
+        		-- KeepInZone_in
+        		-- KeepOutZone_in
        	
        	-------------------------------------------------------------
 		--State machine support macros
@@ -115,7 +127,7 @@ public
 		---------------- state transitions ----------------
         	eq idle_to_busy : bool = false -> 
         		previous_state = IDLE and 
-        		event(TaskAutomationRequest_in) and  --TODO: check with Derek if this is what is meant by an automation request
+        		event(AutomationRequest_in) and  
         		taskVehicleOrRegionIsDefined;
         	
         	eq busy_to_idle : bool = false -> 
@@ -125,7 +137,7 @@ public
         ---------------- end state transitions ----------------
         		
         	eq dequeue_trigger : bool = false -> 
-        		(event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id) or
+        		(event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id and not uniqueAutomationRequestErrorMessageRecieved) or
         		timer_threshold_reached or 
         		received_error_message;
         		
@@ -134,8 +146,11 @@ public
         		timer>=timeout_threshold;
         		
         	eq received_error_message : bool = false ->
+        		--TODO: Derek is going to update the spec to have a unique automation error response in
+        		--check the error response to match the cached ID, if matched there is an error. 
         		event(UniqueAutomationResponse_in) and 
-        		uniqueAutomationRequestErrorMessageRecieved;
+        		UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id and
+        		uniqueAutomationRequestErrorMessageRecieved; --represents a flag indicating error for now
         		
         	eq timer : int;
         	eq timeout_threshold : int;
@@ -146,9 +161,10 @@ public
         	const SERVICE_TYPE_ERROR_SIGNAL : int = 2;
         	
         	eq timer_reset: bool = true-> 
-        		event(UniqueAutomationRequest_out) or 
+        		event(UniqueAutomationRequest_out) or --Timer starts once we ask for a response (make a request)
         		state=IDLE or 
-        		event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID  = cached_unique_automation_request_id; 
+        		(event(UniqueAutomationResponse_in) and 
+        		UniqueAutomationResponse_in.ResponseID  = cached_unique_automation_request_id); 
         	
         	-- a non-deterministic variable used to model whether or not 
         	-- the requested task, vehicle, or operating region has been defined.
@@ -176,6 +192,7 @@ public
         	--TODO: is it worth modeling the local state of what the service maintains? 
         	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
         		event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined => 
+        			--TODO: derek will add automation request
         			event(ServiceStatus_out) and 
         			ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL; --and 
         			--numTasksInQ = pre(numTasksInQ);
@@ -196,7 +213,7 @@ public
 			
 			guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
 				  state = BUSY =>
-				  	if event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined then
+				  	if event(AutomationRequest_in) and taskVehicleOrRegionIsDefined then
 				 		numTasksInQ = pre(numTasksInQ) + 1
 				 	else
 				 		numTasksInQ = pre(numTasksInQ);
@@ -224,26 +241,29 @@ public
         			state = IDLE;
         			
         	guarantee "[Implied Requirement: process next message only if IDLE or a response has been received]":
-        		 state = BUSY and dequeue_trigger and numTasksInQ >0 =>
+        		 state = BUSY and dequeue_trigger and pre(numTasksInQ) >0 =>
         			--NOTE: no checking that the event is for the next item in the queue.
         			--TODO: can mimic queue if the ID's are incremented by one, I can force what the message refers to (1 minus current)
-        				event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1;
+        				event(UniqueAutomationRequest_out) and 
+        				numTasksInQ = pre(numTasksInQ) - 1 and
+        				cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID;
 
         	--TODO: unclear if ths is the error message behavior specified
         	guarantee "When this service receives either an error message 
         	(indicating that the UniqueAutomationRequest cannot be fulfilled or 
         		a corresponding UniqueAutomationResponse), it will publish the same message. " : true ->
         		received_error_message => 
-        			(event(ServiceStatus_out) and ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL) or
-        			true; --????
+        			event(AutomationResponse_out) and --TODO: will become an automation response error out at some point
+        			(event(ServiceStatus_out) and ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL) ;
         			
-        	--Cannot formalize in AGREE (unlesse I create a counter)
-        	guarantee "The request ID of unique automation responses are unique" :
-        		true;
-        		
-        	--Not sure if there is a way to model this property in agree
-        	guarantee "tasks are fed into 'the system' one at a time" : 
-        		true;
+        			
+--        	--Cannot formalize in AGREE (unlesse I create a counter)
+--        	guarantee "The request ID of unique automation responses are unique" :
+--        		true;
+--        		
+--        	--Not sure if there is a way to model this property in agree
+--        	guarantee "tasks are fed into 'the system' one at a time" : 
+--        		true; --What was meant was to mean "the queue", might not be necessary
         			
         **};
     end AutomationRequestValidatorService;
