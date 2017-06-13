@@ -166,6 +166,10 @@ public
 			guarantee "[Implied: Initially, the service is idle]" :
 				(state = IDLE) -> true;
 				
+			guarantee "[Implied: is this necessary? in IDLE the numTasksInQ is 0]" :
+				state = IDLE =>
+					numTasksInQ = 0;
+			
 			--TODO make error message a new variable. 
         	
         	--TODO: check request resource definition instead of non deterministic boolean? 
@@ -173,8 +177,8 @@ public
         	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
         		event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined => 
         			event(ServiceStatus_out) and 
-        			ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL and 
-        			numTasksInQ = pre(numTasksInQ);
+        			ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL; --and 
+        			--numTasksInQ = pre(numTasksInQ);
         			--TODO: what about the timer? 
         			--TODO: apparently the code sets the status type to "information" rather than "error"
         		
@@ -191,8 +195,11 @@ public
 					cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID; --Used for subsequent specs
 			
 			guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
-				 previous_state = BUSY and event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined =>
-				 	numTasksInQ = pre(numTasksInQ) + 1 and state = BUSY;
+				  state = BUSY =>
+				  	if event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined then
+				 		numTasksInQ = pre(numTasksInQ) + 1
+				 	else
+				 		numTasksInQ = pre(numTasksInQ);
 				 	
 --        	    pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
 --        	    	state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
@@ -217,7 +224,7 @@ public
         			state = IDLE;
         			
         	guarantee "[Implied Requirement: process next message only if IDLE or a response has been received]":
-        		 previous_state = BUSY and dequeue_trigger and numTasksInQ >0 =>
+        		 state = BUSY and dequeue_trigger and numTasksInQ >0 =>
         			--NOTE: no checking that the event is for the next item in the queue.
         			--TODO: can mimic queue if the ID's are incremented by one, I can force what the message refers to (1 minus current)
         				event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1;
