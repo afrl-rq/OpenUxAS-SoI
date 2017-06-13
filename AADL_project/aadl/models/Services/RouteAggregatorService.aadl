@@ -55,7 +55,7 @@ thread RouteAggregatorService
 		--Since we may be servicing multiple requests at a time, we stay in pending until all requests have been 
 		-- serviced, in which case we return to IDLE
 		eq T_PENDING_TO_IDLE : bool = 
-			(previous_state = IDLE) and (num_route_requests_being_serviced = 0);
+			(previous_state = PENDING) and (num_route_requests_being_serviced = 0);
 			
 		-------------------------------------------------------------	
 		--State machine guarantees
@@ -76,8 +76,10 @@ thread RouteAggregatorService
         guarantee "T_PENDING_TO_IDLE_effect" : T_PENDING_TO_IDLE => (state = IDLE);
 
 		-------------------------------------------------------------
-		--TODO: We need a guarantee about not producing outputs when nothing is being serviced. 
-		--  Be careful on the timing.
+		--Other guarantees for correct behavior
+		guarantee "Only produce output when in PENDING": event(RoutePlanRequest_out) => (state = PENDING);
+			
+		-------------------------------------------------------------
 		
 		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state...
 		-- We probably want our guarantees to say things like the outputs have an ID that matches some prior input ID or something like that.
@@ -88,8 +90,10 @@ thread RouteAggregatorService
 		--  
 		--  Currently, my contracts on this component are not nearly sufficient to ensure correctness. The output
 		--  messages could be jibberish. Even if I require the response ID to match the request ID, the
-		--  rest of the information could be garbage.  
-
+		--  rest of the information could be garbage.
+		  
+		-- A property/lemma should be that num_route_requests_being_serviced >= 0.
+		
 	**};
 end RouteAggregatorService;
 
