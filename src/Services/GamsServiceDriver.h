@@ -133,6 +133,9 @@ protected:
 
     /// list of waypoints to move to
     gams::pose::Positions m_waypoints;
+    
+    /// private logger for our service
+    madara::logger::Logger m_logger;
 };
 
 }; //namespace service

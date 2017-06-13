@@ -27,6 +27,7 @@
 #include "madara/knowledge/ContextGuard.h"
 #include "madara/knowledge/containers/Map.h"
 #include "madara/utility/Utility.h"
+#include "madara/knowledge/containers/Integer.h"
 
 #include "gams/groups/GroupFixedList.h"
 #include "gams/loggers/GlobalLogger.h"
@@ -67,6 +68,7 @@ namespace transport = madara::transport;
 namespace controllers = gams::controllers;
 namespace variables = gams::variables;
 namespace platforms = gams::platforms;
+namespace logger = madara::logger;
 
 namespace uxas
 {
@@ -83,8 +85,9 @@ namespace service
     /**
      * Default constructor
      **/
-    GamsDriverThread (const gams::pose::Positions & waypoints)
-    : m_waypoints (waypoints), m_current (0)
+    GamsDriverThread (const gams::pose::Positions & waypoints,
+        logger::Logger & logger)
+    : m_waypoints (waypoints), m_current (0), m_logger (logger)
     {
         
     }
@@ -109,16 +112,18 @@ namespace service
       **/
     virtual void run (void)
     {
-        gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+        // EXAMPLE: using specific logging levels
+        madara_logger_log (m_logger, logger::LOG_MAJOR,
             "GamsDriverThread::run: waypoint index is %d of %d\n",
             (int)m_current, (int)m_waypoints.size ());
     
+        // EXAMPLE: using the GamsService::move function
         /// try to move to current waypoint
         if (m_current < m_waypoints.size () &&
             GamsService::move (m_waypoints[m_current])
             == gams::platforms::PLATFORM_ARRIVED)
         {
-            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+            madara_logger_log (m_logger, logger::LOG_MINOR,
                 "GamsDriverThread::run: moving to waypoint %d of %d\n",
                 (int)m_current, (int)m_waypoints.size ());
     
@@ -126,12 +131,12 @@ namespace service
         }
         else if (m_current >= m_waypoints.size ())
         {
-            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+            madara_logger_log (m_logger, logger::LOG_MAJOR,
                 "GamsDriverThread::run: end of waypoint list\n");
         }
         else
         {
-            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+            madara_logger_log (m_logger, logger::LOG_MAJOR,
                 "GamsDriverThread::run: still moving to waypoint\n");
         }
     }
@@ -142,6 +147,8 @@ namespace service
       
       /// curWaypoint
       size_t m_current;
+      
+      logger::Logger & m_logger;
   };
 
     
@@ -152,7 +159,10 @@ GamsServiceDriver::GamsServiceDriver()
 : ServiceBase(GamsServiceDriver::s_typeName(), GamsServiceDriver::s_directoryName()),
   m_checkpointPrefix ("checkpoints/checkpoint"), m_threader (m_knowledgeBase) {
 
-    UXAS_LOG_ERROR("GamsServiceDriver::constr:: sanity check");
+    // EXAMPLE: by default, MADARA loggers log to stderr. We will later
+    // stop logging to stderr and only log to a file
+    madara_logger_log (m_logger, logger::LOG_ALWAYS,
+        "GamsServiceDriver::constr:: sanity check");
 };
 
 GamsServiceDriver::~GamsServiceDriver() { };
@@ -160,7 +170,13 @@ GamsServiceDriver::~GamsServiceDriver() { };
 bool
 GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
 {
-    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+    // EXAMPLE of using a custom MADARA logger that just goes to a file
+    // this makes a private log for your service at an arbitrary level
+    m_logger.set_level(4);
+    m_logger.clear();
+    m_logger.add_file("GamsServiceDriverLog.txt");
+    
+    madara_logger_log (m_logger, logger::LOG_ALWAYS,
         "GamsServiceDriver::Starting configure\n");
     
     // load settings from the XML file
@@ -180,7 +196,7 @@ GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
             
             if (!currentXmlNode.attribute("BinaryFile").empty())
             {
-                gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                madara_logger_log (m_logger, logger::LOG_ALWAYS,
                     "GamsServiceDriver::Loading knowledge base from %s\n",
                     currentXmlNode.attribute("BinaryFile").as_string());
     
@@ -190,7 +206,7 @@ GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
             
             if (!currentXmlNode.attribute("KarlFile").empty())
             {
-                gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+                madara_logger_log (m_logger, logger::LOG_ALWAYS,
                     "GamsServiceDriver::Evaluating karl file %s\n",
                     currentXmlNode.attribute("KarlFile").as_string());
     
@@ -224,7 +240,7 @@ GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
                     currentXmlNode.attribute("Altitude").as_double());
             }
 
-            gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+            madara_logger_log (m_logger, logger::LOG_ALWAYS,
                 "GamsServiceDriver::config: adding waypoint [%.4f,%.4f,%.4f]\n",
                 nextPosition.lat(), nextPosition.lng(), nextPosition.alt());
 
@@ -239,7 +255,7 @@ GamsServiceDriver::configure(const pugi::xml_node& serviceXmlNode)
     GamsService::s_knowledgeBase.save_context(
         m_checkpointPrefix + "_gsd_config_staticknowledgeBase.kb");
     
-    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+    madara_logger_log (m_logger, logger::LOG_ALWAYS,
         "GamsServiceDriver::config: ended up with %d waypoints\n",
         this->m_waypoints.size());
 
@@ -251,7 +267,9 @@ GamsServiceDriver::initialize()
 {
     bool bSuccess(true);
 
-    gams::loggers::global_logger->log(0, "GamsServiceDriver::initialize\n");
+    
+    madara_logger_log (m_logger, logger::LOG_ALWAYS,
+        "GamsServiceDriver::initialize\n");
     
     // save the agent mapping for forensics
     m_knowledgeBase.save_context(
@@ -260,10 +278,13 @@ GamsServiceDriver::initialize()
     GamsService::s_knowledgeBase.save_context(
         m_checkpointPrefix + "_gsd_init_staticknowledgeBase.kb");
     
+    // EXAMPLE of creating a container that points into the global KB
+    ::madara::knowledge::containers::Integer priority;
+    priority.set_name ("agent.0.priority", GamsService::s_knowledgeBase);
     
     // run at 1hz, forever (-1)
     m_threader.run (1.0, "controller",
-      new GamsDriverThread (this->m_waypoints));
+      new GamsDriverThread (this->m_waypoints, this->m_logger));
     
     
     return (bSuccess);
