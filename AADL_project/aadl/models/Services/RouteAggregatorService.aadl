@@ -91,7 +91,7 @@ thread RouteAggregatorService
 		-- Q (Philosophical): Should component contracts include only what we need for architectural level reasoning,
 		--  or should the contracts be sufficiently detailed so that any component satisfying the contract will
 		--  result in a correctly functioning system? Or would one argue that these are in fact the same?
-		-- John: In general, component contract should have at least enough info to prove system-level reqts.
+		-- John: In general, a component contract should have at least enough info to prove system-level reqts.
 		-- 	Component reqts need to trace to some system reqt.
 		-- Ben: But sometimes we build components out of context. Maybe some are identified for "plug-and-play." Those may
 		--  be over-designed.
