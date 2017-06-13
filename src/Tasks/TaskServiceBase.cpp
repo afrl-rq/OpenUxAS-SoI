@@ -794,8 +794,20 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                             }
                             else //if (itEntityConfiguration != m_idVsEntityConfiguration.end())
                             {
+                                // Assignment algorithm selected an invalid vehicle/option combination.
+                                // This should never happen; fallback, send empty task implementation response
                                 CERR_FILE_LINE_MSG("ERROR::c_Task_Base::isProcessedMessageBase: for TaskId[" << m_task->getTaskID()
                                                    << "] there is not an EntityConfiguration for EntityId[" << vehicleId << "].")
+
+                                // send out the blank response
+                                auto taskImplementationResponse = std::make_shared<uxas::messages::task::TaskImplementationResponse>();
+                                taskImplementationResponse->setResponseID(itTaskImplementationRequest->second->getRequestID());
+                                taskImplementationResponse->setTaskID(m_task->getTaskID());
+                                taskImplementationResponse->setOptionID(optionId);
+                                taskImplementationResponse->setVehicleID(vehicleId);
+                                taskImplementationResponse->setFinalLocation(itTaskImplementationRequest->second->getStartPosition()->clone());
+                                taskImplementationResponse->setFinalHeading(itTaskImplementationRequest->second->getStartHeading());
+                                sendSharedLmcpObjectBroadcastMessage(taskImplementationResponse);
                             } //if (itEntityConfiguration != m_idVsEntityConfiguration.end())
                         } //if(itTaskOptionClass->second->m_pendingRouteIds.empty())
                     } //if(itTaskOptionClass->second->m_pendingRouteIds.find(routePlan->getRouteID()) != itTaskOptionClass->second->m_pendingRouteIds.end())
