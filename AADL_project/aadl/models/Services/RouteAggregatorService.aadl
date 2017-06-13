@@ -32,7 +32,7 @@ thread RouteAggregatorService
 			0 -> 
 				(pre(num_route_requests_being_serviced) 
 					+ UxAS_Node_Lib.bool_to_num(event(RouteRequest_in)) 
-					- UxAS_Node_Lib.bool_to_num(event(RoutePlanRequest_out))
+					- UxAS_Node_Lib.bool_to_num(event(RouteResponse_out))
 				);
 				
 		-------------------------------------------------------------
@@ -77,17 +77,27 @@ thread RouteAggregatorService
 
 		-------------------------------------------------------------
 		--Other guarantees for correct behavior
-		guarantee "Only produce output when in PENDING": event(RoutePlanRequest_out) => (state = PENDING);
+		guarantee "Only produce output when in PENDING": event(RouteResponse_out) => (state = PENDING);
 			
 		-------------------------------------------------------------
+		-- Below is some Q&A. Discussion held 6/13/17. 
 		
-		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state...
+		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state... 
 		-- We probably want our guarantees to say things like the outputs have an ID that matches some prior input ID or something like that.
+		-- John: Modeling the state makes sense if we have a system-level guarantee that references it.
+		-- Ben: Higher level req may be if all reponses are received, response is sent out.
+		-- John: We could try to figure out our system-level reqts first and model the Wiki more coarsely.
 		
 		-- Q (Philosophical): Should component contracts include only what we need for architectural level reasoning,
 		--  or should the contracts be sufficiently detailed so that any component satisfying the contract will
 		--  result in a correctly functioning system? Or would one argue that these are in fact the same?
-		--  
+		-- John: In general, component contract should have at least enough info to prove system-level reqts.
+		-- 	Component reqts need to trace to some system reqt.
+		-- Ben: But sometimes we build components out of context. Maybe some are identified for "plug-and-play." Those may
+		--  be over-designed.
+		-- Aaron: Contracts should ensure that a replacement component gives us the same functionality that we had 
+		--  previously. 
+		 
 		--  Currently, my contracts on this component are not nearly sufficient to ensure correctness. The output
 		--  messages could be jibberish. Even if I require the response ID to match the request ID, the
 		--  rest of the information could be garbage.
