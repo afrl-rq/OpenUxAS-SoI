@@ -17,13 +17,25 @@
 
 
 #include "Waypoint2Sel4Service.h"
+#include "avtas/lmcp/ByteBuffer.h"
+#include "avtas/lmcp/Factory.h"
 #include "afrl/cmasi/AutomationResponse.h"
+#include "afrl/cmasi/MissionCommand.h"
+
+//includes for writing to sel4
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "pugixml.hpp"
 
 #include <iostream>
 
-#define STRING_XML_TYPE "Type"
 #define STRING_XML_VEHICLE_ID "VehicleID"
 
 #define COUT_INFO(MESSAGE) std::cout << "<>Waypoint2Sel4Service:: " << MESSAGE << std::endl;std::cout.flush();
@@ -46,16 +58,7 @@ Waypoint2Sel4Service::~Waypoint2Sel4Service() { };
 bool
 Waypoint2Sel4Service::configure(const pugi::xml_node& ndComponent)
 {
-    std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
-    std::stringstream sstrErrors;
-
-    bool bSucceeded(true);
-
     m_vehicleID = m_entityId; // can be overridden below
-
-    std::string strComponentType = ndComponent.attribute(STRING_XML_TYPE).value();
 
     if (!ndComponent.attribute(STRING_XML_VEHICLE_ID).empty())
     {
@@ -64,7 +67,7 @@ Waypoint2Sel4Service::configure(const pugi::xml_node& ndComponent)
 
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription); 
-    return (bSucceeded);
+    return true;
 }
 
 bool Waypoint2Sel4Service::initialize()
@@ -85,30 +88,66 @@ bool Waypoint2Sel4Service::terminate()
     return true;
 }
 
+void Waypoint2Sel4Service::write2Sel4(afrl::cmasi::MissionCommand * mission){
+    uint32_t i;
+    uint8_t * pArray;
+
+    COUT_INFO("in write2Sel4\n");
+
+    if (mission->getVehicleID() == m_vehicleID)
+    {
+        mission->getVehicleActionList().clear();
+        auto waypointList = mission->getWaypointList();
+        for(auto waypoint : waypointList){
+            waypoint->getVehicleActionList().clear();
+            waypoint->getAssociatedTasks().clear();
+        }
+        avtas::lmcp::ByteBuffer* buf = avtas::lmcp::Factory::packMessage(mission, true);
+        #if 1 == 1
+        int fd = open("/dev/mem", O_RDWR | O_SYNC);
+        uint8_t * mem = (uint8_t *)mmap(0, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0xE0000000);
+
+	COUT_INFO(mission->toString());
+        COUT_INFO("Capacity: ");
+        COUT_INFO(buf->capacity());
+	pArray = buf->array();
+	for(i = 0; i < buf->capacity(); i++){
+            *mem = *(pArray++);
+	}
+//        buf->rewind();
+//        while(buf->hasRemaining()){
+//            *mem = buf->get();
+//        }
+
+        close(fd);
+        #else
+        FILE * f = fopen("/tmp/missioncommands", "wb");
+        fwrite(buf->array(),1,buf->capacity(),f);
+        fclose(f);
+        #endif
+        delete buf;
+    }
+}
 
 bool
 Waypoint2Sel4Service::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
 
-    COUT_INFO("Got message\n");
-    if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object.get()))
+    COUT_INFO("Got message!\n");
+    if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object))
     {
         auto automationResponse = std::static_pointer_cast<afrl::cmasi::AutomationResponse> (receivedLmcpMessage->m_object);
         for (auto mission : automationResponse->getMissionCommandList())
         {
-            if (mission->getVehicleID() == m_vehicleID)
-            {
-                //TODO write the message
-            }
+	    COUT_INFO("Writing message!\n");
+            write2Sel4(mission);
         }
     }
-    else if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
+    else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
     {
-        if (static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->getVehicleID() == m_vehicleID)
-        {
-            //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
-            std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
-        }
+        auto mission = std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object);
+	COUT_INFO("Writing message!\n");
+        write2Sel4(mission.get());
     }
     return (false); // always false implies never terminating service from here
 }
