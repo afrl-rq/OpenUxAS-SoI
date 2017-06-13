@@ -3,13 +3,14 @@
 
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
     <!-- on Linux, type 'ifconfig' to find interface name -->
-    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="en0">
+    <!-- on Windows, type 'netsh interface show interface' to find interface name -->
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="wlan0">
         <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
         <SubscribeToExternalMessage MessageType="uxas.messages.task.AssignmentCoordination"/>
     </Bridge>
 
     <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9900" Server="FALSE" ConsiderSelfGenerated="TRUE">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9900" Server="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.impact.ImpactLineSearchTask" />
@@ -38,6 +39,7 @@
 
         <Message MessageFileName="AirVehicleConfiguration_V1000.xml" SendTime_ms="50"/>
         <Message MessageFileName="AirVehicleConfiguration_V2000.xml" SendTime_ms="60"/>
+        <Message MessageFileName="AirVehicleConfiguration_V3000.xml" SendTime_ms="70"/>
 
         <!-- boundaries -->
         <Message MessageFileName="KeepOutZone_10.xml" SendTime_ms="200"/>
