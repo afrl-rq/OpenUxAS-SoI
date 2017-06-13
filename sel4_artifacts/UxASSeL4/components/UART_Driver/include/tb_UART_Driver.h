@@ -42,10 +42,10 @@ client for the thread implementations.
  **************************************************************************/
 
 
-bool tb_self2decrypt_enqueue(const SMACCM_DATA__UART_Packet_i * tb_self2decrypt);
- // reader prototype for tb_encrypt2self
-bool tb_encrypt2self_dequeue(SMACCM_DATA__UART_Packet_i * tb_encrypt2self);
- bool tb_self2encrypt_enqueue(const bool * tb_self2encrypt);
+bool tb_out_uart_packet_enqueue(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet);
+ // reader prototype for tb_in_uart_packet
+bool tb_in_uart_packet_dequeue(SMACCM_DATA__UART_Packet_i * tb_in_uart_packet);
+ bool tb_out_send_success_enqueue(const bool * tb_out_send_success);
  
 
 //////////////////////////////////////////////////////////////////////////

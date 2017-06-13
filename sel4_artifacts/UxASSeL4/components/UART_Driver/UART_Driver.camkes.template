@@ -37,7 +37,7 @@ AADL thread implementation UART_Driver.
  **************************************************************************/
 
 import <Timer.idl4>;
-import <tb_Monitor_SMACCM_DATA__UART_Packet_i_100.idl4>;
+import <tb_Monitor_SMACCM_DATA__UART_Packet_i_1.idl4>;
 
 import <tb_Monitor_SMACCM_DATA__UART_Packet_i_1.idl4>;
 
@@ -50,9 +50,9 @@ import <clkcar.idl4>;
 import <gen_fwd.idl4>;
 
 
-import <bool_writer.idl4>;
-
 import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
+
+import <bool_writer.idl4>;
 
 
 
@@ -61,11 +61,11 @@ component UART_Driver {
     control;
     has semaphore tb_dispatch_sem;
 
-    uses tb_Monitor_SMACCM_DATA__UART_Packet_i_100 tb_self2decrypt0;
+    uses tb_Monitor_SMACCM_DATA__UART_Packet_i_1 tb_out_uart_packet0;
 
-    uses tb_Monitor_SMACCM_DATA__UART_Packet_i_1 tb_encrypt2self;
-    consumes QueuedData tb_encrypt2self_notification;
-    uses tb_Monitor_bool_1 tb_self2encrypt0;
+    uses tb_Monitor_SMACCM_DATA__UART_Packet_i_1 tb_in_uart_packet;
+    consumes QueuedData tb_in_uart_packet_notification;
+    uses tb_Monitor_bool_1 tb_out_send_success0;
 
 
 

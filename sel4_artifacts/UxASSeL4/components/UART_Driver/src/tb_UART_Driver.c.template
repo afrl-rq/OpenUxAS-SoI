@@ -57,7 +57,7 @@ interface and so contention may occur.
 #include <camkes.h>
 
 /************************************************************************
- *  tb_self2decrypt_enqueue:
+ *  tb_out_uart_packet_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
@@ -69,16 +69,16 @@ interface and so contention may occur.
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_self2decrypt_enqueue
-(const SMACCM_DATA__UART_Packet_i * tb_self2decrypt) {
+bool tb_out_uart_packet_enqueue
+(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet) {
     bool tb_result = true ; 
 
-    tb_result &= tb_self2decrypt0_enqueue((SMACCM_DATA__UART_Packet_i *)tb_self2decrypt);
+    tb_result &= tb_out_uart_packet0_enqueue((SMACCM_DATA__UART_Packet_i *)tb_out_uart_packet);
 
     return tb_result;
 }
 /************************************************************************
- *  tb_self2encrypt_enqueue:
+ *  tb_out_send_success_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
@@ -90,11 +90,11 @@ bool tb_self2decrypt_enqueue
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_self2encrypt_enqueue
-(const bool * tb_self2encrypt) {
+bool tb_out_send_success_enqueue
+(const bool * tb_out_send_success) {
     bool tb_result = true ; 
 
-    tb_result &= tb_self2encrypt0_enqueue((bool *)tb_self2encrypt);
+    tb_result &= tb_out_send_success0_enqueue((bool *)tb_out_send_success);
 
     return tb_result;
 }
@@ -103,19 +103,19 @@ bool tb_self2encrypt_enqueue
 
 void pre_init(void) {
 
-    // Pre-initialization statements for tb_encrypt2self
+    // Pre-initialization statements for tb_in_uart_packet
 
 }
 
 /************************************************************************
- *  tb_entrypoint_tb_UART_Driver_encrypt2self:
+ *  tb_entrypoint_tb_UART_Driver_in_uart_packet:
  *
  * This is the function invoked by an active thread dispatcher to
  * call to a user-defined entrypoint function.  It sets up the dispatch
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_UART_Driver_encrypt2self(const SMACCM_DATA__UART_Packet_i * in_arg) {
+void tb_entrypoint_tb_UART_Driver_in_uart_packet(const SMACCM_DATA__UART_Packet_i * in_arg) {
 }
 
 
