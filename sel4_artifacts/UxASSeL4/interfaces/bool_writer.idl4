@@ -39,7 +39,7 @@ for type name bool_writer.
 
 
 procedure bool_writer {
-    include <tb_smaccmpilot_tk1_types.h>;
+    include <tb_soi_tk1_types.h>;
 
     bool write_bool(refin bool arg);
 }

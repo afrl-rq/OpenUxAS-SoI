@@ -62,12 +62,12 @@
 #
 ############################################################################
 TARGETS := $(notdir ${SOURCE_DIR}).cdl
-ADL := smaccmpilot_tk1_assembly.camkes
+ADL := soi_tk1_assembly.camkes
 
 # For time server: subdirectory containing extra templates.
 TEMPLATES := templates global-templates
 
-VM_CONFIG := smaccmpilot_tk1
+VM_CONFIG := soi_tk1
 VM_NUM_VM := 0
 
 include SerialServer/SerialServer.mk

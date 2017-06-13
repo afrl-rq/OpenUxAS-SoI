@@ -37,7 +37,7 @@
 
 procedure tb_Monitor_bool_1 {
   include <stdbool.h>;
-  include <tb_smaccmpilot_tk1_types.h>;
+  include <tb_soi_tk1_types.h>;
   bool enqueue(refin bool m);
   bool dequeue(out bool m);
 };

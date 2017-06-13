@@ -37,7 +37,7 @@
 
 procedure tb_Monitor_SMACCM_DATA__UART_Packet_i_1 {
   include <stdbool.h>;
-  include <tb_smaccmpilot_tk1_types.h>;
+  include <tb_soi_tk1_types.h>;
   bool enqueue(refin SMACCM_DATA__UART_Packet_i m);
   bool dequeue(out SMACCM_DATA__UART_Packet_i m);
 };

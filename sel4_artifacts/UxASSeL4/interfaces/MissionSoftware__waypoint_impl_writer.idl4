@@ -39,7 +39,7 @@ for type name MissionSoftware__waypoint_impl_writer.
 
 
 procedure MissionSoftware__waypoint_impl_writer {
-    include <tb_smaccmpilot_tk1_types.h>;
+    include <tb_soi_tk1_types.h>;
 
     bool write_MissionSoftware__waypoint_impl(refin MissionSoftware__waypoint_impl arg);
 }

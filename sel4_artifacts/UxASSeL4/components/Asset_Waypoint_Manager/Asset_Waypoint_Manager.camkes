@@ -50,7 +50,7 @@ import <MissionSoftware__waypoint_impl_writer.idl4>;
 
 
 component Asset_Waypoint_Manager {
-    include <tb_smaccmpilot_tk1_types.h>;
+    include <tb_soi_tk1_types.h>;
     control;
     has semaphore tb_dispatch_sem;
 

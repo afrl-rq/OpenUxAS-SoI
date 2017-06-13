@@ -49,7 +49,7 @@
 #ifndef TB_VERIFY
 #include <stdio.h>
 #endif // TB_VERIFY
-#include "../../../../include/tb_smaccmpilot_tk1_types.h"
+#include "../../../../include/tb_soi_tk1_types.h"
 #include "../include/tb_Asset_Waypoint_Manager_in_uart_packet_Monitor.h"
 
 int mon_get_sender_id(void);
@@ -69,9 +69,9 @@ static bool is_empty(void) {
 bool mon_dequeue(SMACCM_DATA__UART_Packet_i * m) {
   if (mon_get_sender_id() != TB_MONITOR_READ_ACCESS) {
     #ifndef TB_VERIFY
-    #ifdef CONFIG_APP_SMACCMPILOT_TK1_TB_DEBUG
+    #ifdef CONFIG_APP_SOI_TK1_TB_DEBUG
     fprintf(stderr, "Monitor tb_Asset_Waypoint_Manager_in_uart_packet: attempt to dequeue without permission\n");
-    #endif // CONFIG_APP_SMACCMPILOT_TK1_TB_DEBUG
+    #endif // CONFIG_APP_SOI_TK1_TB_DEBUG
     #endif // TB_VERIFY
     return false;
   } else if (is_empty()) {
@@ -87,13 +87,13 @@ bool mon_dequeue(SMACCM_DATA__UART_Packet_i * m) {
 bool mon_enqueue(const SMACCM_DATA__UART_Packet_i * m) {
   if (mon_get_sender_id() != TB_MONITOR_WRITE_ACCESS) {
     #ifndef TB_VERIFY
-    #ifdef CONFIG_APP_SMACCMPILOT_TK1_TB_DEBUG
+    #ifdef CONFIG_APP_SOI_TK1_TB_DEBUG
     fprintf(stderr, "Monitor tb_Asset_Waypoint_Manager_in_uart_packet: attempt to enqueue without permission\n");
-    #endif // CONFIG_APP_SMACCMPILOT_TK1_TB_DEBUG
+    #endif // CONFIG_APP_SOI_TK1_TB_DEBUG
     #endif // TB_VERIFY
     return false;
   } else if (is_full()) {
-    #ifdef CONFIG_APP_SMACCMPILOT_TK1_TB_DEBUG
+    #ifdef CONFIG_APP_SOI_TK1_TB_DEBUG
     fprintf(stderr,"Monitor tb_Asset_Waypoint_Manager_in_uart_packet is full!\n");
     #endif 
     return false;

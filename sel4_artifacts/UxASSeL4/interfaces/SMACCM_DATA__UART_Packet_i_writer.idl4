@@ -39,7 +39,7 @@ for type name SMACCM_DATA__UART_Packet_i_writer.
 
 
 procedure SMACCM_DATA__UART_Packet_i_writer {
-    include <tb_smaccmpilot_tk1_types.h>;
+    include <tb_soi_tk1_types.h>;
 
     bool write_SMACCM_DATA__UART_Packet_i(refin SMACCM_DATA__UART_Packet_i arg);
 }

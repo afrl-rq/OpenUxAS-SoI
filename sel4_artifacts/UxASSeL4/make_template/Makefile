@@ -14,7 +14,7 @@
 #
 ############################################################################
 TARGETS := $(notdir ${SOURCE_DIR}).cdl
-ADL := smaccmpilot_tk1_assembly.camkes
+ADL := soi_tk1_assembly.camkes
 
 # For time server: subdirectory containing extra templates.
 TEMPLATES := ../../projects/templates ../../projects/global-components/templates

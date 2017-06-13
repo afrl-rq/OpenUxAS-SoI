@@ -1,6 +1,6 @@
-config APP_SMACCMPILOT_TK1
-    bool "smaccmpilot_tk1 (from AADL)"
+config APP_SOI_TK1
+    bool "soi_tk1 (from AADL)"
     default n
     depends on LIB_SEL4 && (LIB_MUSL_C || LIB_SEL4_C) && LIB_SEL4_VKA && LIB_SEL4_VMM && LIB_SEL4_UTILS && LIB_UTILS && LIB_SEL4_SIMPLE && LIB_SEL4_SIMPLE_DEFAULT && LIB_SEL4_PLAT_SUPPORT && LIB_LWIP
     help
-        smaccmpilot_tk1 (from AADL).
+        soi_tk1 (from AADL).

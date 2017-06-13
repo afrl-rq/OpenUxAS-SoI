@@ -1,7 +1,7 @@
 #ifndef __TB_AADL_Clock_Driver_types__H
 #define __TB_AADL_Clock_Driver_types__H
 
-#include <tb_smaccmpilot_tk1_types.h>
+#include <tb_soi_tk1_types.h>
 
 /**************************************************************************
   Copyright (c) 2013-2016 Rockwell Collins and the University of

@@ -50,14 +50,14 @@ import <bool_writer.idl4>;
 
 import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
 
-import <MissionSoftware__mission_impl_writer.idl4>;
-
 import <MissionSoftware__waypoint_impl_writer.idl4>;
+
+import <MissionSoftware__mission_impl_writer.idl4>;
 
 
 
 component Waypoint_Manager {
-    include <tb_smaccmpilot_tk1_types.h>;
+    include <tb_soi_tk1_types.h>;
     control;
     has semaphore tb_dispatch_sem;
 

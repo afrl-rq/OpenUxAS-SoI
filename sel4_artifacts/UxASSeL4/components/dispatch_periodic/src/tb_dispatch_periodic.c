@@ -36,7 +36,7 @@ This .c file contains the CAmkES periodic dispatcher component definition.
 
  **************************************************************************/
 #include <string.h>
-#include <tb_smaccmpilot_tk1_types.h>
+#include <tb_soi_tk1_types.h>
 #include <camkes.h>
 
 
