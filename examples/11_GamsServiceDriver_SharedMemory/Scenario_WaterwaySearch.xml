@@ -91,7 +91,7 @@
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
         <MaximumSpeed>33.4388885498047</MaximumSpeed>
         <NominalSpeed>22.0</NominalSpeed>
-        <NominalAltitude>1000.0</NominalAltitude>
+        <NominalAltitude>700.0</NominalAltitude>
         <NominalAltitudeType>MSL</NominalAltitudeType>
 
         <NominalFlightProfile>
@@ -216,7 +216,7 @@
         <ID>500</ID>
          <Location>
          <Location3D Series="CMASI">
-          <Altitude>1000</Altitude><AltitudeType>MSL</AltitudeType>           
+          <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
           <Latitude>45.3133</Latitude>
           <Longitude>-120.9402</Longitude>
          </Location3D>
@@ -329,7 +329,7 @@
               <Airspeed>22.1211109161377</Airspeed>
               <Location>
                <Location3D Series="CMASI">
-                <Altitude>1000</Altitude><AltitudeType>MSL</AltitudeType>           
+                <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
                 <Latitude>45.3133</Latitude>
                 <Longitude>-120.9402</Longitude>
                </Location3D>
@@ -341,7 +341,7 @@
            <ContingencyWaypoint>0</ContingencyWaypoint>
            <AssociatedTasks>
            </AssociatedTasks>
-          <Altitude>1000</Altitude><AltitudeType>MSL</AltitudeType>           
+          <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
           <Latitude>45.3133</Latitude>
           <Longitude>-120.9402</Longitude>
          </Waypoint>
