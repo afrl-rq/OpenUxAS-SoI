@@ -28,11 +28,11 @@
         <Knowledge KarlFile="" BinaryFile="" />
         <Logging>
             <Madara File="GamsService.log" Level="1"/>
-            <Gams File="GamsService.log" Level="3" />
+            <Gams File="GamsService.log" Level="4" />
         </Logging>
         <GamsController AgentPrefix="agent.3"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
-            GamsLogLevel="3" MadaraLogLevel="1"
+            GamsLogLevel="4" MadaraLogLevel="1"
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
         <Agents>
           <Agent Prefix="agent.0" EntityId="100"/>
@@ -57,8 +57,8 @@
         <Knowledge KarlFile="../karl/helloworld.karl" BinaryFile="" Type="local"/>
         <Knowledge KarlFile="../karl/enemytrack.karl" BinaryFile="" />
         <Waypoint Latitude="45.326664" Longitude="-120.980900" Altitude="700.000000" />
-        <Waypoint Latitude="45.326674" Longitude="-120.981000" Altitude="700.000000" />
         <Waypoint Latitude="45.316684" Longitude="-120.991100" Altitude="700.000000" />
+        <Waypoint Latitude="45.346664" Longitude="-120.970900" Altitude="700.000000" />
         <Waypoint Latitude="45.316694" Longitude="-120.991200" Altitude="700.000000" />
     </Service>
    

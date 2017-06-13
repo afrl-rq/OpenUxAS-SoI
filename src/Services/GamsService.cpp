@@ -358,10 +358,22 @@ namespace service
         
         if (location.approximately_equal(current, epsilon))
         {
+            gams::loggers::global_logger->log(gams::loggers::LOG_MAJOR,
+              "UxASGamsPlatform::move: [%.4f, %.4f, %.4f] ~= [%.4f, %.4f, %.4f]"
+              " with %.2f m accuracy. Arrived at location.\n",
+              location.lat(), location.lng(), location.alt(), 
+              current.lat(), current.lng(), current.alt(), epsilon);
+
             return platforms::PLATFORM_ARRIVED;
         }
         else
         {
+            gams::loggers::global_logger->log(gams::loggers::LOG_MAJOR,
+              "UxASGamsPlatform::move: [%.4f, %.4f, %.4f] != [%.4f, %.4f, %.4f]"
+              " with %.2f m accuracy. Still moving to location.\n",
+              location.lat(), location.lng(), location.alt(), 
+              current.lat(), current.lng(), current.alt(), epsilon);
+
             m_service->sendWaypoint(location);
             return platforms::PLATFORM_MOVING;
         }
@@ -556,6 +568,20 @@ gams::pose::ReferenceFrame & GamsService::frame (void)
     return UxASGamsPlatform::gps_frame;
 }
 
+double GamsService::get_accuracy (void)
+{
+    knowledge::ContextGuard guard (gamsServiceMutex);
+    
+    double accuracy = 70.0;
+    
+    if (gamsServicePlatform)
+    {
+        accuracy = gamsServicePlatform->get_accuracy();
+    }
+    
+    return accuracy;
+}
+
 int GamsService::move (const gams::pose::Position & location,
       double epsilon)
 {
@@ -566,6 +592,11 @@ int GamsService::move (const gams::pose::Position & location,
     
     if (gamsServicePlatform)
     {
+        gams::loggers::global_logger->log(gams::loggers::LOG_MAJOR,
+          "GamsService::move: moving to [%.4f, %.4f, %.4f]"
+          " with %.2f m accuracy\n",
+          location.lat(), location.lng(), location.alt(), epsilon);
+    
         result = gamsServicePlatform->move (location, epsilon);
     }
     

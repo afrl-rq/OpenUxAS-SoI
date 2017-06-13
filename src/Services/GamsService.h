@@ -129,7 +129,13 @@ public:
      *         @see gams::platforms::PlatformReturnValues
      **/
     static int move (const gams::pose::Position & location,
-      double epsilon = 1.0);
+      double epsilon = get_accuracy ());
+    
+    /**
+     * Returns the accuracy of the underlying platform
+     * @return the accuracy of the platform in meters
+     **/
+    static double get_accuracy (void);
     
     /**
      * Returns the reference frame of the UxAS platform. Use this when
