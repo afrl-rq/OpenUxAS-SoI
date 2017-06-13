@@ -386,7 +386,7 @@ void RoutePlannerService::BuildVehicleSpecificRegion(std::shared_ptr<afrl::cmasi
     //      check orientation and reverse if needed
     //      enforce standard form
     //      insert to list
-    VisiLibity::Bounding_Box zoneBox;
+    VisiLibity::Bounding_Box zoneBox = { };
     bool boxInitialized = false;
     bool validKeepInZone = false;
 
@@ -710,7 +710,7 @@ RoutePlannerService::HandleRoutePlanRequestMsg(std::shared_ptr<uxas::messages::r
     VisiLibity::Point vehiclePt;
     double speed = -1.0;
     double alt = 0.0;
-    afrl::cmasi::AltitudeType::AltitudeType altType;
+    afrl::cmasi::AltitudeType::AltitudeType altType = afrl::cmasi::AltitudeType::MSL;
 
     int64_t regionId = request->getOperatingRegion();
     int64_t vehicleId = request->getVehicleID();

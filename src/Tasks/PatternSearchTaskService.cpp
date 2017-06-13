@@ -66,8 +66,6 @@ PatternSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -248,8 +246,6 @@ PatternSearchTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::
 
 void PatternSearchTaskService::buildTaskPlanOptions()
 {
-    bool isSuccessful{true};
-
     // construct a task option for each vehicle
     // note:: use only one vehicle per option
 
@@ -336,7 +332,6 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute(std::shared_ptr<TaskO
                                                            std::shared_ptr<uxas::messages::route::RoutePlanRequest>& routePlanRequest)
 {
     bool isSuccess(true);
-    auto localsearchAxisHeading_rad = 0.0;
 
     if (m_patternSearchTask->getPattern() == afrl::impact::AreaSearchPattern::Spiral)
     {
@@ -388,8 +383,6 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_pt
             radius_m = 0.5 * pTaskOptionClass->m_laneSpacing_m * (1.0 + theta_rad / n_Const::c_Convert::dPi());
             double north_m = (radius_m * sin(theta_rad - startHeading_rad)) + northStart_m;
             double east_m = (radius_m * cos(theta_rad - startHeading_rad)) + eastStart_m;
-            double latitude_deg(0.0);
-            double longitude_deg(0.0);
             if (firstPass)
             {
                 // add a starting point that puts the leading edge of the sensor on the start of the spiral

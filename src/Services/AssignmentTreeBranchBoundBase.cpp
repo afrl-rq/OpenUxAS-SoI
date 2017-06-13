@@ -240,17 +240,17 @@ bool AssignmentTreeBranchBoundBase::AssigmentPrerequisites::isAssignmentReady(co
                 }
                 else
                 {
-                    bool hasFeasibleEntity{false};
+                    //bool hasFeasibleEntity{false};
                     for (auto& option : m_taskIdVsTaskPlanOptions[*itTaskId]->getOptions())
                     {
                         if (option->getEligibleEntities().empty())
                         {
                             UXAS_LOG_WARN(s_typeName(), "isAssignmentReady:: TaskId[", *itTaskId, "], Option[", option->getOptionID() , "] has no eligible entities");
                         }
-                        else
+                        /*else
                         {
                             hasFeasibleEntity = true;
-                        }
+                        }*/
                     }
                     // TODO: check 'hasFeasibleEntity', if false, then no option has a feasible entity and task cannot be completed.
                     //       Should immediately should return an error reporting that *itTaskId cannot be accomplished as there are
@@ -729,7 +729,7 @@ void c_Node_Base::printStatus(const std::string& Message)
                   << "] numberNodesPruned[" << m_staticAssignmentParameters->m_numberNodesPruned
 
                   << "]" << std::endl)
-            UXAS_LOG_INFORM_ASSIGNMENT("timeSinceStart_s[", timeSinceStart_s,
+    UXAS_LOG_INFORM_ASSIGNMENT("timeSinceStart_s[", timeSinceStart_s,
                                   "] cost[", m_staticAssignmentParameters->m_minimumAssignmentCostCandidate,
                                   "] numberNodesVisited[", m_staticAssignmentParameters->m_numberNodesVisited, "]");
 }
@@ -739,7 +739,7 @@ void c_Node_Base::ExpandNode()
     //////////////////////////////////////////////////////////////////////////////////
     // check assignment viability and find lower bound on costs of child nodes
     //////////////////////////////////////////////////////////////////////////////////
-    bool bVehicleAvailable = false; //if all of the vehicles are dead then this is the final assignment node
+    //bool bVehicleAvailable = false; //if all of the vehicles are dead then this is the final assignment node
     bool bTaskAvailable = false; //if there are no tasks to do then this is the final assignment node
 
     // investigate child nodes
@@ -757,14 +757,18 @@ void c_Node_Base::ExpandNode()
         for (auto itVehicleAssignmentState = m_vehicleIdVsAssignmentState.begin(); itVehicleAssignmentState != m_vehicleIdVsAssignmentState.end(); itVehicleAssignmentState++)
         {
             NodeAssignment(itVehicleAssignmentState->second, *itObjectiveID, prerequisiteTaskOptionId);
-            if (itVehicleAssignmentState->second->m_isAcceptingNewAssignments)
+            /*if (itVehicleAssignmentState->second->m_isAcceptingNewAssignments)
             {
                 bVehicleAvailable = true;
             }
             else
             {
                 COUT_INFO_MSG("Vehicle ID[" << itVehicleAssignmentState->first << "] is finished!")
-            }
+            }*/
+            if (!itVehicleAssignmentState->second->m_isAcceptingNewAssignments)
+			{
+				COUT_INFO_MSG("Vehicle ID[" << itVehicleAssignmentState->first << "] is finished!")
+			}
         }
     } //for(V_INT_IT_t itObjectiveID = vectorOfNextObjectiveIDs.begin(); itObjectiveID != vectorOfNextObjectiveIDs.end(); itObjectiveID++)
 
@@ -931,7 +935,7 @@ void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehi
         }
         else
         {
-            UXAS_LOG_ERROR("ASSIGNMENT_ERROR:: required prerequisite TaskOptionId[", prerequisiteTaskOptionId, "] not found");
+	UXAS_LOG_ERROR("ASSIGNMENT_ERROR:: required prerequisite TaskOptionId[", prerequisiteTaskOptionId, "] not found");
             m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_ERROR:: required prerequisite TaskOptionId[" << prerequisiteTaskOptionId << "] not found!" << std::endl;
             isError = true;
         }

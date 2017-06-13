@@ -189,10 +189,10 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
         std::string payload = wholeStr.substr(aftPayloadSz + getSerialSentinelAfterPayloadSizeSize(), befChecksum - aftPayloadSz - getSerialSentinelAfterPayloadSizeSize());
         UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::getNextPayloadString payload=", payload);
 
-        if (payload.size() == std::stoi(payloadSzStr))
+        if (static_cast<int>(payload.size()) == std::stoi(payloadSzStr))
         {
             uint32_t calcChksum = calculateChecksum(payload);
-            if (calcChksum == std::stoi(chksumStr))
+            if (static_cast<int>(calcChksum) == std::stoi(chksumStr))
             {
                 m_validDeserializeCount++;
                 UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_validDeserializeCount=", m_validDeserializeCount);

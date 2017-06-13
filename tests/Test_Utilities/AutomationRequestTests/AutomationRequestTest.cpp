@@ -276,11 +276,11 @@ TEST(AutomationRequestTest, Test04_EntityEligibility)
 
     std::vector< std::shared_ptr<avtas::lmcp::Object> > msgs;
     ReportMessagesInLogDb(savedMessagesPath, "afrl.cmasi.AutomationResponse", msgs);
-    ASSERT_EQ(1, msgs.size());
+    ASSERT_EQ(1u, msgs.size());
     ASSERT_TRUE(afrl::cmasi::isAutomationResponse(msgs.at(0)));
 
     auto response = std::static_pointer_cast<afrl::cmasi::AutomationResponse>(msgs.at(0));
-    ASSERT_EQ(2, response->getMissionCommandList().size());
+    ASSERT_EQ(2u, response->getMissionCommandList().size());
     ASSERT_TRUE( afrl::cmasi::isMissionCommand(response->getMissionCommandList().at(0)) );
     ASSERT_TRUE( afrl::cmasi::isMissionCommand(response->getMissionCommandList().at(1)) );
 
@@ -293,8 +293,8 @@ TEST(AutomationRequestTest, Test04_EntityEligibility)
     EXPECT_EQ(1000, mish1000->getVehicleID());
     EXPECT_EQ(2000, mish2000->getVehicleID());
 
-    EXPECT_GT(mish1000->getWaypointList().size(), 0);
-    EXPECT_GT(mish2000->getWaypointList().size(), 0);
+    EXPECT_GT(mish1000->getWaypointList().size(), 0u);
+    EXPECT_GT(mish2000->getWaypointList().size(), 0u);
 
     // follow waypoints in order for vehicle 1000 starting from 'FirstWaypoint'
     // ensure that 'AssociatedTasks' include Task 12 and 11 in that order

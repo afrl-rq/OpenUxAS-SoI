@@ -66,8 +66,6 @@ CmasiAreaSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -198,8 +196,6 @@ CmasiAreaSearchTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas
 
 void CmasiAreaSearchTaskService::buildTaskPlanOptions()
 {
-    bool isSuccessful{true};
-
     // construct a task option for each vehicle, for each wedge elevation, and each wedge azimuth
     // note:: use only one vehicle per option
     double wedgeAzimuthIncrement(n_Const::c_Convert::dPiO8());
