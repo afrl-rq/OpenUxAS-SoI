@@ -100,82 +100,140 @@ public
         		--Is this an error? 
         	--What is an error message?
         		
+        	--States
         	const IDLE : int = 0;
         	const BUSY : int = 1;
+       	
+       	-------------------------------------------------------------
+		--State machine support macros
+			eq previous_state: int = prev(state,IDLE);
+			eq some_transition: bool = idle_to_busy
+									or busy_to_idle;
+		-------------------------------------------------------------
+		
+		--****ISSUE: what is a received automation request: what type?****
+		---------------- state transitions ----------------
+        	eq idle_to_busy : bool = false -> 
+        		previous_state = IDLE and 
+        		event(TaskAutomationRequest_in) and  --TODO: check with Derek if this is what is meant by an automation request
+        		taskVehicleOrRegionIsDefined;
         	
+        	eq busy_to_idle : bool = false -> 
+        		previous_state = BUSY and 
+        		dequeue_trigger and
+        		numTasksInQ = 0;
+        ---------------- end state transitions ----------------
+        		
+        	eq dequeue_trigger : bool = false -> 
+        		(event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id) or
+        		timer_threshold_reached or 
+        		received_error_message;
+        		
+        	eq timer_threshold_reached : bool = false -> 
+        		timeout_option and 
+        		timer>=timeout_threshold;
+        		
+        	eq received_error_message : bool = false ->
+        		event(UniqueAutomationResponse_in) and 
+        		uniqueAutomationRequestErrorMessageRecieved;
+        		
         	eq timer : int;
-        	eq timeout_val : int;
+        	eq timeout_threshold : int;
         	eq timeout_option : bool;
         	eq state : int;
-    		
+        	eq cached_unique_automation_request_id : int;
+        	
+        	const SERVICE_TYPE_ERROR_SIGNAL : int = 2;
+        	
+        	eq timer_reset: bool = true-> 
+        		event(UniqueAutomationRequest_out) or 
+        		state=IDLE or 
+        		event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID  = cached_unique_automation_request_id; 
+        	
         	-- a non-deterministic variable used to model whether or not 
         	-- the requested task, vehicle, or operating region has been defined.
         	eq taskVehicleOrRegionIsDefined : bool;
         	
+        	eq uniqueAutomationRequestErrorMessageRecieved : bool; --????
+
         	eq numTasksInQ : int;
         	
+        	guarantee "Self loops": not some_transition => (state = previous_state);
+       			
         	guarantee "Initially the task queue is empty" :
-        		numTasksInQ = 0 -> true;
+        		(numTasksInQ = 0) -> true;
 	
-			guarantee "Implied Spec: Initially, the service is idle" :
-				state = IDLE -> true;
+			guarantee "[Implied: Initially, the service is idle]" :
+				(state = IDLE) -> true;
 				
 			--TODO make error message a new variable. 
         	
         	--TODO: check request resource definition instead of non deterministic boolean? 
         	--TODO: is it worth modeling the local state of what the service maintains? 
         	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
-        		pre(event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined) => 
-        			event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2 and numTasksInQ = pre(numTasksInQ);
+        		event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined => 
+        			event(ServiceStatus_out) and 
+        			ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL and 
+        			numTasksInQ = pre(numTasksInQ);
+        			--TODO: what about the timer? 
         			--TODO: apparently the code sets the status type to "information" rather than "error"
         		
         	--Note: the original wording of this guarantee implies the unique automation request is only sent
         	--out when the system is IDLE. I am manually altering the original "spec" to speak to what I believe
         	--was intended
-        	guarantee "if automation request is received and resource is defined produce unique automation request": true ->
+        	--Note: the wording "immediately" seems to imply it is ok to immediately raise the event instead of using the
+        	--"eventually" idiom. 
+        	guarantee "if automation request is received and resource is defined produce unique automation request.
+        	If in the idle state, this service will immediately publish the UniqueAutomationRequest message and transition to the busy state.": true ->
+				idle_to_busy =>
+				--QUESTION: what is a automation request? above it is listed as a task automation request
+					event(UniqueAutomationRequest_out) and state = BUSY and numTasksInQ = 0 and
+					cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID; --Used for subsequent specs
+			
+			guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
+				 previous_state = BUSY and event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined =>
+				 	numTasksInQ = pre(numTasksInQ) + 1 and state = BUSY;
+				 	
 --        	    pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
 --        	    	state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
-        	    	if pre(state = IDLE) then 
-        	    		event(UniqueAutomationRequest_out) and state = BUSY --and numTasksInQ = 0
-        	    	else --state = BUSY
-        	    	   state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
+--        	    	if pre(state = IDLE) then 
+--        	    		event(UniqueAutomationRequest_out) and state = BUSY --and numTasksInQ = 0
+--        	    	else --state = BUSY
+--        	    	   state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
         	    	   
-        	--Note: forcing an incrementing timer for now
+        	--Note: forcing an incrementing timer (unspecified increment) for now
         	guarantee "Service includes an optional timeout. When a UniqueAutomationRequest is published, a timer begins" : true ->
         		timeout_option => 
-        			if event(UniqueAutomationRequest_out) or 
-        				state=IDLE or 
-        				(event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = pre(UniqueAutomationRequest_out.RequestID)) then
+        			if timer_reset then
         				timer = 0
         			else 
         				timer > pre(0->timer);
         				
-        		
         	--TODO: is this service validating "requests" while queued or only when requests are being actively serviced.
         	
+        	guarantee "If the queue is empty, this service transitions back to the idle state. 
+        	[Implied, that the transition occurs also based on a response, timeout, or error message, i.e., a dequeue trigger]" :
+        		busy_to_idle => 
+        			state = IDLE;
         			
-        	guarantee "Implied Requirement: process next message only if IDLE or a response has been received":
-        		((state= BUSY and event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = pre(UniqueAutomationRequest_out.RequestID)) or
-        		(state=BUSY and timeout_option and timeout_val=timer)) =>
-        			if numTasksInQ > 0 then
+        	guarantee "[Implied Requirement: process next message only if IDLE or a response has been received]":
+        		 previous_state = BUSY and dequeue_trigger and numTasksInQ >0 =>
         			--NOTE: no checking that the event is for the next item in the queue.
         			--TODO: can mimic queue if the ID's are incremented by one, I can force what the message refers to (1 minus current)
-        				event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1
-        			else
-        				state = IDLE;   	
-        	
+        				event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1;
+
         	--TODO: unclear if ths is the error message behavior specified
-        	guarantee "task receives error message behavior" : true ->
-        		pre(event(UniqueAutomationResponse_in)) => 
-        			((event(ServiceStatus_out) and ServiceStatus_out.StatusType = 2) or
-        			(not event(ServiceStatus_out))) and
-        			numTasksInQ = pre(numTasksInQ) - 1;
+        	guarantee "When this service receives either an error message 
+        	(indicating that the UniqueAutomationRequest cannot be fulfilled or 
+        		a corresponding UniqueAutomationResponse), it will publish the same message. " : true ->
+        		received_error_message => 
+        			(event(ServiceStatus_out) and ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL) or
+        			true; --????
         			
         	--Cannot formalize in AGREE (unlesse I create a counter)
         	guarantee "The request ID of unique automation responses are unique" :
         		true;
         		
-	
         	--Not sure if there is a way to model this property in agree
         	guarantee "tasks are fed into 'the system' one at a time" : 
         		true;
