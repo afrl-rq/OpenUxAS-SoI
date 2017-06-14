@@ -31,8 +31,8 @@ thread RouteAggregatorService
 		eq num_route_requests_being_serviced : int = 
 			0 -> 
 				(pre(num_route_requests_being_serviced) 
-					+ UxAS_Node_Lib.bool_to_num(event(RouteRequest_in)) 
-					- UxAS_Node_Lib.bool_to_num(event(RouteResponse_out))
+					+ UxAS_Node_Lib.bool_to_int(event(RouteRequest_in)) 
+					- UxAS_Node_Lib.bool_to_int(event(RouteResponse_out))
 				);
 				
 		-------------------------------------------------------------
