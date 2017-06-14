@@ -30,16 +30,16 @@
             <Madara File="GamsService.log" Level="1"/>
             <Gams File="GamsService.log" Level="4" />
         </Logging>
-        <GamsController AgentPrefix="agent.4"
+        <GamsController AgentPrefix="agent.1"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
             GamsLogLevel="4" MadaraLogLevel="1"
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
         <Agents>
-          <Agent Prefix="agent.0" EntityId="100"/>
-          <Agent Prefix="agent.1" EntityId="200"/>
+          <Agent Prefix="agent.0" EntityId="400"/>
+          <Agent Prefix="agent.1" EntityId="500"/>
           <Agent Prefix="agent.2" EntityId="300"/>
-          <Agent Prefix="agent.3" EntityId="400"/>
-          <Agent Prefix="agent.4" EntityId="500"/>
+          <Agent Prefix="agent.3" EntityId="100"/>
+          <Agent Prefix="agent.4" EntityId="200"/>
         </Agents>
         <Groups>
           <Group Prefix="group.allies">
@@ -63,6 +63,7 @@
     </Service>
    
     <Service Type="CollisionAvoidanceService" >
+      <DART id="1" />
     </Service>
    
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
