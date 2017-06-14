@@ -17,7 +17,7 @@
   <TaskID>20</TaskID>
   <Label>LS20</Label>
   <EligibleEntities>
-    <int64>1000/<int64>
+    <int64>1000</int64>
   </EligibleEntities>
   <RevisitRate>0</RevisitRate>
   <Parameters></Parameters>
