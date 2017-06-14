@@ -973,9 +973,11 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
         int64_t entityId = message->getID();
         std::string agentPrefix = getAgentPrefix (entityId);
 
+#ifdef DART_DEBUG
         ::madara::logger::global_logger->log (0,
             "GamsService: Processing entity(%d), agent(%s)\n",
             (int)entityId, agentPrefix.c_str ());
+#endif
         
         variables::Agent agent;
         if (agentPrefix != "")
@@ -984,10 +986,11 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
 
             if (found != m_agentMap.end ())
             {
+#ifdef DART_DEBUG
                 ::madara::logger::global_logger->log (0,
                     "GamsService: Found entity(%d), agent(%s)\n",
                     (int)entityId, agentPrefix.c_str ());
-        
+#endif
                 agent = found->second;
             }
             else
