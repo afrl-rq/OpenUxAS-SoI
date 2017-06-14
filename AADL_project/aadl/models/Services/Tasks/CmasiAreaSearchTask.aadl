@@ -1,0 +1,24 @@
+package CmasiAreaSearchTask_Package
+public
+    -- Data_types Packages
+    with CMASI;
+    with UXTASK;
+    with ROUTE;
+    with UXNATIVE;
+        
+    -- Included
+    with TaskServiceBase_Package;
+    
+    thread CmasiAreaSearchTask extends TaskServiceBase_Package::TaskServiceBase
+        features
+            SensorFootprintResponse_in: refined to in event data port uxtask::SensorFootprintResponse.i;
+            RouteResponse_in: refined to in event data port route::RouteResponse.i;
+--        RoutePlanRequest_out : out event data port route::RoutePlanRequest.i;
+            VehicleActionCommand_out: refined to out event data port cmasi::VehicleActionCommand.i;
+            VideoRecord_out: out event data port uxnative::VideoRecord.i;
+            SensorFootprintRequests_out: refined to out event data port uxtask::SensorFootprintRequests.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end CmasiAreaSearchTask;
+    
+end CmasiAreaSearchTask_Package;

@@ -1,16 +1,11 @@
 package TaskServiceBase_Package
 public
+    -- Data_types Packages
     with CMASI;
-
     with UXTASK;
-
     with IMPACT;
-
     with ROUTE;
-
     with UXNATIVE;
-
---	with UxAS_Props;
 	
     thread TaskServiceBase
         features
