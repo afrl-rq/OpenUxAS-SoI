@@ -1,0 +1,25 @@
+import <tb_Monitor_SMACCM_DATA__UART_Packet_i_100.idl4>;
+import <tb_Monitor_SMACCM_DATA__UART_Packet_i_5.idl4>;
+import <tb_Monitor_bool_1.idl4>;
+
+import <clkcar.idl4>;
+import <gen_fwd.idl4>;
+
+component uart_shim {
+    control;
+
+    // AADL interface
+    include <tb_smaccmpilot_tk1_types.h>;
+    uses tb_Monitor_SMACCM_DATA__UART_Packet_i_100 tb_self2decrypt;
+    uses tb_Monitor_SMACCM_DATA__UART_Packet_i_5 tb_encrypt2self;
+    consumes QueuedData tb_encrypt2self_notification;
+    uses tb_Monitor_bool_1 tb_self2encrypt;
+
+    uses clkcar_inf clkcar;
+    provides gen_fwd_inf gen_fwd;
+
+    // Internal interface
+    dataport Buf tk1_uart_regs;
+    consumes DataAvailable interrupt;
+    has mutex device;
+}
