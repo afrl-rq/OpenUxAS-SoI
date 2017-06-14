@@ -71,6 +71,7 @@ void print_state(int _X,int _Y,int id, int x, int y, int xf, int yf)
 #include <cassert>
 #include <cmath>
 
+#include "CollisionAvoidanceService.hpp"
 #include "madara/knowledge/KnowledgeBase.h"
 #include "madara/knowledge/KnowledgeRecord.h"
 #include "madara/knowledge/Functions.h"
@@ -133,7 +134,7 @@ bool debug = 0;
 /********************************************************************/
 //-- declare knowledge base
 /********************************************************************/
-engine::KnowledgeBase knowledge;
+engine::KnowledgeBase &knowledge = uxas::service::GamsService::s_knowledgeBase;
 
 /********************************************************************/
 //-- Needed as a workaround for non-const-correctness in Madara;
@@ -161,7 +162,7 @@ std::vector<std::string> platform_params;
 std::string platform_name ("debug");
 typedef void (*PlatformInitFn)(const std::vector<std::string> &, engine::KnowledgeBase &, engine::KnowledgeMap &);
 typedef std::map<std::string, PlatformInitFn> PlatformInitFns;
-PlatformInitFns platform_init_fns;
+//PlatformInitFns platform_init_fns;
 const std::string default_multicast ("239.255.0.1:4150");
 madara::transport::QoSTransportSettings settings;
 int write_fd (-1);
@@ -178,7 +179,7 @@ Reference<unsigned int>  num_processes(knowledge, ".num_processes");
 engine::KnowledgeUpdateSettings private_update (true);
 
 //-- used to synchronize and make sure that all nodes are up
-ArrayReference<unsigned int, 3> startSync(knowledge, "startSync");
+ArrayReference<unsigned int, 2> startSync(knowledge, "startSync");
 Reference<unsigned int> syncPhase(knowledge, ".syncPhase");
 
 KnowledgeRecord
@@ -192,7 +193,7 @@ sync_inputs (engine::FunctionArguments & args, engine::Variables & vars)
 /********************************************************************/
 //-- barrier variables
 /********************************************************************/
-ArrayReference<unsigned int, 3> mbarrier_COLLISION_AVOIDANCE(knowledge, "mbarrier_COLLISION_AVOIDANCE");
+ArrayReference<unsigned int, 2> mbarrier_COLLISION_AVOIDANCE(knowledge, "mbarrier_COLLISION_AVOIDANCE");
 
 /********************************************************************/
 //-- map from synchronous threads to synchronous partner node ids
@@ -207,7 +208,7 @@ size_t role2Id(size_t nodeId, const std::string &roleName);
 /********************************************************************/
 //-- number of participating processes
 /********************************************************************/
-unsigned int processes (3);
+unsigned int processes (2);
 
 /********************************************************************/
 //-- Defining program-specific constants
@@ -238,8 +239,8 @@ namespace node_uav
 /********************************************************************/
 //-- Defining global variables at node scope
 /********************************************************************/
-ArrayReference<_Bool, 3, 10, 10> lock(knowledge, "lock");
-ArrayReference<_Bool, 3> missionOver(knowledge, "missionOver");
+ArrayReference<_Bool, 2, 10, 10> lock(knowledge, "lock");
+ArrayReference<_Bool, 2> missionOver(knowledge, "missionOver");
 _Bool var_init_missionOver (0);
 
 /********************************************************************/
@@ -300,8 +301,8 @@ CachedReference<short> thread0_yp(knowledge, ".yp");
 //-- Defining global variables at scope of thread COLLISION_AVOIDANCE
 //-- Used to implement Read-Execute-Write semantics
 /********************************************************************/
-ArrayReference<Proactive<_Bool, CachedReference>, 3, 10, 10> thread0_lock(knowledge, "lock");
-ArrayReference<Proactive<_Bool, CachedReference>, 3> thread0_missionOver(knowledge, "missionOver");
+ArrayReference<Proactive<_Bool, CachedReference>, 2, 10, 10> thread0_lock(knowledge, "lock");
+ArrayReference<Proactive<_Bool, CachedReference>, 2> thread0_missionOver(knowledge, "missionOver");
 
 /********************************************************************/
 //-- Defining group variables at scope of thread COLLISION_AVOIDANCE
@@ -426,9 +427,9 @@ void handle_arguments (int argc, char ** argv)
       {
         std::stringstream buffer (argv[i + 1]);
         buffer >> settings.id;
-        if(settings.id < 0 || settings.id >= 3) {
+        if(settings.id < 0 || settings.id >= 2) {
           std::cerr << "ERROR: Invalid node id: " << settings.id 
-                    << "  valid range: [0, 2]" << std::endl;
+                    << "  valid range: [0, 1]" << std::endl;
           ::exit(1);
         }
         if(settings.id == 0) { node_name = "uav"; role_name = "Uav"; }
@@ -650,7 +651,7 @@ thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars);
 //-- GAMS variables and functions
 /********************************************************************/
 
-#include "./GamsPlatformUXAS.hpp"
+#include "GamsPlatformUXAS.hpp"
 
 // begin dmpl namespace
 namespace dmpl
@@ -1264,162 +1265,178 @@ template<class T> std::string to_string(const T &in)
 }
 
 /********************************************************************/
-//-- Initialize VREP
+//-- the main service class
 /********************************************************************/
-
-void init_vrep(const std::vector<std::string> &params, engine::KnowledgeBase &knowledge, engine::KnowledgeMap &platform_args)
+namespace uxas
 {
-  if(params.size() >= 2 && params[1].size() > 0)
-    knowledge.set(".vrep_host", params[1]);
-  else
-    knowledge.set(".vrep_host", "127.0.0.1");
-  if(params.size() >= 3 && params[2].size() > 0)
-    knowledge.set(".vrep_port", params[2]);
-  else
-    knowledge.set(".vrep_port", to_string(19905+settings.id));
-  if(params.size() >= 4 && params[3].size() > 0)
-    knowledge.set(".vrep_sw_position", params[3]);
-  else
-    knowledge.set(".vrep_sw_position", "40.4464255,-79.9499426");
-  if(params.size() >= 5 && params[4].size() > 0)
-    knowledge.set(".vrep_max_delta", params[4]);
-  else
-    knowledge.set(".vrep_max_delta", 0.4);
-  if(params.size() >= 6 && params[5].size() > 0)
-    platform_args["resource_dir"] = params[5];
-  knowledge.set(".vrep_max_rotate_delta", M_PI/32.0);
-  knowledge.set(".vrep_move_thread_rate", "0");
-  knowledge.set("vrep_ready", "1");
-}
-
-/********************************************************************/
-//-- The main function. This is where everything starts.
-/********************************************************************/
-
-int main (int argc, char ** argv)
-{
-  settings.type = madara::transport::MULTICAST;
-  platform_init_fns["vrep"] = init_vrep;
-  platform_init_fns["vrep-uav"] = init_vrep;
-  platform_init_fns["vrep-quad"] = init_vrep;
-  platform_init_fns["vrep-heli"] = init_vrep;
-  platform_init_fns["vrep-ant"] = init_vrep;
-  platform_init_fns["vrep-uav-laser"] = init_vrep;
-  platform_init_fns["vrep-quad-laser"] = init_vrep;
-
-  //-- handle any command line arguments and check their sanity
-  handle_arguments (argc, argv);
-  check_argument_sanity ();
-
-  if (settings.hosts.size () == 0)
+  namespace service
   {
-    //-- setup default transport as multicast
-    settings.hosts.push_back (default_multicast);
-    if (dmpl::debug) {
-      settings.add_receive_filter (madara::filters::log_aggregate);
-      settings.add_send_filter (madara::filters::log_aggregate);
+    CollisionAvoidanceService::ServiceBase::CreationRegistrar<CollisionAvoidanceService>
+    CollisionAvoidanceService::s_registrar(CollisionAvoidanceService::s_registryServiceTypeNames());
+
+    CollisionAvoidanceService::CollisionAvoidanceService()
+      : ServiceBase(CollisionAvoidanceService::s_typeName(),
+                    CollisionAvoidanceService::s_directoryName()),
+        m_checkpointPrefix ("checkpoints/checkpoint"), m_threader (m_knowledgeBase) {
+    };
+
+    CollisionAvoidanceService::~CollisionAvoidanceService() { };
+    
+    bool CollisionAvoidanceService::configure(const pugi::xml_node& serviceXmlNode)
+    {
+      std::cout << "Collision Avoidance Service configured ...\n";
+      return true;
+        
+      //-- TBD
+      settings.type = madara::transport::MULTICAST;
+
+      /*
+        platform_init_fns["vrep"] = init_vrep;
+        platform_init_fns["vrep-uav"] = init_vrep;
+        platform_init_fns["vrep-quad"] = init_vrep;
+        platform_init_fns["vrep-heli"] = init_vrep;
+        platform_init_fns["vrep-ant"] = init_vrep;
+        platform_init_fns["vrep-uav-laser"] = init_vrep;
+        platform_init_fns["vrep-quad-laser"] = init_vrep;
+      */
+  
+      //-- handle any command line arguments and check their sanity
+      //handle_arguments (argc, argv);
+      check_argument_sanity ();
+
+      if (settings.hosts.size () == 0)
+        {
+          //-- setup default transport as multicast
+          settings.hosts.push_back (default_multicast);
+          if (dmpl::debug) {
+            settings.add_receive_filter (madara::filters::log_aggregate);
+            settings.add_send_filter (madara::filters::log_aggregate);
+          }
+        }
+
+      settings.queue_length = 1000000;
+      settings.set_deadline(1);
+
+      //-- configure the knowledge base with the transport settings
+      knowledge.attach_transport(host, settings);
+
+      //-- Initialize commonly used local variables
+      id = settings.id;
+      num_processes = processes;
+
+
+      /******************************************************************/
+      //-- Invoking constructors
+      /******************************************************************/
+      if(node_name == "uav" && role_name == "Uav") node_uav::node_uav_role_Uav::constructor ();
+
+      //-- Defining thread functions for MADARA
+      if(node_name == "uav" && role_name == "Uav")
+        knowledge.define_function ("REMODIFY_INPUT_GLOBALS",
+                                   node_uav::node_uav_role_Uav::REMODIFY_INPUT_GLOBALS);
+      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_BARRIERS",
+                                 node_uav::node_uav_role_Uav::REMODIFY_BARRIERS_COLLISION_AVOIDANCE);
+      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_GLOBALS",
+                                 node_uav::node_uav_role_Uav::REMODIFY_GLOBALS_COLLISION_AVOIDANCE);
+      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PULL",
+                                 node_uav::node_uav_role_Uav::thread0_PULL);
+      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PUSH",
+                                 node_uav::node_uav_role_Uav::thread0_PUSH);
+      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE",
+                                 node_uav::node_uav_role_Uav::thread0);
+
+      //-- Synchronize to make sure all nodes are up
+      knowledge.define_function ("sync_inputs", dmpl::sync_inputs);
+      threads::Threader threader(knowledge);
+      Algo *syncInputsAlgo = new Algo(1000000, "sync_inputs", &knowledge);
+      syncInputsAlgo->start(threader);
+      {
+        syncPhase = 1;
+        for(;;) {
+          size_t flag = 1;
+          for(size_t i = 0;i < 2; ++i)
+            if(startSync[i] < syncPhase) { flag = 0; break; }
+          if(flag) break;
+          sleep(0.2);
+        }
+        syncPhase = 2;
+        for(;;) {
+          size_t flag = 1;
+          for(size_t i = 0;i < 2; ++i)
+            if(startSync[i] < syncPhase) { flag = 0; break; }
+          if(flag) break;
+          sleep(0.2);
+        }
+      }
+
+      //-- Initializing platform
+      engine::KnowledgeMap platform_args;
+      /*
+        PlatformInitFns::iterator init_fn = platform_init_fns.find(platform_name);
+        if(init_fn != platform_init_fns.end())
+        init_fn->second(platform_params, knowledge, platform_args);
+        else
+        init_vrep(platform_params, knowledge, platform_args);
+      */
+  
+      //-- Initializing simulation
+      if(node_name == "uav" && role_name == "Uav") {
+        knowledge.define_function ("initialize_platform", node_uav::node_uav_role_Uav::base_StartingPosition);
+      }
+      knowledge.evaluate("initialize_platform ()");
+
+      //-- Creating algorithms
+      std::vector<Algo *> algos;
+      Algo *algo;
+      if(node_name == "uav" && role_name == "Uav") {
+        syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1,2};
+        syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0,2};
+        syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][2] = {0,1};
+        algo = new SyncAlgo(100000, "node_uav_role_Uav_COLLISION_AVOIDANCE", "COLLISION_AVOIDANCE", &knowledge, platform_name, &platform_args);
+        algos.push_back(algo);
+      }
+
+      //-- start threads and simulation
+      for(int i = 0; i < algos.size(); i++)
+        algos[i]->start(threader);
+      std::stringstream buffer;
+      buffer << "(vrep_ready = 1) && (S" << id << ".init = S" << id << ".init) && S0.init";
+      for(unsigned int i = 1; i < num_processes; ++i)
+        buffer << " && S" << i << ".init";
+      std::string expression = buffer.str ();
+      madara::knowledge::CompiledExpression compiled;
+      compiled = knowledge.compile (expression);
+      std::cerr << "waiting for " << num_processes << " agent(s) to come online..." << std::endl;
+      knowledge.wait (compiled);
+
+      knowledge.set("begin_sim", "1");
+      std::cerr << "*** AGENT " << id << " READY ***" << std::endl;
+
+      //-- wait for all threads to terminate
+      threader.wait();
+  
+      return true;
+    }
+
+    bool CollisionAvoidanceService::initialize()
+    {
+      bool bSuccess(true);
+      return (bSuccess);
+    };
+
+    bool CollisionAvoidanceService::terminate()
+    {
+      return true;
+    }
+
+    bool
+    CollisionAvoidanceService::
+    processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage>
+                               receivedLmcpMessage)
+    {
+      return false;
     }
   }
-
-  settings.queue_length = 1000000;
-  settings.set_deadline(1);
-
-  //-- configure the knowledge base with the transport settings
-  knowledge.attach_transport(host, settings);
-
-  //-- Initialize commonly used local variables
-  id = settings.id;
-  num_processes = processes;
-
-
-  /******************************************************************/
-  //-- Invoking constructors
-  /******************************************************************/
-  if(node_name == "uav" && role_name == "Uav") node_uav::node_uav_role_Uav::constructor ();
-
-  //-- Defining thread functions for MADARA
-  if(node_name == "uav" && role_name == "Uav")
-    knowledge.define_function ("REMODIFY_INPUT_GLOBALS",
-                                node_uav::node_uav_role_Uav::REMODIFY_INPUT_GLOBALS);
-  knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_BARRIERS",
-                              node_uav::node_uav_role_Uav::REMODIFY_BARRIERS_COLLISION_AVOIDANCE);
-  knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_GLOBALS",
-                              node_uav::node_uav_role_Uav::REMODIFY_GLOBALS_COLLISION_AVOIDANCE);
-  knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PULL",
-                              node_uav::node_uav_role_Uav::thread0_PULL);
-  knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PUSH",
-                              node_uav::node_uav_role_Uav::thread0_PUSH);
-  knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE",
-                              node_uav::node_uav_role_Uav::thread0);
-
-  //-- Synchronize to make sure all nodes are up
-  knowledge.define_function ("sync_inputs", dmpl::sync_inputs);
-  threads::Threader threader(knowledge);
-  Algo *syncInputsAlgo = new Algo(1000000, "sync_inputs", &knowledge);
-  syncInputsAlgo->start(threader);
-  {
-    syncPhase = 1;
-    for(;;) {
-      size_t flag = 1;
-      for(size_t i = 0;i < 3; ++i)
-        if(startSync[i] < syncPhase) { flag = 0; break; }
-      if(flag) break;
-      sleep(0.2);
-    }
-    syncPhase = 2;
-    for(;;) {
-      size_t flag = 1;
-      for(size_t i = 0;i < 3; ++i)
-        if(startSync[i] < syncPhase) { flag = 0; break; }
-      if(flag) break;
-      sleep(0.2);
-    }
-  }
-
-  //-- Initializing platform
-  engine::KnowledgeMap platform_args;
-  PlatformInitFns::iterator init_fn = platform_init_fns.find(platform_name);
-  if(init_fn != platform_init_fns.end())
-    init_fn->second(platform_params, knowledge, platform_args);
-  else
-    init_vrep(platform_params, knowledge, platform_args);
-
-  //-- Initializing simulation
-  if(node_name == "uav" && role_name == "Uav") {
-    knowledge.define_function ("initialize_platform", node_uav::node_uav_role_Uav::base_StartingPosition);
-  }
-  knowledge.evaluate("initialize_platform ()");
-
-  //-- Creating algorithms
-  std::vector<Algo *> algos;
-  Algo *algo;
-  if(node_name == "uav" && role_name == "Uav") {
-    syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1,2};
-    syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0,2};
-    syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][2] = {0,1};
-    algo = new SyncAlgo(100000, "node_uav_role_Uav_COLLISION_AVOIDANCE", "COLLISION_AVOIDANCE", &knowledge, platform_name, &platform_args);
-    algos.push_back(algo);
-  }
-
-  //-- start threads and simulation
-  for(int i = 0; i < algos.size(); i++)
-    algos[i]->start(threader);
-  std::stringstream buffer;
-  buffer << "(vrep_ready = 1) && (S" << id << ".init = S" << id << ".init) && S0.init";
-  for(unsigned int i = 1; i < num_processes; ++i)
-    buffer << " && S" << i << ".init";
-  std::string expression = buffer.str ();
-  madara::knowledge::CompiledExpression compiled;
-  compiled = knowledge.compile (expression);
-  std::cerr << "waiting for " << num_processes << " agent(s) to come online..." << std::endl;
-  knowledge.wait (compiled);
-
-  knowledge.set("begin_sim", "1");
-  std::cerr << "*** AGENT " << id << " READY ***" << std::endl;
-
-  //-- wait for all threads to terminate
-  threader.wait();
-  return 0;
 }
 
 /********************************************************************/

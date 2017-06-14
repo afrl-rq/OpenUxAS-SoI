@@ -108,6 +108,7 @@
 // realtime/gams
 #include "GamsService.h"
 #include "GamsServiceDriver.h"
+#include "CollisionAvoidanceService.hpp"
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -176,6 +177,7 @@
 // realtime/gams
 {auto svc = uxas::stduxas::make_unique<uxas::service::GamsService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::GamsServiceDriver>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::CollisionAvoidanceService>();}
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////
