@@ -62,10 +62,6 @@
         <Waypoint Latitude="45.346664" Longitude="-120.991200" Altitude="700.000000" />
     </Service>
    
-    <Service Type="CollisionAvoidanceService" >
-      <DART id="1" />
-    </Service>
-   
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
         <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
         <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>
