@@ -41,13 +41,13 @@ namespace service
 {
 
 
-/*! \class GamsServiceDriver
- *   \brief A service that tests interactions with GamsService
+/*! \class CollisionAvoidanceService
+ *   \brief A service that implements a collision avoidance protocol.
  *
  * 
  * 
  * Configuration String: 
- *  <Service Type="GamsServiceDriver" />
+ *  <Service Type="CollisionAvoidanceService" />
  * 
  * Options:
  *
