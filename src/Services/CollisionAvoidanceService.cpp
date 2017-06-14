@@ -358,249 +358,6 @@ void tokenize(const std::string& str, ContainerT& tokens,
 }
 
 /********************************************************************/
-//-- handle arguments from the command line
-/********************************************************************/
-void handle_arguments (int argc, char ** argv)
-{
-  for (int i = 1; i < argc; ++i)
-  {
-    std::string arg1 (argv[i]);
-
-    if (arg1 == "-m" || arg1 == "--multicast")
-    {
-      if (i + 1 < argc)
-      {
-        settings.hosts.push_back (argv[i + 1]);
-        settings.type = madara::transport::MULTICAST;
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-p" || arg1 == "--platform")
-    {
-      if (i + 1 < argc)
-      {
-        tokenize(std::string(argv[i + 1]), platform_params, ":");
-        platform_name = (platform_params[0]);
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-b" || arg1 == "--broadcast")
-    {
-      if (i + 1 < argc)
-      {
-        settings.hosts.push_back (argv[i + 1]);
-        settings.type = madara::transport::BROADCAST;
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-u" || arg1 == "--udp")
-    {
-      if (i + 1 < argc)
-      {
-        settings.hosts.push_back (argv[i + 1]);
-        settings.type = madara::transport::UDP;
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-o" || arg1 == "--host")
-    {
-      if (i + 1 < argc)
-        host = argv[i + 1];
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-d" || arg1 == "--domain")
-    {
-      if (i + 1 < argc) {
-        settings.write_domain = argv[i + 1];
-        settings.add_read_domain(argv[i + 1]);
-      } else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-i" || arg1 == "--id")
-    {
-      if (i + 1 < argc)
-      {
-        std::stringstream buffer (argv[i + 1]);
-        buffer >> settings.id;
-        if(settings.id < 0 || settings.id >= 2) {
-          std::cerr << "ERROR: Invalid node id: " << settings.id 
-                    << "  valid range: [0, 1]" << std::endl;
-          ::exit(1);
-        }
-        if(settings.id == 0) { node_name = "uav"; role_name = "Uav"; }
-        if(settings.id == 1) { node_name = "uav"; role_name = "Uav"; }
-        if(settings.id == 2) { node_name = "uav"; role_name = "Uav"; }
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-l" || arg1 == "--level")
-    {
-      if (i + 1 < argc)
-      {
-        int log_level = 0;
-        std::stringstream buffer (argv[i + 1]);
-        buffer >> log_level;
-        madara::logger::global_logger->set_level(log_level);
-        gams::loggers::global_logger->set_level(log_level);
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "--drop-rate")
-    {
-      if (i + 1 < argc)
-      {
-        double drop_rate;
-        std::stringstream buffer (argv[i + 1]);
-        buffer >> drop_rate;
-        std::cerr << "drop_rate: " << drop_rate << std::endl;
-        settings.update_drop_rate (drop_rate,
-          madara::transport::PACKET_DROP_PROBABLISTIC);
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-e" || arg1 == "--expect-log")
-    {
-      if (i + 1 < argc)
-      {
-        expect_file.open(argv[i + 1], ios::out | ios::trunc);
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-f" || arg1 == "--logfile")
-    {
-      if (i + 1 < argc)
-      {
-        ::madara::logger::global_logger->clear();
-        ::madara::logger::global_logger->add_file(argv[i + 1]);
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else if (arg1 == "-r" || arg1 == "--reduced")
-    {
-      settings.send_reduced_message_header = true;
-    }
-    else if (arg1 == "-dbg" || arg1 == "--debug")
-    {
-      dmpl::debug = true;
-    }
-    else if (arg1 == "--write-fd")
-    {
-      if (i + 1 < argc)
-      {
-        std::stringstream buffer (argv[i + 1]);
-        buffer >> write_fd;
-      }
-      else goto WRONG_ARG;
-      ++i;
-    }
-
-    //-- Providing init for input variable x
-    else if (arg1 == "--var_x")
-    {
-      if (i + 1 < argc)
-      {
-        std::stringstream buffer (argv[i + 1]);
-        if(node_name == "uav" && role_name == "Uav")
-          buffer >> node_uav::var_init_x;
-        else throw std::runtime_error
-             ("ERROR : no input variable x for node and role combination : ("
-              + node_name + " , " + role_name + ")");
-      }
-      
-      else goto WRONG_ARG;
-      ++i;
-    }
-
-    //-- Providing init for input variable xf
-    else if (arg1 == "--var_xf")
-    {
-      if (i + 1 < argc)
-      {
-        std::stringstream buffer (argv[i + 1]);
-        if(node_name == "uav" && role_name == "Uav")
-          buffer >> node_uav::var_init_xf;
-        else throw std::runtime_error
-             ("ERROR : no input variable xf for node and role combination : ("
-              + node_name + " , " + role_name + ")");
-      }
-      
-      else goto WRONG_ARG;
-      ++i;
-    }
-
-    //-- Providing init for input variable y
-    else if (arg1 == "--var_y")
-    {
-      if (i + 1 < argc)
-      {
-        std::stringstream buffer (argv[i + 1]);
-        if(node_name == "uav" && role_name == "Uav")
-          buffer >> node_uav::var_init_y;
-        else throw std::runtime_error
-             ("ERROR : no input variable y for node and role combination : ("
-              + node_name + " , " + role_name + ")");
-      }
-      
-      else goto WRONG_ARG;
-      ++i;
-    }
-
-    //-- Providing init for input variable yf
-    else if (arg1 == "--var_yf")
-    {
-      if (i + 1 < argc)
-      {
-        std::stringstream buffer (argv[i + 1]);
-        if(node_name == "uav" && role_name == "Uav")
-          buffer >> node_uav::var_init_yf;
-        else throw std::runtime_error
-             ("ERROR : no input variable yf for node and role combination : ("
-              + node_name + " , " + role_name + ")");
-      }
-      
-      else goto WRONG_ARG;
-      ++i;
-    }
-    else
-    {
-      WRONG_ARG:
-      std::cerr << "Illegal argument : " << arg1 << '\n'
-                << "Usage : " << argv[0] << " <options> <dmpl-file>\n"
-                << "Options :\n" <<
-        " [-p|--platform type]     platform for loop (vrep, dronerk)\n"\
-        " [-b|--broadcast ip:port] the broadcast ip to send and listen to\n"\
-        " [-d|--domain domain]     the knowledge domain to send and listen to\n"\
-        " [-e|--expect-log file]   file to log variables related to 'expect' clauses\n"\
-        " [-f|--logfile file]      log to a file\n"\
-        " [-i|--id id]             the id of this agent (should be non-negative)\n"\
-        " [-l|--level level]       the logger level (0+, higher is higher detail)\n"\
-        " [-m|--multicast ip:port] the multicast ip to send and listen to\n"\
-        " [-mb|--max-barrier-time time] time in seconds to barrier for other processes\n"\
-        " [-o|--host hostname]     the hostname of this process (def:localhost)\n"\
-        " [-r|--reduced]           use the reduced message header\n"\
-        " [-dbg|--debug]           print debug messages\n"\
-        " [-u|--udp ip:port]       the udp ips to send to (first is self to bind to)\n"\
-        " [--var_x] sets the initial value of variable x\n"\
-        " [--var_xf] sets the initial value of variable xf\n"\
-        " [--var_y] sets the initial value of variable y\n"\
-        " [--var_yf] sets the initial value of variable yf\n"\
-        ;
-      ::exit (1);
-    }
-  }
-}
-
-/********************************************************************/
 //-- helper function to check validity of supplied arguments
 /********************************************************************/
 void check_argument_sanity()
@@ -1281,15 +1038,218 @@ namespace uxas
     };
 
     CollisionAvoidanceService::~CollisionAvoidanceService() { };
+
+    /********************************************************************/
+    //-- handle arguments from the command line
+    /********************************************************************/
+    void CollisionAvoidanceService::read_arguments (const pugi::xml_node& serviceXmlNode)
+    {
+        // load settings from the XML file
+        for (pugi::xml_node currentXmlNode = serviceXmlNode.first_child();
+             currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
+        {
+            // if we need to load initial knowledge
+            if (std::string("DART") == currentXmlNode.name())
+            {
+                if (!currentXmlNode.attribute("id").empty())
+                {
+                    settings.id = currentXmlNode.attribute("id").as_int();
+                }
+            }
+        }
+    
+      /*
+      for (int i = 1; i < argc; ++i)
+        {
+          std::string arg1 (argv[i]);
+          if (arg1 == "-i" || arg1 == "--id")
+            {
+              if (i + 1 < argc)
+                {
+                  std::stringstream buffer (argv[i + 1]);
+                  buffer >> settings.id;
+                  if(settings.id < 0 || settings.id >= 2) {
+                    std::cerr << "ERROR: Invalid node id: " << settings.id 
+                              << "  valid range: [0, 1]" << std::endl;
+                    ::exit(1);
+                  }
+                  if(settings.id == 0) { node_name = "uav"; role_name = "Uav"; }
+                  if(settings.id == 1) { node_name = "uav"; role_name = "Uav"; }
+                  if(settings.id == 2) { node_name = "uav"; role_name = "Uav"; }
+                }
+              else goto WRONG_ARG;
+              ++i;
+            }
+          else if (arg1 == "-l" || arg1 == "--level")
+            {
+              if (i + 1 < argc)
+                {
+                  int log_level = 0;
+                  std::stringstream buffer (argv[i + 1]);
+                  buffer >> log_level;
+                  madara::logger::global_logger->set_level(log_level);
+                  gams::loggers::global_logger->set_level(log_level);
+                }
+              else goto WRONG_ARG;
+              ++i;
+            }
+          else if (arg1 == "--drop-rate")
+            {
+              if (i + 1 < argc)
+                {
+                  double drop_rate;
+                  std::stringstream buffer (argv[i + 1]);
+                  buffer >> drop_rate;
+                  std::cerr << "drop_rate: " << drop_rate << std::endl;
+                  settings.update_drop_rate (drop_rate,
+                                             madara::transport::PACKET_DROP_PROBABLISTIC);
+                }
+              else goto WRONG_ARG;
+              ++i;
+            }
+          else if (arg1 == "-e" || arg1 == "--expect-log")
+            {
+              if (i + 1 < argc)
+                {
+                  expect_file.open(argv[i + 1], ios::out | ios::trunc);
+                }
+              else goto WRONG_ARG;
+              ++i;
+            }
+          else if (arg1 == "-f" || arg1 == "--logfile")
+            {
+              if (i + 1 < argc)
+                {
+                  ::madara::logger::global_logger->clear();
+                  ::madara::logger::global_logger->add_file(argv[i + 1]);
+                }
+              else goto WRONG_ARG;
+              ++i;
+            }
+          else if (arg1 == "-r" || arg1 == "--reduced")
+            {
+              settings.send_reduced_message_header = true;
+            }
+          else if (arg1 == "-dbg" || arg1 == "--debug")
+            {
+              dmpl::debug = true;
+            }
+          else if (arg1 == "--write-fd")
+            {
+              if (i + 1 < argc)
+                {
+                  std::stringstream buffer (argv[i + 1]);
+                  buffer >> write_fd;
+                }
+              else goto WRONG_ARG;
+              ++i;
+            }
+
+          //-- Providing init for input variable x
+          else if (arg1 == "--var_x")
+            {
+              if (i + 1 < argc)
+                {
+                  std::stringstream buffer (argv[i + 1]);
+                  if(node_name == "uav" && role_name == "Uav")
+                    buffer >> node_uav::var_init_x;
+                  else throw std::runtime_error
+                         ("ERROR : no input variable x for node and role combination : ("
+                          + node_name + " , " + role_name + ")");
+                }
+      
+              else goto WRONG_ARG;
+              ++i;
+            }
+
+          //-- Providing init for input variable xf
+          else if (arg1 == "--var_xf")
+            {
+              if (i + 1 < argc)
+                {
+                  std::stringstream buffer (argv[i + 1]);
+                  if(node_name == "uav" && role_name == "Uav")
+                    buffer >> node_uav::var_init_xf;
+                  else throw std::runtime_error
+                         ("ERROR : no input variable xf for node and role combination : ("
+                          + node_name + " , " + role_name + ")");
+                }
+      
+              else goto WRONG_ARG;
+              ++i;
+            }
+
+          //-- Providing init for input variable y
+          else if (arg1 == "--var_y")
+            {
+              if (i + 1 < argc)
+                {
+                  std::stringstream buffer (argv[i + 1]);
+                  if(node_name == "uav" && role_name == "Uav")
+                    buffer >> node_uav::var_init_y;
+                  else throw std::runtime_error
+                         ("ERROR : no input variable y for node and role combination : ("
+                          + node_name + " , " + role_name + ")");
+                }
+      
+              else goto WRONG_ARG;
+              ++i;
+            }
+
+          //-- Providing init for input variable yf
+          else if (arg1 == "--var_yf")
+            {
+              if (i + 1 < argc)
+                {
+                  std::stringstream buffer (argv[i + 1]);
+                  if(node_name == "uav" && role_name == "Uav")
+                    buffer >> node_uav::var_init_yf;
+                  else throw std::runtime_error
+                         ("ERROR : no input variable yf for node and role combination : ("
+                          + node_name + " , " + role_name + ")");
+                }
+      
+              else goto WRONG_ARG;
+              ++i;
+            }
+          else
+            {
+            WRONG_ARG:
+              std::cerr << "Illegal argument : " << arg1 << '\n'
+                        << "Usage : " << argv[0] << " <options> <dmpl-file>\n"
+                        << "Options :\n" <<
+                " [-p|--platform type]     platform for loop (vrep, dronerk)\n"\
+                " [-b|--broadcast ip:port] the broadcast ip to send and listen to\n"\
+                " [-d|--domain domain]     the knowledge domain to send and listen to\n"\
+                " [-e|--expect-log file]   file to log variables related to 'expect' clauses\n"\
+                " [-f|--logfile file]      log to a file\n"\
+                " [-i|--id id]             the id of this agent (should be non-negative)\n"\
+                " [-l|--level level]       the logger level (0+, higher is higher detail)\n"\
+                " [-m|--multicast ip:port] the multicast ip to send and listen to\n"\
+                " [-mb|--max-barrier-time time] time in seconds to barrier for other processes\n"\
+                " [-o|--host hostname]     the hostname of this process (def:localhost)\n"\
+                " [-r|--reduced]           use the reduced message header\n"\
+                " [-dbg|--debug]           print debug messages\n"\
+                " [-u|--udp ip:port]       the udp ips to send to (first is self to bind to)\n"\
+                " [--var_x] sets the initial value of variable x\n"\
+                " [--var_xf] sets the initial value of variable xf\n"\
+                " [--var_y] sets the initial value of variable y\n"\
+                " [--var_yf] sets the initial value of variable yf\n"\
+                ;
+              ::exit (1);
+            }
+        }
+      */
+    }
     
     bool CollisionAvoidanceService::configure(const pugi::xml_node& serviceXmlNode)
     {
-      std::cout << "CollisionAvoidanceService configured for id " << settings.id << "...\n";
-      
-      //-- handle any command line arguments and check their sanity
-      //handle_arguments (argc, argv);
+      //-- read arguments from XML file
+      read_arguments (serviceXmlNode);
       //check_argument_sanity ();
 
+      std::cout << "CollisionAvoidanceService configured for id " << settings.id << "...\n";
+      
       //-- Initialize commonly used local variables
       id = settings.id;
       num_processes = processes;

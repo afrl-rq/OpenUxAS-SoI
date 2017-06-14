@@ -107,6 +107,9 @@ private:
     /** brief Copy assignment operation not permitted */
     void operator=(CollisionAvoidanceService const&) = delete;
 
+    void
+    read_arguments(const pugi::xml_node& serviceXmlNode);
+
     bool
     configure(const pugi::xml_node& serviceXmlNode) override;
 
