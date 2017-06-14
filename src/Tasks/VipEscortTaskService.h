@@ -100,7 +100,7 @@ public:
     static const std::vector<std::string>
     s_registryServiceTypeNames()
     {
-        std::vector<std::string> registryServiceTypeNames = {s_typeName(),"YOUR_TASKS_FULL_LMCP_TYPE_NAME"};
+        std::vector<std::string> registryServiceTypeNames = {s_typeName(),"uxas.projects.UT.VipEscortTask"};
         return (registryServiceTypeNames);
     };
 

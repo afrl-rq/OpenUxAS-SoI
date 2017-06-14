@@ -1,6 +1,5 @@
-# Waterway Search Example
+# VIP Escort Example
 
-This is an example of running UxAS service that communicates to the Amase simulation in order to generate plans and an assignment for one of two UAVs to monitor a waterway. For more background see the file 'doc/UxAS_UserManual.pdf'
 
 ## Files:
 

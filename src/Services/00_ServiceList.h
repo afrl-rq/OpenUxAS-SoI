@@ -85,6 +85,7 @@
 #include "PatternSearchTaskService.h"
 #include "TaskManagerService.h"
 #include "TaskTrackerService.h"
+#include "VipEscortTaskService.h"
 
 // test
 #include "SendMessagesService.h"
@@ -150,6 +151,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::PatternSearchTaskService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskTrackerService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::VipEscortTaskService>();}
 
 // test
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SendMessagesService>();}

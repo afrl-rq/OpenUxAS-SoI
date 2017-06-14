@@ -7,9 +7,9 @@ RM_LOG="rm -R ./log"
 
 BIN="../../../build/uxas"
 
-mkdir -p RUNDIR_WaterwaySearch
-cd RUNDIR_WaterwaySearch
+mkdir -p RUNDIR_VipEscort
+cd RUNDIR_VipEscort
 $RM_DATAWORK
 $RM_LOG
-$BIN -cfgPath ../cfg_WaterwaySearch.xml
+$BIN -cfgPath ../cfg_VipEscort.xml
 
