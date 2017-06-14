@@ -1050,7 +1050,7 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
         // clone the LMCP message into a MadaraState structure
         std::shared_ptr<uxas::madara::MadaraState> ptr_MadaraState(
             static_cast<uxas::madara::MadaraState *> (
-                receivedLmcpMessage->m_object.get()));
+                receivedLmcpMessage->m_object.get()->clone()));
         
         
         // contents are returned as a byte vector. Convert that into a char[]
