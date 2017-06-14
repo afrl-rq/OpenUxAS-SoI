@@ -30,7 +30,18 @@ namespace
 {
     void zs_budget_enforcement_helper(void *param, int rid)
     {
-        (static_cast<uxas::communications::LmcpObjectNetworkClientBase*>(param))->zs_budget_enforcement_handler(rid);
+        if (param != NULL)
+        {
+            try
+            {
+                uxas::communications::LmcpObjectNetworkClientBase &obj = *(static_cast<uxas::communications::LmcpObjectNetworkClientBase *>(param));
+                obj.zs_budget_enforcement_handler(rid);
+            }
+            catch (std::exception& ex)
+            {
+                 std::cout << "zs_budget_enforcement_helper() exception: " << ex.what() << "\n";
+            }
+       }
     }
 }
 
@@ -320,9 +331,9 @@ LmcpObjectNetworkClientBase::initializeNetworkClient()
             std::cout << "error calling create reserve\n";
         }
 
-//        if (zsv_fork_enforcement_handler(zs_schedfd,zs_rid,zs_budget_enforcement_helper,this)<0){
-//            std::cout << "::initializesendAddressedAttributedMessageNetworkClient method COULD NOT REGISTER budget enforcement handler helper\n" ;
-//        }
+        if (zsv_fork_enforcement_handler(zs_schedfd,zs_rid,zs_budget_enforcement_helper,this)<0){
+            std::cout << "::initializesendAddressedAttributedMessageNetworkClient method COULD NOT REGISTER budget enforcement handler helper\n" ;
+        }
     }
     
     return (true);
@@ -367,13 +378,13 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
                     catch (std::exception& intrException)
                     {
                         std::string exName = std::string(intrException.what());
-                        if (exName == "Interrupted system call"){
-                            zsInterruptionException = true;
-                        } else {
-                            // not the exception we are interested in
-                            // keep propagating
-                            throw intrException;
-                        }
+//                        if (exName == "Interrupted system call"){
+//                            zsInterruptionException = true;
+//                        } else {
+//                            // not the exception we are interested in
+//                            // keep propagating
+//                            throw intrException;
+//                        }
                         zsInterruptionException = true;
                     }
                 } while (zsInterruptionException);
@@ -384,7 +395,7 @@ LmcpObjectNetworkClientBase::executeNetworkClient()
                           std::cout << "Error attaching the reserve \n";
                         }
                         zs_isReserveAttached = true;
-                        std::cout << "Attached reserved rid("<<zs_rid<<") \n";
+                        std::cout << "Attached reserved rid("<<zs_rid<<") to tid(" << gettid() << ")\n";
                     } else {
                         //std::cout << "Calling wait_release tid("<< gettid() << ") rid(" << zs_rid << ")\n" ;    
                         zsv_wait_release(zs_schedfd,zs_rid);
@@ -622,6 +633,7 @@ LmcpObjectNetworkClientBase::sendSharedLmcpObjectLimitedCastMessage(const std::s
 void
 LmcpObjectNetworkClientBase::zs_budget_enforcement_handler(int rid)
 {    
+    std::cout << "zs_budget_enforcement_handler("<<rid<<")\n";
 }
 
 void LmcpObjectNetworkClientBase::zs_set_budget_reservation_parameters(
@@ -647,6 +659,22 @@ void LmcpObjectNetworkClientBase::zs_set_budget_reservation_parameters(
     zs_isReservationEnabled = true;   
 }
 
+void 
+LmcpObjectNetworkClientBase::setRuntimeAssuranceOn()
+{
+    rtaActive = true;
+}
+void 
+LmcpObjectNetworkClientBase::setRuntimeAssuranceOff()
+{
+    rtaActive = false;
+}
+
+bool 
+LmcpObjectNetworkClientBase::isRuntimeAssuranceOn()
+{
+    return rtaActive;
+}
 }; //namespace communications
 }; //namespace uxas
 

@@ -552,9 +552,11 @@ private:
     long zs_overload_wcet_nsecs;
     int zs_criticality;
     
+    bool rtaActive =false;
+    
     
 public:
-    void 
+    virtual void 
     zs_budget_enforcement_handler(int rid);
     
     void
@@ -569,6 +571,13 @@ public:
     long overload_wcet_nsecs,
     int criticality
     );
+    void 
+    setRuntimeAssuranceOn();
+    void 
+    setRuntimeAssuranceOff();
+    bool
+    isRuntimeAssuranceOn();
+
 };
 
 }; //namespace communications

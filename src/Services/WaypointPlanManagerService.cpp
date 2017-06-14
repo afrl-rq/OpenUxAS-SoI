@@ -32,6 +32,10 @@
 
 #include <iostream>
 
+extern "C" {
+#include <zsrmvapi.h>
+}
+
 #define STRING_COMPONENT_NAME "WaypointPlanManager"
 
 #define STRING_XML_COMPONENT "Component"
@@ -67,7 +71,18 @@ WaypointPlanManagerService::ServiceBase::CreationRegistrar<WaypointPlanManagerSe
 WaypointPlanManagerService::s_registrar(WaypointPlanManagerService::s_registryServiceTypeNames());
 
 WaypointPlanManagerService::WaypointPlanManagerService()
-: ServiceBase(WaypointPlanManagerService::s_typeName(), WaypointPlanManagerService::s_directoryName()) { };
+: ServiceBase(WaypointPlanManagerService::s_typeName(), WaypointPlanManagerService::s_directoryName()) 
+{ 
+    beginCloseBorder.setLongitude(-121.01294);
+    beginCloseBorder.setLatitude(45.2898);
+    endCloseBorder.setLongitude(-120.91681);
+    endCloseBorder.setLatitude(45.32789);
+    
+    beginFarBorder.setLongitude(-121.0029);
+    beginFarBorder.setLatitude(45.27694);
+    endFarBorder.setLongitude(-120.906);
+    endFarBorder.setLatitude(45.30954);
+};
 
 WaypointPlanManagerService::~WaypointPlanManagerService() { };
 
@@ -174,9 +189,18 @@ WaypointPlanManagerService::terminate()
     return true;
 }
 
+bool firstTime = true;
+
 bool
 WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
+//    afrl::cmasi::Waypoint beginBorder;
+//    beginBorder.setLatitude(45.2898);
+//    beginBorder.setLongitude(-121.01294);
+//    afrl::cmasi::Waypoint endBorder;
+//    endBorder.setLatitude(45.32789);
+//    endBorder.setLongitude(-120.91681);
+
     //COUT_FILE_LINE_MSG("getLmcpTypeName()" << receivedLmcpMessage->m_object->getLmcpTypeName() << "]")
     std::shared_ptr<avtas::lmcp::Object> pMissionCommand_Out; // if a new mission command is generate it is saved in this variable
 
@@ -186,21 +210,76 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
 
         if (airVehicleState->getID() == m_vehicleID)
         {
-            if (m_isMoveToNextWaypoint)
+            m_lastReportedToWaypoint = airVehicleState->getCurrentWaypoint();
+            afrl::cmasi::Waypoint* wp= this->getWaypointFromID(m_lastReportedToWaypoint);            
+            
+            std::cout << "waypoint: " << m_lastReportedToWaypoint << "\n";
+            
+            if (!_stopped)
             {
-                int64_t waypointIdNext = {-1};
-                if (isGetNextWaypointId(airVehicleState->getCurrentWaypoint(), waypointIdNext))
+
+                if (m_isMoveToNextWaypoint)
+                {
+                    int64_t waypointIdNext = {-1};
+                    if (isGetNextWaypointId(airVehicleState->getCurrentWaypoint(), waypointIdNext))
+                    {
+                        int64_t idMissionSegmentTemp = {-1};
+                        isGetCurrentSegment(waypointIdNext, _nextMissionCommandToSend, idMissionSegmentTemp);
+                    }
+
+                    m_isMoveToNextWaypoint = false;
+                }
+                else
                 {
                     int64_t idMissionSegmentTemp = {-1};
-                    isGetCurrentSegment(waypointIdNext, _nextMissionCommandToSend, idMissionSegmentTemp);
+                    isGetCurrentSegment(airVehicleState->getCurrentWaypoint(), _nextMissionCommandToSend, idMissionSegmentTemp);
                 }
 
-                m_isMoveToNextWaypoint = false;
-            }
-            else
+                if (wp != NULL) 
+                {
+                    // HERE: test this "impromptum correction with budget enforcement
+                    if (!allowedWaypoint(beginCloseBorder,endCloseBorder,*wp) && _testing && isRuntimeAssuranceOn())
+                    {
+                        _testing = false;
+
+                        // set new border to the close border 
+                        // as a way to encode discovering a foe 
+                        beginCurrentBorder = beginCloseBorder;
+                        endCurrentBorder = endCloseBorder;
+                        
+                        // for now we just cause a big delay and do not send anything                        
+                        std::cout << "Beyond border. Sleeping\n";
+                        unsigned long long tsbuffer[10];
+                        long bufsize=10;
+                        long idx=0;
+                        
+                        busy_timestamped(15, tsbuffer, bufsize, &idx);
+                                                
+                        // clear the next command in order not to do anything
+                        _nextMissionCommandToSend.reset();                                                
+                    }
+                }
+            } else  // _stopped
             {
-                int64_t idMissionSegmentTemp = {-1};
-                isGetCurrentSegment(airVehicleState->getCurrentWaypoint(), _nextMissionCommandToSend, idMissionSegmentTemp);
+                // the budget enforcement stopped the vehicle
+                // now we need to correct it and "resume"
+                
+                if (wp != NULL) 
+                {
+                    if (!allowedWaypoint(beginCurrentBorder,endCurrentBorder,*wp) && isRuntimeAssuranceOn())
+                    {
+                        auto cmd = getCurrentSegment(m_lastReportedToWaypoint);
+                        
+                        if (cmd)
+                        {
+                            correctSegment(cmd,beginCurrentBorder,endCurrentBorder);
+                            cmd->setFirstWaypoint(m_lastReportedToWaypoint);
+                            _nextMissionCommandToSend = cmd;
+                        }
+                    }
+                }
+                
+                _stopped = false;
             }
         }
     }
@@ -288,14 +367,59 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     
     if(_nextMissionCommandToSend)
     {
-        //-- we wrap the sending of the message in a function call
-        //-- that implements the logical enforcer
-        rta_sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
+        if (firstTime && isRuntimeAssuranceOn())
+        {
+            firstTime = false;
+            static_cast<afrl::cmasi::MissionCommand*>(_nextMissionCommandToSend.get())->setFirstWaypoint(100004040);
+        }
+        sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
         _nextMissionCommandToSend.reset();
     }
     
     return (false); // always false implies never terminating service from here
 };
+
+void
+WaypointPlanManagerService::aroundFoes(const afrl::cmasi::Waypoint &startBorder, const afrl::cmasi::Waypoint &endBorder,afrl::cmasi::Waypoint& wp)
+{   
+}
+
+void
+WaypointPlanManagerService::safeStop()
+{
+    afrl::cmasi::Waypoint* wp;
+    afrl::cmasi::MissionCommand *cmd = new afrl::cmasi::MissionCommand();
+    
+    if (m_lastReportedToWaypoint >=0)
+    {
+        wp = this->getWaypointFromID(m_lastReportedToWaypoint);
+        if (wp != NULL)
+        {            
+            afrl::cmasi::LoiterAction * pLoiterAction(new afrl::cmasi::LoiterAction());
+            pLoiterAction->setRadius(m_loiterRadiusDefault_m);
+            pLoiterAction->setDuration(-1);
+            pLoiterAction->setAirspeed(wp->getSpeed());
+            afrl::cmasi::Location3D* pLocation3D = new afrl::cmasi::Location3D();
+            pLocation3D->setLatitude(wp->getLatitude());
+            pLocation3D->setLongitude(wp->getLongitude());
+            pLocation3D->setAltitude(wp->getAltitude());
+            pLoiterAction->setLocation(pLocation3D);
+            pLocation3D = 0; //don't own
+            
+            wp = wp->clone();
+            wp->getVehicleActionList().clear();
+            wp->getVehicleActionList().push_back(pLoiterAction);
+            wp->setNextWaypoint(wp->getNumber());
+            cmd->setCommandID(1);
+            cmd->setFirstWaypoint(wp->getNumber());
+            cmd->getWaypointList().push_back(wp);
+            cmd->setVehicleID(m_vehicleID);
+            _stopMissionCommandToSend.reset(cmd);
+            sendSharedLmcpObjectBroadcastMessage(_stopMissionCommandToSend);
+            //_stopMissionCommandToSend.reset();
+        }
+    }
+}
 
 /*********************************************************************/
 //-- this method performs logical enforcement and sends out a set of
@@ -305,14 +429,6 @@ void
 WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage
 (const std::shared_ptr<avtas::lmcp::Object>& lmcpObject)
 {
-    //-- create the border between the safe and unsafe areas. this is
-    //-- defined in terms of two endpoints
-    afrl::cmasi::Waypoint beginBorder;
-    beginBorder.setLatitude(45.2898);
-    beginBorder.setLongitude(-121.01294);
-    afrl::cmasi::Waypoint endBorder;
-    endBorder.setLatitude(45.32789);
-    endBorder.setLongitude(-120.91681);
 
     //-- get the next set of waypoints created by the service
     auto missionCmd = static_cast<afrl::cmasi::MissionCommand *>(lmcpObject.get());
@@ -323,16 +439,9 @@ WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage
     {
         //-- if this waypoint is in the unsafe zone, project it on the
         //-- border
-        if(!allowedWayPoint(beginBorder,endBorder,*(wpl[i])))
-            projectWayPoint(beginBorder,endBorder,*(wpl[i]));
+        if(!allowedWaypoint(beginCurrentBorder,endCurrentBorder,*(wpl[i])))
+            projectWayPoint(beginCurrentBorder,endCurrentBorder,*(wpl[i]));
     }
-
-    /*
-    for(const auto &wp : missionCmd->getWaypointList())
-    {
-        std::cout << "waypoint : " << wp->toXML() << '\n';
-    }
-    */
 
     sendSharedLmcpObjectBroadcastMessage(lmcpObject);
 }
@@ -342,7 +451,7 @@ WaypointPlanManagerService::rta_sendSharedLmcpObjectBroadcastMessage
 //-- border defined by the first two points.
 /*********************************************************************/
 bool
-WaypointPlanManagerService::allowedWayPoint(const afrl::cmasi::Waypoint &startBorder,
+WaypointPlanManagerService::allowedWaypoint(const afrl::cmasi::Waypoint &startBorder,
                                             const afrl::cmasi::Waypoint &endBorder,
                                             const afrl::cmasi::Waypoint &wp)
 {
@@ -396,6 +505,44 @@ WaypointPlanManagerService::projectWayPoint(const afrl::cmasi::Waypoint &startBo
     double xp = (yp - c1) / m1;
     wp.setLatitude(xp);
     wp.setLongitude(yp);
+}
+
+void WaypointPlanManagerService::zs_budget_enforcement_handler(int rid)
+{  
+    afrl::cmasi::Waypoint beginBorder;
+    beginBorder.setLatitude(45.2898);
+    beginBorder.setLongitude(-121.01294);
+    afrl::cmasi::Waypoint endBorder;
+    endBorder.setLatitude(45.32789);
+    endBorder.setLongitude(-120.91681);
+    
+
+    std::cout << "Budget enforcement("<<rid<<"): ";
+    if (isRuntimeAssuranceOn())
+    {
+        std::cout<< "Runtime Assurance ACTIVE: ";
+        if (m_lastReportedToWaypoint >=0)
+        {
+            afrl::cmasi::Waypoint* wp= getWaypointFromID(m_lastReportedToWaypoint);            
+            if (wp != NULL) 
+            {
+                if (!allowedWaypoint(beginBorder,endBorder,*wp))
+                {
+                    //_nextMissionCommandToSend.reset();
+                    if (!_stopped){
+                        std::cout << "stopping!";
+                        _stopped = true;
+                        safeStop();
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        std::cout << "Runtime Assurance NOT ACTIVE";
+    }
+    std::cout << "\n";
 }
 
 bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand)
@@ -570,6 +717,50 @@ bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::M
     return (isSucceeded);
 };
 
+afrl::cmasi::Waypoint* 
+WaypointPlanManagerService::getWaypointFromID(const int64_t& waypointIdCurrent)
+{
+    for (auto itSegment = m_missionSegments.begin(); itSegment != m_missionSegments.end(); itSegment++)
+    {
+        for (auto itWaypoint = (*itSegment)->getWaypointList().begin(); itWaypoint != (*itSegment)->getWaypointList().end(); itWaypoint++)
+        {
+            if ((*itWaypoint)->getNumber() == waypointIdCurrent)
+            {
+                return *itWaypoint;
+            }
+        }
+    }
+    return NULL;
+}
+
+std::shared_ptr<afrl::cmasi::MissionCommand>
+WaypointPlanManagerService::getCurrentSegment(const int64_t& waypointIdCurrent)
+{
+    for (auto itSegment : m_missionSegments)
+    {
+        for (auto itWaypoint : itSegment->getWaypointList())
+        {
+            if (itWaypoint->getNumber() == waypointIdCurrent)
+            {
+                return itSegment;
+            }
+        }
+    }    
+    return NULL;
+}
+
+void
+WaypointPlanManagerService::correctSegment(std::shared_ptr<afrl::cmasi::MissionCommand> segment, afrl::cmasi::Waypoint &startBorder,afrl::cmasi::Waypoint &endBorder)
+{    
+    for (auto itWaypoint : segment->getWaypointList())
+    {
+        if (!allowedWaypoint(startBorder,endBorder,*itWaypoint))
+        {
+            projectWayPoint(startBorder,endBorder,*itWaypoint);
+        }
+    }
+}
+
 bool WaypointPlanManagerService::isGetCurrentSegment(const int64_t& waypointIdCurrent, std::shared_ptr<avtas::lmcp::Object>& segmentCurrent, int64_t & idMissionSegmentCurrent)
 {
     bool isSucceeded(false);
@@ -598,6 +789,7 @@ bool WaypointPlanManagerService::isGetCurrentSegment(const int64_t& waypointIdCu
     if (segmentTemp && (segmentTemp->getCommandID() != m_idMissionSegmentCurrent))
     {
         COUT_INFO("New Segment: m_idMissionSegmentNew[" << segmentTemp->getCommandID() << "] m_idMissionSegmentOld[" << m_idMissionSegmentCurrent << "] waypointIdCurrent[" << waypointIdCurrent << "] First Segment Waypoint[" << segmentTemp->getWaypointList().front()->getNumber() << "] Last[" << segmentTemp->getWaypointList().back()->getNumber() << "]")
+        m_idMissionSegmentPrev = m_idMissionSegmentCurrent;
         m_idMissionSegmentCurrent = segmentTemp->getCommandID();
         afrl::cmasi::MissionCommand* segmentCurrentLocal = {segmentTemp->clone()};
         idMissionSegmentCurrent = segmentCurrentLocal->getCommandID();

@@ -480,7 +480,18 @@ ServiceManager::instantiateConfigureInitializeStartService(const pugi::xml_node&
             zsCriticality = serviceXmlNode.attribute("zsCriticality").as_int();
             isReserveEnabled=true;
         }
-
+        if (!serviceXmlNode.attribute("rtaOn").empty())
+        {
+            bool rtaOn = serviceXmlNode.attribute("rtaOn").as_bool();
+            if (rtaOn)
+            {
+                newService->setRuntimeAssuranceOn();
+            }
+            else
+            {
+                newService->setRuntimeAssuranceOff();
+            }
+        }
         if (isReserveEnabled){
             if ( (zsPeriod_secs != 0       || zsPeriod_nsecs != 0) && 
                  (zsZeroSlack_secs !=0     || zsZeroSlack_nsecs != 0) &&

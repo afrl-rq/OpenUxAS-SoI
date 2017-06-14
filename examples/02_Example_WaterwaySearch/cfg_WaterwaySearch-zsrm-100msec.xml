@@ -13,13 +13,14 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="AutomationDiagramDataService"/>
 
-    <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
+    <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="1500" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"
 	     zsPeriodSecs="0" zsPeriodNsecs = "100000000" zsZeroSlackSecs="1" zsZeroSlackNsecs="0"
 	     zsNominalWCETSecs="0" zsNominalWCETNsecs="10000000" zsOverloadWCETSecs="0" zsOverloadWCETNsecs="10000000"
-	     zsCriticality="1"/>
-    <Service Type="WaypointPlanManagerService" VehicleID="500" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
+	     zsCriticality="1"
+	     rtaOn="TRUE"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="500" NumberWaypointsToServe="1500" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"
 	     zsPeriodSecs="0" zsPeriodNsecs = "100000000" zsZeroSlackSecs="1" zsZeroSlackNsecs="0"

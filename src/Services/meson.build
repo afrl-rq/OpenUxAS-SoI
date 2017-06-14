@@ -45,6 +45,7 @@ incs_services = [
     '../../3rd/TinyGPS',
     '../../3rd/zlib-1.2.8/contrib/minizip',
     '../../3rd/zlib-1.2.8',
+      stac_root + '/zsrmvmodule',
   ),
   incs_lmcp,
 ]

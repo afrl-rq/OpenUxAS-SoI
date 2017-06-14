@@ -143,13 +143,21 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
 protected:
-    bool allowedWayPoint(const afrl::cmasi::Waypoint &startBorder,
+    // RTA methods
+    bool allowedWaypoint(const afrl::cmasi::Waypoint &startBorder,
                          const afrl::cmasi::Waypoint &endBorder,
                          const afrl::cmasi::Waypoint &wp);
     void projectWayPoint(const afrl::cmasi::Waypoint &startBorder,
                          const afrl::cmasi::Waypoint &endBorder,
                          afrl::cmasi::Waypoint &wp);
     void rta_sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject);
+    void aroundFoes(const afrl::cmasi::Waypoint &startBorder, const afrl::cmasi::Waypoint &endBorder,afrl::cmasi::Waypoint& wp);
+    void safeStop();
+    afrl::cmasi::Waypoint* getWaypointFromID(const int64_t& waypointIdCurrent);
+    std::shared_ptr<afrl::cmasi::MissionCommand> getCurrentSegment(const int64_t& waypointIdCurrent);
+    void correctSegment(std::shared_ptr<afrl::cmasi::MissionCommand> segment, afrl::cmasi::Waypoint &startBorder,afrl::cmasi::Waypoint &endBorder);
+    // END of RTA methods
+    
     bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand>& ptr_MissionCommand);
     bool isGetCurrentSegment(const int64_t& waypointIdCurrent, std::shared_ptr<avtas::lmcp::Object>& segmentCurrent, int64_t& idMissionSegmentCurrent);
     bool isGetNextWaypointId(const int64_t& waypointIdCurrent, int64_t& waypointIdNext);
@@ -203,9 +211,26 @@ protected:
      vehicle controlled by this manager*/
     int64_t m_gimbalPayloadId = {-1};
 
+    // RTA fields
+    std::shared_ptr<avtas::lmcp::Object> _stopMissionCommandToSend;
+    bool _stopped = false;
+    int64_t m_idMissionSegmentPrev = {0};
+    
+    afrl::cmasi::Waypoint beginFarBorder; 
+    afrl::cmasi::Waypoint endFarBorder;
+    afrl::cmasi::Waypoint beginCloseBorder;
+    afrl::cmasi::Waypoint endCloseBorder;
+    
+    afrl::cmasi::Waypoint& beginCurrentBorder = beginFarBorder;
+    afrl::cmasi::Waypoint& endCurrentBorder = endFarBorder;
+    
+    bool _testing = true;
+
+    // END of RTA fields
 private:
 
-
+public:
+    void zs_budget_enforcement_handler(int rid);
 
 
 };
