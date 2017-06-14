@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        CMASI message definitions. The Common Mission Automation Services Interface (CMASI) defines data relevant to mission planning and
+        UAV autonomy. Direct any questions to Matt Duquette (matthew.duquette@wright.edu).
+        <br/>
+        <p>CMASI is designed for machine-to-machine communication of information related to UAV mission planning.  It is designed
+        to provide a minimum set of data for that purpose.  It is envisioned that end-users would expand on the base data set
+        by making custom messages that extend from existing data types.</p>
+
+        <p><i>Note on units:</i> Unless otherwise specified, the units of measure [meters, kilograms, milliSeconds, degrees] are used.  Since this is a system
+        for machine-to-machine communication, end applications are expected to do appropriate conversions to and from the MKSD unit types.</p>
+
+        <p><i>Note on Earth coordinates:</i>Unless otherwise specified, latitudes and longitudes are assumed to be based on the
+        WGS84 ellipsoid/datum and EGM96 gravitational model.  Altitude is the height above mean sea level for a given point.
+        (See <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS-84</a> and <a href="http://en.wikipedia.org/wiki/EGM96">EGM96</a>
+        for more info)</p>
+        <p>Note on directions:  Unless otherwise noted, all directional angles are relative to true North.</p>
+        <p>Note on IDs:  Many types have scenario-wide unique ids associated with them (VehicleID, TaskID, etc.)  These IDs should not be zero.</p>
+
+
+        <h2>Changes</h2>
+		
+        <h3>7 May 2015</h3>
+		<ul>
+			<li>Added nominal altitde in {@link EntityConfiguration}</li>
+		</ul>
+ 
+		<h3>23 April 2015</h3>
+		<ul>
+			<li>Changed default AltitudeType in {@link Location3D} from "AGL" to "MSL"</li>
+			<li>Changed time field in {@link FollowPathCommand} from real32 seconds to int64 milliseconds</li>
+			<li>Changed DwellTime field in {@link SearchTask} from real32 seconds to int64 milliseconds</li>
+			<li>Changed Duration field in {@link LoiterAction} from real32 seconds to int64 milliseconds</li>
+		</ul>
+		
+		<h3>16 April 2015</h3>
+		<ul>
+			<li>Moved "ActualEnergyRate", "CurrentCommand", "CurrentWaypoint", "Mode", and "AssociatedTasks" 
+				from {@link AirVehicleState} to {@link EntityState} </li>
+		</ul>
+ 
+		<h3>18 March 2015</h3>
+		<ul>
+            <li>All ID fields updated from uint32 to int64</li>
+            <li>PauseTime in {@link PathWaypoint} and Duration in {@link GimbalStareAction} changed to millisecond units</li>
+        </ul>
+		
+		<h3>11 March 2015</h3>
+		<ul>
+			<li>Moved EntityDetection, TrackEntityTask, and TrackEntityAction to PERCEIVE MDM</li>
+			<li>Added "Unknown" gimbal pointing type to {@link GimbalPointingMode}</li>
+			<li>Added reported boresight angles and vertical field of view to {@link GimballedPayloadState}</li>
+			<li>{@link CameraState} now derives from {@link GimballedPayloadState} for direct reporting of angles during state messages</li>
+			<li><Added associated payload actions to {@link CameraAction} to streamline gimbal pointing simultaneously with camera zoom</li>
+                        <li>Added {@link WaypointTransfer} message and {@link WaypointTransferMode} enumeration</li>
+                        <li>Added additional contingency point in {@link Waypoint}</li>
+                        <li>Added {@link PayloadStowAction} and added "stowed" to {@link GimbalPointingMode} </li>
+                </ul>
+		
+		<h3>5 March 2015</h3>
+		<ul>
+			<li>Moved body axis speeds, accelerations, and angles from {@link AirVehicleState} to {@link EntityState}.</li>
+			<li>Added {@link KeyValuePair} lists to {@link EntityConfiguration} and {@link EntityState} to support easy inclusion of custom data</li>
+			<li>Added {@link EntityDetection}</li>
+			<li>Added {@link TrackEntityTask}, {@link TrackEntityAction}</li>
+			<li>Added {@link FollowPathCommand} and {@link PathWaypoint}</li>
+		</ul>
+        
+        <h3>25 Feb 2015</h3>
+        <ul>
+            <li>Created {@link EntityConfiguration} and {@link EntityState} with {@link AirVehicleConfiguration} and {@link AirVehicleState} deriving from them
+            <li>Created {@link OperatingRegion} to collect all zones during {@link AutomationRequest}
+            <li>Moved vehicle eligibility constraints to {@link Task}
+            <li>Removed VehicleInfo structure for {@link AutomationRequest} constraints - all constraints via task or zone eligibility
+            <li>Removed Location2D. When only two dimensions are needed, the third is ignored as specified in message documentation
+            <li>Added altitude type. {@link Location3D} and {@link AbstractZone} now both utilize
+            <li>All time fields now use int64 type and are considered in units of milliseconds
+        </ul>
+ 
+        <h3>8 October 2010</h3>
+        <ul>
+            <li>Changed EndPoint in {@link VehicleInfo} to be {@link Location2D} based on group discussion
+            <li>Added Centerpoint field in {@link CameraState}
+            <li>Changed "ClimbRate" to "VerticalSpeed" in {@link FlightProfile}
+        </ul>
+
+        <h3>7 October 2010</h3>
+        <ul>
+            <li>Changed StartPoint in {@link VehicleInfo} to be {@link Location3D} so that altitude is always well defined
+            <li>Fixed documentation in {@link AirVehicleConfiguration} regarding MinAltAboveGround
+            <li>Fixed documentation in {@link AirVehicleState} regarding VerticalSpeed
+        </ul>
+
+        <h3>4 October 2010</h3>
+        <ul>
+            <li>Made {@link VideoStreamState} extend {@link PayloadState}
+            <li>Fixed documentation in {@link WeatherReport}
+        </ul>
+
+        <h3>21 September 2010</h3>
+        <ul>
+            <li>Set default WavelengthBand to "EO" in {@link CameraConfiguration}.
+            <li>Added aspect ratio comment in {@link CameraConfiguration}.
+            <li>Changed documentation in {@link VehicleInfo} to denote use of {@link Location2D} or
+            {@link Location3D} objects for "StartPoint" and "EndPoint".
+            <li>Added note regarding end-of-route behavior in {@link MissionCommand}.
+            <li>Changed {@link VideoStreamConfiguration} to extend {@link PayloadConfiguration} and removed.
+            "VideoStreamConfigurationList" from {@link AirVehicleConfiguration}.
+            <li>Added "Priority" and "Required" fields to {@link Task}.
+            <li>Created {@link WeatherReport}.
+            <li>Changed comment regarding WGS-84 and EGM-96.
+        </ul>
+        
+        <h3>31 August 2010</h3>
+        <ul>
+        <li>Fixed missing type in "UseInertialViewAngles" in {@link LineSearchTask}
+        </ul>
+
+        <h3>20 August 2010</h3>
+        <ul>
+        <li>Changed default altitude to Mean-sea-level from Height-above-ellipsoid</li>
+        <li>Added note in main documentation regarding "zero" in ids
+        <li>Changed documentation for "ContingencyPoint" in {@link Waypoint}
+        <li>Removed WavelengthBand from {@link CameraAction} and changed WavelengthBands to WavelengthBand (array to scalar) in {@link CameraConfiguration}
+        <li>Removed framerate information from {@link CameraConfiguration} and {@link SearchTask}
+        <li>Renamed "FlightMode" to {@link NavigationMode}
+        <li>Added "Hover" to {@link LoiterType} and updated {@link LoiterAction} to reflect the use of Axis in hover-mode.
+        <li>Added Min, Max, and Min AGL altitudes to {@link AirVehicleConfiguration}
+        <li>Updated documentation for Min/Max altitudes in {@link VehicleInfo}.
+        <li>Added start and end points in {@link VehicleInfo}.
+        <li>Improved (hopefully) the view angle documentation in {@link LineSearchTask}.
+        <li>Updated documentation in {@link Wedge}.
+        </ul>
+
+        <h3>10 August 2010</h3>
+        <ul>
+        <li>Changed "ContingencyWaypoint" type from {@link Waypoint} to uint32 in {@link Waypoint}.
+        <li>Renamed "LostCommPoint" to "ContingencyPoint" in {@link VehicleInfo} and updated the documentation.
+        <li>Added "RequiredFramerate" to {@link SearchTask}.
+        <li>Addded "AvailableFramerates" to {@link CameraConfiguration}.
+        <li>Changed "WaypointMode" enum to {@link FlightMode}.  WaypointMode was a misnomer, since the enum describes many flight states, "WaypointFollow" being
+        only one of the available states.
+        <li>Added "AvailableLoiterTypes" and "AvailableTurnTypes" to {@link AirVehicleConfiguration} to denote vehicle capabilities.
+        <li>Removed "AssignedAltitude" from {@link AirVehicleConfiguration} since altitude can be assigned using {@link VehicleInfo} object in {@link AutomationRequest}
+        The presence of "AssignedAltitude" caused ambiguity in planning situations.  (which takes precedence?)
+        <li>Added "CurrentCommand" to {@link AirVehicleState} to denote the VehicleActionCommand or MissionCommand currently being executed.
+        <li>Improved documentation in {@link Wedge}.
+        </ul>
+
+        <h3>28 July 2010</h3>
+        <ul>
+        <li>Removed "WedgeList" from {@link Task} and put "ViewAngleList" fields in {@link PointSearchTask} {@link LineSearchTask}, and {@link AreaSearchTask}
+        The definition of ViewAngle is based on the type of task.</li>
+        <li>Removed "Azimuth" and "Elevation" from {@link LineSearchTask}. Replaced with "ViewAngleList"</li>
+        <li>Added {@link KeyValuePair} to replace many existing string fields with a more structured set of data</li>
+        <li>Replaced string fields with {@link KeyValuePair} type to enable structured maps of data in {@link Task}, {@link OperatorSignal}, {@link AutomationResponse},
+        {@link ServiceStatus}, {@link SessionStatus}.</li>
+        <li>Added "CommandID" in {@link VehicleActionCommand} and {@link MissionCommand}</li>
+        <li>Added {@link CommandStatusType} enum
+        <li>Added "Status" fields in {@link VehicleActionCommand} and {@link MissionCommand}.
+        <li>Updated documentation to {@link VehicleInfo} to clarify the meaning of min/max altitudes.
+        </ul>
+
+        <h3>26 July 2010</h3>
+        <ul>
+        <li>Changed version tag to "2".
+        <li>Replaced references to "No Fly" to "Keep Out".
+        <li>Added "Length" parameter in {@link LoiterAction}.
+        <li>Fixed azimuth and elevation fields in {@link LineSearchTask} to reflect inertial coordinates.
+        <li>Updated comments in {@link AirVehicleState} regarding body angles.
+        <li>Added "Visual" to {@link ZoneAvoidanceType} enum.
+        <li>Added vertical component to {@link Wedge}.
+        <li>Added "ContingencyWaypoint" field in {@link Waypoint}.
+        <li>Added {@link AutomationResponse} type.
+        <li>Changed "PlanRequest" to {@link AutomationRequest}.
+        <li>Added "UseAltitude" field in {@link MustFlyTask}.
+        <li>Moved "Boundary" from {@link KeepInZone} and {@link KeepOutZone} into {@link AbstractZone}.
+        <li>Added {@link RemoveZones} and {@link RemoveAirVehicles} types.
+        <li>Added {@link FlightDirectorAction} type.
+        </ul>
+
+        ( Previous changes are reflected in CMASI version 1 MDM )
+        
+-->
+<MDM>
+    <SeriesName>UT</SeriesName>
+    <Namespace>uxas/projects/UT</Namespace>
+    <Version>1</Version>
+
+        <!-- Base class for geometry types -->
+    <StructList>
+
+       <!-- Defines the VIP escort task for two UAVs -->
+       <Struct Name="VipEscortTask" Extends="Task" Series="CMASI">
+           <Field Name="VIP" Type="int64" Default="1" />
+           <Field Name="UAV1" Type="int64" Default="2" />
+           <Field Name="UAV2" Type="int64" Default="" />
+       </Struct>
+        
+    </StructList>
+		
+	
+</MDM>
+
+
+
+
