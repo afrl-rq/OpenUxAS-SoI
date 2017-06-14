@@ -3,9 +3,9 @@
 
 ## Files:
 
-* `cfg_VipEscort.xml` - This is 
-* `runUxAS_VipEscort.sh` - 
-* `runAMASE_VipEscort.sh` - 
-* `Scenario_VipEscort.xml` -
+* `cfg_VipEscort.xml`
+* `runUxAS_VipEscort.sh`
+* `runAMASE_VipEscort.sh`
+* `Scenario_VipEscort.xml`
 
 
