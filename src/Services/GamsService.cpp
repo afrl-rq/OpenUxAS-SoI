@@ -64,6 +64,7 @@ namespace transport = madara::transport;
 namespace controllers = gams::controllers;
 namespace variables = gams::variables;
 namespace platforms = gams::platforms;
+namespace loggers = gams::loggers;
 
 /// static knowledge base which is configured with UxAS transport
 knowledge::KnowledgeBase uxas::service::GamsService::s_knowledgeBase;
@@ -358,7 +359,8 @@ namespace service
         
         if (location.approximately_equal(current, epsilon))
         {
-            gams::loggers::global_logger->log(gams::loggers::LOG_MAJOR,
+            madara_logger_ptr_log (loggers::global_logger.get (),
+              loggers::LOG_MAJOR,
               "UxASGamsPlatform::move: [%.4f, %.4f, %.4f] ~= [%.4f, %.4f, %.4f]"
               " with %.2f m accuracy. Arrived at location.\n",
               location.lat(), location.lng(), location.alt(), 
@@ -368,7 +370,8 @@ namespace service
         }
         else
         {
-            gams::loggers::global_logger->log(gams::loggers::LOG_MAJOR,
+            madara_logger_ptr_log (loggers::global_logger.get (),
+              loggers::LOG_MAJOR,
               "UxASGamsPlatform::move: [%.4f, %.4f, %.4f] != [%.4f, %.4f, %.4f]"
               " with %.2f m accuracy. Still moving to location.\n",
               location.lat(), location.lng(), location.alt(), 
@@ -592,7 +595,8 @@ int GamsService::move (const gams::pose::Position & location,
     
     if (gamsServicePlatform)
     {
-        gams::loggers::global_logger->log(gams::loggers::LOG_MAJOR,
+        madara_logger_ptr_log (loggers::global_logger.get (),
+          loggers::LOG_MAJOR,
           "GamsService::move: moving to [%.4f, %.4f, %.4f]"
           " with %.2f m accuracy\n",
           location.lat(), location.lng(), location.alt(), epsilon);
@@ -623,14 +627,16 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
     m_controllerSettings.run_time = 10;
     m_controllerSettings.send_hertz = -1;
     
-    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+    madara_logger_ptr_log (loggers::global_logger.get (),
+        loggers::LOG_MAJOR,
         "GamsService::Starting configure\n");
     
     // set the prefixes for the global maps of agents to entities
     agentToEntity.set_name("agent", gamsServiceMutex);
     entityToAgent.set_name("entity", gamsServiceMutex);
     
-    gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
+    madara_logger_ptr_log (loggers::global_logger.get (),
+        loggers::LOG_MINOR,
         "GamsService::Iterating config XML\n");
     
     
@@ -643,8 +649,9 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         {
             if (!currentXmlNode.attribute("BinaryFile").empty())
             {
-                gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
-                    "GamsServiceDriver::Loading knowledge base from %s\n",
+                madara_logger_ptr_log (loggers::global_logger.get (),
+                    loggers::LOG_MAJOR,
+                    "GamsService::Loading knowledge base from %s\n",
                     currentXmlNode.attribute("BinaryFile").as_string());
     
                 s_knowledgeBase.load_context(
@@ -653,8 +660,9 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
             
             if (!currentXmlNode.attribute("KarlFile").empty())
             {
-                gams::loggers::global_logger->log(gams::loggers::LOG_ALWAYS,
-                    "GamsServiceDriver::Evaluating karl file\n");
+                madara_logger_ptr_log (loggers::global_logger.get (),
+                    loggers::LOG_MAJOR,
+                    "GamsService::Evaluating karl file\n");
     
                 knowledge::EvalSettings settings;
                 settings.treat_globals_as_locals = true;
@@ -668,6 +676,10 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         // if we need to setup the GamsController
         else if(std::string("GamsController") == currentXmlNode.name())
         {
+            madara_logger_ptr_log (loggers::global_logger.get (),
+                loggers::LOG_MAJOR,
+                "GamsService::config: importing GamsController settings\n");
+    
             // retrieve the agent prefix/id
             if (!currentXmlNode.attribute("AgentPrefix").empty())
             {
@@ -727,6 +739,10 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         // if we need to setup the agent mappings
         else if(std::string("Agents") == currentXmlNode.name())
         {
+            madara_logger_ptr_log (loggers::global_logger.get (),
+                loggers::LOG_MAJOR,
+                "GamsService::config: importing agent mappings\n");
+    
             // iterate through agent mappings
             for (pugi::xml_node agentNode = currentXmlNode.first_child();
                  agentNode; agentNode = agentNode.next_sibling())
@@ -755,6 +771,10 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         // if we have logging to setup
         else if(std::string("Logging") == currentXmlNode.name())
         {
+            madara_logger_ptr_log (loggers::global_logger.get (),
+                loggers::LOG_MAJOR,
+                "GamsService::config: importing logging settings\n");
+    
             pugi::xml_node madaraNode = currentXmlNode.child("Madara");
             pugi::xml_node gamsNode = currentXmlNode.child("Gams");
             
@@ -790,6 +810,10 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         // if we need to setup the agent mappings
         else if(std::string("Groups") == currentXmlNode.name())
         {
+            madara_logger_ptr_log (loggers::global_logger.get (),
+                loggers::LOG_MAJOR,
+                "GamsService::config: importing group settings\n");
+    
             // iterate through agent mappings
             for (pugi::xml_node groupNode = currentXmlNode.first_child();
                  groupNode; groupNode = groupNode.next_sibling())
@@ -848,7 +872,8 @@ GamsService::initialize()
 {
     bool bSuccess(true);
 
-    gams::loggers::global_logger->log(0, "GamsService::initialize\n");
+    madara_logger_ptr_log (loggers::global_logger.get (),
+        loggers::LOG_MAJOR, "GamsService::initialize\n");
     
     // create the UxAS platform
     m_controller->init_platform(new UxASGamsPlatform(this));
@@ -973,11 +998,10 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
         int64_t entityId = message->getID();
         std::string agentPrefix = getAgentPrefix (entityId);
 
-#ifdef DART_DEBUG
-        ::madara::logger::global_logger->log (0,
+        madara_logger_ptr_log (loggers::global_logger.get (),
+            loggers::LOG_MAJOR,
             "GamsService: Processing entity(%d), agent(%s)\n",
             (int)entityId, agentPrefix.c_str ());
-#endif
         
         variables::Agent agent;
         if (agentPrefix != "")
@@ -986,11 +1010,6 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
 
             if (found != m_agentMap.end ())
             {
-#ifdef DART_DEBUG
-                ::madara::logger::global_logger->log (0,
-                    "GamsService: Found entity(%d), agent(%s)\n",
-                    (int)entityId, agentPrefix.c_str ());
-#endif
                 agent = found->second;
             }
             else
