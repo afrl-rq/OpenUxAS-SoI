@@ -23,6 +23,7 @@ srcs_services = [
   'WaypointPlanManagerService.cpp',
   'GamsService.cpp',
   'GamsServiceDriver.cpp',
+  'CollisionAvoidanceService.cpp',
 ]
 
 incs_services = [
@@ -50,6 +51,7 @@ incs_services = [
     ace_root,
     madara_root + '/include',
     gams_root + '/src',
+    dmpl_root + '/include',
   ),
   incs_lmcp,
 ]
