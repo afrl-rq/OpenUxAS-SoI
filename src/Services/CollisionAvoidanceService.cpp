@@ -1284,46 +1284,15 @@ namespace uxas
     
     bool CollisionAvoidanceService::configure(const pugi::xml_node& serviceXmlNode)
     {
-      std::cout << "Collision Avoidance Service configured ...\n";
-      return true;
-        
-      //-- TBD
-      settings.type = madara::transport::MULTICAST;
-
-      /*
-        platform_init_fns["vrep"] = init_vrep;
-        platform_init_fns["vrep-uav"] = init_vrep;
-        platform_init_fns["vrep-quad"] = init_vrep;
-        platform_init_fns["vrep-heli"] = init_vrep;
-        platform_init_fns["vrep-ant"] = init_vrep;
-        platform_init_fns["vrep-uav-laser"] = init_vrep;
-        platform_init_fns["vrep-quad-laser"] = init_vrep;
-      */
-  
+      std::cout << "CollisionAvoidanceService configured for id " << settings.id << "...\n";
+      
       //-- handle any command line arguments and check their sanity
       //handle_arguments (argc, argv);
-      check_argument_sanity ();
-
-      if (settings.hosts.size () == 0)
-        {
-          //-- setup default transport as multicast
-          settings.hosts.push_back (default_multicast);
-          if (dmpl::debug) {
-            settings.add_receive_filter (madara::filters::log_aggregate);
-            settings.add_send_filter (madara::filters::log_aggregate);
-          }
-        }
-
-      settings.queue_length = 1000000;
-      settings.set_deadline(1);
-
-      //-- configure the knowledge base with the transport settings
-      knowledge.attach_transport(host, settings);
+      //check_argument_sanity ();
 
       //-- Initialize commonly used local variables
       id = settings.id;
       num_processes = processes;
-
 
       /******************************************************************/
       //-- Invoking constructors
@@ -1346,10 +1315,10 @@ namespace uxas
                                  node_uav::node_uav_role_Uav::thread0);
 
       //-- Synchronize to make sure all nodes are up
+      /*
       knowledge.define_function ("sync_inputs", dmpl::sync_inputs);
-      threads::Threader threader(knowledge);
       Algo *syncInputsAlgo = new Algo(1000000, "sync_inputs", &knowledge);
-      syncInputsAlgo->start(threader);
+      syncInputsAlgo->start(m_threader);
       {
         syncPhase = 1;
         for(;;) {
@@ -1368,23 +1337,11 @@ namespace uxas
           sleep(0.2);
         }
       }
+      */
 
       //-- Initializing platform
       engine::KnowledgeMap platform_args;
-      /*
-        PlatformInitFns::iterator init_fn = platform_init_fns.find(platform_name);
-        if(init_fn != platform_init_fns.end())
-        init_fn->second(platform_params, knowledge, platform_args);
-        else
-        init_vrep(platform_params, knowledge, platform_args);
-      */
-  
-      //-- Initializing simulation
-      if(node_name == "uav" && role_name == "Uav") {
-        knowledge.define_function ("initialize_platform", node_uav::node_uav_role_Uav::base_StartingPosition);
-      }
-      knowledge.evaluate("initialize_platform ()");
-
+      
       //-- Creating algorithms
       std::vector<Algo *> algos;
       Algo *algo;
@@ -1398,9 +1355,9 @@ namespace uxas
 
       //-- start threads and simulation
       for(int i = 0; i < algos.size(); i++)
-        algos[i]->start(threader);
+        algos[i]->start(m_threader);
       std::stringstream buffer;
-      buffer << "(vrep_ready = 1) && (S" << id << ".init = S" << id << ".init) && S0.init";
+      buffer << "(S" << id << ".init = S" << id << ".init) && S0.init";
       for(unsigned int i = 1; i < num_processes; ++i)
         buffer << " && S" << i << ".init";
       std::string expression = buffer.str ();
@@ -1412,9 +1369,6 @@ namespace uxas
       knowledge.set("begin_sim", "1");
       std::cerr << "*** AGENT " << id << " READY ***" << std::endl;
 
-      //-- wait for all threads to terminate
-      threader.wait();
-  
       return true;
     }
 
