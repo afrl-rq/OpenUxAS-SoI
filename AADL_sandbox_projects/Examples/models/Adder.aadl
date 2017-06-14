@@ -1,0 +1,62 @@
+--Copyright 2016-2017 Rockwell Collins, Inc. All rights reserved.
+-------------------------------------
+-- This adder implements the following system.
+-- The purpose of the example is to demonstrate 
+-- how different values can be used in B and C
+-- without changing the top-level contract 
+-- (in this case, that Output = 5).
+--
+--    B_____
+--          |
+--          + ------> Output
+--    C_____|      
+-------------------------------------
+
+
+package Adder
+public 
+   with Base_Types;
+   
+   
+system B
+	features
+		Output: out data port Base_Types::Integer;
+			
+	annex agree {** 
+		guarantee "B output range" : Output = 1;
+	**};	
+end B ; 
+
+system C
+	features
+		Output: out data port Base_Types::Integer;
+			
+	annex agree {** 
+		guarantee "C output range" : Output = 4;
+	**};	
+end C ; 
+   
+system top_level
+	features
+		Output: out data port Base_Types::Integer;
+	annex agree {** 
+		guarantee "System output is sum of component outputs" : Output = B_out + C_out;
+		guarantee "System output is 5" : Output = 5;
+		eq B_out : Base_Types::Integer;
+		eq C_out : Base_Types::Integer;
+	**};	
+end top_level;
+
+system implementation top_level.Impl
+	subcomponents
+		B_sub : system B ; 
+		C_sub : system C ; 
+	annex agree {**
+		assign B_out = B_sub.Output;
+		assign C_out = C_sub.Output;
+		assign Output = B_out + C_out;
+	**};
+	 
+end top_level.Impl;	
+
+end Adder;

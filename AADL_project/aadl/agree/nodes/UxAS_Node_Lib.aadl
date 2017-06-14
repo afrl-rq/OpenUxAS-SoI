@@ -15,8 +15,11 @@ public
 		let
   			ret = cond -> (pre(ret) or cond);
 		tel;
-		
-	node bool_to_num(a : bool) returns (res : int);
+	
+	-----------------------------------------------------------------
+	-- The bool_to_int node returns 1 for true and 0 for false.
+	-----------------------------------------------------------------	
+	node bool_to_int(a : bool) returns (res : int);
 		let
 		   res = if a then 1 else 0;
 		tel;

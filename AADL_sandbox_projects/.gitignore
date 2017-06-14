@@ -1,3 +1,15 @@
-.aadlbin-gen/
-*.aadlbin-gen
+*.aadlbin
+*.aaxl2
+*.aadl_diagram
+
 UxAS_jad/.aadlbin-gen/
+UxAS_jad/instances
+UxAS_jad/diagrams
+
+Examples/.aadlbin-gen
+Examples/instances
+Examples/diagrams/
+
+UxAS_Arch_Model_sjsr/.aadlbin-gen
+UxAS_Arch_Model_sjsr/instances
+UxAS_Arch_Model_sjsr/diagrams

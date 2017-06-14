@@ -23,24 +23,39 @@ thread RouteAggregatorService
         AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
    	annex agree{**
-   		const IDLE : int = 0;
+   		-------------------------------------------------------------
+   		-- Note: I'm not sure we need to model this IDLE <--> PENDING state machine,
+   		--  but I'm keeping it for now. This is described in the Wiki.
+   		--  We're not yet sure if we'll want to refer to this service's state in our system-level
+   		--  guarantees.
+  		-------------------------------------------------------------
+  		-- BEGIN STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		--State constants
+ 		const IDLE : int = 0;
         const PENDING : int = 1;
 
-		eq state: int;
-		
-		eq num_route_requests_being_serviced : int = 
-			0 -> 
-				(pre(num_route_requests_being_serviced) 
-					+ UxAS_Node_Lib.bool_to_num(event(RouteRequest_in)) 
-					- UxAS_Node_Lib.bool_to_num(event(RoutePlanRequest_out))
-				);
-				
 		-------------------------------------------------------------
-		--State machine support macros
+		--State variable
+		eq state: int;
+
+		-------------------------------------------------------------
+		--State machine support macros		
+
 		eq previous_state: int = prev(state, IDLE);
+
 		eq some_transition: bool = T_IDLE_TO_PENDING
 									or T_PENDING_TO_IDLE;
 
+		-------------------------------------------------------------
+		--Helper macro for this particular state machine
+		eq num_route_requests_being_serviced : int = 
+			0 -> 
+				(pre(num_route_requests_being_serviced) 
+					+ UxAS_Node_Lib.bool_to_int(event(RouteRequest_in)) 
+					- UxAS_Node_Lib.bool_to_int(event(RouteResponse_out))
+				);
+				
 		-------------------------------------------------------------	
 		--State transition macros
 		
@@ -55,7 +70,7 @@ thread RouteAggregatorService
 		--Since we may be servicing multiple requests at a time, we stay in pending until all requests have been 
 		-- serviced, in which case we return to IDLE
 		eq T_PENDING_TO_IDLE : bool = 
-			(previous_state = IDLE) and (num_route_requests_being_serviced = 0);
+			(previous_state = PENDING) and (num_route_requests_being_serviced = 0);
 			
 		-------------------------------------------------------------	
 		--State machine guarantees
@@ -76,19 +91,51 @@ thread RouteAggregatorService
         guarantee "T_PENDING_TO_IDLE_effect" : T_PENDING_TO_IDLE => (state = IDLE);
 
 		-------------------------------------------------------------
-		--TODO: We need a guarantee about not producing outputs when nothing is being serviced. 
-		--  Be careful on the timing.
+		-- END STATE MACHINE LOGIC
+		-------------------------------------------------------------
 		
-		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state...
-		-- We probably want our guarantees to say things like the outputs have an ID that matches some prior input ID or something like that.
+		--Other guarantees for correct behavior
+		guarantee "Only produce output when in PENDING": event(RouteResponse_out) => (state = PENDING);
+
+		--Given that the purpose of the aggregator role is to service aggregate route requests,
+		-- by interacting with the route planner(s), there are a whole bunch of implied guarantees.
+		-- Some of those are listed below.
+		
+		-- Each RouteResponse_out has an ID that matches some prior RouteRequest_in. Should we pick a time window so that
+		--  we can state this property? i.e., RouteRequest_in => within X we get a ReouteResponse_out with a matching ID
+		
+		-- The locations and destinations of the responses should match the requests, or an error should be produced.
+		--  Note, we'll need an assumption on the route plan responses in order to satisfy this.
+		--  I'm not sure how to write this without saving state of the requests and responses received so far :(
+		--  This could be done for one RouteRequest_in at a time, provided I assume some max number of RoutePlanRequests 
+		--  that correspond to it. I think that would be worth doing to illustrate what we can specify if we simplify things a bit.
+		--  And then I could expand it to handle more than one RouteRequest at a time (some max number, like 2 :) ).
+		
+		-------------------------------------------------------------
+		-- Properties/Lemmas that could be captured in SpeAR or wherever this component is instantiated in AADL.
+		-- * num_route_requests_being_serviced >= 0.			
+		
+		------------------------------------------------------------
+		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 
+		
+		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state... 
+		-- John: Modeling the state makes sense if we have a system-level guarantee that references it.
+		-- Ben: Higher level req may be if all responses are received, response is sent out.
+		-- John: We could try to figure out our system-level reqts first and model the Wiki more coarsely.
 		
 		-- Q (Philosophical): Should component contracts include only what we need for architectural level reasoning,
 		--  or should the contracts be sufficiently detailed so that any component satisfying the contract will
 		--  result in a correctly functioning system? Or would one argue that these are in fact the same?
-		--  
+		-- John: In general, a component contract should have at least enough info to prove system-level reqts.
+		-- 	Component reqts need to trace to some system reqt.
+		-- Ben: But sometimes we build components out of context. Maybe some are identified for "plug-and-play." Those may
+		--  be over-designed.
+		-- Aaron: Contracts should ensure that a replacement component gives us the same functionality that we had 
+		--  previously. 
+		 
 		--  Currently, my contracts on this component are not nearly sufficient to ensure correctness. The output
 		--  messages could be jibberish. Even if I require the response ID to match the request ID, the
-		--  rest of the information could be garbage.  
+		--  rest of the information could be garbage.
 
 	**};
 end RouteAggregatorService;

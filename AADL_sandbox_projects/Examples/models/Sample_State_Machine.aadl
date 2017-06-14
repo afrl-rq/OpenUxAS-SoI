@@ -1,0 +1,88 @@
+--Copyright 2016-2017 Rockwell Collins, Inc. All rights reserved.
+
+-----------------------------------------------------
+-- The state machine this implements looks like this:
+--   A->B->C
+--   |     ^
+--   |_____|
+------------------------------------------------------
+
+package Sample_State_Machine
+
+public
+	with Base_Types;
+	
+system Sample_State_Machine_Sys
+	features
+      	Go_To_Next_State_in: in data port Base_Types::Boolean;
+      	Skip_Enabled_in : in data port Base_Types::Boolean;
+      	State_out: out data port Base_Types::Integer;
+		
+	annex agree {**
+		const StateA : int = 0;
+        const StateB : int = 1;
+        const StateC : int = 2;
+		
+		-------------------------------------------------------------
+		--State machine support macros
+		eq previous_state: int = prev(State_out, StateA);
+		eq some_transition: bool = T_A_to_B
+									or T_B_to_C
+									or T_A_to_C;
+
+		-------------------------------------------------------------		
+		--State transition macros
+		
+		--This is initially false to prevent transition to B on the initial timestep
+		eq T_A_to_B : bool = 
+			false -> ((previous_state = StateA) and Go_To_Next_State_in) and not Skip_Enabled_in;
+	
+		-- The following would be an easy mistake to make. To see how realizability catches the problem,
+		--  comment out T_A_to_B above, uncomment T_A_to_B below, and run realizability (on the system). 
+		--  You should see a counterexample.
+--		eq T_A_to_B : bool = 
+--			false -> ((previous_state = StateA) and Go_To_Next_State_in);
+	
+		eq T_B_to_C : bool = 
+			(previous_state = StateB) and Go_To_Next_State_in;
+		
+		--This is initially false to prevent transition to B on the initial timestep	
+		eq T_A_to_C : bool = 
+			false -> ((previous_state = StateA) and Go_To_Next_State_in and Skip_Enabled_in);
+
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+		-- Note: The state machine is represented by guarantees, which AGREE will assume to be 
+		-- true since this is the lowest level component.  Guarantees (or lemmas) about this 
+		-- state machine would be stated and proved at the next level up.  This idiom allows us to 
+		-- state the transitions individually, without complex if/then/else nests that would 
+		-- result if we attempted to model the state machine in imperative style; 
+		-- these nests would become progressively more difficult to maintain as the 
+		-- state machine became more complex (more states and/or transitions).
+		-- Additionally, a more "declarative" style is more natural for architectural 
+		-- level modeling.
+		-- The only "tricky" part is to ensure that all transitions are encoded.
+		
+		--This guarantee specifies the initial state.
+        guarantee "Initial_State": (State_out = StateA) -> true;
+        
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (State_out = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_A_to_B_effect" : T_A_to_B => (State_out = StateB);
+       
+        guarantee "T_B_to_C_effect" : T_B_to_C => (State_out = StateC);
+               
+        guarantee "T_A_to_C_effect" : T_A_to_C => (State_out = StateC);                       
+                     
+		**};
+		
+	end Sample_State_Machine_Sys;
+
+end Sample_State_Machine;
