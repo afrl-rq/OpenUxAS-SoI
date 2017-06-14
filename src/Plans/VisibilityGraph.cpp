@@ -273,7 +273,7 @@ namespace n_FrameworkLib
         {
             V_POLYGON_IT_t itPolygonBegin = vplygnGetPolygons().begin();
             V_POLYGON_IT_t itPolygonEnd = vplygnGetPolygons().end();
-            CPolygon::enError errPolygon = itPolygon->errCalculateDistanceToOtherPolygons(itPolygonBegin, itPolygonEnd);
+            itPolygon->errCalculateDistanceToOtherPolygons(itPolygonBegin, itPolygonEnd);
         }
 
         //based on order of polygons:
@@ -285,7 +285,7 @@ namespace n_FrameworkLib
             {
                 for (V_POLYGON_IT_t itPolygons2 = (itPolygons1 + 1); itPolygons2 != vplygnGetPolygons().end(); itPolygons2++)
                 {
-                    CPolygon::enError errPolygon = itPolygons1->errFindVisibleEdges(vposGetVerticiesBase(), itPolygons2, veGetEdgesVisibleBase());
+                    itPolygons1->errFindVisibleEdges(vposGetVerticiesBase(), itPolygons2, veGetEdgesVisibleBase());
                 }
             }
         }
@@ -301,7 +301,7 @@ namespace n_FrameworkLib
                 {
                     if (itPolygons2 != itPolygons1)
                     {
-                        CPolygon::enError errPolygon = itPolygons1->errAddExtraVisibleEdges(vposGetVerticiesBase(), itPolygons2, veGetEdgesVisibleBase());
+                        itPolygons1->errAddExtraVisibleEdges(vposGetVerticiesBase(), itPolygons2, veGetEdgesVisibleBase());
                     }
                 }
             }
@@ -309,12 +309,12 @@ namespace n_FrameworkLib
             itPolygons1 = vplygnGetPolygons().end() - 1;
             for (V_POLYGON_IT_t itPolygons2 = vplygnGetPolygons().begin(); itPolygons2 != (vplygnGetPolygons().end() - 1); itPolygons2++)
             {
-                CPolygon::enError errPolygon = itPolygons1->errAddExtraVisibleEdges(vposGetVerticiesBase(), itPolygons2, veGetEdgesVisibleBase());
+                itPolygons1->errAddExtraVisibleEdges(vposGetVerticiesBase(), itPolygons2, veGetEdgesVisibleBase());
             }
         }
         else if (!vplygnGetPolygons().empty()) //if(vplygnGetPolygons().size() > 1)
         {
-            CPolygon::enError errPolygon = vplygnGetPolygons().begin()->errAddExtraVisibleEdges(vposGetVerticiesBase(), vplygnGetPolygons().begin(), veGetEdgesVisibleBase());
+            vplygnGetPolygons().begin()->errAddExtraVisibleEdges(vposGetVerticiesBase(), vplygnGetPolygons().begin(), veGetEdgesVisibleBase());
         }
         PRINT_DEBUG("*DEBUG*")
         return (errReturn);
@@ -510,10 +510,8 @@ namespace n_FrameworkLib
         
         for (auto itWayNodeIds = wayIdVsNodeIds.begin(); itWayNodeIds != wayIdVsNodeIds.end(); itWayNodeIds++)
         {
-            bool isNewEdge(false);
             if(itWayNodeIds->first != currentWayId)
             {
-                isNewEdge = true;
                 itStart = nodeIdVsIndex.find(itWayNodeIds->second);
                 if(itStart != nodeIdVsIndex.end())
                 {
@@ -566,7 +564,6 @@ namespace n_FrameworkLib
                 vposGetVerticiesBase().size());
 
         PRINT_DEBUG("*DEBUG* num_vertices(edglstvecGetGraph())[" << num_vertices(edglstvecGetGraph()) << "]")
-        boost::property_map<GRAPH_LIST_VEC_t, boost::edge_weight_t>::type weightmap = get(boost::edge_weight, edglstvecGetGraph());
 
         //reintialize the vertex parents
         vvvtxGetVertexParentBase().clear();
@@ -591,7 +588,6 @@ namespace n_FrameworkLib
             vvvtxGetVertexParentBase()[szCountVerticies] = vtxParents;
 
             //TODO:: need to calculate the a vector of the distance matrix using distances and parents
-            int iSanityCheck(static_cast<int> (num_vertices(edglstvecGetGraph())));
             for (size_t szCountVerticies2 = 0; szCountVerticies2 < num_vertices(edglstvecGetGraph()); szCountVerticies2++)
             {
                 vviGetVertexDistancesBase()[szCountVerticies][szCountVerticies2] = viDistances[szCountVerticies2];
@@ -746,7 +742,6 @@ namespace n_FrameworkLib
                 (*ptr_mipthDistanceMapStart)[iIdEnd].iGetIndexBaseBegin() = -1;
                 (*ptr_mipthDistanceMapStart)[iIdEnd].iGetIndexBaseEnd() = -1;
                 (*ptr_mipthDistanceMapStart)[iIdEnd].iGetLength() = static_cast<int> (posPositionStart.relativeDistance2D_m(posPositionEnd));
-                int iTemp = static_cast<int> (posPositionStart.relativeDistance2D_m(posPositionEnd));
                 (*ptr_mipthDistanceMapStart)[iIdEnd].posGetStart() = posPositionStart;
                 (*ptr_mipthDistanceMapStart)[iIdEnd].posGetEnd() = posPositionEnd;
             }
@@ -756,7 +751,6 @@ namespace n_FrameworkLib
                 // Check for visible edges from the Start Position to all base vertices
                 //////////////////////////////////////////////////////////////////////////////////////////
 
-                double dClosestEdge_m((std::numeric_limits<double>::max)()); //set to big number
                 CEdge edgeClosest;
 
                 //check start position with all base vertices to find visible edges
@@ -1788,8 +1782,6 @@ namespace n_FrameworkLib
                                 //        gam = acos( (norm(a - z)^2 - 2*R^2)/(-2*R^2) );
                                 posTemp = posA;
                                 posTemp -= posZ;
-                                double dGama(acos((pow(posTemp.absoluteDistance2D_m(), 2.0) -
-                                        (-2.0 * pow(dTurnRadius_m, 2.0))) / (-2.0 * pow(dTurnRadius_m, 2.0))));
 
                                 //        swp = [swp; [a norm(swp(end,1:2)-a) a 0]; [z R*gam c turn]];
                                 //

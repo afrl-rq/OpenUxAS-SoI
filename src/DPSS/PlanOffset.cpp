@@ -226,7 +226,6 @@ void Dpss::CorrespondingStarePoints(std::vector<xyPoint>& plan, std::vector<xyPo
         lengthCovered += s.len();
 
         xyPoint starePoint;
-        int rdIndx = 0;
 
         double correspondingRoadLength = lengthCovered/totalPlanLength*totalRoadLength;
         double roadCovered = 0.0;
@@ -235,7 +234,6 @@ void Dpss::CorrespondingStarePoints(std::vector<xyPoint>& plan, std::vector<xyPo
             Segment r(road[n-1],road[n]);
             if( (roadCovered+r.len()) > correspondingRoadLength)
             {
-                rdIndx = n;
                 if(r.len() > 1e-6)
                     starePoint = road[n-1] + (road[n] - road[n-1])*((correspondingRoadLength-roadCovered)/r.len());
                 else

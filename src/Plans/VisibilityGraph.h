@@ -275,7 +275,7 @@ namespace n_FrameworkLib
 
             //run any functions that are needed to get the polygons ready for the visibility graph
             for (V_POLYGON_IT_t itPolygon = vplygnGetPolygons().begin(); itPolygon != vplygnGetPolygons().end(); itPolygon++) {
-                CPolygon::enError errPolygon = itPolygon->errFinalizePolygon(vposGetVerticiesBase());
+                itPolygon->errFinalizePolygon(vposGetVerticiesBase());
             }
 
             return (errReturn);
@@ -631,7 +631,6 @@ namespace n_FrameworkLib
         //%end getlinevals
 
         void GetLineIntervals(const CPosition& posP1, const CPosition& posP2, int& iVert, double& dM, double& dB) {
-            double dTol(1.0e-6);
             if (n_Const::c_Convert::bCompareDouble(posP1.m_north_m, posP2.m_north_m, n_Const::c_Convert::enEqual)) {
                 iVert = 1;
                 dM = 0.0;

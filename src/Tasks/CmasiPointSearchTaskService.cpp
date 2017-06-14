@@ -63,8 +63,6 @@ CmasiPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 {
     bool isSuccessful(true);
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     if (isSuccessful)
@@ -251,7 +249,6 @@ bool CmasiPointSearchTaskService::isCalculateOption(const int64_t& taskId, int64
         waypoint->setLongitude(taskOption->getEndLocation()->getLongitude());
         waypoint->setAltitude(taskOption->getEndLocation()->getAltitude());
         routePlan->getWaypoints().push_back(waypoint);
-        int64_t routeId = TaskOptionClass::m_firstImplementationRouteId;
 
         routePlan->setRouteID(TaskOptionClass::m_firstImplementationRouteId);
 //        double costForward_ms = static_cast<int64_t> (((nominalSpeed_mps > 0.0) ? (standoffDistance / nominalSpeed_mps) : (0.0))*1000.0);
@@ -261,7 +258,6 @@ bool CmasiPointSearchTaskService::isCalculateOption(const int64_t& taskId, int64
 
         auto taskOptionLocal = taskOption->clone();
         taskOptionLocal->setOptionID(optionId);
-        bool optionPushedBack(false);
         for (auto itEligibleEntites = m_speedAltitudeVsEligibleEntityIdsRequested.begin(); itEligibleEntites != m_speedAltitudeVsEligibleEntityIdsRequested.end(); itEligibleEntites++)
         {
             taskOptionLocal->getEligibleEntities() = itEligibleEntites->second;
@@ -274,7 +270,6 @@ bool CmasiPointSearchTaskService::isCalculateOption(const int64_t& taskId, int64
             pTaskOptionClass->m_orderedRouteIdVsPlan[routePlan->getRouteID()] = routePlan;
             m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
             m_taskPlanOptions->getOptions().push_back(taskOptionLocal);
-            optionPushedBack = true;
             // start a new option
             optionId++;
             taskOptionLocal = taskOption->clone();

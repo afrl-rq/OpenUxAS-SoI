@@ -48,40 +48,38 @@ public:
 public:
 
     c_VehicleBase() :
-    CBaseObject(1),
-    m_vehicleType(envehicleUAV),
-    m_iVisibilityVertexIndex(-1),
-    m_bUseTaskEligibility(false),
-    m_dHeadingInitial_rad(0.0)
+    	CBaseObject(1),
+		m_vehicleType(envehicleUAV),
+		m_iVisibilityVertexIndex(-1),
+		m_bUseTaskEligibility(false),
+		m_dHeadingInitial_rad(0.0)
     {};
     
     c_VehicleBase(const int& iID,
-            const double& dNorth_m, const double& dEast_m, const double& dPositionZ_m,
+    		const double& dNorth_m, const double& dEast_m, const double& dPositionZ_m,
             const double& dPsi_rad,
             const double& dDistancePrevious = 0.0,
             const n_enVehicleType_t& vehicleType = envehicleMunition
             ) :
-    CBaseObject(iID, dNorth_m, dEast_m, dPositionZ_m, dPsi_rad),
-    CAssignment(iID, dNorth_m, dEast_m, dPositionZ_m, dPsi_rad, dDistancePrevious),
-    m_vehicleType(vehicleType),
-    m_iVisibilityVertexIndex(-1),
-    m_bUseTaskEligibility(false),
-    m_dHeadingInitial_rad(dPsi_rad)
+            	CBaseObject(iID, dNorth_m, dEast_m, dPositionZ_m, dPsi_rad),
+				CAssignment(iID, dNorth_m, dEast_m, dPositionZ_m, dPsi_rad, dDistancePrevious),
+				m_vehicleType(vehicleType),
+				m_iVisibilityVertexIndex(-1),
+				m_bUseTaskEligibility(false),
+				m_dHeadingInitial_rad(dPsi_rad)
     {
         stringstream sstrFileName;
         sstrFileName << "V_" << iGetID();
         strGetBaseFileName() = sstrFileName.str();
     };
 
-
-
     c_VehicleBase(afrl::cmasi::AirVehicleConfiguration* pAirVehicleConfiguration) :
-    CVehicleParameters(pAirVehicleConfiguration),
-    CBaseObject(pAirVehicleConfiguration->getID()),
-    m_vehicleType(envehicleUAV),
-    m_iVisibilityVertexIndex(-1),
-    m_bUseTaskEligibility(false),
-    m_dHeadingInitial_rad(0.0)
+    	CBaseObject(pAirVehicleConfiguration->getID()),
+		CVehicleParameters(pAirVehicleConfiguration),
+		m_vehicleType(envehicleUAV),
+		m_iVisibilityVertexIndex(-1),
+		m_bUseTaskEligibility(false),
+		m_dHeadingInitial_rad(0.0)
     {
         stringstream sstrFileName;
         sstrFileName << "V_" << iGetID();
@@ -89,12 +87,12 @@ public:
     };
 
     c_VehicleBase(afrl::impact::SurfaceVehicleConfiguration* pSurfaceVehicleConfiguration) :
-    CVehicleParameters(pSurfaceVehicleConfiguration),
-    CBaseObject(pSurfaceVehicleConfiguration->getID()),
-    m_vehicleType(envehicleSurfaceVehicle),
-    m_iVisibilityVertexIndex(-1),
-    m_bUseTaskEligibility(false),
-    m_dHeadingInitial_rad(0.0)
+    	CBaseObject(pSurfaceVehicleConfiguration->getID()),
+		CVehicleParameters(pSurfaceVehicleConfiguration),
+		m_vehicleType(envehicleSurfaceVehicle),
+		m_iVisibilityVertexIndex(-1),
+		m_bUseTaskEligibility(false),
+		m_dHeadingInitial_rad(0.0)
     {
         stringstream sstrFileName;
         sstrFileName << "V_" << iGetID();
@@ -102,12 +100,12 @@ public:
     };
 
     c_VehicleBase(afrl::impact::GroundVehicleConfiguration* pGroundVehicleConfiguration) :
-    CVehicleParameters(pGroundVehicleConfiguration),
-    CBaseObject(pGroundVehicleConfiguration->getID()),
-    m_vehicleType(envehicleGroundVehicle),
-    m_iVisibilityVertexIndex(-1),
-    m_bUseTaskEligibility(false),
-    m_dHeadingInitial_rad(0.0)
+    	CBaseObject(pGroundVehicleConfiguration->getID()),
+		CVehicleParameters(pGroundVehicleConfiguration),
+		m_vehicleType(envehicleGroundVehicle),
+		m_iVisibilityVertexIndex(-1),
+		m_bUseTaskEligibility(false),
+		m_dHeadingInitial_rad(0.0)
     {
         stringstream sstrFileName;
         sstrFileName << "V_" << iGetID();

@@ -403,7 +403,7 @@ void Dpss::UpdateLinearization(DpssWaypoint points[], int numPoints)
 double Dpss::ComputeSeperation(double& beta, xyPoint& a, xyPoint& b, xyPoint& c)
 {
     xyPoint q1,q2,q3;
-    double q1len, q2len, q3len, seperation, triangleArea;
+    double q1len, q2len, q3len, seperation;
 
     // normalize, remove if necessary
     q1.x = b.x - a.x;
@@ -444,7 +444,6 @@ double Dpss::ComputeSeperation(double& beta, xyPoint& a, xyPoint& b, xyPoint& c)
         seperation = q1len;
     else
         seperation = fabs(q1.x*q3.y - q3.x*q1.y)/q3len;
-    triangleArea = 0.5*seperation*q3len;
 
     return seperation;
 }

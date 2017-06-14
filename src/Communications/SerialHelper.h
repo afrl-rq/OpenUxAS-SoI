@@ -15,6 +15,8 @@
 
 #include "stdUniquePtr.h"
 
+#include <sstream>
+
 namespace uxas
 {
 namespace communications
@@ -56,8 +58,11 @@ public:
                 break;
         }
         
-        errorMessage = networkActorType + " - Error on serial port "
-                + serialPortAddress + " with baud rate ", baudRate, " during " + actionString + " operation";
+        std::ostringstream ss;
+        ss << networkActorType << " - Error on serial port " << serialPortAddress
+        		<< " with baud rate " << baudRate
+				<< " during " << actionString << " operation";
+        errorMessage = ss.str();
         std::unique_ptr<afrl::cmasi::ServiceStatus> serviceStatus = uxas::stduxas::make_unique<afrl::cmasi::ServiceStatus>();
         std::unique_ptr<afrl::cmasi::KeyValuePair> keyValuePair = uxas::stduxas::make_unique<afrl::cmasi::KeyValuePair>();
         keyValuePair->setKey(std::string("EXCEPTION " + networkActorType));

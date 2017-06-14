@@ -542,17 +542,6 @@ void RouteAggregatorService::SendMatrix(int64_t autoKey)
             auto taskpair = m_routeTaskPairing.find(rId);
             if (taskpair != m_routeTaskPairing.end())
             {
-                int64_t optionCost = 0;
-                if (m_taskOptions.find(taskpair->second->taskId) != m_taskOptions.end())
-                {
-                    for (auto& opt : m_taskOptions[taskpair->second->taskId]->getOptions())
-                    {
-                        if (opt->getOptionID() == taskpair->second->taskOption)
-                        {
-                            optionCost = opt->getCost();
-                        }
-                    }
-                }
                 if (plan->second.second->getRouteCost() < 0)
                 {
                     routesNotFound << "V[" << taskpair->second->vehicleId << "](" << taskpair->second->prevTaskId << "," << taskpair->second->prevTaskOption << ")-(" << taskpair->second->taskId << "," << taskpair->second->taskOption << ")" << std::endl;

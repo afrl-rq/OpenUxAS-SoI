@@ -66,8 +66,6 @@ CmasiLineSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
