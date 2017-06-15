@@ -38,6 +38,7 @@ AADL thread implementation dispatch_periodic.
 
 // import <int64_t_writer.idl4>;
 import <Timer.idl4>;
+import <TimeServerTK1/TimeServer.camkes>;
 
 component dispatch_periodic {
     control;

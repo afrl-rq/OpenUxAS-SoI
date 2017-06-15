@@ -32,12 +32,12 @@ static void write_callback(ps_chardevice_t* device,
                            size_t bytes_transfered,
                            void* token) {
     const bool b = true;
-    tb_self2encrypt_enqueue(/* unused */ &b);
+    tb_out_send_success0_enqueue(/* unused */ &b);
 }
 
-static void encrypt2self_callback(void *unused) {
+static void in_uart_packet_callback(void *unused) {
     SMACCM_DATA__UART_Packet_i packet;
-    while (tb_encrypt2self_dequeue(&packet)) {
+    while (tb_in_uart_packet_dequeue(&packet)) {
         device_lock();
         int result = ps_cdev_write(&serial_device,
                                    &packet.buf,
@@ -51,7 +51,7 @@ static void encrypt2self_callback(void *unused) {
         }
     }
     
-    tb_encrypt2self_notification_reg_callback(&encrypt2self_callback, NULL);
+    tb_in_uart_packet_notification_reg_callback(&in_uart_packet_callback, NULL);
 }
 
 void pre_init(void)
@@ -73,7 +73,7 @@ void pre_init(void)
     serial_device.flags &= ~SERIAL_AUTO_CR;
     serial_configure(&serial_device, BAUD_RATE, 8, PARITY_NONE, 1);
 
-    tb_encrypt2self_notification_reg_callback(&encrypt2self_callback, NULL);
+    tb_in_uart_packet_notification_reg_callback(&in_uart_packet_callback, NULL);
     
     printf("UART initialized\n");
 }
@@ -85,7 +85,7 @@ static void read_callback(ps_chardevice_t *device,
                    size_t bytes_transfered,
                    void *token) {
     read_packet.buf_len = bytes_transfered;
-    if (!tb_self2decrypt_enqueue(&read_packet)) {
+    if (!tb_out_uart_packet_enqueue(&read_packet)) {
         printf("UART Shim: Unable to put UART packet in queue\n");
     }
 

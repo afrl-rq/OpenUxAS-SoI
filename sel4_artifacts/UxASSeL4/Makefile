@@ -4,7 +4,7 @@ CFLAGS += -DODROID
 
 # Start with the generated Makefile from AADL Trusted Build
 include ${PWD}/apps/soi_tk1/make_template/Makefile
-
+include ${PWD}/apps/soi_tk1/components/Virtual_Machine/VM.mk
 
 ###### UART files
 
@@ -15,7 +15,6 @@ uart_shim_CFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/UART_Driver/uart_shim/src/*.c))
 
 ###### End UART
-
 
 ###### Clock_Driver files
 
@@ -29,5 +28,3 @@ include ${PWD}/projects/DARPA-tk1/components/clkcar/clkcar.mk
 
 include ${PWD}/tools/camkes/camkes.mk
 
-
-$(VM_CFILES:%.c=%.o) $(COMPONENTS): $(srctree)/.config

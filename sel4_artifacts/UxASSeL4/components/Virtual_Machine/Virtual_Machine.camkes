@@ -49,10 +49,8 @@ import <gen_fwd.idl4>;
 import <MissionSoftware__mission_impl_writer.idl4>;
 import <MissionSoftware__waypoint_impl_writer.idl4>;
 
-
-
 component Virtual_Machine {
-    include <tb_smaccmpilot_tk1_types.h>;
+    include <tb_soi_tk1_types.h>;
     control;
     has semaphore tb_dispatch_sem;
 
@@ -62,11 +60,26 @@ component Virtual_Machine {
     consumes QueuedData tb_in_waypoint_notification;
 
 
+//#ifdef CONFIG_TK1_DEVICE_FWD
     uses gen_fwd_inf uartfwd;
     uses gen_fwd_inf clkcarfwd;
-    
-    composition{
-        export vm.uartfwd -> uartfwd;
-        export vm.clkcarfwd -> clkcarfwd;
-    }
+//#endif
+
+    attribute int base_prio;
+    attribute int num_extra_frame_caps;
+    attribute int extra_frame_map_address;
+
 }
+
+//assembly {
+//
+//    composition{
+//        component Virtual_Machine  Virtual_Machine_inst;
+//    }
+//
+//    configuration {
+//
+//    }
+//
+//}
+

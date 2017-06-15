@@ -11,3 +11,55 @@ config APP_SOI_TK1_TB_DEBUG
     depends on APP_SOI_TK1 && PRINTING
     help
         Enable trusted build debugging for the SOI_TK1 application.
+
+#config TK1_DEVICE_FWD
+#    bool "Forward VM access to UART and Clock and reset controller"
+#    depends on APP_SOI_TK1 && PLAT_TK1
+#    default n
+#    help
+#        When using the VM with other components that need access to the UART and clock and reset controller
+#        devices, this option will cause the vm to forward the faults over a RPC connection
+
+#source "projects/vm/components/VM/Kconfig"
+
+config VM_EMMC2_NODMA
+    bool "SD access control to prevent DMA"
+    depends on APP_CAMKES_VM && PLAT_EXYNOS5410
+    default n
+    help
+        Installs SD card into the VM with read only access. Write access is
+        trapped and emulated to ensure that DMA is not used.
+
+config VM_VUSB
+    bool "Para-virtual USB driver"
+    depends on APP_CAMKES_VM && PLAT_EXYNOS5410
+    help
+        Selects the device tree which enables the para virtual USB driver and
+        installs the device into the VM.
+
+config VM_VCHAN
+    bool "Enable vchan connection"
+    depends on APP_CAMKES_VM && PLAT_EXYNOS5410
+    help
+        Enable vchan connection.
+
+choice
+    bool "root file system selection"
+    depends on APP_CAMKES_VM && PLAT_EXYNOS5410
+    default VM_ROOTFS_MMCBLK1P2
+    help
+        Selects the root device and partition which should be used for the
+        root filesystem.
+
+    config VM_ROOTFS_MMCBLK0P2
+        bool "mmcblk0p2"
+        help
+            Selects partition 2 of the on board eMMC as the root filesystem.
+
+    config VM_ROOTFS_MMCBLK1P2
+        bool "mmcblk1p2"
+        help
+            Selects partition 2 of the on removable SD card as the root
+            filesystem.
+
+endchoice
