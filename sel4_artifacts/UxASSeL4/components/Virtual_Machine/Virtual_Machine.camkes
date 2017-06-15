@@ -78,260 +78,38 @@ component Virtual_Machine {
     }   
 
   configuration {
+        vm_obj.base_prio = 100;
+        vm_obj.priority = 101;
+        vm_shim_obj.priority = 103;
+
+        vm_obj.untyped_mmios = [ 
+            "0x50046000:12", // Interrupt Controller Virtual CPU interface (Virtual Machine view)
+            "0x60004000:12", // Interrupt controller registers (ICTLR)
+            "0x700b0000:12", // SDMMC-1, SDMMC-2, SDMMC-3, SDMMC-4,
+            "0x7d000000:12", // USB on-the-go (micro)
+            "0x7d004000:12", // USB on top board
+            "0x7d008000:12", // USB on bottom board
+            "0xb0000000:28", // Linux kernel memory regions
+            "0xc0000000:29", // Linux kernel memory regions
+            "0xe0000000:28", // Linux kernel memory regions
+            ];
+
+        vm_obj.irqs =  [
+            27, // INTERRUPT_VGPT (INTERRUPT_PPI_11)
+            53, // INTERRUPT_USB2
+            63, // INTERRUPT_SDMMC4
+            122, // INTERRUPT_UARTD
+            129, // INTERRUPT_USB3
+            ];
+
+        vm_obj.smmu = [10, 23];
 
         vm_obj.asid_pool = true;
 
         vm_obj.simple = true;
-        vm_obj.cnode_size_bits = 23;
-        vm_obj.simple_untyped24_pool = 10;
+        vm_obj.cnode_size_bits = 21; 
+        vm_obj.simple_untyped24_pool = 10; 
 
-        vm_obj.base_prio = 100;
-
-        vm_obj._priority = 101;
-        vm_obj.sem_value = 0;
-#ifdef CONFIG_PLAT_EXYNOS5410
-
-        vm_obj.untyped_mmios = [
-                    "0x10000000:12", // CHIP_ID
-                    "0x10486000:12", // VCPU
-                    "0x12c20000:12", // UART2
-                    "0x10040000:12", // POWER0
-                    "0x10041000:12", // POWER1
-                    "0x10042000:12", // POWER2
-                    "0x10043000:12", // POWER3
-                    "0x10044000:12", // POWER4
-                    "0x10050000:12", // SYSREG
-                    "0x10030000:12", // CMU_COREX
-                    "0x10038000:12", // CMU_MEM
-                    "0x1001c000:12", // CMU_ISP
-                    "0x10018000:12", // CMU_ACP
-                    "0x12110000:12", // USB EHCI
-                    "0x12130000:12", // USB CTRL
-                    "0x12200000:12", // MSH0
-                    "0x12220000:12", // MSH2
-                    "0x40000000:29"]; // RAM
-        vm_obj.mmios = ["0x10010000:0x1000:12", // CMU_CPU
-                    "0x10020000:0x1000:12", // CMU_TOP
-                    "0x13400000:0x1000:12", // GPIO_RIGHT
-                    "0x10014000:0x1000:12"]; // CMU_CORE
-        vm_obj.irqs =  [27, // VTCNT (arch timer)
-                    85, // UART2
-                    107, // SDMMC0
-                    109, // SDMMC2
-                    103]; // USB
-
-  #endif
-
-
-#ifdef CONFIG_PLAT_TK1
-
-        vm_obj.untyped_mmios = [
-                    "0x50046000:12", // Interrupt Controller Virtual CPU interface (Virtual Machine view)
-                    "0x60004000:12", // Interrupt controller registers (ICTLR)
-                    "0x700b0000:12", // SDMMC-1, SDMMC-2, SDMMC-3, SDMMC-4,
-                    "0x7d000000:12", // USB
-                    "0x7d004000:12", // USB2
-                    "0x7d008000:12", // USB3
-                    "0xb0000000:28", // Linux kernel memory regions
-                    "0xc0000000:29", // Linux kernel memory regions
-                    "0xe0000000:28", // Linux kernel memory regions
-#ifndef CONFIG_TK1_DEVICE_FWD
-                    "0x60006000:12", // Clock and Reset (CAR)
-                    "0x70006000:12", // UARTA, UARTB, VFIR, UARTC, UARTD, HDMI_IOBIST, MIPI_IOBIST, LPDDR2_IOBIST, PCIE_X2_0_IOBIST, PCIE_X2_1_IOBIST, PCIE_X4_IOBIST, SATA_IOBIST
-#endif
-#ifdef CONFIG_TK1_INSECURE
-                    "0x01000000:12", // PCIe Controller 0 config registers
-                    "0x01001000:12", // PCIe Controller 1 config registers
-                    "0x01003000:12", // PCIe Pads & AFI
-                    "0x02000000:25", // Start of PCIE_A2 region
-                    "0x04000000:26", // Start of PCIE_A2 region
-                    "0x08000000:27", // Start of PCIE_A2 region
-                    "0x13000000:20", // In PCIE_A3 region
-                                   //  Note: In the address map this region is 8KB, but we only pass through 4KB
-                    "0x50000000:17", // Graphics host registers
-                    "0x50020000:16", // Graphics host registers
-                    "0x50030000:14", // Graphics host registers
-                    "0x54200000:18", // Display A
-                    "0x54240000:18", // Display B
-                    "0x60005000:12", // Timers (TMR)
-                    "0x6000c000:12", // System Registers, AHB Arbitration + Gizmo Controller, AHB/APB Debug Bus, Secure Boot, STAT-MON, Activity Monitor
-                    "0x6000d000:12", // GPIOS 1-8
-                    "0x60020000:12", // APB-DMA
-                    "0x70000000:12", // APB-MISC: pinmux@0x70000868
-                    "0x7000c000:12", // I2C, TWC, DTV, I2C2, I2C3, OWR, I2C4
-                    "0x7000d000:12", // I2C5, I2C6, SPI 2B-(1..6)
-                    "0x7000e000:12", // RTC, KBC, PMC
-                    "0x7000f000:12", // FUSE, KFUSE
-                    "0x70110000:12", // DVFS
-                    "0x7001b000:12", // EMC
-                    "0x70020000:12", // SATA
-                    "0x70021000:12", // SATA
-                    "0x70027000:12", // SATA
-                    "0x70030000:12", // HDA
-                    "0x70031000:12", // HDA
-                    "0x70038000:12", // HDA
-                    "0x7009f000:12", // XUSB_PADCTL TODO: Look into pads
-                    "0x70300000:12", // Audio Cluster
-                    "0x70301000:12", // Audio Cluster
-  #endif
-                    ];
-        vm_obj.irqs =  [27, // INTERRUPT_VGPT (INTERRUPT_PPI_11)
-                    53, // INTERRUPT_USB2
-                    63, // INTERRUPT_SDMMC4
-                    122, // INTERRUPT_UARTD
-                    129, // INTERRUPT_USB3
-  #ifdef CONFIG_TK1_INSECURE
-                    32, // INTERRUPT_TMR1
-                    33, // INTERRUPT_TMR2
-                    34, // INTERRUPT_RTC
-                    35, // INTERRUPT_CEC
-                    36, // INTERRUPT_SHR_SEM_INBOX_FULL
-                    37, // INTERRUPT_SHR_SEM_INBOX_EMPTY
-                    38, // INTERRUPT_SHR_SEM_OUTBOX_FULL
-                    39, // INTERRUPT_SHR_SEM_OUTBOX_EMPTY
-                    40, // INTERRUPT_VDE_UCQ
-                    41, // INTERRUPT_VDE_SYNC_TOKEN
-                    42, // INTERRUPT_VDE_BSEV
-                    43, // INTERRUPT_VDE_BSEA
-                    44, // INTERRUPT_VDE_SXE
-                    45, // INTERRUPT_SATA_RX_STAT
-                    46, // INTERRUPT_SDMMC1
-                    47, // INTERRUPT_SDMMC2
-                    49, // INTERRUPT_VDE
-                    50, // INTERRUPT_AVP_UCQ
-                    51, // INTERRUPT_SDMMC3
-                    52, // INTERRUPT_USB
-                    54, // INTERRUPT_USB2
-                    55, // INTERRUPT_SATA_CTL
-                    57, // INTERRUPT_VCP
-                    58, // INTERRUPT_APB_DMA_CPU
-                    59, // INTERRUPT_AHB_DMA_CPU
-                    60, // INTERRUPT_ARB_SEM_GNT_COP
-                    61, // INTERRUPT_ARB_SEM_GNT_CPU
-                    62, // INTERRUPT_OWR
-                    64, // INTERRUPT_GPIO1
-                    65, // INTERRUPT_GPIO2
-                    66, // INTERRUPT_GPIO3
-                    67, // INTERRUPT_GPIO4
-                    68, // INTERRUPT_UARTA
-                    69, // INTERRUPT_UARTB
-                    70, // INTERRUPT_I2C
-                    71, // INTERRUPT_USB3_HOST
-                    72, // INTERRUPT_USB3_HOST_SMI
-                    73, // INTERRUPT_TMR3
-                    74, // INTERRUPT_TMR4
-                    75, // INTERRUPT_USB3_HOST_PME
-                    76, // INTERRUPT_USB3_DEV_HOST
-                    77, // INTERRUPT_ACTMON
-                    78, // INTERRUPT_UARTC
-                    79, // INTERRUPT_HSI
-                    80, // INTERRUPT_THERMAL
-                    81, // INTERRUPT_XUSB_PADCTL
-                    82, // INTERRUPT_TSEC
-                    83, // INTERRUPT_EDP
-                    84, // INTERRUPT_VFIR
-                    85, // INTERRUPT_I2C5
-                    86, // INTERRUPT_STAT_MON
-                    87, // INTERRUPT_GPIO5
-                    88, // INTERRUPT_USB3_DEV_SMI
-                    89, // INTERRUPT_USB3_DEV_PME
-                    90, // INTERRUPT_SE
-                    91, // INTERRUPT_SPI1
-                    92, // INTERRUPT_APB_DMA_COP
-                    93, // INTERRUPT_AHB_DMA_COP
-                    94, // INTERRUPT_CLDVFS
-                    95, // INTERRUPT_I2C6
-                    96, // INTERRUPT_HOST1X_SYNCPT_COP
-                    97, // INTERRUPT_HOST1X_SYNCPT_CPU
-                    98, // INTERRUPT_HOST1X_GEN_COP
-                    99, // INTERRUPT_HOST1X_GEN_CPU
-                    100, // INTERRUPT_MSENC
-                    101, // INTERRUPT_VI
-                    102, // INTERRUPT_ISPB
-                    103, // INTERRUPT_ISP
-                    104, // INTERRUPT_VIC
-                    105, // INTERRUPT_DISPLAY
-                    106, // INTERRUPT_DISPLAYB
-                    107, // INTERRUPT_HDMI
-                    108, // INTERRUPT_SOR
-                    110, // INTERRUPT_EMC
-                    111, // INTERRUPT_SPI6
-                    113, // INTERRUPT_HDA
-                    114, // INTERRUPT_SPI2
-                    115, // INTERRUPT_SPI3
-                    116, // INTERRUPT_I2C2
-                    118, // INTERRUPT_PMU_EXT
-                    119, // INTERRUPT_GPIO6
-                    121, // INTERRUPT_GPIO7
-                    124, // INTERRUPT_I2C3
-                    127, // INTERRUPT_SW
-                    128, // INTERRUPT_SNOR
-                    130, // INTERRUPT_PCIE_INT
-                    131, // INTERRUPT_PCIE_MSI
-                    132, // INTERRUPT_PCIE_WAKE
-                    133, // INTERRUPT_AVP_CACHE
-                    135, // INTERRUPT_AUDIO_CLUSTER
-                    136, // INTERRUPT_APB_DMA_CH0
-                    137, // INTERRUPT_APB_DMA_CH1
-                    138, // INTERRUPT_APB_DMA_CH2
-                    139, // INTERRUPT_APB_DMA_CH3
-                    140, // INTERRUPT_APB_DMA_CH4
-                    141, // INTERRUPT_APB_DMA_CH5
-                    142, // INTERRUPT_APB_DMA_CH6
-                    143, // INTERRUPT_APB_DMA_CH7
-                    144, // INTERRUPT_APB_DMA_CH8
-                    145, // INTERRUPT_APB_DMA_CH9
-                    146, // INTERRUPT_APB_DMA_CH10
-                    147, // INTERRUPT_APB_DMA_CH11
-                    148, // INTERRUPT_APB_DMA_CH12
-                    149, // INTERRUPT_APB_DMA_CH13
-                    150, // INTERRUPT_APB_DMA_CH14
-                    151, // INTERRUPT_APB_DMA_CH15
-                    152, // INTERRUPT_I2C4
-                    153, // INTERRUPT_TMR5
-                    154, // INTERRUPT_HIER_GROUP1_COP
-                    155, // INTERRUPT_WDT_CPU
-                    156, // INTERRUPT_WDT_AVP
-                    157, // INTERRUPT_GPIO8
-                    158, // INTERRUPT_CAR
-                    159, // INTERRUPT_HIER_GROUP1_CPU
-                    160, // INTERRUPT_APB_DMA_CH16
-                    161, // INTERRUPT_APB_DMA_CH17
-                    162, // INTERRUPT_APB_DMA_CH18
-                    163, // INTERRUPT_APB_DMA_CH19
-                    164, // INTERRUPT_APB_DMA_CH20
-                    165, // INTERRUPT_APB_DMA_CH21
-                    166, // INTERRUPT_APB_DMA_CH22
-                    167, // INTERRUPT_APB_DMA_CH23
-                    168, // INTERRUPT_APB_DMA_CH24
-                    169, // INTERRUPT_APB_DMA_CH25
-                    170, // INTERRUPT_APB_DMA_CH26
-                    171, // INTERRUPT_APB_DMA_CH27
-                    172, // INTERRUPT_APB_DMA_CH28
-                    173, // INTERRUPT_APB_DMA_CH29
-                    174, // INTERRUPT_APB_DMA_CH30
-                    175, // INTERRUPT_APB_DMA_CH31
-                    176, // INTERRUPT_CPU0_PMU
-                    177, // INTERRUPT_CPU1_PMU
-                    178, // INTERRUPT_CPU2_PMU
-                    179, // INTERRUPT_CPU3_PMU
-                    180, // INTERRUPT_SDMMC1_SYS
-                    181, // INTERRUPT_SDMMC2_SYS
-                    182, // INTERRUPT_SDMMC3_SYS
-                    183, // INTERRUPT_SDMMC4_SYS
-                    184, // INTERRUPT_TMR6
-                    185, // INTERRUPT_TMR7
-                    186, // INTERRUPT_TMR8
-                    187, // INTERRUPT_TMR9
-                    188, // INTERRUPT_TMR0
-                    189, // INTERRUPT_GPU
-                    190, // INTERRUPT_GPU_NONSTALL
-                    191  // ARDPAUX
-  #endif
-                    ];
-
-        vm_obj.smmu = [10, 23];
-  #endif
     }
 
 }
