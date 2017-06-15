@@ -61,17 +61,12 @@
         </Groups>
     </Service>
    
-    <Service Type="GamsServiceDriver" >
-        <Knowledge KarlFile="../karl/helloworld.karl" BinaryFile="" Type="local"/>
-        <Knowledge KarlFile="../karl/enemytrack.karl" BinaryFile="" />
+    <Service Type="CollisionAvoidanceService" >
+        <DART id="1" node_name="uav" role_name="Uav" />
         <Waypoint Latitude="45.316684" Longitude="-120.980900" Altitude="700.000000" />
         <Waypoint Latitude="45.326664" Longitude="-120.991100" Altitude="700.000000" />
         <Waypoint Latitude="45.316694" Longitude="-120.970900" Altitude="700.000000" />
         <Waypoint Latitude="45.346664" Longitude="-120.991200" Altitude="700.000000" />
-    </Service>
-   
-    <Service Type="CollisionAvoidanceService" >
-      <DART id="1" node_name="uav" role_name="Uav" />
     </Service>
    
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">

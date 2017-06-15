@@ -1064,6 +1064,30 @@ namespace uxas
                     role_name = currentXmlNode.attribute("role_name").as_string();
                 }
             }
+            // if we need to load initial knowledge
+            if (std::string("Waypoint") == currentXmlNode.name())
+            {
+                gams::pose::Position nextPosition (GamsService::frame ());
+                
+                if (!currentXmlNode.attribute("Latitude").empty())
+                {
+                    nextPosition.lat(
+                        currentXmlNode.attribute("Latitude").as_double());
+                }
+                if (!currentXmlNode.attribute("Longitude").empty())
+                {
+                    nextPosition.lng(
+                        currentXmlNode.attribute("Longitude").as_double());
+                }
+                if (!currentXmlNode.attribute("Altitude").empty())
+                {
+                    nextPosition.alt(
+                        currentXmlNode.attribute("Altitude").as_double());
+                }
+
+                std::cerr << "Found waypoint : " << nextPosition << '\n';
+                m_waypoints.push_back (nextPosition);
+            }
         }
     
       /*
