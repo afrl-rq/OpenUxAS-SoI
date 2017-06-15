@@ -3,7 +3,6 @@ import <tb_Monitor_MissionSoftware__waypoint_impl_1.idl4>;
 
 component VM_shim {
     include <tb_soi_tk1_types.h>;
-    control;
 
     //AADL stuff
     uses tb_Monitor_MissionSoftware__mission_impl_1 tb_out_mission;
