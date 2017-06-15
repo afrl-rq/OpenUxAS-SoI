@@ -19,7 +19,7 @@ public
             GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
             UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
             UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
-            --RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
+--            RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
             SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
             TaskInitialized_out: out event data port uxtask::TaskInitialized.i;
@@ -34,15 +34,18 @@ public
             SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
             VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
             
-            --NOTE: derek changed these from RoutePlanRequest and RoutePlanResponse
+            --NOTE: derek changed these from RoutePlanRequest and RoutePlanResponse            
             RouteRequest_out: out event data port route::RouteRequest.i;
             RouteResponse_in: in event data port route::RouteResponse.i;
-            
+                        
             
         properties
             Dispatch_Protocol => Sporadic;
             
-        --NOTE: agree might not be able to handle inheritance, might require copy/paste
+        -- NOTES: 
+        -- > BRodes: agree might not be able to handle inheritance, might require copy/paste
+        -- > AFifarek (20170615): The agree annex does not reason about contracts defined in an "extended" component therefore the inherited components will need their contracts copy/paste
+        
        	annex agree{**
        		eq state : int;
        		
