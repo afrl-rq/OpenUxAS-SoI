@@ -155,6 +155,7 @@ public
 			Dispatch_Protocol => Sporadic;
 			TB_SYS::Thread_Type => Active;
 			Compute_Execution_Time => 10 us .. 100 us;
+			TB_SYS::Sends_Events_To => "{{}}";
 	end Virtual_Machine;
 	
 	thread Waypoint_Manager

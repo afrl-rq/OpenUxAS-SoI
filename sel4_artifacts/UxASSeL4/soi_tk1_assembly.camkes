@@ -120,7 +120,7 @@ assembly {
 
 
         connection seL4RPCCall conn5 (from Asset_Waypoint_Manager_inst.tb_out_waypoint0, to tb_waypoint_manager_in_waypoint_monitor.mon);
-        connection seL4RPCCall conn6 (from Asset_Waypoint_Manager_inst.tb_out_waypoint1, to tb_waypoint_manager_in_waypoint_monitor.mon);
+        connection seL4RPCCall conn6 (from Asset_Waypoint_Manager_inst.tb_out_waypoint1, to tb_virtual_machine_in_waypoint_monitor.mon);
 
         connection seL4RPCCall conn7 (from Asset_Waypoint_Manager_inst.tb_in_uart_packet, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
         connection seL4Notification conn8 (from tb_asset_waypoint_manager_in_uart_packet_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_in_uart_packet_notification);
@@ -211,8 +211,8 @@ assembly {
         Asset_Waypoint_Manager_inst.tb_timer_global_endpoint = "Asset_Waypoint_Manager_tb_timer";
         Waypoint_Manager_inst.tb_timer_attributes = 12;
         Waypoint_Manager_inst.tb_timer_global_endpoint = "Waypoint_Manager_tb_timer";
-   }
 
+    }
 }
 
 
