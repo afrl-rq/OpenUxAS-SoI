@@ -10,8 +10,7 @@
         <SubscribeToExternalMessage MessageType="uxas.madara.MadaraState" />
     </Bridge>
     
-    <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9800" Server="FALSE">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
