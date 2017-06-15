@@ -71,7 +71,7 @@
     </Service>
    
     <Service Type="CollisionAvoidanceService" >
-      <DART id="0" />
+      <DART id="0" node_name="uav" role_name="Uav" />
     </Service>
    
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
