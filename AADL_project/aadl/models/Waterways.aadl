@@ -253,6 +253,27 @@ public
         	prove rate_monotonic_schedulable()
             prove isolation(this) 
         **};
+        annex agree {**
+        	-- We use AGREE connections to assert true for the cases where an 
+        	--  input port is fed by multiple sources.
+        	-- Note: AGREE will assume arbitrary values for the input ports on 
+        	--  these connections. Refinements may be needed to prove system-level 
+        	--  guarantees involving these ports.
+        	connection conn0: true;
+        	connection conn1: true;
+        	connection conn2: true;
+        	connection conn3: true;
+        	connection conn4: true;
+        	connection conn5: true;
+        	connection conn6: true;
+        	connection conn7: true;
+        	connection conn8: true;
+        	connection conn9: true;
+        	connection conn10: true;
+        	connection conn11: true;
+        	connection conn12: true;
+        	connection conn13: true;
+        **};
             
     end waterways.i;
 
