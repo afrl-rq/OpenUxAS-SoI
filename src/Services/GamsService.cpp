@@ -850,6 +850,11 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
     // save the agent mapping for forensics
     s_knowledgeBase.save_context(
         m_controllerSettings.checkpoint_prefix + "_config_knowledgeBase.kb");
+
+    if (m_uniqueId == "")
+    {
+        m_uniqueId = s_knowledgeBase.setup_unique_hostport();
+    }
     
     // attach the MadaraTransport for knowledge modifications to UxAS messages
     s_knowledgeBase.attach_transport (
