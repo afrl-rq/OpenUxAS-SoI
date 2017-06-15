@@ -1,0 +1,77 @@
+--Authored by: Rockwell Collins and Dependable Computing
+
+package State_Machine_with_Unreachable_State
+
+--------------------------------------
+--The sm system below is a state machine with an unreachable state (STATE3).
+--Here we demonstrate how to use lemmas at the level above to check for
+-- unreachable states. This can also be done in SpeAR via Properties.
+--------------------------------------
+
+public
+	with Base_Types;
+	
+	system top_level
+		annex agree {** 
+			guarantee "true" : true;
+		**};	
+	end top_level;
+	
+	system implementation top_level.Impl
+		subcomponents
+			sm_sub : system sm; 
+		annex agree {**
+			lemma "False indicates STATE1 is reachable" : sm_sub.state != sm_sub.STATE1;
+			lemma "False indicates STATE2 is reachable" : sm_sub.state != sm_sub.STATE2;
+			lemma "False indicates STATE3 is reachable" : sm_sub.state != sm_sub.STATE3;
+		**};
+		 
+	end top_level.Impl;	
+	
+	system sm
+		features
+			go_in: in event data port Base_Types::Boolean;
+		annex agree {**
+            const STATE1 : int = 0;
+            const STATE2 : int = 1;
+            const STATE3 : int = 2;
+            
+            eq flag : bool = false;
+            
+            eq state : int;
+            eq previous_state: int = prev(state,STATE1);
+            eq some_transition: bool = one_to_two
+                                    or two_to_one
+                                    or three_to_two;
+                                    
+            eq one_to_two : bool = false->
+                previous_state = STATE1 and event(go_in);
+                
+            eq two_to_one : bool = false ->
+                previous_state = STATE2 and event(go_in);
+                
+            eq three_to_two : bool = false ->
+                previous_state = STATE3 and event(go_in);
+                
+            guarantee "Self loops": not some_transition => (state = previous_state);
+            
+            guarantee "Transition from 1 to 2":
+                one_to_two =>
+                    state = STATE2;
+            
+            guarantee "Transition from 2 to 1":
+                two_to_one =>
+                    state = STATE1;
+                
+            guarantee "State 3 is not a possibility, but is realizable":
+                state = 3 => true;
+                
+            guarantee "Transition from state 3 to state 2: not possible but realizable":
+                three_to_two =>
+                    state = STATE2;
+                    
+            guarantee "test":
+                state != 0 and state !=1 => state = 2;
+        **};
+        end sm;
+end State_Machine_with_Unreachable_State;
