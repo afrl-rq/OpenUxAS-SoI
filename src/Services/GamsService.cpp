@@ -106,6 +106,9 @@ namespace service
       {
         // populate variables like buffer_ based on transport settings
         transport::Base::setup ();
+
+        // update the caller's settings to be the result of Base::setup ()
+        new_settings = settings_;
       }
 
       /**
