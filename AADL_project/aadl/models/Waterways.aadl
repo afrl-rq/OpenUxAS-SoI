@@ -40,6 +40,9 @@ public
     process waterways
         features
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+        annex agree {**
+        	guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+        **};
     end waterways;
 
     process implementation waterways.i
