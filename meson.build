@@ -76,7 +76,6 @@ lib_pugixml             = sub_pugixml.get_variable('lib')
 subdir('src/DPSS')
 
 subdir('src/VisilibityLib')
-
 if not get_option('afrl_internal')
   subdir('src/LMCP')
 endif

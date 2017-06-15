@@ -17,6 +17,7 @@ srcs_tasks = [
   'TaskManagerService.cpp',
   'TaskServiceBase.cpp',
   'TaskTrackerService.cpp',
+  'VipEscortTaskService.cpp'
 ]
 
 incs_tasks = [

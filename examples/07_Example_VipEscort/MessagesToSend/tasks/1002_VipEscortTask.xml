@@ -1,0 +1,12 @@
+<VipEscortTask Series="UT">
+	<TaskID>1002</TaskID>
+	<Label>Vip_Escort_Task</Label>
+	<EligibleEntities></EligibleEntities>
+	<RevisitRate>0</RevisitRate>
+	<Priority>0</Priority>
+	<Required>true</Required>
+	<VIP>1</VIP>
+	<UAV1>2</UAV1>
+	<UAV2>3</UAV2>
+
+</VipEscortTask>
