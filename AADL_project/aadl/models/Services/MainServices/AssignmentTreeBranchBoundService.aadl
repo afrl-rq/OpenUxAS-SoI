@@ -1,0 +1,8 @@
+package AssignmentTreeBranchBoundService_Pkg
+public
+    -- empty
+    
+    thread AssignmentTreeBranchBoundService
+    end AssignmentTreeBranchBoundService;
+    
+end AssignmentTreeBranchBoundService_Pkg;

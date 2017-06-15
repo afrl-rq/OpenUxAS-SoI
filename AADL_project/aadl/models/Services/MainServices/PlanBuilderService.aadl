@@ -1,0 +1,22 @@
+package PlanBuilderService_Pkg
+public
+    with CMASI;
+    with UXTASK;
+    with IMPACT;
+    
+    thread PlanBuilderService
+        features
+            TaskImplementationResponse_in: in event data port uxtask::TaskImplementationResponse.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            TaskAssignmentSummary_in: in event data port uxtask::TaskAssignmentSummary.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+            UniqueAutomationResponse_out: out event data port uxtask::UniqueAutomationResponse.i;
+            TaskImplementationRequest_out: out event data port uxtask::TaskImplementationRequest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end PlanBuilderService;
+    
+end PlanBuilderService_Pkg;

@@ -1,0 +1,26 @@
+package RoutePlannerVisibilityService_Pkg
+public
+    -- Include DataTypes
+    with CMASI;
+    with IMPACT;
+    with ROUTE;
+    
+    thread RoutePlannerVisibilityService
+        features
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            RoutePlanRequest_in: in event data port route::RoutePlanRequest.i;
+            RouteRequest_in: in event data port route::RouteRequest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            KeepInZone_in: in event data port cmasi::KeepInZone.i;
+            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            RoutePlanResponse_out: out event data port route::RoutePlanResponse.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end RoutePlannerVisibilityService;
+    
+end RoutePlannerVisibilityService_Pkg;

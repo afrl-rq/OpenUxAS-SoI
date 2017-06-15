@@ -1,0 +1,47 @@
+package TaskManagerService_Pkg
+public
+    -- Include DataTypes
+    with CMASI;
+    with UXTASK;
+    with IMPACT;
+    with UXNATIVE;
+  
+    
+    thread TaskManagerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            FollowPathCommand_in: in event data port cmasi::FollowPathCommand.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            EntityState_in: in event data port cmasi::EntityState.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+            UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
+            KillService_out: out event data port uxnative::KillService.i;
+            CreateNewService_out: out event data port uxnative::CreateNewService.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+            
+        annex agree{**
+                            
+            guarantee "Upon reception of a Task message, it will send the appropriate CreateNewService message." :
+                event(Task_in) => 
+                    event(CreateNewService_out);
+                    
+            guarantee "When TaskManagerService receives a RemoveTasks message, it will form the appropriate KillService 
+                message to properly destroy the service that was created to fulfill the original Task.":
+                event(RemoveTasks_in) =>
+                    true; --TBD
+        **};
+        
+    end TaskManagerService;
+end TaskManagerService_Pkg;

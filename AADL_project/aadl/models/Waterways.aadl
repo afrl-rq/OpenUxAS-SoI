@@ -1,13 +1,8 @@
 package Waterways
 public
+    --Included DataTypes
     with CMASI;
-    with UXTASK;
-    with IMPACT;
-    with ROUTE;
-    with UXNATIVE;
 	with UxAS_Props;
-	
-	with PLTL;
 	
 	-- Included Tasks
 	with AngledAreaSearchTask_Package;
@@ -26,366 +21,21 @@ public
 	with PatternSearchTask_Package;
 	with TaskServiceBase_Package;
 	
-	-- Included Services
+	-- Included Main Services
+	with AssignmentTreeBranchBoundService_Pkg;
+	with AutomationRequestValidatorService_Pkg;	
+	with AutomationDiagramDataService_Pkg;
+	with PlanBuilderService_Pkg;
 	with RouteAggregatorService_Pkg;
+	with RoutePlannerVisibilityService_Pkg;
+	with TaskManagerService_Pkg;
+	with TaskTrackerService_Pkg;
+	with WaypointPlanManagerService_Pkg;
 	
-	
-
-    thread TaskManagerService
-        features
-            MissionCommand_in: in event data port cmasi::MissionCommand.i;
-            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
-            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
-            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
-            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
-            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
-            FollowPathCommand_in: in event data port cmasi::FollowPathCommand.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            EntityState_in: in event data port cmasi::EntityState.i;
-            PointOfInterest_in: in event data port impact::PointOfInterest.i;
-            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
-            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
-            Task_in: in event data port cmasi::Task.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            LineOfInterest_in: in event data port impact::LineOfInterest.i;
-            UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
-            KillService_out: out event data port uxnative::KillService.i;
-            CreateNewService_out: out event data port uxnative::CreateNewService.i;
-    	properties
-    		Dispatch_Protocol => Sporadic;
-    		
-    	annex agree{**
-    	            		
-    		guarantee "Upon reception of a Task message, it will send the appropriate CreateNewService message." :
-    			event(Task_in) => 
-    				event(CreateNewService_out);
-    				
-    		guarantee "When TaskManagerService receives a RemoveTasks message, it will form the appropriate KillService 
-    			message to properly destroy the service that was created to fulfill the original Task.":
-    			event(RemoveTasks_in) =>
-    				true; --TBD
-    	**};
-    	
-    end TaskManagerService;
-
-    thread AutomationRequestValidatorService
-        features
-            TaskInitialized_in: in event data port uxtask::TaskInitialized.i;
-            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
-            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
-            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
-            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
-            AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            TaskAutomationRequest_in: in event data port uxtask::TaskAutomationRequest.i;
-            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
-            PointOfInterest_in: in event data port impact::PointOfInterest.i;
-            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
-            Task_in: in event data port cmasi::Task.i;
-            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
-            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            KeepInZone_in: in event data port cmasi::KeepInZone.i;
-            ImpactAutomationRequest_in: in event data port impact::ImpactAutomationRequest.i;
-            LineOfInterest_in: in event data port impact::LineOfInterest.i;
-                    --note that the code does not acually subscribe to "ServiceStatus" currently
-            ServiceStatus_in: in event data port cmasi::ServiceStatus.i;
-                    --the source code subscribes to all descendants of task:
-            SearchTask_in: in event data port cmasi::SearchTask.i;
-            AreaSearchTask_in: in event data port cmasi::AreaSearchTask.i;
-            LineSearchTask_in: in event data port cmasi::LineSearchTask.i;
-            LoiterTask_in: in event data port cmasi::LoiterTask.i;
-            MustFlyTask_in: in event data port cmasi::MustFlyTask.i;
-            PointSearchTask_in: in event data port cmasi::PointSearchTask.i;
-            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
-            ImpactAutomationResponse_out: out event data port impact::ImpactAutomationResponse.i;
-            AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
-            TaskAutomationResponse_out: out event data port uxtask::TaskAutomationResponse.i;
-            UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-            
-            
-        annex agree {**
-        --Questions: 
-        	--Is the system idle when waiting for a response?
-        		--Busy defined with respect to "servicing" a request, not the queue size? 
-        	--Does the system move on to the next task before receiving a response? 
-        	--Is it possible to recieve a response that does not match the request? 
-        		--Is this an error? 
-        	--What is an error message?
-        		
-        	--States
-        	const IDLE : int = 0;
-        	const BUSY : int = 1;
-        	
-        	--TODO: possible third or intermediate state? 
-        	-- All vehicles requested exist, task requested exists, flight regions actually exist. 
-        	
-        	--previous received an airvehicle ID, airvehicle state
-        		--AirVehicleConfiguration_in and AirVehicleState_in
-        	--task requested exists
-        		--TaskInitialized_in
-        	-- regions
-        		-- OperatingRegion_in
-        		-- KeepInZone_in
-        		-- KeepOutZone_in
-       	
-       	-------------------------------------------------------------
-		--State machine support macros
-			eq previous_state: int = prev(state,IDLE);
-			eq some_transition: bool = idle_to_busy
-									or busy_to_idle;
-		-------------------------------------------------------------
-		
-		--****ISSUE: what is a received automation request: what type?****
-		---------------- state transitions ----------------
-        	eq idle_to_busy : bool = false -> 
-        		previous_state = IDLE and 
-        		event(AutomationRequest_in) and  
-        		taskVehicleOrRegionIsDefined;
-        	
-        	eq busy_to_idle : bool = false -> 
-        		previous_state = BUSY and 
-        		dequeue_trigger and
-        		numTasksInQ = 0;
-        ---------------- end state transitions ----------------
-        		
-        	eq dequeue_trigger : bool = false -> 
-        		(event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id and not uniqueAutomationRequestErrorMessageRecieved) or
-        		timer_threshold_reached or 
-        		received_error_message;
-        		
-        	eq timer_threshold_reached : bool = false -> 
-        		timeout_option and 
-        		timer>=timeout_threshold;
-        		
-        	eq received_error_message : bool = false ->
-        		--TODO: Derek is going to update the spec to have a unique automation error response in
-        		--check the error response to match the cached ID, if matched there is an error. 
-        		event(UniqueAutomationResponse_in) and 
-        		UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id and
-        		uniqueAutomationRequestErrorMessageRecieved; --represents a flag indicating error for now
-        		
-        	eq timer : int;
-        	eq timeout_threshold : int;
-        	eq timeout_option : bool;
-        	eq state : int;
-        	eq cached_unique_automation_request_id : int;
-        	
-        	const SERVICE_TYPE_ERROR_SIGNAL : int = 2;
-        	
-        	eq timer_reset: bool = true-> 
-        		event(UniqueAutomationRequest_out) or --Timer starts once we ask for a response (make a request)
-        		state=IDLE or 
-        		(event(UniqueAutomationResponse_in) and 
-        		UniqueAutomationResponse_in.ResponseID  = cached_unique_automation_request_id); 
-        	
-        	-- a non-deterministic variable used to model whether or not 
-        	-- the requested task, vehicle, or operating region has been defined.
-        	eq taskVehicleOrRegionIsDefined : bool;
-        	
-        	eq uniqueAutomationRequestErrorMessageRecieved : bool; --????
-
-        	eq numTasksInQ : int;
-        	
-        	guarantee "Self loops": not some_transition => (state = previous_state);
-       			
-        	guarantee "Initially the task queue is empty" :
-        		(numTasksInQ = 0) -> true;
-	
-			guarantee "Implied Spec: Initially, the service is idle" :
-				(state = IDLE) -> true;
-				
-			guarantee "[Implied: is this necessary? in IDLE the numTasksInQ is 0]" :
-				state = IDLE =>
-					numTasksInQ = 0;
-			
-			--TODO make error message a new variable. 
-        	
-        	--TODO: check request resource definition instead of non deterministic boolean? 
-        	--TODO: is it worth modeling the local state of what the service maintains? 
-        	guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
-        		event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined => 
-        			--TODO: derek will add automation request
-        			event(ServiceStatus_out) and 
-        			ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL; --and 
-        			--numTasksInQ = pre(numTasksInQ);
-        			--TODO: what about the timer? 
-        			--TODO: apparently the code sets the status type to "information" rather than "error"
-        		
-        	--Note: the original wording of this guarantee implies the unique automation request is only sent
-        	--out when the system is IDLE. I am manually altering the original "spec" to speak to what I believe
-        	--was intended
-        	--Note: the wording "immediately" seems to imply it is ok to immediately raise the event instead of using the
-        	--"eventually" idiom. 
-        	guarantee "if automation request is received and resource is defined produce unique automation request.
-        	If in the idle state, this service will immediately publish the UniqueAutomationRequest message and transition to the busy state.": true ->
-				idle_to_busy =>
-				--QUESTION: what is a automation request? above it is listed as a task automation request
-					event(UniqueAutomationRequest_out) and state = BUSY and numTasksInQ = 0 and
-					cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID; --Used for subsequent specs
-			
-			guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
-				  state = BUSY =>
-				  	if event(AutomationRequest_in) and taskVehicleOrRegionIsDefined then
-				 		numTasksInQ = pre(numTasksInQ) + 1
-				 	else
-				 		numTasksInQ = pre(numTasksInQ);
-				 	
---        	    pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
---        	    	state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
---        	    	if pre(state = IDLE) then 
---        	    		event(UniqueAutomationRequest_out) and state = BUSY --and numTasksInQ = 0
---        	    	else --state = BUSY
---        	    	   state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
-        	    	   
-        	--Note: forcing an incrementing timer (unspecified increment) for now
-        	guarantee "Service includes an optional timeout. When a UniqueAutomationRequest is published, a timer begins" : true ->
-        		timeout_option => 
-        			if timer_reset then
-        				timer = 0
-        			else 
-        				timer > pre(0->timer);
-        				
-        	--TODO: is this service validating "requests" while queued or only when requests are being actively serviced.
-        	
-        	guarantee "If the queue is empty, this service transitions back to the idle state. 
-        	[Implied, that the transition occurs also based on a response, timeout, or error message, i.e., a dequeue trigger]" :
-        		busy_to_idle => 
-        			state = IDLE;
-        			
-        	guarantee "[Implied Requirement: process next message only if IDLE or a response has been received]":
-        		 state = BUSY and dequeue_trigger and pre(numTasksInQ) >0 =>
-        			--NOTE: no checking that the event is for the next item in the queue.
-        			--TODO: can mimic queue if the ID's are incremented by one, I can force what the message refers to (1 minus current)
-        				event(UniqueAutomationRequest_out) and 
-        				numTasksInQ = pre(numTasksInQ) - 1 and
-        				cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID;
-
-        	--TODO: unclear if ths is the error message behavior specified
-        	guarantee "When this service receives either an error message 
-        	(indicating that the UniqueAutomationRequest cannot be fulfilled or 
-        		a corresponding UniqueAutomationResponse), it will publish the same message. " : true ->
-        		received_error_message => 
-        			event(AutomationResponse_out) and --TODO: will become an automation response error out at some point
-        			(event(ServiceStatus_out) and ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL) ;
-        			
-        			
---        	--Cannot formalize in AGREE (unlesse I create a counter)
---        	guarantee "The request ID of unique automation responses are unique" :
---        		true;
---        		
---        	--Not sure if there is a way to model this property in agree
---        	guarantee "tasks are fed into 'the system' one at a time" : 
---        		true; --What was meant was to mean "the queue", might not be necessary
-        			
-        **};
-    end AutomationRequestValidatorService;
+	-- Included Logging and Data Services
+	with MessageLoggerDataService_Pkg;
+	with SendMessagesService_Pkg;
     
-    thread implementation AutomationRequestValidatorService.impl
-    	annex agree {**
-    		lemma "It is not possible to have a negative number of tasks queued" : 
-    		numTasksInQ >= 0;
-    		
-    		lemma "There are only two system states (busy and idle)" :
-    		state = BUSY or state = IDLE;
-
-    	**};
-    	
-    end AutomationRequestValidatorService.impl;
-
-    thread RoutePlannerVisibilityService
-        features
-            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
-            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
-            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
-            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
-            RoutePlanRequest_in: in event data port route::RoutePlanRequest.i;
-            RouteRequest_in: in event data port route::RouteRequest.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            KeepInZone_in: in event data port cmasi::KeepInZone.i;
-            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            RoutePlanResponse_out: out event data port route::RoutePlanResponse.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-    end RoutePlannerVisibilityService;
-
-    thread AssignmentTreeBranchBoundService
-    end AssignmentTreeBranchBoundService;
-
-    thread AutomationDiagramDataService
-        features
-            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
-            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
-            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            KeepInZone_in: in event data port cmasi::KeepInZone.i;
-            PointOfInterest_in: in event data port impact::PointOfInterest.i;
-            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
-            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
-            Task_in: in event data port cmasi::Task.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            LineOfInterest_in: in event data port impact::LineOfInterest.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-    end AutomationDiagramDataService;
-
-    thread WaypointPlanManagerService
-        features
-            MissionCommand_in: in event data port cmasi::MissionCommand.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            IncrementWaypoint_in: in event data port uxnative::IncrementWaypoint.i;
-            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-    end WaypointPlanManagerService;
-
-    thread PlanBuilderService
-        features
-            TaskImplementationResponse_in: in event data port uxtask::TaskImplementationResponse.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
-            TaskAssignmentSummary_in: in event data port uxtask::TaskAssignmentSummary.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
-            UniqueAutomationResponse_out: out event data port uxtask::UniqueAutomationResponse.i;
-            TaskImplementationRequest_out: out event data port uxtask::TaskImplementationRequest.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-    end PlanBuilderService;
-
-    thread SendMessagesService
-        features
-            StartupComplete_in: in event data port uxnative::StartupComplete.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-    end SendMessagesService;
-
-    thread MessageLoggerDataService
-    end MessageLoggerDataService;
-
-
-    thread TaskTrackerService
-        features
-            MissionCommand_in: in event data port cmasi::MissionCommand.i;
-            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            PointOfInterest_in: in event data port impact::PointOfInterest.i;
-            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
-            Task_in: in event data port cmasi::Task.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            LineOfInterest_in: in event data port impact::LineOfInterest.i;
-        properties
-            Dispatch_Protocol => Sporadic;
-    end TaskTrackerService;
 
     process waterways
         features
@@ -394,16 +44,16 @@ public
 
     process implementation waterways.i
         subcomponents
-            TaskManagerService: thread TaskManagerService;
-            AutomationRequestValidatorService: thread AutomationRequestValidatorService;
-            RoutePlannerVisibilityService: thread RoutePlannerVisibilityService;
-            AssignmentTreeBranchBoundService: thread AssignmentTreeBranchBoundService;
-            AutomationDiagramDataService: thread AutomationDiagramDataService;
-            WaypointPlanManagerService1: thread WaypointPlanManagerService;
-            WaypointPlanManagerService2: thread WaypointPlanManagerService;
-            PlanBuilderService: thread PlanBuilderService;
-            SendMessagesService: thread SendMessagesService;
-            MessageLoggerDataService: thread MessageLoggerDataService;
+            TaskManagerService: thread TaskManagerService_Pkg::TaskManagerService;
+            AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService;
+            RoutePlannerVisibilityService: thread RoutePlannerVisibilityService_Pkg::RoutePlannerVisibilityService;
+            AssignmentTreeBranchBoundService: thread AssignmentTreeBranchBoundService_Pkg::AssignmentTreeBranchBoundService;
+            AutomationDiagramDataService: thread AutomationDiagramDataService_Pkg::AutomationDiagramDataService;
+            WaypointPlanManagerService1: thread WaypointPlanManagerService_Pkg::WaypointPlanManagerService;
+            WaypointPlanManagerService2: thread WaypointPlanManagerService_Pkg::WaypointPlanManagerService;
+            PlanBuilderService: thread PlanBuilderService_Pkg::PlanBuilderService;
+            SendMessagesService: thread SendMessagesService_Pkg::SendMessagesService;
+            MessageLoggerDataService: thread MessageLoggerDataService_Pkg::MessageLoggerDataService;
             AngledAreaSearchTask: thread AngledAreaSearchTask_Package::AngledAreaSearchTask;
             AssignmentCoordinatorTask: thread AssignmentCoordinatorTask_Package::AssignmentCoordinatorTask;
             BlockadeTask: thread BlockadeTask_Package::BlockadeTask;
@@ -418,7 +68,7 @@ public
             MultiVehicleWatchTask: thread MultiVehicleWatchTask_Package::MultiVehicleWatchTask;
             OverwatchTask: thread OverwatchTask_Package::OverwatchTask;
             PatternSearchTask: thread PatternSearchTask_Package::PatternSearchTask;
-            TaskTracker: thread TaskTrackerService;
+            TaskTracker: thread TaskTrackerService_Pkg::TaskTrackerService;
             
             RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
         connections
@@ -602,5 +252,7 @@ public
         **};
             
     end waterways.i;
+
+
 
 end Waterways;
