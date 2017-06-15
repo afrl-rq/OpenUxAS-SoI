@@ -198,12 +198,10 @@ bool CmasiPointSearchTaskService::isCalculateOption(const int64_t& taskId, int64
         //taskOption->setCost();    // defaults to 0.0
         taskOption->setStartLocation(m_pointSearchTask->getSearchLocation()->clone());
         taskOption->setEndLocation(m_pointSearchTask->getSearchLocation()->clone());
-        //            for(auto itEligibleEntities=m_speedAltitudeVsEligibleEntitesRequested.begin();itEligibleEntities!=m_speedAltitudeVsEligibleEntitesRequested.end();itEligibleEntities++)
-        //            {
-        //                taskOption->getEligibleEntities().insert(taskOption->getEligibleEntities().end(),itEligibleEntities->second.begin(),itEligibleEntities->second.end());
-        //            }
-        //taskOption->getEligibleEntities();    // defaults to all entities eligible
-        //taskOption->setCost(0);
+        for(auto itEligibleEntities : m_speedAltitudeVsEligibleEntityIdsRequested)
+            for( auto id : itEligibleEntities.second )
+                taskOption->getEligibleEntities().push_back(id);
+        taskOption->setCost(0);
         auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
         m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
         m_taskPlanOptions->getOptions().push_back(taskOption);
