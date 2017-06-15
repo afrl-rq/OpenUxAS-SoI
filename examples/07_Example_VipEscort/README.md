@@ -7,5 +7,3 @@
 * `runUxAS_VipEscort.sh`
 * `runAMASE_VipEscort.sh`
 * `Scenario_VipEscort.xml`
-
-

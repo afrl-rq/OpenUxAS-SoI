@@ -19,6 +19,7 @@
 
 #include "TaskServiceBase.h"
 
+#include "uxas/UT/VipEscortTask.h"
 namespace uxas
 {
 namespace service
@@ -100,7 +101,7 @@ public:
     static const std::vector<std::string>
     s_registryServiceTypeNames()
     {
-        std::vector<std::string> registryServiceTypeNames = {s_typeName(),"uxas.projects.UT.VipEscortTask"};
+        std::vector<std::string> registryServiceTypeNames = {s_typeName(),"uxas.UT.VipEscortTask"};
         return (registryServiceTypeNames);
     };
 
@@ -144,12 +145,13 @@ private:
 
     void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)override { };
 
-    void buildTaskPlanOptions()override { };
+    void buildTaskPlanOptions()override;
+
+    bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const std::vector<int64_t>& eligibleEntities);
 
 private:
     // storage for the option entries
-    std::string m_option01{std::string("No Option 1")};
-    int32_t m_option02{0};
+    std::shared_ptr<uxas::UT::VipEscortTask> m_VipEscortTask;
 };
 
 

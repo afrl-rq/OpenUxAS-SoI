@@ -16,13 +16,14 @@
  * <Service Type="VipEscortTaskService" OptionString="Option_01" OptionInt="36" />
  * 
  */
-
-// include header for this service
 #include "VipEscortTaskService.h"
+// include header for this service
+
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
 
+#include "uxas/UT/VipEscortTask.h"
 #include <iostream>     // std::cout, cerr, etc
 
 // convenience definitions for the option strings
@@ -56,47 +57,86 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     bool isSuccess(true);
+    std::shared_ptr<uxas::UT::VipEscortTask> m_VipEscortTask;
+    std::stringstream sstrErrors;
+       if (uxas::UT::isVipEscortTask(m_task.get()))
+       {
+           m_VipEscortTask = std::static_pointer_cast<uxas::UT::VipEscortTask>(m_task);
+           if (!m_VipEscortTask)
+           {
+               sstrErrors << "ERROR:: **VipEscortTaskService::bConfigure failed to cast a VipEscort_Task from the task pointer." << std::endl;
+               isSuccess = false;
+           }
+       }
+       else
+       {
+           sstrErrors << "ERROR:: **VipEscortTaskService::bConfigure failed: taskObject[" << m_task->getFullLmcpTypeName() << "] is not a VipEscortTaskService." << std::endl;
+           isSuccess = false;
+       }
 
-//        if (uxas::project::pisr::isPISR_Task(m_task.get()))
-//        {
-//            m_pisrTask = std::static_pointer_cast<uxas::project::pisr::PISR_Task>(m_task);
-//            if (!m_pisrTask)
-//            {
-//                sstrErrors << "ERROR:: **VipEscortTaskService::bConfigure failed to cast a PISR_Task from the task pointer." << std::endl;
-//                isSuccessful = false;
-//            }
-//            else
-//            {
-//                //////////////////////////////////////////////
-//                //////////// PROCESS OPTIONS /////////////////
-//                pugi::xml_node ndTaskOptions = ndComponent.child(m_taskOptions_XmlTag.c_str());
-//                if (ndTaskOptions)
-//                {
-//                    for (pugi::xml_node ndTaskOption = ndTaskOptions.first_child(); ndTaskOption; ndTaskOption = ndTaskOption.next_sibling())
-//                    {
-//                        
-////        m_option01 = ndComponent.attribute(STRING_XML_OPTION_STRING).value();
-////        m_option02 = ndComponent.attribute(STRING_XML_OPTION_INT).as_int();
-//                        
-//                        
-//                        if (std::string(STRING_XML_USE_ASSIGNED_TASK_ID) == ndTaskOption.name())
-//                        {
-//                            m_useAssignedTaskId = true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        else
-//        {
-//            sstrErrors << "ERROR:: **VipEscortTaskService::bConfigure failed: taskObject[" << m_task->getFullLmcpTypeName() << "] is not a c00_TaskTemplate_Task." << std::endl;
-//            isSuccessful = false;
-//        }
-
-    // subscribe to messages::
     addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
 
     return (isSuccess);
+}
+
+void VipEscortTaskService::buildTaskPlanOptions()
+{
+    bool isSuccessful{true};
+
+    int64_t optionId(1);
+    int64_t taskId(m_VipEscortTask->getTaskID());
+
+    if (isCalculateOption(taskId, optionId, m_VipEscortTask->getEligibleEntities()))
+    {
+        optionId++;
+    }
+
+    std::string compositionString("+(");
+    for (auto itOption = m_taskPlanOptions->getOptions().begin(); itOption != m_taskPlanOptions->getOptions().end(); itOption++)
+    {
+        compositionString += "p";
+        compositionString += std::to_string((*itOption)->getOptionID());
+        compositionString += " ";
+    }
+    compositionString += ")";
+    std::cout << compositionString << std::endl;
+    
+    m_taskPlanOptions->setComposition(compositionString);
+
+    // send out the options
+    if (isSuccessful)
+    {
+        auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(m_taskPlanOptions);
+        sendSharedLmcpObjectBroadcastMessage(newResponse);
+    }
+};
+
+bool VipEscortTaskService::isCalculateOption(const int64_t& taskId, int64_t& optionId, const std::vector<int64_t>& eligibleEntities) {
+    bool isSuccessful{true};
+
+    // if (m_watchedEntityStateLast)
+    // {
+    //     auto taskOption = new uxas::messages::task::TaskOption;
+    //     taskOption->setTaskID(taskId);
+    //     taskOption->setOptionID(optionId);
+    //     taskOption->getEligibleEntities() = eligibleEntities;
+    //     taskOption->setStartLocation(m_watchedEntityStateLast->getLocation()->clone());
+    //     taskOption->setStartHeading(m_watchedEntityStateLast->getHeading());
+    //     taskOption->setEndLocation(m_watchedEntityStateLast->getLocation()->clone());
+    //     taskOption->setEndHeading(m_watchedEntityStateLast->getHeading());
+    //     auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
+    //     m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
+    //     m_taskPlanOptions->getOptions().push_back(taskOption);
+    //     taskOption = nullptr; //just gave up ownership
+
+    // }
+    // else
+    // {
+    //     CERR_FILE_LINE_MSG("ERROR::Task_WatchTask:: no watchedEntityState found for Entity[" << m_watchTask->getWatchedEntityID() << "]")
+    //     isSuccessful = false;
+    // }
+
+    return (isSuccessful);
 }
 
 bool VipEscortTaskService::initializeTask()
