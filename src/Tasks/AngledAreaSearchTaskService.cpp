@@ -66,8 +66,6 @@ AngledAreaSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -207,8 +205,6 @@ AngledAreaSearchTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avta
 
 void AngledAreaSearchTaskService::buildTaskPlanOptions()
 {
-    bool isSuccessful{true};
-
     // construct a task option for each vehicle
     // note:: use only one vehicle per option
 

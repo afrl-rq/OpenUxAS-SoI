@@ -136,7 +136,7 @@ private:
     // copy constructor - make unusable to prevent bad things from happening
     CGrid(const CGrid& grid);
     // assignment operator - make unusable to prevent bad things from happening
-    CGrid & operator = (const CGrid& grid) {};
+    CGrid & operator = (const CGrid& grid) = delete;
     
     
     /************************************************

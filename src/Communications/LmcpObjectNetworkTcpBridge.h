@@ -128,11 +128,9 @@ private:
     std::set<std::string> m_nonImportForwardAddresses;
     std::set<std::string> m_nonExportForwardAddresses;
 
-    /** \brief  this is the tcp/ip address, including port, of the PUB
-     * socket, e.g.  "tcp://xxx.xxx.xxx.xxx:5555" or "tcp://*:5555". Used to
-     * relay messages to the external entity. */
-//    std::string m_tcpReceiveAddress{"tcp://*:5555"};
-//    std::string m_tcpSendAddress{"tcp://*:5556"};
+    /// \brief  this is the tcp/ip address, including port, of the PUB
+    /// socket, e.g.  "tcp://xxx.xxx.xxx.xxx:5555" or "tcp://*:5555". Used to
+    /// relay messages to the external entity.
     std::string m_tcpReceiveSendAddress = std::string("tcp://*:5555");
     /** \brief  If this is set to true the TcpBridge connects (binds) as a server. 
      If it is false the TcpBridge connects as a client. Defaults to true */

@@ -667,7 +667,6 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
 
             auto optionId = getOptionIdFromRouteId(routePlanResponse->getResponseID());
             auto vehicleId = routePlanResponse->getVehicleID();
-            auto operatingRegion = routePlanResponse->getOperatingRegion();
             auto itTaskOptionClass = m_optionIdVsTaskOptionClass.find(optionId);
             auto itTaskImplementationRequest = m_routeIdVsTaskImplementationRequest.find(routePlanResponse->getResponseID());
             if ((itTaskOptionClass != m_optionIdVsTaskOptionClass.end()) &&

@@ -243,7 +243,7 @@ ConfigurationManager::populateEnabledComponentXmlNode(pugi::xml_node& uxasNode, 
         if (nodeName.compare(baseNode.name()) == 0)
         {
             // add copy of base XML component node to the enabled XML
-            pugi::xml_node newCmpntNode = uxasNode.append_copy(baseNode);
+            uxasNode.append_copy(baseNode);
 //            UXAS_LOG_DEBUGGING(s_typeName(), "::populateEnabledComponentXmlNode appended new copy of base ", cmpntType->first, " XML node");
         }
     }

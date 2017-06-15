@@ -129,8 +129,6 @@ double CTrajectory::dMinimumDistanceDubins(CTrajectoryParameters& cTrajectoryPar
     double dDistanceTotalMinimum_m = std::numeric_limits<double>::max();    // defaults to error
     CAssignment assignMinimum;
 
-    double dDistanceFinalLeg_m(0.0);
-
     CTrajectoryParametersEnd cParametersEndFinal = *vParametersEnd.begin();    //need to keep track of which final parameters were used in the minimum assignment
 
     // find minimum distance path to all possible endpoint/headings/standoffs
@@ -868,7 +866,6 @@ std::vector<std::vector<double>> CTrajectory::FindPathBetweenTurns(std::vector<s
     std::vector<std::vector<double>> Z;
     std::vector<double> Zelem;
     bool found=false; //flag if the path has been found
-    bool found2=false;
     bool cond1,cond2;
     int N=Turn1.size();
     double Step[2]; //connection step
@@ -1155,8 +1152,6 @@ size_t CTrajectory::szMinimumDistanceCircle(CPosition posBegin,CPosition posEnd,
     double dAngleTol = 0.005;    //% If tangent point within angular tolerance to given point, use given point instead
     double dPositionTol = 0.01;    //% if turn circles centers are close together then consider them the same
 
-    double dMinDistance = std::numeric_limits<double>::max();    //%defaults to error condition
-
     double dTheta_rad;
     double dDistCircleCenters = n_Const::c_Convert::iRound(circleSecond.relativeDistanceAngle2D_m(circleFirst,dTheta_rad));
     
@@ -1177,10 +1172,8 @@ size_t CTrajectory::szMinimumDistanceCircle(CPosition posBegin,CPosition posEnd,
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //% find out if this should be a direct tangent or a transverse tanget
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    bool bOnlyDirectTangents = false;
     if(dDistCircleCenters < n_Const::c_Convert::iRound(circleFirst.dGetRadius() + circleSecond.dGetRadius()))
     {
-       bOnlyDirectTangents = true;    //%only direct tangents are possible
        if((circleFirst.turnGetTurnDirection() != circleSecond.turnGetTurnDirection())||
             ((circleFirst.turnGetTurnDirection() == CCircle::turnNone) || (circleSecond.turnGetTurnDirection() == CCircle::turnNone))
             )
@@ -1336,8 +1329,6 @@ size_t CTrajectory::szMinimumDistanceCircle(CPosition posBegin,CPosition posEnd,
     }    //if (circleSecond.turnGetTurnDirection() == CCircle::turnCounterclockwise)
     dDistance3 = dAngle02*dTurnRadius_m;
 
-    dMinDistance = dDistance1 + dDistance2 + dDistance3; 
-
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //%% transform waypoints back to original coordinate frame
@@ -1447,7 +1438,6 @@ size_t CTrajectory::szMinimumDistanceTurnTurnTurn(CPosition posBegin,CPosition p
 
 
     //%  Probably ought to set these tolerances in the global defaults m-file
-    double dAngleTol = 0.005;    //% If tangent point within angular tolerance to given point, use given point instead
     double dPositionTol = 0.01;    //% if turn circles centers are close together then consider them the same
 
     double dTheta_rad = 0.0;

@@ -123,7 +123,7 @@ TimerManager::destroyTimers(std::vector<uint64_t>& timerIds, uint64_t timeOut_ms
             break;
         }
         else if (std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now() - startTime).count() > timeOut_ms)
+                std::chrono::system_clock::now() - startTime).count() > static_cast<int64_t>(timeOut_ms))
         {
             break;
         }
@@ -162,7 +162,7 @@ TimerManager::createTimerImpl(Timer&& timer)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     timer.m_id = m_nextId++;
-    auto iter = m_timersById.emplace(timer.m_id, std::move(timer));
+    m_timersById.emplace(timer.m_id, std::move(timer));
     return timer.m_id;
 };
 
@@ -320,7 +320,7 @@ TimerManager::disableOrDestroyTimerImpl(uint64_t timerId, bool isDestroy, uint64
                 }
                 else if (timeOut_ms > 0 &&
                         std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::system_clock::now() - startTime).count() > timeOut_ms)
+                        std::chrono::system_clock::now() - startTime).count() > static_cast<int64_t>(timeOut_ms))
                 {
                     UXAS_LOG_WARN(s_typeName(), "::disableOrDestroyTimerImpl failed to ", (isDestroy ? "destroy" : "disable"),
                              " timer ID ", timerId, " and name ", itTimer->second.m_name,
