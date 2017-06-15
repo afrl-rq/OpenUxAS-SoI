@@ -1317,7 +1317,7 @@ namespace uxas
       for(int i = 0; i < algos.size(); i++)
         algos[i]->start(m_threader);
       std::stringstream buffer;
-      buffer << "(S" << id << ".init = S" << id << ".init) && S0.init";
+      buffer << "(S" << id << ".init = 1) && S0.init";
       for(unsigned int i = 1; i < num_processes; ++i)
         buffer << " && S" << i << ".init";
       std::string expression = buffer.str ();
