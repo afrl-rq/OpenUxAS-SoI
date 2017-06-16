@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS EntityID="100" FormatVersion="1.0" EntityType="Aircraft" ConsoleLoggerSeverityLevel="INFO">
+
+<!--
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.PointSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.AreaSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+    </Bridge>
+    <Service Type="Test_SimulationTime"/>
+-->
+
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="SensorManagerService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="PlanBuilderService"/>
+    <Service Type="AutomationDiagramDataService"/>
+
+    <Service Type="SendMessagesService" 
+        PathToMessageFiles="../MessagesToSend/">
+
+        <!-- configurations -->
+        <Message MessageFileName="AirVehicleConfiguration_V1000.xml" SendTime_ms="50"/>
+        <Message MessageFileName="AirVehicleConfiguration_V2000.xml" SendTime_ms="50"/>
+
+        <!-- initial states -->
+        <Message MessageFileName="AirVehicleState_V1000.xml" SendTime_ms="100"/>
+        <Message MessageFileName="AirVehicleState_V2000.xml" SendTime_ms="100"/>
+
+        <!-- boundaries -->
+        <Message MessageFileName="KeepOutZone_10.xml" SendTime_ms="200"/>
+        <Message MessageFileName="KeepOutZone_11.xml" SendTime_ms="210"/>
+        <Message MessageFileName="OperatingRegion_100.xml" SendTime_ms="240"/>
+
+        <!-- the tasks -->
+        <Message MessageFileName="PointSearchTask_10.xml" SendTime_ms="300"/>
+        <Message MessageFileName="PointSearchTask_11.xml" SendTime_ms="310"/>
+        <Message MessageFileName="PointSearchTask_12.xml" SendTime_ms="320"/>
+        <Message MessageFileName="RendezvousTask_101.xml" SendTime_ms="330"/>
+
+        <Message MessageFileName="AutomationRequest.xml" SendTime_ms="500"/>
+    </Service>
+    
+    <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>
+
+

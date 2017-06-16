@@ -145,6 +145,13 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
     m_taskImplementationId = 0;
     m_entityIdVsTaskImplementationRequests.clear();
     m_entityIdVsTaskImplementationResponses.clear();
+    
+    std::vector<int64_t> participatingVehicles = m_uniqueAutomationRequest->getOriginalRequest()->getEntityList();
+    if(participatingVehicles.empty())
+    {
+        for(auto v: m_entityIdVsEntityState)
+            participatingVehicles.push_back(v.first);
+    }
 
     for (auto itTask = taskAssignmentSummary->getTaskList().begin(); itTask != taskAssignmentSummary->getTaskList().end(); itTask++)
     {
@@ -214,6 +221,36 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
 
                 taskImplementationRequest->getStartPosition()->setLatitude(latitude_deg);
                 taskImplementationRequest->getStartPosition()->setLongitude(longitude_deg);
+                
+                // put all known entity states as neighbors
+                for(auto neighbor : participatingVehicles)
+                {
+                    if(neighbor != (*itTask)->getAssignedVehicle())
+                    {
+                        auto neighborState = new uxas::messages::task::PlanningState();
+                        auto usePlanningState = std::find_if(m_uniqueAutomationRequest->getPlanningStates().begin(), m_uniqueAutomationRequest->getPlanningStates().end(),
+                                                [&](uxas::messages::task::PlanningState* state) { return state->getEntityID() == neighbor; });
+                        auto currentState = m_entityIdVsEntityState.find(neighbor);
+                        if(usePlanningState != m_uniqueAutomationRequest->getPlanningStates().end())
+                        {
+                            neighborState->setEntityID((*usePlanningState)->getEntityID());
+                            neighborState->setPlanningPosition((*usePlanningState)->getPlanningPosition()->clone());
+                            neighborState->setPlanningHeading((*usePlanningState)->getPlanningHeading());
+                            taskImplementationRequest->getNeighborLocations().push_back(neighborState);
+                        }
+                        else if(currentState != m_entityIdVsEntityState.end())
+                        {
+                            neighborState->setEntityID(currentState->second->getID());
+                            neighborState->setPlanningPosition(currentState->second->getLocation()->clone());
+                            neighborState->setPlanningHeading(currentState->second->getHeading());
+                            taskImplementationRequest->getNeighborLocations().push_back(neighborState);
+                        }
+                        else
+                        {
+                            delete neighborState;
+                        }
+                    }
+                }
             }
             else
             {

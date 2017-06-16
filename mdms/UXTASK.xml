@@ -9,7 +9,7 @@
 <MDM>
     <SeriesName>UXTASK</SeriesName>
     <Namespace>uxas/messages/task</Namespace>
-    <Version>6</Version>
+    <Version>7</Version>
     
     <EnumList>
     </EnumList>
@@ -23,6 +23,37 @@
         received for all the EligibleEntities, they are used for planning and assignmnet for 
         the specified {@link CoordinatedAutomationRequest}-->
         <Struct Name="AssignmentCoordinatorTask" Extends="CMASI/Task">
+        </Struct>
+
+        <!-- This task will synchronize all involved vehicles at a specified location
+             (or set of locations) at the same time.
+
+             Loiter patterns are used to ensure that when the latest
+             vehicle arrives, the others will be in the proper positions
+             and orientations to satisfy the location specification
+             simultaneously. -->
+        <Struct Name="RendezvousTask" Extends="CMASI/Task">
+            <!-- Number of vehicles that will participate in the rendezvous. To restrict
+                 the available participants, use the 'EligibleEntities' field. If the
+                 number of participants is exactly equal to the number of eligible
+                 entities, then this task will only produce a single option that ensures
+                 those exact entities meet at the rendezvous location. -->
+            <Field Name="NumberOfParticipants" Type="byte" />
+            <!-- Rendezvous location. All vehicles will be at this location
+                 simultaneously unless 'MultiLocationRendezvous' is set to 'true'. -->
+            <Field Name="Location" Type="CMASI/Location3D" Default="NULL" />
+            <!-- Rendezvous location. All vehicles will arrive with this heading
+                 simultaneously unless 'MultiLocationRendezvous' is set to 'true'. -->
+            <Field Name="Heading" Type="real32" />
+            <!-- Flag for specifying complex rendezvous arrangements. When 'true'
+                 vehicles must arrive according to the list of specified locations. -->
+            <Field Name="MultiLocationRendezvous" Type="bool" Default="false" />
+            <!-- The desired rendezvous states of the entities. If the EntityID fields
+                 are set to 0, then any eligible vehicle can be used at that location. 
+                 Only used when 'MultiLocationRendezvous' is set to 'true'. If the 
+                 EntityID fields are non-zero, they must correspond to an eligible
+                 vehicle and only that particular entity can be. -->
+            <Field Name="RendezvousStates" Type="PlanningState[]" />
         </Struct>
 
         <!-- The state of an entity to be used as the initial planning state when 
@@ -69,7 +100,6 @@
             in an {@link AssignmentCoordination} message. -->
             <Field Name="PlanningStates" Type="PlanningState[]" />
         </Struct>
-        
         <!-- A CMASI automation request (with Identifier) that is sent by tasks. -->
         <Struct Name="TaskAutomationRequest">
             <!-- Identifier for tracking requests and responses -->
@@ -230,6 +260,9 @@
             <Field Name="OptionID" Type="int64" />
             <!-- Time before which this task cannot begin -->
             <Field Name="TimeThreshold" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Predicted locations and headings of all other entities at the point
+                 in the mission when this option is to be conducted. -->
+            <Field Name="NeighborLocations" Type="PlanningState[]" />
         </Struct>
         
         <!-- Response to a final task implementation request (one for each vehicle assigned).

@@ -14,6 +14,7 @@ srcs_tasks = [
   'MultiVehicleWatchTaskService.cpp',
   'OverwatchTaskService.cpp',
   'PatternSearchTaskService.cpp',
+  'RendezvousTask.cpp',
   'TaskManagerService.cpp',
   'TaskServiceBase.cpp',
   'TaskTrackerService.cpp',

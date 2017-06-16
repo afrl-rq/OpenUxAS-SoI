@@ -457,7 +457,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                 }
                 else
                 {
-                    CERR_FILE_LINE_MSG("ERROR::c_Task_CmasiLineSearch::ProcessMessage: for TaskId[" << m_task->getTaskID()
+                    CERR_FILE_LINE_MSG("ERROR::TaskServiceBase::ProcessMessage: for TaskId[" << m_task->getTaskID()
                                        << "] OptionId[" << taskImplementationRequest->getOptionID()
                                        << "] does not exist, but was specified in a TaskImplementationRequest.")
                 }
