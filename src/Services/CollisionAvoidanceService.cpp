@@ -1346,6 +1346,7 @@ namespace uxas
       }
 
       //-- start threads and simulation
+      id = settings.id;
       for(int i = 0; i < algos.size(); i++)
         algos[i]->start(m_threader);
       std::stringstream buffer;
