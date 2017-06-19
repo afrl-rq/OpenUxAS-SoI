@@ -1028,16 +1028,36 @@ namespace uxas
 {
   namespace service
   {
-    CollisionAvoidanceService::ServiceBase::CreationRegistrar<CollisionAvoidanceService>
-    CollisionAvoidanceService::s_registrar(CollisionAvoidanceService::s_registryServiceTypeNames());
 
-    CollisionAvoidanceService::CollisionAvoidanceService()
-      : ServiceBase(CollisionAvoidanceService::s_typeName(),
-                    CollisionAvoidanceService::s_directoryName()),
-        m_checkpointPrefix ("checkpoints/checkpoint"), m_threader (m_knowledgeBase) {
-    };
+      //-- minimum and maximum latitide and longitude of the visible
+      //-- map area
+      const double LAT_MIN = 45.296;
+      const double LAT_MAX = 45.35;
+      const double LNG_MIN = -121.02;
+      const double LNG_MAX = -120.91;
+      const double CELL_LAT = (LAT_MAX - LAT_MIN) / 9;
+      const double CELL_LNG = (LNG_MAX - LNG_MIN) / 9;
+      
+      //-- function to convert from a position to cell coordinates
+      std::pair<int,int> GpsToCell(double lat, double lng)
+      {
+          double cellx = (lng - (LNG_MIN - CELL_LNG / 2)) / CELL_LNG;
+          int icellx = (int)(floor(cellx));
+          double celly = (lat - (LAT_MIN - CELL_LAT / 2)) / CELL_LAT;
+          int icelly = (int)(floor(celly));
+          return std::pair<int,int>(cellx, celly);
+      }      
+      
+      CollisionAvoidanceService::ServiceBase::CreationRegistrar<CollisionAvoidanceService>
+      CollisionAvoidanceService::s_registrar(CollisionAvoidanceService::s_registryServiceTypeNames());
 
-    CollisionAvoidanceService::~CollisionAvoidanceService() { };
+      CollisionAvoidanceService::CollisionAvoidanceService()
+          : ServiceBase(CollisionAvoidanceService::s_typeName(),
+                        CollisionAvoidanceService::s_directoryName()),
+            m_checkpointPrefix ("checkpoints/checkpoint"), m_threader (m_knowledgeBase) {
+      };
+
+      CollisionAvoidanceService::~CollisionAvoidanceService() { };
 
     /********************************************************************/
     //-- handle arguments from the command line
@@ -1059,9 +1079,17 @@ namespace uxas
                 {
                     node_name = currentXmlNode.attribute("node_name").as_string();
                 }
-                if (!currentXmlNode.attribute("role_name").empty())
+                if (!currentXmlNode.attribute("init_lat").empty() &&
+                    !currentXmlNode.attribute("init_lng").empty())
                 {
-                    role_name = currentXmlNode.attribute("role_name").as_string();
+                    double init_lat = currentXmlNode.attribute("init_lat").as_double();
+                    double init_lng = currentXmlNode.attribute("init_lng").as_double();
+                    auto init_cell = GpsToCell(init_lat, init_lng);
+                    std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
+                    x = init_cell.first;
+                    xp = init_cell.first;
+                    y = init_cell.second;
+                    yp = init_cell.second;
                 }
             }
             // if we need to load initial knowledge
