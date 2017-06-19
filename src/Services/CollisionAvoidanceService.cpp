@@ -1343,9 +1343,8 @@ namespace uxas
         std::vector<Algo *> algos;
         Algo *algo;
         if(node_name == "uav" && role_name == "Uav") {
-            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1,2};
-            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0,2};
-            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][2] = {0,1};
+            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1};
+            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0};
             algo = new SyncAlgo(100000, "node_uav_role_Uav_COLLISION_AVOIDANCE", "COLLISION_AVOIDANCE", &knowledge, platform_name, &platform_args);
             algos.push_back(algo);
         }
