@@ -581,9 +581,8 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
           (void) (std::cerr  << "node " << id << " completed mission ...\n");
         }
       }
-      if (((id == 0 && ((thread0_missionOver[1] == Integer (0)) || (thread0_missionOver[2] == Integer (0)))) || 
-        (id == 1 && ((thread0_missionOver[0] == Integer (0)) || (thread0_missionOver[2] == Integer (0)))) || 
-        (id == 2 && ((thread0_missionOver[0] == Integer (0)) || (thread0_missionOver[1] == Integer (0))))))
+      if (((id == 0 && ((thread0_missionOver[1] == Integer (0)))) || 
+           (id == 1 && ((thread0_missionOver[0] == Integer (0))))))
       {
         return Integer(0);
       }
@@ -614,8 +613,8 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
     {
       if ((thread0_state == WAITING))
       {
-        if (((id == 0 && ((thread0_lock[1][thread0_xp][thread0_yp] != Integer (0)) || (thread0_lock[2][thread0_xp][thread0_yp] != Integer (0)))) || 
-          (id == 1 && ((thread0_lock[2][thread0_xp][thread0_yp] != Integer (0))))))
+          if (((id == 0 && ((thread0_lock[1][thread0_xp][thread0_yp] != Integer (0)))) || 
+               (id == 1)))
         {
           return Integer(0);
         }
