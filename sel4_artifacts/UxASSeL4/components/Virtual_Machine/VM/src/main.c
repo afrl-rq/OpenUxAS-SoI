@@ -413,7 +413,7 @@ void restart_component(void) {
 }
 
 extern char __bss_start[];
-extern char __bss_end[];
+extern char __bss_end__[];
 extern char __sysinfo[];
 extern char __libc[];
 extern char morecore_area[];
@@ -449,7 +449,7 @@ void reset_resources(void) {
     memcpy(save_morecore_area, morecore_area, 4);
     memcpy(save_morecore_size, morecore_size, 4);
     /* zero the bss */
-    memset(__bss_start, 0, (uintptr_t)__bss_end - (uintptr_t)__bss_start);
+    memset(__bss_start, 0, (uintptr_t)__bss_end__ - (uintptr_t)__bss_start);
     /* restore these pieces */
     memcpy(__libc, save_libc, 34);
     memcpy(__sysinfo, save_sysinfo, 4);
