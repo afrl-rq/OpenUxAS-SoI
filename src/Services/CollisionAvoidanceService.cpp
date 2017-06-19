@@ -276,17 +276,19 @@ Reference<short> state(knowledge, ".state");
 short var_init_state (0);
 Reference<short> x(knowledge, ".x");
 short var_init_x (0);
-Reference<short> xf(knowledge, ".xf");
-short var_init_xf (0);
 Reference<short> xp(knowledge, ".xp");
 short var_init_xp (0);
 Reference<short> y(knowledge, ".y");
 short var_init_y (0);
-Reference<short> yf(knowledge, ".yf");
-short var_init_yf (0);
 Reference<short> yp(knowledge, ".yp");
 short var_init_yp (0);
 
+//-- pointer to list of waypoints
+gams::pose::Positions *wpPtr = NULL;
+    
+//-- id of next waypoint to be reached
+short nextWpId = 0;
+    
 /********************************************************************/
 //-- Begin defining variables for role Uav
 /********************************************************************/
@@ -313,10 +315,8 @@ namespace node_uav_role_Uav
 /********************************************************************/
 CachedReference<short> thread0_state(knowledge, ".state");
 CachedReference<short> thread0_x(knowledge, ".x");
-CachedReference<short> thread0_xf(knowledge, ".xf");
 CachedReference<short> thread0_xp(knowledge, ".xp");
 CachedReference<short> thread0_y(knowledge, ".y");
-CachedReference<short> thread0_yf(knowledge, ".yf");
 CachedReference<short> thread0_yp(knowledge, ".yp");
 
 /********************************************************************/
@@ -522,10 +522,8 @@ thread0_PULL (engine::FunctionArguments & args, engine::Variables & vars)
     madara::knowledge::ContextGuard guard(knowledge);
     pull(thread0_state);
     pull(thread0_x);
-    pull(thread0_xf);
     pull(thread0_xp);
     pull(thread0_y);
-    pull(thread0_yf);
     pull(thread0_yp);
     pull(thread0_lock);
     pull(thread0_missionOver);
@@ -541,10 +539,8 @@ thread0_PUSH (engine::FunctionArguments & args, engine::Variables & vars)
     madara::knowledge::ContextGuard guard(knowledge);
     push(thread0_state);
     push(thread0_x);
-    push(thread0_xf);
     push(thread0_xp);
     push(thread0_y);
-    push(thread0_yf);
     push(thread0_yp);
     push(thread0_lock[id]);
     push(thread0_missionOver[id]);
@@ -576,7 +572,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
   }
   if ((thread0_state == NEXT))
   {
-    if (((thread0_x == thread0_xf) && (thread0_y == thread0_yf)))
+    if (nextWpId >= wpPtr->size())
     {
       if ((thread0_missionOver[id] == Integer (0)))
       {
@@ -629,14 +625,15 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
       {
         if ((thread0_state == MOVE))
         {
-          if ((GRID_MOVE (thread0_xp, thread0_yp, Integer (1))))
-          {
-            return Integer(0);
-          }
-          thread0_lock[id][thread0_x][thread0_y] = Integer (0);
-          thread0_x = thread0_xp;
-          thread0_y = thread0_yp;
-          thread0_state = NEXT;
+            if(uxas::service::GamsService::move ((*wpPtr)[nextWpId-1]) !=
+               gams::platforms::PLATFORM_ARRIVED)
+            {
+                return Integer(0);
+            }
+            thread0_lock[id][thread0_x][thread0_y] = Integer (0);
+            thread0_x = thread0_xp;
+            thread0_y = thread0_yp;
+            thread0_state = NEXT;
         }
       }
     }
@@ -654,31 +651,15 @@ thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
 
 
   //-- Begin function body
-  thread0_xp = thread0_x;
-  thread0_yp = thread0_y;
-  if ((thread0_x < thread0_xf))
-  {
-    thread0_xp = (thread0_xp + Integer (1));
-  }
-  else
-  {
-    if ((thread0_x > thread0_xf))
-    {
-      thread0_xp = (thread0_xp - Integer (1));
-    }
-    else
-    {
-      if ((thread0_y < thread0_yf))
-      {
-        thread0_yp = (thread0_yp + Integer (1));
-      }
-      else
-      {
-        thread0_yp = (thread0_yp - Integer (1));
-      }
-    }
-  }
+  gams::pose::Position nextPos = (*wpPtr)[nextWpId];
+  ++nextWpId;
 
+  auto nextCell = GpsToCell(nextPos.lat(), nextPos.lng());
+  thread0_xp = nextCell.first;
+  thread0_yp = nextCell.second;
+
+  std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
+  
   //-- Insert return statement, in case user program did not
   return Integer(0);
 }
@@ -707,12 +688,6 @@ int check_init_x ()
   x = var_init_x;
   return (Integer(((Integer (0) <= x) && (x < X))));
 }
-int check_init_xf ()
-{
-  engine::Variables vars;
-  xf = var_init_xf;
-  return (Integer(((Integer (0) <= xf) && (xf < X))));
-}
 void initialize_xp ()
 {
   engine::Variables vars;
@@ -723,12 +698,6 @@ int check_init_y ()
   engine::Variables vars;
   y = var_init_y;
   return (Integer(((Integer (0) <= y) && (y < Y))));
-}
-int check_init_yf ()
-{
-  engine::Variables vars;
-  yf = var_init_yf;
-  return (Integer(((Integer (0) <= yf) && (yf < Y))));
 }
 void initialize_yp ()
 {
@@ -742,9 +711,7 @@ void constructor ()
   initialize_lock ();
   initialize_missionOver ();
   initialize_state ();
-  if(!check_init_xf ()) throw std::runtime_error("ERROR: illegal initial value of variable xf");
   initialize_xp ();
-  if(!check_init_yf ()) throw std::runtime_error("ERROR: illegal initial value of variable yf");
   initialize_yp ();
 }
 
@@ -1089,10 +1056,10 @@ namespace uxas
                     double init_lng = currentXmlNode.attribute("init_lng").as_double();
                     auto init_cell = GpsToCell(init_lat, init_lng);
                     std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
-                    x = init_cell.first;
-                    xp = init_cell.first;
-                    y = init_cell.second;
-                    yp = init_cell.second;
+                    node_uav::x = init_cell.first;
+                    node_uav::xp = init_cell.first;
+                    node_uav::y = init_cell.second;
+                    node_uav::yp = init_cell.second;
                 }
             }
             // if we need to load initial knowledge
@@ -1307,93 +1274,96 @@ namespace uxas
     
     bool CollisionAvoidanceService::configure(const pugi::xml_node& serviceXmlNode)
     {
-      //-- read arguments from XML file
-      read_arguments (serviceXmlNode);
-      //check_argument_sanity ();
+        //-- set pointer to waypoints
+        node_uav::wpPtr = &m_waypoints;
+        
+        //-- read arguments from XML file
+        read_arguments (serviceXmlNode);
+        //check_argument_sanity ();
 
-      std::cout << "CollisionAvoidanceService configured for id " << settings.id << "...\n";
+        std::cout << "CollisionAvoidanceService configured for id " << settings.id << "...\n";
       
-      //-- Initialize commonly used local variables
-      id = settings.id;
-      num_processes = processes;
+        //-- Initialize commonly used local variables
+        id = settings.id;
+        num_processes = processes;
 
-      /******************************************************************/
-      //-- Invoking constructors
-      /******************************************************************/
-      if(node_name == "uav" && role_name == "Uav") node_uav::node_uav_role_Uav::constructor ();
+        /******************************************************************/
+        //-- Invoking constructors
+        /******************************************************************/
+        if(node_name == "uav" && role_name == "Uav") node_uav::node_uav_role_Uav::constructor ();
 
-      //-- Defining thread functions for MADARA
-      if(node_name == "uav" && role_name == "Uav")
-        knowledge.define_function ("REMODIFY_INPUT_GLOBALS",
-                                   node_uav::node_uav_role_Uav::REMODIFY_INPUT_GLOBALS);
-      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_BARRIERS",
-                                 node_uav::node_uav_role_Uav::REMODIFY_BARRIERS_COLLISION_AVOIDANCE);
-      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_GLOBALS",
-                                 node_uav::node_uav_role_Uav::REMODIFY_GLOBALS_COLLISION_AVOIDANCE);
-      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PULL",
-                                 node_uav::node_uav_role_Uav::thread0_PULL);
-      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PUSH",
-                                 node_uav::node_uav_role_Uav::thread0_PUSH);
-      knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE",
-                                 node_uav::node_uav_role_Uav::thread0);
+        //-- Defining thread functions for MADARA
+        if(node_name == "uav" && role_name == "Uav")
+            knowledge.define_function ("REMODIFY_INPUT_GLOBALS",
+                                       node_uav::node_uav_role_Uav::REMODIFY_INPUT_GLOBALS);
+        knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_BARRIERS",
+                                   node_uav::node_uav_role_Uav::REMODIFY_BARRIERS_COLLISION_AVOIDANCE);
+        knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_REMODIFY_GLOBALS",
+                                   node_uav::node_uav_role_Uav::REMODIFY_GLOBALS_COLLISION_AVOIDANCE);
+        knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PULL",
+                                   node_uav::node_uav_role_Uav::thread0_PULL);
+        knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE_PUSH",
+                                   node_uav::node_uav_role_Uav::thread0_PUSH);
+        knowledge.define_function ("node_uav_role_Uav_COLLISION_AVOIDANCE",
+                                   node_uav::node_uav_role_Uav::thread0);
 
-      //-- Synchronize to make sure all nodes are up
-      /*
-      knowledge.define_function ("sync_inputs", dmpl::sync_inputs);
-      Algo *syncInputsAlgo = new Algo(1000000, "sync_inputs", &knowledge);
-      syncInputsAlgo->start(m_threader);
-      {
-        syncPhase = 1;
-        for(;;) {
+        //-- Synchronize to make sure all nodes are up
+        /*
+          knowledge.define_function ("sync_inputs", dmpl::sync_inputs);
+          Algo *syncInputsAlgo = new Algo(1000000, "sync_inputs", &knowledge);
+          syncInputsAlgo->start(m_threader);
+          {
+          syncPhase = 1;
+          for(;;) {
           size_t flag = 1;
           for(size_t i = 0;i < 2; ++i)
-            if(startSync[i] < syncPhase) { flag = 0; break; }
+          if(startSync[i] < syncPhase) { flag = 0; break; }
           if(flag) break;
           sleep(0.2);
-        }
-        syncPhase = 2;
-        for(;;) {
+          }
+          syncPhase = 2;
+          for(;;) {
           size_t flag = 1;
           for(size_t i = 0;i < 2; ++i)
-            if(startSync[i] < syncPhase) { flag = 0; break; }
+          if(startSync[i] < syncPhase) { flag = 0; break; }
           if(flag) break;
           sleep(0.2);
-        }
-      }
-      */
+          }
+          }
+        */
 
-      //-- Initializing platform
-      engine::KnowledgeMap platform_args;
+        //-- Initializing platform
+        engine::KnowledgeMap platform_args;
       
-      //-- Creating algorithms
-      std::vector<Algo *> algos;
-      Algo *algo;
-      if(node_name == "uav" && role_name == "Uav") {
-        syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1,2};
-        syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0,2};
-        syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][2] = {0,1};
-        algo = new SyncAlgo(100000, "node_uav_role_Uav_COLLISION_AVOIDANCE", "COLLISION_AVOIDANCE", &knowledge, platform_name, &platform_args);
-        algos.push_back(algo);
-      }
+        //-- Creating algorithms
+        std::vector<Algo *> algos;
+        Algo *algo;
+        if(node_name == "uav" && role_name == "Uav") {
+            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1,2};
+            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0,2};
+            syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][2] = {0,1};
+            algo = new SyncAlgo(100000, "node_uav_role_Uav_COLLISION_AVOIDANCE", "COLLISION_AVOIDANCE", &knowledge, platform_name, &platform_args);
+            algos.push_back(algo);
+        }
 
-      //-- start threads and simulation
-      id = settings.id;
-      for(int i = 0; i < algos.size(); i++)
-        algos[i]->start(m_threader);
-      std::stringstream buffer;
-      buffer << "(S" << id << ".init = 1) && S0.init";
-      for(unsigned int i = 1; i < num_processes; ++i)
-        buffer << " && S" << i << ".init";
-      std::string expression = buffer.str ();
-      madara::knowledge::CompiledExpression compiled;
-      compiled = knowledge.compile (expression);
-      std::cerr << "waiting for " << num_processes << " agent(s) to come online..." << std::endl;
-      knowledge.wait (compiled);
+        //-- start threads and simulation
+        id = settings.id;
+        for(int i = 0; i < algos.size(); i++)
+            algos[i]->start(m_threader);
+        std::stringstream buffer;
+        buffer << "(S" << id << ".init = 1) && S0.init";
+        for(unsigned int i = 1; i < num_processes; ++i)
+            buffer << " && S" << i << ".init";
+        std::string expression = buffer.str ();
+        madara::knowledge::CompiledExpression compiled;
+        compiled = knowledge.compile (expression);
+        std::cerr << "waiting for " << num_processes << " agent(s) to come online..." << std::endl;
+        knowledge.wait (compiled);
 
-      knowledge.set("begin_sim", "1");
-      std::cerr << "*** AGENT " << id << " READY ***" << std::endl;
+        knowledge.set("begin_sim", "1");
+        std::cerr << "*** AGENT " << id << " READY ***" << std::endl;
 
-      return true;
+        return true;
     }
 
     bool CollisionAvoidanceService::initialize()
