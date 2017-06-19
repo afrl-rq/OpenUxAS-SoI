@@ -1049,6 +1049,10 @@ namespace uxas
                 {
                     node_name = currentXmlNode.attribute("node_name").as_string();
                 }
+                if (!currentXmlNode.attribute("role_name").empty())
+                {
+                    role_name = currentXmlNode.attribute("role_name").as_string();
+                }
                 if (!currentXmlNode.attribute("init_lat").empty() &&
                     !currentXmlNode.attribute("init_lng").empty())
                 {
