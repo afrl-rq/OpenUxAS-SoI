@@ -116,19 +116,19 @@ bool VipEscortTaskService::isCalculateOption(const int64_t& taskId, int64_t& opt
     bool isSuccessful{true};
 
 
-    auto taskOption = new uxas::messages::task::TaskOption;
-    taskOption->getEligibleEntities().push_back(optionId);
-    taskOption->setTaskID(taskId);
-    taskOption->setOptionID(optionId);
-    taskOption->getEligibleEntities() = eligibleEntities;
-    taskOption->setStartLocation(m_watchedEntityStateLast->getLocation()->clone());
-    taskOption->setStartHeading(m_watchedEntityStateLast->getHeading());
-    taskOption->setEndLocation(m_watchedEntityStateLast->getLocation()->clone());
-    taskOption->setEndHeading(m_watchedEntityStateLast->getHeading());
-    auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
-    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
-    m_taskPlanOptions->getOptions().push_back(taskOption);
-    taskOption = nullptr; //just gave up ownership
+    // auto taskOption = new uxas::messages::task::TaskOption;
+    // taskOption->getEligibleEntities().push_back(optionId);
+    // taskOption->setTaskID(taskId);
+    // taskOption->setOptionID(optionId);
+    // taskOption->getEligibleEntities() = eligibleEntities;
+    // taskOption->setStartLocation(m_watchedEntityStateLast->getLocation()->clone());
+    // taskOption->setStartHeading(m_watchedEntityStateLast->getHeading());
+    // taskOption->setEndLocation(m_watchedEntityStateLast->getLocation()->clone());
+    // taskOption->setEndHeading(m_watchedEntityStateLast->getHeading());
+    // auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
+    // m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
+    // m_taskPlanOptions->getOptions().push_back(taskOption);
+    // taskOption = nullptr; //just gave up ownership
 
 
     return (isSuccessful);
