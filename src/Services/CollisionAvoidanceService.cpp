@@ -106,16 +106,20 @@ namespace
     const double LNG_MAX = -120.91;
     const double CELL_LAT = (LAT_MAX - LAT_MIN) / 9;
     const double CELL_LNG = (LNG_MAX - LNG_MIN) / 9;
-      
+
+    //-- a cell id -- pair of X and Y coordinates
+    typedef std::pair<int,int> Cell;
+    
     //-- function to convert from a position to cell coordinates
-    std::pair<int,int> GpsToCell(double lat, double lng)
+    Cell GpsToCell(double lat, double lng)
     {
         double cellx = (lng - (LNG_MIN - CELL_LNG / 2)) / CELL_LNG;
         int icellx = (int)(floor(cellx));
         double celly = (lat - (LAT_MIN - CELL_LAT / 2)) / CELL_LAT;
         int icelly = (int)(floor(celly));
-        return std::pair<int,int>(cellx, celly);
-    }     
+        return Cell(cellx, celly);
+    }
+
 }
 
 // begin dmpl namespace
