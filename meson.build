@@ -1,4 +1,4 @@
-project('UxAS', 'c', 'cpp', subproject_dir: '3rd')
+project('UxAS', 'c', 'cpp', 'rust', subproject_dir: '3rd')
 
 conf = configuration_data()
 

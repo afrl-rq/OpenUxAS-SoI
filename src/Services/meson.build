@@ -1,17 +1,19 @@
 srcs_services = [
   '00_ServiceTemplate.cpp',
   '01_HelloWorld.cpp',
-  'AutomationDiagramDataService.cpp',
   'AssignmentTreeBranchBoundBase.cpp',
   'AssignmentTreeBranchBoundService.cpp',
+  'AutomationDiagramDataService.cpp',
   'AutomationRequestValidatorService.cpp',
   'BatchSummaryService.cpp',
+  'HelloRust.cpp',
   'MessageLoggerDataService.cpp',
   'OperatingRegionStateService.cpp',
   'OsmPlannerService.cpp',
   'PlanBuilderService.cpp',
   'RouteAggregatorService.cpp',
   'RoutePlannerService.cpp',
+  'RoutePlannerVisibilityService.cpp',
   'SendMessagesService.cpp',
   'SensorManagerService.cpp',
   'SerialAutomationRequestTestService.cpp',
@@ -19,7 +21,6 @@ srcs_services = [
   'ServiceManager.cpp',
   'TcpBridge.cpp',
   'Test_SimulationTime.cpp',
-  'RoutePlannerVisibilityService.cpp',
   'WaypointPlanManagerService.cpp',
 ]
 
@@ -60,10 +61,10 @@ cpp = meson.get_compiler('cpp')
 
 if cpp.get_id() == 'msvc'
   cpp_args += [
-  	'/std:c++14',
-	'-DZMQ_DEFINED_STDINT',
+    '/std:c++14',
+    '-DZMQ_DEFINED_STDINT',
     '-DZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
   ]
 else
   cpp_args += [
@@ -73,12 +74,17 @@ else
   ]
 endif
 
+subdir('rs')
+
 lib_services = static_library(
   'services',
   srcs_services,
   srcs_services_internal,
   dependencies: [
     dep_boost,
+  ],
+  link_with: [
+    lib_services_rs,
   ],
   cpp_args: cpp_args,
   include_directories: incs_services,

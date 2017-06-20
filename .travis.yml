@@ -21,8 +21,12 @@ addons:
 before_install:
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
+  - export PATH=~/.cargo/bin:$PATH
+  # install Rust
+  - curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path
+  - rustc --version
   # install newer Meson than is packaged in repos
-  - pip3 install --user meson
+  - pip3 install --user https://github.com/acfoltzer/meson/tarball/rust-improvements
   - meson --version
   # download newer Ninja than is packaged in repos
   - curl -L -s https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip -o ninja-linux.zip
@@ -32,7 +36,7 @@ before_install:
 
 install:
   # clone, build, and run LmcpGen
-  - git clone git@github.com:afrl-rq/LmcpGen.git ../LmcpGen
+  - git clone https://github.com/afrl-rq/LmcpGen.git ../LmcpGen
   # tries to check out the same branch as the one we're building if it's
   # available, so that development can proceed in tandem
   - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)

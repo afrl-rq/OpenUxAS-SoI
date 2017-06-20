@@ -60,6 +60,7 @@
 
 // examples
 #include "01_HelloWorld.h"
+#include "HelloRust.h"
 
 // data
 #include "MessageLoggerDataService.h"
@@ -125,6 +126,7 @@
 
 // examples
 {auto svc = uxas::stduxas::make_unique<uxas::service::HelloWorld>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::HelloRust>();}
 
 // adapter
 {auto svc = uxas::stduxas::make_unique<uxas::service::adapter::TcpBridge>();}   //TEST ONLY
