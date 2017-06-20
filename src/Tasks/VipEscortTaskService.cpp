@@ -82,6 +82,7 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 void VipEscortTaskService::buildTaskPlanOptions()
 {
     bool isSuccessful{true};
+    std::cout << "Building plan options..." << std::endl;
 
     int64_t optionId(1);
     int64_t taskId(m_VipEscortTask->getTaskID());
@@ -114,27 +115,21 @@ void VipEscortTaskService::buildTaskPlanOptions()
 bool VipEscortTaskService::isCalculateOption(const int64_t& taskId, int64_t& optionId, const std::vector<int64_t>& eligibleEntities) {
     bool isSuccessful{true};
 
-    // if (m_watchedEntityStateLast)
-    // {
-    //     auto taskOption = new uxas::messages::task::TaskOption;
-    //     taskOption->setTaskID(taskId);
-    //     taskOption->setOptionID(optionId);
-    //     taskOption->getEligibleEntities() = eligibleEntities;
-    //     taskOption->setStartLocation(m_watchedEntityStateLast->getLocation()->clone());
-    //     taskOption->setStartHeading(m_watchedEntityStateLast->getHeading());
-    //     taskOption->setEndLocation(m_watchedEntityStateLast->getLocation()->clone());
-    //     taskOption->setEndHeading(m_watchedEntityStateLast->getHeading());
-    //     auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
-    //     m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
-    //     m_taskPlanOptions->getOptions().push_back(taskOption);
-    //     taskOption = nullptr; //just gave up ownership
 
-    // }
-    // else
-    // {
-    //     CERR_FILE_LINE_MSG("ERROR::Task_WatchTask:: no watchedEntityState found for Entity[" << m_watchTask->getWatchedEntityID() << "]")
-    //     isSuccessful = false;
-    // }
+    auto taskOption = new uxas::messages::task::TaskOption;
+    taskOption->getEligibleEntities().push_back(optionId);
+    taskOption->setTaskID(taskId);
+    taskOption->setOptionID(optionId);
+    taskOption->getEligibleEntities() = eligibleEntities;
+    taskOption->setStartLocation(m_watchedEntityStateLast->getLocation()->clone());
+    taskOption->setStartHeading(m_watchedEntityStateLast->getHeading());
+    taskOption->setEndLocation(m_watchedEntityStateLast->getLocation()->clone());
+    taskOption->setEndHeading(m_watchedEntityStateLast->getHeading());
+    auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
+    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
+    m_taskPlanOptions->getOptions().push_back(taskOption);
+    taskOption = nullptr; //just gave up ownership
+
 
     return (isSuccessful);
 }

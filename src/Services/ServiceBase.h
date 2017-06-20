@@ -126,18 +126,18 @@ public:
     instantiateService(const std::string& serviceType)
     {
         auto it = createFunctionByServiceType().find(serviceType);
-        std::cout << "mymap contains:";
-        for ( auto iti = createFunctionByServiceType().begin(); iti != createFunctionByServiceType().end(); ++iti )
-            std::cout << " " << iti->first << ":" << iti->second;
-        std::cout << std::endl;
+        // std::cout << "mymap contains:";
+        // for ( auto iti = createFunctionByServiceType().begin(); iti != createFunctionByServiceType().end(); ++iti )
+        //     std::cout << " " << iti->first << ":" << iti->second;
+        // std::cout << std::endl;
 
-        std::cout << "mymap's buckets contain:\n";
-        for ( unsigned i = 0; i < createFunctionByServiceType().bucket_count(); ++i) {
-            std::cout << "bucket #" << i << " contains:";
-            for ( auto local_it = createFunctionByServiceType().begin(i); local_it!= createFunctionByServiceType().end(i); ++local_it )
-                std::cout << " " << local_it->first << ":" << local_it->second;
-            std::cout << std::endl;
-        }
+        // std::cout << "mymap's buckets contain:\n";
+        // for ( unsigned i = 0; i < createFunctionByServiceType().bucket_count(); ++i) {
+        //     std::cout << "bucket #" << i << " contains:";
+        //     for ( auto local_it = createFunctionByServiceType().begin(i); local_it!= createFunctionByServiceType().end(i); ++local_it )
+        //         std::cout << " " << local_it->first << ":" << local_it->second;
+        //     std::cout << std::endl;
+        // }
         ServiceBase * newService(it == createFunctionByServiceType().end() ? nullptr : (it->second)());
         std::unique_ptr<ServiceBase> service(newService);
         return (service);
