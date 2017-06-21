@@ -523,6 +523,10 @@ gams::pose::GPSFrame  UxASGamsPlatform::gps_frame;
       **/
     virtual void run (void)
     {
+        madara_logger_ptr_log (loggers::global_logger.get (),
+          loggers::LOG_MAJOR,
+          "GamsService::ControllerLoop:run: calling controller->run()\n");
+    
         // run from the controller configuration settings
         m_controller->run();
     }
@@ -665,15 +669,13 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
             {
                 madara_logger_ptr_log (loggers::global_logger.get (),
                     loggers::LOG_MAJOR,
-                    "GamsService::Evaluating karl file\n");
+                    "GamsService::Saving karl file (%s) for later evaluation\n",
+                    currentXmlNode.attribute("KarlFile").as_string());
     
-                knowledge::EvalSettings settings;
-                settings.treat_globals_as_locals = true;
-                
                 std::string karlFile = ::madara::utility::file_to_string (
                    currentXmlNode.attribute("KarlFile").as_string());
                 
-                s_knowledgeBase.evaluate(karlFile, settings);
+                m_karlFiles.push_back (karlFile);
             }
         }
         // if we need to setup the GamsController
@@ -847,13 +849,6 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         }
     }
 
-    // save the agent mapping for forensics
-    gamsServiceMutex.save_context(
-        m_controllerSettings.checkpoint_prefix + "_config_gamsServiceMutex.kb");
-    // save the agent mapping for forensics
-    s_knowledgeBase.save_context(
-        m_controllerSettings.checkpoint_prefix + "_config_knowledgeBase.kb");
-
     if (m_uniqueId == "")
     {
         m_uniqueId = s_knowledgeBase.setup_unique_hostport();
@@ -867,6 +862,38 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
     m_controller = new gams::controllers::BaseController (s_knowledgeBase,
         m_controllerSettings);
     
+    knowledge::EvalSettings evalSettings;
+    evalSettings.treat_globals_as_locals = true;
+    evalSettings.delay_sending_modifieds = true;
+                
+    madara_logger_ptr_log (loggers::global_logger.get (),
+        loggers::LOG_MAJOR,
+        "GamsService::config: evaluating %d karl files\n",
+        (int)m_karlFiles.size ());
+    
+    // evaluate the karl files
+    for (size_t i = 0; i < m_karlFiles.size (); ++i)
+    {
+        
+        madara_logger_ptr_log (loggers::global_logger.get (),
+            loggers::LOG_MINOR,
+            "GamsService::config: evaluating the following karl:\n%s\n",
+            m_karlFiles[i].c_str ());
+    
+        s_knowledgeBase.evaluate(m_karlFiles[i], evalSettings);
+    }
+          
+    madara_logger_ptr_log (loggers::global_logger.get (),
+        loggers::LOG_MAJOR,
+        "GamsService::config: saving initial configuration checkpoints\n");
+    
+    // save the agent mapping for forensics
+    gamsServiceMutex.save_context(
+        m_controllerSettings.checkpoint_prefix + "_config_gamsServiceMutex.kb");
+    // save the agent mapping for forensics
+    s_knowledgeBase.save_context(
+        m_controllerSettings.checkpoint_prefix + "_config_knowledgeBase.kb");
+
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
@@ -884,7 +911,8 @@ GamsService::initialize()
         loggers::LOG_MAJOR, "GamsService::initialize\n");
     
     // create the UxAS platform
-    m_controller->init_platform(new UxASGamsPlatform(this));
+    m_controller->init_platform(new UxASGamsPlatform(this, &s_knowledgeBase,
+      m_controller->get_sensors ()));
     m_controller->init_algorithm("null");
     
     {

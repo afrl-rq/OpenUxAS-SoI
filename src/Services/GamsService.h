@@ -35,6 +35,8 @@
 
 #include <cstdint> // uint32_t
 #include <atomic>
+#include <vector>
+#include <string>
 
 namespace uxas
 {
@@ -233,6 +235,9 @@ private:
     
     /// map of agents to their corresponding GAMS variable containers
     gams::variables::AgentMap m_agentMap;
+    
+    /// a list of karl files to evaluate after controller initialization
+    std::vector <std::string> m_karlFiles;
 };
 
 }; //namespace service
