@@ -210,7 +210,7 @@ struct JobAbortException : public std::exception {};
 /********************************************************************/
 //-- Containers for commonly used global variables
 /********************************************************************/
-Reference<unsigned int> id(knowledge, ".id");
+Reference<unsigned int> id(knowledge, ".uxas_id");
 Reference<unsigned int>  num_processes(knowledge, ".num_processes");
 engine::KnowledgeUpdateSettings private_update (true);
 
@@ -221,7 +221,7 @@ Reference<unsigned int> syncPhase(knowledge, ".syncPhase");
 KnowledgeRecord
 sync_inputs (engine::FunctionArguments & args, engine::Variables & vars)
 {
-  std::string syncStr("REMODIFY_INPUT_GLOBALS () ; startSync.{.id} = .syncPhase");
+  std::string syncStr("REMODIFY_INPUT_GLOBALS () ; startSync.{.uxas_id} = .syncPhase");
   knowledge.evaluate (syncStr);
   return Integer(0);
 }
@@ -950,7 +950,7 @@ SyncAlgo::SyncAlgo (
   wait_settings.poll_frequency = .1;
 
   round_logic = knowledge_->compile (
-    knowledge_->expand_statement (_exec_func + " (); ++" + mbarrier + ".{.id}"));
+    knowledge_->expand_statement (_exec_func + " (); ++" + mbarrier + ".{.uxas_id}"));
 }
 
 SyncAlgo::~SyncAlgo (void)
@@ -995,7 +995,7 @@ void SyncAlgo::run (void)
     if(phase == 0)
     {
       wait_settings.delay_sending_modifieds = true; 
-      knowledge_->evaluate ("++" + mbarrier + ".{.id}", wait_settings); 
+      knowledge_->evaluate ("++" + mbarrier + ".{.uxas_id}", wait_settings); 
       phase++;
     }
     if(phase == 1)
@@ -1415,7 +1415,6 @@ namespace uxas
         }
 
         //-- start threads and simulation
-        id = settings.id;
         for(int i = 0; i < algos.size(); i++)
             algos[i]->start(m_threader);
         std::stringstream buffer;
