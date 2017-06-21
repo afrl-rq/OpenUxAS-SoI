@@ -596,7 +596,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
   }
   if ((thread0_state == NEXT))
   {
-    if (nextWpId >= wpPtr->size())
+    if ((thread0_x == thread0_xf) && (thread0_y == thread0_yf) && (nextWpId >= wpPtr->size()))
     {
       if ((thread0_missionOver[id] == Integer (0)))
       {
