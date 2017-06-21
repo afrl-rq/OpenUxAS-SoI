@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS FormatVersion="1.0" EntityID="400"  EntityType="Aircraft">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.AirVehicleState" />
+        <SubscribeToMessage MessageType="uxas.madara.MadaraState" />
+    </Bridge>
+    <Service Type="Test_SimulationTime"/>
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/>
+    <Service Type="RouteAggregatorService" />
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="AutomationDiagramDataService"/>
+    <!--
+    <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="500" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
+    
+    -->
+    <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
+    <Service Type="GamsService" >
+        <Knowledge KarlFile="" BinaryFile="" />
+        <Logging>
+            <Madara File="GamsService.log" Level="1"/>
+            <Gams File="GamsService.log" Level="4" />
+        </Logging>
+        <GamsController AgentPrefix="agent.0"
+            CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
+            GamsLogLevel="4" MadaraLogLevel="1"
+            LoopHertz="1.0" SendHertz="-1" RunTime="10" />
+        <Agents>
+          <Agent Prefix="agent.0" EntityId="400"/>
+          <Agent Prefix="agent.1" EntityId="500"/>
+          <Agent Prefix="agent.2" EntityId="300"/>
+          <Agent Prefix="agent.3" EntityId="100"/>
+          <Agent Prefix="agent.4" EntityId="200"/>
+        </Agents>
+        <Groups>
+          <Group Prefix="group.allies">
+            <Member Name="agent.0" />
+            <Member Name="agent.2" />
+            <Member Name="agent.3" />
+          </Group>
+          <Group Prefix="group.enemies">
+            <Member Name="agent.1" />
+          </Group>
+        </Groups>
+    </Service>
+   
+    <Service Type="GamsServiceDriver" >
+        <Knowledge KarlFile="../karl/helloworld.karl" BinaryFile="" Type="local"/>
+        <Knowledge KarlFile="../karl/enemytrack.karl" BinaryFile="" />
+        <Waypoint Latitude="45.326664" Longitude="-120.980900" Altitude="700.000000" />
+        <Waypoint Latitude="45.316684" Longitude="-120.991100" Altitude="700.000000" />
+        <Waypoint Latitude="45.346664" Longitude="-120.970900" Altitude="700.000000" />
+        <Waypoint Latitude="45.316694" Longitude="-120.991200" Altitude="700.000000" />
+    </Service>
+   
+    <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+        <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
+    </Service>
+    <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        
+    </Service>
+</UxAS>
+
+
