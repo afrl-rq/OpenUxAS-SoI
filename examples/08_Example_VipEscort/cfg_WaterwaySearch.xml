@@ -3,8 +3,8 @@
     <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
-        <!-- <SubscribeToMessage MessageType="uxas.UT.VipEscortTask" /> -->
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+        <SubscribeToMessage MessageType="uxas.UT.VipEscortTask" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
@@ -28,7 +28,7 @@
         <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
         <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
         <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="300"/>
-        <!-- <Message MessageFileName="tasks/1002_VipEscortTask.xml" SendTime_ms="400"/> -->
+        <Message MessageFileName="tasks/1002_VipEscortTask.xml" SendTime_ms="300"/>
         <Message MessageFileName="tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml" SendTime_ms="5000"/>
     </Service>
     <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">

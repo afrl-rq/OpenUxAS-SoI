@@ -127,6 +127,7 @@ void VipEscortTaskService::buildTaskPlanOptions()
     {
         auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(m_taskPlanOptions);
         sendSharedLmcpObjectBroadcastMessage(newResponse);
+        std::cout << "**VipEscortTaskService::Message sent!" << std::endl;
     }
 };
 
