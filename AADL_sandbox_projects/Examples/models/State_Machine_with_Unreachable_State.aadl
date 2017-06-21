@@ -74,7 +74,9 @@ public
                 state != 0 and state !=1 => state = 2;
         **};
         end sm;
-        
+
+-- This empty implementation allows us to run the Test Case Generator on the contract
+--  alone.        
 system implementation sm.Impl
 end sm.Impl;
 
