@@ -1,6 +1,6 @@
       <AirVehicleConfiguration Series="CMASI" Time="1.0">
-        <ID>400</ID>
-        <Label>UAV 400</Label>
+        <ID>1</ID>
+        <Label>UAV 1</Label>
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
         <MaximumSpeed>33.4388885498047</MaximumSpeed>
         <NominalSpeed>22.0</NominalSpeed>

@@ -10,8 +10,8 @@
     <ScenarioEventList>
 
       <AirVehicleConfiguration Series="CMASI" Time="1.0">
-        <ID>400</ID>
-        <Label>UAV 400</Label>
+        <ID>1</ID>
+        <Label>UAV 1</Label>
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
         <MaximumSpeed>33.4388885498047</MaximumSpeed>
         <NominalSpeed>22.0</NominalSpeed>
@@ -86,8 +86,8 @@
       </AirVehicleConfiguration>
 
       <AirVehicleConfiguration Series="CMASI" Time="1.1">
-        <ID>500</ID>
-        <Label>UAV 500</Label>
+        <ID>2</ID>
+        <Label>UAV 2</Label>
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
         <MaximumSpeed>33.4388885498047</MaximumSpeed>
         <NominalSpeed>22.0</NominalSpeed>
@@ -162,7 +162,7 @@
 
 
       <AirVehicleState Series="CMASI" Time="1.4">
-        <ID>400</ID>
+        <ID>1</ID>
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
@@ -213,7 +213,7 @@
       </AirVehicleState>
  
       <AirVehicleState Series="CMASI" Time="1.5">
-        <ID>500</ID>
+        <ID>2</ID>
          <Location>
          <Location3D Series="CMASI">
           <Altitude>1000</Altitude><AltitudeType>MSL</AltitudeType>           
@@ -266,7 +266,7 @@
  
       <MissionCommand Series="CMASI" Time="1.8">
         <CommandID>100</CommandID>
-        <VehicleID>400</VehicleID>
+        <VehicleID>1</VehicleID>
         <WaypointList>
          <Waypoint Series="CMASI">
            <Number>1</Number>
@@ -309,7 +309,7 @@
 
       <MissionCommand Series="CMASI" Time="1.9">
         <CommandID>100</CommandID>
-        <VehicleID>500</VehicleID>
+        <VehicleID>2</VehicleID>
         <WaypointList>
          <Waypoint Series="CMASI">
            <Number>1</Number>

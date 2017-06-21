@@ -1,5 +1,5 @@
       <AirVehicleState Series="CMASI">
-        <ID>400</ID>
+        <ID>1</ID>
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           

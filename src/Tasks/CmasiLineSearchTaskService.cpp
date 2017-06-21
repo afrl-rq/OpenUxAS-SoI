@@ -223,6 +223,7 @@ void CmasiLineSearchTaskService::buildTaskPlanOptions()
     } //for(auto itEligibleEntities=m_speedAltitudeVsEligibleEntitesRequested.begin();itEl ... 
 
     compositionString += ")";
+    std::cout << compositionString << std::endl;
 
     m_taskPlanOptions->setComposition(compositionString);
 

@@ -22,6 +22,7 @@
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
+#include "afrl/cmasi/LoiterTask.h"
 
 #include "uxas/UT/VipEscortTask.h"
 #include <iostream>     // std::cout, cerr, etc
@@ -57,7 +58,6 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     bool isSuccess(true);
-    std::shared_ptr<uxas::UT::VipEscortTask> m_VipEscortTask;
     std::stringstream sstrErrors;
        if (uxas::UT::isVipEscortTask(m_task.get()))
        {
@@ -82,24 +82,42 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 void VipEscortTaskService::buildTaskPlanOptions()
 {
     bool isSuccessful{true};
-    std::cout << "Building plan options..." << std::endl;
 
     int64_t optionId(1);
-    int64_t taskId(m_VipEscortTask->getTaskID());
 
-    if (isCalculateOption(taskId, optionId, m_VipEscortTask->getEligibleEntities()))
-    {
-        optionId++;
-    }
+    int64_t vip = m_VipEscortTask->getVIP();
+    int64_t uav1 = m_VipEscortTask->getUAV1();
+    int64_t uav2 = m_VipEscortTask->getUAV2();
 
-    std::string compositionString("+(");
-    for (auto itOption = m_taskPlanOptions->getOptions().begin(); itOption != m_taskPlanOptions->getOptions().end(); itOption++)
-    {
-        compositionString += "p";
-        compositionString += std::to_string((*itOption)->getOptionID());
-        compositionString += " ";
-    }
-    compositionString += ")";
+    auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+    auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+    pTaskOptionClass->m_taskOption->setTaskID(m_task->getTaskID());
+    pTaskOptionClass->m_taskOption->setOptionID(optionId);
+    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
+    pTaskOptionClass->m_taskOption->setStartLocation(0);
+    pTaskOptionClass->m_taskOption->setStartHeading(0);
+    pTaskOptionClass->m_taskOption->setEndLocation(0);
+    pTaskOptionClass->m_taskOption->setEndHeading(0);
+    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+    m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
+
+    // setting task option for UAV1
+    optionId++;
+    pTaskOptionClass->m_taskOption->setOptionID(optionId);
+    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
+    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+    m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());   
+
+    // setting task option for UAV2
+    optionId++;
+    pTaskOptionClass->m_taskOption->setOptionID(optionId);
+    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
+    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+    m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());  
+
+    std::string compositionString("|(");
+    compositionString += "p1 p2 p3)";
+
     std::cout << compositionString << std::endl;
     
     m_taskPlanOptions->setComposition(compositionString);
