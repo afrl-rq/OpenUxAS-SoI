@@ -647,8 +647,9 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
       {
         if ((thread0_state == MOVE))
         {
-            if(uxas::service::GamsService::move ((*wpPtr)[nextWpId-1]) !=
-               gams::platforms::PLATFORM_ARRIVED)
+            gams::pose::Position nextGps = CellToGps(thread0_xp, thread0_yp);
+            std::cerr << "GAMS::move " << nextGps << '\n';
+            if(uxas::service::GamsService::move (nextGps) != gams::platforms::PLATFORM_ARRIVED)
             {
                 return Integer(0);
             }
