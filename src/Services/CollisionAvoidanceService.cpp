@@ -1125,10 +1125,8 @@ namespace uxas
                     double init_lng = currentXmlNode.attribute("init_lng").as_double();
                     auto init_cell = GpsToCell(init_lat, init_lng);
                     std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
-                    node_uav::x = init_cell.first;
-                    node_uav::xp = init_cell.first;
-                    node_uav::y = init_cell.second;
-                    node_uav::yp = init_cell.second;
+                    node_uav::var_init_x = init_cell.first;
+                    node_uav::var_init_y = init_cell.second;
                 }
             }
             // if we need to load initial knowledge
