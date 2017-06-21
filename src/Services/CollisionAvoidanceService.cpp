@@ -710,6 +710,12 @@ int check_init_x ()
   x = var_init_x;
   return (Integer(((Integer (0) <= x) && (x < X))));
 }
+int check_init_xf ()
+{
+  engine::Variables vars;
+  xf = var_init_xf;
+  return (Integer(((Integer (0) <= xf) && (xf < X))));
+}
 void initialize_xp ()
 {
   engine::Variables vars;
@@ -720,6 +726,12 @@ int check_init_y ()
   engine::Variables vars;
   y = var_init_y;
   return (Integer(((Integer (0) <= y) && (y < Y))));
+}
+int check_init_yf ()
+{
+  engine::Variables vars;
+  yf = var_init_yf;
+  return (Integer(((Integer (0) <= yf) && (yf < Y))));
 }
 void initialize_yp ()
 {
