@@ -120,6 +120,16 @@ namespace
         return Cell(cellx, celly);
     }
 
+    //-- return the GPS location of the center of a cell.
+    gams::pose::Position CellToGps(int x, int y)
+    {
+        gams::pose::Position res(uxas::service::GamsService::frame());
+        res.lng(LNG_MIN + x * CELL_LNG);
+        res.lat(LAT_MIN + y * CELL_LAT);
+        res.alt(700);
+        return res;
+    }
+
 }
 
 // begin dmpl namespace
