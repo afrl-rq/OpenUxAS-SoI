@@ -668,18 +668,47 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
 KnowledgeRecord
 thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
 {
+  std::cerr << "current cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
 
   //-- Declare local (parameter and temporary) variables
+  if((thread0_x == thread0_xf) && (thread0_y == thread0_yf))
+  {
+      //-- Begin function body
+      gams::pose::Position nextPos = (*wpPtr)[nextWpId];
+      ++nextWpId;
 
+      auto nextCell = GpsToCell(nextPos.lat(), nextPos.lng());
+      thread0_xf = nextCell.first;
+      thread0_yf = nextCell.second;
 
+      std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
+  }
+  
   //-- Begin function body
-  gams::pose::Position nextPos = (*wpPtr)[nextWpId];
-  ++nextWpId;
-
-  auto nextCell = GpsToCell(nextPos.lat(), nextPos.lng());
-  thread0_xp = nextCell.first;
-  thread0_yp = nextCell.second;
-
+  thread0_xp = thread0_x;
+  thread0_yp = thread0_y;
+  if ((thread0_x < thread0_xf))
+  {
+    thread0_xp = (thread0_xp + Integer (1));
+  }
+  else
+  {
+    if ((thread0_x > thread0_xf))
+    {
+      thread0_xp = (thread0_xp - Integer (1));
+    }
+    else
+    {
+      if ((thread0_y < thread0_yf))
+      {
+        thread0_yp = (thread0_yp + Integer (1));
+      }
+      else
+      {
+        thread0_yp = (thread0_yp - Integer (1));
+      }
+    }
+  }
   std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
   
   //-- Insert return statement, in case user program did not
