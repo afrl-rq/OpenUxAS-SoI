@@ -290,10 +290,14 @@ Reference<short> state(knowledge, ".state");
 short var_init_state (0);
 Reference<short> x(knowledge, ".x");
 short var_init_x (0);
+Reference<short> xf(knowledge, ".xf");
+short var_init_xf (0);
 Reference<short> xp(knowledge, ".xp");
 short var_init_xp (0);
 Reference<short> y(knowledge, ".y");
 short var_init_y (0);
+Reference<short> yf(knowledge, ".yf");
+short var_init_yf (0);
 Reference<short> yp(knowledge, ".yp");
 short var_init_yp (0);
 
@@ -329,8 +333,10 @@ namespace node_uav_role_Uav
 /********************************************************************/
 CachedReference<short> thread0_state(knowledge, ".state");
 CachedReference<short> thread0_x(knowledge, ".x");
+CachedReference<short> thread0_xf(knowledge, ".xf");
 CachedReference<short> thread0_xp(knowledge, ".xp");
 CachedReference<short> thread0_y(knowledge, ".y");
+CachedReference<short> thread0_yf(knowledge, ".yf");
 CachedReference<short> thread0_yp(knowledge, ".yp");
 
 /********************************************************************/
@@ -536,8 +542,10 @@ thread0_PULL (engine::FunctionArguments & args, engine::Variables & vars)
     madara::knowledge::ContextGuard guard(knowledge);
     pull(thread0_state);
     pull(thread0_x);
+    pull(thread0_xf);
     pull(thread0_xp);
     pull(thread0_y);
+    pull(thread0_yf);
     pull(thread0_yp);
     pull(thread0_lock);
     pull(thread0_missionOver);
@@ -553,8 +561,10 @@ thread0_PUSH (engine::FunctionArguments & args, engine::Variables & vars)
     madara::knowledge::ContextGuard guard(knowledge);
     push(thread0_state);
     push(thread0_x);
+    push(thread0_xf);
     push(thread0_xp);
     push(thread0_y);
+    push(thread0_yf);
     push(thread0_yp);
     push(thread0_lock[id]);
     push(thread0_missionOver[id]);
@@ -723,7 +733,9 @@ void constructor ()
   initialize_lock ();
   initialize_missionOver ();
   initialize_state ();
+  if(!check_init_xf ()) throw std::runtime_error("ERROR: illegal initial value of variable xf");
   initialize_xp ();
+  if(!check_init_yf ()) throw std::runtime_error("ERROR: illegal initial value of variable yf");
   initialize_yp ();
 }
 
