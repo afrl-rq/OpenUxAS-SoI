@@ -1406,6 +1406,7 @@ namespace uxas
         //-- Creating algorithms
         std::vector<Algo *> algos;
         Algo *algo;
+        std::cerr << "node_name = " << node_name << " role_name = " << role_name << '\n';
         if(node_name == "uav" && role_name == "Uav") {
             syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][0] = {1};
             syncPartnerIds["node_uav_role_Uav_COLLISION_AVOIDANCE"][1] = {0};
