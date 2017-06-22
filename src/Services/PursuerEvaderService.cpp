@@ -227,7 +227,7 @@ PursuerEvaderService::configure(const pugi::xml_node& serviceXmlNode)
                 "PursuerEvaderService::config: adding waypoint [%.4f,%.4f,%.4f]\n",
                 nextPosition.lat(), nextPosition.lng(), nextPosition.alt());
 
-            this->m_waypoints.push_back (nextPosition);
+            m_waypoints.push_back (nextPosition);
         }
     }
 
