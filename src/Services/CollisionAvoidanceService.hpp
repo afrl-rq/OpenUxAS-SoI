@@ -146,5 +146,5 @@ protected:
 }; //namespace service
 }; //namespace uxas
 
-#endif /* UXAS_SERVICE_GAMSDRIVER_SERVICE_H */
+#endif /* UXAS_SERVICE_COLLISION_AVOIDANCE_SERVICE_HPP */
 
