@@ -7,6 +7,6 @@
 	<Required>true</Required>
 	<VIP>400</VIP>
 	<UAV1>500</UAV1>
-	<UAV2>500</UAV2>
+	<UAV2>600</UAV2>
 
 </VipEscortTask>

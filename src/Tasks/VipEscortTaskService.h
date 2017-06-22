@@ -18,7 +18,7 @@
 #define UXAS_VipEscort_TASK_SERVICE_H
 
 #include "TaskServiceBase.h"
-
+#include "afrl/cmasi/AirVehicleState.h"
 #include "uxas/UT/VipEscortTask.h"
 namespace uxas
 {
@@ -152,6 +152,7 @@ private:
 private:
     // storage for the option entries
     std::shared_ptr<uxas::UT::VipEscortTask> m_VipEscortTask;
+    std::shared_ptr<afrl::cmasi::AirVehicleState> m_AirVehicleState;
 };
 
 

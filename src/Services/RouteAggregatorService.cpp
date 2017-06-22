@@ -233,6 +233,7 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
             areq->getOriginalRequest()->getEntityList().push_back(entity.second->getID());
         }
     }
+    
 
     // to minimize network traffic make a separate request for each vehicle
     for (size_t v = 0; v < areq->getOriginalRequest()->getEntityList().size(); v++)
@@ -383,6 +384,7 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
     {
         CheckAllRoutePlans();
     }
+
 }
 
 void RouteAggregatorService::HandleRouteRequest(std::shared_ptr<uxas::messages::route::RouteRequest> request)

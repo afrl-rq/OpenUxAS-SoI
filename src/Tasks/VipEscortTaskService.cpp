@@ -23,14 +23,15 @@
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
 #include "afrl/cmasi/LoiterTask.h"
-
+#include "afrl/cmasi/Location3D.h"
+#include "avtas/lmcp/LmcpXMLReader.h"
 #include "uxas/UT/VipEscortTask.h"
 #include <iostream>     // std::cout, cerr, etc
 
 // convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
 #define STRING_XML_OPTION_INT "OptionInt"
-
+#define STRING_XML_ENTITY_STATES "EntityStates"
 // namespace definitions
 namespace uxas  // uxas::
 {
@@ -57,7 +58,7 @@ bool
 VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
-    bool isSuccess(true);
+    bool isSuccessful(true);
     std::stringstream sstrErrors;
        if (uxas::UT::isVipEscortTask(m_task.get()))
        {
@@ -65,18 +66,42 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
            if (!m_VipEscortTask)
            {
                sstrErrors << "ERROR:: **VipEscortTaskService::bConfigure failed to cast a VipEscort_Task from the task pointer." << std::endl;
-               isSuccess = false;
+               isSuccessful = false;
            }
        }
        else
        {
            sstrErrors << "ERROR:: **VipEscortTaskService::bConfigure failed: taskObject[" << m_task->getFullLmcpTypeName() << "] is not a VipEscortTaskService." << std::endl;
-           isSuccess = false;
+           isSuccessful = false;
        }
+
+    if (isSuccessful)
+    {
+            pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
+            if (entityStates)
+            {
+                for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
+                {
+
+                    std::shared_ptr<afrl::cmasi::AirVehicleState> entityState;
+                    std::stringstream stringStream;
+                    ndEntityState.print(stringStream);
+                    avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
+                    if (object != nullptr)
+                    {
+                        entityState.reset(static_cast<afrl::cmasi::AirVehicleState*> (object));
+                        object = nullptr;
+                        m_AirVehicleState = entityState;
+                    }
+                }
+            }
+
+    } //if(isSuccessful)
+    return (isSuccessful);
 
     addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
 
-    return (isSuccess);
+    return (isSuccessful);
 }
 
 void VipEscortTaskService::buildTaskPlanOptions()
@@ -94,9 +119,9 @@ void VipEscortTaskService::buildTaskPlanOptions()
     pTaskOptionClass->m_taskOption->setTaskID(m_task->getTaskID());
     pTaskOptionClass->m_taskOption->setOptionID(optionId);
     pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
-    pTaskOptionClass->m_taskOption->setStartLocation(0);
+    pTaskOptionClass->m_taskOption->setStartLocation(m_AirVehicleState->getLocation()->clone());
     pTaskOptionClass->m_taskOption->setStartHeading(0);
-    pTaskOptionClass->m_taskOption->setEndLocation(0);
+    pTaskOptionClass->m_taskOption->setEndLocation(m_AirVehicleState->getLocation()->clone());
     pTaskOptionClass->m_taskOption->setEndHeading(0);
     m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
     m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
@@ -104,19 +129,24 @@ void VipEscortTaskService::buildTaskPlanOptions()
     // setting task option for UAV1
     optionId++;
     pTaskOptionClass->m_taskOption->setOptionID(optionId);
-    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
+    pTaskOptionClass->m_taskOption->getEligibleEntities().clear();
+    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(uav1);
+    pTaskOptionClass->m_taskOption->setStartLocation(m_AirVehicleState->getLocation()->clone());
+    pTaskOptionClass->m_taskOption->setStartHeading(0);
+    pTaskOptionClass->m_taskOption->setEndLocation(m_AirVehicleState->getLocation()->clone());
+    pTaskOptionClass->m_taskOption->setEndHeading(0);
     m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
     m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());   
 
     // setting task option for UAV2
-    optionId++;
-    pTaskOptionClass->m_taskOption->setOptionID(optionId);
-    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
-    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
-    m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());  
+    // optionId++;
+    // pTaskOptionClass->m_taskOption->setOptionID(optionId);
+    // pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(uav2);
+    // m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+    // m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());  
 
     std::string compositionString("|(");
-    compositionString += "p1 p2 p3)";
+    compositionString += "p1 p2)";
 
     std::cout << compositionString << std::endl;
     
@@ -178,22 +208,15 @@ bool VipEscortTaskService::terminateTask()
 }
 
 bool VipEscortTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject)
+//example: if (afrl::cmasi::isServiceStatus(receivedLmcpObject))
 {
-//    if (afrl::cmasi::isKeyValuePair(receivedLmcpObject))
-//    {
-//        //receive message
-//        auto keyValuePairIn = std::static_pointer_cast<afrl::cmasi::KeyValuePair> (receivedLmcpMessage->m_object);
-//        std::cout << "*** RECEIVED:: Service[" << s_typeName() << "] Received a KeyValuePair with the Key[" << keyValuePairIn->getKey() << "] and Value[" << keyValuePairIn->getValue() << "] *** " << std::endl;
-//        
-//        // send out response
-//        auto keyValuePairOut = std::make_shared<afrl::cmasi::KeyValuePair>();
-//        keyValuePairOut->setKey(s_typeName());
-//        keyValuePairOut->setValue(std::to_string(m_serviceId));
-//        sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
-//        
-//    }
-    return false;
-}
+    auto airVehicleState = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpObject);
+    if (airVehicleState)
+    {
+        m_AirVehicleState = airVehicleState;
+    }
+    return (false); // always false implies never terminating service from here
+};
 
 }; //namespace task
 }; //namespace service
