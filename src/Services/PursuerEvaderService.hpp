@@ -137,6 +137,9 @@ protected:
     
     /// private logger for our service
     madara::logger::Logger m_logger;
+
+    /// if the node is a pursuer
+    bool isPursuer = false;
 };
 
 }; //namespace service

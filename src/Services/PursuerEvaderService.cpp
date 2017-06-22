@@ -184,6 +184,25 @@ PursuerEvaderService::configure(const pugi::xml_node& serviceXmlNode)
          currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
         // if we need to load initial knowledge
+        if (std::string("Role") == currentXmlNode.name())
+        {            
+            if (!currentXmlNode.attribute("Name").empty())
+            {
+                std::cerr << "Role name = " << currentXmlNode.attribute("Name").as_string() << '\n';
+                if(std::string(currentXmlNode.attribute("Name").as_string()) == std::string("Pursuer"))
+                {
+                    isPursuer = true;
+                    std::cerr << "Node is a pursuer ...\n";
+                }
+                else
+                {
+                    std::cerr << "Node is an evader ...\n";
+                    
+                }
+            }
+        }
+
+        // if we need to load initial knowledge
         if (std::string("Waypoint") == currentXmlNode.name())
         {
             gams::pose::Position nextPosition (GamsService::frame ());
