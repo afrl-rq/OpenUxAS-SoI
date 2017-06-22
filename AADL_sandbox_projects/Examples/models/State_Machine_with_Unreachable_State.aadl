@@ -21,6 +21,7 @@ public
 		subcomponents
 			sm_sub : system sm; 
 		annex agree {**
+			-- These lemmas can be used to identify the unreachable state (SATE3).
 			lemma "False indicates STATE1 is reachable" : sm_sub.state != sm_sub.STATE1;
 			lemma "False indicates STATE2 is reachable" : sm_sub.state != sm_sub.STATE2;
 			lemma "False indicates STATE3 is reachable" : sm_sub.state != sm_sub.STATE3;
@@ -76,7 +77,8 @@ public
         end sm;
 
 -- This empty implementation allows us to run the Test Case Generator on the contract
---  alone.        
+--  alone, but the results are not useful b/c we aren't really giving it an implementation
+--  to run against.       
 system implementation sm.Impl
 end sm.Impl;
 
