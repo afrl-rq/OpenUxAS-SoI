@@ -1147,7 +1147,7 @@ namespace uxas
                     node_uav::var_init_y = init_cell.second;
                 }
             }
-            // if we need to load initial knowledge
+            // read a waypoint
             if (std::string("Waypoint") == currentXmlNode.name())
             {
                 gams::pose::Position nextPosition (GamsService::frame ());
@@ -1170,6 +1170,24 @@ namespace uxas
 
                 std::cerr << "Found waypoint : " << nextPosition << '\n';
                 m_waypoints.push_back (nextPosition);
+            }
+            // read a waypoint via cell id
+            if (std::string("WaypointCell") == currentXmlNode.name())
+            {
+                if (!currentXmlNode.attribute("X").empty() &&
+                    !currentXmlNode.attribute("Y").empty() &&
+                    !currentXmlNode.attribute("Altitude").empty())
+                {
+                    auto nextPosition = CellToGps(currentXmlNode.attribute("X").as_int(),
+                                                  currentXmlNode.attribute("Y").as_int());
+                    nextPosition.alt(
+                        currentXmlNode.attribute("Altitude").as_double());
+                    std::cerr << "Found waypoint cell id : ("
+                              << currentXmlNode.attribute("X").as_int() << ','
+                              << currentXmlNode.attribute("Y").as_int() << ")\n";
+                    std::cerr << "Found waypoint cell : " << nextPosition << '\n';
+                    m_waypoints.push_back (nextPosition);
+                }
             }
         }    
     }
