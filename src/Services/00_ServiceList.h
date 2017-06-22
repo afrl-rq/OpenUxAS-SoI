@@ -109,6 +109,7 @@
 #include "GamsService.h"
 #include "GamsServiceDriver.h"
 #include "CollisionAvoidanceService.hpp"
+#include "PursuerEvaderService.hpp"
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -178,6 +179,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::GamsService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::GamsServiceDriver>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::CollisionAvoidanceService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::PursuerEvaderService>();}
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////

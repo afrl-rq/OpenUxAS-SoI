@@ -24,6 +24,7 @@ srcs_services = [
   'GamsService.cpp',
   'GamsServiceDriver.cpp',
   'CollisionAvoidanceService.cpp',
+  'PursuerEvaderService.cpp',
 ]
 
 incs_services = [
