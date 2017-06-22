@@ -19,8 +19,8 @@ function run_uxas {
 }
 
 run_uxas 400 &> /tmp/out.400 &
-run_uxas 500 2>&1 | tee /tmp/out.500
-run_uxas 600 2>&1 | tee /tmp/out.600
-run_uxas 700 2>&1 | tee /tmp/out.700
+run_uxas 500 &> /tmp/out.500 &
+run_uxas 600 &> /tmp/out.600 &
+run_uxas 700 &> /tmp/out.700 &
 run_uxas 800 2>&1 | tee /tmp/out.800
 wait
