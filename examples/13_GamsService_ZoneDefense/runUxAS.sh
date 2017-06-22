@@ -9,6 +9,7 @@ BIN="$UXAS_ROOT/build/uxas"
 
 function run_uxas {
     EID="$1"
+    rm -rf RUNDIR_$EID
     [ ! -e RUNDIR_$EID ] && mkdir -p RUNDIR_$EID
     cd RUNDIR_$EID
     [ ! -e checkpoints ] && mkdir checkpoints

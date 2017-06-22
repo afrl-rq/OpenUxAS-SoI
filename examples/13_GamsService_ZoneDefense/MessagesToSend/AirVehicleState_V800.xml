@@ -2,7 +2,7 @@
         <ID>400</ID>
          <Location>
          <Location3D Series="CMASI">
-          <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
+          <Altitude>800</Altitude><AltitudeType>MSL</AltitudeType>           
           <Latitude>45.3171</Latitude>
           <Longitude>-120.9923</Longitude>
          </Location3D>
