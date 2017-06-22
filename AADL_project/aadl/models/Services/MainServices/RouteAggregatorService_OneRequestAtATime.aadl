@@ -63,7 +63,6 @@ public
 			lemma "ResponseID matches the RequestID" : 
 				event(sub.RouteResponse_out) => 
 				(sub.RouteResponse_out.ResponseID = sub.RouteRequest_being_serviced.RequestID);
-				
 			--Q: Is there a situation where we need to re-send a message?   
 			lemma "We don't send more messages than the size of the VehicleID array":
 				sub.num_of_route_plan_requests_out <= sub.size_of_VehicleID_array;
@@ -164,7 +163,10 @@ thread RouteAggregatorService_OneRequestAtATime
 		-------------------------------------------------------------
 		-- END STATE MACHINE LOGIC
 		-------------------------------------------------------------
-		--Simplifying assumptions for this version of the RouteAggregatorService
+		
+		-------------------------------------------------------------
+		-------------------------------------------------------------		
+		--Simplifying assumption for this version of the RouteAggregatorService
 		
 		-- We don't receive a new RouteRequest until after we've responded to
 		--  the one we're servicing.
@@ -172,19 +174,67 @@ thread RouteAggregatorService_OneRequestAtATime
 			event(RouteRequest_in) => (previous_state = IDLE);
 	
 		-------------------------------------------------------------
+		-------------------------------------------------------------
 		-- The guarantees in this section capture correct component behavior.
 		-- The set is still not complete though.
 		
-		guarantee "Only produce a route response when previous state was PENDING": event(RouteResponse_out) => (previous_state = PENDING);
+		guarantee "Only produce a route response when previous state was PENDING": 
+			event(RouteResponse_out) => (previous_state = PENDING);
 	
-		--Q: Should we relax this to allow it on the first time step in PENDING? What happens if we do?
-		guarantee "Only produce a route plan request when the previous state was PENDING": event(RoutePlanRequest_out) => (previous_state = PENDING);	
+		guarantee "Only produce a route plan request when the previous state was PENDING": 
+			event(RoutePlanRequest_out) => (previous_state = PENDING);	
 
 		--Store the route request being service since it could change (without an event)
 		--  on the next timestep.
 		eq RouteRequest_being_serviced : route::RouteRequest.i =
 			if event(RouteRequest_in) then RouteRequest_in
 			else pre(RouteRequest_being_serviced);
+		
+		guarantee "Contents of route plan requests match contents of route request (execept VehicleID and RequestID)" :
+			event(RoutePlanRequest_out) =>
+				((RoutePlanRequest_out.AssociatedTaskID = RouteRequest_being_serviced.AssociatedTaskID)
+					and (RoutePlanRequest_out.OperatingRegion = RouteRequest_being_serviced.OperatingRegion)
+					and (RoutePlanRequest_out.RouteRequests = RouteRequest_being_serviced.RouteRequests)
+					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
+				);
+
+		-- For this one service at a time version, the following guarantee is entailed by the ones we already have,
+		--  so I made it a lemma instead.
+--		guarantee "RouteResponse ID matches RouteRequest ID" :
+--			event(RouteResponse_out) => 
+--				(RouteResponse_out.ResponseID = RouteRequest_being_serviced.RequestID); 
+
+		-- Should we pick a time window so that we can state the following property? 
+		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
+		
+		-------------------------------------------------------------
+		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
+
+		-- The locations and destinations (first and last waypoints) of the route plans in the responses should match the requests, or an error should be produced.
+		-- This is something the route planners should guarantee, and we could check that the originator of the RouteRequst receives 
+		-- routes that satisfy this if we could guarantee that this RouteAggregator Service passed on the routes from the planners without
+		-- modifying them, but we can't do that without building the array of responses or changing the data structure (interface)
+		-- somehow.
+		eq route_response_consists_of_route_plan_responses_received : bool;
+		guarantee "The routes in RouteResponse_out are the route plan responses received." :
+			route_response_consists_of_route_plan_responses_received;
+		
+		eq route_plan_request_sent_for_each_vehicleID : bool;	
+		guarantee "For each vehicle ID in the VehicleID array of the route request, a route plan request message is sent
+		    with a matchine Vehicle ID (and the rest of the contents the same)":
+		    route_plan_request_sent_for_each_vehicleID;
+		
+		eq size_of_VehicleID_array : int = 3; --hard-coded to three for this version
+		
+		eq num_of_route_plan_requests_out : int = if (state = IDLE) 
+													then 0 
+													else ((0 -> pre(num_of_route_plan_requests_out)) 
+														+ UxAS_Node_Lib.bool_to_int(event(RoutePlanRequest_out))
+													);
+		
+		-------------------------------------------------------------
+		-- The guarantees below this line depend on some internal state. Do we want to keep them? They seem important for 
+		--   correctness, but also force us to pick a fixed size for the VehicleID array, etc.
 		
 		-- I want to model the notion of storing route plan responses and, after receiving them all,
 		--  sending the route response. To do that I need some internal state. I'm using a table, which is also
@@ -308,15 +358,7 @@ thread RouteAggregatorService_OneRequestAtATime
 				and (false -> pre(table_of_route_plan_responses_received.recd_ID3))
 				)
 				then (event(RouteResponse_out) and (RouteResponse_out.ResponseID = RouteRequest_being_serviced.RequestID))
-				else not event(RouteResponse_out);
-	
-		guarantee "Contents of route plan requests match contents of route request (execept VehicleID and RequestID)" :
-			event(RoutePlanRequest_out) =>
-				((RoutePlanRequest_out.AssociatedTaskID = RouteRequest_being_serviced.AssociatedTaskID)
-					and (RoutePlanRequest_out.OperatingRegion = RouteRequest_being_serviced.OperatingRegion)
-					and (RoutePlanRequest_out.RouteRequests = RouteRequest_being_serviced.RouteRequests)
-					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
-				);
+				else not event(RouteResponse_out);	
 		
 		guarantee "The RequestID in a RoutePlanRequest_out message is an ID in the table for which we have not sent
 					a route plan request yet" :
@@ -327,37 +369,8 @@ thread RouteAggregatorService_OneRequestAtATime
 											or ((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID3)
 												and (not pre(table_of_route_plan_responses_received.sent_ID3))));
 										
-		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
-		eq route_response_consists_of_route_plan_responses_received : bool;
-		guarantee "The routes in RouteResponse_out are the route plan responses received." :
-			route_response_consists_of_route_plan_responses_received;
-		
-		eq route_plan_request_sent_for_each_vehicleID : bool;	
-		guarantee "For each vehicle ID in the VehicleID array of the route request, a route plan request message is sent
-		    with a matchine Vehicle ID (and the rest of the contents the same)":
-		    route_plan_request_sent_for_each_vehicleID;
-		
-		eq size_of_VehicleID_array : int = 3; --hard-coded to three for this version
-		
-		eq num_of_route_plan_requests_out : int = if (state = IDLE) 
-													then 0 
-													else ((0 -> pre(num_of_route_plan_requests_out)) 
-														+ UxAS_Node_Lib.bool_to_int(event(RoutePlanRequest_out))
-													);
+
 	
-		-- Each RouteResponse_out has an ID that matches some prior RouteRequest_in. Should we pick a time window so that
-		--  we can state this property? i.e., RouteRequest_in => within X we get a ReouteResponse_out with a matching ID
-		-- For this one service at a time version, the following guarantee is entailed by the ones we already have,
-		--  so I'm moving it to a lemma.
---		guarantee "RouteResponse ID matches RouteRequest ID" :
---			event(RouteResponse_out) => 
---				(RouteResponse_out.ResponseID = RouteRequest_being_serviced.RequestID); 
-						
-		-- The locations and destinations (first and last waypoints) of the route plans in the responses should match the requests, or an error should be produced.
-		-- This is something the route planners should guarantee, and we could check that the originator of the RouteRequst receives 
-		-- routes that satisfy this if we could guarantee that this RouteAggregator Service passed on those routes without
-		-- modifying them, but we can't do that without building the array of responses or changing the data structure (interface)
-		-- somehow.
 		
 		------------------------------------------------------------
 		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 
