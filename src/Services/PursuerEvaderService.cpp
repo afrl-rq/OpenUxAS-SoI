@@ -32,6 +32,7 @@
 #include "gams/groups/GroupFixedList.h"
 #include "gams/loggers/GlobalLogger.h"
 #include "gams/utility/Position.h"
+#include "gams/variables/Agent.h"
 
 #include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/AirVehicleState.h"
@@ -70,6 +71,56 @@ namespace variables = gams::variables;
 namespace platforms = gams::platforms;
 namespace logger = madara::logger;
 
+namespace
+{
+    //-- minimum and maximum latitide and longitude of the visible
+    //-- map area
+    const double LAT_MIN = 45.296;
+    const double LAT_MAX = 45.35;
+    const double LNG_MIN = -121.02;
+    const double LNG_MAX = -120.91;
+    const double CELL_LAT = (LAT_MAX - LAT_MIN) / 9;
+    const double CELL_LNG = (LNG_MAX - LNG_MIN) / 9;
+
+    //-- compute the location that the evader should go to given the
+    //-- current evader and pursuer locations
+    gams::pose::Position EvaderTarget(const gams::pose::Position &pursuerPos,
+                                      const gams::pose::Position &evaderPos)
+    {
+        gams::pose::Position res(uxas::service::GamsService::frame());
+        res.alt(evaderPos.alt());
+
+        if(evaderPos.lat() <= pursuerPos.lat())
+        {
+            if(evaderPos.lng() <= pursuerPos.lng())
+            {
+                res.lat(LAT_MIN);
+                res.lng(LNG_MIN);
+            }
+            else
+            {
+                res.lat(LAT_MIN);
+                res.lng(LNG_MAX);
+            }
+        }
+        else
+        {
+            if(evaderPos.lng() <= pursuerPos.lng())
+            {
+                res.lat(LAT_MAX);
+                res.lng(LNG_MIN);
+            }
+            else
+            {
+                res.lat(LAT_MAX);
+                res.lng(LNG_MAX);
+            }
+        }
+        
+        return res;
+    }
+}
+
 namespace uxas
 {
 namespace service
@@ -79,23 +130,26 @@ namespace service
   /**
   * A periodic thread for executing GamsService drivers
   **/
-  class GamsDriverThread : public ::madara::threads::BaseThread
+  class PursuerEvaderThread : public ::madara::threads::BaseThread
   {
   public:
     /**
      * Default constructor
      **/
-    GamsDriverThread (const gams::pose::Positions & waypoints,
-        logger::Logger & logger)
-    : m_waypoints (waypoints), m_current (0), m_logger (logger)
+    PursuerEvaderThread (const gams::pose::Positions & waypoints,
+                         logger::Logger & logger,
+                         bool isPursuer,
+                         gams::variables::Agent & pursuer,
+                         gams::variables::Agent & evader)
+    : m_waypoints (waypoints), m_current (0), m_logger (logger),
+      m_isPursuer(isPursuer), m_pursuer (pursuer), m_evader (evader)
     {
-        
     }
     
     /**
      * Destructor
      **/
-    virtual ~GamsDriverThread ()
+    virtual ~PursuerEvaderThread ()
     {
     }
     
@@ -114,31 +168,20 @@ namespace service
     {
         // EXAMPLE: using specific logging levels
         madara_logger_log (m_logger, logger::LOG_MAJOR,
-            "GamsDriverThread::run: waypoint index is %d of %d\n",
-            (int)m_current, (int)m_waypoints.size ());
-    
-        // EXAMPLE: using the GamsService::move function
-        /// try to move to current waypoint
-        if (m_current < m_waypoints.size () &&
-            GamsService::move (m_waypoints[m_current])
-            == gams::platforms::PLATFORM_ARRIVED)
-        {
-            madara_logger_log (m_logger, logger::LOG_MINOR,
-                "GamsDriverThread::run: moving to waypoint %d of %d\n",
-                (int)m_current, (int)m_waypoints.size ());
-    
-            ++m_current;
-        }
-        else if (m_current >= m_waypoints.size ())
-        {
-            madara_logger_log (m_logger, logger::LOG_MAJOR,
-                "GamsDriverThread::run: end of waypoint list\n");
-        }
+            "PursuerEvaderThread::run: pursuer.location is [%s], evader.location is [%s]\n",
+            m_pursuer.location.to_record ().to_string ().c_str (),
+            m_evader.location.to_record ().to_string ().c_str ());
+
+        gams::pose::Position pursuerPos(GamsService::frame());
+        pursuerPos.from_container(m_pursuer.location);
+
+        gams::pose::Position evaderPos(GamsService::frame());
+        evaderPos.from_container(m_evader.location);
+
+        if(m_isPursuer)
+            GamsService::move(evaderPos);
         else
-        {
-            madara_logger_log (m_logger, logger::LOG_MAJOR,
-                "GamsDriverThread::run: still moving to waypoint\n");
-        }
+            GamsService::move(EvaderTarget(pursuerPos, evaderPos));
     }
 
   private:
@@ -149,6 +192,10 @@ namespace service
       size_t m_current;
       
       logger::Logger & m_logger;
+
+      bool m_isPursuer;
+      gams::variables::Agent & m_pursuer;
+      gams::variables::Agent & m_evader;
   };
 
     
@@ -173,8 +220,11 @@ PursuerEvaderService::configure(const pugi::xml_node& serviceXmlNode)
     // EXAMPLE of using a custom MADARA logger that just goes to a file
     // this makes a private log for your service at an arbitrary level
     m_logger.set_level(4);
-    m_logger.clear();
     m_logger.add_file("PursuerEvaderServiceLog.txt");
+
+    // the variables are initialized so you can do pursuer.location
+    m_pursuer.init_vars (GamsService::s_knowledgeBase, "agent.0");
+    m_evader.init_vars (GamsService::s_knowledgeBase, "agent.1");
     
     madara_logger_log (m_logger, logger::LOG_ALWAYS,
         "PursuerEvaderService::Starting configure\n");
@@ -189,7 +239,7 @@ PursuerEvaderService::configure(const pugi::xml_node& serviceXmlNode)
             if (!currentXmlNode.attribute("Name").empty())
             {
                 std::cerr << "Role name = " << currentXmlNode.attribute("Name").as_string() << '\n';
-                if(std::string(currentXmlNode.attribute("Name").as_string()) == std::string("Pursuer"))
+                if(std::string("Pursuer") == currentXmlNode.attribute("Name").as_string())
                 {
                     isPursuer = true;
                     std::cerr << "Node is a pursuer ...\n";
@@ -267,7 +317,8 @@ PursuerEvaderService::initialize()
     
     // run at 1hz, forever (-1)
     m_threader.run (1.0, "controller",
-      new GamsDriverThread (this->m_waypoints, this->m_logger));
+                    new PursuerEvaderThread (this->m_waypoints, this->m_logger,
+                                             this->isPursuer, this->m_pursuer, this->m_evader));
     
     
     return (bSuccess);

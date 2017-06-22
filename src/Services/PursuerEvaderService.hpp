@@ -26,6 +26,7 @@
 #include "madara/knowledge/KnowledgeBase.h"
 #include "madara/threads/Threader.h"
 #include "gams/pose/Position.h"
+#include "gams/variables/Agent.h"
 
 
 #include "afrl/cmasi/Waypoint.h"
@@ -140,6 +141,12 @@ protected:
 
     /// if the node is a pursuer
     bool isPursuer = false;
+
+    /// Agent variables for the pursuer (e.g. location)
+    gams::variables::Agent m_pursuer;
+
+    /// Agent variables for the evader (e.g. location)
+    gams::variables::Agent m_evader;
 };
 
 }; //namespace service
