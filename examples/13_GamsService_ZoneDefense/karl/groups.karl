@@ -1,0 +1,10 @@
+group.assets.members.size=1;
+group.assets.members.0="agent.0";
+group.protectors.members.size=3;
+group.protectors.members.0="agent.2";
+group.protectors.members.1="agent.3";
+group.protectors.members.2="agent.4";
+group.enemies.members.size=1;
+group.enemies.members.0="agent.1";
+
+

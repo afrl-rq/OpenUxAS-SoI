@@ -1,0 +1,33 @@
+/**
+ * ##### ABOUT .PREFIX ######
+ * .prefix is set by GamsController/AgentPrefix. Order matters in the
+ * service XML file right now, so just be sure to include this Karl
+ * file after configuring the GamsService/GamsController element
+ *
+ * Using .prefix like this provides a way to write .karl files in such
+ * a way that they are extensible to an arbitrarily scalable number of UAS.
+ * 
+ * ##### ABOUT THE WAYPOINTS ALGORITHM ####
+ * This is one of the simplest algorithms in GAMS. You provide a list of
+ * locations to go to in [lat, long, alt] form. You can specify "repeat"
+ * in the args to list how many times to repeat the pattern in the waypoints
+ * locations list.
+ *
+ * ##### CONFLICTS WITH MORE THAN ONE AGENT ####
+ * Remember that if you load this file for multiple agents, they'll all be
+ * going to the same waypoints at the same heights, so change the waypoint
+ * altitudes to stop them from colliding. However, I think AMASE doesn't really
+ * do altitude differences.
+ **/
+{.prefix}.algorithm="waypoints";
+{.prefix}.algorithm.args.locations.size=4;
+{.prefix}.algorithm.args.locations.0=[45.342664,-120.973900,700.0];
+{.prefix}.algorithm.args.locations.1=[45.319694,-120.994200,700.0];
+{.prefix}.algorithm.args.locations.2=[45.336664,-120.980900,700.0];
+{.prefix}.algorithm.args.locations.3=[45.313684,-120.998100,700.0];
+{.prefix}.algorithm.args.repeat=3;
+{.prefix}.madara_debug_level=1;
+{.prefix}.gams_debug_level=4;
+
+
+
