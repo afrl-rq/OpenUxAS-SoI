@@ -62,12 +62,17 @@ public
 			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
 			lemma "ResponseID matches the RequestID" : 
 				event(sub.RouteResponse_out) => 
-				(sub.RouteResponse_out.ResponseID = sub.RouteRequest_being_serviced.RequestID); 
-			
+				(sub.RouteResponse_out.ResponseID = sub.RouteRequest_being_serviced.RequestID);
+				
+			--Q: Is there a situation where we need to re-send a message?   
+			lemma "We don't send more messages than the size of the VehicleID array":
+				sub.num_of_route_plan_requests_out <= sub.size_of_VehicleID_array;
+				
 			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
 			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
 			lemma "False indicates the PENDING state is reachable" : sub.state != sub.PENDING;
-			lemma "False indicates the system is able to produce a response" : not event(sub.RouteResponse_out);
+			lemma "False indicates the system is able to produce a route response" : not event(sub.RouteResponse_out);
+			lemma "False indicates the system is able to produce a route plan request" : not event(sub.RoutePlanRequest_out);
 		**};
 		 
 	end top_level.Impl;	
@@ -170,18 +175,17 @@ thread RouteAggregatorService_OneRequestAtATime
 		-- The guarantees in this section capture correct component behavior.
 		-- The set is still not complete though.
 		
-		guarantee "Only produce output when previous state was PENDING": event(RouteResponse_out) => (previous_state = PENDING);
+		guarantee "Only produce a route response when previous state was PENDING": event(RouteResponse_out) => (previous_state = PENDING);
+	
+		--Q: Should we relax this to allow it on the first time step in PENDING? What happens if we do?
+		guarantee "Only produce a route plan request when the previous state was PENDING": event(RoutePlanRequest_out) => (previous_state = PENDING);	
 
-	
-	
 		--Store the route request being service since it could change (without an event)
 		--  on the next timestep.
 		eq RouteRequest_being_serviced : route::RouteRequest.i =
 			if event(RouteRequest_in) then RouteRequest_in
-			else pre(RouteRequest_in);
+			else pre(RouteRequest_being_serviced);
 		
-		eq table_of_route_plan_responses_received : RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.Impl;
-
 		-- I want to model the notion of storing route plan responses and, after receiving them all,
 		--  sending the route response. To do that I need some internal state. I'm using a table, which is also
 		--  mentioned in the Wiki for this service.  
@@ -189,6 +193,11 @@ thread RouteAggregatorService_OneRequestAtATime
 		--  The size of the table corresponse to the number of VehicleIDs in RouteRequest_in, which I don't
 		--  know given our current data types. (It's a flexible size.)
 		-- So, for now, let's assume each incoming RouteRequest has 3 vehicle IDs (so we produce 3 RoutePlanRequests).
+		-- I'm also hard-coding the RequestIDs for this version to be 1, 2, and 3. This is easier to model for the time being.
+		-- We can make it more flexible later if we decide to keep this table approach to modeling.
+		
+		eq table_of_route_plan_responses_received : RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.Impl;
+		
 		const INIT_TABLE_OF_ROUTE_PLAN_RESPONSES_RECEIVED: RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.impl =
 			RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.impl
 				{
@@ -208,10 +217,7 @@ thread RouteAggregatorService_OneRequestAtATime
 				table_of_route_plan_responses_received = INIT_TABLE_OF_ROUTE_PLAN_RESPONSES_RECEIVED;
 		
 		-- Ideally, we would have a guarantee about sending the route plan requests within some
-		--  timeframe. I don't know how to do it now without adding additional state
-		--  (e.g., msg 1 sent, then msg 2 sent, then msg 3). This could be captured as an 
-		--  intermediate state b/w IDLE and PENDING. May be worth asking Sean or Derek about this.
-		--guarantee "Send RoutePlanRequests" : TBD
+		--  timeframe. For now, as modeled, this service could sit on them forever. 
 				
 		guarantee "Table IDs stay the same until a new RouteRequest is received." :
 			not event(RouteRequest_in) => 
@@ -222,34 +228,79 @@ thread RouteAggregatorService_OneRequestAtATime
 					and (table_of_route_plan_responses_received.ID3 = 
 							(0 -> pre(table_of_route_plan_responses_received.ID3)))
 				);						
-											
-		guarantee "Update Table Entry for ID1": 
-			if ((previous_state = PENDING) 
-				and event(RoutePlanResponse_in) 
-				and (RoutePlanResponse_in.ResponseID = 
-						table_of_route_plan_responses_received.ID1))
-				then (table_of_route_plan_responses_received.recd_ID1) --set to true
-				else (table_of_route_plan_responses_received.recd_ID1 = 
-						(false -> pre(table_of_route_plan_responses_received.recd_ID1)));
 
-		guarantee "Update Table Entry for ID2": 
-			if ((previous_state = PENDING) 
-				and event(RoutePlanResponse_in) 
-				and (RoutePlanResponse_in.ResponseID = 
-						table_of_route_plan_responses_received.ID2))
-				then (table_of_route_plan_responses_received.recd_ID2) --set to true
+		guarantee "Update Table Entry for ID1 Sent":
+			if (previous_state = PENDING)
+				then if (event(RoutePlanRequest_out) 
+							and (RoutePlanRequest_out.RequestID = 
+								table_of_route_plan_responses_received.ID1))
+						then (table_of_route_plan_responses_received.sent_ID1) --set to true
+						else (table_of_route_plan_responses_received.sent_ID1 = 
+							(false -> pre(table_of_route_plan_responses_received.sent_ID1)))
+				else (table_of_route_plan_responses_received.sent_ID1 = 
+					(false -> pre(table_of_route_plan_responses_received.sent_ID1)));
+
+		guarantee "Update Table Entry for ID2 Sent":
+			if (previous_state = PENDING)
+				then if (event(RoutePlanRequest_out) 
+							and (RoutePlanRequest_out.RequestID = 
+								table_of_route_plan_responses_received.ID2))
+						then (table_of_route_plan_responses_received.sent_ID2) --set to true
+						else (table_of_route_plan_responses_received.sent_ID2 = 
+							(false -> pre(table_of_route_plan_responses_received.sent_ID2)))
+				else (table_of_route_plan_responses_received.sent_ID2 = 
+					(false -> pre(table_of_route_plan_responses_received.sent_ID2)));
+
+		guarantee "Update Table Entry for ID3 Sent":
+			if (previous_state = PENDING)
+				then if (event(RoutePlanRequest_out) 
+							and (RoutePlanRequest_out.RequestID = 
+								table_of_route_plan_responses_received.ID3))
+						then (table_of_route_plan_responses_received.sent_ID3) --set to true
+						else (table_of_route_plan_responses_received.sent_ID3 = 
+							(false -> pre(table_of_route_plan_responses_received.sent_ID3)))
+				else (table_of_route_plan_responses_received.sent_ID3 = 
+					(false -> pre(table_of_route_plan_responses_received.sent_ID3)));
+											
+		guarantee "Update Table Entry for ID1 Received": 
+			if (previous_state = PENDING)
+				then if (event(RoutePlanResponse_in) 
+							and (RoutePlanResponse_in.ResponseID = 
+								table_of_route_plan_responses_received.ID1)
+							--check that the corresponding request has already been sent (no responses before request)
+							and (pre(table_of_route_plan_responses_received.sent_ID1))) 
+					then (table_of_route_plan_responses_received.recd_ID1) --set to true
+					else (table_of_route_plan_responses_received.recd_ID1 = 
+						(false -> pre(table_of_route_plan_responses_received.recd_ID1)))
+				else (table_of_route_plan_responses_received.recd_ID1 = 
+					(false -> pre(table_of_route_plan_responses_received.recd_ID1)));
+
+		guarantee "Update Table Entry for ID2 Received": 
+			if (previous_state = PENDING)
+				then if (event(RoutePlanResponse_in) 
+							and (RoutePlanResponse_in.ResponseID = 
+								table_of_route_plan_responses_received.ID2)
+							--check that the corresponding request has already been sent (no responses before request)
+							and (pre(table_of_route_plan_responses_received.sent_ID2))) 
+					then (table_of_route_plan_responses_received.recd_ID2) --set to true
+					else (table_of_route_plan_responses_received.recd_ID2 = 
+						(false -> pre(table_of_route_plan_responses_received.recd_ID2)))
 				else (table_of_route_plan_responses_received.recd_ID2 = 
-						(false -> pre(table_of_route_plan_responses_received.recd_ID2)));
-					
-		guarantee "Update Table Entry for ID3": 
-			if ((previous_state = PENDING) 
-				and event(RoutePlanResponse_in) 
-				and (RoutePlanResponse_in.ResponseID = 
-						table_of_route_plan_responses_received.ID3))
-				then (table_of_route_plan_responses_received.recd_ID3) --set to true
+					(false -> pre(table_of_route_plan_responses_received.recd_ID2)));
+
+		guarantee "Update Table Entry for ID3 Received": 
+			if (previous_state = PENDING)
+				then if (event(RoutePlanResponse_in) 
+							and (RoutePlanResponse_in.ResponseID = 
+								table_of_route_plan_responses_received.ID3)
+							--check that the corresponding request has already been sent (no responses before request)
+							and (pre(table_of_route_plan_responses_received.sent_ID3))) 
+					then (table_of_route_plan_responses_received.recd_ID3) --set to true
+					else (table_of_route_plan_responses_received.recd_ID3 = 
+						(false -> pre(table_of_route_plan_responses_received.recd_ID3)))
 				else (table_of_route_plan_responses_received.recd_ID3 = 
-						(false -> pre(table_of_route_plan_responses_received.recd_ID3)));
-		
+					(false -> pre(table_of_route_plan_responses_received.recd_ID3)));
+	
 		guarantee "Produce route response output with matching ID once all route plan responses have been received" :
 			if (pre(state = PENDING) 
 				and (false -> pre(table_of_route_plan_responses_received.recd_ID1))
@@ -267,12 +318,15 @@ thread RouteAggregatorService_OneRequestAtATime
 					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
 				);
 		
-		guarantee "The RequestID in a RoutePlanRequest_out message is stored in the table" :
-			event(RoutePlanRequest_out) => ((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID1)
-											or (RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID2)
-											or (RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID3)
-			);
-								
+		guarantee "The RequestID in a RoutePlanRequest_out message is an ID in the table for which we have not sent
+					a route plan request yet" :
+			event(RoutePlanRequest_out) => (((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID1)
+												and (not pre(table_of_route_plan_responses_received.sent_ID1)))
+											or ((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID2)
+												and (not pre(table_of_route_plan_responses_received.sent_ID2)))
+											or ((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID3)
+												and (not pre(table_of_route_plan_responses_received.sent_ID3))));
+										
 		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
 		eq route_response_consists_of_route_plan_responses_received : bool;
 		guarantee "The routes in RouteResponse_out are the route plan responses received." :
@@ -283,31 +337,13 @@ thread RouteAggregatorService_OneRequestAtATime
 		    with a matchine Vehicle ID (and the rest of the contents the same)":
 		    route_plan_request_sent_for_each_vehicleID;
 		
-		eq size_of_VehicleID_array : int;
+		eq size_of_VehicleID_array : int = 3; --hard-coded to three for this version
+		
 		eq num_of_route_plan_requests_out : int = if (state = IDLE) 
 													then 0 
 													else ((0 -> pre(num_of_route_plan_requests_out)) 
 														+ UxAS_Node_Lib.bool_to_int(event(RoutePlanRequest_out))
 													);
-		
-		--Q: How do we ensure uniqueness of IDs across this system? A lot seems to ride on that in terms of not picking up and using
-		--  the wrong message. 
-	
-		--If we get responses to messages we haven't sent yet, we have a problem!  
-		--assume "We don't get responses to to our requests until after we send the request!"...
-				
-		eq num_of_route_plan_responses_in : int = if (state = IDLE) 
-													then 0 
-													else ((0 -> pre(num_of_route_plan_responses_in)) 
-														+ UxAS_Node_Lib.bool_to_int(
-															(event(RoutePlanResponse_in) 
-																and (RoutePlanRequest_out.RequestID = RouteRequest_being_serviced.RequestID)
-															)
-														)
-													);
-		
-		eq net_route_plan_messages : int = num_of_route_plan_requests_out - num_of_route_plan_responses_in;
-		guarantee "" : true;
 	
 		-- Each RouteResponse_out has an ID that matches some prior RouteRequest_in. Should we pick a time window so that
 		--  we can state this property? i.e., RouteRequest_in => within X we get a ReouteResponse_out with a matching ID
@@ -347,8 +383,5 @@ thread RouteAggregatorService_OneRequestAtATime
 
 	**};
 end RouteAggregatorService_OneRequestAtATime;
-
-thread implementation RouteAggregatorService_OneRequestAtATime.Impl
-end RouteAggregatorService_OneRequestAtATime.Impl;
 
 end RouteAggregatorService_OneRequestAtATime_Pkg;
