@@ -51,7 +51,7 @@ lib_tasks = static_library(
     dep_boost,
   ],
   cpp_args: [
-    '-std=c++11',
+    '-std=c++11', '-I/usr/include/python2.7', '-lpython2.7',
   ],
   include_directories: incs_tasks
 )

@@ -22,9 +22,9 @@
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
-#include "afrl/cmasi/LoiterTask.h"
 #include "afrl/cmasi/Location3D.h"
 #include "avtas/lmcp/LmcpXMLReader.h"
+#include <Python.h>
 #include "uxas/UT/VipEscortTask.h"
 #include <iostream>     // std::cout, cerr, etc
 
@@ -58,6 +58,28 @@ bool
 VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
+
+    // setenv("PYTHONPATH", ".", 1);
+
+    // Py_Initialize();
+
+    // PyObject* module = PyImport_ImportModule("mymath");
+    // assert(module != NULL);
+
+    // PyObject* klass = PyObject_GetAttrString(module, "math");
+    // assert(klass != NULL);
+
+    // PyObject* controller = PyInstance_New(klass, NULL, NULL);
+    // assert(controller != NULL);
+
+    // PyObject* result = PyObject_CallMethod(controller, "add", "(ii)", 1, 2);
+    // assert(result != NULL);
+
+    // printf("1 + 2 = %ld\n", PyInt_AsLong(result));
+
+
+
+
     bool isSuccessful(true);
     std::stringstream sstrErrors;
        if (uxas::UT::isVipEscortTask(m_task.get()))
@@ -91,7 +113,18 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
                     {
                         entityState.reset(static_cast<afrl::cmasi::AirVehicleState*> (object));
                         object = nullptr;
-                        m_AirVehicleState = entityState;
+                        if (entityState->getID() == m_VipEscortTask->getVIP())
+                        {
+                            m_VipAirVehicleState = entityState;
+                        }
+                        else if (entityState->getID() == m_VipEscortTask->getUAV1())
+                        {
+                            m_Uav1AirVehicleState = entityState;
+                        }
+                        else if (entityState->getID() == m_VipEscortTask->getUAV2())
+                        {
+                            m_Uav2AirVehicleState = entityState;
+                        }                        
                     }
                 }
             }
@@ -108,34 +141,50 @@ void VipEscortTaskService::buildTaskPlanOptions()
 {
     bool isSuccessful{true};
 
-    int64_t optionId(1);
+    // int64_t optionId(1);
 
     int64_t vip = m_VipEscortTask->getVIP();
     int64_t uav1 = m_VipEscortTask->getUAV1();
     int64_t uav2 = m_VipEscortTask->getUAV2();
 
-    auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+
+    auto taskOption = new uxas::messages::task::TaskOption;
+    taskOption->setTaskID(m_task->getTaskID());
+    taskOption->setOptionID(vip);
+    taskOption->getEligibleEntities().clear();
+    taskOption->getEligibleEntities().push_back(vip); // defaults to all entities eligible
+    auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
     auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
-    pTaskOptionClass->m_taskOption->setTaskID(m_task->getTaskID());
-    pTaskOptionClass->m_taskOption->setOptionID(optionId);
-    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
-    pTaskOptionClass->m_taskOption->setStartLocation(m_AirVehicleState->getLocation()->clone());
+
+    // auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+    // auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+    // pTaskOptionClass->m_taskOption->setTaskID(m_task->getTaskID());
+    // pTaskOptionClass->m_taskOption->setOptionID(vip);
+    // pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(vip);
+    pTaskOptionClass->m_taskOption->setStartLocation(m_VipAirVehicleState->getLocation()->clone());
     pTaskOptionClass->m_taskOption->setStartHeading(0);
-    pTaskOptionClass->m_taskOption->setEndLocation(m_AirVehicleState->getLocation()->clone());
+    pTaskOptionClass->m_taskOption->setEndLocation(m_VipAirVehicleState->getLocation()->clone());
     pTaskOptionClass->m_taskOption->setEndHeading(0);
-    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+    m_optionIdVsTaskOptionClass.insert(std::make_pair(vip, pTaskOptionClass));
     m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
 
     // setting task option for UAV1
-    optionId++;
-    pTaskOptionClass->m_taskOption->setOptionID(optionId);
-    pTaskOptionClass->m_taskOption->getEligibleEntities().clear();
-    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(uav1);
-    pTaskOptionClass->m_taskOption->setStartLocation(m_AirVehicleState->getLocation()->clone());
+    taskOption = new uxas::messages::task::TaskOption;
+    taskOption->setTaskID(m_task->getTaskID());
+    taskOption->setOptionID(uav1);
+    taskOption->getEligibleEntities().clear();
+    taskOption->getEligibleEntities().push_back(uav1); // defaults to all entities eligible
+    pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
+    pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+
+    // pTaskOptionClass->m_taskOption->setOptionID(uav1);
+    // pTaskOptionClass->m_taskOption->getEligibleEntities().clear();
+    // pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(uav1);
+    pTaskOptionClass->m_taskOption->setStartLocation(m_Uav1AirVehicleState->getLocation()->clone());
     pTaskOptionClass->m_taskOption->setStartHeading(0);
-    pTaskOptionClass->m_taskOption->setEndLocation(m_AirVehicleState->getLocation()->clone());
+    pTaskOptionClass->m_taskOption->setEndLocation(m_Uav1AirVehicleState->getLocation()->clone());
     pTaskOptionClass->m_taskOption->setEndHeading(0);
-    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+    m_optionIdVsTaskOptionClass.insert(std::make_pair(uav1, pTaskOptionClass));
     m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());   
 
     // setting task option for UAV2
@@ -146,7 +195,7 @@ void VipEscortTaskService::buildTaskPlanOptions()
     // m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());  
 
     std::string compositionString("|(");
-    compositionString += "p1 p2)";
+    compositionString += "p" + std::to_string(vip) + " p" + std::to_string(uav1) + ")";
 
     std::cout << compositionString << std::endl;
     
@@ -157,7 +206,6 @@ void VipEscortTaskService::buildTaskPlanOptions()
     {
         auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(m_taskPlanOptions);
         sendSharedLmcpObjectBroadcastMessage(newResponse);
-        std::cout << "**VipEscortTaskService::Message sent!" << std::endl;
     }
 };
 
@@ -207,13 +255,68 @@ bool VipEscortTaskService::terminateTask()
     return (true);
 }
 
+void VipEscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) {
+    std::cout << m_VipAirVehicleState->getLocation()->toString() << std::endl;
+    std::cout << m_Uav1AirVehicleState->getLocation()->toString() << std::endl;
+    // if (m_watchedEntityStateLast)
+    // {
+    //     // point the camera at the search point
+    //     auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
+    //     //vehicleActionCommand->setCommandID();
+    //     vehicleActionCommand->setVehicleID(entityState->getID());
+    //     //vehicleActionCommand->setStatus();
+    //     auto gimbalStareAction = new afrl::cmasi::GimbalStareAction;
+    //     gimbalStareAction->setStarepoint(m_watchedEntityStateLast->getLocation()->clone());
+    //     vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction);
+    //     gimbalStareAction = nullptr; //gave up ownership
+    //     // add the loiter
+    //     auto loiterAction = new afrl::cmasi::LoiterAction();
+    //     loiterAction->setLocation(m_watchedEntityStateLast->getLocation()->clone());
+    //     if (m_idVsEntityConfiguration.find(entityState->getID()) != m_idVsEntityConfiguration.end())
+    //     {
+    //         loiterAction->setAirspeed(m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed());
+    //     }
+    //     else
+    //     {
+    //         CERR_FILE_LINE_MSG("ERROR::Task_WatchTask:: no EntityConfiguration found for Entity[" << entityState->getID() << "]")
+    //     }
+    //     loiterAction->setRadius(m_loiterRadius_m);
+    //     loiterAction->setAxis(0.0);
+    //     loiterAction->setDirection(afrl::cmasi::LoiterDirection::Clockwise);
+    //     loiterAction->setDuration(-1.0);
+    //     loiterAction->setLength(0.0);
+    //     loiterAction->setLoiterType(afrl::cmasi::LoiterType::Circular);
+    //     vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
+    //     loiterAction = nullptr; //gave up ownership
+
+    //     // send out the response
+    //     auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(vehicleActionCommand);
+    //     sendSharedLmcpObjectBroadcastMessage(newMessage);
+    // }
+    // else
+    // {
+    //     CERR_FILE_LINE_MSG("ERROR::Task_WatchTask:: no watchedEntityState found for Entity[" << m_watchTask->getWatchedEntityID() << "]")
+    // }
+}
+
 bool VipEscortTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject)
 //example: if (afrl::cmasi::isServiceStatus(receivedLmcpObject))
 {
     auto airVehicleState = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpObject);
     if (airVehicleState)
     {
-        m_AirVehicleState = airVehicleState;
+        if (airVehicleState->getID() == m_VipEscortTask->getVIP())
+        {
+            m_VipAirVehicleState = airVehicleState;
+        }
+        if (airVehicleState->getID() == m_VipEscortTask->getUAV1())
+        {
+            m_Uav1AirVehicleState = airVehicleState;
+        }
+        if (airVehicleState->getID() == m_VipEscortTask->getUAV2())
+        {
+            m_Uav2AirVehicleState = airVehicleState;
+        }
     }
     return (false); // always false implies never terminating service from here
 };

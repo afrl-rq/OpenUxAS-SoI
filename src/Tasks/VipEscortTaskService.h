@@ -143,7 +143,7 @@ private:
     
     bool processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
 
-    void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)override { };
+    void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)override;
 
     void buildTaskPlanOptions()override;
 
@@ -152,7 +152,9 @@ private:
 private:
     // storage for the option entries
     std::shared_ptr<uxas::UT::VipEscortTask> m_VipEscortTask;
-    std::shared_ptr<afrl::cmasi::AirVehicleState> m_AirVehicleState;
+    std::shared_ptr<afrl::cmasi::AirVehicleState> m_VipAirVehicleState;
+    std::shared_ptr<afrl::cmasi::AirVehicleState> m_Uav1AirVehicleState;
+    std::shared_ptr<afrl::cmasi::AirVehicleState> m_Uav2AirVehicleState;
 };
 
 
