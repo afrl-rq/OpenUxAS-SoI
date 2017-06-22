@@ -8,10 +8,11 @@
 // ===============================================================================
 
 /* 
- * File:   PursuerEvaderService.h
- * Author: James Edmondson <jedmondson@gmail.com>
+ * File:   PursuerEvaderService.hpp
+ * Author: Sagar Chaki <chaki@sei.cmu.edu>
  *
- * Created on May 30, 2017, 3:40 PM
+ * Created on June 22, 2017, 10:00 AM
+ *
  */
 
 #ifndef UXAS_SERVICE_PURSUER_EVADER_SERVICE_HPP

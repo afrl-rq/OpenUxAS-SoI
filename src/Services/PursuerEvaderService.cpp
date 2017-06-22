@@ -9,9 +9,9 @@
 
 /* 
  * File:   PursuerEvaderService.cpp
- * Author: James Edmondson <jedmondson@gmail.com>
+ * Author: Sagar Chaki <chaki@sei.cmu.edu>
  *
- * Created on May 30, 2017, 3:40 PM
+ * Created on June 22, 2017, 10:00 AM
  *
  */
 
