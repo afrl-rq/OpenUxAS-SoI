@@ -189,7 +189,7 @@ PursuerEvaderService::configure(const pugi::xml_node& serviceXmlNode)
             if (!currentXmlNode.attribute("Name").empty())
             {
                 std::cerr << "Role name = " << currentXmlNode.attribute("Name").as_string() << '\n';
-                if(std::string(currentXmlNode.attribute("Name").as_string()) == std::string("Pursuer"))
+                if(std::string("Pursuer") == currentXmlNode.attribute("Name").as_string())
                 {
                     isPursuer = true;
                     std::cerr << "Node is a pursuer ...\n";
