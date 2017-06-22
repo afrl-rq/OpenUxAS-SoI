@@ -184,42 +184,6 @@ PursuerEvaderService::configure(const pugi::xml_node& serviceXmlNode)
          currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
         // if we need to load initial knowledge
-        if (std::string("Knowledge") == currentXmlNode.name())
-        {
-            knowledge::KnowledgeBase * context = &GamsService::s_knowledgeBase;
-            
-            // if they define Type at all, then use the private knowledge base
-            if (!currentXmlNode.attribute("Type").empty())
-            {
-                context = &m_knowledgeBase;
-            }
-            
-            if (!currentXmlNode.attribute("BinaryFile").empty())
-            {
-                madara_logger_log (m_logger, logger::LOG_ALWAYS,
-                    "PursuerEvaderService::Loading knowledge base from %s\n",
-                    currentXmlNode.attribute("BinaryFile").as_string());
-    
-                context->load_context(
-                    currentXmlNode.attribute("BinaryFile").as_string());
-            }
-            
-            if (!currentXmlNode.attribute("KarlFile").empty())
-            {
-                madara_logger_log (m_logger, logger::LOG_ALWAYS,
-                    "PursuerEvaderService::Evaluating karl file %s\n",
-                    currentXmlNode.attribute("KarlFile").as_string());
-    
-                knowledge::EvalSettings settings;
-                settings.treat_globals_as_locals = true;
-                
-                std::string karlFile = ::madara::utility::file_to_string (
-                   currentXmlNode.attribute("KarlFile").as_string());
-                
-                context->evaluate(karlFile, settings);
-            }
-        }
-        // if we need to load initial knowledge
         if (std::string("Waypoint") == currentXmlNode.name())
         {
             gams::pose::Position nextPosition (GamsService::frame ());
