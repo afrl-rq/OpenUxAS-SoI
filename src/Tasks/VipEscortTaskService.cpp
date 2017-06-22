@@ -309,11 +309,11 @@ bool VipEscortTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas:
         {
             m_VipAirVehicleState = airVehicleState;
         }
-        if (airVehicleState->getID() == m_VipEscortTask->getUAV1())
+        else if (airVehicleState->getID() == m_VipEscortTask->getUAV1())
         {
             m_Uav1AirVehicleState = airVehicleState;
         }
-        if (airVehicleState->getID() == m_VipEscortTask->getUAV2())
+        else if (airVehicleState->getID() == m_VipEscortTask->getUAV2())
         {
             m_Uav2AirVehicleState = airVehicleState;
         }
