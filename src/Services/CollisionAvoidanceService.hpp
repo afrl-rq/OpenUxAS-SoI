@@ -8,10 +8,11 @@
 // ===============================================================================
 
 /* 
- * File:   GamsServiceDriver.h
- * Author: James Edmondson <jedmondson@gmail.com>
+ * File:   CollisionAvoidanceService.hpp
+ * Author: Sagar Chaki <chaki@sei.cmu.edu>
  *
- * Created on May 30, 2017, 3:40 PM
+ * Created on June 14, 2017, 10:40 AM
+ *
  */
 
 #ifndef UXAS_SERVICE_COLLISION_AVOIDANCE_SERVICE_HPP

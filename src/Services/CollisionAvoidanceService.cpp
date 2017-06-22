@@ -1,3 +1,20 @@
+// ===============================================================================
+// Authors: AFRL/RQQA
+// Organization: Air Force Research Laboratory, Aerospace Systems Directorate, Power and Control Division
+// 
+// Copyright (c) 2017 Government of the United State of America, as represented by
+// the Secretary of the Air Force.  No copyright is claimed in the United States under
+// Title 17, U.S. Code.  All Other Rights Reserved.
+// ===============================================================================
+
+/* 
+ * File:   CollisionAvoidanceService.cpp
+ * Author: Sagar Chaki <chaki@sei.cmu.edu>
+ *
+ * Created on June 14, 2017, 10:40 AM
+ *
+ */
+
 //-- DMPLC Version: 0.2
 //-- DMPLC Command Line:  dmplc -g -dl 1 --roles uav:Uav:3 --map small --grid-x 10 --grid-y 10 --grid-z 10 -o example-01-2.mission_example-01.cpp example-01.dmpl
 
