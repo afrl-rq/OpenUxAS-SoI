@@ -176,6 +176,9 @@ thread RouteAggregatorService
 		eq produce_route_resonse_once_with_matching_ID_once_all_route_plan_responses_have_been_received : bool;
 		guarantee "Produce route response output with matching ID once all route plan responses have been received" : 
 			produce_route_resonse_once_with_matching_ID_once_all_route_plan_responses_have_been_received;
+		
+		-- Q: Is the ResponseID in the route plan responses enough to ensure the message is the response we're expecting? 
+		-- Do we have any system-level guarantees about uniqueness of these IDs? 
 			
 		------------------------------------------------------------
 		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 

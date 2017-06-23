@@ -306,6 +306,9 @@ thread RouteAggregatorService_OneRequestAtATime
 							(false -> pre(table_of_route_plan_responses_received.sent_ID3)))
 				else (table_of_route_plan_responses_received.sent_ID3 = 
 					(false -> pre(table_of_route_plan_responses_received.sent_ID3)));
+		
+		-- Q: Is the ID enough to ensure the message is the response we're expecting? Do we have any system-level
+		--  guarantees about uniqueness of these IDs? 
 											
 		guarantee "Update Table Entry for ID1 Received": 
 			if (previous_state = PENDING)
