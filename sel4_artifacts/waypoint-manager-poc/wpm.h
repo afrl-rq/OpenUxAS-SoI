@@ -4,17 +4,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define MKSWAPDECL(N) void swap##N(void *v)
-
-MKSWAPDECL(2);
-
-MKSWAPDECL(4);
-
-MKSWAPDECL(8);
-
+#define WP_HDR_LEN 15
 
 struct  __attribute__((packed)) wp_struct {
-  char header[15];
+  char header[WP_HDR_LEN];
   /** Latitude */
   /* double __Latitude; */
   double latitude;
@@ -74,8 +67,10 @@ struct  __attribute__((packed)) wp_struct {
 
 typedef struct wp_struct wp_t;
 
+#define MC_HDR_LEN 23
+ 
 struct __attribute__((packed)) mc_trnc_struct {
-  char header[23];
+  char header[MC_HDR_LEN];
   uint64_t commandid;
   uint64_t vehicleid;
   uint16_t vehicleactionlistsize;
@@ -86,7 +81,7 @@ struct __attribute__((packed)) mc_trnc_struct {
 typedef struct mc_trnc_struct mc_trnc_t;
 
 struct __attribute__((packed)) mc_full_struct {
-  char header[23];
+  char header[MC_HDR_LEN];
   uint64_t commandid;
   uint64_t vehicleid;
   uint16_t vehicleactionlistsize;
@@ -107,17 +102,13 @@ union mc_union {
 typedef union mc_union mc_t;
 
 
-bool deserialize_mc(FILE * f, mc_t * mc);
+bool DeserializeMCFromFile(FILE * f, mc_t * mc_ptr);
 
-bool correct_mc(mc_t * mc);
+void PrintMC(FILE * f, mc_t * mc_ptr);
 
-void output_mc(FILE * f, mc_t * mc);
-
-uint32_t calculateChecksum(const uint8_t * bytes, const uint32_t len);
-
-bool sub_mc(const mc_t * super, const uint64_t const nxid, uint16_t len, mc_t * sub);
-
-bool find_wp(const mc_t * mc, const uint64_t nxid, wp_t * wp);
-
+bool MCPrefix(const mc_t * orig_mc_ptr,
+              const uint64_t id,
+              const uint16_t len,
+              mc_t * mc_new_ptr);
 
 #endif /* __WPM_H__ */
