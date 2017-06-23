@@ -9,6 +9,9 @@ public
 	-- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+		**};
 	end top_level;
 	
 	process implementation top_level.Impl
