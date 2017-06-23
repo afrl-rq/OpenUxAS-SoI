@@ -5,6 +5,28 @@ public
     with IMPACT;
     with ROUTE;
     
+    -- This is a "dummy" top-level system. We use it so that we can check 
+	--  properties of our component contract, states as lemmas in the top_level implementation.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread RoutePlannerVisibilityService; 
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			-- TBD
+				
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			-- TBD
+			
+		**};
+		 
+	end top_level.Impl;	
+    
     thread RoutePlannerVisibilityService
         features
             GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
@@ -21,6 +43,32 @@ public
             RoutePlanResponse_out: out event data port route::RoutePlanResponse.i;
         properties
             Dispatch_Protocol => Sporadic;
+        annex agree {**
+        	-- What does correct mean for this component? The Wiki talks about how the route planner works,
+        	--  as well as the importance of efficiency. I don't think we want to specify how this route planner
+        	--  works (design), but we should strive to specify what it means for a route planner to be correct.
+        	
+        	--  For starters, the start and end locations should match those in the request, unless an 
+        	--   error is returned.
+        	-- I need to access the arrays to formally express this (beyond using a Boolean variable set to true).
+        	eq first_and_last_waypoints_in_each_route_plan_match_those_requested: bool;
+        	guarantee "First and last waypoints in each route plan in the route plan response match the start location
+        		and end location in the corresponding route constraint in the route plan request":
+        		first_and_last_waypoints_in_each_route_plan_match_those_requested = true;
+        		
+        	-- Q: Does this service process only one request at a time? I think so. Can we assume it does this on one timestep?
+        	-- Should we require it completes the job within some set amount of time?
+        	-- If we can assume that we can respond in one timestep, then we don't need to store the request or worry about 
+        	--  what to do if we get another request before we're done servicing the one we're working on.
+        	--  I need some more info here before I proceed.
+        	
+        	-- From the Wiki: The RoutePlanResponse message is the only one published by the RoutePlannerVisibilityService 
+        	--  and is always sent using the return-to-sender addressing which ensures that only the original requester receives 
+        	--  the response.
+        	-- Q: What is this return-to-sender addressing exactly? I think it just means we put the RequestID in the ResponseID field.
+        	
+        	
+        **};
     end RoutePlannerVisibilityService;
     
 end RoutePlannerVisibilityService_Pkg;
