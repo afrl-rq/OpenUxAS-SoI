@@ -5,6 +5,27 @@ public
     with IMPACT;
     with ROUTE;
     with UxAS_Node_Lib;
+
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread RouteAggregatorService; 
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
+	
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+			lemma "False indicates the PENDING state is reachable" : sub.state != sub.PENDING;
+			lemma "False indicates the system is able to produce a route response" : not event(sub.RouteResponse_out);
+			lemma "False indicates the system is able to produce a route plan request" : not event(sub.RoutePlanRequest_out);
+		**};
+		 
+	end top_level.Impl;	
 	
 thread RouteAggregatorService
     features
@@ -93,28 +114,51 @@ thread RouteAggregatorService
 		-------------------------------------------------------------
 		-- END STATE MACHINE LOGIC
 		-------------------------------------------------------------
+		-- The guarantees in this section capture correct component behavior.
+		-- The set is still not complete though.
 		
-		--Other guarantees for correct behavior
-		guarantee "Only produce output when in PENDING": event(RouteResponse_out) => (state = PENDING);
+		guarantee "Only produce a route response when previous state was PENDING": 
+			event(RouteResponse_out) => (previous_state = PENDING);
+	
+		guarantee "Only produce a route plan request when the previous state was PENDING": 
+			event(RoutePlanRequest_out) => (previous_state = PENDING);	
 
-		--Given that the purpose of the aggregator role is to service aggregate route requests,
-		-- by interacting with the route planner(s), there are a whole bunch of implied guarantees.
-		-- Some of those are listed below.
+		-- Should we pick a time window so that we can state the following property? 
+		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
+		--   We would need to assume that the route planners respond in a timely manner
+		--   in order to guarantee that.
+
+		-------------------------------------------------------------
+		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
 		
-		-- Each RouteResponse_out has an ID that matches some prior RouteRequest_in. Should we pick a time window so that
-		--  we can state this property? i.e., RouteRequest_in => within X we get a ReouteResponse_out with a matching ID
+		-- The locations and destinations (first and last waypoints) of the route plans in the responses should match the requests, or an error should be produced.
+		-- This is something the route planners should guarantee, and we could check that the originator of the RouteRequst receives 
+		-- routes that satisfy this if we could guarantee that this RouteAggregator Service passed on the routes from the planners without
+		-- modifying them, but we can't do that without building the array of responses or changing the data structure (interface)
+		-- somehow.	
 		
-		-- The locations and destinations of the responses should match the requests, or an error should be produced.
-		--  Note, we'll need an assumption on the route plan responses in order to satisfy this.
-		--  I'm not sure how to write this without saving state of the requests and responses received so far :(
-		--  This could be done for one RouteRequest_in at a time, provided I assume some max number of RoutePlanRequests 
-		--  that correspond to it. I think that would be worth doing to illustrate what we can specify if we simplify things a bit.
-		--  And then I could expand it to handle more than one RouteRequest at a time (some max number, like 2 :) ).
+		eq route_response_consists_of_route_plan_responses_received : bool;
+		guarantee "The routes in RouteResponse_out are the route plan responses received." :
+			route_response_consists_of_route_plan_responses_received;
+		
+		eq route_plan_request_sent_for_each_vehicleID : bool;	
+		guarantee "For each vehicle ID in the VehicleID array of the route request, a route plan request message is sent
+		    with a matchine Vehicle ID (and the rest of the contents the same)":
+		    route_plan_request_sent_for_each_vehicleID;
 		
 		-------------------------------------------------------------
-		-- Properties/Lemmas that could be captured in SpeAR or wherever this component is instantiated in AADL.
-		-- * num_route_requests_being_serviced >= 0.			
-		
+		-- The guarantees below this line depend on some internal state. That is difficult to
+		--  express for a RouteAggregatorService that can service an arbitrary number of 
+		--  requests at a time. We would be forced to fix the number it can serve to some max
+		--  for modeling purposes. Not sure we want to do that.
+		--  Q for Sean/Derek: Does it really serve an arbitrary number or is there a max?
+		--
+		-- Note: I do have a formal version of these guarantees in RouteAggregatorService_OneRequestAtATime
+		--
+		eq contents_of_route_plan_requests_match_contents_of_route_request : bool;
+		guarantee "Contents of route plan requests match contents of route request (execept VehicleID and RequestID)" :
+			contents_of_route_plan_requests_match_contents_of_route_request;
+			
 		------------------------------------------------------------
 		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 
 		

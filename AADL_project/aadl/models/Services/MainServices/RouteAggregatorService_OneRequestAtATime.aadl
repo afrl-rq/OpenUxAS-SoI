@@ -198,15 +198,10 @@ thread RouteAggregatorService_OneRequestAtATime
 					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
 				);
 
-		-- For this one service at a time version, the following guarantee is entailed by the ones we already have,
-		--  so I made it a lemma instead.
---		guarantee "RouteResponse ID matches RouteRequest ID" :
---			event(RouteResponse_out) => 
---				(RouteResponse_out.ResponseID = RouteRequest_being_serviced.RequestID); 
-
 		-- Should we pick a time window so that we can state the following property? 
 		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
-		
+		--   We would need to assume that the route planners respond in a timely manner
+		--   in order to guarantee that. 	
 		-------------------------------------------------------------
 		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
 
