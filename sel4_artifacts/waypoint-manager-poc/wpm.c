@@ -5,6 +5,10 @@
 * command manipulation.                                                       *
 ******************************************************************************/
 
+
+/* TODO: Rename this file and it's corresponding header to something
+   like "mcutils.c" and "mcutils.h" */
+
 #include "wpm.h"
 #include <assert.h>
 #include <string.h>
