@@ -117,6 +117,9 @@ thread RouteAggregatorService
 		-------------------------------------------------------------
 		-- END STATE MACHINE LOGIC
 		-------------------------------------------------------------
+		
+		-------------------------------------------------------------
+		-------------------------------------------------------------
 		-- The guarantees in this section capture correct component behavior.
 		-- The set is still not complete though.
 		
@@ -156,11 +159,23 @@ thread RouteAggregatorService
 		--  for modeling purposes. Not sure we want to do that.
 		--  Q for Sean/Derek: Does it really serve an arbitrary number or is there a max?
 		--
-		-- Note: I do have a formal version of these guarantees in RouteAggregatorService_OneRequestAtATime
+		-- Note: I do have a formal version of these guarantee in RouteAggregatorService_OneRequestAtATime
 		--
 		eq contents_of_route_plan_requests_match_contents_of_route_request : bool;
 		guarantee "Contents of route plan requests match contents of route request (execept VehicleID and RequestID)" :
 			contents_of_route_plan_requests_match_contents_of_route_request;
+
+		-- Should we pick a time window so that we can state the following property? 
+		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
+		--   We would need to assume that the route planners respond in a timely manner
+		--   in order to guarantee that. 	
+
+		-- We may want to add a guarantee about sending the route plan requests within some
+		--  timeframe. For now, as modeled, this service could sit on them forever. 
+		
+		eq produce_route_resonse_once_with_matching_ID_once_all_route_plan_responses_have_been_received : bool;
+		guarantee "Produce route response output with matching ID once all route plan responses have been received" : 
+			produce_route_resonse_once_with_matching_ID_once_all_route_plan_responses_have_been_received;
 			
 		------------------------------------------------------------
 		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 

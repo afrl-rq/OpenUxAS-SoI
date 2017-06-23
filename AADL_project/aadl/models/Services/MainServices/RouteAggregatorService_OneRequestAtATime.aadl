@@ -202,6 +202,9 @@ thread RouteAggregatorService_OneRequestAtATime
 		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
 		--   We would need to assume that the route planners respond in a timely manner
 		--   in order to guarantee that. 	
+		
+		-- We may want to add a guarantee about sending the route plan requests within some
+		--  timeframe. For now, as modeled, this service could sit on them forever. 
 		-------------------------------------------------------------
 		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
 
@@ -216,7 +219,7 @@ thread RouteAggregatorService_OneRequestAtATime
 		
 		eq route_plan_request_sent_for_each_vehicleID : bool;	
 		guarantee "For each vehicle ID in the VehicleID array of the route request, a route plan request message is sent
-		    with a matchine Vehicle ID (and the rest of the contents the same)":
+		    with a matching Vehicle ID (and the rest of the contents the same)":
 		    route_plan_request_sent_for_each_vehicleID;
 		
 		eq size_of_VehicleID_array : int = 3; --hard-coded to three for this version
@@ -260,10 +263,7 @@ thread RouteAggregatorService_OneRequestAtATime
 		guarantee "Intial table for a new route request" :
 			event(RouteRequest_in) =>  
 				table_of_route_plan_responses_received = INIT_TABLE_OF_ROUTE_PLAN_RESPONSES_RECEIVED;
-		
-		-- Ideally, we would have a guarantee about sending the route plan requests within some
-		--  timeframe. For now, as modeled, this service could sit on them forever. 
-				
+						
 		guarantee "Table IDs stay the same until a new RouteRequest is received." :
 			not event(RouteRequest_in) => 
 				((table_of_route_plan_responses_received.ID1 = 
