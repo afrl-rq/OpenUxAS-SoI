@@ -1144,7 +1144,9 @@ namespace uxas
                     auto init_cell = GpsToCell(init_lat, init_lng);
                     std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
                     node_uav::var_init_x = init_cell.first;
+                    node_uav::var_init_xf = init_cell.first;
                     node_uav::var_init_y = init_cell.second;
+                    node_uav::var_init_yf = init_cell.second;
                 }
             }
             // read a waypoint
