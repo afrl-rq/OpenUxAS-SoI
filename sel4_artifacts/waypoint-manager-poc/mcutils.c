@@ -3,13 +3,11 @@
 *                                                                             *
 * Purposes: Implements a number of functions useful for mission               *
 * command manipulation.                                                       *
+*                                                                             *
+* Testing build:  $CC -g -D__WPM_TESTS__ wpm.c                                *
 ******************************************************************************/
 
-
-/* TODO: Rename this file and it's corresponding header to something
-   like "mcutils.c" and "mcutils.h" */
-
-#include "wpm.h"
+#include "mcutils.h"
 #include <assert.h>
 #include <string.h>
 
@@ -19,21 +17,20 @@
    
      len - the length of p in uint8_t's
 */
+#define SWAP_MAXLEN 8
 void Swap(uint8_t * p, const size_t len) {
-  const size_t MAXLEN = 8;
-  char in[MAXLEN], out[MAXLEN];
+  uint8_t tmp[SWAP_MAXLEN];
 
   /* assumption: p is not NULL. */
   assert(p != NULL);
   
   /* assumption: Swap is never called with len > MAXLEN. */
-  assert(len <= MAXLEN);
+  assert(len <= SWAP_MAXLEN);
 
-  memcpy(in, p, len);
+  memcpy(tmp, p, len);
   for(size_t i = 0 ; i<len ; i++) {
-    out[i] = in[( len - i ) - 1];
+    p[i] = tmp[( len - i ) - 1];
   }
-  memcpy(p,out,len);
 }
 
 /* SWAP: A wrapping macro for use with Swap. */
@@ -99,7 +96,8 @@ bool FixCopiedMC(mc_t * mc_ptr) {
   SWAP(mc_ptr->full.startingwaypoint);
 
   /* The mission command serialization ends with a checksump */
-  mc_ptr->full.checksum = *((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1));
+  mc_ptr->full.checksum =
+    *((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1));
   SWAP(mc_ptr->full.checksum);
 
   /* Zeroize the unused waypoints. */
@@ -202,7 +200,7 @@ bool FindWP(const mc_t * mc_ptr, const uint64_t id, wp_t * wp_ptr) {
   return false;
 }
 
-/* MCPrefix: Create a new mission command from a prefix of the
+/* MCWaypointSubSequence: Create a new mission command from a prefix of the
    waypoints of another mission command. 
 
      orig_mc_ptr - The mission command whose prefix waypoints will be
@@ -216,7 +214,7 @@ bool FindWP(const mc_t * mc_ptr, const uint64_t id, wp_t * wp_ptr) {
      version of mc_orig_ptr.
 
 */
-bool MCPrefix(const mc_t * orig_mc_ptr,
+bool MCWaypointSubSequence(const mc_t * orig_mc_ptr,
               const uint64_t id,
               const uint16_t len,
               mc_t * mc_new_ptr) {
@@ -255,13 +253,14 @@ bool MCPrefix(const mc_t * orig_mc_ptr,
     idit = wp.nxid;
   }
 
+  mc_new_ptr->full.waypoints[i - 1].nxid = mc_new_ptr->full.waypoints[i - 1].id;
   mc_new_ptr->full.startingwaypoint = id;
   mc_new_ptr->full.waypointssize = i;
   mc_new_ptr->full.checksum = Checksum((uint8_t*)mc_new_ptr,sizeof(mc_t));
   return true;
 }
 
-/* GetMCPrefix: Get a mission command prefix if the waypoint being
+/* GetMCWaypointSubSequence: Get a mission command prefix if the waypoint being
    approached by the platform is half way through the previous mission
    command prefix which was assumed to be sent.
 
@@ -281,7 +280,7 @@ bool MCPrefix(const mc_t * orig_mc_ptr,
      false otherwise.
 
  */
-bool GetMCPrefix(const mc_t * orig_mc_ptr,
+bool GetMCWaypointSubSequence(const mc_t * orig_mc_ptr,
                  const uint64_t last_prefix_start_id,
                  const uint64_t ap_id,
                  const uint16_t len,
@@ -310,7 +309,6 @@ bool GetMCPrefix(const mc_t * orig_mc_ptr,
   if(len == 0) {
     return false;
   }
-
   
   /* Check to see if the ap_id is in the first half of the auto-pilot
      length. */
@@ -327,18 +325,23 @@ bool GetMCPrefix(const mc_t * orig_mc_ptr,
 
     it_id = wp.nxid;
   }
-
-
+  
   for( ; i < len; i++) {
     
     /* assumption: all ids in the waypoint list can be found. */
     assert(FindWP(orig_mc_ptr, it_id, &wp) == true );
 
     if( wp.id == ap_id ) {
-      MCPrefix(orig_mc_ptr, ap_id, len, new_mc_ptr);
-      return true;
+      return MCWaypointSubSequence(orig_mc_ptr, ap_id, len, new_mc_ptr);
     }
-    
+
+    it_id = wp.nxid;
+  }
+
+  /* Handle the special case where the auto-pilot waypoint lenght is
+     1. */
+  if( len == 1 ) {
+    return MCWaypointSubSequence(orig_mc_ptr, ap_id, len, new_mc_ptr);
   }
 
   /* assumption: Control flow should never get here. */
@@ -349,38 +352,144 @@ bool GetMCPrefix(const mc_t * orig_mc_ptr,
 
 #ifdef __WPM_TESTS__
 
-mc_t orig_mc, new_mc;
+mc_t orig_mc, new_mc, blnk_mc;
 
-bool DeserializeAndPrefixTest1() {
+#define RETURNONFAIL(X)                                                 \
+  if((X) != true) {                                                     \
+    fprintf(stderr,"(%s:%u) Test failed.\n",__FILE__,__LINE__);         \
+    return false;                                                       \
+  }
+
+
+bool CheckMCWaypointSubSequence(const mc_t * orig_mc,
+                                const mc_t * new_mc,
+                                const uint64_t start_waypoint_id,
+                                const uint16_t sslen) {
+  wp_t orig_wp;
+  wp_t new_wp;
+  uint64_t it_id = start_waypoint_id;
+
+  /* Certain parts of a mission command subsequence should not change. */
+  RETURNONFAIL(memcmp(orig_mc->full.header,
+                      new_mc->full.header,
+                      MC_HDR_LEN) == 0);
+  RETURNONFAIL(orig_mc->full.commandid == new_mc->full.commandid);
+  RETURNONFAIL(orig_mc->full.vehicleid == new_mc->full.vehicleid);
+  RETURNONFAIL(orig_mc->full.vehicleactionlistsize ==
+               new_mc->full.vehicleactionlistsize);
+
+  /* A subsequence could be shorter. */
+  RETURNONFAIL(new_mc->full.waypointssize <= sslen);
+
+  /* The starting point we provided to the subsequence should be its
+     starting point. */
+  RETURNONFAIL(start_waypoint_id == new_mc->full.startingwaypoint);
+
+  /* Check that all non-last waypoints are identical up to the
+     subsequence size. */
+  for(uint16_t j = 0 ; j < new_mc->full.waypointssize - 1; j++) {
+    RETURNONFAIL(FindWP(orig_mc, it_id, &orig_wp));
+    RETURNONFAIL(FindWP(new_mc, it_id, &new_wp));
+    RETURNONFAIL(memcmp(&orig_wp,&new_wp, sizeof(wp_t)) == 0);
+    it_id = new_wp.nxid;
+  }
+
+  /* Check that the last waypoint is identical and that its nxid
+     points to itself. */
+  RETURNONFAIL(FindWP(orig_mc, it_id, &orig_wp));
+  RETURNONFAIL(FindWP(new_mc, it_id, &new_wp));
+  orig_wp.nxid = orig_wp.id;
+  RETURNONFAIL(memcmp(&orig_wp, &new_wp, sizeof(wp_t)) == 0);        
+  return true;
+}
+
+bool WaterwaysTest() {
 
   FILE * f = NULL;
   wp_t wp;
-  bool pass = true;
+  /* Specific to the current data in waterways.mc. If it changes, the
+     following values will need to change.*/
+  const uint64_t start_waypoint = 100004001;
+  uint16_t waypointslen = 76;
+  
   
   memset(&orig_mc, 0, sizeof(mc_t));
-  memset(&new_mc, 0, sizeof(mc_t));
+  memset(&blnk_mc, 0, sizeof(mc_t));
   
-  f = fopen("missioncommand","r");
+  /* Load waterways data. */
+  f = fopen("./testdata/waterways.mc","r");
+  RETURNONFAIL(f != NULL);
+  RETURNONFAIL(DeserializeMCFromFile(f, &orig_mc));
+  fclose(f);
 
-  pass = pass & DeserializeMCFromFile(f, &orig_mc);
-  pass = pass & MCPrefix(&orig_mc, orig_mc.full.startingwaypoint, 5, &new_mc);
-  /*  pass = pass & (memcmp(orig_mc.full.header,
-                        new_mc.full.header,
-                        MC_HDR_LEN));*/
 
-  /* TODO: Complete checks for equality where relevant. */
+  /* For each subsequence length less than or equal to the total
+     number of waypoints. */
+  for(uint16_t i = 1 ; i <= waypointslen ; i++) {
+    uint64_t last_subseq_id = start_waypoint;
+    uint16_t n = 0;
+
+    /* Update test progress. */
+    fprintf(stdout,".");
+    fflush(stdout);
+
+    memset(&new_mc, 0, sizeof(mc_t));
+
+    /* Get a subsequence of length i/ */
+    RETURNONFAIL(MCWaypointSubSequence(&orig_mc,
+                                       start_waypoint,
+                                       i,
+                                       &new_mc));
+    
+    /* Check that the subsequence is correct. */
+    RETURNONFAIL(CheckMCWaypointSubSequence(&orig_mc,
+                                            &new_mc,
+                                            start_waypoint,
+                                            i));
+    memset(&new_mc, 0, sizeof(mc_t));
+
+    RETURNONFAIL(MCWaypointSubSequence(&orig_mc,
+                                       last_subseq_id,
+                                       i,
+                                       &new_mc));
+    
+    RETURNONFAIL(FindWP(&orig_mc, last_subseq_id, &wp));
+    while(wp.id != wp.nxid) {
+      bool flag = GetMCWaypointSubSequence(&orig_mc,
+                                     last_subseq_id,
+                                     wp.id,
+                                     i,
+                                     &new_mc);
+      if(n < i/2) {
+        n++;
+        RETURNONFAIL(flag != true);
+      } else {
+        n = 1;
+        last_subseq_id = wp.id;
+        RETURNONFAIL(flag == true);
+        RETURNONFAIL(CheckMCWaypointSubSequence(&orig_mc,
+                                                &new_mc,
+                                                last_subseq_id,
+                                                i));
+      }
+      RETURNONFAIL(FindWP(&orig_mc, wp.nxid, &wp));
+    
+    }
+  }
   
-  return pass;
+  return true;
 }
 
-#define TEST(X) fprintf(stdout,\
-                        "Test %s: %s\n",\
-                        #X,\
-                        X() == true ? "Pass" : "Fail")
+#define TEST(X) \
+  {                                                                   \
+    bool flag;                                                        \
+    fprintf(stdout,"%s ",#X);                                         \
+    flag = X();                                                       \
+    fprintf(stdout, "%s\n", flag == true ? " Passed." : " Failed.");  \
+  }
 
 int main(void) {
-
-  TEST(DeserializeAndPrefixTest1);
+  TEST(WaterwaysTest);
   return 0;
 }
 
