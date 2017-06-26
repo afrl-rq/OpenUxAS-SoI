@@ -246,36 +246,25 @@ main(int argc, char** argv)
     }
 
     UXAS_LOG_INFORM("UxAS_Main running ServiceManager");
-	if(!runUntil_sec)
-	{
+    if(!runUntil_sec)
+    {
         uxas::service::ServiceManager::getInstance().runUntil(uxas::common::ConfigurationManager::getInstance().getRunDuration_s());
-	}
-	else
-	{
+    }
+    else
+    {
         uxas::service::ServiceManager::getInstance().runUntil(runUntil_sec);
-	}
+    }
 
     uxas::service::ServiceManager::getInstance().destroyServiceManager();
     networkServer->terminate();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     networkServer.reset();
-    uxas::communications::transport::ZeroMqFabric::getInstance().~ZeroMqFabric();
+    uxas::communications::transport::ZeroMqFabric::Destroy();
 
-    std::cout << std::endl << "***************************************************" << std::endl << std::endl;
-    std::cout << std::endl << "****** UxAS is Shutting Down immediately !!! ******" << std::endl << std::endl;
-    std::cout << std::endl << "***************************************************" << std::endl << std::endl;
-
-    //this causes a nasty termination
-    // but it terminates. there probably a dangling thread, somewhere
-    try 
-    {
-        throw; // Insert code that will return by throwing a exception.
-    }
-    catch (const std::exception& e) // Consider using a custom exception type for intentional
-    { // throws. A good idea might be a `return_exception`.
-        //        return EXIT_SUCCESS;
-        std::cout << "Standard exception: " << e.what() << std::endl;
-    }
+    std::cout << std::endl;
+    std::cout << "***************************************************" << std::endl;
+    std::cout << "****** UxAS is Shutting Down immediately !!! ******" << std::endl;
+    std::cout << "***************************************************" << std::endl;
 
     return EXIT_SUCCESS;
 

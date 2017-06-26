@@ -72,8 +72,6 @@ BlockadeTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
 
@@ -166,7 +164,7 @@ void BlockadeTaskService::buildTaskPlanOptions()
         }
     }
 
-    int64_t N = m_blockadeTask->getNumberVehicles();
+    size_t N = m_blockadeTask->getNumberVehicles();
     if (m_speedAltitudeVsEligibleEntityIdsRequested.size() < N)
     {
         N = m_speedAltitudeVsEligibleEntityIdsRequested.size();

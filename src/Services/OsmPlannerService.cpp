@@ -882,7 +882,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                 if (*itWayId != currentWayId)
                 {
                     itStartId = m_idVsNode->find(itNode->second);
-                    auto itStartIndex = m_nodeIdVsPlanningIndex.find(itNode->second);
                     if (itStartId != m_idVsNode->end())
                     {
                         auto itStartIndex = m_nodeIdVsPlanningIndex.find(itNode->second);

@@ -71,8 +71,6 @@ MultiVehicleWatchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -163,7 +161,7 @@ void MultiVehicleWatchTaskService::buildTaskPlanOptions()
         }
     }
 
-    int64_t N = m_MultiVehicleWatchTask->getNumberVehicles();
+    size_t N = m_MultiVehicleWatchTask->getNumberVehicles();
     if (m_speedAltitudeVsEligibleEntityIdsRequested.size() < N)
     {
         N = m_speedAltitudeVsEligibleEntityIdsRequested.size();
@@ -230,13 +228,6 @@ void MultiVehicleWatchTaskService::activeEntityState(const std::shared_ptr<afrl:
         for (auto activeEntity : m_activeEntities)
         {
             neighborIds.push_back(activeEntity);
-        }
-
-        // look up speed to use for commanding vehicle
-        double speed = entityState->getGroundspeed();
-        if (m_idVsEntityConfiguration.find(entityState->getID()) != m_idVsEntityConfiguration.end())
-        {
-            speed = m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed();
         }
 
         // at this point, all neighbors have valid positions and are considered cooperating on task

@@ -81,7 +81,7 @@ static void zyreSetHeaderEntry(zyre_t* pZyreNode,const std::string& strKey,const
         std::strcpy (cstrKey,strKey.c_str());
         char * cstrValue = new char [strValue.length()+1];
         std::strcpy (cstrValue, strValue.c_str());
-        zyre_set_header(pZyreNode,cstrKey,cstrValue);
+        zyre_set_header(pZyreNode,cstrKey,"%s",cstrValue);
         delete cstrKey; cstrKey = 0;
         delete cstrValue; cstrValue = 0;
 }

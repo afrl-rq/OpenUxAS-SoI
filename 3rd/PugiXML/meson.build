@@ -1,7 +1,7 @@
 project('PugiXML', 'cpp')
 
 os = target_machine.system()
-if os == 'linux'
+if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
 endif
 

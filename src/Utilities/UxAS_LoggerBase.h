@@ -43,10 +43,6 @@ struct HeadLogData
 
 class LoggerBase
 {
-
-// <editor-fold defaultstate="collapsed" desc="Static Logger Registry">
-#pragma region "Static Logger Registry"
-
 public:
 
     /** \brief instantiates and returns a unique smart pointer to a logger.  */
@@ -101,8 +97,6 @@ private:
         static std::unordered_map<std::string, uxas::common::log::LoggerBase::loggerCreationFunctionPointer> impl;
         return impl;
     }
-#pragma endregion    
-// </editor-fold>
 
 public:
 

@@ -156,21 +156,18 @@ select(1, &t_rfds, NULL, NULL, &tv);
 }
 '''
 
-# force EPOLL on cross compile
-if meson.is_cross_build()
+if cpp.links(kqueue, name: 'kqueue links')
+  cpp_args += ['-DZMQ_USE_KQUEUE']
+elif meson.is_cross_build() and cpp.links(epoll, name: 'epoll links')
   cpp_args += ['-DZMQ_USE_EPOLL']
-else
-  if cpp.links(kqueue, name: 'kqueue links')
-    cpp_args += ['-DZMQ_USE_KQUEUE']
-  elif cpp.run(epoll, name: 'epoll runs').returncode() == 0
-    cpp_args += ['-DZMQ_USE_EPOLL']
-  elif cpp.links(devpoll, name: 'devpoll links')
-    cpp_args += ['-DZMQ_USE_DEVPOLL']
-  elif cpp.links(poll, name: 'poll links')
-    cpp_args += ['-DZMQ_USE_POLL']
-  elif cpp.links(select, name: 'select links')
-    cpp_args += ['-DZMQ_USE_SELECT']
-  endif
+elif not meson.is_cross_build() and cpp.run(epoll, name: 'epoll runs').returncode() == 0
+  cpp_args += ['-DZMQ_USE_EPOLL']
+elif cpp.links(devpoll, name: 'devpoll links')
+  cpp_args += ['-DZMQ_USE_DEVPOLL']
+elif cpp.links(poll, name: 'poll links')
+  cpp_args += ['-DZMQ_USE_POLL']
+elif cpp.links(select, name: 'select links')
+  cpp_args += ['-DZMQ_USE_SELECT']
 endif
 
 foreach f : check_functions
