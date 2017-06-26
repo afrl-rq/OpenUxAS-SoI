@@ -459,6 +459,28 @@ public
     system uxas
         features
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+        annex agree {**
+            guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+            
+            -- Note: Many of these guarantees may be generally applicable to 
+            --  all missions, and the developer should consider copying and 
+            --  re-proving these guarantees for each new configuration of UxAS.
+         	
+         	--This is a guarantee I would like to express but cannot currently. 
+         	-- If I had arrays (or even data implementations mimicking arrays), 
+         	--   I could express this as well as the suppporting component-level guarantees
+         	--   in RoutePlannerVisibilityService and RouteAggregatorService.
+         	-- For RoutePlannerVisibilityService, the guarantee would be 
+         	--	"The first and last waypoints of each route plan in the route plan response
+         	--	match the requested start and end locations in the corresponding route constraint 
+         	--	in the route request."
+         	-- For RouteAggregatorService, the guarantee would be "Routes are passed on from the route planners 
+         	--		without changing them."
+--			guarantee "The first and last waypoints in each route plan in each route 
+-- 							in a route response	match the start and end locations in the corresponding
+--							route constraint of the corresponding route request."
+ 
+        **};
     end uxas;
 
     system implementation uxas.i
