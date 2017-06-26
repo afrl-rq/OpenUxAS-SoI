@@ -279,6 +279,7 @@ unsigned int processes (2);
 #define X 10
 #define Y 10
 #define Z 10
+#define STRING_XML_COLLISION_AVOIDANCE "CollisionAvoidance"
 
 /********************************************************************/
 //-- Begin defining variables for node uav
@@ -1284,6 +1285,10 @@ namespace uxas
         knowledge.set("begin_sim", "1");
         std::cerr << "*** AGENT " << id << " READY ***" << std::endl;
 
+        //-- subscribe to private messages from
+        //-- WaypointPlanManagerService containing waypoints
+        addSubscriptionAddress(STRING_XML_COLLISION_AVOIDANCE);
+        
         return true;
     }
 
@@ -1303,7 +1308,34 @@ namespace uxas
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage>
                                receivedLmcpMessage)
     {
-      return false;
+        if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
+        {
+            /*
+            if (static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->getVehicleID() == m_vehicleID)
+            {
+                //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
+                std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
+                if (isInitializePlan(ptr_MissionCommand))
+                {
+                    int64_t waypointIdCurrent = {ptr_MissionCommand->getWaypointList().front()->getNumber()};
+                    int64_t idMissionSegmentTemp = {-1};
+                    if (isGetCurrentSegment(waypointIdCurrent, _nextMissionCommandToSend, idMissionSegmentTemp))
+                    {
+                        if (idMissionSegmentTemp >= 0)
+                        {
+                            m_idMissionSegmentCurrent = idMissionSegmentTemp;
+                        }
+                    }
+                }
+            }
+            */
+            
+            //sendSharedLmcpObjectBroadcastMessage(ptr_odstObjectDestination->ptrGetObject());        
+            std::cerr << "received private message from WaypointPlanManagerService ...\n";
+            std::cerr << receivedLmcpMessage->m_object->toXML() << '\n';
+        }
+
+        return false;
     }
   }
 }
