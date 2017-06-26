@@ -10,7 +10,7 @@ public
 	--  "properties" of our component contract.
 	process top_level
 		annex agree {**
-			guarantee "Placeholder guarantee to force agree to run" : true;
+			guarantee "Placeholder guarantee to force AGREE to run" : true;
 		**};
 	end top_level;
 	
@@ -18,14 +18,30 @@ public
 		subcomponents
 			sub : thread RouteAggregatorService; 
 		annex agree {**
+			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as properties
 			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
-	
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.state = sub.IDLE) 
+				or (sub.state = sub.PENDING);
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.state = sub.previous_state);
+			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
-			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
-			lemma "False indicates the PENDING state is reachable" : sub.state != sub.PENDING;
+			
+			--Check that all states are reachable
+			lemma "False indicates the IDLE state is reachable" : not (sub.state = sub.IDLE); 
+			lemma "False indicates the PENDING state is reachable" : not (sub.state = sub.PENDING);
+			
+			--Check that all state transitions are reachable
+			lemma "False indicates that T_IDLE_TO_PENDING is reachable" : not sub.T_IDLE_TO_PENDING;
+			lemma "False indicates that T_PENDING_TO_IDLE is reachable": not sub.T_PENDING_TO_IDLE;
+			
+			--Check that events are possible
 			lemma "False indicates the system is able to produce a route response" : not event(sub.RouteResponse_out);
 			lemma "False indicates the system is able to produce a route plan request" : not event(sub.RoutePlanRequest_out);
+			lemma "False indicates the system is able to receive a route plan response": not event(sub.RouteRequest_in);
+			lemma "False indicates the system is able to receive a route request": not event(sub.RoutePlanResponse_in);
 		**};
 		 
 	end top_level.Impl;	

@@ -5,7 +5,7 @@ public
     with IMPACT;
     with ROUTE;
     
-    -- This is a "dummy" top-level system. We use it so that we can check 
+   -- This is a "dummy" top-level system. We use it so that we can check 
 	--  properties of our component contract, states as lemmas in the top_level implementation.
 	process top_level
 		annex agree {**
@@ -19,7 +19,7 @@ public
 		annex agree {**
 			-- These lemmas could be captured in SpeAR as properties
 			-- TBD
-				
+			lemma "Placeholder lemma so that AGREE/OSATE can build the part's controls." : true;
 			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
 			-- TBD
 			
