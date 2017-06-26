@@ -150,7 +150,9 @@ WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::IncrementWaypoint::Subscription);
-    addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription); // for direct implementation outside of automation response
+
+    //addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription); // for direct implementation outside of automation response
+    
     return (bSucceeded);
 }
 
