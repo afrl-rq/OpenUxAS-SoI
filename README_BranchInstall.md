@@ -15,13 +15,14 @@ remove software dependencies. We add to them.
 
 ####### New installations ###
 
-1. GAMS and MADARA with tests (leave off tests if you don't want tests). Copy
+   GAMS and MADARA with tests (leave off tests if you don't want tests). Copy
    and paste the following, after you have modified GAMS_ROOT to be an
    appropriate location on your harddrive (e.g., $HOME/software/gams).
 
      export GAMS_ROOT=<wherever you want GAMS to go>
+     export DMPL_ROOT=<wherever you want DART DMPL to go>
      git clone -b master --single-branch https://github.com/jredmondson/gams $GAMS_ROOT
-     $GAMS_ROOT/scripts/linux/base_build.sh prereqs ace madara gams vrep tests
+     $GAMS_ROOT/scripts/linux/base_build.sh prereqs ace madara gams dmpl vrep tests
 
    Copy the export= printouts to the bottom of your .bashrc and .profile files
    in your home directory ($HOME/.bashrc) and ($HOME/.profile) and then reload
@@ -37,23 +38,5 @@ remove software dependencies. We add to them.
    information and troubleshooting, please see the installation Wiki page
    for GAMS here: https://github.com/jredmondson/gams/wiki/GAMS-Installation#linux-build-scripts
 
-2. DART dmplc compiler. This branch also includes support for the DART dmplc
-   formally verifying compiler project. The instructions for installing DART
-   dmplc are the following:
-
-     cd $HOME
-     git clone --depth 1 -b release-0.4.0 https://github.com/cps-sei/dmplc.git
-
-     export DMPL_ROOT=$HOME/dmplc
-     export PATH=$DMPL_ROOT/src/dmplc:$PATH
-     export PATH=$DMPL_ROOT/src/vrep:$PATH
-
-     cd $DMPL_ROOT
-     make clean
-     make MZSRM=0
-
-   As with the GAMS/MADARA installation, it is advised that you update your
-   .bashrc and .profile files with DMPL_ROOT and also add $DMPL_ROOT/src/dmplc
-   to your $PATH variable.
 
 
