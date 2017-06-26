@@ -58,20 +58,40 @@ public
 		annex agree {**
 			assign sub_previous_state = sub.previous_state;
 			assign sub_IDLE = sub.IDLE;
+			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as properties
 			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
+			
 			lemma "ResponseID matches the RequestID" : 
 				event(sub.RouteResponse_out) => 
 				(sub.RouteResponse_out.ResponseID = sub.RouteRequest_being_serviced.RequestID);
+			
 			--Q: Is there a situation where we need to re-send a message?   
 			lemma "We don't send more messages than the size of the VehicleID array":
 				sub.num_of_route_plan_requests_out <= sub.size_of_VehicleID_array;
-				
-			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
-			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
-			lemma "False indicates the PENDING state is reachable" : sub.state != sub.PENDING;
+			
+			--State machine lemmas
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.state = sub.IDLE) 
+				or (sub.state = sub.PENDING);
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.state = sub.previous_state);	
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
+			
+			--Check that all states are reachable
+			lemma "False indicates the IDLE state is reachable" : not (sub.state = sub.IDLE); 
+			lemma "False indicates the PENDING state is reachable" : not (sub.state = sub.PENDING);
+			
+			--Check that all state transitions are reachable
+			lemma "False indicates that T_IDLE_TO_PENDING is reachable" : not sub.T_IDLE_TO_PENDING;
+			lemma "False indicates that T_PENDING_TO_IDLE is reachable": not sub.T_PENDING_TO_IDLE;
+			
+			--Check that events are possible
 			lemma "False indicates the system is able to produce a route response" : not event(sub.RouteResponse_out);
 			lemma "False indicates the system is able to produce a route plan request" : not event(sub.RoutePlanRequest_out);
+			lemma "False indicates the system is able to receive a route plan response": not event(sub.RouteRequest_in);
+			lemma "False indicates the system is able to receive a route request": not event(sub.RoutePlanResponse_in);
 		**};
 		 
 	end top_level.Impl;	

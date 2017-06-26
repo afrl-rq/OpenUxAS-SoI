@@ -21,13 +21,15 @@ public
 			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as properties
 			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
+			
+			--State machine lemmas
 			lemma "The value of the state variable corresponds to a 'real' state." :
 				(sub.state = sub.IDLE) 
 				or (sub.state = sub.PENDING);
 			lemma "Only stated transitions are allowed." :
 				sub.some_transition or (sub.state = sub.previous_state);
 			------------------------------------------------------
-			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
 			
 			--Check that all states are reachable
 			lemma "False indicates the IDLE state is reachable" : not (sub.state = sub.IDLE); 

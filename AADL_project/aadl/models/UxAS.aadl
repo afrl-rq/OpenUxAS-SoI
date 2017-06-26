@@ -460,7 +460,7 @@ public
         features
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
         annex agree {**
-            guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+            guarantee "Dummy guarantee so AGREE will run off the top level.": true;
             
             -- Note: Many of these guarantees may be generally applicable to 
             --  all missions, and the developer should consider copying and 
