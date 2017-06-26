@@ -143,7 +143,6 @@ namespace
         gams::pose::Position res(uxas::service::GamsService::frame());
         res.lng(LNG_MIN + x * CELL_LNG);
         res.lat(LAT_MIN + y * CELL_LAT);
-        res.alt(700);
         return res;
     }
 
@@ -665,6 +664,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
         if ((thread0_state == MOVE))
         {
             gams::pose::Position nextGps = CellToGps(thread0_xp, thread0_yp);
+            nextGps.alt((*wpPtr)[nextWpId-1].alt());
             std::cerr << "GAMS::move " << nextGps << '\n';
             if(uxas::service::GamsService::move (nextGps) != gams::platforms::PLATFORM_ARRIVED)
             {
