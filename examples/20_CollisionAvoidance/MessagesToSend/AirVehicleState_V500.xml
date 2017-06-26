@@ -3,8 +3,8 @@
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
-          <Latitude>45.3133</Latitude>
-          <Longitude>-120.9402</Longitude>
+          <Latitude>45.3100</Latitude>
+          <Longitude>-120.9923</Longitude>
          </Location3D>
         </Location>
         <u>0</u>
