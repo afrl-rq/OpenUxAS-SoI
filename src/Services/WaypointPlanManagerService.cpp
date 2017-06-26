@@ -46,6 +46,7 @@
 #define STRING_XML_SET_LAST_WAYPOINT_SPEED_TO_0 "SetLastWaypointSpeedTo0"
 #define STRING_XML_TURN_TYPE "TurnType"
 #define STRING_XML_GIMBAL_PAYLOAD_ID "GimbalPayloadId"
+#define STRING_XML_COLLISION_AVOIDANCE "CollisionAvoidance"
 
 #define DEFAULT_SEGMENT_LENGTH_MIN_M (100000)
 #define DEFAULT_NEW_WAYPOINTS_FRACTION (1.0)
@@ -137,6 +138,13 @@ WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
     if (!ndComponent.attribute(STRING_XML_GIMBAL_PAYLOAD_ID).empty())
     {
         m_gimbalPayloadId = ndComponent.attribute(STRING_XML_GIMBAL_PAYLOAD_ID).as_int64();
+    }
+
+    //-- check for collision avoidance service and record result
+    if (!ndComponent.attribute(STRING_XML_COLLISION_AVOIDANCE).empty())
+    {
+        m_collisionAvoidance = ndComponent.attribute(STRING_XML_COLLISION_AVOIDANCE).as_bool();
+        std::cerr << "=== CollisionAvoidance = " << m_collisionAvoidance << '\n';
     }
 
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
@@ -527,8 +535,17 @@ void WaypointPlanManagerService::OnSendNewMissionTimer()
 {
     if (_nextMissionCommandToSend)
     {
-        sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
-
+        if(m_collisionAvoidance)
+        {
+            std::cerr << "sending out waypoint privately to collision avoidance service ...\n";
+            sendSharedLmcpObjectLimitedCastMessage(STRING_XML_COLLISION_AVOIDANCE,
+                                                   _nextMissionCommandToSend);
+        }
+        else
+        {
+            sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
+        }
+        
         _nextMissionCommandToSend.reset();
     }
 }

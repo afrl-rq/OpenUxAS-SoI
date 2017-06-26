@@ -195,6 +195,8 @@ protected:
     /*! \brief  this is the payload Id to use for addressing the gimbal on the
      vehicle controlled by this manager*/
     int64_t m_gimbalPayloadId = {-1};
+    /*! \brief  this indicates whether a collision avoidance service is active*/
+    bool m_collisionAvoidance = false;
 
 private:
 
