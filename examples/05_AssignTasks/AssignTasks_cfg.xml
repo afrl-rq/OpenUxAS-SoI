@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS EntityID="100" FormatVersion="1.0" EntityType="Aircraft">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+    </Bridge>
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="SensorManagerService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="PlanBuilderService"/>
+    <Service Type="AutomationDiagramDataService"/>
+    
+    <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
+    param.turnType="FlyOver" GimbalPayloadId="101"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
+    param.turnType="FlyOver" GimbalPayloadId="102"/>
+    
+    <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+
+        <Message MessageFileName="AirVehicleConfiguration_V1.xml" SendTime_ms="150"/>
+        <Message MessageFileName="AirVehicleConfiguration_V2.xml" SendTime_ms="160"/>
+        
+        <Message MessageFileName="AirVehicleState_V1.xml" SendTime_ms="170"/>
+        <Message MessageFileName="AirVehicleState_V2.xml" SendTime_ms="180"/>
+
+        <Message MessageFileName="KeepOutZone_1.xml" SendTime_ms="200"/>
+        <Message MessageFileName="KeepOutZone_2.xml" SendTime_ms="210"/>
+        <Message MessageFileName="KeepInZone_3.xml" SendTime_ms="220"/>
+        <Message MessageFileName="OperatingRegion_10.xml" SendTime_ms="230"/>
+
+        <Message MessageFileName="PointSearchTask_1.xml" SendTime_ms="300"/>
+        <Message MessageFileName="PointSearchTask_2.xml" SendTime_ms="310"/>
+        <Message MessageFileName="LineSearchTask_3.xml" SendTime_ms="320"/>
+        <Message MessageFileName="LineSearchTask_4.xml" SendTime_ms="330"/>
+        <Message MessageFileName="AreaSearchTask_5.xml" SendTime_ms="340"/>
+        <Message MessageFileName="AreaSearchTask_6.xml" SendTime_ms="350"/>
+
+        <Message MessageFileName="AutomationRequest_All.xml" SendTime_ms="5000"/>
+    </Service>
+    
+    <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="uxas.messages.task.AssignmentCostMatrix" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="AircraftPathPlanner" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="RoutePlanner" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>
+
+
