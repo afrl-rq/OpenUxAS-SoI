@@ -5,6 +5,50 @@ public
     with UXTASK;
     with IMPACT;
     
+    	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread AutomationRequestValidatorService; 
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--States to check for reachability:
+			    -- IDLE
+			    -- BUSY
+			
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+			lemma "False indicates the BUSY state is reachable" : sub.state != sub.BUSY; --NOTE: initially found this was unreachable
+			
+			lemma "True indicates we have enumerated all states in the reachability observers" :
+				sub.state = sub.IDLE or
+				sub.state = sub.BUSY;	
+				
+			lemma "False indicates idle_to_busy transition is reachable" : 
+           		 sub.idle_to_busy;
+           		 
+           	lemma "False indicates busy_to_idle transition is reachable" : 
+           		 sub.busy_to_idle;	
+           		 
+           	lemma "True if only stated transitions are executed (no missing transitions)." :
+                sub.some_transition or sub.state = sub.previous_state;	
+				
+			lemma "True indicates the queue can never go negative" : 
+            	sub.numTasksInQ >= 0;
+            lemma "False indicates the queue can potentially be greater than 0" : 
+            	sub.numTasksInQ = 0;
+            	
+		**};
+	end top_level.Impl;	
+	
+    
     thread AutomationRequestValidatorService
         features
             TaskInitialized_in: in event data port uxtask::TaskInitialized.i;
@@ -84,9 +128,9 @@ public
                 taskVehicleOrRegionIsDefined;
             
             eq busy_to_idle : bool = false -> 
-                previous_state = BUSY and 
+                (previous_state = BUSY and 
                 dequeue_trigger and
-                numTasksInQ = 0;
+                numTasksInQ = 0);
         ---------------- end state transitions ----------------
                 
             eq dequeue_trigger : bool = false -> 
@@ -161,16 +205,20 @@ public
             If in the idle state, this service will immediately publish the UniqueAutomationRequest message and transition to the busy state.": true ->
                 idle_to_busy =>
                 --QUESTION: what is a automation request? above it is listed as a task automation request
-                    event(UniqueAutomationRequest_out) and state = BUSY and numTasksInQ = 0 and
+                    event(UniqueAutomationRequest_out) and state = BUSY and
                     cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID; --Used for subsequent specs
             
             guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
                   state = BUSY =>
-                    if event(AutomationRequest_in) and taskVehicleOrRegionIsDefined then
+                  --Note: the definition of the idle state suggests numTasksInQ should already be 0 on transition
+                  --the first guarantee in the above if statement is therefore likely redundant, but helpful for reviewers
+                  	if previous_state != BUSY and not (event(AutomationRequest_in) and taskVehicleOrRegionIsDefined) then
+                  		numTasksInQ = 0
+                    else if event(AutomationRequest_in) and taskVehicleOrRegionIsDefined then
                         numTasksInQ = pre(numTasksInQ) + 1
                     else
                         numTasksInQ = pre(numTasksInQ);
-                    
+                   
 --              pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
 --                  state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
 --                  if pre(state = IDLE) then 
@@ -220,17 +268,5 @@ public
                     
         **};
     end AutomationRequestValidatorService;
-    
-    thread implementation AutomationRequestValidatorService.impl
-        annex agree {**
-            lemma "It is not possible to have a negative number of tasks queued" : 
-            numTasksInQ >= 0;
-            
-            lemma "There are only two system states (busy and idle)" :
-            state = BUSY or state = IDLE;
-
-        **};
-        
-    end AutomationRequestValidatorService.impl;
     
 end AutomationRequestValidatorService_Pkg;

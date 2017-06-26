@@ -6,6 +6,91 @@ public
     with IMPACT;
     with ROUTE;
     with UXNATIVE;
+    
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread TaskServiceBase; 
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--States to check for reachability:
+			    -- INIT 
+	       		-- IDLE 
+	       		-- SENSOR_REQUEST 
+	       		-- OPTION_ROUTES 
+	       		-- OPTIONS_PUBLISHED 
+	       		-- FINAL_ROUTES 
+	       		-- OPTION_SELECTED 
+	       		-- ACTIVE 
+	       		-- COMPLETED 
+			
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			lemma "False indicates the INIT state is reachable" : sub.state != sub.INIT; 
+			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+			lemma "False indicates the SENSOR_REQUEST state is reachable" : sub.state != sub.SENSOR_REQUEST; 
+			lemma "False indicates the OPTION_ROUTES state is reachable" : sub.state != sub.OPTION_ROUTES; 
+			lemma "False indicates the OPTIONS_PUBLISHED state is reachable" : sub.state != sub.OPTIONS_PUBLISHED; 
+			lemma "False indicates the FINAL_ROUTES state is reachable" : sub.state != sub.FINAL_ROUTES; 
+			lemma "False indicates the OPTION_SELECTED state is reachable" : sub.state != sub.OPTION_SELECTED; 
+			lemma "False indicates the ACTIVE state is reachable" : sub.state != sub.ACTIVE; 
+			lemma "False indicates the COMPLETED state is reachable" : sub.state != sub.COMPLETED; 
+			
+			lemma "True indicates we have enumerated all states in the reachability observers" :
+				sub.state = sub.INIT or
+				sub.state = sub.IDLE or
+				sub.state = sub.SENSOR_REQUEST or
+				sub.state = sub.OPTION_ROUTES or
+				sub.state = sub.OPTIONS_PUBLISHED or
+				sub.state = sub.FINAL_ROUTES or
+				sub.state = sub.OPTION_SELECTED or
+				sub.state = sub.ACTIVE or
+				sub.state = sub.COMPLETED;
+				
+			lemma "False indicates init_to_idle transition is reachable" : 
+           		 sub.init_to_idle;
+           		 
+           	lemma "False indicates idle_to_sensor_request transition is reachable" : 
+           		 sub.idle_to_sensor_request;	
+           		 
+           	lemma "False indicates sensor_request_to_option_routes transition is reachable" : 
+           		 sub.sensor_request_to_option_routes;	
+           		 
+      		lemma "False indicates option_routes_to_options_published transition is reachable" : 
+           		 sub.option_routes_to_options_published;	
+           		 
+           	lemma "False indicates options_published_to_final_routes transition is reachable" : 
+           		 sub.options_published_to_final_routes;	
+           		 
+           	lemma "False indicates final_routes_to_option_selected transition is reachable" : 
+           		 sub.final_routes_to_option_selected;	
+           		 
+           	lemma "False indicates option_selected_to_sensor_request transition is reachable" : 
+           		 sub.option_selected_to_sensor_request;	
+           		 
+           	lemma "False indicates option_selected_to_active transition is reachable" : 
+           		 sub.option_selected_to_active;	
+           		 
+           	lemma "False indicates active_to_completed transition is reachable" : 
+           		 sub.active_to_completed;	
+           		 
+           	lemma "False indicates completed_to_idle transition is reachable" : 
+           		 sub.completed_to_idle;	
+           		 
+           	lemma "True if only stated transitions are executed (no missing transitions)." :
+                sub.some_transition or sub.state = sub.previous_state;	
+										
+				
+		**};
+	end top_level.Impl;	
+	
 	
     thread TaskServiceBase
         features
