@@ -1167,6 +1167,9 @@ namespace uxas
             if (std::string("Waypoint") == currentXmlNode.name())
             {
                 std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
+                wp->setNumber(m_waypoints.size() + 1);
+                wp->setNextWaypoint(wp->getNumber());
+                wp->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
 
                 if (!currentXmlNode.attribute("Latitude").empty())
                 {
@@ -1196,6 +1199,9 @@ namespace uxas
                                                   currentXmlNode.attribute("Y").as_int());
 
                     std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
+                    wp->setNumber(m_waypoints.size() + 1);
+                    wp->setNextWaypoint(wp->getNumber());
+                    wp->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
                     wp->setLatitude(nextPosition.lat());
                     wp->setLongitude(nextPosition.lng());                    
                     wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
