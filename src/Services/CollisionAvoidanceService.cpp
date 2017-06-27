@@ -1343,21 +1343,6 @@ namespace uxas
                     for(auto x : ptr_MissionCommand->getWaypointList())
                         m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
                 }
-                
-                /*
-                if (isInitializePlan(ptr_MissionCommand))
-                {
-                    int64_t waypointIdCurrent = {ptr_MissionCommand->getWaypointList().front()->getNumber()};
-                    int64_t idMissionSegmentTemp = {-1};
-                    if (isGetCurrentSegment(waypointIdCurrent, _nextMissionCommandToSend, idMissionSegmentTemp))
-                    {
-                        if (idMissionSegmentTemp >= 0)
-                        {
-                            m_idMissionSegmentCurrent = idMissionSegmentTemp;
-                        }
-                    }
-                }
-                */
             }
             
             //sendSharedLmcpObjectBroadcastMessage(ptr_odstObjectDestination->ptrGetObject());        
