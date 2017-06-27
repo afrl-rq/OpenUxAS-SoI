@@ -17,6 +17,6 @@ function run_uxas {
     $BIN -cfgPath ../cfg_$EID.xml
 }
 
-run_uxas 400 &> /tmp/out.400 &
-run_uxas 500 2>&1 | tee /tmp/out.500
+run_uxas 400 2>&1 | grep -v "^[0-9]:[0-9]:" > /tmp/out.400 &
+run_uxas 500 2>&1 | grep -v "^[0-9]:[0-9]:" | tee /tmp/out.500
 wait
