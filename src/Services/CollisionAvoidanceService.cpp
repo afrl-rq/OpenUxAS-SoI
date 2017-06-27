@@ -323,6 +323,9 @@ std::list<std::shared_ptr<afrl::cmasi::Waypoint>> *wpPtr = NULL;
     
 //-- the current waypoint we are moving toward
 std::shared_ptr<afrl::cmasi::Waypoint> currWP;
+
+//-- lock to implement mutex for wpPtr and currWP
+std::mutex wpLock;
     
 /********************************************************************/
 //-- Begin defining variables for role Uav
@@ -613,7 +616,14 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
   }
   if ((thread0_state == NEXT))
   {
-    if ((thread0_x == thread0_xf) && (thread0_y == thread0_yf) && (!wpPtr || wpPtr->empty()))
+    //-- check if there are no more waypoints
+    bool noWP = false;
+    {
+      std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
+      noWP = wpPtr->empty();
+    }
+      
+    if ((thread0_x == thread0_xf) && (thread0_y == thread0_yf) && noWP)
     {
       if ((thread0_missionOver[id] == Integer (0)))
       {
@@ -692,9 +702,12 @@ thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
   //-- Declare local (parameter and temporary) variables
   if((thread0_x == thread0_xf) && (thread0_y == thread0_yf))
   {
-      //-- Begin function body
-      currWP = wpPtr->front();
-      wpPtr->pop_front();
+      //-- update list of waypoints. make sure you get the lock.
+      {
+          std::lock_guard<std::mutex> lockGuard(wpLock);
+          currWP = wpPtr->front();
+          wpPtr->pop_front();
+      }
       
       auto nextCell = GpsToCell(currWP->getLatitude(), currWP->getLongitude());
       thread0_xf = nextCell.first;
@@ -1316,9 +1329,15 @@ namespace uxas
             if (std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object)->getVehicleID() == m_entityId)
             {
                 std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
-                for(auto x : ptr_MissionCommand->getWaypointList())
-                    m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
 
+                //-- update list of waypoints. make sure you get the lock.
+                {
+                    std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
+                    m_waypoints.clear();
+                    for(auto x : ptr_MissionCommand->getWaypointList())
+                        m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
+                }
+                
                 /*
                 if (isInitializePlan(ptr_MissionCommand))
                 {
