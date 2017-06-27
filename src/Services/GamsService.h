@@ -120,18 +120,22 @@ public:
     /**
      * Sends a MissionCommand with a waypoint to UxAS
      * @param  location  location to move to
+     * @param  uxasWP    the waypoint that UxAS is moving to
      **/
-    void sendWaypoint (const gams::pose::Position & location);
+    void sendWaypoint (const gams::pose::Position & location,
+                       const std::shared_ptr<afrl::cmasi::Waypoint> &uxasWP);
     
     /**
      * Moves the agent platform to a location.
-     * @param   target    the coordinates to move to
+     * @param   location  the coordinates to move to
+     * @param   uxasWP    the waypoint that UxAS is moving to
      * @param   epsilon   approximation value
      * @return the status of the move operation,
      *         @see gams::platforms::PlatformReturnValues
      **/
     static int move (const gams::pose::Position & location,
-      double epsilon = get_accuracy ());
+                     const std::shared_ptr<afrl::cmasi::Waypoint> &uxasWP,
+                     double epsilon = get_accuracy ());
     
     /**
      * Returns the accuracy of the underlying platform

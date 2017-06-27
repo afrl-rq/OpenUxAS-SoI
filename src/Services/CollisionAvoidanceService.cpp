@@ -677,7 +677,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
             gams::pose::Position nextGps = CellToGps(thread0_xp, thread0_yp);
             nextGps.alt(currWP->getAltitude());
             std::cerr << "GAMS::move " << nextGps << '\n';
-            if(uxas::service::GamsService::move (nextGps) != gams::platforms::PLATFORM_ARRIVED)
+            if(uxas::service::GamsService::move (nextGps, currWP) != gams::platforms::PLATFORM_ARRIVED)
             {
                 return Integer(0);
             }

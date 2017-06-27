@@ -179,9 +179,9 @@ namespace service
         evaderPos.from_container(m_evader.location);
 
         if(m_isPursuer)
-            GamsService::move(evaderPos);
+            GamsService::move(evaderPos, NULL);
         else
-            GamsService::move(EvaderTarget(pursuerPos, evaderPos));
+            GamsService::move(EvaderTarget(pursuerPos, evaderPos), NULL);
     }
 
   private:

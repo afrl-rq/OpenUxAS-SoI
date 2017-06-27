@@ -330,7 +330,7 @@ namespace service
         gams::pose::Position next (gps_frame);
         next.from_container(self_->agent.home);
         
-        return this->move(next, get_accuracy ());
+        return this->move(next, NULL, get_accuracy ());
     }
 
     /**
@@ -345,12 +345,14 @@ namespace service
 
     /**
      * Moves the platform to a location. Optional.
-     * @param   target    the coordinates to move to
+     * @param   location  the coordinates to move to
+     * @param   uxasWP    the waypoint that UxAS is moving to
      * @param   epsilon   approximation value
      * @return the status of the move operation, @see PlatformReturnValues
      **/
     virtual int move (const gams::pose::Position & location,
-      double epsilon)
+                      const std::shared_ptr<afrl::cmasi::Waypoint> &uxasWP,
+                      double epsilon)
     {
         gams::pose::Position current (gps_frame);
         current.from_container(self_->agent.location);
@@ -380,7 +382,7 @@ namespace service
               location.lat(), location.lng(), location.alt(), 
               current.lat(), current.lng(), current.alt(), epsilon);
 
-            m_service->sendWaypoint(location);
+            m_service->sendWaypoint(location, uxasWP);
             return platforms::PLATFORM_MOVING;
         }
     }
@@ -418,7 +420,7 @@ namespace service
     virtual int pose (const gams::pose::Pose & target,
       double loc_epsilon = 0.1, double rot_epsilon = M_PI/16)
     {
-        return move (gams::pose::Position(target), loc_epsilon);
+        return move (gams::pose::Position(target), NULL, loc_epsilon);
     }
 
     /**
@@ -593,7 +595,8 @@ double GamsService::get_accuracy (void)
 }
 
 int GamsService::move (const gams::pose::Position & location,
-      double epsilon)
+                       const std::shared_ptr<afrl::cmasi::Waypoint> &uxasWP,
+                       double epsilon)
 {
     knowledge::ContextGuard guard (gamsServiceMutex);
     
@@ -608,7 +611,7 @@ int GamsService::move (const gams::pose::Position & location,
           " with %.2f m accuracy\n",
           location.lat(), location.lng(), location.alt(), epsilon);
     
-        result = gamsServicePlatform->move (location, epsilon);
+        result = (static_cast<UxASGamsPlatform*>(gamsServicePlatform))->move (location, uxasWP, epsilon);
     }
     
     return result;
@@ -981,23 +984,34 @@ GamsService::sendBuffer (char * buffer, size_t length)
 }
 
 void
-GamsService::sendWaypoint (const gams::pose::Position & location)
+GamsService::sendWaypoint (const gams::pose::Position & location,
+                           const std::shared_ptr<afrl::cmasi::Waypoint> &uxasWP)
 {
     // create the next waypoint
-    afrl::cmasi::Waypoint * nextPoint = new afrl::cmasi::Waypoint ();
+    afrl::cmasi::Waypoint * nextPoint = NULL;
+
+    if(uxasWP)
+    {
+        nextPoint = uxasWP->clone();
+    }
+    else
+    {
+        nextPoint = new afrl::cmasi::Waypoint ();
+        nextPoint->setNumber(1);
+        nextPoint->setNextWaypoint(1);
+        nextPoint->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
+    }
+    
     nextPoint->setLatitude(location.lat());
     nextPoint->setLongitude(location.lng());
     nextPoint->setAltitude(location.alt());
-    nextPoint->setNumber(1);
-    nextPoint->setNextWaypoint(1);
-    nextPoint->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
     
     // create a mission with the waypoint as its only member
     auto newMission = std::shared_ptr<afrl::cmasi::MissionCommand>(new afrl::cmasi::MissionCommand);
     newMission->getWaypointList().push_back (nextPoint);
         
     // indicate that the first waypoint is the waypoint to use
-    newMission->setFirstWaypoint(1);
+    newMission->setFirstWaypoint(nextPoint->getNumber());
     
     newMission->setVehicleID(this->m_entityId);
         

@@ -120,7 +120,7 @@ namespace service
         // EXAMPLE: using the GamsService::move function
         /// try to move to current waypoint
         if (m_current < m_waypoints.size () &&
-            GamsService::move (m_waypoints[m_current])
+            GamsService::move (m_waypoints[m_current], NULL)
             == gams::platforms::PLATFORM_ARRIVED)
         {
             madara_logger_log (m_logger, logger::LOG_MINOR,
