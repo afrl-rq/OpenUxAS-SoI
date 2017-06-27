@@ -460,6 +460,7 @@ KnowledgeRecord
 thread0 (engine::FunctionArguments & args, engine::Variables & vars);
 KnowledgeRecord
 thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables & vars);
+void thread0_NEXT_WP ();
 KnowledgeRecord
 thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars);
 } // end node_uav_role_Uav namespace
@@ -619,37 +620,36 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
   }
   if ((thread0_state == NEXT))
   {
-    //-- check if there are no more waypoints
-    bool noWP = false;
+    //-- check if we need to update currWP
+    if(currWP == NULL || (nextPos.lat() == currWP->getLatitude() && nextPos.lng() == currWP->getLongitude()))
     {
-      std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
-      noWP = wpPtr->empty();
-    }
-      
-    if ((thread0_x == thread0_xf) && (thread0_y == thread0_yf) && noWP)
-    {
-      if ((thread0_missionOver[id] == Integer (0)))
-      {
-        thread0_missionOver[id] = Integer (1);
+        //-- check if there are no more waypoints
         {
-          (void) (std::cerr  << "node " << id << " completed mission ...\n");
+            std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
+            if(wpPtr->empty())
+            {
+                return Integer(0);
+            }
         }
-      }
-      if (((id == 0 && ((thread0_missionOver[1] == Integer (0)))) || 
-           (id == 1 && ((thread0_missionOver[0] == Integer (0))))))
-      {
-        return Integer(0);
-      }
-      {
-        (void) (std::cerr << "node " << id << " exited mission with code " << id << '\n'); (::exit (0));
-      }
+        //-- update next waypoint
+        thread0_NEXT_WP();
+        
     }
+
+    //-- if the next waypoint is in the same cell as we are in, then move directly to there
+    if(thread0_x == thread0_xf && thread0_y == thread0_yf)
+    {
+        nextPos.lat(currWP->getLatitude());
+        nextPos.lng(currWP->getLongitude());
+        thread0_state = MOVE;
+    }
+    else        
     {
       (void) (thread0_NEXT_XY (
            __strip_const(engine::FunctionArguments(0))
           , vars));
+      thread0_state = REQUEST;
     }
-    thread0_state = REQUEST;
   }
   else
   {
@@ -696,29 +696,33 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
   return Integer(0);
 }
 
+void thread0_NEXT_WP ()
+{
+    //-- update list of waypoints. make sure you get the lock.
+    {
+        std::lock_guard<std::mutex> lockGuard(wpLock);
+        currWP = wpPtr->front();
+        wpPtr->pop_front();
+    }
+      
+    auto nextCell = GpsToCell(currWP->getLatitude(), currWP->getLongitude());
+    thread0_xf = nextCell.first;
+    thread0_yf = nextCell.second;
+
+    std::cerr << "next waypoint Number = " << currWP->getNumber() << '\n';
+    std::cerr << "next waypoint GPS = (" << currWP->getLatitude()
+              << ',' << currWP->getLongitude() << ") ...\n";
+    std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
+}
+    
 KnowledgeRecord
 thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
 {
   std::cerr << "current cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
 
-  //-- Declare local (parameter and temporary) variables
-  if((thread0_x == thread0_xf) && (thread0_y == thread0_yf))
-  {
-      //-- update list of waypoints. make sure you get the lock.
-      {
-          std::lock_guard<std::mutex> lockGuard(wpLock);
-          currWP = wpPtr->front();
-          wpPtr->pop_front();
-      }
-      
-      auto nextCell = GpsToCell(currWP->getLatitude(), currWP->getLongitude());
-      thread0_xf = nextCell.first;
-      thread0_yf = nextCell.second;
-
-      std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
-  }
-  
   //-- Begin function body
+  //thread0_xp = thread0_xf;
+  //thread0_yp = thread0_yf;
   thread0_xp = thread0_x;
   thread0_yp = thread0_y;
   if ((thread0_x < thread0_xf))
@@ -743,8 +747,21 @@ thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
       }
     }
   }
-  nextPos = CellToGps(thread0_xp, thread0_yp);
+  
   std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
+
+  //-- if the next cell contains the next waypoint, then move to the
+  //-- waypoint.
+  if(thread0_xp == thread0_xf && thread0_yp == thread0_yf)
+  {
+      nextPos.lat(currWP->getLatitude());
+      nextPos.lng(currWP->getLongitude());
+  }
+  //-- otherwise move to the center of the next cell
+  else
+  {
+      nextPos = CellToGps(thread0_xp, thread0_yp);
+  }
   
   //-- Insert return statement, in case user program did not
   return Integer(0);
@@ -1345,9 +1362,14 @@ namespace uxas
                 //-- update list of waypoints. make sure you get the lock.
                 {
                     std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
-                    m_waypoints.clear();
+
                     for(auto x : ptr_MissionCommand->getWaypointList())
-                        m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
+                    {
+                        if(m_waypoints.empty() || m_waypoints.back()->getNumber() < x->getNumber())
+                        {
+                            m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
+                        }
+                    }
                     std::cerr << "Updated waypoints : " << m_waypoints.size() << '\n';
                 }
             }
