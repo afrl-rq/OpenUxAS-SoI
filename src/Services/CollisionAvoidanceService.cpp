@@ -1334,6 +1334,8 @@ namespace uxas
         {
             if (std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object)->getVehicleID() == m_entityId)
             {
+                std::cerr << "received private message from WaypointPlanManagerService ...\n";
+                std::cerr << receivedLmcpMessage->m_object->toXML() << '\n';
                 std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
 
                 //-- update list of waypoints. make sure you get the lock.
@@ -1342,12 +1344,10 @@ namespace uxas
                     m_waypoints.clear();
                     for(auto x : ptr_MissionCommand->getWaypointList())
                         m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
+                    std::cerr << "Updated waypoints : " << m_waypoints.size() << '\n';
                 }
             }
             
-            //sendSharedLmcpObjectBroadcastMessage(ptr_odstObjectDestination->ptrGetObject());        
-            std::cerr << "received private message from WaypointPlanManagerService ...\n";
-            std::cerr << receivedLmcpMessage->m_object->toXML() << '\n';
         }
 
         return false;
