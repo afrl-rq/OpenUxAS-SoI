@@ -203,11 +203,16 @@ public
             --"eventually" idiom. 
             guarantee "if automation request is received and resource is defined produce unique automation request.
             If in the idle state, this service will immediately publish the UniqueAutomationRequest message and transition to the busy state.": true ->
-                idle_to_busy =>
+                 idle_to_busy => 
                 --QUESTION: what is a automation request? above it is listed as a task automation request
                     event(UniqueAutomationRequest_out) and state = BUSY and
                     cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID; --Used for subsequent specs
-            
+           
+           guarantee "[ADDED SPEC] cached_unique_automation_request_id does not change if the two conditions under which it can change are both not currently triggered. 
+           These conditions are implied in other guarantees.":
+           		not idle_to_busy and  not(state = BUSY and dequeue_trigger and pre(numTasksInQ) >0) =>
+           			cached_unique_automation_request_id = pre(cached_unique_automation_request_id);
+            		
             guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
                   state = BUSY =>
                   --Note: the definition of the idle state suggests numTasksInQ should already be 0 on transition
