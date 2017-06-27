@@ -1,40 +1,17 @@
     <AutomationRequest Series="CMASI">
       <EntityList>
-        <int64>1000</int64>
-        <int64>1001</int64>
-        <int64>1002</int64>
+        <int64>1</int64>
+        <int64>2</int64>
       </EntityList>
       <TaskList>
-
-      <!-- PointSearchTask -->
-      <int64>10</int64> 
-      <!-- PointSearchTask -->
-      <int64>11</int64>
-      <!-- PointSearchTask -->
-      <int64>12</int64>
-      <!-- ImpactPointSearchTask -->
-      <int64>13</int64>
-
-      <!-- ImpactLineSearchTask -->
-      <int64>21</int64> 
-      <!-- LineSearchTask -->
-      <int64>20</int64> 
-      <!-- LineSearchTask -->
-      <int64>30</int64>
-
-      <!-- AreaSearchTask -->
-      <int64>50</int64>
-
-      <!-- AngledAreaSearchTask -->
-      <int64>51</int64> 
-
-      <!-- PatternSearchTask -->
-      <int64>60</int64> 
-      <!-- PatternSearchTask -->
-      <int64>61</int64>
-      
+        <int64>1</int64>
+        <int64>2</int64>
+        <int64>3</int64>
+        <int64>4</int64>
+        <int64>5</int64>
+        <int64>6</int64>
       </TaskList>
-      <TaskRelationships></TaskRelationships>
-      <OperatingRegion>100</OperatingRegion>
-      <RedoAllTasks>true</RedoAllTasks>
+      <TaskRelationships>|(.(p1 +(p3 p5)) .(p2 p4 p6))</TaskRelationships>
+      <OperatingRegion>10</OperatingRegion>
+      <RedoAllTasks>false</RedoAllTasks>
     </AutomationRequest>

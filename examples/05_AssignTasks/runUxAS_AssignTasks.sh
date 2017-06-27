@@ -11,4 +11,4 @@ mkdir -p RUNDIR_AssignTasks
 cd RUNDIR_AssignTasks
 $RM_DATAWORK
 $RM_LOG
-$BIN -cfgPath ../cfg_AssignTasks.xml
+$BIN -cfgPath ../AssignTasks_cfg.xml
