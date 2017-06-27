@@ -23,11 +23,11 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="AutomationDiagramDataService"/>
 
-    <!--
     <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"
              CollisionAvoidance="TRUE" />
+    <!--
     <Service Type="WaypointPlanManagerService" VehicleID="500" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
              AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
