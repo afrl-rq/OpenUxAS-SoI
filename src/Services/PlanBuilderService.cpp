@@ -78,6 +78,7 @@ PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
     {
         auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_currentEntityStates[entityState->getID()] = entityState;
+        std::cout << " # PlanBuilder caching state for AirVehicle " << entityState->getID() << std::endl;
     }
     else if(afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object))
     {
@@ -233,7 +234,7 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
     //taskImplementationRequest->setCorrespondingAutomationRequestID(uniqueRequestID);
     m_expectedResponseID[m_taskImplementationId] = uniqueRequestID;
     taskImplementationRequest->setRequestID(m_taskImplementationId++);
-    taskImplementationRequest->setStartingWaypointID( (*planState)->finalWaypointID );
+    taskImplementationRequest->setStartingWaypointID( (*planState)->finalWaypointID + 1 );
     taskImplementationRequest->setVehicleID(taskAssignment->getAssignedVehicle());
     taskImplementationRequest->setTaskID(taskAssignment->getTaskID());
     taskImplementationRequest->setOptionID(taskAssignment->getOptionID());
@@ -273,7 +274,18 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         return;
     
     if(taskImplementationResponse->getTaskWaypoints().empty())
+    {
+        // task cannot be completed (e.g. inside a no-fly zone)
+        std::string errMsg = "Task [" + std::to_string(taskImplementationResponse->getTaskID()) + "]";
+        errMsg += " option [" + std::to_string(taskImplementationResponse->getOptionID()) + "]";
+        errMsg += " assigned to vehicle [" + std::to_string(taskImplementationResponse->getVehicleID()) + "]";
+        errMsg += " reported an empty waypoint list for implementation!";
+        sendError(errMsg);
+        
+        // legacy: still try to complete the request, just skipping this task
+        checkNextTaskImplementationRequest(uniqueRequestID);
         return;
+    }
     
     auto corrMish = std::find_if(m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().begin(), m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end(),
                                 [&](afrl::cmasi::MissionCommand* mish) { return mish->getVehicleID() == taskImplementationResponse->getVehicleID(); });
@@ -311,7 +323,13 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
             (*projectedState)->state->setPlanningHeading(taskImplementationResponse->getFinalHeading());
         }
     }
+                                
+    checkNextTaskImplementationRequest(uniqueRequestID);
     
+};
+
+void PlanBuilderService::checkNextTaskImplementationRequest(int64_t uniqueRequestID)
+{
     // check to see if there are any more in the queue
     //    yes --> sendNextTaskImplementationRequest
     //    no --> send m_inProgressResponse[uniqueRequestID], then clear it out
@@ -321,14 +339,21 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         {
             sendSharedLmcpObjectBroadcastMessage(m_inProgressResponse[uniqueRequestID]);
             m_inProgressResponse.erase(uniqueRequestID);
+            
+            auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
+            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Information);
+            auto keyValuePair = new afrl::cmasi::KeyValuePair;
+            std::string message = "UniqueAutomationResponse[" + std::to_string(uniqueRequestID) + "] - sent";
+            keyValuePair->setKey(message);
+            serviceStatus->getInfo().push_back(keyValuePair);
+            sendSharedLmcpObjectBroadcastMessage(serviceStatus);
         }
         else
         {
             sendNextTaskImplementationRequest(uniqueRequestID);
         }
     }
-    
-};
+}
 
 }; //namespace service
 }; //namespace uxas

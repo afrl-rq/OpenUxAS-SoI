@@ -130,6 +130,7 @@ private:
     void sendError(std::string& errMsg);
     
     bool sendNextTaskImplementationRequest(int64_t uniqueRequestID);
+    void checkNextTaskImplementationRequest(int64_t uniqueRequestID);
     
     /*! \brief  nested class for tracking projected state of an entity during the plan building process */
     class ProjectedState {

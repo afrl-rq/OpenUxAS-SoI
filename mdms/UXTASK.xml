@@ -123,6 +123,8 @@
             <Field Name="ResponseID" Type="int64" />
             <!-- Original automation request without a unique identifier -->
             <Field Name="OriginalResponse" Type="CMASI/AutomationResponse" />
+            <!-- The final states of entities when the plan is completed. -->
+            <Field Name="FinalStates" Type="PlanningState[]" />
         </Struct>
         
         <!-- Patches CMASI automation request to add a unique identifier -->
@@ -148,6 +150,8 @@
             <Field Name="ResponseID" Type="int64" />
             <!-- Original automation request without a unique identifier -->
             <Field Name="OriginalResponse" Type="CMASI/AutomationResponse" />
+            <!-- The final states of entities when the plan is completed. -->
+            <Field Name="FinalStates" Type="PlanningState[]" />
         </Struct>
         
         <!-- Request to compute a set of sensor footprints from possible vehicles in the system -->
