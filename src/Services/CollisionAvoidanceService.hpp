@@ -137,7 +137,7 @@ protected:
     madara::threads::Threader m_threader;
 
     /// list of waypoints to move to
-    gams::pose::Positions m_waypoints;
+    std::list<std::shared_ptr<afrl::cmasi::Waypoint>> m_waypoints;
     
     /// private logger for our service
     madara::logger::Logger m_logger;

@@ -318,11 +318,11 @@ short var_init_yf (0);
 Reference<short> yp(knowledge, ".yp");
 short var_init_yp (0);
 
-//-- pointer to list of waypoints
-gams::pose::Positions *wpPtr = NULL;
+//-- pointer to list of future waypoints
+std::list<std::shared_ptr<afrl::cmasi::Waypoint>> *wpPtr = NULL;
     
-//-- id of next waypoint to be reached
-short nextWpId = 0;
+//-- the current waypoint we are moving toward
+std::shared_ptr<afrl::cmasi::Waypoint> currWP;
     
 /********************************************************************/
 //-- Begin defining variables for role Uav
@@ -613,7 +613,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
   }
   if ((thread0_state == NEXT))
   {
-    if ((thread0_x == thread0_xf) && (thread0_y == thread0_yf) && (nextWpId >= wpPtr->size()))
+    if ((thread0_x == thread0_xf) && (thread0_y == thread0_yf) && (!wpPtr || wpPtr->empty()))
     {
       if ((thread0_missionOver[id] == Integer (0)))
       {
@@ -665,7 +665,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
         if ((thread0_state == MOVE))
         {
             gams::pose::Position nextGps = CellToGps(thread0_xp, thread0_yp);
-            nextGps.alt((*wpPtr)[nextWpId-1].alt());
+            nextGps.alt(currWP->getAltitude());
             std::cerr << "GAMS::move " << nextGps << '\n';
             if(uxas::service::GamsService::move (nextGps) != gams::platforms::PLATFORM_ARRIVED)
             {
@@ -693,10 +693,10 @@ thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
   if((thread0_x == thread0_xf) && (thread0_y == thread0_yf))
   {
       //-- Begin function body
-      gams::pose::Position nextPos = (*wpPtr)[nextWpId];
-      ++nextWpId;
-
-      auto nextCell = GpsToCell(nextPos.lat(), nextPos.lng());
+      currWP = wpPtr->front();
+      wpPtr->pop_front();
+      
+      auto nextCell = GpsToCell(currWP->getLatitude(), currWP->getLongitude());
       thread0_xf = nextCell.first;
       thread0_yf = nextCell.second;
 
@@ -1153,26 +1153,24 @@ namespace uxas
             // read a waypoint
             if (std::string("Waypoint") == currentXmlNode.name())
             {
-                gams::pose::Position nextPosition (GamsService::frame ());
-                
+                std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
+
                 if (!currentXmlNode.attribute("Latitude").empty())
                 {
-                    nextPosition.lat(
-                        currentXmlNode.attribute("Latitude").as_double());
+                    wp->setLatitude(currentXmlNode.attribute("Latitude").as_double());
                 }
                 if (!currentXmlNode.attribute("Longitude").empty())
                 {
-                    nextPosition.lng(
-                        currentXmlNode.attribute("Longitude").as_double());
+                    wp->setLongitude(currentXmlNode.attribute("Longitude").as_double());
                 }
                 if (!currentXmlNode.attribute("Altitude").empty())
                 {
-                    nextPosition.alt(
-                        currentXmlNode.attribute("Altitude").as_double());
+                    wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
                 }
 
-                std::cerr << "Found waypoint : " << nextPosition << '\n';
-                m_waypoints.push_back (nextPosition);
+                std::cerr << "Found waypoint : " << wp->toXML() << '\n';
+
+                m_waypoints.push_back (wp);
             }
             // read a waypoint via cell id
             if (std::string("WaypointCell") == currentXmlNode.name())
@@ -1183,13 +1181,18 @@ namespace uxas
                 {
                     auto nextPosition = CellToGps(currentXmlNode.attribute("X").as_int(),
                                                   currentXmlNode.attribute("Y").as_int());
-                    nextPosition.alt(
-                        currentXmlNode.attribute("Altitude").as_double());
+
+                    std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
+                    wp->setLatitude(nextPosition.lat());
+                    wp->setLongitude(nextPosition.lng());                    
+                    wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
+
                     std::cerr << "Found waypoint cell id : ("
                               << currentXmlNode.attribute("X").as_int() << ','
                               << currentXmlNode.attribute("Y").as_int() << ")\n";
-                    std::cerr << "Found waypoint cell : " << nextPosition << '\n';
-                    m_waypoints.push_back (nextPosition);
+                    std::cerr << "Found waypoint cell : " << wp->toXML() << '\n';
+
+                    m_waypoints.push_back (wp);
                 }
             }
         }    
@@ -1310,11 +1313,13 @@ namespace uxas
     {
         if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
         {
-            /*
-            if (static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->getVehicleID() == m_vehicleID)
+            if (std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object)->getVehicleID() == m_entityId)
             {
-                //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
                 std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
+                for(auto x : ptr_MissionCommand->getWaypointList())
+                    m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
+
+                /*
                 if (isInitializePlan(ptr_MissionCommand))
                 {
                     int64_t waypointIdCurrent = {ptr_MissionCommand->getWaypointList().front()->getNumber()};
@@ -1327,8 +1332,8 @@ namespace uxas
                         }
                     }
                 }
+                */
             }
-            */
             
             //sendSharedLmcpObjectBroadcastMessage(ptr_odstObjectDestination->ptrGetObject());        
             std::cerr << "received private message from WaypointPlanManagerService ...\n";
