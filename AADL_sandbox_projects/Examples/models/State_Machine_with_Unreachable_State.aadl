@@ -21,7 +21,7 @@ public
 		subcomponents
 			sm_sub : system sm; 
 		annex agree {**
-			-- These lemmas can be used to identify the unreachable state (SATE3).
+			-- These lemmas can be used to identify the unreachable state (STATE3).
 			lemma "False indicates STATE1 is reachable" : sm_sub.state != sm_sub.STATE1;
 			lemma "False indicates STATE2 is reachable" : sm_sub.state != sm_sub.STATE2;
 			lemma "False indicates STATE3 is reachable" : sm_sub.state != sm_sub.STATE3;

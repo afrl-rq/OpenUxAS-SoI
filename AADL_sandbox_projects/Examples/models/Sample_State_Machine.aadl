@@ -1,5 +1,4 @@
---Copyright 2016-2017 Rockwell Collins, Inc. All rights reserved.
-
+-- Authors: Rockwell Collins and Dependable Computing
 -----------------------------------------------------
 -- The state machine this implements looks like this:
 --   A->B->C
@@ -12,6 +11,45 @@ package Sample_State_Machine
 public
 	with Base_Types;
 	
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	system top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force AGREE to run" : true;
+		**};
+	end top_level;
+	
+	system implementation top_level.Impl
+		subcomponents
+			sub : system Sample_State_Machine_Sys; 
+		annex agree {**
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--State machine lemmas
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.State_out = sub.StateA) 
+				or (sub.State_out = sub.StateB)
+				or (sub.State_out = sub.StateC);
+				
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.State_out = sub.previous_state);
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
+			
+			--Check that all states are reachable
+			lemma "False indicates StateA reachable" : not (sub.State_out = sub.StateA);
+			lemma "False indicates StateB reachable" : not (sub.State_out = sub.StateB);
+			lemma "False indicates StateC reachable" : not (sub.State_out = sub.StateC); 
+			
+			--Check that all state transitions are reachable
+			lemma "False indicates that T_A_to_B is reachable" : not sub.T_A_to_B;
+			lemma "False indicates that T_B_to_C is reachable": not sub.T_B_to_C;
+			lemma "False indicates that T_A_to_C is reachable": not sub.T_A_to_C;
+		**};
+		 
+	end top_level.Impl;	
+
 system Sample_State_Machine_Sys
 	features
       	Go_To_Next_State_in: in data port Base_Types::Boolean;
