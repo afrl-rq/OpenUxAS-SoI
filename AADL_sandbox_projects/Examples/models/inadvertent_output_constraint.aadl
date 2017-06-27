@@ -1,0 +1,105 @@
+package inadvertent_output_constraint
+public
+	with Base_Types;
+	
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force AGREE to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread TaskServiceBase; 
+		annex agree {**
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--State machine lemmas
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.state = sub.STATE1) 
+				or (sub.state = sub.STATE2);
+				
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.state = sub.previous_state);
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
+			
+			--Check that all states are reachable
+			lemma "False indicates State1 reachable" : not (sub.state = sub.STATE1);
+			lemma "False indicates State2 reachable" : not (sub.state = sub.STATE1);
+				
+			--Check that all state transitions are reachable
+			lemma "False indicates that one_to_two is reachable" : not sub.one_to_two;
+			lemma "False indicates that two_to_one is reachable": not sub.two_to_one;
+			
+			--Check if the output_var can be more than one value
+			lemma "True indicates the internal out_var (tracking output) can only be constant, an inadvertent output space constraint (an ERROR)" :
+				sub.out_var = pre(sub.out_var);
+			
+			lemma "True indicates the output can only be constant, an inadvertent output space constraint (an ERROR)" :
+				sub.output = pre(sub.output);
+				
+			lemma "True indicates output and out_var are synched (expected)" :
+				sub.output = sub.out_var;
+		**};
+		 
+	end top_level.Impl;	
+	
+	
+	
+    thread TaskServiceBase
+    	features
+    		output: out event data port Base_Types::Integer;
+       	annex agree{**
+       		eq state : int;
+
+       		eq out_var : int = output -> output;
+       		
+       		--Task States
+       		const STATE1 : 			int = 1;
+       		const STATE2 : 			int = 2;
+       		
+       	-------------------------------------------------------------
+		--State machine support macros
+			eq previous_state: int = prev(state,STATE1);
+			eq some_transition: bool = one_to_two
+									or two_to_one;
+
+		-------------------------------------------------------------		
+	
+		--------------------------State Transition Predicates-----------------------------------	
+			eq one_to_two : bool = false->
+				previous_state = STATE1 and event(output);
+				
+			eq two_to_one : bool = false ->
+				previous_state = STATE2 and event(output);
+       			
+       		guarantee "Self loops": not some_transition => (state = previous_state);
+       			
+       		--Note: this mechanism of state transitions was applied 
+       		--to maintain the state of a variable in all states once assigned.
+       		--The risk of this approach is that if there is more than one assignment of the
+       		--variable possible, as is the case in this example. This mistake is not caught
+       		--by any analysis. 
+   			guarantee "State 1 to 2" :
+   			if one_to_two then
+   				state = STATE2 and
+   				out_var = output
+   			else
+   				out_var = pre(out_var);
+   				
+   			guarantee "State 2 to 1" :
+   			if two_to_one then
+   				state = STATE2 and
+   				out_var = output
+   			else
+   				out_var = pre(out_var);
+   
+       	**};
+       	
+    end TaskServiceBase;
+    
+end inadvertent_output_constraint;
