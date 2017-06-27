@@ -33,7 +33,7 @@
         <GamsController AgentPrefix="agent.1"
             CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
             GamsLogLevel="4" MadaraLogLevel="1"
-            LoopHertz="1.0" SendHertz="-1" RunTime="10" />
+            LoopHertz="1.0" SendHertz="-1" RunTime="3600" />
         <Agents>
           <Agent Prefix="agent.0" EntityId="400"/>
           <Agent Prefix="agent.1" EntityId="500"/>
