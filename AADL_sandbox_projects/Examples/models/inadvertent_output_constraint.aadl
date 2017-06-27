@@ -40,7 +40,7 @@ public
 				sub.out_var = pre(sub.out_var);
 			
 			lemma "True indicates the output can only be constant, an inadvertent output space constraint (an ERROR)" :
-				sub.output = pre(sub.output);
+				true -> sub.output = pre(sub.output);
 				
 			lemma "True indicates output and out_var are synched (expected)" :
 				sub.output = sub.out_var;
