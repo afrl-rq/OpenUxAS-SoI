@@ -324,6 +324,9 @@ std::list<std::shared_ptr<afrl::cmasi::Waypoint>> *wpPtr = NULL;
 //-- the current waypoint we are moving toward
 std::shared_ptr<afrl::cmasi::Waypoint> currWP;
 
+//-- the next position we are moving toward. this is updated along with xp and yp.
+gams::pose::Position nextPos(uxas::service::GamsService::frame());
+    
 //-- lock to implement mutex for wpPtr and currWP
 std::mutex wpLock;
     
@@ -674,10 +677,9 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
       {
         if ((thread0_state == MOVE))
         {
-            gams::pose::Position nextGps = CellToGps(thread0_xp, thread0_yp);
-            nextGps.alt(currWP->getAltitude());
-            std::cerr << "GAMS::move " << nextGps << '\n';
-            if(uxas::service::GamsService::move (nextGps, currWP) != gams::platforms::PLATFORM_ARRIVED)
+            nextPos.alt(currWP->getAltitude());
+            std::cerr << "GAMS::move " << nextPos << '\n';
+            if(uxas::service::GamsService::move (nextPos, currWP) != gams::platforms::PLATFORM_ARRIVED)
             {
                 return Integer(0);
             }
@@ -741,6 +743,7 @@ thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
       }
     }
   }
+  nextPos = CellToGps(thread0_xp, thread0_yp);
   std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
   
   //-- Insert return statement, in case user program did not
@@ -810,6 +813,7 @@ void constructor ()
   initialize_xp ();
   if(!check_init_yf ()) throw std::runtime_error("ERROR: illegal initial value of variable yf");
   initialize_yp ();
+  nextPos = CellToGps(xp, yp);
 }
 
 } // end node_uav_role_Uav namespace
