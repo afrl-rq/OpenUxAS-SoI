@@ -38,8 +38,8 @@
 
 namespace uxas
 {
-namespace service
-{
+    namespace service
+    {
 
 
 /*! \class CollisionAvoidanceService
@@ -57,93 +57,90 @@ namespace service
  * 
  * Sent Messages:
  */
+        class CollisionAvoidanceService : public ServiceBase
+        {
+        public:
 
+            static const std::string&
+            s_typeName()
+                {
+                    static std::string s_string("CollisionAvoidanceService");
+                    return (s_string);
+                };
 
-
-class CollisionAvoidanceService : public ServiceBase
-{
-public:
-
-    static const std::string&
-    s_typeName()
-    {
-        static std::string s_string("CollisionAvoidanceService");
-        return (s_string);
-    };
-
-    static const std::vector<std::string>
-    s_registryServiceTypeNames()
-    {
-        std::vector<std::string> registryServiceTypeNames = {s_typeName()};
-        return (registryServiceTypeNames);
-    };
+            static const std::vector<std::string>
+            s_registryServiceTypeNames()
+                {
+                    std::vector<std::string> registryServiceTypeNames = {s_typeName()};
+                    return (registryServiceTypeNames);
+                };
     
-    static const std::string&
-    s_directoryName()
-    {
-        static std::string s_string("");
-        return (s_string);
-    };
+            static const std::string&
+            s_directoryName()
+                {
+                    static std::string s_string("");
+                    return (s_string);
+                };
 
-    static ServiceBase*
-    create()
-    {
-        return new CollisionAvoidanceService;
-    };
+            static ServiceBase*
+            create()
+                {
+                    return new CollisionAvoidanceService;
+                };
 
-    CollisionAvoidanceService();
+            CollisionAvoidanceService();
 
-    virtual
-    ~CollisionAvoidanceService();
+            virtual
+            ~CollisionAvoidanceService();
 
     
-private:
+        private:
 
-    static
-    ServiceBase::CreationRegistrar<CollisionAvoidanceService> s_registrar;
+            static
+            ServiceBase::CreationRegistrar<CollisionAvoidanceService> s_registrar;
 
-    /** brief Copy construction not permitted */
-    CollisionAvoidanceService(CollisionAvoidanceService const&) = delete;
+            /** brief Copy construction not permitted */
+            CollisionAvoidanceService(CollisionAvoidanceService const&) = delete;
 
-    /** brief Copy assignment operation not permitted */
-    void operator=(CollisionAvoidanceService const&) = delete;
+            /** brief Copy assignment operation not permitted */
+            void operator=(CollisionAvoidanceService const&) = delete;
 
-    void
-    read_arguments(const pugi::xml_node& serviceXmlNode);
+            void
+            read_arguments(const pugi::xml_node& serviceXmlNode);
 
-    bool
-    configure(const pugi::xml_node& serviceXmlNode) override;
+            bool
+            configure(const pugi::xml_node& serviceXmlNode) override;
 
-    bool
-    initialize() override;
+            bool
+            initialize() override;
 
-    //bool
-    //start() override;
+            //bool
+            //start() override;
 
-    bool
-    terminate() override;
+            bool
+            terminate() override;
 
-    bool
-    processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
+            bool
+            processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-protected:
+        protected:
     
-    std::string m_checkpointPrefix;
+            std::string m_checkpointPrefix;
     
-    // private knowledge base
-    madara::knowledge::KnowledgeBase m_knowledgeBase;
+            // private knowledge base
+            madara::knowledge::KnowledgeBase m_knowledgeBase;
     
-    /// qos-enabled thread manager
-    madara::threads::Threader m_threader;
+            /// qos-enabled thread manager
+            madara::threads::Threader m_threader;
 
-    /// list of waypoints to move to
-    std::list<std::shared_ptr<afrl::cmasi::Waypoint>> m_waypoints;
+            /// list of waypoints to move to
+            std::list<std::shared_ptr<afrl::cmasi::Waypoint>> m_waypoints;
     
-    /// private logger for our service
-    madara::logger::Logger m_logger;
-};
+            /// private logger for our service
+            madara::logger::Logger m_logger;
+        };
 
-}; //namespace service
+    }; //namespace service
 }; //namespace uxas
 
 #endif /* UXAS_SERVICE_COLLISION_AVOIDANCE_SERVICE_HPP */
