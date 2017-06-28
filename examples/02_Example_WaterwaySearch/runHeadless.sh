@@ -14,8 +14,11 @@ $RM_DATAWORK
 $RM_LOG
 
 echo "Starting UxAS ..."
-$BIN -runUntil 40 -cfgPath ../cfg_WaterwaySearch.xml > consoleout.txt &
+mkdir -p log
+$BIN -runUntil 43 -cfgPath ../cfg_WaterwaySearch.xml > log/consoleout.txt &
 cd "$here";
+
+sleep 3
 
 echo "Starting AMASE ..."
 cd ../../../OpenAMASE/OpenAMASE;

@@ -1,0 +1,22 @@
+    <PointSearchTask Series="CMASI">
+      <SearchLocation>
+        <Location3D Series="CMASI">
+          <Latitude>25.330369830330564</Latitude>
+          <Longitude>-80.54224359715526</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </SearchLocation>
+      <StandoffDistance>0.0</StandoffDistance>
+      <ViewAngleList/>
+      <DesiredWavelengthBands/>
+      <DwellTime>0</DwellTime>
+      <GroundSampleDistance>0.0</GroundSampleDistance>
+      <TaskID>2</TaskID>
+      <Label/>
+      <EligibleEntities/>
+      <RevisitRate>0.0</RevisitRate>
+      <Parameters/>
+      <Priority>0</Priority>
+      <Required>true</Required>
+    </PointSearchTask>
