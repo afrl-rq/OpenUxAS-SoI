@@ -86,7 +86,20 @@ public
            		 
            	lemma "True if only stated transitions are executed (no missing transitions)." :
                 sub.some_transition or sub.state = sub.previous_state;	
-										
+				
+			-- Inadvertent internal variable constraint checks	
+				
+			lemma "False if the internal variable cached_task_plan_options is not constant (no inadvertent constraints)":
+				true -> sub.cached_task_plan_options = pre(sub.cached_task_plan_options);	
+				
+			lemma "False if the internal variable cached_route_request_id is not constant (no inadvertent constraints)"	:
+				true -> sub.cached_route_request_id = pre(sub.cached_route_request_id);
+				
+			lemma "False if the internal variable cached_sensor_request_id is not constant (no inadvertent constraints)":
+				true -> sub.cached_sensor_request_id = pre(sub.cached_sensor_request_id);
+				
+			lemma "False if the internal variable cached_task_id is not constant (no inadvertent constraints)"	:
+				true -> sub.cached_task_id = pre(sub.cached_task_id);
 				
 		**};
 	end top_level.Impl;	
@@ -137,7 +150,6 @@ public
        		eq init_complete : bool ;
        		eq entity_state_task_id_present : bool;
        		eq unique_automation_request_task_id_present : bool;
-       		eq task_id : int;
        		
        		--Task States
        		const INIT : 				int = 1;
@@ -169,6 +181,8 @@ public
 		eq cached_task_plan_options : int; 
 		eq cached_route_request_id : int;
 		eq cached_sensor_request_id : int; 
+		eq cached_task_id : int;
+		
 		--routes are "whispered"
 		--sensors maybe whisipered
 		--TODO ask john about changes to code implications on AADL/AGREE
@@ -229,10 +243,12 @@ public
        		guarantee "all tasks remain in init until all internal initialization is complete, transitioning to idle after.
        		When a Task has completed its internal initialization, it must report transition from this state 
        		via the TaskInitialized message." :
-       			init_to_idle => 
+       			if init_to_idle then 
        				state = IDLE and 
        				--event(TaskInitialized_out) and --Note, now becoming an "eventually" for init (on transition)
-       				task_id = TaskInitialized_out.TaskID; --Not part of the spec, but used for other specs. 
+       				cached_task_id = TaskInitialized_out.TaskID --Not part of the spec, but used for other specs. 
+       			else
+       				cached_task_id = pre(cached_task_id);
        				
 --       		guarantee "The IDLE represents the state ... before any requests have been made that include the Task. " :
 --       			true; --not really what was meant I think
@@ -244,9 +260,11 @@ public
        			that are also included in the UniqueAutomationRequest message.
        			[ASSUMPTION: calculations requests are assumed to mean SensorFootprintRequests_in]" :
        			--NOTE: the SensorFootprintResponse_in is not a defined output of the base task. 
-       			idle_to_sensor_request => 
+       			if idle_to_sensor_request then 
        				state = SENSOR_REQUEST and
-       				cached_sensor_request_id = SensorFootprintRequests_out.RequestID;
+       				cached_sensor_request_id = SensorFootprintRequests_out.RequestID
+       			else
+       				cached_sensor_request_id = pre(cached_sensor_request_id);
        				--event(SensorFootprintRequests_out) and --NOTE: we don't really mean this happens every time step, putting on the edge
        				--true; --TODO: pertain to sensors on board? --NOTE: derek says a well-formed request would only have sensors that "pertain"
        		
@@ -262,9 +280,20 @@ public
        			[IMPLIED: the service will then be in OptionRoutes state]" :
        			--NOTE: the SensorFootprintResponse_out is not a defined output of the base task. 
        			--TODO: how do I know the sensor footprint is for the given task or does it matter? 
+--       			sensor_request_to_option_routes =>
+--       				state = OPTION_ROUTES and
+--       				cached_route_request_id = RouteRequest_out.RequestID;
        			sensor_request_to_option_routes =>
        				state = OPTION_ROUTES and
        				cached_route_request_id = RouteRequest_out.RequestID;
+       			
+       		--The there are two transitions that both set cached_route_reuquest_id, hence a separate 
+       		--is necessary that checks that if not in both transitions, the cached_route_request_id
+       		--does not change. 
+       		guarantee "[ADDED GUARANTEE] If not transition from sensor request to options routes or
+       				options published to final routes, the cached_route_request_id is not modified.":
+       			not sensor_request_to_option_routes and not options_published_to_final_routes =>
+       				cached_route_request_id = pre(cached_route_request_id);
        		
        		--Note: now part of the transition into OptionRoutes ....Blame derek :-)
 --       		guarantee "[IMPLIED: in OPTION_ROUTES state] the Task can request waypoints from the RouteAggregatorService that carry out the on-Task goals.
@@ -277,10 +306,12 @@ public
        		guarantee "The Task remains in the OptionRoutes state until the RouteAggregatorService replies.
        		When routes are returned [IMPLIED: from the route aggregator service the service will be in the OPTIONS_PUBLISHED state] 
        		[ASSUMPTION: the replies are assumed to be RoutePlanResponse_in]":
-       		option_routes_to_options_published =>
+       		if option_routes_to_options_published then
        			state = OPTIONS_PUBLISHED and
-       			cached_task_plan_options = TaskPlanOptions_out.CorrespondingAutomationRequestID ; --NOTE: used only for model checking
-       		
+       			cached_task_plan_options = TaskPlanOptions_out.CorrespondingAutomationRequestID  --NOTE: used only for model checking
+       		else
+       			cached_task_plan_options = pre(cached_task_plan_options);
+       			
 --       			if pre(state)= OPTION_ROUTES and pre(event(RoutePlanResponse_in)) then
 --       				state = OPTIONS_PUBLISHED
 --       			else
@@ -302,7 +333,7 @@ public
        		--TODO: implied? check for responses for the given task? 
        			options_published_to_final_routes =>
        				state = FINAL_ROUTES and
-       				cached_route_request_id = RouteRequest_out.RequestID; 
+       				cached_route_request_id = RouteRequest_out.RequestID;
        			
        		guarantee "When a Task is Active, it is allowed to update sensor navigation commands to on-task vehicles." :
        		--NOTE: this contract is not valid in the parent type as there is no VehicleActionCommand_out defined in the parent
