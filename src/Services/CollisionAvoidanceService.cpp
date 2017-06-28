@@ -647,10 +647,19 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
     }
     else        
     {
-      (void) (thread0_NEXT_XY (
-           __strip_const(engine::FunctionArguments(0))
-          , vars));
-      thread0_state = REQUEST;
+        (void) (thread0_NEXT_XY (
+                    __strip_const(engine::FunctionArguments(0))
+                    , vars));
+        
+        //-- if the next waypoint is in the same cell as we are in, then move directly to there
+        if(thread0_x == thread0_xp && thread0_y == thread0_yp)
+        {
+            thread0_state = MOVE;
+        }
+        else
+        {
+            thread0_state = REQUEST;
+        }
     }
   }
   else
