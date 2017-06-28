@@ -13,7 +13,7 @@
         <ID>400</ID>
         <Label>UAV 400</Label>
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
-        <MaximumSpeed>33.4388885498047</MaximumSpeed>
+        <MaximumSpeed>133.4388885498047</MaximumSpeed>
         <NominalSpeed>22.0</NominalSpeed>
         <NominalAltitude>700.0</NominalAltitude>
         <NominalAltitudeType>MSL</NominalAltitudeType>
@@ -89,7 +89,7 @@
         <ID>500</ID>
         <Label>UAV 500</Label>
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
-        <MaximumSpeed>33.4388885498047</MaximumSpeed>
+        <MaximumSpeed>133.4388885498047</MaximumSpeed>
         <NominalSpeed>22.0</NominalSpeed>
         <NominalAltitude>700.0</NominalAltitude>
         <NominalAltitudeType>MSL</NominalAltitudeType>
