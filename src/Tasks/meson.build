@@ -30,7 +30,7 @@ incs_tasks = [
     '../../src/VisilibityLib',
     '../../3rd/PugiXML/src',
     '../../3rd/cppzmq-4.2.1',
-    '../../3rd/zeromq-4.1.1/include',
+    '../../3rd/zeromq-4.1.6/include',
   ),
   incs_lmcp,
 ]
