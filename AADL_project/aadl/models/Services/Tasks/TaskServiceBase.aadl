@@ -55,34 +55,34 @@ public
 				sub.state = sub.COMPLETED;
 				
 			lemma "False indicates init_to_idle transition is reachable" : 
-           		 sub.init_to_idle;
+           		 not sub.init_to_idle;
            		 
            	lemma "False indicates idle_to_sensor_request transition is reachable" : 
-           		 sub.idle_to_sensor_request;	
+           		 not sub.idle_to_sensor_request;	
            		 
            	lemma "False indicates sensor_request_to_option_routes transition is reachable" : 
-           		 sub.sensor_request_to_option_routes;	
+           		 not sub.sensor_request_to_option_routes;	
            		 
       		lemma "False indicates option_routes_to_options_published transition is reachable" : 
-           		 sub.option_routes_to_options_published;	
+           		 not sub.option_routes_to_options_published;	
            		 
            	lemma "False indicates options_published_to_final_routes transition is reachable" : 
-           		 sub.options_published_to_final_routes;	
+           		 not sub.options_published_to_final_routes;	
            		 
            	lemma "False indicates final_routes_to_option_selected transition is reachable" : 
-           		 sub.final_routes_to_option_selected;	
+           		 not sub.final_routes_to_option_selected;	
            		 
            	lemma "False indicates option_selected_to_sensor_request transition is reachable" : 
-           		 sub.option_selected_to_sensor_request;	
+           		 not sub.option_selected_to_sensor_request;	
            		 
            	lemma "False indicates option_selected_to_active transition is reachable" : 
-           		 sub.option_selected_to_active;	
+           		 not sub.option_selected_to_active;	
            		 
            	lemma "False indicates active_to_completed transition is reachable" : 
-           		 sub.active_to_completed;	
+           		 not sub.active_to_completed;	
            		 
            	lemma "False indicates completed_to_idle transition is reachable" : 
-           		 sub.completed_to_idle;	
+           		  not sub.completed_to_idle;	
            		 
            	lemma "True if only stated transitions are executed (no missing transitions)." :
                 sub.some_transition or sub.state = sub.previous_state;	
