@@ -28,22 +28,25 @@ public
 			-- These lemmas could be captured in SpeAR as observers (without the negation)
 			
 			--Check that all states are reachable
-			lemma "False indicates State1 reachable" : not (sub.state = sub.STATE1);
-			lemma "False indicates State2 reachable" : not (sub.state = sub.STATE1);
+			lemma "False (expected) indicates State1 reachable" : not (sub.state = sub.STATE1);
+			lemma "False (expected) indicates State2 reachable" : not (sub.state = sub.STATE1);
 				
 			--Check that all state transitions are reachable
-			lemma "False indicates that one_to_two is reachable" : not sub.one_to_two;
-			lemma "False indicates that two_to_one is reachable": not sub.two_to_one;
+			lemma "False (expected) indicates that one_to_two is reachable" : not sub.one_to_two;
+			lemma "False (expected) indicates that two_to_one is reachable": not sub.two_to_one;
 			
 			--Check if the output_var can be more than one value
-			lemma "True indicates the internal out_var (tracking output) can only be constant, an inadvertent output space constraint (an ERROR)" :
-				sub.out_var = pre(sub.out_var);
+			lemma "True (ERROR) indicates the internal out_var (tracking output) can only be constant, an inadvertent output space constraint" :
+				true -> sub.out_var = pre(sub.out_var);
 			
-			lemma "True indicates the output can only be constant, an inadvertent output space constraint (an ERROR)" :
+			lemma "True (ERROR) indicates the output can only be constant, an inadvertent output space constraint" :
 				true -> sub.output = pre(sub.output);
 				
-			lemma "True indicates output and out_var are synched (expected)" :
-				sub.output = sub.out_var;
+			lemma "True (ERROR) indicates internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
+				true -> sub.state = sub.STATE2 => sub.out_var = pre(sub.out_var);
+				
+			lemma "True (expected) indicates output and out_var are synched when an output is generated" :
+				true -> event(sub.output) => sub.output = sub.out_var;
 		**};
 		 
 	end top_level.Impl;	
@@ -56,7 +59,7 @@ public
        	annex agree{**
        		eq state : int;
 
-       		eq out_var : int = output -> output;
+       		eq out_var : int;
        		
        		--Task States
        		const STATE1 : 			int = 1;
@@ -97,6 +100,27 @@ public
    				out_var = output
    			else
    				out_var = pre(out_var);
+			--Alternative erroneous conifguration (not caught by some lemmas)
+--   			two_to_one =>
+--   				state = STATE2 and
+--   				out_var = output;
+   			
+   			--- Proposed Solution Idiom Below ---
+   
+--   			guarantee "If not transitioning, the out_var should not change" :
+--   				not one_to_two and not two_to_one =>
+--   					out_var = pre(out_var);
+--   					
+--   			guarantee "State 1 to 2" :
+--   			one_to_two =>
+--   				state = STATE2 and
+--   				out_var = output;
+--   				
+--   			guarantee "State 2 to 1" :
+--   			two_to_one =>
+--   				state = STATE2 and
+--   				out_var = output;
+
    
        	**};
        	
