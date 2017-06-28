@@ -242,6 +242,9 @@ private:
     
     /// a list of karl files to evaluate after controller initialization
     std::vector <std::string> m_karlFiles;
+
+    /// the vehicle speed
+    double m_vehicleSpeed = 22.0;
 };
 
 }; //namespace service

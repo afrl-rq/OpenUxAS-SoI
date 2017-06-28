@@ -654,8 +654,16 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
     for (pugi::xml_node currentXmlNode = serviceXmlNode.first_child();
          currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
+        // if we need to read vehicle details
+        if (std::string("Vehicle") == currentXmlNode.name())
+        {
+            if (!currentXmlNode.attribute("Speed").empty())
+            {
+                m_vehicleSpeed = currentXmlNode.attribute("Speed").as_double();
+            }
+        }
         // if we need to load initial knowledge
-        if (std::string("Knowledge") == currentXmlNode.name())
+        else if (std::string("Knowledge") == currentXmlNode.name())
         {
             if (!currentXmlNode.attribute("BinaryFile").empty())
             {
@@ -999,7 +1007,7 @@ GamsService::sendWaypoint (const gams::pose::Position & location,
         nextPoint = new afrl::cmasi::Waypoint ();
         nextPoint->setNumber(1);
         nextPoint->setNextWaypoint(1);
-        nextPoint->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
+        nextPoint->setSpeed(m_vehicleSpeed);  // TODO: get from AirVehicleConfiguration
     }
     
     nextPoint->setLatitude(location.lat());
