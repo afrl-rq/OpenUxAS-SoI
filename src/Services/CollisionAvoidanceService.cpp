@@ -711,6 +711,9 @@ namespace dmpl
                 return Integer(0);
             }
 
+            /***********************************/
+            //-- update xf and yf
+            /***********************************/
             void thread0_NEXT_WP ()
             {
                 //-- update list of waypoints. make sure you get the lock.
@@ -730,6 +733,10 @@ namespace dmpl
                 std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
             }
     
+            
+            /***********************************/
+            //-- update xp and yp
+            /***********************************/
             KnowledgeRecord
             thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars)
             {
