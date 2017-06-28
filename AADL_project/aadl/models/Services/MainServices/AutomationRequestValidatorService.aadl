@@ -32,10 +32,10 @@ public
 				sub.state = sub.BUSY;	
 				
 			lemma "False indicates idle_to_busy transition is reachable" : 
-           		 sub.idle_to_busy;
+           		 not sub.idle_to_busy;
            		 
            	lemma "False indicates busy_to_idle transition is reachable" : 
-           		 sub.busy_to_idle;	
+           		 not sub.busy_to_idle;	
            		 
            	lemma "True if only stated transitions are executed (no missing transitions)." :
                 sub.some_transition or sub.state = sub.previous_state;	
