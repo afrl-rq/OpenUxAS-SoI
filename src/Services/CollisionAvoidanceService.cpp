@@ -694,7 +694,10 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
             {
                 return Integer(0);
             }
-            thread0_lock[id][thread0_x][thread0_y] = Integer (0);
+            if(thread0_x != thread0_xp || thread0_y != thread0_yp)
+            {
+                thread0_lock[id][thread0_x][thread0_y] = Integer (0);
+            }
             thread0_x = thread0_xp;
             thread0_y = thread0_yp;
             thread0_state = NEXT;
