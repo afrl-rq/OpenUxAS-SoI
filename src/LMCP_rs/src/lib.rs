@@ -236,10 +236,10 @@ pub trait HasSearchTask {
 #[repr(C)]
 pub struct SearchTask {
     base: Task,
-    desired_wavelength_bands: *mut WavelengthBand,
-    desired_wavelength_bands_len: size_t,
-    dwell_time: int64_t,
-    ground_sample_distance: c_float,
+    pub desired_wavelength_bands: *mut WavelengthBand,
+    pub desired_wavelength_bands_len: size_t,
+    pub dwell_time: int64_t,
+    pub ground_sample_distance: c_float,
 }
 
 impl<T> HasTask for T where T: HasSearchTask {
