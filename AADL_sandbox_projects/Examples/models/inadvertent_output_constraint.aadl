@@ -36,13 +36,17 @@ public
 			lemma "False (expected) indicates that two_to_one is reachable": not sub.two_to_one;
 			
 			--Check if the output_var can be more than one value
-			lemma "True (ERROR) indicates the internal out_var (tracking output) can only be constant, an inadvertent output space constraint" :
-				true -> sub.out_var = pre(sub.out_var);
 			
-			lemma "True (ERROR) indicates the output can only be constant, an inadvertent output space constraint" :
+			lemma "True (ERROR) Test1: indicates the output can only be constant, an inadvertent output space constraint" :
 				true -> sub.output = pre(sub.output);
 				
-			lemma "True (ERROR) indicates internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
+			lemma "True (ERROR) Test2: indicates the output can only be constant, an inadvertent output space constraint" :
+				true -> event(sub.output) => sub.output = pre(sub.output);
+				
+			lemma "True (ERROR) Test1: indicates the internal out_var (tracking output) can only be constant, an inadvertent output space constraint" :
+				true -> sub.out_var = pre(sub.out_var);
+				
+			lemma "True (ERROR) Test2: indicates the internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
 				true -> sub.state = sub.STATE2 => sub.out_var = pre(sub.out_var);
 				
 			lemma "True (expected) indicates output and out_var are synched when an output is generated" :
@@ -96,13 +100,13 @@ public
    				
    			guarantee "State 2 to 1" :
    			if two_to_one then
-   				state = STATE2 and
+   				state = STATE1 and
    				out_var = output
    			else
    				out_var = pre(out_var);
-			--Alternative erroneous conifguration (not caught by some lemmas)
+--			--Alternative erroneous conifguration (not caught by some lemmas)
 --   			two_to_one =>
---   				state = STATE2 and
+--   				state = STATE1 and
 --   				out_var = output;
    			
    			--- Proposed Solution Idiom Below ---
@@ -118,7 +122,7 @@ public
 --   				
 --   			guarantee "State 2 to 1" :
 --   			two_to_one =>
---   				state = STATE2 and
+--   				state = STATE1 and
 --   				out_var = output;
 
    
