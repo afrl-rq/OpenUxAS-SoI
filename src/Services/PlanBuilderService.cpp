@@ -78,7 +78,6 @@ PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
     {
         auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_currentEntityStates[entityState->getID()] = entityState;
-        std::cout << " # PlanBuilder caching state for AirVehicle " << entityState->getID() << std::endl;
     }
     else if(afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object))
     {
