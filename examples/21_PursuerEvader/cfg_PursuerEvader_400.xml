@@ -25,6 +25,7 @@
     -->
     <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
     <Service Type="GamsService" >
+        <Vehicle Speed="50.0"/>
         <Knowledge KarlFile="" BinaryFile="" />
         <Logging>
             <Madara File="GamsService.log" Level="1"/>
