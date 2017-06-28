@@ -188,7 +188,7 @@ executable(
       'src/Includes',
       'src/Services',
       '3rd/cppzmq-4.2.1',
-      '3rd/zeromq-4.1.1/include',
+      '3rd/zeromq-4.1.6/include',
       '3rd/PugiXML/src',
       '3rd/sqlite-amalgamation-3120200',
       '3rd/SQLiteCpp-1.3.1/include',
