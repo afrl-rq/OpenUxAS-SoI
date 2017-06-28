@@ -701,6 +701,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
             thread0_x = thread0_xp;
             thread0_y = thread0_yp;
             thread0_state = NEXT;
+            std::cerr << "current waypoint cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
         }
       }
     }
