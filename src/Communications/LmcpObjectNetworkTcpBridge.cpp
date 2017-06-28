@@ -81,7 +81,7 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
 
     if (isSuccess)
     {
-        if (!bridgeXmlNode.attribute("ConsiderSelfGenerated"))
+        if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
         {
             m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
             UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
