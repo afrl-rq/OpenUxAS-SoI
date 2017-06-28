@@ -53,9 +53,10 @@ void print_state(int _X,int _Y,int id, int x, int y, int xf, int yf)
     xi = x; yi = y;
   }
 
-  for(int i = 0;i < 150;++i) printf("\n");
+  //for(int i = 0;i < 150;++i) printf("\n");
   
-  printf("round = %d : id = %d\n", ++roundNum, id);
+  printf("round = %d : id = %d x = %d y = %d xf = %d yf = %d\n", ++roundNum, id, x, y, xf, yf);
+  /*
   printf("_X = %d _Y = %d\n",_X,_Y);
   print_line(_X);
   for(int i = 0;i < _Y;++i) {
@@ -69,6 +70,7 @@ void print_state(int _X,int _Y,int id, int x, int y, int xf, int yf)
     printf("\n");
     print_line(_X);
   }
+  */
 }
 
 
@@ -612,7 +614,7 @@ thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables
 {
 
   //-- Declare local (parameter and temporary) variables
-
+  //print_state(10,10,id, thread0_x, thread0_y, thread0_xf, thread0_yf);
 
   //-- Begin function body
   {
