@@ -59,6 +59,9 @@ check_headers = [
 foreach h : check_headers
   if cpp.has_header(h.get(1))
     cdata.set(h.get(0), 1)
+    if h.get(0) == 'HAVE_SYS_EVENTFD_H'
+      cpp_args += ['-DZMQ_HAVE_EVENTFD']
+    endif
   endif
 endforeach
 

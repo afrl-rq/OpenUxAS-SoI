@@ -209,6 +209,10 @@ echo "Preparing UxAS specific patches to external libraries..."
 ./prepare
 echo "*** Note that ./prepare will need to be run again any time a file is modified in one of the /3rd/wrap_patches subdirectories or the /3rd/*.wrap.tmpl files, or any time you move or rename your source tree. ***"
 
+if [ ! -d "$WORKSPACEDIR/OpenUxAS/build" ]; then # if build directory doesn't exist, meson wasn't run yet
+    FIRST_TIME=1
+fi
+
 if [ $FIRST_TIME -eq 1 ]; then
     cd $WORKSPACEDIR/OpenUxAS
     echo "Performing first build of OpenUxAS..."
