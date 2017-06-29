@@ -5,6 +5,63 @@
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
     </Bridge>
+
+    <!-- Send every message from zeromq bus to an external program -->
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://*:9999" Server="TRUE">
+        <SubscribeToMessage MessageType="a" />
+        <SubscribeToMessage MessageType="b" />
+        <SubscribeToMessage MessageType="c" />
+        <SubscribeToMessage MessageType="d" />
+        <SubscribeToMessage MessageType="e" />
+        <SubscribeToMessage MessageType="f" />
+        <SubscribeToMessage MessageType="g" />
+        <SubscribeToMessage MessageType="h" />
+        <SubscribeToMessage MessageType="i" />
+        <SubscribeToMessage MessageType="j" />
+        <SubscribeToMessage MessageType="k" />
+        <SubscribeToMessage MessageType="l" />
+        <SubscribeToMessage MessageType="m" />
+        <SubscribeToMessage MessageType="n" />
+        <SubscribeToMessage MessageType="o" />
+        <SubscribeToMessage MessageType="p" />
+        <SubscribeToMessage MessageType="q" />
+        <SubscribeToMessage MessageType="r" />
+        <SubscribeToMessage MessageType="s" />
+        <SubscribeToMessage MessageType="t" />
+        <SubscribeToMessage MessageType="u" />
+        <SubscribeToMessage MessageType="v" />
+        <SubscribeToMessage MessageType="w" />
+        <SubscribeToMessage MessageType="x" />
+        <SubscribeToMessage MessageType="y" />
+        <SubscribeToMessage MessageType="z" />
+        <SubscribeToMessage MessageType="A" />
+        <SubscribeToMessage MessageType="B" />
+        <SubscribeToMessage MessageType="C" />
+        <SubscribeToMessage MessageType="D" />
+        <SubscribeToMessage MessageType="E" />
+        <SubscribeToMessage MessageType="F" />
+        <SubscribeToMessage MessageType="G" />
+        <SubscribeToMessage MessageType="H" />
+        <SubscribeToMessage MessageType="I" />
+        <SubscribeToMessage MessageType="J" />
+        <SubscribeToMessage MessageType="K" />
+        <SubscribeToMessage MessageType="L" />
+        <SubscribeToMessage MessageType="M" />
+        <SubscribeToMessage MessageType="N" />
+        <SubscribeToMessage MessageType="O" />
+        <SubscribeToMessage MessageType="P" />
+        <SubscribeToMessage MessageType="Q" />
+        <SubscribeToMessage MessageType="R" />
+        <SubscribeToMessage MessageType="S" />
+        <SubscribeToMessage MessageType="T" />
+        <SubscribeToMessage MessageType="U" />
+        <SubscribeToMessage MessageType="V" />
+        <SubscribeToMessage MessageType="W" />
+        <SubscribeToMessage MessageType="X" />
+        <SubscribeToMessage MessageType="Y" />
+        <SubscribeToMessage MessageType="Z" />
+    </Bridge>
+
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
