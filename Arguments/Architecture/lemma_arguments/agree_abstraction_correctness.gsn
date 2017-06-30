@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15cf9c05961"
+        name="AGREE Abstraction Correctness">
+      All entity abstractions within {component} correctly abstract the entity behavior and characteristics.
+
+      <c
+          id="__gsn__15cf9c31dad"
+          name="Context">
+        {Definition of entity abstraction}
+      </c>
+
+      <s
+          id="__gsn__15cf9c1cc9e"
+          name="Strategy">
+        Argue each individual entity abstraction is correct and that the complete set is assessed.
+
+        <c
+            id="__gsn__15cf9c3b4ef"
+            name="Context">
+          {component entity abstractions}
+        </c>
+
+        <g
+            id="__gsn__15cf9c1d8bd"
+            repeat="true"
+            name="{Entity Abstraction} is Correct">
+
+          <s
+              id="__gsn__15cf9c7e6e8"
+              optional="true"
+              name="Evidence Scheme">
+            {AGREE lemma idiom for {entity abstraction type} }
+
+            <c
+                id="__gsn__15cf9c8b5ac"
+                name="Context">
+              {idiom documentation}
+            </c>
+
+            <e
+                id="__gsn__15cf9c8630c"
+                name="Evidence">
+              {AGREE lemma proof}
+            </e>
+
+            <comment
+                id="__gsn__15cf9c8bacc"
+                name="Rodes">
+              Consider for example the possibility of defining idioms for how to correctly model queue abstractions.
+            </comment>
+          </s>
+
+          <s
+              id="__gsn__15cf9c9620e"
+              optional="true"
+              name="Evidence Scheme">
+            {manual inspection}
+
+            <e
+                id="__gsn__15cf9cafc33"
+                name="Evidence">
+              {manual assessment report}
+            </e>
+
+            <comment
+                id="__gsn__15cf9c9a82c"
+                name="Rodes">
+              Consider where entire behaviors are abstraction out, like array operations, and replaced with an “uninterpreted function”-like idiom returning a boolean. The boolean (representing performing an action or a specific event) cannot be formally assessed in anyway as the abstraction is too abstract.
+            </comment>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15cf9c3de4f"
+            name="Entity Abstraction Set Completeness">
+          The set of component entity abstractions assessed is complete.
+
+          <s
+              id="__gsn__15cf9c4c4db"
+              name="Evidence Scheme">
+            {manual inspection}
+
+            <e
+                id="__gsn__15cf9c4a7e2"
+                name="Evidence">
+              {manual inspection}
+            </e>
+          </s>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>

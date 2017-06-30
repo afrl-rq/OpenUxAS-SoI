@@ -74,7 +74,8 @@ public
             TaskTracker: thread TaskTrackerService_Pkg::TaskTrackerService;
             
             RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
-        connections
+    	connections
+    		
             conn0: port AngledAreaSearchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn1: port AssignmentCoordinatorTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn2: port BlockadeTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
@@ -146,6 +147,7 @@ public
             conn66: port PlanBuilderService.UniqueAutomationResponse_out -> OverwatchTask.UniqueAutomationResponse_in;
             conn67: port PlanBuilderService.UniqueAutomationResponse_out -> PatternSearchTask.UniqueAutomationResponse_in;
             conn69: port AssignmentCoordinatorTask.TaskAutomationRequest_out -> AutomationRequestValidatorService.TaskAutomationRequest_in;
+   
             conn70: port AngledAreaSearchTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
             conn71: port AssignmentCoordinatorTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
             conn72: port BlockadeTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
@@ -160,6 +162,7 @@ public
             conn81: port MultiVehicleWatchTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
             conn82: port OverwatchTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
             conn83: port PatternSearchTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+
             conn85: port AngledAreaSearchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
             conn86: port AssignmentCoordinatorTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
             conn87: port BlockadeTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
@@ -172,6 +175,7 @@ public
             conn97: port MultiVehicleWatchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
             conn98: port OverwatchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
             conn99: port PatternSearchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
+            
             conn101: port TaskManagerService.CreateNewService_out -> AngledAreaSearchTask.CreateNewService_in;
             conn102: port TaskManagerService.CreateNewService_out -> AssignmentCoordinatorTask.CreateNewService_in;
             conn103: port TaskManagerService.CreateNewService_out -> BlockadeTask.CreateNewService_in;
@@ -221,6 +225,7 @@ public
             conn149: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> MultiVehicleWatchTask.UniqueAutomationRequest_in;
             conn150: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> OverwatchTask.UniqueAutomationRequest_in;
             conn151: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PatternSearchTask.UniqueAutomationRequest_in;
+
             conn153: port AutomationRequestValidatorService.AutomationResponse_out -> TaskManagerService.AutomationResponse_in;
             conn154: port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService1.AutomationResponse_in;
             conn2154: port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService2.AutomationResponse_in;
@@ -228,10 +233,11 @@ public
             conn156: port AutomationRequestValidatorService.AutomationResponse_out -> TaskTracker.AutomationResponse_in;
             conn157: port AssignmentCoordinatorTask.AutomationResponse_out -> TaskManagerService.AutomationResponse_in;
             conn158: port AssignmentCoordinatorTask.AutomationResponse_out -> WaypointPlanManagerService1.AutomationResponse_in;
-            conn2158: port AssignmentCoordinatorTask.AutomationResponse_out -> WaypointPlanManagerService2.AutomationResponse_in;
+            conn2158: port AssignmentCoordinatorTask.AutomationResponse_out -> WaypointPlanManagerService2.AutomationResponse_in;   
             conn159: port AssignmentCoordinatorTask.AutomationResponse_out -> EscortTask.AutomationResponse_in;
             conn160: port AssignmentCoordinatorTask.AutomationResponse_out -> TaskTracker.AutomationResponse_in;
-            conn161: port PlanBuilderService.TaskImplementationRequest_out -> AngledAreaSearchTask.TaskImplementationRequest_in;
+            
+            conn161: port PlanBuilderService.TaskImplementationRequest_out -> AngledAreaSearchTask.TaskImplementationRequest_in;            
             conn162: port PlanBuilderService.TaskImplementationRequest_out -> AssignmentCoordinatorTask.TaskImplementationRequest_in;
             conn163: port PlanBuilderService.TaskImplementationRequest_out -> BlockadeTask.TaskImplementationRequest_in;
             conn164: port PlanBuilderService.TaskImplementationRequest_out -> CmasiAreaSearchTask.TaskImplementationRequest_in;
@@ -253,30 +259,20 @@ public
         	prove rate_monotonic_schedulable()
             prove isolation(this) 
         **};
-        annex agree {**
+--        annex agree {**
         	-- We use AGREE connections to assert true for the cases where an 
         	--  input port is fed by multiple sources.
         	-- Note: AGREE will assume arbitrary values for the input ports on 
         	--  these connections. Refinements may be needed to prove system-level 
         	--  guarantees involving these ports.
-        	connection conn0: true;
-        	connection conn1: true;
-        	connection conn2: true;
-        	connection conn3: true;
-        	connection conn4: true;
-        	connection conn5: true;
-        	connection conn6: true;
-        	connection conn7: true;
-        	connection conn8: true;
-        	connection conn9: true;
-        	connection conn10: true;
-        	connection conn11: true;
-        	connection conn12: true;
-        	connection conn13: true;
-        **};
+        	
+        	--We don't have any of these currently because we only need them when
+        	-- both the source and destination components for multiple fan-in have 
+        	-- AGREE contracts.
+        	
+--        	connection connXYZ: true;
+--        **};
             
     end waterways.i;
-
-
 
 end Waterways;

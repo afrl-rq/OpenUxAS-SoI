@@ -1,0 +1,418 @@
+---------------------------------------
+-- This version of the RouteAggregatorService only services one 
+--   RouteRequest at a time. That is a simplifying assumption 
+--   in order to develop a more robust contract. The plan is
+--   to use what we can in the version that serves multiple route requests
+--   after it is fleshed out here. There will likely be some guarantees we
+--   can no longer express in the multiple-request version, so we may keep
+--   this version around as well for experimentation at the higher level.
+---------------------------------------
+
+package RouteAggregatorService_OneRequestAtATime_Pkg
+
+public
+	with CMASI;
+    with UXTASK;
+    with IMPACT;
+    with ROUTE;
+    with UxAS_Node_Lib;
+    with Base_Types;
+
+	data Int_to_Bool_3_by_3_Table_Type
+	end Int_to_Bool_3_by_3_Table_Type;
+	
+	data implementation Int_to_Bool_3_by_3_Table_Type.Impl
+		subcomponents
+			ID1: data Base_Types::Integer;
+			ID2: data Base_Types::Integer;
+			ID3: data Base_Types::Integer;
+			sent_ID1: data Base_Types::Boolean;
+			sent_ID2: data Base_Types::Boolean;
+			sent_ID3: data Base_Types::Boolean;
+			recd_ID1: data Base_Types::Boolean;
+			recd_ID2: data Base_Types::Boolean;
+			recd_ID3: data Base_Types::Boolean;
+	end Int_to_Bool_3_by_3_Table_Type.Impl;
+
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		features
+			RouteRequest_in: in event data port route::RouteRequest.i;
+		annex agree {**
+			--The eqs are used to access data internal to the subcomponent(s).
+			-- In this case, I need them to state an assumption at this level to 
+			--  satisfy the subcomponent's assumption.  
+			eq sub_previous_state : int;
+			eq sub_IDLE : int;
+			assume "A new RouteRequest is only received when the subcomponent is in IDLE.":
+				event(RouteRequest_in) => (sub_previous_state = sub_IDLE);
+		**};	
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread RouteAggregatorService_OneRequestAtATime; 
+		connections
+			conn00: port RouteRequest_in -> sub.RouteRequest_in;
+		annex agree {**
+			assign sub_previous_state = sub.previous_state;
+			assign sub_IDLE = sub.IDLE;
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as properties
+			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
+			
+			lemma "ResponseID matches the RequestID" : 
+				event(sub.RouteResponse_out) => 
+				(sub.RouteResponse_out.ResponseID = sub.RouteRequest_being_serviced.RequestID);
+			
+			--Q: Is there a situation where we need to re-send a message?   
+			lemma "We don't send more messages than the size of the VehicleID array":
+				sub.num_of_route_plan_requests_out <= sub.size_of_VehicleID_array;
+			
+			--State machine lemmas
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.state = sub.IDLE) 
+				or (sub.state = sub.PENDING);
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.state = sub.previous_state);	
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
+			
+			--Check that all states are reachable
+			lemma "False indicates the IDLE state is reachable" : not (sub.state = sub.IDLE); 
+			lemma "False indicates the PENDING state is reachable" : not (sub.state = sub.PENDING);
+			
+			--Check that all state transitions are reachable
+			lemma "False indicates that T_IDLE_TO_PENDING is reachable" : not sub.T_IDLE_TO_PENDING;
+			lemma "False indicates that T_PENDING_TO_IDLE is reachable": not sub.T_PENDING_TO_IDLE;
+			
+			--Check that events are possible
+			lemma "False indicates the system is able to produce a route response" : not event(sub.RouteResponse_out);
+			lemma "False indicates the system is able to produce a route plan request" : not event(sub.RoutePlanRequest_out);
+			lemma "False indicates the system is able to receive a route plan response": not event(sub.RouteRequest_in);
+			lemma "False indicates the system is able to receive a route request": not event(sub.RoutePlanResponse_in);
+		**};
+		 
+	end top_level.Impl;	
+	
+thread RouteAggregatorService_OneRequestAtATime
+    features
+        GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+        SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+        AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+        RouteRequest_in: in event data port route::RouteRequest.i;
+        GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+        UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+        RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
+        SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+        TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
+        AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+        RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
+        AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i;
+        RouteResponse_out: out event data port route::RouteResponse.i;
+   	annex agree{**
+   		-------------------------------------------------------------
+   		-- Note: I'm not sure we need to model this IDLE <--> PENDING state machine,
+   		--  but I'm keeping it for now. This is described in the Wiki.
+   		--  We're not yet sure if we'll want to refer to this service's state in our system-level
+   		--  guarantees.
+  		-------------------------------------------------------------
+  		-- BEGIN STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		--State constants
+ 		const IDLE : int = 0;
+        const PENDING : int = 1;
+
+		-------------------------------------------------------------
+		--State variable
+		eq state: int;
+
+		-------------------------------------------------------------
+		--State machine support macros		
+
+		eq previous_state: int = prev(state, IDLE);
+
+		eq some_transition: bool = T_IDLE_TO_PENDING
+									or T_PENDING_TO_IDLE;
+
+		-------------------------------------------------------------
+		--Helper macro for this particular state machine
+		eq num_route_requests_being_serviced : int = 
+			0 -> 
+				(pre(num_route_requests_being_serviced) 
+					+ UxAS_Node_Lib.bool_to_int(event(RouteRequest_in)) 
+					- UxAS_Node_Lib.bool_to_int(event(RouteResponse_out))
+				);
+				
+		-------------------------------------------------------------	
+		--State transition macros
+		
+		--This is initially false to prevent transition to PENDING on the initial timestep
+		--Note: The documentation seems to say we also need to create a table and send the RoutePlanRequest messages
+		--  before moving to IDLE. We could possibly introduce another state between IDLE and PENDING for "setup"; 
+		--  but since I'm not modeling those details currently, I think it's okay to move to PENDING as soon as we receive
+		--  RouteRequest_in.
+		eq T_IDLE_TO_PENDING : bool = 
+			false -> ((previous_state = IDLE) and event(RouteRequest_in));
+		
+		--Since we may be servicing multiple requests at a time, we stay in pending until all requests have been 
+		-- serviced, in which case we return to IDLE
+		eq T_PENDING_TO_IDLE : bool = 
+			(previous_state = PENDING) and (num_route_requests_being_serviced = 0);
+			
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+		--This guarantee specifies the initial state.
+        guarantee "Initial_State": (state = IDLE) -> true;
+        
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (state = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_IDLE_TO_PENDING_effect" : T_IDLE_TO_PENDING => (state = PENDING);
+        
+        guarantee "T_PENDING_TO_IDLE_effect" : T_PENDING_TO_IDLE => (state = IDLE);
+
+		-------------------------------------------------------------
+		-- END STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		
+		-------------------------------------------------------------
+		-------------------------------------------------------------		
+		--Simplifying assumption for this version of the RouteAggregatorService
+		
+		-- We don't receive a new RouteRequest until after we've responded to
+		--  the one we're servicing.
+		assume "A new RouteRequest is only received when in IDLE.":
+			event(RouteRequest_in) => (previous_state = IDLE);
+	
+		-------------------------------------------------------------
+		-------------------------------------------------------------
+		-- The guarantees in this section capture correct component behavior.
+		-- The set is still not complete though.
+		
+		guarantee "Only produce a route response when previous state was PENDING": 
+			event(RouteResponse_out) => (previous_state = PENDING);
+	
+		guarantee "Only produce a route plan request when the previous state was PENDING": 
+			event(RoutePlanRequest_out) => (previous_state = PENDING);	
+
+		--Store the route request being service since it could change (without an event)
+		--  on the next timestep.
+		eq RouteRequest_being_serviced : route::RouteRequest.i =
+			if event(RouteRequest_in) then RouteRequest_in
+			else pre(RouteRequest_being_serviced);
+		
+		guarantee "Contents of route plan requests match contents of route request (execept VehicleID and RequestID)" :
+			event(RoutePlanRequest_out) =>
+				((RoutePlanRequest_out.AssociatedTaskID = RouteRequest_being_serviced.AssociatedTaskID)
+					and (RoutePlanRequest_out.OperatingRegion = RouteRequest_being_serviced.OperatingRegion)
+					and (RoutePlanRequest_out.RouteRequests = RouteRequest_being_serviced.RouteRequests)
+					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
+				);
+
+		-- Should we pick a time window so that we can state the following property? 
+		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
+		--   We would need to assume that the route planners respond in a timely manner
+		--   in order to guarantee that. 	
+		
+		-- We may want to add a guarantee about sending the route plan requests within some
+		--  timeframe. For now, as modeled, this service could sit on them forever. 
+		-------------------------------------------------------------
+		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
+
+		-- The locations and destinations (first and last waypoints) of the route plans in the responses should match the requests, or an error should be produced.
+		-- This is something the route planners should guarantee, and we could check that the originator of the RouteRequst receives 
+		-- routes that satisfy this if we could guarantee that this RouteAggregator Service passed on the routes from the planners without
+		-- modifying them, but we can't do that without building the array of responses or changing the data structure (interface)
+		-- somehow.
+		eq route_response_consists_of_route_plan_responses_received : bool;
+		guarantee "The routes in RouteResponse_out are the route plan responses received." :
+			route_response_consists_of_route_plan_responses_received;
+		
+		eq route_plan_request_sent_for_each_vehicleID : bool;	
+		guarantee "For each vehicle ID in the VehicleID array of the route request, a route plan request message is sent
+		    with a matching Vehicle ID (and the rest of the contents the same)":
+		    route_plan_request_sent_for_each_vehicleID;
+		
+		eq size_of_VehicleID_array : int = 3; --hard-coded to three for this version
+		
+		eq num_of_route_plan_requests_out : int = if (state = IDLE) 
+													then 0 
+													else ((0 -> pre(num_of_route_plan_requests_out)) 
+														+ UxAS_Node_Lib.bool_to_int(event(RoutePlanRequest_out))
+													);
+		
+		-------------------------------------------------------------
+		-- The guarantees below this line depend on some internal state. Do we want to keep them? They seem important for 
+		--   correctness, but also force us to pick a fixed size for the VehicleID array, etc.
+		
+		-- I want to model the notion of storing route plan responses and, after receiving them all,
+		--  sending the route response. To do that I need some internal state. I'm using a table, which is also
+		--  mentioned in the Wiki for this service.  
+		--  Due to the limitations of the modeling environment, I need to pick a fixed size for that table.
+		--  The size of the table corresponse to the number of VehicleIDs in RouteRequest_in, which I don't
+		--  know given our current data types. (It's a flexible size.)
+		-- So, for now, let's assume each incoming RouteRequest has 3 vehicle IDs (so we produce 3 RoutePlanRequests).
+		-- I'm also hard-coding the RequestIDs for this version to be 1, 2, and 3. This is easier to model for the time being.
+		-- We can make it more flexible later if we decide to keep this table approach to modeling.
+		
+		eq table_of_route_plan_responses_received : RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.Impl;
+		
+		const INIT_TABLE_OF_ROUTE_PLAN_RESPONSES_RECEIVED: RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.impl =
+			RouteAggregatorService_OneRequestAtATime_Pkg::Int_to_Bool_3_by_3_Table_Type.impl
+				{
+					ID1 = 1;
+					ID2 = 2;
+					ID3 = 3;
+					sent_ID1 = false;
+					sent_ID2 = false;
+					sent_ID3 = false;
+					recd_ID1 = false;
+					recd_ID2 = false;
+					recd_ID3 = false
+				}; 
+
+		guarantee "Intial table for a new route request" :
+			event(RouteRequest_in) =>  
+				table_of_route_plan_responses_received = INIT_TABLE_OF_ROUTE_PLAN_RESPONSES_RECEIVED;
+						
+		guarantee "Table IDs stay the same until a new RouteRequest is received." :
+			not event(RouteRequest_in) => 
+				((table_of_route_plan_responses_received.ID1 = 
+						(0 -> pre(table_of_route_plan_responses_received.ID1)))
+					and (table_of_route_plan_responses_received.ID2 = 
+							(0 -> pre(table_of_route_plan_responses_received.ID2)))
+					and (table_of_route_plan_responses_received.ID3 = 
+							(0 -> pre(table_of_route_plan_responses_received.ID3)))
+				);						
+
+		guarantee "Update Table Entry for ID1 Sent":
+			if (previous_state = PENDING)
+				then if (event(RoutePlanRequest_out) 
+							and (RoutePlanRequest_out.RequestID = 
+								table_of_route_plan_responses_received.ID1))
+						then (table_of_route_plan_responses_received.sent_ID1) --set to true
+						else (table_of_route_plan_responses_received.sent_ID1 = 
+							(false -> pre(table_of_route_plan_responses_received.sent_ID1)))
+				else (table_of_route_plan_responses_received.sent_ID1 = 
+					(false -> pre(table_of_route_plan_responses_received.sent_ID1)));
+
+		guarantee "Update Table Entry for ID2 Sent":
+			if (previous_state = PENDING)
+				then if (event(RoutePlanRequest_out) 
+							and (RoutePlanRequest_out.RequestID = 
+								table_of_route_plan_responses_received.ID2))
+						then (table_of_route_plan_responses_received.sent_ID2) --set to true
+						else (table_of_route_plan_responses_received.sent_ID2 = 
+							(false -> pre(table_of_route_plan_responses_received.sent_ID2)))
+				else (table_of_route_plan_responses_received.sent_ID2 = 
+					(false -> pre(table_of_route_plan_responses_received.sent_ID2)));
+
+		guarantee "Update Table Entry for ID3 Sent":
+			if (previous_state = PENDING)
+				then if (event(RoutePlanRequest_out) 
+							and (RoutePlanRequest_out.RequestID = 
+								table_of_route_plan_responses_received.ID3))
+						then (table_of_route_plan_responses_received.sent_ID3) --set to true
+						else (table_of_route_plan_responses_received.sent_ID3 = 
+							(false -> pre(table_of_route_plan_responses_received.sent_ID3)))
+				else (table_of_route_plan_responses_received.sent_ID3 = 
+					(false -> pre(table_of_route_plan_responses_received.sent_ID3)));
+		
+		-- Q: Is the ID enough to ensure the message is the response we're expecting? Do we have any system-level
+		--  guarantees about uniqueness of these IDs? 
+											
+		guarantee "Update Table Entry for ID1 Received": 
+			if (previous_state = PENDING)
+				then if (event(RoutePlanResponse_in) 
+							and (RoutePlanResponse_in.ResponseID = 
+								table_of_route_plan_responses_received.ID1)
+							--check that the corresponding request has already been sent (no responses before request)
+							and (pre(table_of_route_plan_responses_received.sent_ID1))) 
+					then (table_of_route_plan_responses_received.recd_ID1) --set to true
+					else (table_of_route_plan_responses_received.recd_ID1 = 
+						(false -> pre(table_of_route_plan_responses_received.recd_ID1)))
+				else (table_of_route_plan_responses_received.recd_ID1 = 
+					(false -> pre(table_of_route_plan_responses_received.recd_ID1)));
+
+		guarantee "Update Table Entry for ID2 Received": 
+			if (previous_state = PENDING)
+				then if (event(RoutePlanResponse_in) 
+							and (RoutePlanResponse_in.ResponseID = 
+								table_of_route_plan_responses_received.ID2)
+							--check that the corresponding request has already been sent (no responses before request)
+							and (pre(table_of_route_plan_responses_received.sent_ID2))) 
+					then (table_of_route_plan_responses_received.recd_ID2) --set to true
+					else (table_of_route_plan_responses_received.recd_ID2 = 
+						(false -> pre(table_of_route_plan_responses_received.recd_ID2)))
+				else (table_of_route_plan_responses_received.recd_ID2 = 
+					(false -> pre(table_of_route_plan_responses_received.recd_ID2)));
+
+		guarantee "Update Table Entry for ID3 Received": 
+			if (previous_state = PENDING)
+				then if (event(RoutePlanResponse_in) 
+							and (RoutePlanResponse_in.ResponseID = 
+								table_of_route_plan_responses_received.ID3)
+							--check that the corresponding request has already been sent (no responses before request)
+							and (pre(table_of_route_plan_responses_received.sent_ID3))) 
+					then (table_of_route_plan_responses_received.recd_ID3) --set to true
+					else (table_of_route_plan_responses_received.recd_ID3 = 
+						(false -> pre(table_of_route_plan_responses_received.recd_ID3)))
+				else (table_of_route_plan_responses_received.recd_ID3 = 
+					(false -> pre(table_of_route_plan_responses_received.recd_ID3)));
+	
+		guarantee "Produce route response output with matching ID once all route plan responses have been received" :
+			if (pre(state = PENDING) 
+				and (false -> pre(table_of_route_plan_responses_received.recd_ID1))
+				and (false -> pre(table_of_route_plan_responses_received.recd_ID2))
+				and (false -> pre(table_of_route_plan_responses_received.recd_ID3))
+				)
+				then (event(RouteResponse_out) and (RouteResponse_out.ResponseID = RouteRequest_being_serviced.RequestID))
+				else not event(RouteResponse_out);	
+		
+		guarantee "The RequestID in a RoutePlanRequest_out message is an ID in the table for which we have not sent
+					a route plan request yet" :
+			event(RoutePlanRequest_out) => (((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID1)
+												and (not pre(table_of_route_plan_responses_received.sent_ID1)))
+											or ((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID2)
+												and (not pre(table_of_route_plan_responses_received.sent_ID2)))
+											or ((RoutePlanRequest_out.RequestID = table_of_route_plan_responses_received.ID3)
+												and (not pre(table_of_route_plan_responses_received.sent_ID3))));
+										
+
+	
+		
+		------------------------------------------------------------
+		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 
+		
+		-- Q: What will the top-level UxAS use from this? It doesn't have visibility into the internal state... 
+		-- John: Modeling the state makes sense if we have a system-level guarantee that references it.
+		-- Ben: Higher level req may be if all responses are received, response is sent out.
+		-- John: We could try to figure out our system-level reqts first and model the Wiki more coarsely.
+		
+		-- Q (Philosophical): Should component contracts include only what we need for architectural level reasoning,
+		--  or should the contracts be sufficiently detailed so that any component satisfying the contract will
+		--  result in a correctly functioning system? Or would one argue that these are in fact the same?
+		-- John: In general, a component contract should have at least enough info to prove system-level reqts.
+		-- 	Component reqts need to trace to some system reqt.
+		-- Ben: But sometimes we build components out of context. Maybe some are identified for "plug-and-play." Those may
+		--  be over-designed.
+		-- Aaron: Contracts should ensure that a replacement component gives us the same functionality that we had 
+		--  previously. 
+		 
+		--  Currently, my contracts on this component are not nearly sufficient to ensure correctness. The output
+		--  messages could be jibberish. Even if I require the response ID to match the request ID, the
+		--  rest of the information could be garbage.
+
+	**};
+end RouteAggregatorService_OneRequestAtATime;
+
+end RouteAggregatorService_OneRequestAtATime_Pkg;

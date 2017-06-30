@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15cf98d28ef"
+        name="State Reachability">
+      All states of {component} are reachable by an execution trace.
+
+      <c
+          id="__gsn__15cf9937324"
+          name="Context">
+        {Component States}
+      </c>
+
+      <s
+          id="__gsn__15cf992ad96"
+          name="Strategy">
+        Argue reachability of each state individually and completeness of the set.
+
+        <g
+            id="__gsn__15cf992bd26"
+            name="States Complete">
+          {Component States} are the only component states.
+
+          <s
+              id="__gsn__15cf99d0e87"
+              name="Evidence Scheme">
+            {AGREE state completeness idiom}
+
+            <c
+                id="__gsn__15cf99d6ecb"
+                name="Context">
+              {idiom documentation}
+            </c>
+
+            <e
+                id="__gsn__15cf99441e2"
+                name="Evidence">
+              {Agree lemma of state completeness}
+            </e>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15cf9931a24"
+            repeat="true"
+            name="{State} Reachable">
+          There exists a trace for which state {State} is reachable.
+
+          <s
+              id="__gsn__15cf99d9cc8"
+              name="Evidence Scheme">
+            {AGREE state reachability idiom}
+
+            <c
+                id="__gsn__15cf99d9cc9"
+                name="Context">
+              {idiom documentation}
+            </c>
+
+            <e
+                id="__gsn__15cf994c62a"
+                name="Evidence">
+              {Agree lemma witness for the state}
+            </e>
+          </s>
+        </g>
+      </s>
+
+      <comment
+          id="__gsn__15cf998606a"
+          name="Rodes">
+        Supports an abstract notion that the model is correct: a dead state would indicate either over engineering or (more alarming) an erroneous specification.
+      </comment>
+    </g>
+  </gsn>
+</argument>

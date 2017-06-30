@@ -1,0 +1,131 @@
+package AssignmentTreeBranchBoundBase_Pkg
+public
+	with CMASI;
+    with UXTASK;
+    
+    	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread AssignmentTreeBranchBoundBase; 
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--States to check for reachability:
+			    -- IDLE
+			    -- WAIT 
+			
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			lemma "False indicates the INIT state is reachable" : sub.state != sub.IDLE; 
+			lemma "False indicates the IDLE state is reachable" : sub.state != sub.WAIT; 
+
+			lemma "True indicates we have enumerated all states in the reachability observers" :
+				sub.state = sub.IDLE or
+				sub.state = sub.WAIT; 
+				
+			lemma "False indicates idle_to_wait transition is executable/reachable" : 
+           		 not sub.idle_to_wait;
+           	
+           	lemma "False indicates wait_to_idle transition is executable/reachable" : 
+           		 not sub.wait_to_idle;
+           		 
+           	lemma "True if only stated transitions are executed (no missing transitions)." :
+                sub.some_transition or sub.state = sub.previous_state;	
+										
+				
+		**};
+	end top_level.Impl;	
+	
+	
+	thread AssignmentTreeBranchBoundBase
+        features
+            TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
+            AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+            TaskAssignmentSummary_out: out event data port uxtask::TaskAssignmentSummary.i;
+            
+      	annex agree
+      	{**
+      		eq state : int;
+       		
+       		--Task States
+       		const IDLE : 				int = 1;
+       		const WAIT : 				int = 2;
+
+       	-------------------------------------------------------------
+		--State machine support macros
+			eq previous_state: int = prev(state,IDLE);
+			eq some_transition: bool = idle_to_wait
+										or wait_to_idle; 
+		-------------------------------------------------------------		
+
+		--------------------------State Transition Predicates-----------------------------------
+      		
+      		--Upon reception of a UniqueAutomationRequest, this service enters the wait state 
+      		eq idle_to_wait : bool =  false ->
+      			previous_state = IDLE and 
+      			event(UniqueAutomationRequest_in);
+      		--The results of the optimization are packaged into the TaskAssignmentSummary and published, 
+      		--at which point this service returns to the idle state.
+      		eq wait_to_idle : bool = false ->
+      			previous_state = WAIT and
+      			pre(event(TaskAssignmentSummary_out));
+      			
+      		-- Other internal transitions --
+      		
+      		eq send_task_assignment_summary : bool = false ->
+      			state = WAIT and 
+      			event(AssignmentCostMatrix_in) and 
+      			AssignmentCostMatrix_in.CorrespondingAutomationRequestID = curUniqueAutomationRequestID and
+      			allExpectedTaskOptionsReceived;
+      			
+      		
+      		--NOTE: CANNOT FORMALIZE WITHOUT ARRAY SUPPORT (NO WAY TO TIE VARIABLE TO INPUT PORTS)	
+      		--True if while in the wait state, all taskoptions are received for all tasks in the request
+      		--TaskOptions must match the UniqueAutomationRequest ID to be valid. 
+      		--According to Derek, option tasks may come in that overwrite existing tasks. This may
+      		--in the future be considered an error, but currently if it where to happen they are allowing the overwrite. 
+      		eq allExpectedTaskOptionsReceived : bool ;
+      		
+      		eq curUniqueAutomationRequestID : int;
+      		
+      		guarantee "Self loops": not some_transition => (state = previous_state);
+      	
+      		guarantee "Upon reception of a UniqueAutomationRequest, this service enters the wait state ": 
+      			if idle_to_wait then
+      				state = WAIT and
+      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID
+      			else
+      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
+      		
+      		guarantee "[ADDED GURANTEE]: In IDLE, there are no expected task options (clear the flag, i.e., set to false) ":
+      		 	state = IDLE  =>
+      				allExpectedTaskOptionsReceived = false;
+      		
+      		--NOTE: although there is an expectation about the ordering in which the RouteAggregatorService sends out
+      		--the AssignmentCostMatrix relative to receiving Taskoptions, there is no intrinsic need to assume this ordering here (verified with Derek).
+      		--We instead allow the TaskOptions and Matrix to come in in any order. Upon receiving the requisite task and matrix the summary is sent out. 
+      		guarantee "Upon receiving the AssignmentCostMatrix (which should be received strictly after the TaskPlanOptions
+      			due to the behavior of the RouteAggregatorService), this service conducts the branch-and-bound search to determine 
+      			the proper ordering and assignment of Tasks to vehicles. The results of the optimization are packaged into the TaskAssignmentSummary":
+      			if send_task_assignment_summary then
+      				event(TaskAssignmentSummary_out)
+      			else
+      				not event(TaskAssignmentSummary_out);
+      				
+      		guarantee "The results of the optimization are packaged into the TaskAssignmentSummary and published, 
+      			at which point this service returns to the idle state.":
+      			wait_to_idle =>
+      				state = IDLE and
+      				allExpectedTaskOptionsReceived = false; --redundant, but explicit
+      	**};
+    end AssignmentTreeBranchBoundBase;
+    
+end AssignmentTreeBranchBoundBase_Pkg;
