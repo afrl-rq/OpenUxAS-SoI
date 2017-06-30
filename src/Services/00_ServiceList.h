@@ -91,6 +91,7 @@
 #include "SerialAutomationRequestTestService.h"
 #include "TcpBridge.h"
 #include "Test_SimulationTime.h"
+#include "VehicleStateListenerService.h"
 
 // general services
 #include "AssignmentTreeBranchBoundService.h"
@@ -155,6 +156,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SendMessagesService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SerialAutomationRequestTestService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::Test_SimulationTime>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::test::VehicleStateListenerService>();}
 
 // general services
 {auto svc = uxas::stduxas::make_unique<uxas::service::AssignmentTreeBranchBoundService>();}

@@ -20,6 +20,7 @@ srcs_services = [
   'TcpBridge.cpp',
   'Test_SimulationTime.cpp',
   'RoutePlannerVisibilityService.cpp',
+  'VehicleStateListenerService.cpp',
   'WaypointPlanManagerService.cpp',
 ]
 
