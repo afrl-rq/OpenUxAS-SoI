@@ -129,6 +129,6 @@ lib = static_library(
   include_directories: include_directories(
     'include',
     'src',
-    '../zeromq-4.1.1/include'
+    '../zeromq-4.1.6/include'
   ),
 )
