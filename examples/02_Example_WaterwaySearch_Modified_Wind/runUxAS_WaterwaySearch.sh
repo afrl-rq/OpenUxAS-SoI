@@ -5,7 +5,7 @@ SAVE_DIR=$(pwd)
 RM_DATAWORK="rm -R ./datawork"
 RM_LOG="rm -R ./log"
 
-BIN="../../../build/uxas"
+BIN="../../../build_debug/uxas"
 
 mkdir -p RUNDIR_WaterwaySearch
 cd RUNDIR_WaterwaySearch
