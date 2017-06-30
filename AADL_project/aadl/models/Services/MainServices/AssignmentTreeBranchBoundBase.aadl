@@ -83,7 +83,8 @@ public
       		eq send_task_assignment_summary : bool = false ->
       			state = WAIT and 
       			event(AssignmentCostMatrix_in) and 
-      			AssignmentCostMatrix_in.CorrespondingAutomationRequestID = curUniqueAutomationRequestID;
+      			AssignmentCostMatrix_in.CorrespondingAutomationRequestID = curUniqueAutomationRequestID and
+      			allExpectedTaskOptionsReceived;
       			
       		
       		--NOTE: CANNOT FORMALIZE WITHOUT ARRAY SUPPORT (NO WAY TO TIE VARIABLE TO INPUT PORTS)	
@@ -122,7 +123,8 @@ public
       		guarantee "The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       			at which point this service returns to the idle state.":
       			wait_to_idle =>
-      				state = IDLE;
+      				state = IDLE and
+      				allExpectedTaskOptionsReceived = false; --redundant, but explicit
       	**};
     end AssignmentTreeBranchBoundBase;
     

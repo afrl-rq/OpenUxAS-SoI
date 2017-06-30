@@ -7,6 +7,8 @@ public
     -- [Manually Added] Added extension manually as per the comment above
     thread AssignmentTreeBranchBoundService extends AssignmentTreeBranchBoundBase_Pkg::AssignmentTreeBranchBoundBase 
        -- empty
+       -- NOTE: Derek confirmed there is nothing further to add at the architectural level
+       -- The cost function will change here if we care to model that in the future. 
     end AssignmentTreeBranchBoundService;
     
 end AssignmentTreeBranchBoundService_Pkg;
