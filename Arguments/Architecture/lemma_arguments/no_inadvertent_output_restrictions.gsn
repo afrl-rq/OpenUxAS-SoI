@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15cf99f1ed6"
+        name="No Inadvertent Output Space Restrictions">
+
+      <comment
+          id="__gsn__15cf9b0bb68"
+          name="Rodes">
+        In AGREE, any component specifying constraints on an output is at risk of inadvertently constraining the output space by erroneous logic. Unlike inputs, the model is free to chose inputs within the other defined constraints. An error in logic may therefore lead to constraining the space unnecessarily, thus leading to an incorrect specification.
+      </comment>
+    </g>
+  </gsn>
+</argument>
