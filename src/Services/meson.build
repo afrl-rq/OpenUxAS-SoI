@@ -20,7 +20,7 @@ srcs_services = [
   'TcpBridge.cpp',
   'Test_SimulationTime.cpp',
   'RoutePlannerVisibilityService.cpp',
-  'VehicleStateListenerService.cpp',
+  '../../../AutonomyMonitoringService/src/Service/VehicleStateListenerService.cpp',
   'WaypointPlanManagerService.cpp',
 ]
 
@@ -45,6 +45,7 @@ incs_services = [
     '../../3rd/serial-1.2.1/include',
     '../../3rd/TinyGPS',
     '../../3rd/zlib-1.2.8/contrib/minizip',
+    '../../../AutonomyMonitoringService/src/Service',
     '../../3rd/zlib-1.2.8',
   ),
   incs_lmcp,
