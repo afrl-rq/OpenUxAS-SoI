@@ -70,7 +70,7 @@ public
             KeepInZone_in: in event data port cmasi::KeepInZone.i;
             ImpactAutomationRequest_in: in event data port impact::ImpactAutomationRequest.i;
             LineOfInterest_in: in event data port impact::LineOfInterest.i;
-                    --note that the code does not acually subscribe to "ServiceStatus" currently
+                    --note that the code does not actually subscribe to "ServiceStatus" currently
             ServiceStatus_in: in event data port cmasi::ServiceStatus.i;
                     --the source code subscribes to all descendants of task:
             SearchTask_in: in event data port cmasi::SearchTask.i;
@@ -165,6 +165,7 @@ public
             
             -- a non-deterministic variable used to model whether or not 
             -- the requested task, vehicle, or operating region has been defined.
+            -- AWF (20170620): This should be temporary until other components are generated to support a more precise description
             eq taskVehicleOrRegionIsDefined : bool;
             
             eq uniqueAutomationRequestErrorMessageRecieved : bool; --????
@@ -226,6 +227,7 @@ public
                    
 --              pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
 --                  state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
+                    -- AWF (20170620): Wouldn't we want pre(state) = IDLE otherwise we are asking the previous of a bool evaluation
 --                  if pre(state = IDLE) then 
 --                      event(UniqueAutomationRequest_out) and state = BUSY --and numTasksInQ = 0
 --                  else --state = BUSY
