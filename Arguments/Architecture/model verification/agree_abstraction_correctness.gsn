@@ -31,35 +31,35 @@
     <g
         id="__gsn__15cf9c05961"
         name="AGREE Abstraction Correctness">
-      All entity abstractions within {component} correctly abstract the entity behavior and characteristics.
+      All abstractions within {component} correctly abstracts the intended behavior and characteristics.
 
       <c
           id="__gsn__15cf9c31dad"
-          name="Context">
-        {Definition of entity abstraction}
+          name="Definition">
+        {Definition of an abstraction}
       </c>
 
       <s
           id="__gsn__15cf9c1cc9e"
           name="Strategy">
-        Argue each individual entity abstraction is correct and that the complete set is assessed.
+        Argue each abstraction is correct and that the complete set is assessed.
 
         <c
             id="__gsn__15cf9c3b4ef"
             name="Context">
-          {component entity abstractions}
+          {component abstractions}
         </c>
 
         <g
             id="__gsn__15cf9c1d8bd"
             repeat="true"
-            name="{Entity Abstraction} is Correct">
+            name="{Abstraction} is Correct">
 
           <s
               id="__gsn__15cf9c7e6e8"
               optional="true"
               name="Evidence Scheme">
-            {AGREE lemma idiom for {entity abstraction type} }
+            {AGREE lemma idiom for {abstraction type} }
 
             <c
                 id="__gsn__15cf9c8b5ac"
@@ -97,6 +97,12 @@
                 name="Rodes">
               Consider where entire behaviors are abstraction out, like array operations, and replaced with an “uninterpreted function”-like idiom returning a boolean. The boolean (representing performing an action or a specific event) cannot be formally assessed in anyway as the abstraction is too abstract.
             </comment>
+
+            <comment
+                id="__gsn__15cfb355c67"
+                name="Rodes">
+              Also consider the consistency with AADL model constructs, e.g., state machines in AADL recreated in AGREE.
+            </comment>
           </s>
         </g>
 
@@ -117,7 +123,18 @@
             </e>
           </s>
         </g>
+
+        <comment
+            id="__gsn__15cfb51d988"
+            name="Rodes">
+          Types of abstractions include: behavior abstraction, data structure abstraction, AADL abstraction, others?
+        </comment>
       </s>
+
+      <comment
+          id="__gsn__15cfb339f75"
+          name="Rodes">
+      </comment>
     </g>
   </gsn>
 </argument>

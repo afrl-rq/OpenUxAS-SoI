@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15cf9b38487"
+        name="AADL Model Validation">
+      The system AADL model faithfully captures the intent of the architecture designers and satisfies relevant system requirements.
+
+      <c
+          id="__gsn__15cfb13a9df"
+          name="Context">
+        {AADL model}
+      </c>
+
+      <s
+          id="__gsn__15cf9bd432c"
+          name="Strategy">
+        Argue each component meets the architecture designers expectations and AADL requirement satisfaction
+
+        <c
+            id="__gsn__15cf9b7d456"
+            name="Context">
+          {system components}
+        </c>
+
+        <g
+            id="__gsn__15cf9bd8762"
+            repeat="true"
+            name="{Component} Validation">
+          {Component} Faithfully captures the intent of the architecture designers.
+
+          <c
+              id="__gsn__15cf9be4a17"
+              name="Context">
+            {AADL spec}
+          </c>
+
+          <s
+              id="__gsn__15cf9bd6ae3"
+              name="Strategy">
+            Argue validation of decomposed component specification entities.
+
+            <g
+                id="__gsn__15cf9be8147"
+                name="Component Type Definition">
+            </g>
+
+            <g
+                id="__gsn__15cf9be8507"
+                name="Implementation">
+            </g>
+
+            <g
+                id="__gsn__15cf9beeffc"
+                name="Properties">
+            </g>
+
+            <g
+                id="__gsn__15cf9bf023e"
+                name="Features">
+            </g>
+
+            <g
+                id="__gsn__15cf9bd7eb3"
+                name="Connections">
+            </g>
+
+            <g
+                id="__gsn__15cfb82a94a"
+                name="Annexes">
+
+              <c
+                  id="__gsn__15cfb83fb8c"
+                  name="Context">
+                {Component annexes}
+              </c>
+
+              <s
+                  id="__gsn__15cfb82d4a9"
+                  name="Strategy">
+                Argue validation of each annex
+
+                <m
+                    id="__gsn__15cfb842dc4"
+                    link="agree_validation.gsn"
+                    name="AGREE">
+                  AGREE validation
+                </m>
+
+                <g
+                    id="__gsn__15cfb841bdc"
+                    name="Resolute">
+                </g>
+
+                <g
+                    id="__gsn__15cfb844714"
+                    repeat="true"
+                    name="{other}">
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15cf9bf0fed"
+                repeat="true"
+                name="{other}">
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15cfb14f819"
+            name="Requirement Satisfaction">
+          The AADL architecture satisfies all relevant requirements.
+
+          <c
+              id="__gsn__15cfb96a326"
+              name="Context">
+            {relevant requirements}
+          </c>
+
+          <s
+              id="__gsn__15cfb92483a"
+              name="Strategy">
+            Argue requirement satisfaction by form verification, validation of the formal model, and where necessary validation informally.
+
+            <g
+                id="__gsn__15cfb92545b"
+                name="Model Verification">
+            </g>
+
+            <g
+                id="__gsn__15cfb925833"
+                name="Verificaiton Model Validation">
+
+              <m
+                  id="__gsn__15cfb9356a1"
+                  link="agree_validation.gsn"
+                  name="AGREE">
+                AGREE validation
+              </m>
+            </g>
+
+            <g
+                id="__gsn__15cfb928ba2"
+                optional="true"
+                name="Informal">
+            </g>
+          </s>
+
+          <comment
+              id="__gsn__15cfb72b697"
+              name="Rodes">
+            The link from requirements to architecture is addressed under this claim.
+          </comment>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
