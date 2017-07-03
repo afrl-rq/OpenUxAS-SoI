@@ -1,0 +1,91 @@
+package erroneous_state_transition
+public
+	with Base_Types;
+	
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	system top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force AGREE to run" : true;
+		**};
+	end top_level;
+	
+	system implementation top_level.Impl
+		subcomponents
+			sub : system example; 
+		annex agree {**
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--State machine lemmas
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.state = sub.STATE1) 
+				or (sub.state = sub.STATE2);
+				
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.state = sub.state);
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
+			
+			--Check that all states are reachable
+			lemma "False indicates State1 reachable" : not (sub.state = sub.STATE1);
+			lemma "False indicates State2 reachable" : not (sub.state = sub.STATE2);
+			
+			--Check that all state transitions are reachable
+			lemma "False indicates that one_to_two is reachable" : not sub.one_to_two;
+
+			lemma "True if only stated transitions are executed (no missing transitions)." :
+                sub.some_transition or sub.state = sub.previous_state;	
+		**};
+		 
+	end top_level.Impl;	
+	
+	
+	system example
+		features
+			input: in event data port Base_Types::integer;
+			output: out event data port Base_Types::integer;
+			
+		annex agree{**
+			const STATE1 : int = 0;
+            const STATE2 : int = 1;
+            
+            
+            eq state : int;
+            eq previous_state: int = prev(state,STATE1);
+            eq some_transition: bool = one_to_two;
+            
+            eq output_condition : bool = state = STATE1 and event(input);
+                
+            --EXAMPLE ERROR:
+            	--The error below cannot be found with the current lemmas.
+            	--The correction (patch) below is what should have been written.                    
+            eq one_to_two : bool = false->
+            	--ERROR
+                previous_state = STATE1 and event(output);
+                --CORRECTED (patch)
+--                previous_state = STATE1 and pre(event(output));
+                
+                  
+            guarantee "Self loops": not some_transition => (state = previous_state);
+            
+            guarantee "Transition from 1 to 2":
+                one_to_two =>
+                    state = STATE2;
+            
+            --No transition from 2 needed for the example
+                    
+            guarantee "Send output when an input is received in STATE 1":
+            	 output_condition =>
+            	 	event(output);
+            	
+            --Suggested Problem Fix
+            	--Provides further spec definition to catch the above error
+            	--as a realizability failure
+            guarantee "PROBLEM FIX: Define the event(output) in all other cases" :
+            	not output_condition => 
+            		not event(output);
+		**};
+		
+	end example;
+end erroneous_state_transition;
