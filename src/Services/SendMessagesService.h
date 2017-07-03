@@ -76,7 +76,7 @@ public:
     virtual
     ~SendMessagesService();
 
-private:
+protected:
 
     static
     ServiceBase::CreationRegistrar<SendMessagesService> s_registrar;

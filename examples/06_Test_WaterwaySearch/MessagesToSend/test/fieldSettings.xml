@@ -1,0 +1,13 @@
+      <AirVehicleConfiguration Series="CMASI" Time="1.0" OriginalFileName = "AirVehicleConfiguration_V400.xml">
+        <NominalSpeed>
+            <staliro_minimum> 19.0 </staliro_minimum>
+            <staliro_maximum> 22.0 </staliro_maximum>
+        </NominalSpeed>
+        <NominalFlightProfile>
+         <FlightProfile Series="CMASI">
+           <staliro_minimum> 19.0 </staliro_minimum>
+           <staliro_maximum> 22.0 </staliro_maximum>
+         </FlightProfile>
+        </NominalFlightProfile>
+      </AirVehicleConfiguration>
+

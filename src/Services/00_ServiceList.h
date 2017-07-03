@@ -88,6 +88,8 @@
 
 // test
 #include "SendMessagesService.h"
+#include "SendTestMessagesService.h"
+#include "MessageLoggerForTestService.h"
 #include "SerialAutomationRequestTestService.h"
 #include "TcpBridge.h"
 #include "Test_SimulationTime.h"
@@ -153,8 +155,10 @@
 
 // test
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SendMessagesService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::test::SendTestMessagesService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SerialAutomationRequestTestService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::Test_SimulationTime>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::test::MessageLoggerForTestService>();}
 
 // general services
 {auto svc = uxas::stduxas::make_unique<uxas::service::AssignmentTreeBranchBoundService>();}

@@ -16,6 +16,8 @@ srcs_utilities = [
   'UxAS_Time.cpp',
   'UxAS_TimerManager.cpp',
   'UxAS_ZeroMQ.cpp',
+  'STaliroCommInterface.cpp',
+  'STaliroTrajectoryPopulator.cpp',
 ]
 
 incs_utilities = [
@@ -26,7 +28,9 @@ incs_utilities = [
     '../../3rd/sqlite-amalgamation-3120200',
     '../../3rd/SQLiteCpp-1.3.1/include',
     '../../3rd/zeromq-4.1.1/include',
+    '../../src/Communications',
   ),
+  incs_lmcp,
 ]
 
 if get_option('afrl_internal')

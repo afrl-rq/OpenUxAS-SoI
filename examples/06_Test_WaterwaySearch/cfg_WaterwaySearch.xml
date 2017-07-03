@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS FormatVersion="1.0" EntityID="100"  EntityType="Aircraft">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+    </Bridge>
+    <Service Type="Test_SimulationTime"/>
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/>
+    <Service Type="RouteAggregatorService" />
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="AutomationDiagramDataService"/>
+
+    <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="500" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
+
+    <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
+
+    <Service Type="SendTestMessagesService" PathToMessageFiles="../MessagesToSend/" TestGeneratorPort="5556">
+        <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
+        <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="300"/>
+        <Message MessageFileName="tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml" SendTime_ms="5000"/>
+    </Service>
+    <Service Type="MessageLoggerForTestService">
+    </Service>
+</UxAS>
+
+

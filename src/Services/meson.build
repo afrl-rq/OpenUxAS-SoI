@@ -13,6 +13,8 @@ srcs_services = [
   'RouteAggregatorService.cpp',
   'RoutePlannerService.cpp',
   'SendMessagesService.cpp',
+  'SendTestMessagesService.cpp',
+  'MessageLoggerForTestService.cpp',
   'SensorManagerService.cpp',
   'SerialAutomationRequestTestService.cpp',
   'ServiceBase.cpp',
