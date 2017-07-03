@@ -92,9 +92,9 @@ public
            		--the error becomes undetectable again.
            		--e.g., output_condition includes `state = STATE2 and event(input)
            		--in this case, event(output) can occur in STATE2 immediately on state entry. 
-            guarantee "PROBLEM FIX: Define the event(output) in all other cases" :
-            	not output_condition => 
-            		not event(output);
+--            guarantee "PROBLEM FIX: Define the event(output) in all other cases" :
+--            	not output_condition => 
+--            		not event(output);
             		
            
 		**};
