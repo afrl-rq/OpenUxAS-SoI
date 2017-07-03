@@ -55,7 +55,12 @@ public
             eq previous_state: int = prev(state,STATE1);
             eq some_transition: bool = one_to_two;
             
-            eq output_condition : bool = state = STATE1 and event(input);
+            --FIX/SOLUTION PROBLEM:
+            	--predicate after 'or' would make the example error again
+            	--undetectable even with the proposed fix. 
+            eq output_condition : bool = 
+            	(state = STATE1 and event(input)); --or
+--            	(state = STATE2 and event(input));
                 
             --EXAMPLE ERROR:
             	--The error below cannot be found with the current lemmas.
@@ -82,9 +87,16 @@ public
             --Suggested Problem Fix
             	--Provides further spec definition to catch the above error
             	--as a realizability failure
+            --Challenge/Issue with the fix
+           		--If output_condition overlaps with any state transitions, 
+           		--the error becomes undetectable again.
+           		--e.g., output_condition includes `state = STATE2 and event(input)
+           		--in this case, event(output) can occur in STATE2 immediately on state entry. 
             guarantee "PROBLEM FIX: Define the event(output) in all other cases" :
             	not output_condition => 
             		not event(output);
+            		
+           
 		**};
 		
 	end example;
