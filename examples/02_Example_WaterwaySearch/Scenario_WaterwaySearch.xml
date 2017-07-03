@@ -4,7 +4,7 @@
     <SimulationView LongExtent="0.11" Latitude="45.323" Longitude="-120.9645"/>
     <ScenarioName>Waterway Search Example</ScenarioName>
     <Date>1/1/2020:16:50:18</Date>
-    <ScenarioDuration>7200.0</ScenarioDuration>
+    <ScenarioDuration>785.0</ScenarioDuration>
     <TrackAgeOut/>
   </ScenarioData>
     <ScenarioEventList>

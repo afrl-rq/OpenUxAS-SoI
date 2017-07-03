@@ -27,8 +27,12 @@ incs_utilities = [
     '../../3rd/PugiXML/src',
     '../../3rd/sqlite-amalgamation-3120200',
     '../../3rd/SQLiteCpp-1.3.1/include',
+<<<<<<< HEAD
     '../../3rd/zeromq-4.1.1/include',
     '../../src/Communications',
+=======
+    '../../3rd/zeromq-4.1.6/include',
+>>>>>>> 6fc2fd5fbccdd6b52483449fc61d0c07576c71d7
   ),
   incs_lmcp,
 ]
