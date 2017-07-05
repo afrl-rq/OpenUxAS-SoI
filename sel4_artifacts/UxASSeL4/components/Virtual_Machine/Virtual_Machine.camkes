@@ -38,8 +38,7 @@ AADL thread implementation Virtual_Machine.
 
 import <std_connector.camkes>;
 import <Timer.idl4>;
-import <tb_Monitor_MissionSoftware__mission_impl_1.idl4>;
-import <tb_Monitor_MissionSoftware__waypoint_impl_1.idl4>;
+import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
 
 
 // Idl files for RPCs
@@ -49,13 +48,12 @@ import <gen_fwd.idl4>;
 import "VM_shim/VM_shim.camkes";
 import "VM/VM.camkes";
 
-import <MissionSoftware__mission_impl_writer.idl4>;
-import <MissionSoftware__waypoint_impl_writer.idl4>;
+import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 component Virtual_Machine {
     include <tb_soi_tk1_types.h>;
-    uses tb_Monitor_MissionSoftware__mission_impl_1 tb_out_mission0;
-    uses tb_Monitor_MissionSoftware__waypoint_impl_1 tb_in_waypoint;
+    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_out_mission0;
+    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_in_waypoint;
     consumes QueuedData tb_in_waypoint_notification;
 
     uses gen_fwd_inf uartfwd;
