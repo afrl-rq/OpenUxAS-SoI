@@ -93,7 +93,7 @@ lemma mon_get_sender_id_wp[wp]:
 definition is_queue :: "lifted_globals \<Rightarrow> bool" where
   "is_queue s \<equiv> front_'' s < 1 \<and> length_'' s \<le> 1"
 
-definition the_queue :: "lifted_globals \<Rightarrow> MissionSoftware__mission_impl_C queue" where
+definition the_queue :: "lifted_globals \<Rightarrow> tb_MissionSoftware__mission_command_impl_container_C queue" where
   "the_queue s \<equiv> (list_array (contents_'' s), unat (front_'' s), unat (length_'' s))"
 
 fun queue_length :: "'a queue \<Rightarrow> nat" where
@@ -137,11 +137,11 @@ lemma enqueue_not_full:
    \<lbrace> \<lambda>s. is_queue s \<and>
          q = the_queue s \<and>
          queue_length q < 1 \<and>
-         is_valid_MissionSoftware__mission_impl_C s x \<and>
+         is_valid_tb_MissionSoftware__mission_command_impl_container_C s x \<and>
          P s \<rbrace>
    mon_enqueue' x
    \<lbrace> \<lambda>r s. r = 1 \<and>
-           the_queue s = enqueue q (heap_MissionSoftware__mission_impl_C s x) \<and>
+           the_queue s = enqueue q (heap_tb_MissionSoftware__mission_command_impl_container_C s x) \<and>
            is_queue s \<and>
            P s \<rbrace>!"
 apply (unfold mon_enqueue'_def)
@@ -165,16 +165,16 @@ lemma dequeue_not_empty:
    \<lbrace> \<lambda>s. is_queue s \<and>
          q = the_queue s \<and>
          queue_length q > 0 \<and>
-         is_valid_MissionSoftware__mission_impl_C s x \<and>
+         is_valid_tb_MissionSoftware__mission_command_impl_container_C s x \<and>
          P s \<rbrace>
    mon_dequeue' x
    \<lbrace> \<lambda>r s. r > 0 \<and>
-           dequeue q = (heap_MissionSoftware__mission_impl_C s x, the_queue s) \<and>
+           dequeue q = (heap_tb_MissionSoftware__mission_command_impl_container_C s x, the_queue s) \<and>
            is_queue s \<and>
            P s \<rbrace>!"
 apply (unfold mon_dequeue'_def)
   apply wp
-  apply (auto simp: fun_upd_def is_queue_def the_queue_def tb_Waypoint_Manager_in_mission_Monitor.update_MissionSoftware__mission_impl_def
+  apply (auto simp: fun_upd_def is_queue_def the_queue_def tb_Waypoint_Manager_in_mission_Monitor.update_tb_MissionSoftware__mission_command_impl_container_def
                   gr0_conv_Suc list_array_nth unat_arith_simps)
 done
 

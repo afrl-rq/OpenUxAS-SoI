@@ -29,53 +29,15 @@ public
 	process Mission_Software
 	end Mission_Software;
 
-	data waypoint
-  	properties
-    	Data_Model::Data_Representation => Struct;
-	end waypoint;
+	data mission_command
+	end mission_command;
 
-	data implementation waypoint.impl
-	subcomponents
-  		latitude: data Base_Types::Float_64;
-  		longitude: data Base_Types::Float_64;
-  		altitude: data Base_Types::Float_32;
-  		altitude_type: data Base_Types::Integer_32;
-  		id: data Base_Types::Integer_64;
-  		nxid: data Base_Types::Integer_64;
-  		speed: data Base_Types::Float_32;
-  		speed_type: data Base_Types::Float_32;
-  		climbrate: data Base_Types::Float_32;
-  		turntype: data Base_Types::Integer_32;
-  		vehicleactionlistsize: data Base_Types::Unsigned_16;
-  		contingencywaypointa: data Base_Types::Integer_64;
-  		contingencywaypointb: data Base_Types::Integer_64;
-  		associatedtasksize: data Base_Types::Unsigned_16;
-	end waypoint.impl;
-
-	data waypoint_array
-	end waypoint_array;
-
-	data implementation waypoint_array.impl
+	data implementation mission_command.impl
   	properties
     	Data_Model::Data_Representation => Array;
-    	Data_Model::Base_Type => (classifier (waypoint.impl));
-    	Data_Model::Dimension => (65536);
-	end waypoint_array.impl;
-
-	data mission
-  	properties
-    	Data_Model::Data_Representation => Struct;
-	end mission;
-
-	data implementation mission.impl
-	subcomponents
-		commandid: data Base_Types::Integer_64;
-        vehicleid: data Base_Types::Integer_64;
-        vehicleactionlistsize: data Base_Types::Unsigned_16;
-        status: data Base_Types::Integer_32;		
-  		waypoints: data waypoint_array.impl;
-  		startingid: data Base_Types::Integer_64;
-	end mission.impl;
+    	Data_Model::Base_Type => (classifier (Base_Types::Unsigned_8));
+    	Data_Model::Dimension => (23264);
+	end mission_command.impl;
 
 	process implementation Mission_Software.i
 		subcomponents
@@ -144,8 +106,8 @@ public
 
 	thread Virtual_Machine
 		features
-			out_mission: out event data port mission.impl;
-			in_waypoint: in event data port waypoint.impl;
+			out_mission: out event data port mission_command.impl;
+			in_waypoint: in event data port mission_command.impl;
 			
 			clkcarfwd: requires subprogram group access gen_fwd_inf;
 			uartfwd: requires subprogram group access gen_fwd_inf;
@@ -160,10 +122,10 @@ public
 	
 	thread Waypoint_Manager
 		features
-			in_mission: in event data port mission.impl {
+			in_mission: in event data port mission_command.impl {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_mission");
 			};
-			in_waypoint: in event data port waypoint.impl {
+			in_waypoint: in event data port mission_command.impl {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
 			};
 			in_send_success: in event data port Base_Types::Boolean  {
@@ -187,7 +149,7 @@ public
 	
 	thread Asset_Waypoint_Manager
 		features
-			out_waypoint: out event data port waypoint.impl {
+			out_waypoint: out event data port mission_command.impl {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_waypoint");
 			};
 			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i {

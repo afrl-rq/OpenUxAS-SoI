@@ -173,8 +173,8 @@ void tb_entrypoint_Waypoint_Manager_Waypoint_Manager_initializer(const int64_t *
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_in_mission(const MissionSoftware__mission_impl * in_arg) {
-    in_mission((MissionSoftware__mission_impl *) in_arg);
+void tb_entrypoint_tb_Waypoint_Manager_in_mission(const MissionSoftware__mission_command_impl * in_arg) {
+    in_mission((MissionSoftware__mission_command_impl *) in_arg);
 
 }
 
@@ -186,8 +186,8 @@ void tb_entrypoint_tb_Waypoint_Manager_in_mission(const MissionSoftware__mission
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_in_waypoint(const MissionSoftware__waypoint_impl * in_arg) {
-    in_waypoint((MissionSoftware__waypoint_impl *) in_arg);
+void tb_entrypoint_tb_Waypoint_Manager_in_waypoint(const MissionSoftware__mission_command_impl * in_arg) {
+    in_waypoint((MissionSoftware__mission_command_impl *) in_arg);
 
 }
 
@@ -217,8 +217,8 @@ int run(void) {
 
     // tb_timer_periodic(0, ((uint64_t)1)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
-    MissionSoftware__mission_impl tb_in_mission;
-    MissionSoftware__waypoint_impl tb_in_waypoint;
+    MissionSoftware__mission_command_impl tb_in_mission;
+    MissionSoftware__mission_command_impl tb_in_waypoint;
     bool tb_in_send_success;
 
 
@@ -236,10 +236,10 @@ int run(void) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
         }
-        while (tb_in_mission_dequeue((MissionSoftware__mission_impl*)&tb_in_mission)) {
+        while (tb_in_mission_dequeue((tb_MissionSoftware__mission_command_impl_container*)&tb_in_mission)) {
             tb_entrypoint_tb_Waypoint_Manager_in_mission(&tb_in_mission);
         }
-        while (tb_in_waypoint_dequeue((MissionSoftware__waypoint_impl*)&tb_in_waypoint)) {
+        while (tb_in_waypoint_dequeue((tb_MissionSoftware__mission_command_impl_container*)&tb_in_waypoint)) {
             tb_entrypoint_tb_Waypoint_Manager_in_waypoint(&tb_in_waypoint);
         }
         while (tb_in_send_success_dequeue((bool*)&tb_in_send_success)) {

@@ -37,9 +37,9 @@ AADL thread implementation Virtual_Machine.
  **************************************************************************/
 
 import <Timer.idl4>;
-import <tb_Monitor_MissionSoftware__mission_impl_1.idl4>;
+import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
 
-import <tb_Monitor_MissionSoftware__waypoint_impl_1.idl4>;
+import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
 
 
 // Idl files for RPCs
@@ -47,9 +47,7 @@ import <tb_Monitor_MissionSoftware__waypoint_impl_1.idl4>;
 import <gen_fwd.idl4>;
 
 
-import <MissionSoftware__waypoint_impl_writer.idl4>;
-
-import <MissionSoftware__mission_impl_writer.idl4>;
+import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 
 
@@ -58,14 +56,14 @@ component Virtual_Machine {
     control;
     has semaphore tb_dispatch_sem;
 
-    uses tb_Monitor_MissionSoftware__mission_impl_1 tb_out_mission0;
+    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_out_mission0;
 
-    uses tb_Monitor_MissionSoftware__waypoint_impl_1 tb_in_waypoint;
+    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_in_waypoint;
     consumes QueuedData tb_in_waypoint_notification;
 
 
-    uses gen_fwd_inf clkcarfwd;
     uses gen_fwd_inf uartfwd;
+    uses gen_fwd_inf clkcarfwd;
 
 
 }

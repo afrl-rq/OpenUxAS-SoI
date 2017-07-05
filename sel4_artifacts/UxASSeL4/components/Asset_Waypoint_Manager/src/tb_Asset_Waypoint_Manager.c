@@ -101,12 +101,12 @@ void tb_timer_complete_callback(void *_ UNUSED) {
  *
  ************************************************************************/
 bool tb_out_waypoint_enqueue
-(const MissionSoftware__waypoint_impl * tb_out_waypoint) {
+(const MissionSoftware__mission_command_impl * tb_out_waypoint) {
     bool tb_result = true ; 
 
-    tb_result &= tb_out_waypoint0_enqueue((MissionSoftware__waypoint_impl *)tb_out_waypoint);
+    tb_result &= tb_out_waypoint0_enqueue((tb_MissionSoftware__mission_command_impl_container *)tb_out_waypoint);
 
-    tb_result &= tb_out_waypoint1_enqueue((MissionSoftware__waypoint_impl *)tb_out_waypoint);
+    tb_result &= tb_out_waypoint1_enqueue((tb_MissionSoftware__mission_command_impl_container *)tb_out_waypoint);
 
     return tb_result;
 }
