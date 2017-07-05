@@ -36,6 +36,41 @@ public
 
 			lemma "True if only stated transitions are executed (no missing transitions)." :
                 sub.some_transition or sub.state = sub.previous_state;	
+            
+            --Check if there is an error in how outputs trigger state transitions.     
+            
+            ---- The following two lemmas, if both true at the same time or both false indicates an error ----
+            lemma "True (falling edge) indicates a state change has already occurred if the output_condition occurs" :
+            	sub.state1_output_condition =>
+            		(true -> (sub.state != pre(sub.state)));
+            		
+            lemma "True (rising edge) indicates a state change occurs after an output_condition" :
+            	pre(sub.state1_output_condition) =>
+            		(true -> sub.state != pre(sub.state));
+            -------------
+            
+            ---- Sanity check on the above two lemmas ----
+            
+            lemma "False (falling edge witness)" :
+            	sub.state1_output_condition =>
+            		(true -> (sub.state = pre(sub.state)));
+            		
+            lemma "False (rising edge witness)" :
+            	pre(sub.state1_output_condition) =>
+            		(true -> sub.state = pre(sub.state));
+            -------------
+            
+            
+            ---Jen's Lemmas	
+            lemma "Output event in state 1 => transition" :
+                pre(event(sub.output)) and (true -> (pre(sub.state) = sub.STATE1))
+                    => (sub.state = sub.STATE2);		
+            
+            lemma "Output event => transition with exceptions" :
+                true -> (pre(event(sub.output)) =>
+                            (sub.some_transition or
+                            (sub.state = sub.STATE2))); -- STATE2 is the terminal state.
+            	
 		**};
 		 
 	end top_level.Impl;	
@@ -49,54 +84,61 @@ public
 		annex agree{**
 			const STATE1 : int = 0;
             const STATE2 : int = 1;
-            
-            
+
             eq state : int;
             eq previous_state: int = prev(state,STATE1);
             eq some_transition: bool = one_to_two;
             
-            --FIX/SOLUTION PROBLEM:
-            	--predicate after 'or' would make the example error again
+            eq state1_output_condition : bool = (false ->
+            	(state = STATE1 and event(input)));
+            
+            eq state2_output_condition : bool = (false ->
+            	(state = STATE2 and event(input)));
+            
+            eq all_output_conditions : bool = (false ->
+            	((state1_output_condition)
+            --CHALLENGE TO ERROR DETECTION IDIOM (discussed below):
+            	--predicate after 'or' would make the example erroneous again,
             	--undetectable even with the proposed fix. 
-            eq output_condition : bool = 
-            	(state = STATE1 and event(input)); --or
---            	(state = STATE2 and event(input));
+            	or
+            	(state2_output_condition)));
                 
-            --EXAMPLE ERROR:
+            --EXAMPLE SPEC ERROR:
             	--The error below cannot be found with the current lemmas.
-            	--The correction (patch) below is what should have been written.                    
-            eq one_to_two : bool = false->
-            	--ERROR
-                previous_state = STATE1 and event(output);
-                --CORRECTED (patch)
---                previous_state = STATE1 and pre(event(output));
-                
-                  
+            	--The correction (patch) below is what should have been written (using 'pre').                    
+            eq one_to_two : bool = (false->
+            	--SPEC ERROR
+                previous_state = STATE1 and event(output));
+                --CORRECTED SPEC (patch)
+--                (previous_state = STATE1 and pre(event(output))));
+                    
             guarantee "Self loops": not some_transition => (state = previous_state);
             
             guarantee "Transition from 1 to 2":
                 one_to_two =>
                     state = STATE2;
-            
-            --No transition from 2 needed for the example
-                    
+       
             guarantee "Send output when an input is received in STATE 1":
-            	 output_condition =>
+            	 state1_output_condition =>
+            	 	event(output);
+ 	
+           	guarantee "Send output when an input is received in STATE 2":
+            	 state2_output_condition =>
             	 	event(output);
             	
-            --Suggested Problem Fix
-            	--Provides further spec definition to catch the above error
-            	--as a realizability failure
-            --Challenge/Issue with the fix
-           		--If output_condition overlaps with any state transitions, 
-           		--the error becomes undetectable again.
-           		--e.g., output_condition includes `state = STATE2 and event(input)
-           		--in this case, event(output) can occur in STATE2 immediately on state entry. 
---            guarantee "PROBLEM FIX: Define the event(output) in all other cases" :
---            	not output_condition => 
---            		not event(output);
-            		
-           
+            --Suggested Problem Fix (ERROR DETECTION IDIOM)
+            	-- Further specification about when an output event can and cannot occur
+            	-- (using iff to indicate it only occurs under the specific output predicates)
+            	-- Provides further spec definition to catch the above error
+            	-- as a realizability failure. 
+            --Challenge/Issue with the fix (CHALLENGE TO ERROR DETECTION)
+           		-- If output_condition overlaps with any state transitions, 
+           		-- the error becomes undetectable again.
+           		-- e.g., output_condition includes `state = STATE2 and event(input)
+           		-- in this case, event(output) can occur in STATE2 immediately on state entry. 
+            guarantee "PROBLEM FIX: Define the event(output) in all other cases" :
+            	all_output_conditions <=> 
+            		event(output);
 		**};
 		
 	end example;
