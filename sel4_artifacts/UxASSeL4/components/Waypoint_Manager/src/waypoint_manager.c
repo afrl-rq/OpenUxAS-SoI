@@ -1,9 +1,9 @@
 #include <tb_Waypoint_Manager.h>
-void in_mission(const MissionSoftware__mission_impl * mission) {
+void in_mission(const MissionSoftware__mission_command_impl * mission) {
 	printf("waypoint_manager.c:in_mission -- Received mission with address: %x\n",mission);
 }
 
-void in_waypoint(const MissionSoftware__waypoint_impl * waypoint) {
+void in_waypoint(const MissionSoftware__mission_command_impl * waypoint) {
 	printf("waypoint_manager.c:in_waypoint -- Received waypoint with address: %x\n",waypoint);
 }
 

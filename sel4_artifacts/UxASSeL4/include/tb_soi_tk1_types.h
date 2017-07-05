@@ -75,35 +75,7 @@ typedef
          int32_t buf_len  ; 
       } SMACCM_DATA__UART_Packet_i ; 
 
-typedef 
-      struct MissionSoftware__waypoint_impl { 
-         double latitude  ; 
-         double longitude  ; 
-         float altitude  ; 
-         int32_t altitude_type  ; 
-         int64_t id  ; 
-         int64_t nxid  ; 
-         float speed  ; 
-         float speed_type  ; 
-         float climbrate  ; 
-         int32_t turntype  ; 
-         uint16_t vehicleactionlistsize  ; 
-         int64_t contingencywaypointa  ; 
-         int64_t contingencywaypointb  ; 
-         uint16_t associatedtasksize  ; 
-      } MissionSoftware__waypoint_impl ; 
-
-typedef MissionSoftware__waypoint_impl MissionSoftware__waypoint_array_impl [65536]; 
-
-typedef 
-      struct MissionSoftware__mission_impl { 
-         int64_t commandid  ; 
-         int64_t vehicleid  ; 
-         uint16_t vehicleactionlistsize  ; 
-         int32_t status  ; 
-         MissionSoftware__waypoint_array_impl waypoints  ; 
-         int64_t startingid  ; 
-      } MissionSoftware__mission_impl ; 
+typedef uint8_t MissionSoftware__mission_command_impl [23264]; 
 
 typedef 
       struct tb_SMACCM_DATA__UART_Buffer_container { 
@@ -111,8 +83,8 @@ typedef
       } tb_SMACCM_DATA__UART_Buffer_container ; 
 
 typedef 
-      struct tb_MissionSoftware__waypoint_array_impl_container { 
-         MissionSoftware__waypoint_array_impl f  ; 
-      } tb_MissionSoftware__waypoint_array_impl_container ; 
+      struct tb_MissionSoftware__mission_command_impl_container { 
+         MissionSoftware__mission_command_impl f  ; 
+      } tb_MissionSoftware__mission_command_impl_container ; 
 
 #endif // __TB_AADL_soi_tk1_types__H

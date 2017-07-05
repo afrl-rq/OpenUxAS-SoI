@@ -37,15 +37,15 @@ AADL thread implementation Asset_Waypoint_Manager.
  **************************************************************************/
 
 import <Timer.idl4>;
-import <tb_Monitor_MissionSoftware__waypoint_impl_1.idl4>;
-import <tb_Monitor_MissionSoftware__waypoint_impl_1.idl4>;
+import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
+import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
 
 import <tb_Monitor_SMACCM_DATA__UART_Packet_i_1.idl4>;
 
 
-import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
+import <MissionSoftware__mission_command_impl_writer.idl4>;
 
-import <MissionSoftware__waypoint_impl_writer.idl4>;
+import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
 
 
 
@@ -56,8 +56,8 @@ component Asset_Waypoint_Manager {
 
     uses Timer tb_timer;
     consumes Notification tb_timer_complete;
-    uses tb_Monitor_MissionSoftware__waypoint_impl_1 tb_out_waypoint0;
-    uses tb_Monitor_MissionSoftware__waypoint_impl_1 tb_out_waypoint1;
+    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_out_waypoint0;
+    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_out_waypoint1;
 
     uses tb_Monitor_SMACCM_DATA__UART_Packet_i_1 tb_in_uart_packet;
     consumes QueuedData tb_in_uart_packet_notification;

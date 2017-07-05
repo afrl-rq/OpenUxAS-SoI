@@ -49,17 +49,17 @@ void component_entry(const int64_t * periodic_dispatcher);
 
  void component_init(const int64_t *arg);
  // reader prototype for tb_in_mission
-bool tb_in_mission_dequeue(MissionSoftware__mission_impl * tb_in_mission);
+bool tb_in_mission_dequeue(tb_MissionSoftware__mission_command_impl_container * tb_in_mission);
 // user dispatch entrypoints for port tb_in_mission
 
-void in_mission(const MissionSoftware__mission_impl * tb_in_mission);
+void in_mission(const MissionSoftware__mission_command_impl * tb_in_mission);
 
 
  // reader prototype for tb_in_waypoint
-bool tb_in_waypoint_dequeue(MissionSoftware__waypoint_impl * tb_in_waypoint);
+bool tb_in_waypoint_dequeue(tb_MissionSoftware__mission_command_impl_container * tb_in_waypoint);
 // user dispatch entrypoints for port tb_in_waypoint
 
-void in_waypoint(const MissionSoftware__waypoint_impl * tb_in_waypoint);
+void in_waypoint(const MissionSoftware__mission_command_impl * tb_in_waypoint);
 
 
  // reader prototype for tb_in_send_success
