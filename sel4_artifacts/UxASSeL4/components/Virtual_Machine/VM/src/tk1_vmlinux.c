@@ -47,6 +47,65 @@ extern irq_server_t _irq_server;
 extern seL4_CPtr _fault_endpoint;
 
 
+#ifdef APP_SOI_TK1
+static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
+//    vusb_device_t* vusb;
+//    usb_ctrl_regs_t *ctrl_regs;
+//    uint32_t* reg;
+//    int offset;
+//
+//    assert(d->priv);
+//    offset = fault_get_address(fault) - d->pstart - 0x1000;
+//    vusb = device_to_vusb_dev_data(d);
+//    ctrl_regs = vusb->ctrl_regs;
+//    reg = (uint32_t*)((void*)ctrl_regs + (offset & ~0x3));
+//    if (fault_is_read(fault)) {
+//        if (reg != &ctrl_regs->status) {
+//            fault_set_data(fault, *reg);
+//        }
+//    } else {
+//        if (reg == &ctrl_regs->status) {
+//            /* start a transfer */
+//            root_hub_ctrl_start(vusb->hcd, ctrl_regs);
+//        } else if (reg == &ctrl_regs->intr) {
+//            /* Clear the interrupt pending flag */
+//            *reg = fault_emulate(fault, *reg);
+//        } else if (reg == &ctrl_regs->notify) {
+//            /* Manual notification */
+//            vm_vusb_notify(vusb);
+//        } else if (reg == &ctrl_regs->cancel_transaction) {
+//            /* Manual notification */
+//            vm_vusb_cancel(vusb, fault_get_data(fault));
+//        } else if ((void*)reg >= (void*)&ctrl_regs->req) {
+//            /* Fill out the root hub USB request */
+//            *reg = fault_emulate(fault, *reg);
+//        }
+//    }   
+//    return advance_fault(fault);
+    int addr;
+    uint8_t data;
+
+    addr = fault_get_address(fault);
+    printf("VM RECEIVED FAULT at addr:%x\n", addr);
+
+    if(fault_is_write(fault)){
+        data = (uint8_t *)fault_get_data(fault);
+
+    }
+
+    return ignore_fault(fault);
+}
+
+const struct device dev_uxas_waypoint = {
+    .devid = DEV_CUSTOM,
+    .name = "waypoint",
+    .pstart = 0xE0000000, //this is an empty address on the tk1
+    .size = 0x1000,
+    .handle_page_fault = handle_waypoint_fault,
+    .priv = NULL
+};
+#endif //APP_SOI_TK1
+
 static const struct device *linux_pt_devices[] = {
     &dev_usb1,
     &dev_usb3,
@@ -409,7 +468,10 @@ install_linux_devices(vm_t* vm)
         err = vm_install_passthrough_device(vm, linux_pt_devices[i]);
         assert(!err);
     }
+
+#ifdef APP_SOI_TK1
     err = vm_add_device(vm, &dev_uxas_waypoint);
+#endif
 
     /* Install ram backed devices */
     /* Devices that are just anonymous memory mappings */
