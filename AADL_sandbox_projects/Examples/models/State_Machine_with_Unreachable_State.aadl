@@ -76,10 +76,4 @@ public
         **};
         end sm;
 
--- This empty implementation allows us to run the Test Case Generator on the contract
---  alone, but the results are not useful b/c we aren't really giving it an implementation
---  to run against.       
-system implementation sm.Impl
-end sm.Impl;
-
 end State_Machine_with_Unreachable_State;
