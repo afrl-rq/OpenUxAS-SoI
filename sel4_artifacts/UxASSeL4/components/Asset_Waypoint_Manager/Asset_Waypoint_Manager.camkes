@@ -43,6 +43,7 @@ import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 
 import <void_writer.idl4>;
+import <tb_Monitor_void_1.idl4>;
 
 import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
 

@@ -45,34 +45,38 @@ import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
 
 import <gen_fwd.idl4>;
 
-import "VM_shim/VM_shim.camkes";
 import "VM/VM.camkes";
 
 import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 component Virtual_Machine {
     include <tb_soi_tk1_types.h>;
-    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_out_mission0;
-    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_in_waypoint;
-    consumes QueuedData tb_in_waypoint_notification;
+
+    uses tb_Monitor_void_1 tb_mission_read;
+    consumes QueuedData tb_mission_read_notification;
+    uses tb_Monitor_void_1 tb_waypoint_write;
+    consumes QueuedData tb_waypoint_write_notification;
+
+    dataport MissionSoftware__mission_command_impl mission;
+    dataport MissionSoftware__mission_command_impl waypoint;
 
     uses gen_fwd_inf uartfwd;
     uses gen_fwd_inf clkcarfwd;
 
  composition {
         component VM vm_obj;
-        component VM_shim vm_shim_obj;
 
-        export vm_shim_obj.tb_out_mission -> tb_out_mission0;
-        export vm_shim_obj.tb_in_waypoint -> tb_in_waypoint;
-        export vm_shim_obj.tb_in_waypoint_notification -> tb_in_waypoint_notification;
         export vm_obj.uartfwd -> uartfwd;
         export vm_obj.clkcarfwd -> clkcarfwd;
+        export vm_obj.mission -> mission;
+        export vm_obj.waypoint -> waypoint;
 
-        connection seL4SharedData mission(from vm_obj.mission, to vm_shim_obj.mission);
-        connection seL4SharedData waypoint(from vm_shim_obj.waypoint, to vm_obj.waypoint);
-        connection seL4Notification waypoint_notif(from vm_shim_obj.waypoint_notif, to vm_obj.waypoint_notif);
-        connection seL4Notification mission_notif(from vm_obj.mission_notif, to vm_shim_obj.mission_notif);
+        export vm_obj.tb_mission_read -> tb_mission_read;
+        export vm_obj.tb_waypoint_write -> tb_waypoint_write;
+
+        export vm_obj.tb_mission_read_notification -> tb_mission_read_notification;
+        export vm_obj.tb_waypoint_write_notification -> tb_waypoint_write_notification;
+
     }   
 
   configuration {
