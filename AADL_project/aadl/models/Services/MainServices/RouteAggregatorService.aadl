@@ -161,14 +161,15 @@ thread RouteAggregatorService
 		-- modifying them, but we can't do that without building the array of responses or changing the data structure (interface)
 		-- somehow.	
 		
+		--Think of these Boolean variables as a predicates
 		eq route_response_consists_of_route_plan_responses_received : bool;
 		guarantee "The routes in RouteResponse_out are the route plan responses received." :
-			route_response_consists_of_route_plan_responses_received;
+			route_response_consists_of_route_plan_responses_received; --guarantee that this predicate is true
 		
 		eq route_plan_request_sent_for_each_vehicleID : bool;	
 		guarantee "For each vehicle ID in the VehicleID array of the route request, a route plan request message is sent
 		    with a matchine Vehicle ID (and the rest of the contents the same)":
-		    route_plan_request_sent_for_each_vehicleID;
+		    route_plan_request_sent_for_each_vehicleID; --guarantee that this predicate is true
 		
 		-------------------------------------------------------------
 		-- The guarantees below this line depend on some internal state. That is difficult to
@@ -176,17 +177,14 @@ thread RouteAggregatorService
 		--  requests at a time. We would be forced to fix the number it can serve to some max
 		--  for modeling purposes. Not sure we want to do that.
 		--  Q for Sean/Derek: Does it really serve an arbitrary number or is there a max?
-		--
+		--	A from Sean: It's variable depending on number of requests you make.
+		
 		-- Note: I do have a formal version of these guarantee in RouteAggregatorService_OneRequestAtATime
 		--
+		--Tony: Maybe this can be done with variables for current request and associated route plan request.
 		eq contents_of_route_plan_requests_match_contents_of_route_request : bool;
-		guarantee "Contents of route plan requests match contents of route request (execept VehicleID and RequestID)" :
+		guarantee "Contents of route plan requests match contents of route request (except VehicleID and RequestID)" :
 			contents_of_route_plan_requests_match_contents_of_route_request;
-
-		-- Should we pick a time window so that we can state the following property? 
-		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
-		--   We would need to assume that the route planners respond in a timely manner
-		--   in order to guarantee that. 	
 
 		-- We may want to add a guarantee about sending the route plan requests within some
 		--  timeframe. For now, as modeled, this service could sit on them forever. 
