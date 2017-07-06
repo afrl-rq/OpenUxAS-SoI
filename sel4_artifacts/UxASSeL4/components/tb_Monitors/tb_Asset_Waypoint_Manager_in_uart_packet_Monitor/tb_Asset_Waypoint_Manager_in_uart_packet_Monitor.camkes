@@ -34,7 +34,6 @@
   Monitor of type SMACCM_DATA__UART_Packet_i with input port tb_Asset_Waypoint_Manager_in_uart_packet
   queue size of 1. The output port set follows:
 
-   tb_UART_Driver_out_uart_packet
 
 
  **************************************************************************/

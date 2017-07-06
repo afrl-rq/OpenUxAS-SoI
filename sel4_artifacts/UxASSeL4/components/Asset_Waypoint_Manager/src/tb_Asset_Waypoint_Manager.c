@@ -87,35 +87,24 @@ void tb_timer_complete_callback(void *_ UNUSED) {
    (void)periodic_dispatcher_write_int64_t(&tb_time_periodic_dispatcher);
    CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
 }
-/************************************************************************
- *  tb_out_waypoint_enqueue:
- * Invoked from user code in the local thread.
- *
- * This is the function invoked by the local thread to make a
- * call to write to a remote data port.
- *
- * XXX: When simulating fan out, the caller of this function will only 
- * receive a positive response when all enqueues are successful. When a
- * negative response is received it only indicates that at least one
- * enqueue attempt failed.
- *
- ************************************************************************/
-bool tb_out_waypoint_enqueue
-(const MissionSoftware__mission_command_impl * tb_out_waypoint) {
-    bool tb_result = true ; 
-
-    tb_result &= tb_out_waypoint0_enqueue((tb_MissionSoftware__mission_command_impl_container *)tb_out_waypoint);
-
-    tb_result &= tb_out_waypoint1_enqueue((tb_MissionSoftware__mission_command_impl_container *)tb_out_waypoint);
-
-    return tb_result;
-}
 
 static void tb_in_uart_packet_notification_handler(void * unused) {
   MUTEXOP(tb_dispatch_sem_post())
   CALLBACKOP(tb_in_uart_packet_notification_reg_callback(tb_in_uart_packet_notification_handler, NULL));
 }
+/************************************************************************
+ *  tb_Asset_Waypoint_Manager_write_waypoint_write:
+ * Invoked from user code in the local thread.
+ *
+ * This is the function invoked by the local thread to make a
+ * call to write to a remote data port.
+ *
+ ************************************************************************/
 
+bool tb_Asset_Waypoint_Manager_write_waypoint_write(void) {
+    bool tb_result = true ; 
+    return tb_result;
+}
 
 
 void pre_init(void) {
@@ -124,6 +113,7 @@ void pre_init(void) {
     // Pre-initialization statements for Asset_Waypoint_Manager_initializer
     // Pre-initialization statements for tb_in_uart_packet
     CALLBACKOP(tb_in_uart_packet_notification_reg_callback(tb_in_uart_packet_notification_handler, NULL));
+    // Pre-initialization statements for tb_waypoint_read
 
 }
 
@@ -164,6 +154,17 @@ void tb_entrypoint_Asset_Waypoint_Manager_Asset_Waypoint_Manager_initializer(con
 void tb_entrypoint_tb_Asset_Waypoint_Manager_in_uart_packet(const SMACCM_DATA__UART_Packet_i * in_arg) {
     in_uart_packet((SMACCM_DATA__UART_Packet_i *) in_arg);
 
+}
+
+/************************************************************************
+ *  tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read:
+ *
+ * This is the function invoked by an active thread dispatcher to
+ * call to a user-defined entrypoint function.  It sets up the dispatch
+ * context for the user-defined entrypoint, then calls it.
+ *
+ ************************************************************************/
+void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read(void) {
 }
 
 

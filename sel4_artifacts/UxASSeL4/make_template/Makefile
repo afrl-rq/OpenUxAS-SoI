@@ -95,6 +95,20 @@ tb_Asset_Waypoint_Manager_in_uart_packet_Monitor_ASMFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_in_uart_packet_Monitor/src/*.S)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_in_uart_packet_Monitor/src/arch/${ARCH}/*.S)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_in_uart_packet_Monitor/src/plat/${PLAT}/*.S))
+tb_Asset_Waypoint_Manager_waypoint_read_Monitor_CFILES :=  \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/src/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/src/plat/${PLAT}/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/src/arch/${ARCH}/*.c))
+
+tb_Asset_Waypoint_Manager_waypoint_read_Monitor_HFILES := \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/include/*.h)) \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
+
+tb_Asset_Waypoint_Manager_waypoint_read_Monitor_ASMFILES := \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/crt/arch-${ARCH}/crt0.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/src/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/src/arch/${ARCH}/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_Monitor/src/plat/${PLAT}/*.S))
 
 Waypoint_Manager_CFILES :=  \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/*.c)) \
@@ -111,34 +125,6 @@ Waypoint_Manager_ASMFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/arch/${ARCH}/*.S)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/plat/${PLAT}/*.S))
 
-tb_Waypoint_Manager_in_mission_Monitor_CFILES :=  \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/src/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/src/plat/${PLAT}/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/src/arch/${ARCH}/*.c))
-
-tb_Waypoint_Manager_in_mission_Monitor_HFILES := \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/include/*.h)) \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
-
-tb_Waypoint_Manager_in_mission_Monitor_ASMFILES := \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/crt/arch-${ARCH}/crt0.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/src/*.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/src/arch/${ARCH}/*.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_mission_Monitor/src/plat/${PLAT}/*.S))
-tb_Waypoint_Manager_in_waypoint_Monitor_CFILES :=  \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/src/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/src/plat/${PLAT}/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/src/arch/${ARCH}/*.c))
-
-tb_Waypoint_Manager_in_waypoint_Monitor_HFILES := \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/include/*.h)) \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
-
-tb_Waypoint_Manager_in_waypoint_Monitor_ASMFILES := \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/crt/arch-${ARCH}/crt0.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/src/*.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/src/arch/${ARCH}/*.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_waypoint_Monitor/src/plat/${PLAT}/*.S))
 tb_Waypoint_Manager_in_send_success_Monitor_CFILES :=  \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_send_success_Monitor/src/*.c)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_send_success_Monitor/src/plat/${PLAT}/*.c)) \
@@ -153,6 +139,34 @@ tb_Waypoint_Manager_in_send_success_Monitor_ASMFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_send_success_Monitor/src/*.S)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_send_success_Monitor/src/arch/${ARCH}/*.S)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_in_send_success_Monitor/src/plat/${PLAT}/*.S))
+tb_Waypoint_Manager_mission_write_Monitor_CFILES :=  \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/src/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/src/plat/${PLAT}/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/src/arch/${ARCH}/*.c))
+
+tb_Waypoint_Manager_mission_write_Monitor_HFILES := \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/include/*.h)) \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
+
+tb_Waypoint_Manager_mission_write_Monitor_ASMFILES := \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/crt/arch-${ARCH}/crt0.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/src/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/src/arch/${ARCH}/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/src/plat/${PLAT}/*.S))
+tb_Waypoint_Manager_waypoint_read_Monitor_CFILES :=  \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/src/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/src/plat/${PLAT}/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/src/arch/${ARCH}/*.c))
+
+tb_Waypoint_Manager_waypoint_read_Monitor_HFILES := \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/include/*.h)) \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
+
+tb_Waypoint_Manager_waypoint_read_Monitor_ASMFILES := \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/crt/arch-${ARCH}/crt0.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/src/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/src/arch/${ARCH}/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Waypoint_Manager_waypoint_read_Monitor/src/plat/${PLAT}/*.S))
 
 Virtual_Machine_CFILES :=  \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Virtual_Machine/src/*.c)) \
@@ -169,20 +183,34 @@ Virtual_Machine_ASMFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Virtual_Machine/src/arch/${ARCH}/*.S)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Virtual_Machine/src/plat/${PLAT}/*.S))
 
-tb_Virtual_Machine_in_waypoint_Monitor_CFILES :=  \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/src/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/src/plat/${PLAT}/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/src/arch/${ARCH}/*.c))
+tb_Virtual_Machine_mission_read_Monitor_CFILES :=  \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/src/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/src/plat/${PLAT}/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/src/arch/${ARCH}/*.c))
 
-tb_Virtual_Machine_in_waypoint_Monitor_HFILES := \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/include/*.h)) \
+tb_Virtual_Machine_mission_read_Monitor_HFILES := \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/include/*.h)) \
    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
 
-tb_Virtual_Machine_in_waypoint_Monitor_ASMFILES := \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/crt/arch-${ARCH}/crt0.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/src/*.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/src/arch/${ARCH}/*.S)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_in_waypoint_Monitor/src/plat/${PLAT}/*.S))
+tb_Virtual_Machine_mission_read_Monitor_ASMFILES := \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/crt/arch-${ARCH}/crt0.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/src/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/src/arch/${ARCH}/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/src/plat/${PLAT}/*.S))
+tb_Virtual_Machine_waypoint_write_Monitor_CFILES :=  \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/src/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/src/plat/${PLAT}/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/src/arch/${ARCH}/*.c))
+
+tb_Virtual_Machine_waypoint_write_Monitor_HFILES := \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/include/*.h)) \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
+
+tb_Virtual_Machine_waypoint_write_Monitor_ASMFILES := \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/crt/arch-${ARCH}/crt0.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/src/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/src/arch/${ARCH}/*.S)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/src/plat/${PLAT}/*.S))
 
 
 dispatch_periodic_CFILES :=  \

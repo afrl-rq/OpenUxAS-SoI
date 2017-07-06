@@ -48,8 +48,8 @@ void clock_irq_callback(void);
 uint64_t clock_get_time();
 
 // Declarations for managing periodic thread dispatch
-const uint32_t aadl_tick_interval = 1;
-const uint32_t aadl_hyperperiod_subdivisions = 100;
+const uint32_t aadl_tick_interval = 100;
+const uint32_t aadl_hyperperiod_subdivisions = 1;
 uint32_t aadl_calendar_counter = 0;
 uint32_t aadl_calendar_ticks = 0;
 
@@ -57,7 +57,7 @@ uint32_t aadl_calendar_ticks = 0;
 void tb_thread_calendar() {
     if ((aadl_calendar_counter % (100 / aadl_tick_interval)) == 0) {
         Asset_Waypoint_Manager_periodic_dispatcher_emit();
-    }if ((aadl_calendar_counter % (1 / aadl_tick_interval)) == 0) {
+    }if ((aadl_calendar_counter % (100 / aadl_tick_interval)) == 0) {
         Waypoint_Manager_periodic_dispatcher_emit();
     }
 
@@ -91,7 +91,7 @@ void timer_complete_callback() {
 int run(void)
 {
     clock_init();
-    clock_set_interval_in_ms(1);
+    clock_set_interval_in_ms(100);
 
     clock_start_timer();
 
