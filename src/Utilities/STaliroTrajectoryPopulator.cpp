@@ -38,6 +38,7 @@ namespace testgeneration
             
             double curLatitude = airVehicleState->getLocation()->getLatitude();
             double curLongitude = airVehicleState->getLocation()->getLongitude();
+            double curAltitude = airVehicleState->getLocation()->getAltitude();
             uint32_t indexStart = 0;
 
             if (airVehicleState->getID() == 400)
@@ -46,10 +47,11 @@ namespace testgeneration
             }
             else if (airVehicleState->getID() == 500)
             {
-                indexStart = 2;
+                indexStart = 3;
             }
             (*trajectory)[curTime][indexStart] = curLatitude;
             (*trajectory)[curTime][indexStart+1] = curLongitude;
+            (*trajectory)[curTime][indexStart+2] = curAltitude;
         }
     }
 }
