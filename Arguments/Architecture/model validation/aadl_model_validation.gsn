@@ -67,6 +67,12 @@
               name="Strategy">
             Argue validation of decomposed component specification entities.
 
+            <c
+                id="__gsn__15d15315f57"
+                name="Context">
+              {AADL component specification entities}
+            </c>
+
             <g
                 id="__gsn__15cf9be8147"
                 name="Component Type Definition">
@@ -152,26 +158,91 @@
             Argue requirement satisfaction by form verification, validation of the formal model, and where necessary validation informally.
 
             <g
-                id="__gsn__15cfb92545b"
-                name="Model Verification">
-            </g>
+                id="__gsn__15d15294ecf"
+                repeat="true"
+                name="{Requirement} Satisfaction">
+              {Requirement} is satisfied by the architecture.
 
-            <g
-                id="__gsn__15cfb925833"
-                name="Verificaiton Model Validation">
+              <c
+                  id="__gsn__15d15299344"
+                  name="Context">
+                {requirement}
+              </c>
 
-              <m
-                  id="__gsn__15cfb9356a1"
-                  link="agree_validation.gsn"
-                  name="AGREE">
-                AGREE validation
-              </m>
-            </g>
+              <c
+                  id="__gsn__15d152eda77"
+                  name="Definition">
+                {requirement satisfaction by the architecture}
+              </c>
 
-            <g
-                id="__gsn__15cfb928ba2"
-                optional="true"
-                name="Informal">
+              <s
+                  id="__gsn__15d1529ca09"
+                  optional="true"
+                  name="Strategy">
+                Argue satisfaction by formal verification
+
+                <g
+                    id="__gsn__15cfb92545b"
+                    name="Requirement Verification">
+                  {Requirement} is formally verified to be satisfied by the architecture.
+                </g>
+
+                <g
+                    id="__gsn__15cfb925833"
+                    name="Model Validation">
+                  The formal model is valid
+
+                  <c
+                      id="__gsn__15d153006e6"
+                      name="Definition">
+                    {valid}
+                  </c>
+
+                  <m
+                      id="__gsn__15cfb9356a1"
+                      link="agree_validation.gsn"
+                      name="AGREE">
+                    AGREE validation
+
+                    <comment
+                        id="__gsn__15d152a8806"
+                        name="Rodes">
+                      This module (under the current arg. design) will need to address informalisms (assumptions etc.) that are outside of the formalism.
+                    </comment>
+                  </m>
+                </g>
+              </s>
+
+              <s
+                  id="__gsn__15d1529d2b0"
+                  optional="true"
+                  name="Evidence Scheme">
+                Argue satisfaction by informal assessment
+
+                <g
+                    id="__gsn__15cfb928ba2"
+                    name="Informal">
+                  Relevant experts assess {requirement} as satisfied by the architecture.
+
+                  <c
+                      id="__gsn__15d152bc183"
+                      name="Context">
+                    {relevant experts}
+                  </c>
+
+                  <s
+                      id="__gsn__15d152bc184"
+                      name="Evidence Scheme">
+                    {component manual review}
+
+                    <e
+                        id="__gsn__15d152bc185"
+                        name="Evidence">
+                      {sign off and report}
+                    </e>
+                  </s>
+                </g>
+              </s>
             </g>
           </s>
 

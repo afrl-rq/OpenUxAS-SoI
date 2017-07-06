@@ -31,7 +31,7 @@
     <g
         id="__gsn__15cf9c05961"
         name="AGREE Abstraction Correctness">
-      All abstractions within {component} correctly abstracts the intended behavior and characteristics.
+      All AGREE abstractions within {component} correctly abstracts the intended component behavior and characteristics.
 
       <c
           id="__gsn__15cf9c31dad"
@@ -54,6 +54,19 @@
             id="__gsn__15cf9c1d8bd"
             repeat="true"
             name="{Abstraction} is Correct">
+          {Abstraction} is a correct representation of {concept}
+
+          <c
+              id="__gsn__15d1526b1c6"
+              name="Context">
+            {abstraction description}
+          </c>
+
+          <c
+              id="__gsn__15d15272806"
+              name="Context">
+            {concept}
+          </c>
 
           <s
               id="__gsn__15cf9c7e6e8"

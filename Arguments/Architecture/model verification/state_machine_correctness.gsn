@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15d15364bdd"
+        name="State Machine Correctness">
+      All AGREE state machines are correct
+
+      <s
+          id="__gsn__15d153893ec"
+          name="Strategy">
+        Argue correctness of each component’s internal AGREE state machine representation
+
+        <g
+            id="__gsn__15d15389a52"
+            repeat="true"
+            name="{Component} State Machine">
+          {Component} state agree state machine is correct.
+
+          <s
+              id="__gsn__15d1536fdc8"
+              name="Strategy">
+            Argue correctness of each characteristic of a finite state machine
+
+            <c
+                id="__gsn__15d153ba518"
+                name="Context">
+              {characteristics of a FSM}
+            </c>
+
+            <g
+                id="__gsn__15d1537066f"
+                name="States">
+              {component} states are correct
+
+              <c
+                  id="__gsn__15d15452280"
+                  name="Context">
+                {states}
+              </c>
+
+              <s
+                  id="__gsn__15d154ccff4"
+                  name="Strategy">
+
+                <g
+                    id="__gsn__15d154cd3cc"
+                    name="State Verification">
+
+                  <s
+                      id="__gsn__15d15568763"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15d15568d83"
+                        name="State Reachability">
+                    </g>
+
+                    <g
+                        id="__gsn__15d1556b7a2"
+                        name="Behavior Correctness">
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15d154cd6f8"
+                    name="State Validation">
+
+                  <c
+                      id="__gsn__15d1567f890"
+                      name="Context">
+                    {correct}
+                  </c>
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15d15372999"
+                name="Transitions">
+              {Component} state machine transitions correctly between states
+
+              <c
+                  id="__gsn__15d15450d67"
+                  name="Context">
+                {transitions}
+              </c>
+
+              <s
+                  id="__gsn__15d154c50be"
+                  name="Strategy">
+                Argue by verification that {state transitions} ...
+
+                <g
+                    id="__gsn__15d154c61ae"
+                    name="Transition Verification">
+                  {tbd}
+                </g>
+
+                <g
+                    id="__gsn__15d154c649f"
+                    name="Transition Validation">
+                  {tbd}
+
+                  <c
+                      id="__gsn__15d1567e0e0"
+                      name="Context">
+                    {correct}
+                  </c>
+
+                  <s
+                      id="__gsn__15d1554ada3"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15d1554b5c3"
+                        name="Correct State Connections">
+                    </g>
+
+                    <g
+                        id="__gsn__15d1555e14b"
+                        name="Only Transition Under Given Transitions">
+                    </g>
+
+                    <g
+                        id="__gsn__15d15565d04"
+                        name="Transitions Reachable">
+                    </g>
+
+                    <g
+                        id="__gsn__15d1556e40a"
+                        name="Behavior correctness">
+                    </g>
+                  </s>
+                </g>
+
+                <comment
+                    id="__gsn__15d15526110"
+                    name="Rodes">
+                  TODO: Only transitions under specific transitions, the transitions are appropriate (connected to the right states), not erroneously specified
+                </comment>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15d153738a0"
+                name="Start State">
+              {Component} state machine is initialized at the correct start state.
+
+              <c
+                  id="__gsn__15d15400fcd"
+                  name="Context">
+                {start state}
+              </c>
+
+              <s
+                  id="__gsn__15d153ef2e8"
+                  name="Strategy">
+                Argue by verification that {start state} is the start state and correctness of {start state}
+
+                <g
+                    id="__gsn__15d153ef6b8"
+                    name="Start State Verification">
+                  {Component} start state is {start state}
+
+                  <s
+                      id="__gsn__15d153b18ec"
+                      name="Evidence Scheme">
+                    {AGREE lemma for start states  }
+
+                    <c
+                        id="__gsn__15d153b18ed"
+                        name="Context">
+                      {idiom documentation}
+                    </c>
+
+                    <e
+                        id="__gsn__15d153b18ef"
+                        name="Evidence">
+                      {AGREE lemma proof}
+                    </e>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15d153f0ef6"
+                    name="Start State Validation">
+                  {Component} {start state} is the correct start state.
+
+                  <c
+                      id="__gsn__15d1565bc9a"
+                      name="Context">
+                    {correct}
+                  </c>
+
+                  <s
+                      id="__gsn__15d153a3958"
+                      name="Evidence Scheme">
+                    {manual inspection}
+
+                    <e
+                        id="__gsn__15d153a3959"
+                        name="Evidence">
+                      {inspection report and sign off}
+
+                      <comment
+                          id="__gsn__15d15419e64"
+                          name="Rodes">
+                        Must include consistency check with AADL or subdivide this argument to include AADL consistency as one assessment.
+                      </comment>
+                    </e>
+                  </s>
+
+                  <s
+                      id="__gsn__15d1563bfd0"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15d1563c7b6"
+                        name="TBD">
+                      Behavior
+
+                      <s
+                          id="__gsn__15d156524e5"
+                          name="Strategy">
+                        {formal and informal}
+                      </s>
+                    </g>
+                  </s>
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15d153748c8"
+                name="Terminal States">
+              {Component} state machine terminates in the correct terminal states
+
+              <c
+                  id="__gsn__15d153e56c8"
+                  name="Context">
+                {terminal states}
+              </c>
+
+              <s
+                  id="__gsn__15d153ca91a"
+                  name="Strategy">
+                Argue by verification that {terminal states} are the only terminal states and {terminal states} are correct.
+
+                <g
+                    id="__gsn__15d153cb420"
+                    name="Terminal State Verification">
+                  {Component} only terminates in {terminal states}
+
+                  <s
+                      id="__gsn__15d154f1546"
+                      name="Evidence Scheme">
+                    {AGREE lemma for terminal states  }
+
+                    <c
+                        id="__gsn__15d154f1547"
+                        name="Context">
+                      {idiom documentation}
+                    </c>
+
+                    <e
+                        id="__gsn__15d154f1549"
+                        name="Evidence">
+                      {AGREE lemma proof}
+                    </e>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15d153ccd5a"
+                    name="Terminal State Validation">
+                  {Component} {terminal states} are the correct terminal states.
+
+                  <c
+                      id="__gsn__15d156637cb"
+                      name="Context">
+                    {correct}
+                  </c>
+
+                  <s
+                      id="__gsn__15d1561f57a"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15d1566a8df"
+                        name="TBD">
+                      Behavior
+
+                      <c
+                          id="__gsn__15d156a41d1"
+                          name="Context">
+                        {behavior}
+                      </c>
+
+                      <s
+                          id="__gsn__15d153d3e20"
+                          optional="true"
+                          name="Evidence Scheme">
+                        {manual inspection}
+
+                        <e
+                            id="__gsn__15d153d3e21"
+                            name="Evidence">
+                          {inspection report and sign off}
+
+                          <comment
+                              id="__gsn__15d1543d977"
+                              name="Rodes">
+                            Must include checking completeness of the set in addition to verifying that only the intended states are terminal states or the argument must be subdivided.
+                          </comment>
+
+                          <comment
+                              id="__gsn__15d1544a690"
+                              name="Rodes">
+                            Must include consistency check with AADL or subdivide this argument to include AADL consistency as one assessment.
+                          </comment>
+                        </e>
+                      </s>
+
+                      <s
+                          id="__gsn__15d1569d848"
+                          optional="true"
+                          name="Evidence Scheme">
+                        {AGREE lemma for terminal states  }
+
+                        <c
+                            id="__gsn__15d1569d849"
+                            name="Context">
+                          {idiom documentation}
+                        </c>
+
+                        <e
+                            id="__gsn__15d1569d84a"
+                            name="Evidence">
+                          {AGREE lemma proof}
+                        </e>
+
+                        <comment
+                            id="__gsn__15d156aa35a"
+                            name="Rodes">
+                          TODO: the same V&amp;V issues come up again here. How can we simplify?
+                        </comment>
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15d1566f888"
+                        name="TBD">
+                      Complete
+
+                      <s
+                          id="__gsn__15d1566f889"
+                          name="Strategy">
+                        {informal}
+                      </s>
+                    </g>
+                  </s>
+                </g>
+              </s>
+            </g>
+          </s>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
