@@ -72,6 +72,9 @@ interface and so contention may occur.
 bool tb_out_uart_packet_enqueue
 (const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet) {
     bool tb_result = true ; 
+
+    tb_result &= tb_out_uart_packet0_enqueue((SMACCM_DATA__UART_Packet_i *)tb_out_uart_packet);
+
     return tb_result;
 }
 /************************************************************************

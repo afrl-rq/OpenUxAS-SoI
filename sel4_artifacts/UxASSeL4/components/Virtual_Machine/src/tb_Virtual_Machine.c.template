@@ -57,59 +57,44 @@ interface and so contention may occur.
 #include <camkes.h>
 
 /************************************************************************
- *  tb_Virtual_Machine_write_mission_write:
+ *  tb_out_mission_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
  * call to write to a remote data port.
  *
- ************************************************************************/
-
-bool tb_Virtual_Machine_write_mission_write(void) {
-    bool tb_result = true ; 
-    return tb_result;
-}/************************************************************************
- *  tb_Virtual_Machine_write_waypoint_read:
- * Invoked from user code in the local thread.
- *
- * This is the function invoked by the local thread to make a
- * call to write to a remote data port.
+ * XXX: When simulating fan out, the caller of this function will only 
+ * receive a positive response when all enqueues are successful. When a
+ * negative response is received it only indicates that at least one
+ * enqueue attempt failed.
  *
  ************************************************************************/
-
-bool tb_Virtual_Machine_write_waypoint_read(void) {
+bool tb_out_mission_enqueue
+(const MissionSoftware__mission_impl * tb_out_mission) {
     bool tb_result = true ; 
+
+    tb_result &= tb_out_mission0_enqueue((MissionSoftware__mission_impl *)tb_out_mission);
+
     return tb_result;
 }
+
 
 
 void pre_init(void) {
 
-    // Pre-initialization statements for tb_mission_read
-    // Pre-initialization statements for tb_waypoint_write
+    // Pre-initialization statements for tb_in_waypoint
 
 }
 
 /************************************************************************
- *  tb_entrypoint_tb_Virtual_Machine_mission_read:
+ *  tb_entrypoint_tb_Virtual_Machine_in_waypoint:
  *
  * This is the function invoked by an active thread dispatcher to
  * call to a user-defined entrypoint function.  It sets up the dispatch
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Virtual_Machine_mission_read(void) {
-}
-
-/************************************************************************
- *  tb_entrypoint_tb_Virtual_Machine_waypoint_write:
- *
- * This is the function invoked by an active thread dispatcher to
- * call to a user-defined entrypoint function.  It sets up the dispatch
- * context for the user-defined entrypoint, then calls it.
- *
- ************************************************************************/
-void tb_entrypoint_tb_Virtual_Machine_waypoint_write(void) {
+void tb_entrypoint_tb_Virtual_Machine_in_waypoint(const MissionSoftware__waypoint_impl * in_arg) {
 }
 
 

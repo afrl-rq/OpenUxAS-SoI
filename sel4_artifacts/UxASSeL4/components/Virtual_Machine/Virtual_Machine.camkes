@@ -45,8 +45,6 @@ import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
 
 import <gen_fwd.idl4>;
 
-import "VM/VM.camkes";
-
 import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 component Virtual_Machine {
@@ -62,56 +60,5 @@ component Virtual_Machine {
 
     uses gen_fwd_inf uartfwd;
     uses gen_fwd_inf clkcarfwd;
-
- composition {
-        component VM vm_obj;
-
-        export vm_obj.uartfwd -> uartfwd;
-        export vm_obj.clkcarfwd -> clkcarfwd;
-        export vm_obj.mission -> mission;
-        export vm_obj.waypoint -> waypoint;
-
-        export vm_obj.tb_mission_read -> tb_mission_read;
-        export vm_obj.tb_waypoint_write -> tb_waypoint_write;
-
-        export vm_obj.tb_mission_read_notification -> tb_mission_read_notification;
-        export vm_obj.tb_waypoint_write_notification -> tb_waypoint_write_notification;
-
-    }   
-
-  configuration {
-        vm_obj.base_prio = 100;
-        vm_obj.priority = 101;
-        vm_shim_obj.priority = 103;
-
-        vm_obj.untyped_mmios = [ 
-            "0x50046000:12", // Interrupt Controller Virtual CPU interface (Virtual Machine view)
-            "0x60004000:12", // Interrupt controller registers (ICTLR)
-            "0x700b0000:12", // SDMMC-1, SDMMC-2, SDMMC-3, SDMMC-4,
-            "0x7d000000:12", // USB on-the-go (micro)
-            "0x7d004000:12", // USB on top board
-            "0x7d008000:12", // USB on bottom board
-            "0xb0000000:28", // Linux kernel memory regions
-            "0xc0000000:29", // Linux kernel memory regions
-            "0xe0000000:28", // Linux kernel memory regions
-            ];
-
-        vm_obj.irqs =  [
-            27, // INTERRUPT_VGPT (INTERRUPT_PPI_11)
-            53, // INTERRUPT_USB2
-            63, // INTERRUPT_SDMMC4
-            122, // INTERRUPT_UARTD
-            129, // INTERRUPT_USB3
-            ];
-
-        vm_obj.smmu = [10, 23];
-
-        vm_obj.asid_pool = true;
-
-        vm_obj.simple = true;
-        vm_obj.cnode_size_bits = 21; 
-        vm_obj.simple_untyped24_pool = 10; 
-
-    }
 
 }
