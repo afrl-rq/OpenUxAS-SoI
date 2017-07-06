@@ -74,6 +74,14 @@ public
 			d5: data access waypoint -> asset_waypoint_manager.waypoint;
 			d6: data access waypoint -> virtual_machine.waypoint;
 			
+			e1: port virtual_machine.mission_write -> waypoint_manager.mission_write;
+			e2: port waypoint_manager.mission_read -> virtual_machine.mission_read;
+			e3: port virtual_machine.waypoint_read -> asset_waypoint_manager.waypoint_read_vm;
+			e4: port waypoint_manager.waypoint_read -> asset_waypoint_manager.waypoint_read_wm;
+			e5: port asset_waypoint_manager.waypoint_write -> waypoint_manager.waypoint_write;
+			e6: port asset_waypoint_manager.waypoint_write -> virtual_machine.waypoint_write;
+			
+			
 	end Mission_Software.i;
 
 	thread Clock_Driver
@@ -157,8 +165,8 @@ public
 			
 			mission_read : out event port;
 			mission_write : in event port;
-			waypoint_read : in event port;
-			waypoint_write : out event port;
+			waypoint_read : out event port;
+			waypoint_write : in event port;
 			
 			mission: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
@@ -193,7 +201,8 @@ public
 --			};
 			
 			waypoint_write: out event port;
-			waypoint_read: in event port;
+			waypoint_read_vm: in event port;
+			waypoint_read_wm: in event port;
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
 					};

@@ -50,8 +50,6 @@ import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 import <bool_writer.idl4>;
 
-import <void_writer.idl4>;
-
 import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
 
 
@@ -67,11 +65,9 @@ component Waypoint_Manager {
     consumes QueuedData tb_in_send_success_notification;
     uses tb_Monitor_SMACCM_DATA__UART_Packet_i_1 tb_out_uart_packet0;
 
-    uses tb_Monitor_void_1 tb_mission_write;
-    consumes QueuedData tb_mission_write_notification;
-    uses tb_Monitor_void_1 tb_waypoint_read;
-    consumes QueuedData tb_waypoint_read_notification;
-
+    emits Notification mission_read;
+    consumes Notification mission_write;emits Notification waypoint_read;
+    consumes Notification waypoint_write;
 
 
     // Provided interfaces for shared data
