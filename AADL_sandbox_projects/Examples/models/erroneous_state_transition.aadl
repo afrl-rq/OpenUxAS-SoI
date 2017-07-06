@@ -108,9 +108,9 @@ public
             	--The correction (patch) below is what should have been written (using 'pre').                    
             eq one_to_two : bool = (false->
             	--SPEC ERROR
- --               previous_state = STATE1 and event(output));
+                previous_state = STATE1 and event(output));
                 --CORRECTED SPEC (patch)
-                (previous_state = STATE1 and pre(event(output))));
+--                (previous_state = STATE1 and pre(event(output))));
                     
             guarantee "Self loops": not some_transition => (state = previous_state);
             
