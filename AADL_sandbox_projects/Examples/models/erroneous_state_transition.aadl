@@ -63,8 +63,8 @@ public
             
             ---Jen's Lemmas	
             lemma "Output event in state 1 => transition" :
-                pre(event(sub.output)) and (true -> (pre(sub.state) = sub.STATE1))
-                    => (sub.state = sub.STATE2);		
+                true -> (pre(event(sub.output)) and ((pre(sub.state) = sub.STATE1))
+                    => (sub.state = sub.STATE2));		
             
             lemma "Output event => transition with exceptions" :
                 true -> (pre(event(sub.output)) =>
@@ -108,9 +108,9 @@ public
             	--The correction (patch) below is what should have been written (using 'pre').                    
             eq one_to_two : bool = (false->
             	--SPEC ERROR
-                previous_state = STATE1 and event(output));
+ --               previous_state = STATE1 and event(output));
                 --CORRECTED SPEC (patch)
---                (previous_state = STATE1 and pre(event(output))));
+                (previous_state = STATE1 and pre(event(output))));
                     
             guarantee "Self loops": not some_transition => (state = previous_state);
             
