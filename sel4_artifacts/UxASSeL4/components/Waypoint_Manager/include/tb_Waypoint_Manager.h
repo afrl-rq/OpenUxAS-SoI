@@ -48,20 +48,6 @@ void component_entry(const int64_t * periodic_dispatcher);
 
 
  void component_init(const int64_t *arg);
- // reader prototype for tb_in_mission
-bool tb_in_mission_dequeue(tb_MissionSoftware__mission_command_impl_container * tb_in_mission);
-// user dispatch entrypoints for port tb_in_mission
-
-void in_mission(const MissionSoftware__mission_command_impl * tb_in_mission);
-
-
- // reader prototype for tb_in_waypoint
-bool tb_in_waypoint_dequeue(tb_MissionSoftware__mission_command_impl_container * tb_in_waypoint);
-// user dispatch entrypoints for port tb_in_waypoint
-
-void in_waypoint(const MissionSoftware__mission_command_impl * tb_in_waypoint);
-
-
  // reader prototype for tb_in_send_success
 bool tb_in_send_success_dequeue(bool * tb_in_send_success);
 // user dispatch entrypoints for port tb_in_send_success
@@ -70,6 +56,12 @@ void in_send_success(const bool * tb_in_send_success);
 
 
  bool tb_out_uart_packet_enqueue(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet);
+ bool tb_Waypoint_Manager_write_mission_read(void);
+ // reader prototype for tb_mission_write
+bool tb_mission_write_dequeue(void);
+ // reader prototype for tb_waypoint_read
+bool tb_waypoint_read_dequeue(void);
+ bool tb_Waypoint_Manager_write_waypoint_write(void);
  
 
 

@@ -46,13 +46,20 @@ public
 			asset_waypoint_manager: thread Asset_Waypoint_Manager;
 			waypoint_manager: thread Waypoint_Manager;
 			virtual_machine: thread Virtual_Machine;
+				
+			mission : data mission_command.impl{
+				TB_SYS::CAmkES_Owner_Thread => "Virtual_Machine"; --TODO this should be a subcomponent reference
+			};
+			waypoint : data mission_command.impl{
+				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager"; --TODO this should be a subcomponent reference
+			};
 
 		connections
-			vm2wm: port virtual_machine.out_mission -> waypoint_manager.in_mission;
+--			vm2wm: port virtual_machine.out_mission -> waypoint_manager.in_mission;
 			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;
-			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
-			awm2wm: port asset_waypoint_manager.out_waypoint -> waypoint_manager.in_waypoint;
-			awm2vm: port asset_waypoint_manager.out_waypoint -> virtual_machine.in_waypoint;
+--			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
+--			awm2wm: port asset_waypoint_manager.out_waypoint -> waypoint_manager.in_waypoint;
+--			awm2vm: port asset_waypoint_manager.out_waypoint -> virtual_machine.in_waypoint;
 			uart2wm: port uart_driver.out_send_success -> waypoint_manager.in_send_success;
 			
 			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
@@ -60,6 +67,12 @@ public
 			vm_clk_fwd: subprogram group access virtual_machine.clkcarfwd -> clock_driver.clkcarfwd;
 			
 			vm_uart_fwd: subprogram group access virtual_machine.uartfwd -> uart_driver.uartfwd;
+			
+			d1: data access mission -> virtual_machine.mission;
+			d2: data access mission -> waypoint_manager.mission;
+			d3: data access waypoint -> waypoint_manager.waypoint;
+			d5: data access waypoint -> asset_waypoint_manager.waypoint;
+			d6: data access waypoint -> virtual_machine.waypoint;
 			
 	end Mission_Software.i;
 
@@ -70,7 +83,7 @@ public
 		properties
 			TB_SYS::Is_External => true;
 			Priority => 253;
-			Dispatch_Protocol => Sporadic;
+			Dispatch_Protocol => Sporadic; 
 			TB_SYS::Thread_Type => Active;
 			Compute_Execution_Time => 10 us .. 100 us;
 	end Clock_Driver;
@@ -106,8 +119,21 @@ public
 
 	thread Virtual_Machine
 		features
-			out_mission: out event data port mission_command.impl;
-			in_waypoint: in event data port mission_command.impl;
+--			out_mission: out event data port mission_command.impl;
+--			in_waypoint: in event data port mission_command.impl;
+
+			mission_write: out event port;
+			mission_read : in event port;
+			waypoint_write: in event port;
+			waypoint_read : out event port;
+			mission: requires data access mission_command.impl {
+						Access_Right => READ_WRITE;
+					};
+			waypoint: requires data access mission_command.impl {
+						Access_Right => READ_WRITE;
+					};
+			
+			
 			
 			clkcarfwd: requires subprogram group access gen_fwd_inf;
 			uartfwd: requires subprogram group access gen_fwd_inf;
@@ -122,12 +148,25 @@ public
 	
 	thread Waypoint_Manager
 		features
-			in_mission: in event data port mission_command.impl {
-	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_mission");
-			};
-			in_waypoint: in event data port mission_command.impl {
-	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
-			};
+--			in_mission: in event data port mission_command.impl {
+--	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_mission");
+--			};
+--			in_waypoint: in event data port mission_command.impl {
+--	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
+--			};
+			
+			mission_read : out event port;
+			mission_write : in event port;
+			waypoint_read : in event port;
+			waypoint_write : out event port;
+			
+			mission: requires data access mission_command.impl {
+						Access_Right => READ_WRITE;
+					};
+			waypoint: requires data access mission_command.impl {
+						Access_Right => READ_WRITE;
+					};
+					
 			in_send_success: in event data port Base_Types::Boolean  {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_send_success");
 			};
@@ -139,19 +178,25 @@ public
 			Dispatch_Protocol => Periodic;
 			TB_SYS::Thread_Type => Active;
 			Priority => 150;
-			Stack_Size => 1024 Bytes;
+			Stack_Size => 1024 Bytes; 
 			Compute_Execution_Time => 10 us .. 100 us;
 			TB_SYS::Sends_Events_To => "{{}}";
 			TB_SYS::Compute_Entrypoint_Source_Text => ("component_entry");
 			Initialize_Entrypoint_Source_Text => "component_init";
-			Period => 1 ms;
+			Period => 100 ms;
 	end Waypoint_Manager;
 	
 	thread Asset_Waypoint_Manager
 		features
-			out_waypoint: out event data port mission_command.impl {
-	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_waypoint");
-			};
+--			out_waypoint: out event data port mission_command.impl {
+--	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_waypoint");
+--			};
+			
+			waypoint_write: out event port;
+			waypoint_read: in event port;
+			waypoint: requires data access mission_command.impl {
+						Access_Right => READ_WRITE;
+					};
 			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i {
 	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_uart_packet");
 			};
@@ -159,7 +204,7 @@ public
 			Source_Text => ("user_code/asset_waypoint_manager.c");
 	        Dispatch_Protocol => Periodic;
 		    Period => 100 ms;
-	   		Priority => 10;
+	   		Priority => 151;
 	    	Stack_Size => 256 bytes;
 	    	TB_SYS::Thread_Type => Active ;
 	    	Compute_Execution_Time => 10 us .. 50 us;

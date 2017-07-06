@@ -88,16 +88,6 @@ void tb_timer_complete_callback(void *_ UNUSED) {
    CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
 }
 
-static void tb_in_mission_notification_handler(void * unused) {
-  MUTEXOP(tb_dispatch_sem_post())
-  CALLBACKOP(tb_in_mission_notification_reg_callback(tb_in_mission_notification_handler, NULL));
-}
-
-static void tb_in_waypoint_notification_handler(void * unused) {
-  MUTEXOP(tb_dispatch_sem_post())
-  CALLBACKOP(tb_in_waypoint_notification_reg_callback(tb_in_waypoint_notification_handler, NULL));
-}
-
 static void tb_in_send_success_notification_handler(void * unused) {
   MUTEXOP(tb_dispatch_sem_post())
   CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
@@ -123,19 +113,41 @@ bool tb_out_uart_packet_enqueue
 
     return tb_result;
 }
+/************************************************************************
+ *  tb_Waypoint_Manager_write_mission_read:
+ * Invoked from user code in the local thread.
+ *
+ * This is the function invoked by the local thread to make a
+ * call to write to a remote data port.
+ *
+ ************************************************************************/
 
+bool tb_Waypoint_Manager_write_mission_read(void) {
+    bool tb_result = true ; 
+    return tb_result;
+}/************************************************************************
+ *  tb_Waypoint_Manager_write_waypoint_write:
+ * Invoked from user code in the local thread.
+ *
+ * This is the function invoked by the local thread to make a
+ * call to write to a remote data port.
+ *
+ ************************************************************************/
+
+bool tb_Waypoint_Manager_write_waypoint_write(void) {
+    bool tb_result = true ; 
+    return tb_result;
+}
 
 
 void pre_init(void) {
 
     // Pre-initialization statements for periodic_dispatcher
     // Pre-initialization statements for Waypoint_Manager_initializer
-    // Pre-initialization statements for tb_in_mission
-    CALLBACKOP(tb_in_mission_notification_reg_callback(tb_in_mission_notification_handler, NULL));
-    // Pre-initialization statements for tb_in_waypoint
-    CALLBACKOP(tb_in_waypoint_notification_reg_callback(tb_in_waypoint_notification_handler, NULL));
     // Pre-initialization statements for tb_in_send_success
     CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
+    // Pre-initialization statements for tb_mission_write
+    // Pre-initialization statements for tb_waypoint_read
 
 }
 
@@ -166,32 +178,6 @@ void tb_entrypoint_Waypoint_Manager_Waypoint_Manager_initializer(const int64_t *
 }
 
 /************************************************************************
- *  tb_entrypoint_tb_Waypoint_Manager_in_mission:
- *
- * This is the function invoked by an active thread dispatcher to
- * call to a user-defined entrypoint function.  It sets up the dispatch
- * context for the user-defined entrypoint, then calls it.
- *
- ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_in_mission(const MissionSoftware__mission_command_impl * in_arg) {
-    in_mission((MissionSoftware__mission_command_impl *) in_arg);
-
-}
-
-/************************************************************************
- *  tb_entrypoint_tb_Waypoint_Manager_in_waypoint:
- *
- * This is the function invoked by an active thread dispatcher to
- * call to a user-defined entrypoint function.  It sets up the dispatch
- * context for the user-defined entrypoint, then calls it.
- *
- ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_in_waypoint(const MissionSoftware__mission_command_impl * in_arg) {
-    in_waypoint((MissionSoftware__mission_command_impl *) in_arg);
-
-}
-
-/************************************************************************
  *  tb_entrypoint_tb_Waypoint_Manager_in_send_success:
  *
  * This is the function invoked by an active thread dispatcher to
@@ -202,6 +188,28 @@ void tb_entrypoint_tb_Waypoint_Manager_in_waypoint(const MissionSoftware__missio
 void tb_entrypoint_tb_Waypoint_Manager_in_send_success(const bool * in_arg) {
     in_send_success((bool *) in_arg);
 
+}
+
+/************************************************************************
+ *  tb_entrypoint_tb_Waypoint_Manager_mission_write:
+ *
+ * This is the function invoked by an active thread dispatcher to
+ * call to a user-defined entrypoint function.  It sets up the dispatch
+ * context for the user-defined entrypoint, then calls it.
+ *
+ ************************************************************************/
+void tb_entrypoint_tb_Waypoint_Manager_mission_write(void) {
+}
+
+/************************************************************************
+ *  tb_entrypoint_tb_Waypoint_Manager_waypoint_read:
+ *
+ * This is the function invoked by an active thread dispatcher to
+ * call to a user-defined entrypoint function.  It sets up the dispatch
+ * context for the user-defined entrypoint, then calls it.
+ *
+ ************************************************************************/
+void tb_entrypoint_tb_Waypoint_Manager_waypoint_read(void) {
 }
 
 
@@ -215,10 +223,8 @@ int run(void) {
 
     // Port initialization routines
 
-    // tb_timer_periodic(0, ((uint64_t)1)*NS_IN_MS);
+    // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
-    MissionSoftware__mission_command_impl tb_in_mission;
-    MissionSoftware__mission_command_impl tb_in_waypoint;
     bool tb_in_send_success;
 
 
@@ -235,12 +241,6 @@ int run(void) {
         if (tb_occurred_periodic_dispatcher) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
-        }
-        while (tb_in_mission_dequeue((tb_MissionSoftware__mission_command_impl_container*)&tb_in_mission)) {
-            tb_entrypoint_tb_Waypoint_Manager_in_mission(&tb_in_mission);
-        }
-        while (tb_in_waypoint_dequeue((tb_MissionSoftware__mission_command_impl_container*)&tb_in_waypoint)) {
-            tb_entrypoint_tb_Waypoint_Manager_in_waypoint(&tb_in_waypoint);
         }
         while (tb_in_send_success_dequeue((bool*)&tb_in_send_success)) {
             tb_entrypoint_tb_Waypoint_Manager_in_send_success(&tb_in_send_success);
