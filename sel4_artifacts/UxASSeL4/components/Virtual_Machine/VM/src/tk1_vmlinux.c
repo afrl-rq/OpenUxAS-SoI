@@ -27,6 +27,7 @@
 #include <sel4arm-vmm/devices/vusb.h>
 #include <sel4utils/irq_server.h>
 #include <cpio/cpio.h>
+#include <tb_soi_tk1_types.h>
 
 #include <sel4arm-vmm/devices/generic_forward.h>
 
@@ -47,7 +48,6 @@ extern irq_server_t _irq_server;
 extern seL4_CPtr _fault_endpoint;
 
 
-#ifdef APP_SOI_TK1
 static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
 //    vusb_device_t* vusb;
 //    usb_ctrl_regs_t *ctrl_regs;
@@ -84,13 +84,26 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
 //    return advance_fault(fault);
     int addr;
     uint8_t data;
+    int bufIndex = 0;
+    //MissionSoftware__mission_command_impl buf;
 
     addr = fault_get_address(fault);
-    printf("VM RECEIVED FAULT at addr:%x\n", addr);
+    //printf("VM RECEIVED FAULT at addr:%x\n", addr);
 
-    if(fault_is_write(fault)){
-        data = (uint8_t *)fault_get_data(fault);
-
+    if(addr == 0xe0000001){
+        printf("VM RECEIVED FAULT at addr:%x\n", addr);
+        bufIndex = 0;
+    }else if(addr == 0xe0000002){
+        printf("VM RECEIVED FAULT at addr:%x\n", addr);
+        printf("BUFFER IS OF SIZE:%d\n", bufIndex);
+        mission_notif_emit();
+    }else if(addr == 0xe0000000){
+        if(fault_is_write(fault)){
+            data = (uint8_t *)fault_get_data(fault);
+            (*mission)[bufIndex++] = data;
+        }
+    }else{
+        assert(0);
     }
 
     return ignore_fault(fault);
@@ -104,7 +117,6 @@ const struct device dev_uxas_waypoint = {
     .handle_page_fault = handle_waypoint_fault,
     .priv = NULL
 };
-#endif //APP_SOI_TK1
 
 static const struct device *linux_pt_devices[] = {
     &dev_usb1,
@@ -469,9 +481,7 @@ install_linux_devices(vm_t* vm)
         assert(!err);
     }
 
-#ifdef APP_SOI_TK1
     err = vm_add_device(vm, &dev_uxas_waypoint);
-#endif
 
     /* Install ram backed devices */
     /* Devices that are just anonymous memory mappings */
