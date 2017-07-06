@@ -30,8 +30,8 @@
   <gsn>
     <g
         id="__gsn__15cf9995ba7"
-        name="State Transition Reachability">
-      All transitions between {component} states are reachable by an execution trace.
+        name="Reachable State Transitions">
+      All transitions between {component} states are reachable.
 
       <c
           id="__gsn__15cf99a4396"
@@ -43,6 +43,12 @@
           id="__gsn__15cf99a8b83"
           name="Context">
         {component transitions}
+      </c>
+
+      <c
+          id="__gsn__15d19003733"
+          name="Definition">
+        [Transition reachable]: a transition is reachable there exists a state machine execution path where the transition is taken.
       </c>
 
       <s

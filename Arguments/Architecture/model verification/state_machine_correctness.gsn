@@ -147,34 +147,37 @@
                 <g
                     id="__gsn__15d154c61ae"
                     name="Transition Verification">
+                  {TBD}
 
                   <s
                       id="__gsn__15d18a42a84"
                       name="Strategy">
+                    {TBD}
 
                     <c
                         id="__gsn__15d18a82b3e"
                         name="Definition">
-                      [Transition execution]: the act of transition between states over a specific transition path.
+                      [Transition reachable]: a transition is reachable there exists a state machine execution path where the transition is taken.
                     </c>
 
                     <c
                         id="__gsn__15d18a5b696"
                         name="Definition">
-                      [State reachability]: a given state is reachable if a transition execution path exists by which the state is entered.
+                      [State reachability]: a given state is reachable if a state machine execution path exists by which the state is entered.
                     </c>
 
-                    <g
+                    <m
                         id="__gsn__15d15568d83"
-                        name="State Reachability">
-                      All states are reachable
+                        link="state_reachability.gsn"
+                        name="Reachable {Component} States">
+                      All states of {component} are reachable
 
                       <j
                           id="__gsn__15d18a686c4"
                           name="Justification">
                         Unreachable states may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
                       </j>
-                    </g>
+                    </m>
 
                     <g
                         id="__gsn__15d18b94a16"
@@ -188,17 +191,18 @@
                       </j>
                     </g>
 
-                    <g
+                    <m
                         id="__gsn__15d15565d04"
-                        name="Transitions Reachable">
-                      All transitions are executable
+                        link="transition_reachability.gsn"
+                        name="Reachable State Transitions">
+                      All transitions between {component} states are reachable.
 
                       <j
                           id="__gsn__15d18a7de92"
                           name="Justification">
                         Unexecutable transition may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
                       </j>
-                    </g>
+                    </m>
 
                     <g
                         id="__gsn__15d18aba4ad"
@@ -211,6 +215,30 @@
                         This is a separate concern from “completeness”. This claim asks whether the given set of transitions is the exclusive set of transitions. If another transition exists, it isn’t necessarily the state machine transitions are incomplete, but it could mean there is an error in the state machine.
                       </j>
                     </g>
+
+                    <g
+                        id="__gsn__15d190896a6"
+                        name="Transition Guarantees Satisfied">
+                      {implementation of the spec is correct?}
+
+                      <s
+                          id="__gsn__15d1909d5ca"
+                          name="Strategy">
+                        Argue over each transition
+
+                        <g
+                            id="__gsn__15d1909dae4"
+                            repeat="true"
+                            name="{Transition} Guarantee Satisfied">
+                        </g>
+                      </s>
+                    </g>
+
+                    <comment
+                        id="__gsn__15d18f987de"
+                        name="Rodes">
+                      This strategy is effectively an enumeration over defined characteristics of “correct transition verification”.
+                    </comment>
                   </s>
                 </g>
 
@@ -228,6 +256,7 @@
                   <s
                       id="__gsn__15d1554ada3"
                       name="Strategy">
+                    {TBD}
 
                     <g
                         id="__gsn__15d1554b5c3"
