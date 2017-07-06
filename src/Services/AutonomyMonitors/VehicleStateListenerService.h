@@ -20,8 +20,11 @@
 
 #include "ServiceBase.h"
 #include "afrl/cmasi/Location3D.h"
+#include <memory>
+#include <string>
 #include <ostream>
 #include <map>
+#include <vector>
 namespace uxas {
   namespace service {
     namespace test {

@@ -40,7 +40,7 @@
         <Message MessageFileName="AreaSearchTask_5.xml" SendTime_ms="340"/>
         <Message MessageFileName="AreaSearchTask_6.xml" SendTime_ms="350"/>
         <Message MessageFileName="AutomationRequest_All.xml" SendTime_ms="5000"/>
-		<Message MessageFileName="wind/weather_001.xml" SendTime_ms="6000" />
+	<Message MessageFileName="wind/weather_001.xml" SendTime_ms="6000" />
 	<Message MessageFileName="wind/weather_002.xml" SendTime_ms="30000" />	
 	<Message MessageFileName="wind/weather_003.xml" SendTime_ms="60000" />
 	<Message MessageFileName="wind/weather_004.xml" SendTime_ms="90000" />
