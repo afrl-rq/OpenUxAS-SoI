@@ -35,6 +35,7 @@
   1. The input port that will be calling dequeue and receiving notifications 
   is tb_Asset_Waypoint_Manager_in_uart_packet. The output port set follows:
 
+    c.sourcePort
 
 
  **************************************************************************/

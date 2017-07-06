@@ -57,7 +57,7 @@ public
 		connections
 --			vm2wm: port virtual_machine.out_mission -> waypoint_manager.in_mission;
 			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;
---			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
+			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
 --			awm2wm: port asset_waypoint_manager.out_waypoint -> waypoint_manager.in_waypoint;
 --			awm2vm: port asset_waypoint_manager.out_waypoint -> virtual_machine.in_waypoint;
 			uart2wm: port uart_driver.out_send_success -> waypoint_manager.in_send_success;

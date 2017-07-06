@@ -117,52 +117,54 @@ assembly {
 
         // Port connections for active threads
 
-        connection seL4RPCCall conn1 (from UART_Driver_inst.tb_in_uart_packet, to tb_uart_driver_in_uart_packet_monitor.mon);
-        connection seL4Notification conn2 (from tb_uart_driver_in_uart_packet_monitor.monsig, to UART_Driver_inst.tb_in_uart_packet_notification);
+        connection seL4RPCCall conn1 (from UART_Driver_inst.tb_out_uart_packet0, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
 
-        connection seL4RPCCall conn3 (from UART_Driver_inst.tb_out_send_success0, to tb_waypoint_manager_in_send_success_monitor.mon);
+        connection seL4RPCCall conn2 (from UART_Driver_inst.tb_in_uart_packet, to tb_uart_driver_in_uart_packet_monitor.mon);
+        connection seL4Notification conn3 (from tb_uart_driver_in_uart_packet_monitor.monsig, to UART_Driver_inst.tb_in_uart_packet_notification);
 
-
-        connection seL4RPCCall conn4 (from Asset_Waypoint_Manager_inst.tb_in_uart_packet, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
-        connection seL4Notification conn5 (from tb_asset_waypoint_manager_in_uart_packet_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_in_uart_packet_notification);
-
-        connection seL4RPCCall conn6 (from Asset_Waypoint_Manager_inst.tb_waypoint_read, to tb_asset_waypoint_manager_waypoint_read_monitor.mon);
-        connection seL4Notification conn7 (from tb_asset_waypoint_manager_waypoint_read_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_waypoint_read_notification);
+        connection seL4RPCCall conn4 (from UART_Driver_inst.tb_out_send_success0, to tb_waypoint_manager_in_send_success_monitor.mon);
 
 
-        connection seL4RPCCall conn8 (from Waypoint_Manager_inst.tb_in_send_success, to tb_waypoint_manager_in_send_success_monitor.mon);
-        connection seL4Notification conn9 (from tb_waypoint_manager_in_send_success_monitor.monsig, to Waypoint_Manager_inst.tb_in_send_success_notification);
+        connection seL4RPCCall conn5 (from Asset_Waypoint_Manager_inst.tb_in_uart_packet, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
+        connection seL4Notification conn6 (from tb_asset_waypoint_manager_in_uart_packet_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_in_uart_packet_notification);
 
-        connection seL4RPCCall conn10 (from Waypoint_Manager_inst.tb_out_uart_packet0, to tb_uart_driver_in_uart_packet_monitor.mon);
-
-        connection seL4RPCCall conn11 (from Waypoint_Manager_inst.tb_mission_write, to tb_waypoint_manager_mission_write_monitor.mon);
-        connection seL4Notification conn12 (from tb_waypoint_manager_mission_write_monitor.monsig, to Waypoint_Manager_inst.tb_mission_write_notification);
-
-        connection seL4RPCCall conn13 (from Waypoint_Manager_inst.tb_waypoint_read, to tb_waypoint_manager_waypoint_read_monitor.mon);
-        connection seL4Notification conn14 (from tb_waypoint_manager_waypoint_read_monitor.monsig, to Waypoint_Manager_inst.tb_waypoint_read_notification);
+        connection seL4RPCCall conn7 (from Asset_Waypoint_Manager_inst.tb_waypoint_read, to tb_asset_waypoint_manager_waypoint_read_monitor.mon);
+        connection seL4Notification conn8 (from tb_asset_waypoint_manager_waypoint_read_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_waypoint_read_notification);
 
 
-        connection seL4RPCCall conn15 (from Virtual_Machine_inst.tb_mission_read, to tb_virtual_machine_mission_read_monitor.mon);
-        connection seL4Notification conn16 (from tb_virtual_machine_mission_read_monitor.monsig, to Virtual_Machine_inst.tb_mission_read_notification);
+        connection seL4RPCCall conn9 (from Waypoint_Manager_inst.tb_in_send_success, to tb_waypoint_manager_in_send_success_monitor.mon);
+        connection seL4Notification conn10 (from tb_waypoint_manager_in_send_success_monitor.monsig, to Waypoint_Manager_inst.tb_in_send_success_notification);
 
-        connection seL4RPCCall conn17 (from Virtual_Machine_inst.tb_waypoint_write, to tb_virtual_machine_waypoint_write_monitor.mon);
-        connection seL4Notification conn18 (from tb_virtual_machine_waypoint_write_monitor.monsig, to Virtual_Machine_inst.tb_waypoint_write_notification);
+        connection seL4RPCCall conn11 (from Waypoint_Manager_inst.tb_out_uart_packet0, to tb_uart_driver_in_uart_packet_monitor.mon);
+
+        connection seL4RPCCall conn12 (from Waypoint_Manager_inst.tb_mission_write, to tb_waypoint_manager_mission_write_monitor.mon);
+        connection seL4Notification conn13 (from tb_waypoint_manager_mission_write_monitor.monsig, to Waypoint_Manager_inst.tb_mission_write_notification);
+
+        connection seL4RPCCall conn14 (from Waypoint_Manager_inst.tb_waypoint_read, to tb_waypoint_manager_waypoint_read_monitor.mon);
+        connection seL4Notification conn15 (from tb_waypoint_manager_waypoint_read_monitor.monsig, to Waypoint_Manager_inst.tb_waypoint_read_notification);
+
+
+        connection seL4RPCCall conn16 (from Virtual_Machine_inst.tb_mission_read, to tb_virtual_machine_mission_read_monitor.mon);
+        connection seL4Notification conn17 (from tb_virtual_machine_mission_read_monitor.monsig, to Virtual_Machine_inst.tb_mission_read_notification);
+
+        connection seL4RPCCall conn18 (from Virtual_Machine_inst.tb_waypoint_write, to tb_virtual_machine_waypoint_write_monitor.mon);
+        connection seL4Notification conn19 (from tb_virtual_machine_waypoint_write_monitor.monsig, to Virtual_Machine_inst.tb_waypoint_write_notification);
 
 
 
         // Direct RPC connections
 
-        connection seL4RPCCall conn19 (from UART_Driver_inst.clkcar, to Clock_Driver_inst.clkcar);
+        connection seL4RPCCall conn20 (from UART_Driver_inst.clkcar, to Clock_Driver_inst.clkcar);
 
-        connection seL4RPCCall conn20 (from Virtual_Machine_inst.clkcarfwd, to Clock_Driver_inst.clkcarfwd);
-        connection seL4RPCCall conn21 (from Virtual_Machine_inst.uartfwd, to UART_Driver_inst.uartfwd);
+        connection seL4RPCCall conn21 (from Virtual_Machine_inst.clkcarfwd, to Clock_Driver_inst.clkcarfwd);
+        connection seL4RPCCall conn22 (from Virtual_Machine_inst.uartfwd, to UART_Driver_inst.uartfwd);
 
 
 
 
         // Shared memory connections
 
-        connection seL4SharedData conn22 (from Waypoint_Manager_inst.mission, to Virtual_Machine_inst.mission);connection seL4SharedData conn23 (from Waypoint_Manager_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);connection seL4SharedData conn24 (from Virtual_Machine_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);
+        connection seL4SharedData conn23 (from Waypoint_Manager_inst.mission, to Virtual_Machine_inst.mission);connection seL4SharedData conn24 (from Waypoint_Manager_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);connection seL4SharedData conn25 (from Virtual_Machine_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);
 
 
         connection seL4TimeServer periodic_dispatch_timer(from dispatch_periodic_inst.timer, to time_server.the_timer);
@@ -178,6 +180,8 @@ assembly {
 
 
         // Component port configuration declarations
+
+        UART_Driver_inst.tb_out_uart_packet0_attributes = TB_MONITOR_WRITE_ACCESS;
 
         tb_uart_driver_in_uart_packet_monitor.priority = 230;
         UART_Driver_inst.tb_in_uart_packet_attributes = TB_MONITOR_READ_ACCESS;
