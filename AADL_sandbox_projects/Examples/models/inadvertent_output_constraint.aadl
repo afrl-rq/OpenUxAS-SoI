@@ -18,61 +18,60 @@ public
 			-- These lemmas could be captured in SpeAR as properties
 			
 			--State machine lemmas
-			lemma "The value of the state variable corresponds to a 'real' state." :
+			lemma "(True expected) The value of the state variable corresponds to a 'real' state." :
 				(sub.state = sub.STATE1) 
 				or (sub.state = sub.STATE2);
 				
-			lemma "Only stated transitions are allowed." :
+			lemma "(TRUE expected) Only stated transitions are allowed." :
 				sub.some_transition or (sub.state = sub.previous_state);
 			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as observers (without the negation)
 			
 			--Check that all states are reachable
-			lemma "False (expected) indicates State1 reachable" : not (sub.state = sub.STATE1);
-			lemma "False (expected) indicates State2 reachable" : not (sub.state = sub.STATE2);
+			lemma "(FALSE expected) indicates State1 reachable" : not (sub.state = sub.STATE1);
+			lemma "(FALSE expected) indicates State2 reachable" : not (sub.state = sub.STATE2);
 				
 			--Check that all state transitions are reachable
-			lemma "False (expected) indicates that one_to_two is reachable" : not sub.one_to_two;
-			lemma "False (expected) indicates that two_to_one is reachable": not sub.two_to_one;
+			lemma "(FALSE expected) indicates that one_to_two is reachable" : not sub.one_to_two;
+			lemma "(FALSE expected) indicates that two_to_one is reachable": not sub.two_to_one;
 			
 			-- Misc. Example Checks if the output_var can be more than one value
 			
-			lemma "True (ERROR) Test1: indicates the output can only be constant, an inadvertent output space constraint" :
-				true -> sub.output = pre(sub.output);
+			lemma "(FALSE expected) Test1: output constant in all states" :
+				true -> (sub.output = pre(sub.output));
 				
-			lemma "True (ERROR) Test2: indicates the output can only be constant, an inadvertent output space constraint" :
-				true -> event(sub.output) => sub.output = pre(sub.output);
+			lemma "(FALSE expected) Test2: out_var constant in all states" :
+				true -> (sub.out_var = pre(sub.out_var));	
 				
-			lemma "True (ERROR) Test1: indicates the internal out_var (tracking output) can only be constant, an inadvertent output space constraint" :
-				true -> sub.out_var = pre(sub.out_var);
-				
-			lemma "True (ERROR) Test2: indicates the internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
-				true -> sub.state = sub.STATE2 => sub.out_var = pre(sub.out_var);
+			lemma "(FALSE expected) Test2a: out_var constant in all states" :
+				true -> 
+					((sub.state = sub.STATE1 => sub.out_var = pre(sub.out_var)) and
+					(sub.state = sub.STATE2 => sub.out_var = pre(sub.out_var)));
+					
+			lemma "(FALSE expected) Test 3: out_var constant in some or all states" : 
+				true -> 
+					((sub.state = sub.STATE1 or sub.state = sub.STATE2) => sub.out_var = pre(sub.out_var));
 			
-			lemma "True (ERROR) Test3: indicates the internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
-				true -> sub.state = sub.STATE1 => sub.out_var = pre(sub.out_var);
+			lemma "(FALSE expected) Test4: out_var constant always in STATE1":
+				true -> (sub.state = sub.STATE1 => sub.out_var = pre(sub.out_var)); 
 				
-			lemma "True (ERROR) Test4: indicates the internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
-				true -> sub.one_to_two => sub.out_var = pre(sub.out_var);
+			lemma "(FALSE expected)Test5: out_var constant always in STATE2":
+				true -> (sub.state = sub.STATE2 => sub.out_var = pre(sub.out_var));
+				
 			
-			lemma "True (ERROR) Test5: indicates the internal out_var (tracking output) can only be constant, an indavertent outpout space constraint ":
-				true -> sub.two_to_one => sub.out_var = pre(sub.out_var);
-				
-			lemma "True (ERROR) Test 6: indicates the internal out_var (tracking output) can only be constant in all cases where it can be modified,
-			 an indavertent outpout space constraint" : 
---			 	true -> (sub.state = sub.STATE1) => sub.out_var = pre(sub.out_var) and 
---			 	(sub.state = sub.STATE2) => sub.out_var = pre(sub.out_var);
-			 	true -> 
-			 	(sub.one_to_two => sub.out_var = pre(sub.out_var)) or
-			 	(sub.two_to_one => sub.out_var = pre(sub.out_var));
-			 	
-			lemma "True (expected) indicates output and out_var are synched when an output is generated" :
-				true -> event(sub.output) => sub.output = sub.out_var;
-				
-			-- Idiomatic Lemma Check to Handle All Problematic Scenarios --
-			
-			--TBD
+			lemma "(FALSE expected) Test6a: out_var constant at all assignments (transitions)" : 
+				true -> 
+					((sub.one_to_two => sub.out_var = pre(sub.out_var)) and
+					(sub.two_to_one => sub.out_var = pre(sub.out_var)));
+					
+			lemma "(TRUE expected) Test6b: non constant out_var implies an output (assingment) condition ":
+				true ->
+					((sub.out_var != pre(sub.out_var)) => sub.some_transition);
 
+			--NOTE: while it is possible to detect the variable is non-constant, it is more problematic
+			--if the output can be constrained abitrarily. I do not believe AGREE can generally catch 
+			--output constraints. Lemma "tests" can be developed but this is merely testing of the model, not a proof. 
+		
 		**};
 		 
 	end top_level.Impl;	
@@ -87,6 +86,8 @@ public
 
        		eq out_var : int;
        		
+       		eq free_int : int;
+       		
        		--Task States
        		const STATE1 : 			int = 1;
        		const STATE2 : 			int = 2;
@@ -100,13 +101,13 @@ public
 		-------------------------------------------------------------		
 	
 		--------------------------State Transition Predicates-----------------------------------	
-			eq one_to_two : bool = false->
-				previous_state = STATE1 and event(output);
+			eq one_to_two : bool = (false->
+				(previous_state = STATE1 and event(output)));
 				
-			eq two_to_one : bool = false ->
-				previous_state = STATE2 and event(output);
+			eq two_to_one : bool = (false ->
+				(previous_state = STATE2 and event(output)));
        			
-       		guarantee "Self loops": not some_transition => (state = previous_state);
+       		guarantee "Self loops": (not some_transition => (state = previous_state));
        			
        		--Note: this mechanism of state transitions was applied 
        		--to maintain the state of a variable in all states once assigned.
@@ -159,10 +160,11 @@ public
 --   				out_var = pre(out_var);
 --   				
 --   			--- Proposed Solution Idiom Below ---
---   
+--   			
 --   			guarantee "If not transitioning, the out_var should not change" :
---   				not one_to_two and not two_to_one =>
---   					out_var = pre(out_var);
+--   				true -> 
+--   				((not one_to_two and not two_to_one) =>
+--   					(out_var = pre(out_var)));
 --   					
 --   			guarantee "State 1 to 2" :
 --   			one_to_two =>
