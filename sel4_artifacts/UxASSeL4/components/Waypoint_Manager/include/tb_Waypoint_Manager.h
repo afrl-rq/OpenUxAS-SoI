@@ -57,11 +57,9 @@ void in_send_success(const bool * tb_in_send_success);
 
  bool tb_out_uart_packet_enqueue(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet);
  bool tb_Waypoint_Manager_write_mission_read(void);
- // reader prototype for tb_mission_write
-bool tb_mission_write_dequeue(void);
- // reader prototype for tb_waypoint_read
-bool tb_waypoint_read_dequeue(void);
- bool tb_Waypoint_Manager_write_waypoint_write(void);
+ bool tb_Waypoint_Manager_read_mission_write(void);
+ bool tb_Waypoint_Manager_write_waypoint_read(void);
+ bool tb_Waypoint_Manager_read_waypoint_write(void);
  
 
 

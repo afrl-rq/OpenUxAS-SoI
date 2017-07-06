@@ -42,9 +42,10 @@ client for the thread implementations.
  **************************************************************************/
 
 
-bool tb_out_mission_enqueue(const MissionSoftware__mission_impl * tb_out_mission);
- // reader prototype for tb_in_waypoint
-bool tb_in_waypoint_dequeue(MissionSoftware__waypoint_impl * tb_in_waypoint);
+bool tb_Virtual_Machine_write_mission_write(void);
+ bool tb_Virtual_Machine_read_mission_read(void);
+ bool tb_Virtual_Machine_read_waypoint_write(void);
+ bool tb_Virtual_Machine_write_waypoint_read(void);
  
 
 //////////////////////////////////////////////////////////////////////////

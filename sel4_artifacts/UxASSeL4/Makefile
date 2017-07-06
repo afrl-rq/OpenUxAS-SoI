@@ -19,7 +19,8 @@ include ${PWD}/apps/soi_tk1/make_template/Makefile
 #VM_HFILES := $(patsubst ${SOURCE_DIR}/%,%,$(wildcard $(SOURCE_DIR)/components/Virtual_Machine/VM/include/*.h)) \
                  $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
 #VM_LIBS += sel4allocman elf sel4simple sel4simple-default cpio sel4arm-vmm sel4dma usbdrivers
-Virtual_Machine_LIBS += cpio sel4allocman elf sel4simple sel4simple-default sel4arm-vmm sel4dma usbdrivers
+Virtual_Machine_LIBS += sel4allocman elf sel4simple sel4simple-default cpio sel4arm-vmm sel4dma usbdrivers
+Virtual_Machine_OFILES   := archive.o
 
 ###### End VM files
 
@@ -68,8 +69,6 @@ $(STAGE_DIR)/linux/linux: $(TK1_LINUX_BINARY)
 
 COMPONENTS := $(STAGE_DIR)/linux/linux $(STAGE_DIR)/linux/linux-dtb
 
-${BUILD_DIR}/src/Virtual_Machine_inst.vm_obj/static/archive.o: ${COMPONENTS}
+${BUILD_DIR}/src/Virtual_Machine_inst/static/archive.o: ${COMPONENTS}
 	$(Q)mkdir -p $(dir $@)
 	${COMMON_PATH}/files_to_obj.sh $@ _cpio_archive $^
-
-$(VM_CFILES:%.c=%.o) $(COMPONENTS): $(srctree)/.config

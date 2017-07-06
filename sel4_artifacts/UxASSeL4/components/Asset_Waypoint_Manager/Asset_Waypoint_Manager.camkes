@@ -45,9 +45,6 @@ import <tb_Monitor_SMACCM_DATA__UART_Packet_i_1.idl4>;
 import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 
-import <void_writer.idl4>;
-import <tb_Monitor_void_1.idl4>;
-
 import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
 
 
@@ -61,9 +58,9 @@ component Asset_Waypoint_Manager {
     consumes Notification tb_timer_complete;
     uses tb_Monitor_SMACCM_DATA__UART_Packet_i_1 tb_in_uart_packet;
     consumes QueuedData tb_in_uart_packet_notification;
-    uses tb_Monitor_void_1 tb_waypoint_read;
-    consumes QueuedData tb_waypoint_read_notification;
-
+    emits Notification asset_waypoint_manager_waypoint_write____waypoint_manager_waypoint_write;
+    emits Notification asset_waypoint_manager_waypoint_write____virtual_machine_waypoint_write;
+    consumes Notification waypoint_read_vm;consumes Notification waypoint_read_wm;
 
 
     // Provided interfaces for shared data

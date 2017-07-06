@@ -56,8 +56,8 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet);
 
 
  bool tb_Asset_Waypoint_Manager_write_waypoint_write(void);
- // reader prototype for tb_waypoint_read
-bool tb_waypoint_read_dequeue(void);
+ bool tb_Asset_Waypoint_Manager_read_waypoint_read_vm(void);
+ bool tb_Asset_Waypoint_Manager_read_waypoint_read_wm(void);
  
 
 

@@ -124,9 +124,50 @@ bool tb_out_uart_packet_enqueue
 
 bool tb_Waypoint_Manager_write_mission_read(void) {
     bool tb_result = true ; 
+
+    mission_read_emit();
     return tb_result;
 }/************************************************************************
- *  tb_Waypoint_Manager_write_waypoint_write:
+ *
+ * Static variables and queue management functions for event port:
+ *     mission_write
+ *
+ ************************************************************************/
+
+static bool mission_write_index = false;
+
+/************************************************************************
+ *  mission_write_callback:
+ * Invoked by: remote RPC
+ *
+ * This is the function invoked by a remote RPC to write to an active-thread
+ * input event port.  It increments a count of received messages.
+ *
+ ************************************************************************/
+
+bool mission_write_callback(void *_ UNUSED) {
+    mission_write_index = true;
+    CALLBACKOP(mission_write_reg_callback(mission_write_callback, NULL));
+    return true;
+}
+
+/************************************************************************
+ *  tb_Waypoint_Manager_read_mission_write:
+ * Invoked from local active thread.
+ *
+ * This is the function invoked by the active thread to decrement the
+ * input event index.
+ *
+ ************************************************************************/
+
+bool tb_Waypoint_Manager_read_mission_write() {
+    bool result;
+    result = mission_write_index;
+    mission_write_index = false;
+    return result;
+}
+/************************************************************************
+ *  tb_Waypoint_Manager_write_waypoint_read:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
@@ -134,10 +175,51 @@ bool tb_Waypoint_Manager_write_mission_read(void) {
  *
  ************************************************************************/
 
-bool tb_Waypoint_Manager_write_waypoint_write(void) {
+bool tb_Waypoint_Manager_write_waypoint_read(void) {
     bool tb_result = true ; 
+
+    waypoint_read_emit();
     return tb_result;
+}/************************************************************************
+ *
+ * Static variables and queue management functions for event port:
+ *     waypoint_write
+ *
+ ************************************************************************/
+
+static bool waypoint_write_index = false;
+
+/************************************************************************
+ *  waypoint_write_callback:
+ * Invoked by: remote RPC
+ *
+ * This is the function invoked by a remote RPC to write to an active-thread
+ * input event port.  It increments a count of received messages.
+ *
+ ************************************************************************/
+
+bool waypoint_write_callback(void *_ UNUSED) {
+    waypoint_write_index = true;
+    CALLBACKOP(waypoint_write_reg_callback(waypoint_write_callback, NULL));
+    return true;
 }
+
+/************************************************************************
+ *  tb_Waypoint_Manager_read_waypoint_write:
+ * Invoked from local active thread.
+ *
+ * This is the function invoked by the active thread to decrement the
+ * input event index.
+ *
+ ************************************************************************/
+
+bool tb_Waypoint_Manager_read_waypoint_write() {
+    bool result;
+    result = waypoint_write_index;
+    waypoint_write_index = false;
+    return result;
+}
+
 
 
 void pre_init(void) {
@@ -146,8 +228,8 @@ void pre_init(void) {
     // Pre-initialization statements for Waypoint_Manager_initializer
     // Pre-initialization statements for tb_in_send_success
     CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
-    // Pre-initialization statements for tb_mission_write
-    // Pre-initialization statements for tb_waypoint_read
+    // Pre-initialization statements for mission_write
+    // Pre-initialization statements for waypoint_write
 
 }
 
@@ -191,25 +273,25 @@ void tb_entrypoint_tb_Waypoint_Manager_in_send_success(const bool * in_arg) {
 }
 
 /************************************************************************
- *  tb_entrypoint_tb_Waypoint_Manager_mission_write:
+ *  tb_entrypoint_Waypoint_Manager_mission_write:
  *
  * This is the function invoked by an active thread dispatcher to
  * call to a user-defined entrypoint function.  It sets up the dispatch
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_mission_write(void) {
+void tb_entrypoint_Waypoint_Manager_mission_write(void) {
 }
 
 /************************************************************************
- *  tb_entrypoint_tb_Waypoint_Manager_waypoint_read:
+ *  tb_entrypoint_Waypoint_Manager_waypoint_write:
  *
  * This is the function invoked by an active thread dispatcher to
  * call to a user-defined entrypoint function.  It sets up the dispatch
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_waypoint_read(void) {
+void tb_entrypoint_Waypoint_Manager_waypoint_write(void) {
 }
 
 

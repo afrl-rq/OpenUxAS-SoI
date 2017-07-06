@@ -48,19 +48,16 @@ import <MissionSoftware__mission_command_impl_writer.idl4>;
 import <gen_fwd.idl4>;
 
 
-import <void_writer.idl4>;
-
-
 
 component Virtual_Machine {
     include <tb_soi_tk1_types.h>;
     control;
     has semaphore tb_dispatch_sem;
 
-    uses tb_Monitor_void_1 tb_mission_read;
-    consumes QueuedData tb_mission_read_notification;
-    uses tb_Monitor_void_1 tb_waypoint_write;
-    consumes QueuedData tb_waypoint_write_notification;
+    emits Notification mission_write;
+    consumes Notification mission_read;
+    consumes Notification waypoint_write;
+    emits Notification waypoint_read;
 
 
     uses gen_fwd_inf clkcarfwd;
