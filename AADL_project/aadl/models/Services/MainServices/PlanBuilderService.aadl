@@ -4,6 +4,51 @@ public
     with UXTASK;
     with IMPACT;
     
+       -- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread PlanBuilderService; 
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+			lemma "False indicates the IDLE_WAITING state is reachable" : sub.state != sub.IDLE_WAITING; 
+			lemma "False indicates the BUSY_REQUESTING state is reachable" : sub.state != sub.BUSY_REQUESTING; 
+			lemma "False indicates the BUSY_WAITING state is reachable" : sub.state != sub.BUSY_WAITING; 
+
+			lemma "True indicates we have enumerated all states in the reachability observers" :
+				sub.state = sub.IDLE or
+				sub.state = sub.IDLE_WAITING or
+				sub.state = sub.BUSY_REQUESTING or
+				sub.state = sub.BUSY_WAITING;
+			
+			lemma "False indicates idle_to_idle_waiting transition is executable/reachable" : 
+           		 not sub.idle_to_idle_waiting;	
+				
+			lemma "False indicates idle_waiting_to_busy_requesting transition is executable/reachable" : 
+           		 not sub.idle_waiting_to_busy_requesting;
+           		 
+           	lemma "False indicates busy_requesting_to_busy_idle transition is executable/reachable" : 
+           		 not sub.busy_requesting_to_busy_waiting;
+           	
+           	lemma "False indicates busy_waiting_to_idle transition is executable/reachable" : 
+           		 not sub.busy_waiting_to_idle;
+           		 
+           	lemma "True if only stated transitions are executed (no missing transitions)." :
+                sub.some_transition or sub.state = sub.previous_state;	
+										
+				
+		**};
+	end top_level.Impl;	
+    
     thread PlanBuilderService
         features
             TaskImplementationResponse_in: in event data port uxtask::TaskImplementationResponse.i;
@@ -17,6 +62,131 @@ public
             TaskImplementationRequest_out: out event data port uxtask::TaskImplementationRequest.i;
         properties
             Dispatch_Protocol => Sporadic;
+            
+        annex agree{**
+        		
+        	eq state : int;
+       		
+       		--Task States
+       		const IDLE : 				int = 1;
+--       		const BUSY : 				int = 2;
+			--IMPLIED SUB-STATES ADDED FOR SPEC SIMPLICITY
+			const IDLE_WAITING	  : 	int = 2;
+       		const BUSY_REQUESTING : 	int = 3;
+       		const BUSY_WAITING : 		int = 4;
+
+       	-------------------------------------------------------------
+		--State machine support macros
+			eq previous_state: int = prev(state,IDLE);
+			eq some_transition: bool =  idle_to_idle_waiting or
+										idle_waiting_to_busy_requesting or
+										busy_requesting_to_busy_waiting or 
+										busy_waiting_to_idle;
+		-------------------------------------------------------------	
+        	
+        	--ASK DEREK: what if no unique automation request comes in before the task assignment summary? 
+        	--Should the spec transition also include the unique automation request has arrived? 
+        	--For now making a new set of states to ensure the automation request is first made
+
+        	eq idle_to_idle_waiting : bool = (false ->
+        		(previous_state = IDLE and pre(event(UniqueAutomationRequest_in))));
+        		
+        	--The UniqueAutomationRequest is stored until a 
+        	--TaskAssignmentSummary that corresponds to the unique ID is received. 
+        	eq idle_waiting_to_busy_requesting : bool = (false ->
+        		(previous_state = IDLE_WAITING and
+        		event(TaskAssignmentSummary_in) and
+        		TaskAssignmentSummary_in.CorrespondingAutomationRequestID = cached_unique_automation_request_id));
+        		
+        	--ASK DEREK: what if a response is received while sending out requests?
+        	--currently those responses would be ignored. 
+        	eq busy_requesting_to_busy_waiting : bool = (false ->
+        		(previous_state = BUSY_REQUESTING and (pre(all_task_requests_sent_in_order))));	
+        		
+        	--[Implied and Altered Spec]: Once a unique automation response is made, transition to IDLE.
+        	eq busy_waiting_to_idle : bool = (false ->
+        		(previous_state = BUSY_WAITING and
+        		pre(event(UniqueAutomationResponse_out))));
+        		
+        	--The UniqueAutomationRequest is stored until a TaskAssignmentSummary that 
+        	--corresponds to the unique ID is received. 
+        	eq cached_unique_automation_request_id : int;
+     
+     		eq all_task_implementation_responses_received : bool;
+     		
+     		eq all_task_requests_sent_in_order : bool;
+     		
+        	guarantee "Self loops": not some_transition => (state = previous_state);
+        	
+        	--Similar to both the RouteAggregator and the AssignmentTreeBranchBoundService, 
+        	--the PlanBuilderService utilizes a received UniqueAutomationRequest to detect 
+        	--that a new mission request has been made to the system. The UniqueAutomationRequest is stored ...
+        	guarantee "The latest automation request ID is cached when in the IDLE state, otherwise
+        		the cached request ID does not change" : 
+        		if (state = IDLE and event(UniqueAutomationRequest_in))  then
+        			cached_unique_automation_request_id = UniqueAutomationRequest_in.RequestID
+        		else
+        		--TODO: ASK DEREK: Assuming ignoring requests in all other cases (keep previous cached request constant)
+        			(true -> (cached_unique_automation_request_id = pre(cached_unique_automation_request_id)));
+        	
+        	guarantee "[ADDED STATE] Transition to IDLE WAITING after a unique automation request is received" :
+        		idle_to_idle_waiting =>
+        			(state = IDLE_WAITING);		
+        		
+        	--TODO: need to either (1) set a request ID cached ID value to mean "none recieved" or
+        	--(2) have a separate boolean that is set in addition to the cached ID (can I use PLTL somehow?)
+        	
+        	guarantee "[ABSTRACTOIN HACK: no arrays]: all task implementation responses tracking resets in the IDLE state" :
+        		not (state = BUSY_WAITING) => 
+        			not (all_task_implementation_responses_received);
+        			
+        			
+        	guarantee "[ABSTRACTION HACK: no arrays] All task implementation responses as a result of input from TaskImplementationResponse_in.
+        		i.e., If no input is received on TaskImplementationResponse_in, it is not possible to have received all responses.
+        		[HACK: the abstraction variable is equal to the previous value unless a TaskImplementationResponse_in event is received,
+        			at which point, the value of the abstraction variable is undefined (could be true or false)]" :
+      			state = BUSY_WAITING and not event(TaskImplementationResponse_in) =>
+        			(true->(all_task_implementation_responses_received = pre(all_task_implementation_responses_received)));
+        	
+        	
+        	guarantee "The UniqueAutomationRequest is stored until a TaskAssignmentSummary that corresponds 
+        		to the unique ID is received. At this point, the PlanBuilderService transitions from the idle 
+        		state to the busy [requesting] state.":
+        		idle_waiting_to_busy_requesting =>
+        			(state = BUSY_REQUESTING);
+        			
+        	guarantee "[In the BUSY REQUESTING state] Using the list of ordered Tasks dictated by the TaskAssignmentSummary, the PlanBuilderService sends 
+        		a TaskImplementationRequest to each Task in order and waits for a TaskImplementationResponse from each Task 
+        		before moving to the next. " : 
+        			--NOTE: all_task_requests_sent_in_order is redundant in the spec, but used to increase clarity because of the abstraction
+        			(state = BUSY_REQUESTING and not all_task_requests_sent_in_order) =>
+        				event(TaskImplementationRequest_out); 
+        				
+        	guarantee "[ABSTRACTION HACK: no arrays]: all_task_requests_sent_in_order is reset to false in all states but BUSY_REQUESTING":
+        		not (state = BUSY_REQUESTING) =>
+        			not all_task_requests_sent_in_order;
+        			
+        	guarantee "[ABSTRACTION HACK: no arrays]: all_task_requests_sent_in_order may only become true if a task request is sent out ":
+        		(state = BUSY_REQUESTING and not event(TaskImplementationRequest_out)) =>
+        			 (true -> (all_task_requests_sent_in_order = pre(all_task_requests_sent_in_order)));		
+        			
+        	guarantee "[NEW STATE TRANSITION] Transition from busy requesting to busy waiting once all task requests have been sent out" :
+        		busy_requesting_to_busy_waiting =>
+        			state = BUSY_WAITING;
+        				
+        	guarantee "[In the BUSY WAITING state and] Once [if and only if] all Tasks have responded with a TaskImplementationResponse, the PlanBuilderService links all waypoints 
+        	for each vehicle into a complete MissionCommand. The total set of MissionCommands are collected into the UniqueAutomationResponse 
+        	which is broadcast to the system and represents a complete solution to the original AutomationRequest.  " : 
+        		(state = BUSY_WAITING and all_task_implementation_responses_received) <=>
+        			(UniqueAutomationResponse_out.ResponseID = cached_unique_automation_request_id and
+        			true and --TODO: placeholder predicate for collecting mission commands? 
+        			event(UniqueAutomationResponse_out));
+        	
+        	guarantee "[Implied and Altered Spec]: [In the BUSY WAITING state] Once a unique automation response is made, transition to IDLE." :
+        		busy_waiting_to_idle =>
+        			(state = IDLE);
+        			
+        **};
     end PlanBuilderService;
     
 end PlanBuilderService_Pkg;
