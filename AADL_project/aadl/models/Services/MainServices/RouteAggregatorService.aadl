@@ -162,6 +162,7 @@ thread RouteAggregatorService
 		-- somehow.	
 		
 		--Think of these Boolean variables as a predicates
+		
 		eq route_response_consists_of_route_plan_responses_received : bool;
 		guarantee "The routes in RouteResponse_out are the route plan responses received." :
 			route_response_consists_of_route_plan_responses_received; --guarantee that this predicate is true
@@ -177,21 +178,36 @@ thread RouteAggregatorService
 		--  requests at a time. We would be forced to fix the number it can serve to some max
 		--  for modeling purposes. Not sure we want to do that.
 		--  Q for Sean/Derek: Does it really serve an arbitrary number or is there a max?
-		--	A from Sean: It's variable depending on number of requests you make.
+		--	A from Sean: It's variable, depending on number of requests you make.
 		
 		-- Note: I do have a formal version of these guarantee in RouteAggregatorService_OneRequestAtATime
 		--
-		--Tony: Maybe this can be done with variables for current request and associated route plan request.
-		eq contents_of_route_plan_requests_match_contents_of_route_request : bool;
-		guarantee "Contents of route plan requests match contents of route request (except VehicleID and RequestID)" :
-			contents_of_route_plan_requests_match_contents_of_route_request;
+		-- Tony: Maybe this can be done with variables for current request and associated route plan request.
+		-- Jen: The new version below does just that. (Thanks, Tony!)
+		
+		--The route request for which we are making new route plan requests
+		eq RouteRequest_being_serviced : route::RouteRequest.i; 
+		
+		guarantee "Contents of route plan requests match contents of the associated route request (except VehicleID and RequestID)":
+				event(RoutePlanRequest_out) =>
+				((RoutePlanRequest_out.AssociatedTaskID = RouteRequest_being_serviced.AssociatedTaskID)
+					and (RoutePlanRequest_out.OperatingRegion = RouteRequest_being_serviced.OperatingRegion)
+					and (RoutePlanRequest_out.RouteRequests = RouteRequest_being_serviced.RouteRequests)
+					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
+				);
+		
 
 		-- We may want to add a guarantee about sending the route plan requests within some
 		--  timeframe. For now, as modeled, this service could sit on them forever. 
 		
-		eq produce_route_resonse_once_with_matching_ID_once_all_route_plan_responses_have_been_received : bool;
-		guarantee "Produce route response output with matching ID once all route plan responses have been received" : 
-			produce_route_resonse_once_with_matching_ID_once_all_route_plan_responses_have_been_received;
+		eq produce_route_response_once_all_route_plan_responses_have_been_received : bool;
+		guarantee "Produce route response output once all route plan responses have been received" : 
+			produce_route_response_once_all_route_plan_responses_have_been_received;
+		
+		eq RouteRequest_being_responded_to : route::RouteRequest.i; 
+		
+		guarantee "Response ID in the route response should match the ID in the associated route request." :
+			event(RouteResponse_out) => (RouteResponse_out.ResponseID = RouteRequest_being_responded_to.RequestID);
 		
 		-- Q: Is the ResponseID in the route plan responses enough to ensure the message is the response we're expecting? 
 		-- Do we have any system-level guarantees about uniqueness of these IDs? 

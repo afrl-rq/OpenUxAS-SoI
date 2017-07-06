@@ -204,7 +204,7 @@ thread RouteAggregatorService_OneRequestAtATime
 		guarantee "Only produce a route plan request when the previous state was PENDING": 
 			event(RoutePlanRequest_out) => (previous_state = PENDING);	
 
-		--Store the route request being service since it could change (without an event)
+		--Store the route request being serviced since it could change (without an event)
 		--  on the next timestep.
 		eq RouteRequest_being_serviced : route::RouteRequest.i =
 			if event(RouteRequest_in) then RouteRequest_in
