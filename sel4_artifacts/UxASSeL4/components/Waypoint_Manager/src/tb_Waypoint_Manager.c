@@ -225,6 +225,7 @@ void pre_init(void) {
     // Pre-initialization statements for mission_write
     // Pre-initialization statements for waypoint_write
 
+    CALLBACKOP(mission_write_reg_callback(mission_write_callback, NULL));
 }
 
 /************************************************************************
