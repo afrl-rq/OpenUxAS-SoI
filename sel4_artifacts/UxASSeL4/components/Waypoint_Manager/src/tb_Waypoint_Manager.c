@@ -161,6 +161,7 @@ void pre_init(void) {
     // Pre-initialization statements for tb_waypoint_write
     // Pre-initialization statements for tb_in_send_success
 
+    CALLBACKOP(mission_write_reg_callback(mission_write_callback, NULL));
 }
 
 /************************************************************************
