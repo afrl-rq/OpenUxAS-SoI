@@ -55,7 +55,9 @@ component Virtual_Machine {
     has semaphore tb_dispatch_sem;
 
     emits Notification mission_write;
-    consumes Notification mission_read;consumes Notification waypoint_write;emits Notification waypoint_read;
+    consumes Notification mission_read;
+    consumes Notification waypoint_write;
+    emits Notification waypoint_read;
 
 
     uses gen_fwd_inf uartfwd;

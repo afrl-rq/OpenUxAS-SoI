@@ -57,7 +57,7 @@ interface and so contention may occur.
 #include <camkes.h>
 
 /************************************************************************
- *  tb_Virtual_Machine_write_mission_write:
+ *  tb_out_mission_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
@@ -156,8 +156,8 @@ bool tb_Virtual_Machine_read_waypoint_write() {
  * call to write to a remote data port.
  *
  ************************************************************************/
-
-bool tb_Virtual_Machine_write_waypoint_read(void) {
+bool tb_out_mission_enqueue
+(const MissionSoftware__mission_impl * tb_out_mission) {
     bool tb_result = true ; 
 
     waypoint_read_emit();
@@ -165,12 +165,10 @@ bool tb_Virtual_Machine_write_waypoint_read(void) {
 }
 
 
-void pre_init(void) {
 
     // Pre-initialization statements for mission_read
     // Pre-initialization statements for waypoint_write
-
-}
+    // Pre-initialization statements for tb_in_waypoint
 
 /************************************************************************
  *  tb_entrypoint_Virtual_Machine_mission_read:

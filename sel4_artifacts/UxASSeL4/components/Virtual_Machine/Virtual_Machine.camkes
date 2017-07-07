@@ -36,78 +36,37 @@ AADL thread implementation Virtual_Machine.
 
  **************************************************************************/
 
-import <std_connector.camkes>;
 import <Timer.idl4>;
-import <tb_Monitor_MissionSoftware__mission_command_impl_1.idl4>;
+// Idl files for shared data accessors
+
+import <MissionSoftware__mission_command_impl_writer.idl4>;
+import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 
 // Idl files for RPCs
 
 import <gen_fwd.idl4>;
 
-import "VM_shim/VM_shim.camkes";
-import "VM/VM.camkes";
 
-import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 component Virtual_Machine {
     include <tb_soi_tk1_types.h>;
-    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_out_mission0;
-    uses tb_Monitor_MissionSoftware__mission_command_impl_1 tb_in_waypoint;
-    consumes QueuedData tb_in_waypoint_notification;
+    control;
+    has semaphore tb_dispatch_sem;
 
-    uses gen_fwd_inf uartfwd;
+    emits Notification mission_write;
+    consumes Notification mission_read;
+    consumes Notification waypoint_write;
+    emits Notification waypoint_read;
+
+
     uses gen_fwd_inf clkcarfwd;
+    uses gen_fwd_inf uartfwd;
 
- composition {
-        component VM vm_obj;
-        component VM_shim vm_shim_obj;
 
-        export vm_shim_obj.tb_out_mission -> tb_out_mission0;
-        export vm_shim_obj.tb_in_waypoint -> tb_in_waypoint;
-        export vm_shim_obj.tb_in_waypoint_notification -> tb_in_waypoint_notification;
-        export vm_obj.uartfwd -> uartfwd;
-        export vm_obj.clkcarfwd -> clkcarfwd;
+    // Provided interfaces for shared data
 
-        connection seL4SharedData mission(from vm_obj.mission, to vm_shim_obj.mission);
-        connection seL4SharedData waypoint(from vm_shim_obj.waypoint, to vm_obj.waypoint);
-        connection seL4Notification waypoint_notif(from vm_shim_obj.waypoint_notif, to vm_obj.waypoint_notif);
-        connection seL4Notification mission_notif(from vm_obj.mission_notif, to vm_shim_obj.mission_notif);
-    }   
-
-  configuration {
-        vm_obj.base_prio = 100;
-        vm_obj.priority = 101;
-        vm_shim_obj.priority = 103;
-
-        vm_obj.untyped_mmios = [ 
-            "0x50046000:12", // Interrupt Controller Virtual CPU interface (Virtual Machine view)
-            "0x60004000:12", // Interrupt controller registers (ICTLR)
-            "0x700b0000:12", // SDMMC-1, SDMMC-2, SDMMC-3, SDMMC-4,
-            "0x7d000000:12", // USB on-the-go (micro)
-            "0x7d004000:12", // USB on top board
-            "0x7d008000:12", // USB on bottom board
-            "0xb0000000:28", // Linux kernel memory regions
-            "0xc0000000:29", // Linux kernel memory regions
-            "0xe0000000:28", // Linux kernel memory regions
-            ];
-
-        vm_obj.irqs =  [
-            27, // INTERRUPT_VGPT (INTERRUPT_PPI_11)
-            53, // INTERRUPT_USB2
-            63, // INTERRUPT_SDMMC4
-            122, // INTERRUPT_UARTD
-            129, // INTERRUPT_USB3
-            ];
-
-        vm_obj.smmu = [10, 23];
-
-        vm_obj.asid_pool = true;
-
-        vm_obj.simple = true;
-        vm_obj.cnode_size_bits = 21; 
-        vm_obj.simple_untyped24_pool = 10; 
-
-    }
+    dataport MissionSoftware__mission_command_impl mission;
+    dataport MissionSoftware__mission_command_impl waypoint;
 
 }
