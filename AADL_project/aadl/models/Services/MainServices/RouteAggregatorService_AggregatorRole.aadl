@@ -54,14 +54,10 @@ thread RouteAggregatorService_AggregatorRole
         AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i; 
         RouteRequest_in: in event data port route::RouteRequest.i; 
         RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki.
         RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
    	annex agree{**
-   		-------------------------------------------------------------
-   		-- Note: I'm not sure we need to model this IDLE <--> PENDING state machine,
-   		--  but I'm keeping it for now. This is described in the Wiki.
-   		--  We're not yet sure if we'll want to refer to this service's state in our system-level
-   		--  guarantees.
   		-------------------------------------------------------------
   		-- BEGIN STATE MACHINE LOGIC
 		-------------------------------------------------------------

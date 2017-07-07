@@ -113,11 +113,6 @@ thread RouteAggregatorService_OneRequestAtATime
         AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
    	annex agree{**
-   		-------------------------------------------------------------
-   		-- Note: I'm not sure we need to model this IDLE <--> PENDING state machine,
-   		--  but I'm keeping it for now. This is described in the Wiki.
-   		--  We're not yet sure if we'll want to refer to this service's state in our system-level
-   		--  guarantees.
   		-------------------------------------------------------------
   		-- BEGIN STATE MACHINE LOGIC
 		-------------------------------------------------------------
