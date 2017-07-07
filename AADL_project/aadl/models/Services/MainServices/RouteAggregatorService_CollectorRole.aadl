@@ -1,0 +1,42 @@
+package RouteAggregatorService_CollectorRole_Pkg
+public
+	with CMASI;
+    with UXTASK;
+    with IMPACT;
+    with ROUTE;
+    with UxAS_Node_Lib;
+
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to force AGREE to run" : true;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread RouteAggregatorService_CollectorRole; 
+		annex agree {**
+			lemma "Placeholder" : true;
+		**};
+		 
+	end top_level.Impl;	
+	
+thread RouteAggregatorService_CollectorRole
+    features
+        GroundVehicleState_in: in event data port impact::GroundVehicleState.i; 
+        UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i; 
+        RoutePlanResponse_in: in event data port route::RoutePlanResponse.i; --keep
+        SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i; 
+        TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i; 
+        AirVehicleState_in: in event data port cmasi::AirVehicleState.i; 
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki.
+        RoutePlanRequest_out: out event data port route::RoutePlanRequest.i; 
+        AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i; 
+   	annex agree{**
+		guarantee "Placeholder" : true;
+	**};
+end RouteAggregatorService_CollectorRole;
+
+end RouteAggregatorService_CollectorRole_Pkg;
