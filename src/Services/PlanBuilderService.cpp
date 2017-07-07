@@ -336,6 +336,13 @@ void PlanBuilderService::checkNextTaskImplementationRequest(int64_t uniqueReques
     {
         if(m_remainingAssignments[uniqueRequestID].empty())
         {
+            // add FinalStates (which are the 'projected' states in the planning process)
+            if(m_projectedEntityStates.find(uniqueRequestID) != m_projectedEntityStates.end())
+            {
+                for(auto e : m_projectedEntityStates[uniqueRequestID])
+                    if(e && e->state)
+                        m_inProgressResponse[uniqueRequestID]->getFinalStates().push_back(e->state->clone());
+            }
             sendSharedLmcpObjectBroadcastMessage(m_inProgressResponse[uniqueRequestID]);
             m_inProgressResponse.erase(uniqueRequestID);
             
