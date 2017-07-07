@@ -130,10 +130,10 @@ public
 --			out_mission: out event data port mission_command.impl;
 --			in_waypoint: in event data port mission_command.impl;
 
-			mission_write: out event port;
-			mission_read : in event port;
-			waypoint_write: in event port;
-			waypoint_read : out event port;
+			mission_write: out event data port Base_Types::Boolean;
+			mission_read : in event data port Base_Types::Boolean;
+			waypoint_write: in event data port Base_Types::Boolean;
+			waypoint_read : out event data port Base_Types::Boolean;
 			mission: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
 					};
@@ -163,10 +163,10 @@ public
 --	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
 --			};
 			
-			mission_read : out event port;
-			mission_write : in event port;
-			waypoint_read : out event port;
-			waypoint_write : in event port;
+			mission_read : out event data port Base_Types::Boolean;
+			mission_write : in event data port Base_Types::Boolean;
+			waypoint_read : out event data port Base_Types::Boolean;
+			waypoint_write : in event data port Base_Types::Boolean;
 			
 			mission: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
@@ -196,9 +196,9 @@ public
 --	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_waypoint");
 --			};
 			
-			waypoint_write: out event port;
-			waypoint_read_vm: in event port;
-			waypoint_read_wm: in event port;
+			waypoint_write: out event data port Base_Types::Boolean;
+			waypoint_read_vm: in event data port Base_Types::Boolean;
+			waypoint_read_wm: in event data port Base_Types::Boolean;
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
 					};

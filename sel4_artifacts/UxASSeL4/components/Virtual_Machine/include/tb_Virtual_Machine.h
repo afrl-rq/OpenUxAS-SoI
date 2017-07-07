@@ -42,10 +42,12 @@ client for the thread implementations.
  **************************************************************************/
 
 
-bool tb_Virtual_Machine_write_mission_write(void);
- bool tb_Virtual_Machine_read_mission_read(void);
- bool tb_Virtual_Machine_read_waypoint_write(void);
- bool tb_Virtual_Machine_write_waypoint_read(void);
+bool tb_mission_write_enqueue(const bool * tb_mission_write);
+ // reader prototype for tb_mission_read
+bool tb_mission_read_dequeue(bool * tb_mission_read);
+ // reader prototype for tb_waypoint_write
+bool tb_waypoint_write_dequeue(bool * tb_waypoint_write);
+ bool tb_waypoint_read_enqueue(const bool * tb_waypoint_read);
  
 
 //////////////////////////////////////////////////////////////////////////

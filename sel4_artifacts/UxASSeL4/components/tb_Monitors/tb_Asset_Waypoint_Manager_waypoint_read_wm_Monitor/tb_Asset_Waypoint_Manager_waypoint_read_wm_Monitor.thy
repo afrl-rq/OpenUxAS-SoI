@@ -1,11 +1,11 @@
 (* Verifying proper queue functionality using AutoCorress requires the following
  * two modifications:
- * 1) The line in "src/tb_Virtual_Machine_waypoint_write_Monitor.c" defining TB_VERIFY
+ * 1) The line in "src/tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor.c" defining TB_VERIFY
  *    must be uncommented.
  * 2) The AUTOCORRES_HOME text below must be replaced by the path to the 
  *    AutoCorres package for Isabelle.
  *)
-theory tb_Virtual_Machine_waypoint_write_Monitor
+theory tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor
 imports AUTOCORRES_HOME
 begin
 
@@ -73,10 +73,10 @@ apply (auto simp: gr0_conv_Suc take_Suc hd_rotate_conv_nth rotate_conv_mod[symme
 done
 
 
-install_C_file "src/tb_Virtual_Machine_waypoint_write_Monitor.c"
-autocorres[ts_rules = nondet, heap_abs_syntax] "src/tb_Virtual_Machine_waypoint_write_Monitor.c"
+install_C_file "src/tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor.c"
+autocorres[ts_rules = nondet, heap_abs_syntax] "src/tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor.c"
 
-context tb_Virtual_Machine_waypoint_write_Monitor begin
+context tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor begin
 
 lemma monsig_emit_wp [wp]:
   "\<lbrace> P \<rbrace>
@@ -176,7 +176,7 @@ lemma dequeue_not_empty:
            P s \<rbrace>!"
 apply (unfold mon_dequeue'_def)
   apply wp
-  apply (metis (mono_tags, hide_lams) fun_upd_def is_queue_def the_queue_def tb_Virtual_Machine_waypoint_write_Monitor.heap_w8_update_def
+  apply (metis (mono_tags, hide_lams) fun_upd_def is_queue_def the_queue_def tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor.heap_w8_update_def
                   gr0_conv_Suc list_array_nth  lifted_globals.simps(3) lifted_globals.simps(4) not_less)
 done
 

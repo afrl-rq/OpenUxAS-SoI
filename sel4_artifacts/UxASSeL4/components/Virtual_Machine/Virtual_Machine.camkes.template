@@ -37,6 +37,15 @@ AADL thread implementation Virtual_Machine.
  **************************************************************************/
 
 import <Timer.idl4>;
+import <tb_Monitor_bool_1.idl4>;
+
+import <tb_Monitor_bool_1.idl4>;
+
+import <tb_Monitor_bool_1.idl4>;
+
+import <tb_Monitor_bool_1.idl4>;
+
+
 // Idl files for shared data accessors
 
 import <MissionSoftware__mission_command_impl_writer.idl4>;
@@ -48,16 +57,23 @@ import <MissionSoftware__mission_command_impl_writer.idl4>;
 import <gen_fwd.idl4>;
 
 
+import <bool_writer.idl4>;
+
+
 
 component Virtual_Machine {
     include <tb_soi_tk1_types.h>;
     control;
     has semaphore tb_dispatch_sem;
 
-    emits Notification mission_write;
-    consumes Notification mission_read;
-    consumes Notification waypoint_write;
-    emits Notification waypoint_read;
+    uses tb_Monitor_bool_1 tb_mission_write0;
+
+    uses tb_Monitor_bool_1 tb_mission_read;
+    consumes QueuedData tb_mission_read_notification;
+    uses tb_Monitor_bool_1 tb_waypoint_write;
+    consumes QueuedData tb_waypoint_write_notification;
+    uses tb_Monitor_bool_1 tb_waypoint_read0;
+
 
 
     uses gen_fwd_inf uartfwd;

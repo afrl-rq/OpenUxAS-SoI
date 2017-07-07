@@ -33,7 +33,7 @@
 
   Implementing a Monitor of type bool with a queue size of 
   1. The input port that will be calling dequeue and receiving notifications 
-  is tb_Virtual_Machine_waypoint_write. The output port set follows:
+  is tb_Asset_Waypoint_Manager_waypoint_read_vm. The output port set follows:
 
     c.sourcePort
 
@@ -50,7 +50,7 @@
 #include <stdio.h>
 #endif // TB_VERIFY
 #include "../../../../include/tb_soi_tk1_types.h"
-#include "../include/tb_Virtual_Machine_waypoint_write_Monitor.h"
+#include "../include/tb_Asset_Waypoint_Manager_waypoint_read_vm_Monitor.h"
 
 int mon_get_sender_id(void);
 int monsig_emit(void);
@@ -70,7 +70,7 @@ bool mon_dequeue(bool * m) {
   if (mon_get_sender_id() != TB_MONITOR_READ_ACCESS) {
     #ifndef TB_VERIFY
     #ifdef CONFIG_APP_SOI_TK1_TB_DEBUG
-    fprintf(stderr, "Monitor tb_Virtual_Machine_waypoint_write: attempt to dequeue without permission\n");
+    fprintf(stderr, "Monitor tb_Asset_Waypoint_Manager_waypoint_read_vm: attempt to dequeue without permission\n");
     #endif // CONFIG_APP_SOI_TK1_TB_DEBUG
     #endif // TB_VERIFY
     return false;
@@ -88,13 +88,13 @@ bool mon_enqueue(const bool * m) {
   if (mon_get_sender_id() != TB_MONITOR_WRITE_ACCESS) {
     #ifndef TB_VERIFY
     #ifdef CONFIG_APP_SOI_TK1_TB_DEBUG
-    fprintf(stderr, "Monitor tb_Virtual_Machine_waypoint_write: attempt to enqueue without permission\n");
+    fprintf(stderr, "Monitor tb_Asset_Waypoint_Manager_waypoint_read_vm: attempt to enqueue without permission\n");
     #endif // CONFIG_APP_SOI_TK1_TB_DEBUG
     #endif // TB_VERIFY
     return false;
   } else if (is_full()) {
     #ifdef CONFIG_APP_SOI_TK1_TB_DEBUG
-    fprintf(stderr,"Monitor tb_Virtual_Machine_waypoint_write is full!\n");
+    fprintf(stderr,"Monitor tb_Asset_Waypoint_Manager_waypoint_read_vm is full!\n");
     #endif 
     return false;
   } else {

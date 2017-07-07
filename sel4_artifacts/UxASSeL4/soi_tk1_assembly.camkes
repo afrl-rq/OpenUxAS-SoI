@@ -51,12 +51,19 @@ import "components/UART_Driver/UART_Driver.camkes";
 import "components/tb_Monitors/tb_UART_Driver_in_uart_packet_Monitor/tb_UART_Driver_in_uart_packet_Monitor.camkes";
 
 import "components/Asset_Waypoint_Manager/Asset_Waypoint_Manager.camkes";
+import "components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_vm_Monitor/tb_Asset_Waypoint_Manager_waypoint_read_vm_Monitor.camkes";
+import "components/tb_Monitors/tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor/tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor.camkes";
 import "components/tb_Monitors/tb_Asset_Waypoint_Manager_in_uart_packet_Monitor/tb_Asset_Waypoint_Manager_in_uart_packet_Monitor.camkes";
 
 import "components/Waypoint_Manager/Waypoint_Manager.camkes";
+import "components/tb_Monitors/tb_Waypoint_Manager_mission_write_Monitor/tb_Waypoint_Manager_mission_write_Monitor.camkes";
+import "components/tb_Monitors/tb_Waypoint_Manager_waypoint_write_Monitor/tb_Waypoint_Manager_waypoint_write_Monitor.camkes";
 import "components/tb_Monitors/tb_Waypoint_Manager_in_send_success_Monitor/tb_Waypoint_Manager_in_send_success_Monitor.camkes";
 
 import "components/Virtual_Machine/Virtual_Machine.camkes";
+import "components/tb_Monitors/tb_Virtual_Machine_mission_read_Monitor/tb_Virtual_Machine_mission_read_Monitor.camkes";
+import "components/tb_Monitors/tb_Virtual_Machine_waypoint_write_Monitor/tb_Virtual_Machine_waypoint_write_Monitor.camkes";
+
 
 
 
@@ -88,58 +95,93 @@ assembly {
         connection seL4TimeServer tb_Asset_Waypoint_Manager_periodic_dispatcher_timer(from Asset_Waypoint_Manager_inst.tb_timer, to time_server.the_timer);
         connection seL4Notification tb_Asset_Waypoint_Manager_periodic_dispatcher_echo_int(from dispatch_periodic_inst.Asset_Waypoint_Manager_periodic_dispatcher, to Asset_Waypoint_Manager_inst.tb_timer_complete);
 
-        component tb_Asset_Waypoint_Manager_in_uart_packet_Monitor tb_asset_waypoint_manager_in_uart_packet_monitor;
+        component tb_Asset_Waypoint_Manager_waypoint_read_vm_Monitor tb_asset_waypoint_manager_waypoint_read_vm_monitor;
 
-        connection seL4Notification conn1 (from Asset_Waypoint_Manager_inst.asset_waypoint_manager_waypoint_write____waypoint_manager_waypoint_write, to Waypoint_Manager_inst.waypoint_write);
-        connection seL4Notification conn2 (from Asset_Waypoint_Manager_inst.asset_waypoint_manager_waypoint_write____virtual_machine_waypoint_write, to Virtual_Machine_inst.waypoint_write);
+        component tb_Asset_Waypoint_Manager_waypoint_read_wm_Monitor tb_asset_waypoint_manager_waypoint_read_wm_monitor;
+
+        component tb_Asset_Waypoint_Manager_in_uart_packet_Monitor tb_asset_waypoint_manager_in_uart_packet_monitor;
 
         connection seL4TimeServer tb_Waypoint_Manager_periodic_dispatcher_timer(from Waypoint_Manager_inst.tb_timer, to time_server.the_timer);
         connection seL4Notification tb_Waypoint_Manager_periodic_dispatcher_echo_int(from dispatch_periodic_inst.Waypoint_Manager_periodic_dispatcher, to Waypoint_Manager_inst.tb_timer_complete);
 
+        component tb_Waypoint_Manager_mission_write_Monitor tb_waypoint_manager_mission_write_monitor;
+
+        component tb_Waypoint_Manager_waypoint_write_Monitor tb_waypoint_manager_waypoint_write_monitor;
+
         component tb_Waypoint_Manager_in_send_success_Monitor tb_waypoint_manager_in_send_success_monitor;
 
-        connection seL4Notification conn3 (from Waypoint_Manager_inst.mission_read, to Virtual_Machine_inst.mission_read);
 
-        connection seL4Notification conn4 (from Waypoint_Manager_inst.waypoint_read, to Asset_Waypoint_Manager_inst.waypoint_read_wm);
+        component tb_Virtual_Machine_mission_read_Monitor tb_virtual_machine_mission_read_monitor;
 
-        connection seL4Notification conn5 (from Virtual_Machine_inst.mission_write, to Waypoint_Manager_inst.mission_write);
+        component tb_Virtual_Machine_waypoint_write_Monitor tb_virtual_machine_waypoint_write_monitor;
 
-        connection seL4Notification conn6 (from Virtual_Machine_inst.waypoint_read, to Asset_Waypoint_Manager_inst.waypoint_read_vm);
 
 
 
         // Port connections for active threads
 
-        connection seL4RPCCall conn7 (from UART_Driver_inst.tb_out_uart_packet0, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
+        connection seL4RPCCall conn1 (from UART_Driver_inst.tb_out_uart_packet0, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
 
-        connection seL4RPCCall conn8 (from UART_Driver_inst.tb_in_uart_packet, to tb_uart_driver_in_uart_packet_monitor.mon);
-        connection seL4Notification conn9 (from tb_uart_driver_in_uart_packet_monitor.monsig, to UART_Driver_inst.tb_in_uart_packet_notification);
+        connection seL4RPCCall conn2 (from UART_Driver_inst.tb_in_uart_packet, to tb_uart_driver_in_uart_packet_monitor.mon);
+        connection seL4Notification conn3 (from tb_uart_driver_in_uart_packet_monitor.monsig, to UART_Driver_inst.tb_in_uart_packet_notification);
 
-        connection seL4RPCCall conn10 (from UART_Driver_inst.tb_out_send_success0, to tb_waypoint_manager_in_send_success_monitor.mon);
+        connection seL4RPCCall conn4 (from UART_Driver_inst.tb_out_send_success0, to tb_waypoint_manager_in_send_success_monitor.mon);
 
+
+        connection seL4RPCCall conn5 (from Asset_Waypoint_Manager_inst.tb_waypoint_write0, to tb_waypoint_manager_waypoint_write_monitor.mon);
+        connection seL4RPCCall conn6 (from Asset_Waypoint_Manager_inst.tb_waypoint_write1, to tb_waypoint_manager_waypoint_write_monitor.mon);
+
+        connection seL4RPCCall conn7 (from Asset_Waypoint_Manager_inst.tb_waypoint_read_vm, to tb_asset_waypoint_manager_waypoint_read_vm_monitor.mon);
+        connection seL4Notification conn8 (from tb_asset_waypoint_manager_waypoint_read_vm_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_waypoint_read_vm_notification);
+
+        connection seL4RPCCall conn9 (from Asset_Waypoint_Manager_inst.tb_waypoint_read_wm, to tb_asset_waypoint_manager_waypoint_read_wm_monitor.mon);
+        connection seL4Notification conn10 (from tb_asset_waypoint_manager_waypoint_read_wm_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_waypoint_read_wm_notification);
 
         connection seL4RPCCall conn11 (from Asset_Waypoint_Manager_inst.tb_in_uart_packet, to tb_asset_waypoint_manager_in_uart_packet_monitor.mon);
         connection seL4Notification conn12 (from tb_asset_waypoint_manager_in_uart_packet_monitor.monsig, to Asset_Waypoint_Manager_inst.tb_in_uart_packet_notification);
 
 
-        connection seL4RPCCall conn13 (from Waypoint_Manager_inst.tb_in_send_success, to tb_waypoint_manager_in_send_success_monitor.mon);
-        connection seL4Notification conn14 (from tb_waypoint_manager_in_send_success_monitor.monsig, to Waypoint_Manager_inst.tb_in_send_success_notification);
+        connection seL4RPCCall conn13 (from Waypoint_Manager_inst.tb_mission_read0, to tb_virtual_machine_mission_read_monitor.mon);
 
-        connection seL4RPCCall conn15 (from Waypoint_Manager_inst.tb_out_uart_packet0, to tb_uart_driver_in_uart_packet_monitor.mon);
+        connection seL4RPCCall conn14 (from Waypoint_Manager_inst.tb_mission_write, to tb_waypoint_manager_mission_write_monitor.mon);
+        connection seL4Notification conn15 (from tb_waypoint_manager_mission_write_monitor.monsig, to Waypoint_Manager_inst.tb_mission_write_notification);
 
+        connection seL4RPCCall conn16 (from Waypoint_Manager_inst.tb_waypoint_read0, to tb_asset_waypoint_manager_waypoint_read_wm_monitor.mon);
+
+        connection seL4RPCCall conn17 (from Waypoint_Manager_inst.tb_waypoint_write, to tb_waypoint_manager_waypoint_write_monitor.mon);
+        connection seL4Notification conn18 (from tb_waypoint_manager_waypoint_write_monitor.monsig, to Waypoint_Manager_inst.tb_waypoint_write_notification);
+
+        connection seL4RPCCall conn19 (from Waypoint_Manager_inst.tb_in_send_success, to tb_waypoint_manager_in_send_success_monitor.mon);
+        connection seL4Notification conn20 (from tb_waypoint_manager_in_send_success_monitor.monsig, to Waypoint_Manager_inst.tb_in_send_success_notification);
+
+        connection seL4RPCCall conn21 (from Waypoint_Manager_inst.tb_out_uart_packet0, to tb_uart_driver_in_uart_packet_monitor.mon);
+
+        connection seL4RPCCall conn22 (from Virtual_Machine_inst.tb_mission_write0, to tb_waypoint_manager_mission_write_monitor.mon);
+
+        connection seL4RPCCall conn23 (from Virtual_Machine_inst.tb_mission_read, to tb_virtual_machine_mission_read_monitor.mon);
+        connection seL4Notification conn24 (from tb_virtual_machine_mission_read_monitor.monsig, to Virtual_Machine_inst.tb_mission_read_notification);
+
+        connection seL4RPCCall conn25 (from Virtual_Machine_inst.tb_waypoint_write, to tb_virtual_machine_waypoint_write_monitor.mon);
+        connection seL4Notification conn26 (from tb_virtual_machine_waypoint_write_monitor.monsig, to Virtual_Machine_inst.tb_waypoint_write_notification);
+
+        connection seL4RPCCall conn27 (from Virtual_Machine_inst.tb_waypoint_read0, to tb_asset_waypoint_manager_waypoint_read_vm_monitor.mon);
 
 
 
         // Direct RPC connections
 
-        connection seL4RPCCall conn16 (from UART_Driver_inst.clkcar, to Clock_Driver_inst.clkcar);
+        connection seL4RPCCall conn28 (from UART_Driver_inst.clkcar, to Clock_Driver_inst.clkcar);
 
-        connection seL4RPCCall conn17 (from Virtual_Machine_inst.clkcarfwd, to Clock_Driver_inst.clkcarfwd);
-        connection seL4RPCCall conn18 (from Virtual_Machine_inst.uartfwd, to UART_Driver_inst.uartfwd);
+        connection seL4RPCCall conn29 (from Virtual_Machine_inst.clkcarfwd, to Clock_Driver_inst.clkcarfwd);
+        connection seL4RPCCall conn30 (from Virtual_Machine_inst.uartfwd, to UART_Driver_inst.uartfwd);
+
+
+
 
         // Shared memory connections
 
-        connection seL4SharedData conn19 (from Waypoint_Manager_inst.mission, to Virtual_Machine_inst.mission);connection seL4SharedData conn20 (from Virtual_Machine_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);connection seL4SharedData conn21 (from Waypoint_Manager_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);
+        connection seL4SharedData conn31 (from Waypoint_Manager_inst.mission, to Virtual_Machine_inst.mission);connection seL4SharedData conn32 (from Waypoint_Manager_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);connection seL4SharedData conn33 (from Virtual_Machine_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);
+
 
         connection seL4TimeServer periodic_dispatch_timer(from dispatch_periodic_inst.timer, to time_server.the_timer);
         connection seL4GlobalAsynchCallback echo_int(from time_server.timer_notification, to dispatch_periodic_inst.timer_complete);
@@ -163,33 +205,43 @@ assembly {
         UART_Driver_inst.tb_out_send_success0_attributes = TB_MONITOR_WRITE_ACCESS;
 
 
+        Asset_Waypoint_Manager_inst.tb_waypoint_write0_attributes = TB_MONITOR_WRITE_ACCESS;
+        Asset_Waypoint_Manager_inst.tb_waypoint_write1_attributes = TB_MONITOR_WRITE_ACCESS;
+
+        tb_asset_waypoint_manager_waypoint_read_vm_monitor.priority = 230;
+        Asset_Waypoint_Manager_inst.tb_waypoint_read_vm_attributes = TB_MONITOR_READ_ACCESS;
+
+        tb_asset_waypoint_manager_waypoint_read_wm_monitor.priority = 230;
+        Asset_Waypoint_Manager_inst.tb_waypoint_read_wm_attributes = TB_MONITOR_READ_ACCESS;
+
         tb_asset_waypoint_manager_in_uart_packet_monitor.priority = 230;
         Asset_Waypoint_Manager_inst.tb_in_uart_packet_attributes = TB_MONITOR_READ_ACCESS;
 
-        // Asset_Waypoint_Manager_inst.waypoint_read_vm = "Asset_Waypoint_Manager_waypoint_read_vm";
-        // Asset_Waypoint_Manager_inst.waypoint_read_vm_global_endpoint = "Asset_Waypoint_Manager_waypoint_read_vm";
 
-        // Asset_Waypoint_Manager_inst.waypoint_read_wm = "Asset_Waypoint_Manager_waypoint_read_wm";
-        // Asset_Waypoint_Manager_inst.waypoint_read_wm_global_endpoint = "Asset_Waypoint_Manager_waypoint_read_wm";
+        Waypoint_Manager_inst.tb_mission_read0_attributes = TB_MONITOR_WRITE_ACCESS;
 
+        tb_waypoint_manager_mission_write_monitor.priority = 230;
+        Waypoint_Manager_inst.tb_mission_write_attributes = TB_MONITOR_READ_ACCESS;
+
+        Waypoint_Manager_inst.tb_waypoint_read0_attributes = TB_MONITOR_WRITE_ACCESS;
+
+        tb_waypoint_manager_waypoint_write_monitor.priority = 230;
+        Waypoint_Manager_inst.tb_waypoint_write_attributes = TB_MONITOR_READ_ACCESS;
 
         tb_waypoint_manager_in_send_success_monitor.priority = 230;
         Waypoint_Manager_inst.tb_in_send_success_attributes = TB_MONITOR_READ_ACCESS;
 
         Waypoint_Manager_inst.tb_out_uart_packet0_attributes = TB_MONITOR_WRITE_ACCESS;
 
-        // Waypoint_Manager_inst.mission_write = "Waypoint_Manager_mission_write";
-        // Waypoint_Manager_inst.mission_write_global_endpoint = "Waypoint_Manager_mission_write";
+        Virtual_Machine_inst.tb_mission_write0_attributes = TB_MONITOR_WRITE_ACCESS;
 
-        // Waypoint_Manager_inst.waypoint_write = "Waypoint_Manager_waypoint_write";
-        // Waypoint_Manager_inst.waypoint_write_global_endpoint = "Waypoint_Manager_waypoint_write";
+        tb_virtual_machine_mission_read_monitor.priority = 230;
+        Virtual_Machine_inst.tb_mission_read_attributes = TB_MONITOR_READ_ACCESS;
 
+        tb_virtual_machine_waypoint_write_monitor.priority = 230;
+        Virtual_Machine_inst.tb_waypoint_write_attributes = TB_MONITOR_READ_ACCESS;
 
-        // Virtual_Machine_inst.mission_read = "Virtual_Machine_mission_read";
-        // Virtual_Machine_inst.mission_read_global_endpoint = "Virtual_Machine_mission_read";
-
-        // Virtual_Machine_inst.waypoint_write = "Virtual_Machine_waypoint_write";
-        // Virtual_Machine_inst.waypoint_write_global_endpoint = "Virtual_Machine_waypoint_write";
+        Virtual_Machine_inst.tb_waypoint_read0_attributes = TB_MONITOR_WRITE_ACCESS;
 
 
 
@@ -203,37 +255,6 @@ assembly {
         Asset_Waypoint_Manager_inst.tb_timer_global_endpoint = "Asset_Waypoint_Manager_tb_timer";
         Waypoint_Manager_inst.tb_timer_attributes = 12;
         Waypoint_Manager_inst.tb_timer_global_endpoint = "Waypoint_Manager_tb_timer";
-
-        Virtual_Machine_inst.base_prio = 100;
-        Virtual_Machine_inst.priority = 101;
-
-        Virtual_Machine_inst.untyped_mmios = [ 
-            "0x50046000:12", // Interrupt Controller Virtual CPU interface (Virtual Machine view)
-            "0x60004000:12", // Interrupt controller registers (ICTLR)
-            "0x700b0000:12", // SDMMC-1, SDMMC-2, SDMMC-3, SDMMC-4,
-            "0x7d000000:12", // USB on-the-go (micro)
-            "0x7d004000:12", // USB on top board
-            "0x7d008000:12", // USB on bottom board
-            "0xb0000000:28", // Linux kernel memory regions
-            "0xc0000000:29", // Linux kernel memory regions
-            "0xe0000000:28", // Linux kernel memory regions
-            ];
-
-        Virtual_Machine_inst.irqs =  [
-            27, // INTERRUPT_VGPT (INTERRUPT_PPI_11)
-            53, // INTERRUPT_USB2
-            63, // INTERRUPT_SDMMC4
-            122, // INTERRUPT_UARTD
-            129, // INTERRUPT_USB3
-            ];
-
-        Virtual_Machine_inst.smmu = [10, 23];
-
-        Virtual_Machine_inst.asid_pool = true;
-
-        Virtual_Machine_inst.simple = true;
-        Virtual_Machine_inst.cnode_size_bits = 21; 
-        Virtual_Machine_inst.simple_untyped24_pool = 10; 
 
     }
 }

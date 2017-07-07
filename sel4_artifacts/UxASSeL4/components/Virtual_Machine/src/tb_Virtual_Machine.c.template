@@ -57,139 +57,77 @@ interface and so contention may occur.
 #include <camkes.h>
 
 /************************************************************************
- *  tb_out_mission_enqueue:
+ *  tb_mission_write_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
  * call to write to a remote data port.
  *
+ * XXX: When simulating fan out, the caller of this function will only 
+ * receive a positive response when all enqueues are successful. When a
+ * negative response is received it only indicates that at least one
+ * enqueue attempt failed.
+ *
  ************************************************************************/
-
-bool tb_Virtual_Machine_write_mission_write(void) {
+bool tb_mission_write_enqueue
+(const bool * tb_mission_write) {
     bool tb_result = true ; 
 
-    mission_write_emit();
+    tb_result &= tb_mission_write0_enqueue((bool *)tb_mission_write);
+
     return tb_result;
-}/************************************************************************
- *
- * Static variables and queue management functions for event port:
- *     mission_read
- *
- ************************************************************************/
-
-static bool mission_read_index = false;
-
-/************************************************************************
- *  mission_read_callback:
- * Invoked by: remote RPC
- *
- * This is the function invoked by a remote RPC to write to an active-thread
- * input event port.  It increments a count of received messages.
- *
- ************************************************************************/
-
-bool mission_read_callback(void *_ UNUSED) {
-    mission_read_index = true;
-    CALLBACKOP(mission_read_reg_callback(mission_read_callback, NULL));
-    return true;
-}
-
-/************************************************************************
- *  tb_Virtual_Machine_read_mission_read:
- * Invoked from local active thread.
- *
- * This is the function invoked by the active thread to decrement the
- * input event index.
- *
- ************************************************************************/
-
-bool tb_Virtual_Machine_read_mission_read() {
-    bool result;
-    result = mission_read_index;
-    mission_read_index = false;
-    return result;
 }
 /************************************************************************
- *
- * Static variables and queue management functions for event port:
- *     waypoint_write
- *
- ************************************************************************/
-
-static bool waypoint_write_index = false;
-
-/************************************************************************
- *  waypoint_write_callback:
- * Invoked by: remote RPC
- *
- * This is the function invoked by a remote RPC to write to an active-thread
- * input event port.  It increments a count of received messages.
- *
- ************************************************************************/
-
-bool waypoint_write_callback(void *_ UNUSED) {
-    waypoint_write_index = true;
-    CALLBACKOP(waypoint_write_reg_callback(waypoint_write_callback, NULL));
-    return true;
-}
-
-/************************************************************************
- *  tb_Virtual_Machine_read_waypoint_write:
- * Invoked from local active thread.
- *
- * This is the function invoked by the active thread to decrement the
- * input event index.
- *
- ************************************************************************/
-
-bool tb_Virtual_Machine_read_waypoint_write() {
-    bool result;
-    result = waypoint_write_index;
-    waypoint_write_index = false;
-    return result;
-}
-/************************************************************************
- *  tb_Virtual_Machine_write_waypoint_read:
+ *  tb_waypoint_read_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
  * call to write to a remote data port.
  *
+ * XXX: When simulating fan out, the caller of this function will only 
+ * receive a positive response when all enqueues are successful. When a
+ * negative response is received it only indicates that at least one
+ * enqueue attempt failed.
+ *
  ************************************************************************/
-bool tb_out_mission_enqueue
-(const MissionSoftware__mission_impl * tb_out_mission) {
+bool tb_waypoint_read_enqueue
+(const bool * tb_waypoint_read) {
     bool tb_result = true ; 
 
-    waypoint_read_emit();
+    tb_result &= tb_waypoint_read0_enqueue((bool *)tb_waypoint_read);
+
     return tb_result;
 }
 
 
 
-    // Pre-initialization statements for mission_read
-    // Pre-initialization statements for waypoint_write
-    // Pre-initialization statements for tb_in_waypoint
+void pre_init(void) {
+
+    // Pre-initialization statements for tb_mission_read
+    // Pre-initialization statements for tb_waypoint_write
+
+}
 
 /************************************************************************
- *  tb_entrypoint_Virtual_Machine_mission_read:
+ *  tb_entrypoint_tb_Virtual_Machine_mission_read:
  *
  * This is the function invoked by an active thread dispatcher to
  * call to a user-defined entrypoint function.  It sets up the dispatch
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_Virtual_Machine_mission_read(void) {
+void tb_entrypoint_tb_Virtual_Machine_mission_read(const bool * in_arg) {
 }
 
 /************************************************************************
- *  tb_entrypoint_Virtual_Machine_waypoint_write:
+ *  tb_entrypoint_tb_Virtual_Machine_waypoint_write:
  *
  * This is the function invoked by an active thread dispatcher to
  * call to a user-defined entrypoint function.  It sets up the dispatch
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_Virtual_Machine_waypoint_write(void) {
+void tb_entrypoint_tb_Virtual_Machine_waypoint_write(const bool * in_arg) {
 }
 
 

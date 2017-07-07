@@ -48,11 +48,13 @@ void component_entry(const int64_t * periodic_dispatcher);
 
 
  void component_init(const int64_t *arg);
+ bool tb_waypoint_write_enqueue(const bool * tb_waypoint_write);
+ // reader prototype for tb_waypoint_read_vm
+bool tb_waypoint_read_vm_dequeue(bool * tb_waypoint_read_vm);
+ // reader prototype for tb_waypoint_read_wm
+bool tb_waypoint_read_wm_dequeue(bool * tb_waypoint_read_wm);
  // reader prototype for tb_in_uart_packet
 bool tb_in_uart_packet_dequeue(SMACCM_DATA__UART_Packet_i * tb_in_uart_packet);
- bool tb_Asset_Waypoint_Manager_write_waypoint_write(void);
- bool tb_Asset_Waypoint_Manager_read_waypoint_read_vm(void);
- bool tb_Asset_Waypoint_Manager_read_waypoint_read_wm(void);
  
 
 
