@@ -175,12 +175,8 @@ public
 						Access_Right => READ_WRITE;
 					};
 					
-			in_send_success: in event data port Base_Types::Boolean  {
-	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_send_success");
-			};
-			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i {
-	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_uart_packet");
-			};
+			in_send_success: in event data port Base_Types::Boolean;
+			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i;
 		properties
 			Source_Text => ("user_code/waypoint_manager.c");
 			Dispatch_Protocol => Periodic;
@@ -206,9 +202,7 @@ public
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
 					};
-			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i {
-	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_uart_packet");
-			};
+			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i;
 		properties
 			Source_Text => ("user_code/asset_waypoint_manager.c");
 	        Dispatch_Protocol => Periodic;

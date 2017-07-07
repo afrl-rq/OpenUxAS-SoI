@@ -87,11 +87,6 @@ void tb_timer_complete_callback(void *_ UNUSED) {
    (void)periodic_dispatcher_write_int64_t(&tb_time_periodic_dispatcher);
    CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
 }
-
-static void tb_in_send_success_notification_handler(void * unused) {
-  MUTEXOP(tb_dispatch_sem_post())
-  CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
-}
 /************************************************************************
  *  tb_out_uart_packet_enqueue:
  * Invoked from user code in the local thread.
@@ -227,7 +222,6 @@ void pre_init(void) {
     // Pre-initialization statements for periodic_dispatcher
     // Pre-initialization statements for Waypoint_Manager_initializer
     // Pre-initialization statements for tb_in_send_success
-    CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
     // Pre-initialization statements for mission_write
     // Pre-initialization statements for waypoint_write
 
@@ -268,8 +262,6 @@ void tb_entrypoint_Waypoint_Manager_Waypoint_Manager_initializer(const int64_t *
  *
  ************************************************************************/
 void tb_entrypoint_tb_Waypoint_Manager_in_send_success(const bool * in_arg) {
-    in_send_success((bool *) in_arg);
-
 }
 
 /************************************************************************
@@ -307,7 +299,6 @@ int run(void) {
 
     // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
-    bool tb_in_send_success;
 
 
     {
@@ -323,9 +314,6 @@ int run(void) {
         if (tb_occurred_periodic_dispatcher) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
-        }
-        while (tb_in_send_success_dequeue((bool*)&tb_in_send_success)) {
-            tb_entrypoint_tb_Waypoint_Manager_in_send_success(&tb_in_send_success);
         }
 
     }

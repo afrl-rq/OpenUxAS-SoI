@@ -58,8 +58,8 @@ component Virtual_Machine {
     consumes Notification mission_read;consumes Notification waypoint_write;emits Notification waypoint_read;
 
 
-    uses gen_fwd_inf clkcarfwd;
     uses gen_fwd_inf uartfwd;
+    uses gen_fwd_inf clkcarfwd;
 
 
     // Provided interfaces for shared data

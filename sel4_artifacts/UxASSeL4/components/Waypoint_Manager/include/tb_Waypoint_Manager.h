@@ -50,11 +50,6 @@ void component_entry(const int64_t * periodic_dispatcher);
  void component_init(const int64_t *arg);
  // reader prototype for tb_in_send_success
 bool tb_in_send_success_dequeue(bool * tb_in_send_success);
-// user dispatch entrypoints for port tb_in_send_success
-
-void in_send_success(const bool * tb_in_send_success);
-
-
  bool tb_out_uart_packet_enqueue(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet);
  bool tb_Waypoint_Manager_write_mission_read(void);
  bool tb_Waypoint_Manager_read_mission_write(void);
