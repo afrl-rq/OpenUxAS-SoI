@@ -36,7 +36,7 @@ public
   	properties
     	Data_Model::Data_Representation => Array;
     	Data_Model::Base_Type => (classifier (Base_Types::Unsigned_8));
-    	Data_Model::Dimension => (23264);
+    	Data_Model::Dimension => (5963744);
 	end mission_command.impl;
 
 	process implementation Mission_Software.i
@@ -46,40 +46,39 @@ public
 			asset_waypoint_manager: thread Asset_Waypoint_Manager;
 			waypoint_manager: thread Waypoint_Manager;
 			virtual_machine: thread Virtual_Machine;
-				
 			mission : data mission_command.impl{
-				TB_SYS::CAmkES_Owner_Thread => "Virtual_Machine"; --TODO this should be a subcomponent reference
+				--TODO this should be a subcomponent reference
+				TB_SYS::CAmkES_Owner_Thread => "Virtual_Machine";
 			};
 			waypoint : data mission_command.impl{
-				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager"; --TODO this should be a subcomponent reference
+				--TODO this should be a subcomponent reference
+				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
 			};
-
 		connections
---			vm2wm: port virtual_machine.out_mission -> waypoint_manager.in_mission;
 			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;
 			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
---			awm2wm: port asset_waypoint_manager.out_waypoint -> waypoint_manager.in_waypoint;
---			awm2vm: port asset_waypoint_manager.out_waypoint -> virtual_machine.in_waypoint;
 			uart2wm: port uart_driver.out_send_success -> waypoint_manager.in_send_success;
 			
-			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
-			
-			vm_clk_fwd: subprogram group access virtual_machine.clkcarfwd -> clock_driver.clkcarfwd;
-			
-			vm_uart_fwd: subprogram group access virtual_machine.uartfwd -> uart_driver.uartfwd;
-			
-			d1: data access mission -> virtual_machine.mission;
-			d2: data access mission -> waypoint_manager.mission;
-			d3: data access waypoint -> waypoint_manager.waypoint;
-			d5: data access waypoint -> asset_waypoint_manager.waypoint;
-			d6: data access waypoint -> virtual_machine.waypoint;
-			
+			-- TODO: Give ports sensible names.
 			e1: port virtual_machine.mission_write -> waypoint_manager.mission_write;
 			e2: port waypoint_manager.mission_read -> virtual_machine.mission_read;
 			e3: port virtual_machine.waypoint_read -> asset_waypoint_manager.waypoint_read_vm;
 			e4: port waypoint_manager.waypoint_read -> asset_waypoint_manager.waypoint_read_wm;
 			e5: port asset_waypoint_manager.waypoint_write -> waypoint_manager.waypoint_write;
 			e6: port asset_waypoint_manager.waypoint_write -> virtual_machine.waypoint_write;
+			
+			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
+			vm_clk_fwd: subprogram group access virtual_machine.clkcarfwd -> clock_driver.clkcarfwd;
+			vm_uart_fwd: subprogram group access virtual_machine.uartfwd -> uart_driver.uartfwd;
+			
+			-- TODO: Give data access sensible names.
+			d1: data access mission -> virtual_machine.mission;
+			d2: data access mission -> waypoint_manager.mission;
+			d3: data access waypoint -> waypoint_manager.waypoint;
+			d5: data access waypoint -> asset_waypoint_manager.waypoint;
+			d6: data access waypoint -> virtual_machine.waypoint;
+			
+
 			
 			
 	end Mission_Software.i;
@@ -127,22 +126,16 @@ public
 
 	thread Virtual_Machine
 		features
---			out_mission: out event data port mission_command.impl;
---			in_waypoint: in event data port mission_command.impl;
-
-			mission_write: out event port;
-			mission_read : in event port;
-			waypoint_write: in event port;
-			waypoint_read : out event port;
+			mission_write: out event data port Base_Types::Boolean;
+			mission_read : in event data port Base_Types::Boolean;
+			waypoint_write: in event data port Base_Types::Boolean;
+			waypoint_read : out event data port Base_Types::Boolean;
 			mission: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
-					};
+			};
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
-					};
-			
-			
-			
+			};
 			clkcarfwd: requires subprogram group access gen_fwd_inf;
 			uartfwd: requires subprogram group access gen_fwd_inf;
 		properties
@@ -156,29 +149,26 @@ public
 	
 	thread Waypoint_Manager
 		features
---			in_mission: in event data port mission_command.impl {
---	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_mission");
---			};
---			in_waypoint: in event data port mission_command.impl {
---	      		TB_SYS::Compute_Entrypoint_Source_Text => ("in_waypoint");
---			};
-			
-			mission_read : out event port;
-			mission_write : in event port;
-			waypoint_read : out event port;
-			waypoint_write : in event port;
+
+			mission_read : out event data port Base_Types::Boolean;
+			mission_write : in event data port Base_Types::Boolean {
+				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_write");
+			};
+			waypoint_read : out event data port Base_Types::Boolean;
+			waypoint_write : in event data port Base_Types::Boolean {
+				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");				
+			};
 			
 			mission: requires data access mission_command.impl {
-						Access_Right => READ_WRITE;
-					};
+				Access_Right => READ_WRITE;
+			};
 			waypoint: requires data access mission_command.impl {
-						Access_Right => READ_WRITE;
-					};
+				Access_Right => READ_WRITE;
+			};
 					
 			in_send_success: in event data port Base_Types::Boolean;
 			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i;
 		properties
-			Source_Text => ("user_code/waypoint_manager.c");
 			Dispatch_Protocol => Periodic;
 			TB_SYS::Thread_Type => Active;
 			Priority => 150;
@@ -196,15 +186,18 @@ public
 --	      		TB_SYS::Compute_Entrypoint_Source_Text => ("out_waypoint");
 --			};
 			
-			waypoint_write: out event port;
-			waypoint_read_vm: in event port;
-			waypoint_read_wm: in event port;
+			waypoint_write: out event data port Base_Types::Boolean;
+			waypoint_read_vm: in event data port Base_Types::Boolean {
+				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_vm");
+			};
+			waypoint_read_wm: in event data port Base_Types::Boolean {
+				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_wm");
+			};
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
 					};
 			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i;
 		properties
-			Source_Text => ("user_code/asset_waypoint_manager.c");
 	        Dispatch_Protocol => Periodic;
 		    Period => 100 ms;
 	   		Priority => 151;

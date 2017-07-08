@@ -88,97 +88,37 @@ void tb_timer_complete_callback(void *_ UNUSED) {
    CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
 }
 /************************************************************************
- *  tb_Asset_Waypoint_Manager_write_waypoint_write:
+ *  tb_waypoint_write_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
  * call to write to a remote data port.
  *
+ * XXX: When simulating fan out, the caller of this function will only 
+ * receive a positive response when all enqueues are successful. When a
+ * negative response is received it only indicates that at least one
+ * enqueue attempt failed.
+ *
  ************************************************************************/
-
-bool tb_Asset_Waypoint_Manager_write_waypoint_write(void) {
+bool tb_waypoint_write_enqueue
+(const bool * tb_waypoint_write) {
     bool tb_result = true ; 
 
-    asset_waypoint_manager_waypoint_write____waypoint_manager_waypoint_write_emit();
-    asset_waypoint_manager_waypoint_write____virtual_machine_waypoint_write_emit();
+    tb_result &= tb_waypoint_write0_enqueue((bool *)tb_waypoint_write);
+
+    tb_result &= tb_waypoint_write1_enqueue((bool *)tb_waypoint_write);
+
     return tb_result;
-}/************************************************************************
- *
- * Static variables and queue management functions for event port:
- *     waypoint_read_vm
- *
- ************************************************************************/
-
-static bool waypoint_read_vm_index = false;
-
-/************************************************************************
- *  waypoint_read_vm_callback:
- * Invoked by: remote RPC
- *
- * This is the function invoked by a remote RPC to write to an active-thread
- * input event port.  It increments a count of received messages.
- *
- ************************************************************************/
-
-bool waypoint_read_vm_callback(void *_ UNUSED) {
-    waypoint_read_vm_index = true;
-    CALLBACKOP(waypoint_read_vm_reg_callback(waypoint_read_vm_callback, NULL));
-    return true;
 }
 
-/************************************************************************
- *  tb_Asset_Waypoint_Manager_read_waypoint_read_vm:
- * Invoked from local active thread.
- *
- * This is the function invoked by the active thread to decrement the
- * input event index.
- *
- ************************************************************************/
-
-bool tb_Asset_Waypoint_Manager_read_waypoint_read_vm() {
-    bool result;
-    result = waypoint_read_vm_index;
-    waypoint_read_vm_index = false;
-    return result;
-}
-/************************************************************************
- *
- * Static variables and queue management functions for event port:
- *     waypoint_read_wm
- *
- ************************************************************************/
-
-static bool waypoint_read_wm_index = false;
-
-/************************************************************************
- *  waypoint_read_wm_callback:
- * Invoked by: remote RPC
- *
- * This is the function invoked by a remote RPC to write to an active-thread
- * input event port.  It increments a count of received messages.
- *
- ************************************************************************/
-
-bool waypoint_read_wm_callback(void *_ UNUSED) {
-    waypoint_read_wm_index = true;
-    CALLBACKOP(waypoint_read_wm_reg_callback(waypoint_read_wm_callback, NULL));
-    return true;
+static void tb_waypoint_read_vm_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_waypoint_read_vm_notification_reg_callback(tb_waypoint_read_vm_notification_handler, NULL));
 }
 
-/************************************************************************
- *  tb_Asset_Waypoint_Manager_read_waypoint_read_wm:
- * Invoked from local active thread.
- *
- * This is the function invoked by the active thread to decrement the
- * input event index.
- *
- ************************************************************************/
-
-bool tb_Asset_Waypoint_Manager_read_waypoint_read_wm() {
-    bool result;
-    result = waypoint_read_wm_index;
-    waypoint_read_wm_index = false;
-    return result;
+static void tb_waypoint_read_wm_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_waypoint_read_wm_notification_reg_callback(tb_waypoint_read_wm_notification_handler, NULL));
 }
 
 
@@ -187,9 +127,11 @@ void pre_init(void) {
 
     // Pre-initialization statements for periodic_dispatcher
     // Pre-initialization statements for Asset_Waypoint_Manager_initializer
+    // Pre-initialization statements for tb_waypoint_read_vm
+    CALLBACKOP(tb_waypoint_read_vm_notification_reg_callback(tb_waypoint_read_vm_notification_handler, NULL));
+    // Pre-initialization statements for tb_waypoint_read_wm
+    CALLBACKOP(tb_waypoint_read_wm_notification_reg_callback(tb_waypoint_read_wm_notification_handler, NULL));
     // Pre-initialization statements for tb_in_uart_packet
-    // Pre-initialization statements for waypoint_read_vm
-    // Pre-initialization statements for waypoint_read_wm
 
 }
 
@@ -220,6 +162,32 @@ void tb_entrypoint_Asset_Waypoint_Manager_Asset_Waypoint_Manager_initializer(con
 }
 
 /************************************************************************
+ *  tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm:
+ *
+ * This is the function invoked by an active thread dispatcher to
+ * call to a user-defined entrypoint function.  It sets up the dispatch
+ * context for the user-defined entrypoint, then calls it.
+ *
+ ************************************************************************/
+void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm(const bool * in_arg) {
+    mission_read_vm((bool *) in_arg);
+
+}
+
+/************************************************************************
+ *  tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_wm:
+ *
+ * This is the function invoked by an active thread dispatcher to
+ * call to a user-defined entrypoint function.  It sets up the dispatch
+ * context for the user-defined entrypoint, then calls it.
+ *
+ ************************************************************************/
+void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_wm(const bool * in_arg) {
+    mission_read_wm((bool *) in_arg);
+
+}
+
+/************************************************************************
  *  tb_entrypoint_tb_Asset_Waypoint_Manager_in_uart_packet:
  *
  * This is the function invoked by an active thread dispatcher to
@@ -228,28 +196,6 @@ void tb_entrypoint_Asset_Waypoint_Manager_Asset_Waypoint_Manager_initializer(con
  *
  ************************************************************************/
 void tb_entrypoint_tb_Asset_Waypoint_Manager_in_uart_packet(const SMACCM_DATA__UART_Packet_i * in_arg) {
-}
-
-/************************************************************************
- *  tb_entrypoint_Asset_Waypoint_Manager_waypoint_read_vm:
- *
- * This is the function invoked by an active thread dispatcher to
- * call to a user-defined entrypoint function.  It sets up the dispatch
- * context for the user-defined entrypoint, then calls it.
- *
- ************************************************************************/
-void tb_entrypoint_Asset_Waypoint_Manager_waypoint_read_vm(void) {
-}
-
-/************************************************************************
- *  tb_entrypoint_Asset_Waypoint_Manager_waypoint_read_wm:
- *
- * This is the function invoked by an active thread dispatcher to
- * call to a user-defined entrypoint function.  It sets up the dispatch
- * context for the user-defined entrypoint, then calls it.
- *
- ************************************************************************/
-void tb_entrypoint_Asset_Waypoint_Manager_waypoint_read_wm(void) {
 }
 
 
@@ -265,6 +211,8 @@ int run(void) {
 
     // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
+    bool tb_waypoint_read_vm;
+    bool tb_waypoint_read_wm;
 
 
     {
@@ -280,6 +228,12 @@ int run(void) {
         if (tb_occurred_periodic_dispatcher) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Asset_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
+        }
+        while (tb_waypoint_read_vm_dequeue((bool*)&tb_waypoint_read_vm)) {
+            tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm(&tb_waypoint_read_vm);
+        }
+        while (tb_waypoint_read_wm_dequeue((bool*)&tb_waypoint_read_wm)) {
+            tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_wm(&tb_waypoint_read_wm);
         }
 
     }

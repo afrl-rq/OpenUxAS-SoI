@@ -2,6 +2,7 @@ config APP_SOI_TK1
     bool "soi_tk1 (from AADL)"
     default n
     select APP_CAMKES_EXECUTIVE
+    
     help
         soi_tk1 (from AADL).
 
@@ -20,7 +21,7 @@ config APP_SOI_TK1_TB_DEBUG
 #        When using the VM with other components that need access to the UART and clock and reset controller
 #        devices, this option will cause the vm to forward the faults over a RPC connection
 
-#source "projects/vm/components/VM/Kconfig"
+source "projects/vm/components/VM/Kconfig"
 
 config VM_EMMC2_NODMA
     bool "SD access control to prevent DMA"
