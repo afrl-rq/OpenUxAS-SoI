@@ -343,7 +343,10 @@ namespace dmpl
 
         //-- the loitering radius of the vehicle in meters
         double loiterRadius = 0;
-    
+        
+        //-- set of cells to lock during next movement
+        std::set<Cell> cellsToLock;
+        
         /********************************************************************/
         //-- functions to manipulate locks
         /********************************************************************/
@@ -840,18 +843,18 @@ namespace dmpl
                 {
                     if ((thread0_state == REQUEST))
                     {
-                        if (id == 1 && isLockedThread(0, thread0_xp, thread0_yp))
+                        if (id == 1 && isLockedThread(0, cellsToLock))
                         {
                             return Integer(0);
                         }
-                        setLockThread(thread0_xp, thread0_yp);
+                        setLockThread(cellsToLock);
                         thread0_state = WAITING;
                     }
                     else
                     {
                         if ((thread0_state == WAITING))
                         {
-                            if (id == 0 && isLockedThread(1, thread0_xp, thread0_yp))
+                            if (id == 0 && isLockedThread(1, cellsToLock))
                             {
                                 return Integer(0);
                             }
