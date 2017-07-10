@@ -24,6 +24,7 @@
 
 #define GNU_WIN
 #include <stdlib.h>
+#include "UnitConversions.h"
 #include "madara/utility/Utility.h"
 
 int my_sleep (int seconds)
@@ -841,6 +842,36 @@ namespace dmpl
                 //non-infinite slope
                 double m = (y2-y1) / (x2-x1);
                 double c = y1 - m * x1;
+            }
+
+            /***********************************/
+            //given a point, compute the set of cells that the node
+            //can traverse while loitering around that point.
+            /***********************************/
+            std::set<Cell> cellsLoitered(double x, double y)
+            {
+                uxas::common::utilities::CUnitConversions flatEarth;       
+                double north, east;
+                flatEarth.ConvertLatLong_degToNorthEast_m(y, x, north, east);
+                double minLat, maxLat, minLng, maxLng, lat, lng;
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north - loiterRadius, east, minLat, lng);
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north + loiterRadius, east, maxLat, lng);
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north, east - loiterRadius, lat, minLng);
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north, east + loiterRadius, lat, maxLng);
+
+                auto minCell = GpsToCell(minLat, minLng);
+                auto maxCell = GpsToCell(maxLat, maxLng);
+
+                std::set<Cell> res;
+                for(int i = minCell.first;i <= maxCell.first;++i)
+                {
+                    for(int j = minCell.second;j <= maxCell.second;++j)
+                    {
+                        res.insert(Cell(i,j));
+                    }
+                }
+
+                return res;
             }
             
             /***********************************/
