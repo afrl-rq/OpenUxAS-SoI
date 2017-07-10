@@ -291,10 +291,12 @@ namespace dmpl
     namespace node_uav
     {
 
+#define MAX_LOCK 10
+        
         /********************************************************************/
         //-- Defining global variables at node scope
         /********************************************************************/
-        ArrayReference<_Bool, 2, 10, 10> lock(knowledge, "lock");
+        ArrayReference<int, 2, MAX_LOCK> lock(knowledge, "lock");
         ArrayReference<_Bool, 2> missionOver(knowledge, "missionOver");
         _Bool var_init_missionOver (0);
 
@@ -333,6 +335,19 @@ namespace dmpl
         std::mutex wpLock;
     
         /********************************************************************/
+        //-- functions to manipulate locks
+        /********************************************************************/
+
+        void setOnlyLock(int _x, int _y)
+        {
+            lock[id][0] = _x * Y + _y;
+            for(int i = 1;i < MAX_LOCK;++i)
+            {
+                lock[id][i] = -1;
+            }
+        }
+        
+        /********************************************************************/
         //-- Begin defining variables for role Uav
         /********************************************************************/
 
@@ -368,9 +383,54 @@ namespace dmpl
             //-- Defining global variables at scope of thread COLLISION_AVOIDANCE
             //-- Used to implement Read-Execute-Write semantics
             /********************************************************************/
-            ArrayReference<Proactive<_Bool, CachedReference>, 2, 10, 10> thread0_lock(knowledge, "lock");
+            ArrayReference<Proactive<int, CachedReference>, 2, MAX_LOCK> thread0_lock(knowledge, "lock");
             ArrayReference<Proactive<_Bool, CachedReference>, 2> thread0_missionOver(knowledge, "missionOver");
 
+            /********************************************************************/
+            //-- functions to manipulate locks
+            /********************************************************************/
+
+            bool isLockedThread(int _id, int _x, int _y)
+            {
+                for(int i = 0;i < MAX_LOCK;++i)
+                {
+                    int lockVal = thread0_lock[_id][i];
+                    if(lockVal < 0) continue;
+                    if((lockVal % Y) != _y) continue;
+                    if((lockVal / Y) != _x) continue;
+                    return true;
+                }
+                
+                return false;
+            }
+
+            void setLockThread(int _x, int _y)
+            {
+                for(int i = 0;i < MAX_LOCK;++i)
+                {
+                    if(thread0_lock[id][i] < 0)
+                    {
+                        thread0_lock[id][i] = _x * Y + _y;
+                        return;
+                    }
+                }
+                assert(0);
+            }
+
+            void unsetLockThread(int _x, int _y)
+            {
+                for(int i = 0;i < MAX_LOCK;++i)
+                {
+                    int lockVal = thread0_lock[id][i];
+                    if(lockVal < 0) continue;
+                    if((lockVal % Y) != _y) continue;
+                    if((lockVal / Y) != _x) continue;
+                    thread0_lock[id][i] = -1;
+                    return;
+                }
+                assert(0);
+            }
+            
             /********************************************************************/
             //-- Defining group variables at scope of thread COLLISION_AVOIDANCE
             //-- Used to implement Read-Execute-Write semantics
@@ -666,19 +726,18 @@ namespace dmpl
                     {
                         if ((thread0_state == REQUEST))
                             {
-                                if (((id == 1 && ((thread0_lock[0][thread0_xp][thread0_yp] != Integer (0)))) || 
-                                     (id == 2 && ((thread0_lock[0][thread0_xp][thread0_yp] != Integer (0)) || (thread0_lock[1][thread0_xp][thread0_yp] != Integer (0))))))
-                                    {
-                                        return Integer(0);
-                                    }
-                                thread0_lock[id][thread0_xp][thread0_yp] = Integer (1);
+                                if (id == 1 && isLockedThread(0, thread0_xp, thread0_yp))
+                                {
+                                    return Integer(0);
+                                }
+                                setLockThread(thread0_xp, thread0_yp);
                                 thread0_state = WAITING;
                             }
                         else
                             {
                                 if ((thread0_state == WAITING))
                                     {
-                                        if (((id == 0 && ((thread0_lock[1][thread0_xp][thread0_yp] != Integer (0))))))
+                                        if (id == 0 && isLockedThread(1, thread0_xp, thread0_yp))
                                             {
                                                 return Integer(0);
                                             }
@@ -696,7 +755,7 @@ namespace dmpl
                                                     }
                                                 if(thread0_x != thread0_xp || thread0_y != thread0_yp)
                                                     {
-                                                        thread0_lock[id][thread0_x][thread0_y] = Integer (0);
+                                                        unsetLockThread(thread0_x, thread0_y);
                                                     }
                                                 thread0_x = thread0_xp;
                                                 thread0_y = thread0_yp;
@@ -842,7 +901,7 @@ namespace dmpl
             void initialize_lock ()
             {
                 engine::Variables vars;
-                lock[id][x][y] = Integer (1);
+                setOnlyLock(x, y);
             }
             void initialize_missionOver ()
             {
