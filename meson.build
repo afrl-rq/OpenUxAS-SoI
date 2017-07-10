@@ -22,12 +22,6 @@ if res.returncode() == 0
   madara_root = res.stdout()
 endif
 
-dmpl_root = '../dmplc'
-res = run_command(python3, '-c', 'import os; import sys; sys.stdout.write(os.environ["DMPL_ROOT"])')
-if res.returncode() == 0
-  dmpl_root = res.stdout()
-endif
-
 conf = configuration_data()
 
 link_args = []
