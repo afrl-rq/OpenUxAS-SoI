@@ -116,7 +116,7 @@ thread RouteAggregatorService_CollectorRole
 			(previous_state = OPTIONS_WAIT) and all_task_plan_options_received;
 		
 		eq T_ROUTE_PENDING_TO_IDLE : bool =
-			(previous_state = OPTIONS_WAIT) and event(AssignmentCostMatrix_out);	
+			(previous_state = ROUTE_PENDING) and event(AssignmentCostMatrix_out);	--Note: Previously, I had previous_state = OPTIONS_WAIT by mistake; and the lemmas were not sufficient to catch it.
 		-------------------------------------------------------------	
 		--State machine guarantees
 				
@@ -140,6 +140,9 @@ thread RouteAggregatorService_CollectorRole
 		-------------------------------------------------------------
 		-- END STATE MACHINE LOGIC
 		-------------------------------------------------------------
+
+		
+		
 	**};
 end RouteAggregatorService_CollectorRole;
 
