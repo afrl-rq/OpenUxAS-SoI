@@ -445,6 +445,16 @@ namespace dmpl
                 assert(0);
             }
 
+            //-- lock all cells in cells
+            void setLockThread(const std::set<Cell> &cells)
+            {
+                for(const auto &cell : cells)
+                {
+                    setLockThread(cell.first, cell.second);
+                }
+            }
+
+            //-- unlock cell (x,y)
             void unsetLockThread(int _x, int _y)
             {
                 for(int i = 0;i < MAX_LOCK;++i)
