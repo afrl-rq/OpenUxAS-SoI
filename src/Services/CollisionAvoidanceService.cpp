@@ -465,27 +465,27 @@ namespace dmpl
         typedef typename ContainerT::size_type size_type;
 
         while(true)
+        {
+            pos = str.find_first_of(delimiters, lastPos);
+            if(pos == std::string::npos)
             {
-                pos = str.find_first_of(delimiters, lastPos);
-                if(pos == std::string::npos)
-                    {
-                        pos = str.length();
+                pos = str.length();
 
-                        if(pos != lastPos || !trimEmpty)
-                            tokens.push_back(value_type(str.data()+lastPos,
-                                                        (size_type)pos-lastPos ));
+                if(pos != lastPos || !trimEmpty)
+                    tokens.push_back(value_type(str.data()+lastPos,
+                                                (size_type)pos-lastPos ));
 
-                        break;
-                    }
-                else
-                    {
-                        if(pos != lastPos || !trimEmpty)
-                            tokens.push_back(value_type(str.data()+lastPos,
-                                                        (size_type)pos-lastPos ));
-                    }
-
-                lastPos = pos + 1;
+                break;
             }
+            else
+            {
+                if(pos != lastPos || !trimEmpty)
+                    tokens.push_back(value_type(str.data()+lastPos,
+                                                (size_type)pos-lastPos ));
+            }
+
+            lastPos = pos + 1;
+        }
     }
 
     /********************************************************************/
@@ -685,90 +685,90 @@ namespace dmpl
                     (void) (std::cerr  << MSG_MARKER << "id = " << id << " X = " << X << " Y = " << Y << " x = " << thread0_x << " y = " << thread0_y << " state = " << thread0_state << "\n");
                 }
                 if ((thread0_state == NEXT))
+                {
+                    //-- check if we need to update currWP
+                    if(currWP == NULL || (nextPos.lat() == currWP->getLatitude() && nextPos.lng() == currWP->getLongitude()))
                     {
-                        //-- check if we need to update currWP
-                        if(currWP == NULL || (nextPos.lat() == currWP->getLatitude() && nextPos.lng() == currWP->getLongitude()))
+                        //-- check if there are no more waypoints
+                        {
+                            std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
+                            if(wpPtr->empty())
                             {
-                                //-- check if there are no more waypoints
-                                {
-                                    std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
-                                    if(wpPtr->empty())
-                                        {
-                                            return Integer(0);
-                                        }
-                                }
-                                //-- update next waypoint
-                                thread0_NEXT_WP();
+                                return Integer(0);
+                            }
+                        }
+                        //-- update next waypoint
+                        thread0_NEXT_WP();
         
-                            }
-
-                        //-- if the next waypoint is in the same cell as we are in, then move directly to there
-                        if(thread0_x == thread0_xf && thread0_y == thread0_yf)
-                            {
-                                nextPos.lat(currWP->getLatitude());
-                                nextPos.lng(currWP->getLongitude());
-                                thread0_state = MOVE;
-                            }
-                        else        
-                            {
-                                (void) (thread0_NEXT_XY (
-                                                         __strip_const(engine::FunctionArguments(0))
-                                                         , vars));
-        
-                                //-- if the next waypoint is in the same cell as we are in, then move directly to there
-                                if(thread0_x == thread0_xp && thread0_y == thread0_yp)
-                                    {
-                                        thread0_state = MOVE;
-                                    }
-                                else
-                                    {
-                                        thread0_state = REQUEST;
-                                    }
-                            }
                     }
-                else
+
+                    //-- if the next waypoint is in the same cell as we are in, then move directly to there
+                    if(thread0_x == thread0_xf && thread0_y == thread0_yf)
                     {
-                        if ((thread0_state == REQUEST))
+                        nextPos.lat(currWP->getLatitude());
+                        nextPos.lng(currWP->getLongitude());
+                        thread0_state = MOVE;
+                    }
+                    else        
+                    {
+                        (void) (thread0_NEXT_XY (
+                                    __strip_const(engine::FunctionArguments(0))
+                                    , vars));
+        
+                        //-- if the next waypoint is in the same cell as we are in, then move directly to there
+                        if(thread0_x == thread0_xp && thread0_y == thread0_yp)
+                        {
+                            thread0_state = MOVE;
+                        }
+                        else
+                        {
+                            thread0_state = REQUEST;
+                        }
+                    }
+                }
+                else
+                {
+                    if ((thread0_state == REQUEST))
+                    {
+                        if (id == 1 && isLockedThread(0, thread0_xp, thread0_yp))
+                        {
+                            return Integer(0);
+                        }
+                        setLockThread(thread0_xp, thread0_yp);
+                        thread0_state = WAITING;
+                    }
+                    else
+                    {
+                        if ((thread0_state == WAITING))
+                        {
+                            if (id == 0 && isLockedThread(1, thread0_xp, thread0_yp))
                             {
-                                if (id == 1 && isLockedThread(0, thread0_xp, thread0_yp))
+                                return Integer(0);
+                            }
+                            thread0_state = MOVE;
+                        }
+                        else
+                        {
+                            if ((thread0_state == MOVE))
+                            {
+                                nextPos.alt(currWP->getAltitude());
+                                std::cerr << "GAMS::move " << nextPos << '\n';
+                                if(uxas::service::GamsService::move (nextPos, currWP) != gams::platforms::PLATFORM_ARRIVED)
                                 {
                                     return Integer(0);
                                 }
-                                setLockThread(thread0_xp, thread0_yp);
-                                thread0_state = WAITING;
+                                if(thread0_x != thread0_xp || thread0_y != thread0_yp)
+                                {
+                                    unsetLockThread(thread0_x, thread0_y);
+                                }
+                                thread0_x = thread0_xp;
+                                thread0_y = thread0_yp;
+                                thread0_state = NEXT;
+                                std::cerr << "current waypoint cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
                             }
-                        else
-                            {
-                                if ((thread0_state == WAITING))
-                                    {
-                                        if (id == 0 && isLockedThread(1, thread0_xp, thread0_yp))
-                                            {
-                                                return Integer(0);
-                                            }
-                                        thread0_state = MOVE;
-                                    }
-                                else
-                                    {
-                                        if ((thread0_state == MOVE))
-                                            {
-                                                nextPos.alt(currWP->getAltitude());
-                                                std::cerr << "GAMS::move " << nextPos << '\n';
-                                                if(uxas::service::GamsService::move (nextPos, currWP) != gams::platforms::PLATFORM_ARRIVED)
-                                                    {
-                                                        return Integer(0);
-                                                    }
-                                                if(thread0_x != thread0_xp || thread0_y != thread0_yp)
-                                                    {
-                                                        unsetLockThread(thread0_x, thread0_y);
-                                                    }
-                                                thread0_x = thread0_xp;
-                                                thread0_y = thread0_yp;
-                                                thread0_state = NEXT;
-                                                std::cerr << "current waypoint cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
-                                            }
-                                    }
-                            }
+                        }
                     }
+                }
 
                 //-- Insert return statement, in case user program did not
                 return Integer(0);
@@ -888,42 +888,42 @@ namespace dmpl
                 thread0_xp = thread0_x;
                 thread0_yp = thread0_y;
                 if ((thread0_x < thread0_xf))
-                    {
-                        thread0_xp = (thread0_xp + Integer (1));
-                    }
+                {
+                    thread0_xp = (thread0_xp + Integer (1));
+                }
                 else
+                {
+                    if ((thread0_x > thread0_xf))
                     {
-                        if ((thread0_x > thread0_xf))
-                            {
-                                thread0_xp = (thread0_xp - Integer (1));
-                            }
-                        else
-                            {
-                                if ((thread0_y < thread0_yf))
-                                    {
-                                        thread0_yp = (thread0_yp + Integer (1));
-                                    }
-                                else
-                                    {
-                                        thread0_yp = (thread0_yp - Integer (1));
-                                    }
-                            }
+                        thread0_xp = (thread0_xp - Integer (1));
                     }
+                    else
+                    {
+                        if ((thread0_y < thread0_yf))
+                        {
+                            thread0_yp = (thread0_yp + Integer (1));
+                        }
+                        else
+                        {
+                            thread0_yp = (thread0_yp - Integer (1));
+                        }
+                    }
+                }
   
                 std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
 
                 //-- if the next cell contains the next waypoint, then move to the
                 //-- waypoint.
                 if(thread0_xp == thread0_xf && thread0_yp == thread0_yf)
-                    {
-                        nextPos.lat(currWP->getLatitude());
-                        nextPos.lng(currWP->getLongitude());
-                    }
+                {
+                    nextPos.lat(currWP->getLatitude());
+                    nextPos.lng(currWP->getLongitude());
+                }
                 //-- otherwise move to the center of the next cell
                 else
-                    {
-                        nextPos = CellToGps(thread0_xp, thread0_yp);
-                    }
+                {
+                    nextPos = CellToGps(thread0_xp, thread0_yp);
+                }
   
                 //-- Insert return statement, in case user program did not
                 return Integer(0);
@@ -1013,13 +1013,13 @@ namespace dmpl
     {
     public:
         Algo (
-              unsigned period,
-              const std::string &exec_func,
-              madara::knowledge::KnowledgeBase * knowledge = 0,
-              const std::string &platform_name = "",
-              const engine::KnowledgeMap *platform_args = NULL,
-              variables::Sensors * sensors = 0,
-              variables::Self * self = 0);
+            unsigned period,
+            const std::string &exec_func,
+            madara::knowledge::KnowledgeBase * knowledge = 0,
+            const std::string &platform_name = "",
+            const engine::KnowledgeMap *platform_args = NULL,
+            variables::Sensors * sensors = 0,
+            variables::Self * self = 0);
         ~Algo (void);
         virtual int analyze (void);
         virtual int plan (void);
@@ -1045,14 +1045,14 @@ namespace dmpl
     {
     public:
         SyncAlgo (
-                  unsigned period,
-                  const std::string &exec_func,
-                  const std::string &thread_name,
-                  madara::knowledge::KnowledgeBase * knowledge = 0,
-                  const std::string &platform_name = "",
-                  const engine::KnowledgeMap *platform_args = NULL,
-                  variables::Sensors * sensors = 0,
-                  variables::Self * self = 0);
+            unsigned period,
+            const std::string &exec_func,
+            const std::string &thread_name,
+            madara::knowledge::KnowledgeBase * knowledge = 0,
+            const std::string &platform_name = "",
+            const engine::KnowledgeMap *platform_args = NULL,
+            variables::Sensors * sensors = 0,
+            variables::Self * self = 0);
         ~SyncAlgo (void);
         virtual int analyze (void);
         virtual int plan (void);
@@ -1075,16 +1075,16 @@ namespace dmpl
     /********************************************************************/
 
     Algo::Algo (
-                unsigned period,
-                const std::string &exec_func,
-                madara::knowledge::KnowledgeBase * knowledge,
-                const std::string &platform_name,
-                const engine::KnowledgeMap *platform_args,
-                variables::Sensors * sensors,
-                variables::Self * self) : loop(*knowledge),
-                                          _platform_name(platform_name), _platform_args(platform_args),
-                                          BaseAlgorithm (knowledge, 0, sensors, self), knowledge_(knowledge),
-                                          _period(period), _exec_func(exec_func)
+        unsigned period,
+        const std::string &exec_func,
+        madara::knowledge::KnowledgeBase * knowledge,
+        const std::string &platform_name,
+        const engine::KnowledgeMap *platform_args,
+        variables::Sensors * sensors,
+        variables::Self * self) : loop(*knowledge),
+                                  _platform_name(platform_name), _platform_args(platform_args),
+                                  BaseAlgorithm (knowledge, 0, sensors, self), knowledge_(knowledge),
+                                  _period(period), _exec_func(exec_func)
     {
     }
 
@@ -1150,21 +1150,21 @@ namespace dmpl
     /********************************************************************/
 
     SyncAlgo::SyncAlgo (
-                        unsigned period,
-                        const std::string &exec_func,
-                        const std::string &thread_name,
-                        madara::knowledge::KnowledgeBase * knowledge,
-                        const std::string &platform_name,
-                        const engine::KnowledgeMap *platform_args,
-                        variables::Sensors * sensors,
-                        variables::Self * self) : phase(0), mbarrier("mbarrier_" + thread_name),
-                                                  Algo (period, exec_func, knowledge, platform_name, platform_args, sensors, self)
+        unsigned period,
+        const std::string &exec_func,
+        const std::string &thread_name,
+        madara::knowledge::KnowledgeBase * knowledge,
+        const std::string &platform_name,
+        const engine::KnowledgeMap *platform_args,
+        variables::Sensors * sensors,
+        variables::Self * self) : phase(0), mbarrier("mbarrier_" + thread_name),
+                                  Algo (period, exec_func, knowledge, platform_name, platform_args, sensors, self)
     {
         wait_settings.max_wait_time = 0;
         wait_settings.poll_frequency = .1;
 
         round_logic = knowledge_->compile (
-                                           knowledge_->expand_statement (_exec_func + " (); ++" + mbarrier + ".{.uxas_id}"));
+            knowledge_->expand_statement (_exec_func + " (); ++" + mbarrier + ".{.uxas_id}"));
     }
 
     SyncAlgo::~SyncAlgo (void)
@@ -1178,19 +1178,19 @@ namespace dmpl
         barrier_data_string << _exec_func << "_REMODIFY_GLOBALS () ;> ";
         // create barrier check for partner ids
         for (size_t i : syncPartnerIds[_exec_func][settings.id])
+        {
+            if (started)
             {
-                if (started)
-                    {
-                        barrier_data_string << " && ";
-                    }
-
-                barrier_data_string << "" + mbarrier + ".";
-                barrier_data_string << i;
-                barrier_data_string << " >= " + mbarrier + ".";
-                barrier_data_string << settings.id;
-                if (!started)
-                    started = true;
+                barrier_data_string << " && ";
             }
+
+            barrier_data_string << "" + mbarrier + ".";
+            barrier_data_string << i;
+            barrier_data_string << " >= " + mbarrier + ".";
+            barrier_data_string << settings.id;
+            if (!started)
+                started = true;
+        }
 
         // take care of the case when there are no partner ids
         if (syncPartnerIds[_exec_func][settings.id].empty()) {
@@ -1207,40 +1207,40 @@ namespace dmpl
         {
             // Pre-round barrier increment
             if(phase == 0)
-                {
-                    wait_settings.delay_sending_modifieds = true; 
-                    knowledge_->evaluate ("++" + mbarrier + ".{.uxas_id}", wait_settings); 
-                    phase++;
-                }
+            {
+                wait_settings.delay_sending_modifieds = true; 
+                knowledge_->evaluate ("++" + mbarrier + ".{.uxas_id}", wait_settings); 
+                phase++;
+            }
             if(phase == 1)
-                {
-                    // remodify our globals and send all updates 
-                    wait_settings.send_list.clear (); 
-                    wait_settings.delay_sending_modifieds = false; 
-                    // first barrier for new data from previous round 
-                    if(knowledge_->evaluate (barrier_data_logic, wait_settings).to_integer()) 
-                        phase++;
-                }
-            if(phase == 2)
-                {
-                    // Execute main user logic 
-                    wait_settings.delay_sending_modifieds = true; 
-                    knowledge_->evaluate (_exec_func + "_PULL ()", wait_settings); 
-                    Algo::run(); 
+            {
+                // remodify our globals and send all updates 
+                wait_settings.send_list.clear (); 
+                wait_settings.delay_sending_modifieds = false; 
+                // first barrier for new data from previous round 
+                if(knowledge_->evaluate (barrier_data_logic, wait_settings).to_integer()) 
                     phase++;
-                }
+            }
+            if(phase == 2)
+            {
+                // Execute main user logic 
+                wait_settings.delay_sending_modifieds = true; 
+                knowledge_->evaluate (_exec_func + "_PULL ()", wait_settings); 
+                Algo::run(); 
+                phase++;
+            }
             if(phase == 3)
-                {
-                    // second barrier for waiting on others to finish round 
-                    // Increment barrier and only send barrier update 
-                    wait_settings.send_list.clear (); 
-                    wait_settings.delay_sending_modifieds = false; 
-                    if(knowledge_->evaluate (barrier_data_logic, wait_settings).to_integer()) {
-                        wait_settings.delay_sending_modifieds = true; 
-                        knowledge_->evaluate (_exec_func + "_PUSH ()", wait_settings); 
-                        phase = 0;
-                    }
+            {
+                // second barrier for waiting on others to finish round 
+                // Increment barrier and only send barrier update 
+                wait_settings.send_list.clear (); 
+                wait_settings.delay_sending_modifieds = false; 
+                if(knowledge_->evaluate (barrier_data_logic, wait_settings).to_integer()) {
+                    wait_settings.delay_sending_modifieds = true; 
+                    knowledge_->evaluate (_exec_func + "_PUSH ()", wait_settings); 
+                    phase = 0;
                 }
+            }
         }
     }
 
@@ -1317,91 +1317,91 @@ namespace uxas
             // load settings from the XML file
             for (pugi::xml_node currentXmlNode = serviceXmlNode.first_child();
                  currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
+            {
+                // if we need to load initial knowledge
+                if (std::string("DART") == currentXmlNode.name())
                 {
-                    // if we need to load initial knowledge
-                    if (std::string("DART") == currentXmlNode.name())
-                        {
-                            if (!currentXmlNode.attribute("id").empty())
-                                {
-                                    settings.id = currentXmlNode.attribute("id").as_int();
-                                }
-                            if (!currentXmlNode.attribute("node_name").empty())
-                                {
-                                    node_name = currentXmlNode.attribute("node_name").as_string();
-                                }
-                            if (!currentXmlNode.attribute("role_name").empty())
-                                {
-                                    role_name = currentXmlNode.attribute("role_name").as_string();
-                                }
-                            if (!currentXmlNode.attribute("init_lat").empty() &&
-                                !currentXmlNode.attribute("init_lng").empty())
-                                {
-                                    double init_lat = currentXmlNode.attribute("init_lat").as_double();
-                                    double init_lng = currentXmlNode.attribute("init_lng").as_double();
-                                    auto init_cell = GpsToCell(init_lat, init_lng);
-                                    std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
-                                    node_uav::var_init_x = init_cell.first;
-                                    node_uav::var_init_xf = init_cell.first;
-                                    node_uav::var_init_y = init_cell.second;
-                                    node_uav::var_init_yf = init_cell.second;
-                                }
-                            if (!currentXmlNode.attribute("DefaultLoiterRadius_m").empty())
-                            {
-                                node_uav::loiterRadius = currentXmlNode.attribute("DefaultLoiterRadius_m").as_double();
-                            }
-                        }
-                    // read a waypoint
-                    if (std::string("Waypoint") == currentXmlNode.name())
-                        {
-                            std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
-                            wp->setNumber(m_waypoints.size() + 1);
-                            wp->setNextWaypoint(wp->getNumber());
-                            wp->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
+                    if (!currentXmlNode.attribute("id").empty())
+                    {
+                        settings.id = currentXmlNode.attribute("id").as_int();
+                    }
+                    if (!currentXmlNode.attribute("node_name").empty())
+                    {
+                        node_name = currentXmlNode.attribute("node_name").as_string();
+                    }
+                    if (!currentXmlNode.attribute("role_name").empty())
+                    {
+                        role_name = currentXmlNode.attribute("role_name").as_string();
+                    }
+                    if (!currentXmlNode.attribute("init_lat").empty() &&
+                        !currentXmlNode.attribute("init_lng").empty())
+                    {
+                        double init_lat = currentXmlNode.attribute("init_lat").as_double();
+                        double init_lng = currentXmlNode.attribute("init_lng").as_double();
+                        auto init_cell = GpsToCell(init_lat, init_lng);
+                        std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
+                        node_uav::var_init_x = init_cell.first;
+                        node_uav::var_init_xf = init_cell.first;
+                        node_uav::var_init_y = init_cell.second;
+                        node_uav::var_init_yf = init_cell.second;
+                    }
+                    if (!currentXmlNode.attribute("DefaultLoiterRadius_m").empty())
+                    {
+                        node_uav::loiterRadius = currentXmlNode.attribute("DefaultLoiterRadius_m").as_double();
+                    }
+                }
+                // read a waypoint
+                if (std::string("Waypoint") == currentXmlNode.name())
+                {
+                    std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
+                    wp->setNumber(m_waypoints.size() + 1);
+                    wp->setNextWaypoint(wp->getNumber());
+                    wp->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
 
-                            if (!currentXmlNode.attribute("Latitude").empty())
-                                {
-                                    wp->setLatitude(currentXmlNode.attribute("Latitude").as_double());
-                                }
-                            if (!currentXmlNode.attribute("Longitude").empty())
-                                {
-                                    wp->setLongitude(currentXmlNode.attribute("Longitude").as_double());
-                                }
-                            if (!currentXmlNode.attribute("Altitude").empty())
-                                {
-                                    wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
-                                }
+                    if (!currentXmlNode.attribute("Latitude").empty())
+                    {
+                        wp->setLatitude(currentXmlNode.attribute("Latitude").as_double());
+                    }
+                    if (!currentXmlNode.attribute("Longitude").empty())
+                    {
+                        wp->setLongitude(currentXmlNode.attribute("Longitude").as_double());
+                    }
+                    if (!currentXmlNode.attribute("Altitude").empty())
+                    {
+                        wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
+                    }
 
-                            std::cerr << "Found waypoint : " << wp->toXML() << '\n';
+                    std::cerr << "Found waypoint : " << wp->toXML() << '\n';
 
-                            m_waypoints.push_back (wp);
-                        }
-                    // read a waypoint via cell id
-                    if (std::string("WaypointCell") == currentXmlNode.name())
-                        {
-                            if (!currentXmlNode.attribute("X").empty() &&
-                                !currentXmlNode.attribute("Y").empty() &&
-                                !currentXmlNode.attribute("Altitude").empty())
-                                {
-                                    auto nextPosition = CellToGps(currentXmlNode.attribute("X").as_int(),
-                                                                  currentXmlNode.attribute("Y").as_int());
+                    m_waypoints.push_back (wp);
+                }
+                // read a waypoint via cell id
+                if (std::string("WaypointCell") == currentXmlNode.name())
+                {
+                    if (!currentXmlNode.attribute("X").empty() &&
+                        !currentXmlNode.attribute("Y").empty() &&
+                        !currentXmlNode.attribute("Altitude").empty())
+                    {
+                        auto nextPosition = CellToGps(currentXmlNode.attribute("X").as_int(),
+                                                      currentXmlNode.attribute("Y").as_int());
 
-                                    std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
-                                    wp->setNumber(m_waypoints.size() + 1);
-                                    wp->setNextWaypoint(wp->getNumber());
-                                    wp->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
-                                    wp->setLatitude(nextPosition.lat());
-                                    wp->setLongitude(nextPosition.lng());                    
-                                    wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
+                        std::shared_ptr<afrl::cmasi::Waypoint> wp(new afrl::cmasi::Waypoint ());
+                        wp->setNumber(m_waypoints.size() + 1);
+                        wp->setNextWaypoint(wp->getNumber());
+                        wp->setSpeed(22.0);  // TODO: get from AirVehicleConfiguration
+                        wp->setLatitude(nextPosition.lat());
+                        wp->setLongitude(nextPosition.lng());                    
+                        wp->setAltitude(currentXmlNode.attribute("Altitude").as_double());
 
-                                    std::cerr << "Found waypoint cell id : ("
-                                              << currentXmlNode.attribute("X").as_int() << ','
-                                              << currentXmlNode.attribute("Y").as_int() << ")\n";
-                                    std::cerr << "Found waypoint cell : " << wp->toXML() << '\n';
+                        std::cerr << "Found waypoint cell id : ("
+                                  << currentXmlNode.attribute("X").as_int() << ','
+                                  << currentXmlNode.attribute("Y").as_int() << ")\n";
+                        std::cerr << "Found waypoint cell : " << wp->toXML() << '\n';
 
-                                    m_waypoints.push_back (wp);
-                                }
-                        }
-                }    
+                        m_waypoints.push_back (wp);
+                    }
+                }
+            }    
         }
     
         bool CollisionAvoidanceService::configure(const pugi::xml_node& serviceXmlNode)
@@ -1518,29 +1518,29 @@ namespace uxas
                                    receivedLmcpMessage)
         {
             if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
+            {
+                if (std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object)->getVehicleID() == m_entityId)
                 {
-                    if (std::static_pointer_cast<afrl::cmasi::MissionCommand> (receivedLmcpMessage->m_object)->getVehicleID() == m_entityId)
+                    std::cerr << "received private message from WaypointPlanManagerService ...\n";
+                    std::cerr << receivedLmcpMessage->m_object->toXML() << '\n';
+                    std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
+
+                    //-- update list of waypoints. make sure you get the lock.
+                    {
+                        std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
+
+                        for(auto x : ptr_MissionCommand->getWaypointList())
                         {
-                            std::cerr << "received private message from WaypointPlanManagerService ...\n";
-                            std::cerr << receivedLmcpMessage->m_object->toXML() << '\n';
-                            std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
-
-                            //-- update list of waypoints. make sure you get the lock.
+                            if(m_waypoints.empty() || m_waypoints.back()->getNumber() < x->getNumber())
                             {
-                                std::lock_guard<std::mutex> lockGuard(node_uav::wpLock);
-
-                                for(auto x : ptr_MissionCommand->getWaypointList())
-                                    {
-                                        if(m_waypoints.empty() || m_waypoints.back()->getNumber() < x->getNumber())
-                                            {
-                                                m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
-                                            }
-                                    }
-                                std::cerr << "Updated waypoints : " << m_waypoints.size() << '\n';
+                                m_waypoints.push_back(std::shared_ptr<afrl::cmasi::Waypoint>(x->clone()));
                             }
                         }
-            
+                        std::cerr << "Updated waypoints : " << m_waypoints.size() << '\n';
+                    }
                 }
+            
+            }
 
             return false;
         }
