@@ -323,9 +323,15 @@ namespace dmpl
         Reference<short> yp(knowledge, ".yp");
         short var_init_yp (0);
 
+        //-- initial latitude and longitude
+        double init_lat = 0, init_lng = 0;
+        
         //-- pointer to list of future waypoints
         std::list<std::shared_ptr<afrl::cmasi::Waypoint>> *wpPtr = NULL;
     
+        //-- the current wapoint we are at
+        std::shared_ptr<afrl::cmasi::Waypoint> currWP;
+
         //-- the next waypoint we are moving toward
         std::shared_ptr<afrl::cmasi::Waypoint> nextWP;
 
@@ -831,6 +837,7 @@ namespace dmpl
                                 {
                                     unsetLockThread(thread0_x, thread0_y);
                                 }
+                                currWP = nextWP;
                                 thread0_x = thread0_xp;
                                 thread0_y = thread0_yp;
                                 thread0_state = NEXT;
@@ -984,7 +991,9 @@ namespace dmpl
                 initialize_xp ();
                 if(!check_init_yf ()) throw std::runtime_error("ERROR: illegal initial value of variable yf");
                 initialize_yp ();
-                nextPos = CellToGps(xp, yp);
+                nextPos = gams::pose::Position(uxas::service::GamsService::frame());
+                nextPos.lng(init_lng);
+                nextPos.lat(init_lat);
             }
 
         } // end node_uav_role_Uav namespace
@@ -1328,14 +1337,17 @@ namespace uxas
                     if (!currentXmlNode.attribute("init_lat").empty() &&
                         !currentXmlNode.attribute("init_lng").empty())
                     {
-                        double init_lat = currentXmlNode.attribute("init_lat").as_double();
-                        double init_lng = currentXmlNode.attribute("init_lng").as_double();
-                        auto init_cell = GpsToCell(init_lat, init_lng);
+                        node_uav::init_lat = currentXmlNode.attribute("init_lat").as_double();
+                        node_uav::init_lng = currentXmlNode.attribute("init_lng").as_double();
+                        auto init_cell = GpsToCell(node_uav::init_lat, node_uav::init_lng);
                         std::cerr << "initial cell = " << init_cell.first << "," << init_cell.second << '\n';
                         node_uav::var_init_x = init_cell.first;
                         node_uav::var_init_xf = init_cell.first;
                         node_uav::var_init_y = init_cell.second;
                         node_uav::var_init_yf = init_cell.second;
+                        node_uav::currWP = std::shared_ptr<afrl::cmasi::Waypoint>(new afrl::cmasi::Waypoint ());
+                        node_uav::currWP->setLatitude(node_uav::init_lat);
+                        node_uav::currWP->setLongitude(node_uav::init_lng);
                     }
                     if (!currentXmlNode.attribute("DefaultLoiterRadius_m").empty())
                     {
