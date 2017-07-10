@@ -173,6 +173,10 @@ thread RouteAggregatorService_AggregatorRole
 		-- Tony: Maybe this can be done with variables for current request and associated route plan request.
 		-- Jen: The new version below does just that. (Thanks, Tony!)
 		
+		--old version
+		-- eq contents_of_route_plan_requests_match_contents_of_associated_route_request : bool;
+		-- guarantee "contents_of_route_plan_requests_match_contents_of_associated_route_request" :true;
+		
 		--The route request for which we are making new route plan requests
 		eq RouteRequest_being_serviced : route::RouteRequest.i; 
 		
