@@ -732,7 +732,54 @@ namespace dmpl
                           << ',' << currWP->getLongitude() << ") ...\n";
                 std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
             }
-    
+
+            /***********************************/
+            //-- given two points P1 and P2, compute the sequence of
+            //-- cells that must be traversed if traveling in a
+            //-- straight line from P1 to P2.
+            /***********************************/
+            void cellsTraversed(double x1, double y1, double x2, double y2)
+            {
+                std::list<Cell> cells;
+
+                //-- compute the cells that the two points are in
+                auto cell1 = GpsToCell(y1, x1);
+                auto cell2 = GpsToCell(y2, x2);
+
+                //-- special case, both points are in the same cell
+                if(cell1 == cell2)
+                {
+                    cells.push_back(cell1);
+                    return;
+                }
+                                
+                //-- special case, infinite slope
+                if(x1 == x2)
+                {
+                    assert(cell1.first == cell2.first);
+
+                    if(cell1.second < cell2.second)
+                    {
+                        for(int i = cell1.second; i <= cell2.second; ++i)
+                        {
+                            cells.push_back(Cell(cell1.first, i));
+                        }
+                    }
+                    else
+                    {
+                        for(int i = cell1.second; i >= cell2.second; --i)
+                        {
+                            cells.push_back(Cell(cell1.first, i));
+                        }
+                    }
+                    
+                    return;
+                }
+
+                //non-infinite slope
+                double m = (y2-y1) / (x2-x1);
+                double c = y1 - m * x1;
+            }
             
             /***********************************/
             //-- update xp and yp
