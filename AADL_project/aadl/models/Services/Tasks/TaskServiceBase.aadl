@@ -192,7 +192,9 @@ public
 			
 		--------------------------State Transition Predicates-----------------------------------	
 			eq init_to_idle : bool = false->
-				previous_state = INIT and init_complete;-- and pre(event(TaskInitialized_out));
+				previous_state = INIT 
+				--and init_complete
+				 and pre(event(TaskInitialized_out));
 				
 			eq idle_to_sensor_request : bool = false ->
 				previous_state = IDLE and 
@@ -248,8 +250,8 @@ public
        			if init_to_idle then 
        				state = IDLE and 
        				--event(TaskInitialized_out) and --Note, now becoming an "eventually" for init (on transition)
-       				cached_task_id = TaskInitialized_out.TaskID and --Not part of the spec, but used for other specs.
-       				event(TaskInitialized_out) 
+       				cached_task_id = TaskInitialized_out.TaskID --and --Not part of the spec, but used for other specs.
+       				--event(TaskInitialized_out) 
        			else
        				cached_task_id = pre(cached_task_id);
        				
@@ -259,6 +261,14 @@ public
        		guarantee "[Implied: latch init_complete, once init_complete is true, it stays true]" :
        			pre(init_complete) =>
        				init_complete = pre(init_complete);
+       				
+       		guarantee "[Implied: in the init state, once init_complete is true, immediately send out a 
+       				event(TaskInitialized_out).]":
+       				--NOTE: this would send out a event(TaskInitialized_out) in every time step that init_complete
+       					--is true within state INIT, however, the transition condition to idle occurs on the next
+       					--time step after event(TaskInitialized_out) is sent. 
+       			state = INIT and init_complete =>
+       				event(TaskInitialized_out);
        				
        		guarantee "UniqueAutomationRequest messages trigger a transition from the idle state into the SensorRequest state.
        			When a Task is notified of its inclusion (by noting the presence of its ID in the Tasks list of an 
