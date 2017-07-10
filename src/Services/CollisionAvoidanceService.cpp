@@ -464,9 +464,16 @@ namespace dmpl
                     if((lockVal % Y) != _y) continue;
                     if((lockVal / Y) != _x) continue;
                     thread0_lock[id][i] = -1;
-                    return;
                 }
-                assert(0);
+            }
+
+            //-- unlock all cells in cells
+            void unsetLockThread(const std::set<Cell> &cells)
+            {
+                for(const auto &cell : cells)
+                {
+                    unsetLockThread(cell.first, cell.second);
+                }
             }
             
             /********************************************************************/
