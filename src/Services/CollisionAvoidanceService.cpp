@@ -400,6 +400,7 @@ namespace dmpl
             //-- functions to manipulate locks
             /********************************************************************/
 
+            //-- return true if cell (x,y) is locked by node _id
             bool isLockedThread(int _id, int _x, int _y)
             {
                 for(int i = 0;i < MAX_LOCK;++i)
@@ -414,6 +415,21 @@ namespace dmpl
                 return false;
             }
 
+            //-- return true if any cell in cells is locked by node
+            //-- _id
+            bool isLockedThread(int _id, const std::set<Cell> &cells)
+            {
+                for(const auto &cell : cells)
+                {
+                    if(isLockedThread(_id, cell.first, cell.second))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            //-- lock cell (x,y)
             void setLockThread(int _x, int _y)
             {
                 for(int i = 0;i < MAX_LOCK;++i)
