@@ -1,0 +1,27 @@
+package RoutePlannerService_Pkg
+public
+    -- Include DataTypes
+    with CMASI;
+    with IMPACT;
+    with ROUTE;
+    
+    thread RoutePlannerService
+        features
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
+            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            RoutePlanRequest_in: in event data port route::RoutePlanRequest.i;
+            RouteRequest_in: in event data port route::RouteRequest.i;
+            EntityState_in: in event data port cmasi::EntityState.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            KeepInZone_in: in event data port cmasi::KeepInZone.i;
+            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            WaterZone_in: in event data port impact::WaterZone.i;
+            RoutePlanResponse_out: out event data port route::RoutePlanResponse.i;
+    end RoutePlannerService;
+    
+end RoutePlannerService_Pkg;

@@ -1,0 +1,10 @@
+package TcpBridge_Pkg
+public
+    -- Included
+    with ServiceBase_Pkg;
+    
+    thread TcpBridge extends ServiceBase_Pkg::ServiceBase
+    -- Look up in the code what this exactly does.
+    end TcpBridge;
+    
+end TcpBridge_Pkg;

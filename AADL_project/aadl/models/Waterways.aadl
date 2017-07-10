@@ -259,7 +259,7 @@ public
         	prove rate_monotonic_schedulable()
             prove isolation(this) 
         **};
---        annex agree {**
+        annex agree {**
         	-- We use AGREE connections to assert true for the cases where an 
         	--  input port is fed by multiple sources.
         	-- Note: AGREE will assume arbitrary values for the input ports on 
@@ -270,8 +270,9 @@ public
         	-- both the source and destination components for multiple fan-in have 
         	-- AGREE contracts.
         	
---        	connection connXYZ: true;
---        **};
+        	connection conn117: true;
+			connection conn118: true;
+        **};
             
     end waterways.i;
 
