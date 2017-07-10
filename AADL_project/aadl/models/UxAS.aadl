@@ -45,6 +45,8 @@ public
     with RouteAggregatorService_Pkg;
     with RoutePlannerVisibilityService_Pkg;
     with RoutePlannerService_Pkg;
+    with SensorManagerService_Pkg;
+    with SerialAutomationRequestTestService_Pkg;
     with TaskManagerService_Pkg;
     with TaskTrackerService_Pkg;
     with Test_SimulationTime_Pkg;
@@ -63,77 +65,7 @@ public
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
     end Challenge_TelemetryReceiver;
 
-    process PlanBuilderService
-        features
-            TaskImplementationResponse_in: in event data port uxtask::TaskImplementationResponse.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
-            TaskAssignmentSummary_in: in event data port uxtask::TaskAssignmentSummary.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
-            UniqueAutomationResponse_out: out event data port uxtask::UniqueAutomationResponse.i;
-            TaskImplementationRequest_out: out event data port uxtask::TaskImplementationRequest.i;
-    end PlanBuilderService;
-
-    process SensorManagerService
-        features
-            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
-            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
-            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
-            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
-            SensorFootprintRequests_in: in event data port uxtask::SensorFootprintRequests.i;
-            SensorFootprintResponse_out: out event data port uxtask::SensorFootprintResponse.i;
-        annex agree {**
-    	guarantee "footporint response" : true ->
-    	  pre(event(SensorFootprintRequests_in)) = event(SensorFootprintResponse_out);
-    **};
-    end SensorManagerService;
-
-    process SerialAutomationRequestTestService
-        features
-            ImpactAutomationResponse_in: in event data port impact::ImpactAutomationResponse.i;
-            ImpactAutomationRequest_in: in event data port impact::ImpactAutomationRequest.i;
-            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
-            AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
-    end SerialAutomationRequestTestService;   
-
-    
-
-
-    process TaskManagerService
-        features
-            MissionCommand_in: in event data port cmasi::MissionCommand.i;
-            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
-            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
-            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
-            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
-            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
-            FollowPathCommand_in: in event data port cmasi::FollowPathCommand.i;
-            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-            EntityState_in: in event data port cmasi::EntityState.i;
-            PointOfInterest_in: in event data port impact::PointOfInterest.i;
-            RemoveTasks_in: in event data port cmasi::RemoveTasks.i;
-            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
-            Task_in: in event data port cmasi::Task.i;
-            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-            LineOfInterest_in: in event data port impact::LineOfInterest.i;
-            UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
-            KillService_out: out event data port uxnative::KillService.i;
-            CreateNewService_out: out event data port uxnative::CreateNewService.i;
-        annex agree {**
-        	guarantee "creates new task" : true ->
-        		pre(event(Task_in)) => event(CreateNewService_out);
-        		
-        	
-        	guarantee "kills a task" : true ->
-        		pre(event(RemoveTasks_in)) => event(KillService_out);
-        **};
-    end TaskManagerService;
-
-
-    
+  
 
     process uxas
         features
@@ -177,10 +109,8 @@ public
             RoutePlannerService: thread RoutePlannerService_Pkg::RoutePlannerService;
             RoutePlannerVisibilityService: thread RoutePlannerVisibilityService_Pkg::RoutePlannerVisibilityService;
             SendMessagesService: thread SendMessagesService_Pkg::SendMessagesService;
---            SensorManagerService: process SensorManagerService;
---            SerialAutomationRequestTestService: process SerialAutomationRequestTestService;
---            ServiceBase: process ServiceBase;
---            TcpBridge: process TcpBridge;
+            SensorManagerService: thread SensorManagerService_Pkg::SensorManagerService;
+            SerialAutomationRequestTestService: thread SerialAutomationRequestTestService_Pkg::SerialAutomationRequestTestService;
             Test_SimulationTime: thread Test_SimulationTime_Pkg::Test_SimulationTime;
             WaypointPlanManagerService: thread WaypointPlanManagerService_Pkg::WaypointPlanManagerService;
             AngledAreaSearchTask: thread AngledAreaSearchTask_Package::AngledAreaSearchTask;
@@ -202,6 +132,9 @@ public
             TaskTrackerService: thread TaskTrackerService_Pkg::TaskTrackerService;
             
             Challenge_TelemetryReceiver: thread Challenge_TelemetryReceiver;
+            
+--            ServiceBase: process ServiceBase;
+--            TcpBridge: process TcpBridge;            
             
         connections
             conn0: port CmasiAreaSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
