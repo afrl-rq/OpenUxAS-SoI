@@ -192,7 +192,7 @@ public
 			
 		--------------------------State Transition Predicates-----------------------------------	
 			eq init_to_idle : bool = false->
-				previous_state = INIT and init_complete and event(TaskInitialized_out);
+				previous_state = INIT and init_complete and pre(event(TaskInitialized_out));
 				
 			eq idle_to_sensor_request : bool = false ->
 				previous_state = IDLE and event(UniqueAutomationRequest_in) and unique_automation_request_task_id_present and
@@ -252,7 +252,16 @@ public
        				
 --       		guarantee "The IDLE represents the state ... before any requests have been made that include the Task. " :
 --       			true; --not really what was meant I think
+       			
+       		guarantee "[Implied: latch init_complete, once init_complete is true, it stays true]" :
+       			pre(init_complete) =>
+       				init_complete = pre(init_complete);
        				
+       		guarantee "[Implied:] In the init state, Once init_complete is true, send TaskInitialized_out":
+       		--NOTE: this would continuously send out an output message except for the fact we have defined a state transition
+       		--out of INIT once this output is sent (see transitions above). 
+       			state = INIT and init_complete =>
+       				event(TaskInitialized_out);
        			
        		guarantee "UniqueAutomationRequest messages trigger a transition from the idle state into the SensorRequest state.
        			When a Task is notified of its inclusion (by noting the presence of its ID in the Tasks list of an 
