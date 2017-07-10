@@ -36,7 +36,13 @@
       <c
           id="__gsn__15c87fddd8e"
           name="Context">
-        State of the art static analysis includes Cppcheck, …
+        State of the art static analysis includes Cppcheck, SPIN, AutoCorres, CCCC, …
+      </c>
+
+      <c
+          id="__gsn__15c9dcffbb5"
+          name="Context">
+        Rice's Theorem tells us that any non-trivial property about arbitrary software is undecideable.
       </c>
 
       <s
@@ -55,6 +61,13 @@
               name="Comment">
             The fifth type, "Runtime Static Analysis". is ignored, the first type, "Integration-Time Static Analysis", does not seem significantly different from the second type, "Continuous Integration-Time (CI) Static Analysis", and Code-Specification Correspondence is added
           </comment>
+        </c>
+
+        <c
+            id="__gsn__15c9dac3177"
+            link="https://dzone.com/articles/kinds-of-static-analysis-tools"
+            name="Context">
+          "Different Types of Static Analysis Tools" provides a different breakdown: conventions, bad practices, potential bugs, architectural issues, code coverage
         </c>
 
         <g
@@ -183,6 +196,12 @@
           The use of a modern IDE mitigates coding errors by providing immediate feedback to software developers
         </g>
       </s>
+
+      <comment
+          id="__gsn__15c9dd6a583"
+          name="Comment">
+        Review SATE V: https://samate.nist.gov/SATE5.html
+      </comment>
     </g>
   </gsn>
 </argument>
