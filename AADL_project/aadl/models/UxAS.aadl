@@ -11,9 +11,6 @@
 package UxAS
 public
     with CMASI;
-    with UXTASK;
-    with IMPACT;
-    with ROUTE;
     with UXNATIVE;
     
     -- Included Tasks
@@ -142,15 +139,15 @@ public
             conn2: port ImpactLineSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
             conn3: port PatternSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
             conn4: port TaskServiceBase.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
+            
+            -- These are different planners
             conn5: port OsmPlannerService.RoutePlanResponse_out -> BatchSummaryService.RoutePlanResponse_in;
             conn6: port OsmPlannerService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
-            conn7: port OsmPlannerService.RoutePlanResponse_out -> TaskServiceBase.RoutePlanResponse_in;
             conn8: port RoutePlannerService.RoutePlanResponse_out -> BatchSummaryService.RoutePlanResponse_in;
             conn9: port RoutePlannerService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
-            conn10: port RoutePlannerService.RoutePlanResponse_out -> TaskServiceBase.RoutePlanResponse_in;
             conn11: port RoutePlannerVisibilityService.RoutePlanResponse_out -> BatchSummaryService.RoutePlanResponse_in;
             conn12: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
-            conn13: port RoutePlannerVisibilityService.RoutePlanResponse_out -> TaskServiceBase.RoutePlanResponse_in;
+                        
             conn14: port AirVehicleState_in -> AutomationDiagramDataService.AirVehicleState_in;
             conn15: port AirVehicleState_in -> AutomationRequestValidatorService.AirVehicleState_in;
             conn16: port AirVehicleState_in -> BatchSummaryService.AirVehicleState_in;
@@ -202,7 +199,7 @@ public
             conn62: port OperatingRegionStateService.OperatingRegion_out -> RoutePlannerVisibilityService.OperatingRegion_in;
             conn63: port AutomationRequestValidatorService.ImpactAutomationResponse_out -> SerialAutomationRequestTestService.ImpactAutomationResponse_in;
             conn64: port SensorManagerService.SensorFootprintResponse_out -> AngledAreaSearchTask.SensorFootprintResponse_in;
-            conn65: port SensorManagerService.SensorFootprintResponse_out -> CmasiAreaSearchTaskService.SensorFootprintResponse_in;
+            conn65: port SensorManagerService.SensorFootprintResponse_out -> CmasiAreaSearchTask.SensorFootprintResponse_in;
             conn66: port SensorManagerService.SensorFootprintResponse_out -> PatternSearchTask.SensorFootprintResponse_in;
             conn67: port AssignmentTreeBranchBoundBase.TaskAssignmentSummary_out -> PlanBuilderService.TaskAssignmentSummary_in;
             conn68: port OsmPlannerService.EgressRouteResponse_out -> BatchSummaryService.EgressRouteResponse_in;
