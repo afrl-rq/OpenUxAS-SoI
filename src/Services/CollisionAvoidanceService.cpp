@@ -775,7 +775,6 @@ namespace dmpl
                         }
                         //-- update next waypoint
                         thread0_NEXT_WP();
-        
                     }
 
                     //-- if the next waypoint is in the same cell as we are in, then move directly to there
