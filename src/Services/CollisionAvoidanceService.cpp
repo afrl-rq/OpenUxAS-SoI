@@ -567,6 +567,76 @@ namespace dmpl
         namespace node_uav_role_Uav
         {
 
+            /***********************************/
+            //given a point, compute the set of cells that the node
+            //can traverse while loitering around that point.
+            /***********************************/
+            std::set<Cell> cellsLoitered(double x, double y)
+            {
+                uxas::common::utilities::CUnitConversions flatEarth;       
+                double north, east;
+                flatEarth.ConvertLatLong_degToNorthEast_m(y, x, north, east);
+                double minLat, maxLat, minLng, maxLng, lat, lng;
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north - loiterRadius, east, minLat, lng);
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north + loiterRadius, east, maxLat, lng);
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north, east - loiterRadius, lat, minLng);
+                flatEarth.ConvertNorthEast_mToLatLong_deg(north, east + loiterRadius, lat, maxLng);
+
+                auto minCell = GpsToCell(minLat, minLng);
+                auto maxCell = GpsToCell(maxLat, maxLng);
+
+                std::set<Cell> res;
+                for(int i = minCell.first;i <= maxCell.first;++i)
+                {
+                    for(int j = minCell.second;j <= maxCell.second;++j)
+                    {
+                        res.insert(Cell(i,j));
+                    }
+                }
+
+                return res;
+            }
+
+            /***********************************/
+            //-- given two points P1 and P2, compute the sequence of
+            //-- cells that must be traversed if traveling in a
+            //-- straight line from P1 to P2. essentially we compute
+            //-- the set of cells in the rectangle whose diagonals are
+            //-- defined by the two points.
+            /***********************************/
+            std::set<Cell> cellsTraversed(double x1, double y1, double x2, double y2)
+            {
+                //-- compute the cells that the two points are in
+                auto cell1 = GpsToCell(y1, x1);
+                auto cell2 = GpsToCell(y2, x2);
+
+                int minx = (cell1.first < cell2.first) ? cell1.first : cell2.first;
+                int maxx = (cell1.first > cell2.first) ? cell1.first : cell2.first;
+                int miny = (cell1.second < cell2.second) ? cell1.second : cell2.second;
+                int maxy = (cell1.second > cell2.second) ? cell1.second : cell2.second;
+
+                std::set<Cell> res;
+
+                //-- compute the cells in the rectangle whose diagonal
+                //-- is (minx, miny) and (maxx, maxy).
+                for(int i = minx;i <= maxx;++i)
+                {
+                    for(int j = miny;j <= maxy;++j)
+                    {
+                        res.insert(Cell(i,j));
+                    }
+                }
+
+                //-- add the set of cells that may be traversed when
+                //-- loitering at (x2, y2).
+                for(const auto &c : cellsLoitered(x2, y2))
+                {
+                    res.insert(c);
+                }
+
+                return res;
+            }
+
             /********************************************************************/
             //-- Remodify input global shared variables to force MADARA retransmit
             /********************************************************************/
@@ -794,76 +864,6 @@ namespace dmpl
                 std::cerr << "next waypoint GPS = (" << currWP->getLatitude()
                           << ',' << currWP->getLongitude() << ") ...\n";
                 std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
-            }
-
-            /***********************************/
-            //given a point, compute the set of cells that the node
-            //can traverse while loitering around that point.
-            /***********************************/
-            std::set<Cell> cellsLoitered(double x, double y)
-            {
-                uxas::common::utilities::CUnitConversions flatEarth;       
-                double north, east;
-                flatEarth.ConvertLatLong_degToNorthEast_m(y, x, north, east);
-                double minLat, maxLat, minLng, maxLng, lat, lng;
-                flatEarth.ConvertNorthEast_mToLatLong_deg(north - loiterRadius, east, minLat, lng);
-                flatEarth.ConvertNorthEast_mToLatLong_deg(north + loiterRadius, east, maxLat, lng);
-                flatEarth.ConvertNorthEast_mToLatLong_deg(north, east - loiterRadius, lat, minLng);
-                flatEarth.ConvertNorthEast_mToLatLong_deg(north, east + loiterRadius, lat, maxLng);
-
-                auto minCell = GpsToCell(minLat, minLng);
-                auto maxCell = GpsToCell(maxLat, maxLng);
-
-                std::set<Cell> res;
-                for(int i = minCell.first;i <= maxCell.first;++i)
-                {
-                    for(int j = minCell.second;j <= maxCell.second;++j)
-                    {
-                        res.insert(Cell(i,j));
-                    }
-                }
-
-                return res;
-            }
-
-            /***********************************/
-            //-- given two points P1 and P2, compute the sequence of
-            //-- cells that must be traversed if traveling in a
-            //-- straight line from P1 to P2. essentially we compute
-            //-- the set of cells in the rectangle whose diagonals are
-            //-- defined by the two points.
-            /***********************************/
-            std::set<Cell> cellsTraversed(double x1, double y1, double x2, double y2)
-            {
-                //-- compute the cells that the two points are in
-                auto cell1 = GpsToCell(y1, x1);
-                auto cell2 = GpsToCell(y2, x2);
-
-                int minx = (cell1.first < cell2.first) ? cell1.first : cell2.first;
-                int maxx = (cell1.first > cell2.first) ? cell1.first : cell2.first;
-                int miny = (cell1.second < cell2.second) ? cell1.second : cell2.second;
-                int maxy = (cell1.second > cell2.second) ? cell1.second : cell2.second;
-
-                std::set<Cell> res;
-
-                //-- compute the cells in the rectangle whose diagonal
-                //-- is (minx, miny) and (maxx, maxy).
-                for(int i = minx;i <= maxx;++i)
-                {
-                    for(int j = miny;j <= maxy;++j)
-                    {
-                        res.insert(Cell(i,j));
-                    }
-                }
-
-                //-- add the set of cells that may be traversed when
-                //-- loitering at (x2, y2).
-                for(const auto &c : cellsLoitered(x2, y2))
-                {
-                    res.insert(c);
-                }
-
-                return res;
             }
             
             /***********************************/
