@@ -9,7 +9,7 @@ public
 	--  properties of our component contract, states as lemmas in the top_level implementation.
 	process top_level
 		annex agree {**
-			guarantee "Placeholder guarantee to force agree to run" : true;
+			guarantee "Placeholder guarantee to force AGREE to run" : true;
 		**};
 	end top_level;
 	
