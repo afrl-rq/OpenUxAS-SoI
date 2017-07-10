@@ -126,16 +126,16 @@ public
 
 	thread Virtual_Machine
 		features
-			mission_write: out event data port Base_Types::Boolean {
+			mission_write: out event data port Base_Types::Unsigned_32 {
 				TB_SYS::CommPrim_Source_Text => "mission_write";
 			};
-			mission_read : in event data port Base_Types::Boolean {
+			mission_read : in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read");
 			};
-			waypoint_write: in event data port Base_Types::Boolean {
+			waypoint_write: in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");
 			};
-			waypoint_read : out event data port Base_Types::Boolean {
+			waypoint_read : out event data port Base_Types::Unsigned_32 {
 				TB_SYS::CommPrim_Source_Text => "waypoint_read";
 			};
 			mission: requires data access mission_command.impl {
@@ -158,16 +158,16 @@ public
 	thread Waypoint_Manager
 		features
 
-			mission_read : out event data port Base_Types::Boolean {
+			mission_read : out event data port Base_Types::Unsigned_32 {
 				TB_SYS::CommPrim_Source_Text => "mission_read";
 			};
-			mission_write : in event data port Base_Types::Boolean {
+			mission_write : in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_write");
 			};
-			waypoint_read : out event data port Base_Types::Boolean {
+			waypoint_read : out event data port Base_Types::Unsigned_32 {
 				TB_SYS::CommPrim_Source_Text => "waypoint_read";
 			};
-			waypoint_write : in event data port Base_Types::Boolean {
+			waypoint_write : in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");				
 			};
 			
@@ -199,13 +199,13 @@ public
 	thread Asset_Waypoint_Manager
 		features
 			
-			waypoint_write: out event data port Base_Types::Boolean {
+			waypoint_write: out event data port Base_Types::Unsigned_32 {
 				TB_SYS::CommPrim_Source_Text => "waypoint_write";
 			};
-			waypoint_read_vm: in event data port Base_Types::Boolean {
+			waypoint_read_vm: in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_vm");
 			};
-			waypoint_read_wm: in event data port Base_Types::Boolean {
+			waypoint_read_wm: in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_wm");
 			};
 			waypoint: requires data access mission_command.impl {

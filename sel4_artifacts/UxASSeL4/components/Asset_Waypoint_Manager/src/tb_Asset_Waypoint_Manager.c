@@ -102,12 +102,12 @@ void tb_timer_complete_callback(void *_ UNUSED) {
  ************************************************************************/
  
 bool waypoint_write
-(const bool * tb_waypoint_write) {
+(const uint32_t * tb_waypoint_write) {
     bool tb_result = true ; 
 
-    tb_result &= tb_waypoint_write0_enqueue((bool *)tb_waypoint_write);
+    tb_result &= tb_waypoint_write0_enqueue((uint32_t *)tb_waypoint_write);
 
-    tb_result &= tb_waypoint_write1_enqueue((bool *)tb_waypoint_write);
+    tb_result &= tb_waypoint_write1_enqueue((uint32_t *)tb_waypoint_write);
 
     return tb_result;
 }
@@ -176,8 +176,8 @@ void tb_entrypoint_Asset_Waypoint_Manager_Asset_Waypoint_Manager_initializer(con
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm(const bool * in_arg) {
-    mission_read_vm((bool *) in_arg);
+void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm(const uint32_t * in_arg) {
+    mission_read_vm((uint32_t *) in_arg);
 
 }
 
@@ -189,8 +189,8 @@ void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm(const bool * in_ar
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_wm(const bool * in_arg) {
-    mission_read_wm((bool *) in_arg);
+void tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_wm(const uint32_t * in_arg) {
+    mission_read_wm((uint32_t *) in_arg);
 
 }
 
@@ -220,8 +220,8 @@ int run(void) {
 
     // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
-    bool tb_waypoint_read_vm;
-    bool tb_waypoint_read_wm;
+    uint32_t tb_waypoint_read_vm;
+    uint32_t tb_waypoint_read_wm;
     SMACCM_DATA__UART_Packet_i tb_in_uart_packet;
 
 
@@ -239,10 +239,10 @@ int run(void) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Asset_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
         }
-        while (tb_waypoint_read_vm_dequeue((bool*)&tb_waypoint_read_vm)) {
+        while (tb_waypoint_read_vm_dequeue((uint32_t*)&tb_waypoint_read_vm)) {
             tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_vm(&tb_waypoint_read_vm);
         }
-        while (tb_waypoint_read_wm_dequeue((bool*)&tb_waypoint_read_wm)) {
+        while (tb_waypoint_read_wm_dequeue((uint32_t*)&tb_waypoint_read_wm)) {
             tb_entrypoint_tb_Asset_Waypoint_Manager_waypoint_read_wm(&tb_waypoint_read_wm);
         }
         while (tb_in_uart_packet_dequeue((SMACCM_DATA__UART_Packet_i*)&tb_in_uart_packet)) {
