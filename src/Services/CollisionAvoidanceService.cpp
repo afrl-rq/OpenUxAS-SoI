@@ -333,6 +333,9 @@ namespace dmpl
     
         //-- lock to implement mutex for wpPtr and currWP
         std::mutex wpLock;
+
+        //-- the loitering radius of the vehicle in meters
+        double loiterRadius = 0;
     
         /********************************************************************/
         //-- functions to manipulate locks
@@ -1311,6 +1314,10 @@ namespace uxas
                                     node_uav::var_init_y = init_cell.second;
                                     node_uav::var_init_yf = init_cell.second;
                                 }
+                            if (!currentXmlNode.attribute("DefaultLoiterRadius_m").empty())
+                            {
+                                node_uav::loiterRadius = currentXmlNode.attribute("DefaultLoiterRadius_m").as_double();
+                            }
                         }
                     // read a waypoint
                     if (std::string("Waypoint") == currentXmlNode.name())

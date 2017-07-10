@@ -65,7 +65,7 @@
     </Service>
    
     <Service Type="CollisionAvoidanceService" >
-        <DART id="0" node_name="uav" role_name="Uav" init_lat="45.3171" init_lng="-120.9923" />
+        <DART id="0" node_name="uav" role_name="Uav" init_lat="45.3171" init_lng="-120.9923" DefaultLoiterRadius_m="250" />
         <!--
         <WaypointCell X="2" Y="6" Altitude="700.000000" />
         <WaypointCell X="3" Y="6" Altitude="700.000000" />
