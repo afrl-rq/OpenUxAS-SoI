@@ -326,13 +326,13 @@ namespace dmpl
         //-- pointer to list of future waypoints
         std::list<std::shared_ptr<afrl::cmasi::Waypoint>> *wpPtr = NULL;
     
-        //-- the current waypoint we are moving toward
-        std::shared_ptr<afrl::cmasi::Waypoint> currWP;
+        //-- the next waypoint we are moving toward
+        std::shared_ptr<afrl::cmasi::Waypoint> nextWP;
 
         //-- the next position we are moving toward. this is updated along with xp and yp.
         gams::pose::Position nextPos(uxas::service::GamsService::frame());
     
-        //-- lock to implement mutex for wpPtr and currWP
+        //-- lock to implement mutex for wpPtr and nextWP
         std::mutex wpLock;
 
         //-- the loitering radius of the vehicle in meters
@@ -756,8 +756,8 @@ namespace dmpl
                 }
                 if ((thread0_state == NEXT))
                 {
-                    //-- check if we need to update currWP
-                    if(currWP == NULL || (nextPos.lat() == currWP->getLatitude() && nextPos.lng() == currWP->getLongitude()))
+                    //-- check if we need to update nextWP
+                    if(nextWP == NULL || (nextPos.lat() == nextWP->getLatitude() && nextPos.lng() == nextWP->getLongitude()))
                     {
                         //-- check if there are no more waypoints
                         {
@@ -775,8 +775,8 @@ namespace dmpl
                     //-- if the next waypoint is in the same cell as we are in, then move directly to there
                     if(thread0_x == thread0_xf && thread0_y == thread0_yf)
                     {
-                        nextPos.lat(currWP->getLatitude());
-                        nextPos.lng(currWP->getLongitude());
+                        nextPos.lat(nextWP->getLatitude());
+                        nextPos.lng(nextWP->getLongitude());
                         thread0_state = MOVE;
                     }
                     else        
@@ -821,9 +821,9 @@ namespace dmpl
                         {
                             if ((thread0_state == MOVE))
                             {
-                                nextPos.alt(currWP->getAltitude());
+                                nextPos.alt(nextWP->getAltitude());
                                 std::cerr << "GAMS::move " << nextPos << '\n';
-                                if(uxas::service::GamsService::move (nextPos, currWP) != gams::platforms::PLATFORM_ARRIVED)
+                                if(uxas::service::GamsService::move (nextPos, nextWP) != gams::platforms::PLATFORM_ARRIVED)
                                 {
                                     return Integer(0);
                                 }
@@ -852,17 +852,17 @@ namespace dmpl
                 //-- update list of waypoints. make sure you get the lock.
                 {
                     std::lock_guard<std::mutex> lockGuard(wpLock);
-                    currWP = wpPtr->front();
+                    nextWP = wpPtr->front();
                     wpPtr->pop_front();
                 }
       
-                auto nextCell = GpsToCell(currWP->getLatitude(), currWP->getLongitude());
+                auto nextCell = GpsToCell(nextWP->getLatitude(), nextWP->getLongitude());
                 thread0_xf = nextCell.first;
                 thread0_yf = nextCell.second;
 
-                std::cerr << "next waypoint Number = " << currWP->getNumber() << '\n';
-                std::cerr << "next waypoint GPS = (" << currWP->getLatitude()
-                          << ',' << currWP->getLongitude() << ") ...\n";
+                std::cerr << "next waypoint Number = " << nextWP->getNumber() << '\n';
+                std::cerr << "next waypoint GPS = (" << nextWP->getLatitude()
+                          << ',' << nextWP->getLongitude() << ") ...\n";
                 std::cerr << "next waypoint cell = (" << thread0_xf << ',' << thread0_yf << ") ...\n";
             }
             
@@ -908,8 +908,8 @@ namespace dmpl
                 //-- waypoint.
                 if(thread0_xp == thread0_xf && thread0_yp == thread0_yf)
                 {
-                    nextPos.lat(currWP->getLatitude());
-                    nextPos.lng(currWP->getLongitude());
+                    nextPos.lat(nextWP->getLatitude());
+                    nextPos.lng(nextWP->getLongitude());
                 }
                 //-- otherwise move to the center of the next cell
                 else
