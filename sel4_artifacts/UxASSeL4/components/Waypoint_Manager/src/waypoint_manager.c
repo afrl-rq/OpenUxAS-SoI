@@ -1,18 +1,17 @@
-#include <tb_Waypoint_Manager.h>
-
-/* void alarm(const int64_t * periodic_100_m) {} */
-
-void component_entry(const int64_t *n) {
-    static int count = 0;
-    if(tb_Waypoint_Manager_read_mission_write()){
-        printf("Waypoint Received\n");
-    }else if(count == 20){
-        printf("I assure you that I'm running\n");
-        count = 0;
-    }else{
-        count++;
-    }
+#include <stdbool.h>
+#include <stdio.h>
+void component_entry(void) {
 
 }
 
-void component_init(const int64_t *n) { }
+void component_init(void) {
+
+}
+
+void mission_write(bool * unused) {
+	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
+}
+
+void waypoint_write(bool * unused) {
+	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
+}

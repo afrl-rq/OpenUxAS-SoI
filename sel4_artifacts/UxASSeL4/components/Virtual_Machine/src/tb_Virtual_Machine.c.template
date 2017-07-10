@@ -69,13 +69,24 @@ interface and so contention may occur.
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_mission_write_enqueue
+ 
+bool mission_write
 (const bool * tb_mission_write) {
     bool tb_result = true ; 
 
     tb_result &= tb_mission_write0_enqueue((bool *)tb_mission_write);
 
     return tb_result;
+}
+
+static void tb_mission_read_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_mission_read_notification_reg_callback(tb_mission_read_notification_handler, NULL));
+}
+
+static void tb_waypoint_write_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_waypoint_write_notification_reg_callback(tb_waypoint_write_notification_handler, NULL));
 }
 /************************************************************************
  *  tb_waypoint_read_enqueue:
@@ -90,7 +101,8 @@ bool tb_mission_write_enqueue
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_waypoint_read_enqueue
+ 
+bool waypoint_read
 (const bool * tb_waypoint_read) {
     bool tb_result = true ; 
 
@@ -104,7 +116,9 @@ bool tb_waypoint_read_enqueue
 void pre_init(void) {
 
     // Pre-initialization statements for tb_mission_read
+    CALLBACKOP(tb_mission_read_notification_reg_callback(tb_mission_read_notification_handler, NULL));
     // Pre-initialization statements for tb_waypoint_write
+    CALLBACKOP(tb_waypoint_write_notification_reg_callback(tb_waypoint_write_notification_handler, NULL));
 
 }
 
@@ -117,6 +131,8 @@ void pre_init(void) {
  *
  ************************************************************************/
 void tb_entrypoint_tb_Virtual_Machine_mission_read(const bool * in_arg) {
+    mission_read((bool *) in_arg);
+
 }
 
 /************************************************************************
@@ -128,6 +144,8 @@ void tb_entrypoint_tb_Virtual_Machine_mission_read(const bool * in_arg) {
  *
  ************************************************************************/
 void tb_entrypoint_tb_Virtual_Machine_waypoint_write(const bool * in_arg) {
+    waypoint_write((bool *) in_arg);
+
 }
 
 

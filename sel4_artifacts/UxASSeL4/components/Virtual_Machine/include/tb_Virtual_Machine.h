@@ -43,11 +43,23 @@ client for the thread implementations.
 
 
 bool tb_mission_write_enqueue(const bool * tb_mission_write);
+bool mission_write(const bool * tb_mission_write);
  // reader prototype for tb_mission_read
 bool tb_mission_read_dequeue(bool * tb_mission_read);
+// user dispatch entrypoints for port tb_mission_read
+
+void mission_read(const bool * tb_mission_read);
+
+
  // reader prototype for tb_waypoint_write
 bool tb_waypoint_write_dequeue(bool * tb_waypoint_write);
+// user dispatch entrypoints for port tb_waypoint_write
+
+void waypoint_write(const bool * tb_waypoint_write);
+
+
  bool tb_waypoint_read_enqueue(const bool * tb_waypoint_read);
+bool waypoint_read(const bool * tb_waypoint_read);
  
 
 //////////////////////////////////////////////////////////////////////////

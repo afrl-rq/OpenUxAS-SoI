@@ -49,14 +49,32 @@ void component_entry(const int64_t * periodic_dispatcher);
 
  void component_init(const int64_t *arg);
  bool tb_mission_read_enqueue(const bool * tb_mission_read);
+bool mission_read(const bool * tb_mission_read);
  // reader prototype for tb_mission_write
 bool tb_mission_write_dequeue(bool * tb_mission_write);
+// user dispatch entrypoints for port tb_mission_write
+
+void mission_write(const bool * tb_mission_write);
+
+
  bool tb_waypoint_read_enqueue(const bool * tb_waypoint_read);
+bool waypoint_read(const bool * tb_waypoint_read);
  // reader prototype for tb_waypoint_write
 bool tb_waypoint_write_dequeue(bool * tb_waypoint_write);
+// user dispatch entrypoints for port tb_waypoint_write
+
+void waypoint_write(const bool * tb_waypoint_write);
+
+
  // reader prototype for tb_in_send_success
 bool tb_in_send_success_dequeue(bool * tb_in_send_success);
+// user dispatch entrypoints for port tb_in_send_success
+
+void in_send_success(const bool * tb_in_send_success);
+
+
  bool tb_out_uart_packet_enqueue(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet);
+bool out_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet);
  
 
 

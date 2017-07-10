@@ -100,13 +100,19 @@ void tb_timer_complete_callback(void *_ UNUSED) {
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_mission_read_enqueue
+ 
+bool mission_read
 (const bool * tb_mission_read) {
     bool tb_result = true ; 
 
     tb_result &= tb_mission_read0_enqueue((bool *)tb_mission_read);
 
     return tb_result;
+}
+
+static void tb_mission_write_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_mission_write_notification_reg_callback(tb_mission_write_notification_handler, NULL));
 }
 /************************************************************************
  *  tb_waypoint_read_enqueue:
@@ -121,13 +127,24 @@ bool tb_mission_read_enqueue
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_waypoint_read_enqueue
+ 
+bool waypoint_read
 (const bool * tb_waypoint_read) {
     bool tb_result = true ; 
 
     tb_result &= tb_waypoint_read0_enqueue((bool *)tb_waypoint_read);
 
     return tb_result;
+}
+
+static void tb_waypoint_write_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_waypoint_write_notification_reg_callback(tb_waypoint_write_notification_handler, NULL));
+}
+
+static void tb_in_send_success_notification_handler(void * unused) {
+  MUTEXOP(tb_dispatch_sem_post())
+  CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
 }
 /************************************************************************
  *  tb_out_uart_packet_enqueue:
@@ -142,7 +159,8 @@ bool tb_waypoint_read_enqueue
  * enqueue attempt failed.
  *
  ************************************************************************/
-bool tb_out_uart_packet_enqueue
+ 
+bool out_uart_packet
 (const SMACCM_DATA__UART_Packet_i * tb_out_uart_packet) {
     bool tb_result = true ; 
 
@@ -158,10 +176,12 @@ void pre_init(void) {
     // Pre-initialization statements for periodic_dispatcher
     // Pre-initialization statements for Waypoint_Manager_initializer
     // Pre-initialization statements for tb_mission_write
+    CALLBACKOP(tb_mission_write_notification_reg_callback(tb_mission_write_notification_handler, NULL));
     // Pre-initialization statements for tb_waypoint_write
+    CALLBACKOP(tb_waypoint_write_notification_reg_callback(tb_waypoint_write_notification_handler, NULL));
     // Pre-initialization statements for tb_in_send_success
+    CALLBACKOP(tb_in_send_success_notification_reg_callback(tb_in_send_success_notification_handler, NULL));
 
-    CALLBACKOP(mission_write_reg_callback(mission_write_callback, NULL));
 }
 
 /************************************************************************
@@ -199,6 +219,8 @@ void tb_entrypoint_Waypoint_Manager_Waypoint_Manager_initializer(const int64_t *
  *
  ************************************************************************/
 void tb_entrypoint_tb_Waypoint_Manager_mission_write(const bool * in_arg) {
+    mission_write((bool *) in_arg);
+
 }
 
 /************************************************************************
@@ -210,6 +232,8 @@ void tb_entrypoint_tb_Waypoint_Manager_mission_write(const bool * in_arg) {
  *
  ************************************************************************/
 void tb_entrypoint_tb_Waypoint_Manager_waypoint_write(const bool * in_arg) {
+    waypoint_write((bool *) in_arg);
+
 }
 
 /************************************************************************
@@ -221,6 +245,8 @@ void tb_entrypoint_tb_Waypoint_Manager_waypoint_write(const bool * in_arg) {
  *
  ************************************************************************/
 void tb_entrypoint_tb_Waypoint_Manager_in_send_success(const bool * in_arg) {
+    in_send_success((bool *) in_arg);
+
 }
 
 
@@ -236,6 +262,9 @@ int run(void) {
 
     // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
+    bool tb_mission_write;
+    bool tb_waypoint_write;
+    bool tb_in_send_success;
 
 
     {
@@ -251,6 +280,15 @@ int run(void) {
         if (tb_occurred_periodic_dispatcher) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
+        }
+        while (tb_mission_write_dequeue((bool*)&tb_mission_write)) {
+            tb_entrypoint_tb_Waypoint_Manager_mission_write(&tb_mission_write);
+        }
+        while (tb_waypoint_write_dequeue((bool*)&tb_waypoint_write)) {
+            tb_entrypoint_tb_Waypoint_Manager_waypoint_write(&tb_waypoint_write);
+        }
+        while (tb_in_send_success_dequeue((bool*)&tb_in_send_success)) {
+            tb_entrypoint_tb_Waypoint_Manager_in_send_success(&tb_in_send_success);
         }
 
     }

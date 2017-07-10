@@ -1,4 +1,4 @@
 apps-$(CONFIG_APP_SOI_TK1) += soi_tk1
-# soi_tk1: libsel4arm-vmm libsel4allocman libsel4 libmuslc libsel4platsupport libsel4muslccamkes libsel4camkes libsel4sync libsel4debug libsel4bench
 
 soi_tk1: libsel4 libmuslc libsel4platsupport libsel4muslccamkes libsel4camkes libsel4sync libsel4debug libsel4bench libsel4simple libsel4allocman libsel4arm-vmm libsel4vka \
+libsel4simple-default libcpio

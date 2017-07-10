@@ -1,10 +1,18 @@
-#include <tb_Asset_Waypoint_Manager.h>
-void in_uart_packet(const SMACCM_DATA__UART_Packet_i * packet) {
-	printf("waypoint_manager:out_uart_packet -- Received UART packet with address: %x\n",packet);
+#include <stdbool.h>
+#include <stdio.h>
+
+void component_entry(void) {
+
 }
 
-/* void alarm(const int64_t * periodic_100_m) {} */
+void component_init(void) {
 
-void component_entry(const int64_t *n) { }
+}
 
-void component_init(const int64_t *n) { }
+void mission_read_vm(bool * unused) {
+	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
+}
+
+void mission_read_wm(bool * unused) {
+	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
+}
