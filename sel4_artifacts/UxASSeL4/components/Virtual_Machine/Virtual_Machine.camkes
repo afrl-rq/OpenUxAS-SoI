@@ -37,15 +37,27 @@ AADL thread implementation Virtual_Machine.
  **************************************************************************/
 
 import <Timer.idl4>;
+import <tb_Monitor_uint32_t_1.idl4>;
+
+import <tb_Monitor_uint32_t_1.idl4>;
+
+import <tb_Monitor_uint32_t_1.idl4>;
+
+import <tb_Monitor_uint32_t_1.idl4>;
+
+
 // Idl files for shared data accessors
 
 import <MissionSoftware__mission_command_impl_writer.idl4>;
 import <MissionSoftware__mission_command_impl_writer.idl4>;
-import <tb_Monitor_bool_1.idl4>;
+
 
 // Idl files for RPCs
 
 import <gen_fwd.idl4>;
+
+
+import <uint32_t_writer.idl4>;
 
 
 
@@ -54,26 +66,20 @@ component Virtual_Machine {
     control;
     has semaphore tb_dispatch_sem;
 
+    uses tb_Monitor_uint32_t_1 tb_mission_write0;
 
-
-    uses gen_fwd_inf clkcarfwd;
-    uses gen_fwd_inf uartfwd;
-
-	uses tb_Monitor_bool_1 tb_mission_write0;
-	emits QueuedData tb_mission_write_notification0;
-	
-	uses tb_Monitor_bool_1 tb_mission_read;
+    uses tb_Monitor_uint32_t_1 tb_mission_read;
     consumes QueuedData tb_mission_read_notification;
-    
-   	uses tb_Monitor_bool_1 tb_waypoint_write;
+    uses tb_Monitor_uint32_t_1 tb_waypoint_write;
     consumes QueuedData tb_waypoint_write_notification;
-    
-   	uses tb_Monitor_bool_1 tb_waypoint_read0;
-    emits QueuedData tb_waypoint_read_notification0;
+    uses tb_Monitor_uint32_t_1 tb_waypoint_read0;
 
-    //consumes Notification waypoint_write;
-    //emits Notification waypoint_read;
-	
+
+
+    uses gen_fwd_inf uartfwd;
+    uses gen_fwd_inf clkcarfwd;
+
+
     // Provided interfaces for shared data
 
     dataport MissionSoftware__mission_command_impl mission;

@@ -47,6 +47,28 @@ extern vspace_t _vspace;
 extern irq_server_t _irq_server;
 extern seL4_CPtr _fault_endpoint;
 
+//BEGIN SOI SPECIFIC STUFF
+
+void handle_mission_read(uint32_t * var){
+    printf("VM saw mission read from WM\n");
+    uint32_t numBytes;
+    tb_mission_read_dequeue(&numBytes);
+    tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
+}
+
+pre_init(void){
+    tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
+}
+
+
+bool mission_write
+(const bool * tb_mission_write) {
+    bool tb_result = true ; 
+
+    tb_result &= tb_mission_write0_enqueue((bool *)tb_mission_write);
+
+    return tb_result;
+}
 
 static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
 //    vusb_device_t* vusb;
@@ -97,7 +119,7 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
         printf("VM RECEIVED FAULT at addr:%x\n", addr);
         printf("BUFFER IS OF SIZE:%d\n", bufIndex);
         bool alwaysTrue = true;
-        //tb_mission_write0_enqueue(&alwaysTrue);
+        mission_write(&alwaysTrue);
     }else if(addr == 0xe0000000){
         if(fault_is_write(fault)){
             data = (uint8_t *)fault_get_data(fault);
@@ -118,6 +140,8 @@ const struct device dev_uxas_waypoint = {
     .handle_page_fault = handle_waypoint_fault,
     .priv = NULL
 };
+
+//END SOI SPECIFC STUFF
 
 static const struct device *linux_pt_devices[] = {
     &dev_usb1,
