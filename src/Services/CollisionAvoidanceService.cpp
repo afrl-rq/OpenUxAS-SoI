@@ -917,9 +917,17 @@ namespace dmpl
             {
                 std::cerr << "current cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
 
+                /*
                 //-- Begin function body
-                //thread0_xp = thread0_xf;
-                //thread0_yp = thread0_yf;
+                thread0_xp = thread0_xf;
+                thread0_yp = thread0_yf;
+
+                //-- update cells to lock
+                cellsToLock.clear();
+                cellsToLock = cellsTraversed(currWP->getLongitude(),currWP->getLatitude(),
+                                             nextWP->getLongitude(),nextWP->getLatitude());
+                */
+
                 thread0_xp = thread0_x;
                 thread0_yp = thread0_y;
                 if ((thread0_x < thread0_xf))
@@ -944,7 +952,10 @@ namespace dmpl
                         }
                     }
                 }
-  
+                
+                cellsToLock.clear();
+                cellsToLock.insert(Cell(thread0_xp, thread0_yp));
+                
                 std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
 
                 //-- if the next cell contains the next waypoint, then move to the
