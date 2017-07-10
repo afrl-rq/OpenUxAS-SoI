@@ -432,6 +432,8 @@ namespace dmpl
             //-- lock cell (x,y)
             void setLockThread(int _x, int _y)
             {
+                if(isLockedThread(id, _x, _y)) return;
+                
                 for(int i = 0;i < MAX_LOCK;++i)
                 {
                     if(thread0_lock[id][i] < 0)
