@@ -1,0 +1,146 @@
+package RouteAggregatorService_CollectorRole_Pkg
+public
+	with CMASI;
+    with UXTASK;
+    with IMPACT;
+    with ROUTE;
+
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		features
+			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i; 
+		annex agree {**
+			--The eqs are used to access data internal to the subcomponent(s).
+			-- In this case, I need them to state an assumption at this level to 
+			--  satisfy the subcomponent's assumption.  
+			eq sub_previous_state : int;
+			eq sub_IDLE : int;
+			assume "A new UniqueAutomationRequest is only received when the subcomponent is in IDLE.":
+				event(UniqueAutomationRequest_in) => (sub_previous_state = sub_IDLE);
+			**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread RouteAggregatorService_CollectorRole; 
+		connections
+			conn00: port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
+		annex agree {**
+			assign sub_previous_state = sub.previous_state;
+			assign sub_IDLE = sub.IDLE;
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as properties
+			
+			--State machine lemmas
+			lemma "The value of the state variable corresponds to a 'real' state." :
+				(sub.state = sub.IDLE) 
+				or (sub.state = sub.OPTIONS_WAIT)
+				or (sub.state = sub.ROUTE_PENDING);
+				
+			lemma "Only stated transitions are allowed." :
+				sub.some_transition or (sub.state = sub.previous_state);
+			------------------------------------------------------
+			-- These lemmas could be captured in SpeAR as observers (without the negation)
+			
+			--Check that all states are reachable
+			lemma "False indicates the IDLE state is reachable" : not (sub.state = sub.IDLE); 
+			lemma "False indicates the OPTIONS_WAIT state is reachable" : not (sub.state = sub.OPTIONS_WAIT);
+			lemma "False indicates the ROUTE_PENDING state is reachable" : not (sub.state = sub.ROUTE_PENDING);
+			
+			--Check that all state transitions are reachable
+			lemma "False indicates that T_IDLE_TO_OPTIONS_WAIT is reachable" : not sub.T_IDLE_TO_OPTIONS_WAIT;
+			lemma "False indicates that T_OPTIONS_WAIT_TO_ROUTE_PENDING is reachable": not sub.T_OPTIONS_WAIT_TO_ROUTE_PENDING;
+			lemma "False indicates that T_ROUTE_PENDING_TO_IDLE is reachable": not sub.T_ROUTE_PENDING_TO_IDLE;
+			
+			--Check that events are possible
+			lemma "False indicates the system is able to produce an assignment cost matrix" : not event(sub.AssignmentCostMatrix_out);
+			lemma "False indicates the system is able to produce a route plan request" : not event(sub.RoutePlanRequest_out);
+			lemma "False indicates the system is able to receive a unique automation request": not event(sub.UniqueAutomationRequest_in);
+			lemma "False indicates the system is able to receive a route request": not event(sub.RoutePlanResponse_in);
+		**};
+		 
+	end top_level.Impl;	
+	
+thread RouteAggregatorService_CollectorRole
+    features
+        GroundVehicleState_in: in event data port impact::GroundVehicleState.i; 
+        UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i; 
+        RoutePlanResponse_in: in event data port route::RoutePlanResponse.i; --keep
+        SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i; 
+        TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i; 
+        AirVehicleState_in: in event data port cmasi::AirVehicleState.i; 
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki.
+        RoutePlanRequest_out: out event data port route::RoutePlanRequest.i; 
+        AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i; 
+   	annex agree{**
+   		--Although the code for this service supports multiple
+   		-- UniqueAutomationRequests at a time, the AutomationValidatorService ensures that 
+   		-- only a single UniqueAutomationRequest is handled by the system at a time (see Wiki).
+   		-- Furthermore, the documentation in the Wiki (the three states) only makes sense
+   		--  for one request at a time. Hence we make an assumption here that we will not receive 
+   		--  a new UniqueAutomationRequest_in until we have finished servicing the previous one.
+		assume "A new RouteRequest is only received when in IDLE.":
+			event(UniqueAutomationRequest_in) => (previous_state = IDLE);
+
+		-------------------------------------------------------------
+  		-- BEGIN STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		--State constants
+ 		const IDLE : int = 0;
+        const OPTIONS_WAIT : int = 1;
+        const ROUTE_PENDING : int = 2;
+
+		-------------------------------------------------------------
+		--State variable
+		eq state: int;
+
+		-------------------------------------------------------------
+		--State machine support macros		
+
+		eq previous_state: int = prev(state, IDLE);
+
+		eq some_transition: bool = T_IDLE_TO_OPTIONS_WAIT
+									or T_OPTIONS_WAIT_TO_ROUTE_PENDING
+									or T_ROUTE_PENDING_TO_IDLE;
+	
+		-------------------------------------------------------------	
+		--State transition macros
+		
+		--This is initially false to prevent transition to OPTIONS_WAIT on the initial timestep
+		eq T_IDLE_TO_OPTIONS_WAIT : bool = 
+			false -> ((previous_state = IDLE) and event(UniqueAutomationRequest_in));
+		
+		eq all_task_plan_options_received : bool;
+		eq T_OPTIONS_WAIT_TO_ROUTE_PENDING : bool = 
+			(previous_state = OPTIONS_WAIT) and all_task_plan_options_received;
+		
+		eq T_ROUTE_PENDING_TO_IDLE : bool =
+			(previous_state = OPTIONS_WAIT) and event(AssignmentCostMatrix_out);	
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+		--This guarantee specifies the initial state.
+        guarantee "Initial_State": (state = IDLE) -> true;
+        
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (state = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_IDLE_TO_PENDING_effect" : T_IDLE_TO_OPTIONS_WAIT => (state = OPTIONS_WAIT);
+        
+        guarantee "T_PENDING_TO_IDLE_effect" : T_OPTIONS_WAIT_TO_ROUTE_PENDING => (state = ROUTE_PENDING);
+        
+        guarantee "T_ROUTE_PENDING_TO_IDLE" : T_ROUTE_PENDING_TO_IDLE => (state = IDLE);
+
+		-------------------------------------------------------------
+		-- END STATE MACHINE LOGIC
+		-------------------------------------------------------------
+	**};
+end RouteAggregatorService_CollectorRole;
+
+end RouteAggregatorService_CollectorRole_Pkg;

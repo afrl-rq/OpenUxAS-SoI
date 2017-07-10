@@ -44,27 +44,45 @@
             name="{Component} State Machine">
           {Component} state agree state machine is correct.
 
+          <c
+              id="__gsn__15d18a60010"
+              name="Context">
+            {component FSM}
+          </c>
+
           <s
               id="__gsn__15d1536fdc8"
               name="Strategy">
-            Argue correctness of each characteristic of a finite state machine
+            Argue correctness of each characteristic of a \finite state machine
 
             <c
-                id="__gsn__15d153ba518"
+                id="__gsn__15d15452280"
                 name="Context">
-              {characteristics of a FSM}
+              {states}
+            </c>
+
+            <c
+                id="__gsn__15d15450d67"
+                name="Context">
+              {transitions}
+            </c>
+
+            <c
+                id="__gsn__15d15400fcd"
+                name="Context">
+              {start state}
+            </c>
+
+            <c
+                id="__gsn__15d153e56c8"
+                name="Context">
+              {terminal states}
             </c>
 
             <g
                 id="__gsn__15d1537066f"
-                name="States">
+                name="Correct States">
               {component} states are correct
-
-              <c
-                  id="__gsn__15d15452280"
-                  name="Context">
-                {states}
-              </c>
 
               <s
                   id="__gsn__15d154ccff4"
@@ -74,20 +92,11 @@
                     id="__gsn__15d154cd3cc"
                     name="State Verification">
 
-                  <s
-                      id="__gsn__15d15568763"
-                      name="Strategy">
-
-                    <g
-                        id="__gsn__15d15568d83"
-                        name="State Reachability">
-                    </g>
-
-                    <g
-                        id="__gsn__15d1556b7a2"
-                        name="Behavior Correctness">
-                    </g>
-                  </s>
+                  <comment
+                      id="__gsn__15d18b996d6"
+                      name="Rodes">
+                    Underneath this claim, the argument could be supported by further decomposition i.e., the implementation.
+                  </comment>
                 </g>
 
                 <g
@@ -99,20 +108,36 @@
                       name="Context">
                     {correct}
                   </c>
+
+                  <s
+                      id="__gsn__15d15568763"
+                      name="Strategy">
+
+                    <g
+                        id="__gsn__15d1556b7a2"
+                        name="Behavior Correctness">
+                    </g>
+                  </s>
+
+                  <comment
+                      id="__gsn__15d17cd6497"
+                      name="Rodes">
+                    Should include checks that the state machine infrastructure is valid and properly applied (e.g., what if the int representation is accidentally repeated?).
+                  </comment>
                 </g>
+
+                <comment
+                    id="__gsn__15d1835bd64"
+                    name="Rodes">
+                  TODO: how do I address the possibility of screwing up the state infrastructure?
+                </comment>
               </s>
             </g>
 
             <g
                 id="__gsn__15d15372999"
-                name="Transitions">
+                name="Correct Transitions">
               {Component} state machine transitions correctly between states
-
-              <c
-                  id="__gsn__15d15450d67"
-                  name="Context">
-                {transitions}
-              </c>
 
               <s
                   id="__gsn__15d154c50be"
@@ -122,7 +147,99 @@
                 <g
                     id="__gsn__15d154c61ae"
                     name="Transition Verification">
-                  {tbd}
+                  {TBD}
+
+                  <s
+                      id="__gsn__15d18a42a84"
+                      name="Strategy">
+                    {TBD}
+
+                    <c
+                        id="__gsn__15d18a82b3e"
+                        name="Definition">
+                      [Transition reachable]: a transition is reachable there exists a state machine execution path where the transition is taken.
+                    </c>
+
+                    <c
+                        id="__gsn__15d18a5b696"
+                        name="Definition">
+                      [State reachability]: a given state is reachable if a state machine execution path exists by which the state is entered.
+                    </c>
+
+                    <m
+                        id="__gsn__15d15568d83"
+                        link="state_reachability.gsn"
+                        name="Reachable {Component} States">
+                      All states of {component} are reachable
+
+                      <j
+                          id="__gsn__15d18a686c4"
+                          name="Justification">
+                        Unreachable states may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
+                      </j>
+                    </m>
+
+                    <g
+                        id="__gsn__15d18b94a16"
+                        name="Exclusive Reachable State Set">
+                      No states are reachable other than {states}
+
+                      <j
+                          id="__gsn__15d18bee746"
+                          name="Justification">
+                        This is not the same as state “completeness”, but a check that the state machine can’t somehow transition to other undefined states. If it could, the state machine may be erroneous or other states exists that were not defined.
+                      </j>
+                    </g>
+
+                    <m
+                        id="__gsn__15d15565d04"
+                        link="transition_reachability.gsn"
+                        name="Reachable State Transitions">
+                      All transitions between {component} states are reachable.
+
+                      <j
+                          id="__gsn__15d18a7de92"
+                          name="Justification">
+                        Unexecutable transition may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
+                      </j>
+                    </m>
+
+                    <g
+                        id="__gsn__15d18aba4ad"
+                        name="Exclusive Transition Set">
+                      No state transitions, other than {state transitions}, exist.
+
+                      <j
+                          id="__gsn__15d18b4345f"
+                          name="Justification">
+                        This is a separate concern from “completeness”. This claim asks whether the given set of transitions is the exclusive set of transitions. If another transition exists, it isn’t necessarily the state machine transitions are incomplete, but it could mean there is an error in the state machine.
+                      </j>
+                    </g>
+
+                    <g
+                        id="__gsn__15d190896a6"
+                        name="Transition Guarantees Satisfied">
+                      {implementation of the spec is correct?}
+
+                      <s
+                          id="__gsn__15d1909d5ca"
+                          name="Strategy">
+                        Argue over each transition
+
+                        <g
+                            id="__gsn__15d1909dae4"
+                            repeat="true"
+                            name="{Transition} Guarantee Satisfied">
+                        </g>
+                      </s>
+                    </g>
+
+                    <comment
+                        id="__gsn__15d18f987de"
+                        name="Rodes">
+                      This strategy is effectively an enumeration over defined characteristics of “correct transition verification”.
+                    </comment>
+                  </s>
                 </g>
 
                 <g
@@ -139,6 +256,7 @@
                   <s
                       id="__gsn__15d1554ada3"
                       name="Strategy">
+                    {TBD}
 
                     <g
                         id="__gsn__15d1554b5c3"
@@ -146,18 +264,19 @@
                     </g>
 
                     <g
-                        id="__gsn__15d1555e14b"
-                        name="Only Transition Under Given Transitions">
-                    </g>
-
-                    <g
-                        id="__gsn__15d15565d04"
-                        name="Transitions Reachable">
-                    </g>
-
-                    <g
                         id="__gsn__15d1556e40a"
-                        name="Behavior correctness">
+                        name="Correct Transition Behavior">
+                    </g>
+
+                    <g
+                        id="__gsn__15d18ab40b3"
+                        name="Complete Transition Set">
+
+                      <comment
+                          id="__gsn__15d18ae6aec"
+                          name="Rodes">
+                        There are no other transitions that should have been specified.
+                      </comment>
                     </g>
                   </s>
                 </g>
@@ -172,19 +291,19 @@
 
             <g
                 id="__gsn__15d153738a0"
-                name="Start State">
+                name="Correct Start State">
               {Component} state machine is initialized at the correct start state.
-
-              <c
-                  id="__gsn__15d15400fcd"
-                  name="Context">
-                {start state}
-              </c>
 
               <s
                   id="__gsn__15d153ef2e8"
                   name="Strategy">
-                Argue by verification that {start state} is the start state and correctness of {start state}
+                Argue by verification that {start state} is the start state in the spec. and that  {start state} is the intended state machine start state.
+
+                <j
+                    id="__gsn__15d18299ceb"
+                    name="Justification">
+                  Correctness of the start state is determined by the spec actually initializing the state machine to the start state, and assessment that the given initialized start state is the intended start state. Further assessment of the correctness of the start state behavior is assessed in the state correctness claim.
+                </j>
 
                 <g
                     id="__gsn__15d153ef6b8"
@@ -213,12 +332,12 @@
                 <g
                     id="__gsn__15d153f0ef6"
                     name="Start State Validation">
-                  {Component} {start state} is the correct start state.
+                  {Component} {start state} is the intended start state.
 
                   <c
                       id="__gsn__15d1565bc9a"
                       name="Context">
-                    {correct}
+                    {intended start state}
                   </c>
 
                   <s
@@ -238,42 +357,26 @@
                       </comment>
                     </e>
                   </s>
-
-                  <s
-                      id="__gsn__15d1563bfd0"
-                      name="Strategy">
-
-                    <g
-                        id="__gsn__15d1563c7b6"
-                        name="TBD">
-                      Behavior
-
-                      <s
-                          id="__gsn__15d156524e5"
-                          name="Strategy">
-                        {formal and informal}
-                      </s>
-                    </g>
-                  </s>
                 </g>
               </s>
             </g>
 
             <g
                 id="__gsn__15d153748c8"
-                name="Terminal States">
+                name="Correct Terminal States">
               {Component} state machine terminates in the correct terminal states
-
-              <c
-                  id="__gsn__15d153e56c8"
-                  name="Context">
-                {terminal states}
-              </c>
 
               <s
                   id="__gsn__15d153ca91a"
+                  optional="true"
                   name="Strategy">
-                Argue by verification that {terminal states} are the only terminal states and {terminal states} are correct.
+                Argue by verification that {terminal states} are the only terminal states of the state machine spec and {terminal states} are complete.
+
+                <j
+                    id="__gsn__15d1824d2cf"
+                    name="Justification">
+                  Terminal state correctness is determined by determining the state machine can only terminate in the specified states and those states are complete. Further assessment of the correctness of the behavior of the states is assessed under the state correctness claim.
+                </j>
 
                 <g
                     id="__gsn__15d153cb420"
@@ -300,100 +403,70 @@
                 </g>
 
                 <g
-                    id="__gsn__15d153ccd5a"
-                    name="Terminal State Validation">
-                  {Component} {terminal states} are the correct terminal states.
-
-                  <c
-                      id="__gsn__15d156637cb"
-                      name="Context">
-                    {correct}
-                  </c>
+                    id="__gsn__15d1566f888"
+                    name="Terminal States Completeness">
+                  The set {terminal states} is complete
 
                   <s
-                      id="__gsn__15d1561f57a"
-                      name="Strategy">
+                      id="__gsn__15d153d3e20"
+                      name="Evidence Scheme">
+                    {manual inspection}
 
-                    <g
-                        id="__gsn__15d1566a8df"
-                        name="TBD">
-                      Behavior
+                    <e
+                        id="__gsn__15d153d3e21"
+                        name="Evidence">
+                      {inspection report and sign off}
 
-                      <c
-                          id="__gsn__15d156a41d1"
-                          name="Context">
-                        {behavior}
-                      </c>
-
-                      <s
-                          id="__gsn__15d153d3e20"
-                          optional="true"
-                          name="Evidence Scheme">
-                        {manual inspection}
-
-                        <e
-                            id="__gsn__15d153d3e21"
-                            name="Evidence">
-                          {inspection report and sign off}
-
-                          <comment
-                              id="__gsn__15d1543d977"
-                              name="Rodes">
-                            Must include checking completeness of the set in addition to verifying that only the intended states are terminal states or the argument must be subdivided.
-                          </comment>
-
-                          <comment
-                              id="__gsn__15d1544a690"
-                              name="Rodes">
-                            Must include consistency check with AADL or subdivide this argument to include AADL consistency as one assessment.
-                          </comment>
-                        </e>
-                      </s>
-
-                      <s
-                          id="__gsn__15d1569d848"
-                          optional="true"
-                          name="Evidence Scheme">
-                        {AGREE lemma for terminal states  }
-
-                        <c
-                            id="__gsn__15d1569d849"
-                            name="Context">
-                          {idiom documentation}
-                        </c>
-
-                        <e
-                            id="__gsn__15d1569d84a"
-                            name="Evidence">
-                          {AGREE lemma proof}
-                        </e>
-
-                        <comment
-                            id="__gsn__15d156aa35a"
-                            name="Rodes">
-                          TODO: the same V&amp;V issues come up again here. How can we simplify?
-                        </comment>
-                      </s>
-                    </g>
-
-                    <g
-                        id="__gsn__15d1566f888"
-                        name="TBD">
-                      Complete
-
-                      <s
-                          id="__gsn__15d1566f889"
-                          name="Strategy">
-                        {informal}
-                      </s>
-                    </g>
+                      <comment
+                          id="__gsn__15d1544a690"
+                          name="Rodes">
+                        Must include consistency check with AADL or subdivide this argument to include AADL consistency as one assessment.
+                      </comment>
+                    </e>
                   </s>
                 </g>
               </s>
+
+              <s
+                  id="__gsn__15d181f318b"
+                  optional="true"
+                  name="Evidence Scheme">
+                {lack of terminal states}
+
+                <e
+                    id="__gsn__15d181fb400"
+                    name="Evidence">
+                  {the state machine has no terminal states}
+                </e>
+              </s>
             </g>
+
+            <comment
+                id="__gsn__15d183332a3"
+                name="Rodes">
+              Note: in general additional lemmas can be used to aid manual inspection: e.g., an inspection that the state machine as correct transition connections can have lemmas to assert start and end states on a transition. Another example: probing behavior of states with lemmas.
+            </comment>
           </s>
+
+          <comment
+              id="__gsn__15d17eb2e23"
+              name="Rodes">
+            TODO: include a placeholder or note for the kind of validation that has been done with derek manually.
+          </comment>
+        </g>
+
+        <g
+            id="__gsn__15d183655c6"
+            name="TBD">
+          Use of the correct infrastructure for all components?
         </g>
       </s>
+
+      <comment
+          id="__gsn__15d18611afe"
+          name="Rodes">
+        TODO: argument should take into account we may have implementations in the future.
+      </comment>
     </g>
   </gsn>
 </argument>

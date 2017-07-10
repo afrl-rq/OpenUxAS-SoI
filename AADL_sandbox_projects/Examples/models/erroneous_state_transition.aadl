@@ -63,8 +63,8 @@ public
             
             ---Jen's Lemmas	
             lemma "Output event in state 1 => transition" :
-                pre(event(sub.output)) and (true -> (pre(sub.state) = sub.STATE1))
-                    => (sub.state = sub.STATE2);		
+                true -> (pre(event(sub.output)) and ((pre(sub.state) = sub.STATE1))
+                    => (sub.state = sub.STATE2));		
             
             lemma "Output event => transition with exceptions" :
                 true -> (pre(event(sub.output)) =>

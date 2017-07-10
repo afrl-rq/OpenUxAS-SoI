@@ -31,12 +31,18 @@
     <g
         id="__gsn__15cf98d28ef"
         name="State Reachability">
-      All states of {component} are reachable by an execution trace.
+      All states of {component} are reachable.
 
       <c
           id="__gsn__15cf9937324"
           name="Context">
         {Component States}
+      </c>
+
+      <c
+          id="__gsn__15d18ff7b55"
+          name="Definition">
+        [State reachability]: a given state is reachable if a state machine execution path exists by which the state is entered.
       </c>
 
       <s

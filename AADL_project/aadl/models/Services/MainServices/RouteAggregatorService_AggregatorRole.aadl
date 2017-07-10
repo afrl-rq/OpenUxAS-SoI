@@ -1,7 +1,6 @@
-package RouteAggregatorService_Pkg
+package RouteAggregatorService_AggregatorRole_Pkg
 public
 	with CMASI;
-    with UXTASK;
     with IMPACT;
     with ROUTE;
     with UxAS_Node_Lib;
@@ -16,7 +15,7 @@ public
 	
 	process implementation top_level.Impl
 		subcomponents
-			sub : thread RouteAggregatorService; 
+			sub : thread RouteAggregatorService_AggregatorRole; 
 		annex agree {**
 			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as properties
@@ -48,21 +47,15 @@ public
 		 
 	end top_level.Impl;	
 	
-thread RouteAggregatorService
+thread RouteAggregatorService_AggregatorRole
     features
-        GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
-        SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
-        AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
-        RouteRequest_in: in event data port route::RouteRequest.i;
-        GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
-        UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+        GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i; 
+        SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i; 
+        AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i; 
+        RouteRequest_in: in event data port route::RouteRequest.i; 
         RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
-        SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
-        TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
-        AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
-        ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki.
         RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
-        AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
    	annex agree{**
   		-------------------------------------------------------------
@@ -230,6 +223,6 @@ thread RouteAggregatorService
 		--  rest of the information could be garbage.
 
 	**};
-end RouteAggregatorService;
+end RouteAggregatorService_AggregatorRole;
 
-end RouteAggregatorService_Pkg;
+end RouteAggregatorService_AggregatorRole_Pkg;
