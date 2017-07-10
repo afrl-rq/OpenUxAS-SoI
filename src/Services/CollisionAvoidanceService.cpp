@@ -797,54 +797,6 @@ namespace dmpl
             }
 
             /***********************************/
-            //-- given two points P1 and P2, compute the sequence of
-            //-- cells that must be traversed if traveling in a
-            //-- straight line from P1 to P2.
-            /***********************************/
-            void cellsTraversed(double x1, double y1, double x2, double y2)
-            {
-                std::list<Cell> cells;
-
-                //-- compute the cells that the two points are in
-                auto cell1 = GpsToCell(y1, x1);
-                auto cell2 = GpsToCell(y2, x2);
-
-                //-- special case, both points are in the same cell
-                if(cell1 == cell2)
-                {
-                    cells.push_back(cell1);
-                    return;
-                }
-                                
-                //-- special case, infinite slope
-                if(x1 == x2)
-                {
-                    assert(cell1.first == cell2.first);
-
-                    if(cell1.second < cell2.second)
-                    {
-                        for(int i = cell1.second; i <= cell2.second; ++i)
-                        {
-                            cells.push_back(Cell(cell1.first, i));
-                        }
-                    }
-                    else
-                    {
-                        for(int i = cell1.second; i >= cell2.second; --i)
-                        {
-                            cells.push_back(Cell(cell1.first, i));
-                        }
-                    }
-                    
-                    return;
-                }
-
-                //non-infinite slope
-                double m = (y2-y1) / (x2-x1);
-                double c = y1 - m * x1;
-            }
-
-            /***********************************/
             //given a point, compute the set of cells that the node
             //can traverse while loitering around that point.
             /***********************************/
@@ -869,6 +821,46 @@ namespace dmpl
                     {
                         res.insert(Cell(i,j));
                     }
+                }
+
+                return res;
+            }
+
+            /***********************************/
+            //-- given two points P1 and P2, compute the sequence of
+            //-- cells that must be traversed if traveling in a
+            //-- straight line from P1 to P2. essentially we compute
+            //-- the set of cells in the rectangle whose diagonals are
+            //-- defined by the two points.
+            /***********************************/
+            std::set<Cell> cellsTraversed(double x1, double y1, double x2, double y2)
+            {
+                //-- compute the cells that the two points are in
+                auto cell1 = GpsToCell(y1, x1);
+                auto cell2 = GpsToCell(y2, x2);
+
+                int minx = (cell1.first < cell2.first) ? cell1.first : cell2.first;
+                int maxx = (cell1.first > cell2.first) ? cell1.first : cell2.first;
+                int miny = (cell1.second < cell2.second) ? cell1.second : cell2.second;
+                int maxy = (cell1.second > cell2.second) ? cell1.second : cell2.second;
+
+                std::set<Cell> res;
+
+                //-- compute the cells in the rectangle whose diagonal
+                //-- is (minx, miny) and (maxx, maxy).
+                for(int i = minx;i <= maxx;++i)
+                {
+                    for(int j = miny;j <= maxy;++j)
+                    {
+                        res.insert(Cell(i,j));
+                    }
+                }
+
+                //-- add the set of cells that may be traversed when
+                //-- loitering at (x2, y2).
+                for(const auto &c : cellsLoitered(x2, y2))
+                {
+                    res.insert(c);
                 }
 
                 return res;
