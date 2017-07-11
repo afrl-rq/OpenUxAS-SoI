@@ -277,6 +277,7 @@ namespace dmpl
 #define Y 10
 #define Z 10
 #define STRING_XML_COLLISION_AVOIDANCE "CollisionAvoidance"
+#define MAX_LOCK 10
 
     /********************************************************************/
     //-- Begin defining variables for node uav
@@ -284,10 +285,7 @@ namespace dmpl
 
     // begin node_uav namespace
     namespace node_uav
-    {
-
-#define MAX_LOCK 10
-        
+    {        
         /********************************************************************/
         //-- Defining global variables at node scope
         /********************************************************************/
