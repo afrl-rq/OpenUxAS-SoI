@@ -561,6 +561,7 @@ namespace dmpl
             KnowledgeRecord
             thread0_COLLISION_AVOIDANCE (engine::FunctionArguments & args, engine::Variables & vars);
             void thread0_NEXT_WP ();
+            void thread0_NEXT_XY_Rec (double x1, double y1, double x2, double y2);
             KnowledgeRecord
             thread0_NEXT_XY (engine::FunctionArguments & args, engine::Variables & vars);
         } // end node_uav_role_Uav namespace
@@ -922,6 +923,49 @@ namespace dmpl
             }
             
             /***********************************/
+            //-- update xp and yp recursively
+            /***********************************/
+            void thread0_NEXT_XY_Rec(double x1, double y1, double x2, double y2)
+            {
+                //-- compute the cells that the two points are in
+                auto cell1 = GpsToCell(y1, x1);
+                auto cell2 = GpsToCell(y2, x2);
+
+                if(cell1 == cell2)
+                {
+                    assert(0 && "ERROR: cannot be in nextWP at this stage!!");                    
+                }
+
+                if(adjacentCells(cell1, cell2))
+                {
+                    thread0_xp = cell2.first;
+                    thread0_yp = cell2.second;
+                    cellsToLock.clear();
+                    cellsToLock.insert(cell2);
+                    nextPos.lat(y2);
+                    nextPos.lng(x2);
+                    return;
+                }
+
+                if(diagonalCells(cell1, cell2))
+                {
+                    thread0_xp = cell2.first;
+                    thread0_yp = cell2.second;
+                    cellsToLock.clear();
+                    cellsToLock.insert(cell2);
+                    cellsToLock.insert(Cell(cell1.first, cell2.second));
+                    cellsToLock.insert(Cell(cell2.first, cell1.second));
+                    nextPos.lat(y2);
+                    nextPos.lng(x2);
+                    return;
+                }
+
+                double xmid = (x1 + x2) / 2;
+                double ymid = (y1 + y2) / 2;
+                thread0_NEXT_XY_Rec(x1, y1, xmid, ymid);
+            }
+            
+            /***********************************/
             //-- update xp and yp
             /***********************************/
             KnowledgeRecord
@@ -930,6 +974,9 @@ namespace dmpl
                 std::cerr << "current cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
 
 #if 1
+                thread0_NEXT_XY_Rec(currWP->getLongitude(),currWP->getLatitude(),
+                                    nextWP->getLongitude(),nextWP->getLatitude());
+                /*
                 //-- Begin function body
                 thread0_xp = thread0_xf;
                 thread0_yp = thread0_yf;
@@ -938,6 +985,7 @@ namespace dmpl
                 cellsToLock.clear();
                 cellsToLock = cellsTraversed(currWP->getLongitude(),currWP->getLatitude(),
                                              nextWP->getLongitude(),nextWP->getLatitude());
+                */
 #else
                 thread0_xp = thread0_x;
                 thread0_yp = thread0_y;
@@ -970,6 +1018,7 @@ namespace dmpl
                 
                 std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
 
+                /*
                 //-- if the next cell contains the next waypoint, then move to the
                 //-- waypoint.
                 if(thread0_xp == thread0_xf && thread0_yp == thread0_yf)
@@ -982,6 +1031,7 @@ namespace dmpl
                 {
                     nextPos = CellToGps(thread0_xp, thread0_yp);
                 }
+                */
   
                 //-- Insert return statement, in case user program did not
                 return Integer(0);
