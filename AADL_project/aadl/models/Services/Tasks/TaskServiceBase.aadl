@@ -301,15 +301,16 @@ public
        				--NOTE: this would send out a event(TaskInitialized_out) in every time step that init_complete
        					--is true within state INIT, however, the transition condition to idle occurs on the next
        					--time step after event(TaskInitialized_out) is sent. 
-       			state = INIT and init_complete =>
-       				event(TaskInitialized_out);
+       			state = INIT =>
+       				(init_complete <=>
+       					event(TaskInitialized_out));
        				
        		guarantee "[Not originally specified: in the idle state, once an automation request
        				is recieved that is present in the set of expected task IDs, send a SensorFootprintRequests_out]" :
-       			(state = IDLE and 
-       				event(UniqueAutomationRequest_in)  and 
-					unique_automation_request_task_id_present) =>
-						event(SensorFootprintRequests_out);
+       			state = IDLE => 
+       				((event(UniqueAutomationRequest_in)  and 
+					unique_automation_request_task_id_present) <=>
+						event(SensorFootprintRequests_out));
        				
        		guarantee "UniqueAutomationRequest messages trigger a transition from the idle state into the SensorRequest state.
        			When a Task is notified of its inclusion (by noting the presence of its ID in the Tasks list of an 
@@ -334,10 +335,10 @@ public
        			
        		guarantee "[Not originally specified: in the SENSOR_REQUEST state, if the expected SensorFootprintResponse_in is received
        				send a RouteRequest_out]" :
-       			(state = SENSOR_REQUEST and 
-       				event(SensorFootprintResponse_in) and 
-					cached_sensor_request_id = SensorFootprintResponse_in.ResponseID) =>
-						event(RouteRequest_out);
+       			state = SENSOR_REQUEST => 
+       				((event(SensorFootprintResponse_in) and 
+					cached_sensor_request_id = SensorFootprintResponse_in.ResponseID) <=>
+						event(RouteRequest_out));
 					 	
        			
        		--TODO: is the current state implication correct? 
@@ -369,10 +370,10 @@ public
 --       		
        		guarantee "[Not originally specified: if in the OPTION_ROUTES state and an expected RouteResponse_in is received
        				send an event(TaskPlanOptions_out)]":
-       			(state = OPTION_ROUTES and 
-       				event(RouteResponse_in) and 
-					cached_route_request_id = RouteResponse_in.ResponseID) =>
-						event(TaskPlanOptions_out);
+       			state = OPTION_ROUTES => 
+       				((event(RouteResponse_in) and 
+					cached_route_request_id = RouteResponse_in.ResponseID) <=>
+						event(TaskPlanOptions_out));
 				
 				
        		guarantee "The Task remains in the OptionRoutes state until the RouteAggregatorService replies.
@@ -401,10 +402,10 @@ public
        			
        		guarantee "[Not originally specified: if in the OPTION_ROUTES state and an expected TaskImplementationRequest_in,
        				send a RouteRequest_out]":
-       			(state = OPTION_ROUTES and
-       				event(TaskImplementationRequest_in) and
-					cached_task_plan_options = TaskImplementationRequest_in.CorrespondingAutomationRequestID) =>
-						event(RouteRequest_out);
+       			state = OPTION_ROUTES =>
+       				((event(TaskImplementationRequest_in) and
+					cached_task_plan_options = TaskImplementationRequest_in.CorrespondingAutomationRequestID) <=>
+						event(RouteRequest_out));
        				
        			
        		--TODO: INCORRECT AGREE SPECIFICATION
@@ -419,10 +420,10 @@ public
        			
        		guarantee "[Not originally specified: if in the FINAL_ROUTES state and an expected RouteResponse_in is recieved,
        				send a TaskImplementationResponse_out]":
-       			(state = FINAL_ROUTES and
-       				event(RouteResponse_in) and 
-					RouteResponse_in.ResponseID = cached_route_request_id) =>
-						event(TaskImplementationResponse_out);
+       			state = FINAL_ROUTES =>
+       				((event(RouteResponse_in) and 
+					RouteResponse_in.ResponseID = cached_route_request_id) <=>
+						event(TaskImplementationResponse_out));
 					
        			
        		guarantee "When a Task is Active, it is allowed to update sensor navigation commands to on-task vehicles." :
@@ -458,10 +459,10 @@ public
        		
        		guarantee "[Not originally specified: if in the OPTION_SELECTED state an the expected UniqueAutomationRequest_in is received,
        				send SensorFootprintRequests_out]":
-       			(state = OPTION_SELECTED and
-       				event(UniqueAutomationRequest_in) and 
-       				unique_automation_request_task_id_present) =>
-       					event(SensorFootprintRequests_out);
+       			state = OPTION_SELECTED =>
+       				((event(UniqueAutomationRequest_in) and 
+       				unique_automation_request_task_id_present) <=>
+       					event(SensorFootprintRequests_out));
        				
        		guarantee "If during this state [OPTION_SELECTED], a subsequent UniqueAutomationRequest is made, the Task returns to the SensorRequest state and 
        		immediately attempts to fulfill the requirements of the new UniqueAutomationRequest. This behavior implies that a Task can only be 
@@ -479,10 +480,10 @@ public
        				
        		guarantee "[Not originally specified: If in the ACTIVE state and either (1) an new expected EntityState_in is recieved or 
        				(2) an expected UniqueAutomationRequest_in is recieved, send TaskComplete_out]":
-       			(state = ACTIVE and
-       				((event(EntityState_in) and not entity_state_task_id_present) or 
-       				(event(UniqueAutomationRequest_in) and unique_automation_request_task_id_present)))	=>
-       					event(TaskComplete_out);	
+       			state = ACTIVE =>
+       				((((event(EntityState_in) and not entity_state_task_id_present) or 
+       				(event(UniqueAutomationRequest_in) and unique_automation_request_task_id_present)))	<=>
+       					event(TaskComplete_out));	
        				
        		guarantee "A Task remains in the Active state until a subsequent EntityState message does not list the Task ID in its AssociatedTaskList. 
        		At which point, a transition to Completed is made. 
