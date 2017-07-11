@@ -29,7 +29,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 6; i++)
                     {
                         (*trajectory)[curTime].push_back(0.0);
                     }

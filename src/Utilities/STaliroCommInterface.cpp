@@ -24,6 +24,7 @@ namespace testgeneration
             sendBufferSize = 0;
             isConnected = false;
             trajectoryRequested = false;
+            m_lastHeartBeatTime_ms = 0;
         }
         
         void c_CommunicationInterface::createServer(int serverPort)
@@ -68,7 +69,7 @@ namespace testgeneration
             }
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::acceptConnection()
+        bool c_CommunicationInterface::acceptConnection()
         {
             int addrlen = sizeof(serverAddress);
             
@@ -88,19 +89,19 @@ namespace testgeneration
             return isConnected;
         }
         
-        void testgeneration::staliro::c_CommunicationInterface::closeConnection()
+        void c_CommunicationInterface::closeConnection()
         {
             //shutdown(clientSocket, SHUT_RDWR);
             //isConnected = false;
         }
         
-        void testgeneration::staliro::c_CommunicationInterface::resetSendBuffer()
+        void c_CommunicationInterface::resetSendBuffer()
         {
             sendBufferFillPtr = (void *) sendBuffer;
             sendBufferSize = 0;
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::addToSendBuffer(void * data, 
+        bool c_CommunicationInterface::addToSendBuffer(void * data, 
                 size_t dataLength)
         {
             bool retCode = true;
@@ -119,7 +120,7 @@ namespace testgeneration
             return retCode;
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::sendData()
+        bool c_CommunicationInterface::sendData()
         {
             int retCode = true;
             void * curBufferPtr = (void *) sendBuffer;
@@ -142,14 +143,14 @@ namespace testgeneration
             return retCode;
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::sendAck(uint32_t ackReply)
+        bool staliro::c_CommunicationInterface::sendAck(uint32_t ackReply)
         {
             resetSendBuffer();
             addToSendBuffer((void *) &ackReply, sizeof(ackReply));
             return sendData();
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::receiveAck()
+        bool c_CommunicationInterface::receiveAck()
         {
             uint32_t ackMsg = 0;
             uint readCnt = 0;
@@ -182,7 +183,7 @@ namespace testgeneration
             return ackReceived;
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::receiveCommands() 
+        bool c_CommunicationInterface::receiveCommands() 
         {
             uint32_t cmd = 0;
             uint8_t ackReply = 0;
@@ -216,7 +217,7 @@ namespace testgeneration
                 else if (cmd == testgeneration::staliro::STALIRO_START_SIM)
                 {
                     allReceived = true;
-                    m_maxSimulationDuration = readMaxSimulationDuration();
+                    m_maxSimulationDuration_ms = readMaxSimulationDuration();
                     sendAck(testgeneration::staliro::STALIRO_ACK);
                     trajectoryRequested = true;
                 }
@@ -226,7 +227,7 @@ namespace testgeneration
         
         int64_t c_CommunicationInterface::readMaxSimulationDuration()
         {
-            int64_t maxSimDuration = 0;
+            int64_t maxSimDuration_ms = 0;
             double duration_sec = 0.0;
             uint readCnt = 0;
             uint tmpReadCnt = 0;
@@ -246,11 +247,11 @@ namespace testgeneration
                 }
             }
             
-            maxSimDuration = (int64_t) (duration_sec * 1000.0);
-            return maxSimDuration;
+            maxSimDuration_ms = (int64_t) (duration_sec * 1000.0);
+            return maxSimDuration_ms;
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::receiveTrajectoryRequest() 
+        bool c_CommunicationInterface::receiveTrajectoryRequest() 
         {
             uint32_t cmd = 0;
             uint readCnt = 0;
@@ -281,14 +282,14 @@ namespace testgeneration
             return retCode;
         }
 
-        void testgeneration::staliro::c_CommunicationInterface::setFileFieldMapPtr(
+        void c_CommunicationInterface::setFileFieldMapPtr(
                 std::map<std::string, std::map<std::string, 
                 std::string> >* mapPtr)
         {
             fileFieldMapPtr = mapPtr;
         }
         
-        void testgeneration::staliro::c_CommunicationInterface::readInitCond()
+        void c_CommunicationInterface::readInitCond()
         {
             std::string fileName = readFieldString();
             std::string fieldName = readFieldString();
@@ -297,7 +298,7 @@ namespace testgeneration
             (*fileFieldMapPtr)[fileName].insert(std::make_pair(fieldName, value));
         }
         
-        std::string testgeneration::staliro::c_CommunicationInterface::readFieldString()
+        std::string c_CommunicationInterface::readFieldString()
         {
             uint32_t msgLen = 0;
             uint readCnt = 0;
@@ -344,7 +345,7 @@ namespace testgeneration
         }
         
         
-        bool testgeneration::staliro::c_CommunicationInterface::sendTrajInfo(uint32_t numColumns, 
+        bool c_CommunicationInterface::sendTrajInfo(uint32_t numColumns, 
                 uint32_t numRows)
         {
             bool retCode = true;
@@ -365,7 +366,7 @@ namespace testgeneration
             return retCode;
         }
         
-        void testgeneration::staliro::c_CommunicationInterface::addTrajectoryRow(
+        void c_CommunicationInterface::addTrajectoryRow(
                     uint32_t curRowNumber, 
                     uint32_t totalNumOfRows, 
                     uint32_t numElementsInRow, 
@@ -407,8 +408,7 @@ namespace testgeneration
             }
         }
         
-        bool testgeneration::staliro::c_CommunicationInterface::sendTrajData(size_t length, 
-                void * data)
+        bool c_CommunicationInterface::sendTrajData(size_t length, void * data)
         {
             bool retCode = true;
             uint32_t cmd = testgeneration::staliro::STALIRO_TRAJ_DATA;
@@ -430,6 +430,29 @@ namespace testgeneration
             return retCode;
         }
         
+        bool c_CommunicationInterface::sendHeartBeat(int64_t curTime)
+        {
+            double totalTimeInSec = (double) m_maxSimulationDuration_ms / 1000.0;
+            double curTimeInSec = (double) curTime / 1000.0;
+            bool retCode = true;
+            uint32_t cmd = testgeneration::staliro::STALIRO_HEART_BEAT;
+            
+            if (curTime > m_lastHeartBeatTime_ms + STALIRO_HEART_BEAT_PERIOD_MS)
+            {
+                resetSendBuffer();
+                addToSendBuffer((void *) &cmd, sizeof(cmd));
+                addToSendBuffer((void *) &curTimeInSec, sizeof(curTimeInSec));
+                addToSendBuffer((void *) &totalTimeInSec, sizeof(totalTimeInSec));
+                if (!sendData())
+                {
+                    retCode = false;
+                }
+                m_lastHeartBeatTime_ms = curTime;
+            }
+            
+            return retCode;
+        }
+        
         bool c_CommunicationInterface::isTrajectoryRequested()
         {
             return trajectoryRequested;
@@ -437,7 +460,7 @@ namespace testgeneration
         
         int64_t c_CommunicationInterface::getMaxSimulationDuration()
         {
-            return m_maxSimulationDuration;
+            return m_maxSimulationDuration_ms;
         }
     }
 }

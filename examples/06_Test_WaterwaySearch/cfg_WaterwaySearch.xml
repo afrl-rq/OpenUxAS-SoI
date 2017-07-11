@@ -28,7 +28,13 @@
         <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
         <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
         <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="300"/>
+        <Message MessageFileName="WeatherReport_1.xml" SendTime_ms="500"/>
         <Message MessageFileName="tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml" SendTime_ms="5000"/>
+        <Message MessageFileName="WeatherReport_2.xml" SendTime_ms="150000"/>
+        <Message MessageFileName="WeatherReport_3.xml" SendTime_ms="300000"/>
+        <Message MessageFileName="WeatherReport_4.xml" SendTime_ms="450000"/>
+        <Message MessageFileName="WeatherReport_5.xml" SendTime_ms="600000"/>
+        <Message MessageFileName="WeatherReport_6.xml" SendTime_ms="750000"/>
     </Service>
     <Service Type="MessageLoggerForTestService">
     </Service>

@@ -76,6 +76,10 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             {
                 sendOutTrajectory();
             }
+            else
+            {
+                staliroInterface->sendHeartBeat(sessionStatus->getScenarioTime());
+            }
         }
     }
 

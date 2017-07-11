@@ -1,3 +1,4 @@
+<STALIRO_INIT_COND>      
       <AirVehicleConfiguration Series="CMASI" Time="1.0" OriginalFileName = "AirVehicleConfiguration_V400.xml">
         <NominalSpeed>
             <staliro_minimum> 19.0 </staliro_minimum>
@@ -10,4 +11,64 @@
          </FlightProfile>
         </NominalFlightProfile>
       </AirVehicleConfiguration>
-
+      <WeatherReport Series="CMASI" OriginalFileName = "WeatherReport_1.xml">
+        <WindSpeed>
+            <staliro_minimum> 0.0 </staliro_minimum>
+            <staliro_maximum> 20.7 </staliro_maximum>
+        </WindSpeed>
+        <WindDirection>
+           <staliro_minimum> -179.0 </staliro_minimum>
+           <staliro_maximum> 179.0 </staliro_maximum>
+         </WindDirection>
+      </WeatherReport>
+      <WeatherReport Series="CMASI" OriginalFileName = "WeatherReport_2.xml">
+        <WindSpeed>
+            <staliro_minimum> 0.0 </staliro_minimum>
+            <staliro_maximum> 20.7 </staliro_maximum>
+        </WindSpeed>
+        <WindDirection>
+           <staliro_minimum> -179.0 </staliro_minimum>
+           <staliro_maximum> 179.0 </staliro_maximum>
+         </WindDirection>
+      </WeatherReport>
+      <WeatherReport Series="CMASI" OriginalFileName = "WeatherReport_3.xml">
+        <WindSpeed>
+            <staliro_minimum> 0.0 </staliro_minimum>
+            <staliro_maximum> 20.7 </staliro_maximum>
+        </WindSpeed>
+        <WindDirection>
+           <staliro_minimum> -179.0 </staliro_minimum>
+           <staliro_maximum> 179.0 </staliro_maximum>
+         </WindDirection>
+      </WeatherReport>
+      <WeatherReport Series="CMASI" OriginalFileName = "WeatherReport_4.xml">
+        <WindSpeed>
+            <staliro_minimum> 0.0 </staliro_minimum>
+            <staliro_maximum> 20.7 </staliro_maximum>
+        </WindSpeed>
+        <WindDirection>
+           <staliro_minimum> -179.0 </staliro_minimum>
+           <staliro_maximum> 179.0 </staliro_maximum>
+         </WindDirection>
+      </WeatherReport>
+      <WeatherReport Series="CMASI" OriginalFileName = "WeatherReport_5.xml">
+        <WindSpeed>
+            <staliro_minimum> 0.0 </staliro_minimum>
+            <staliro_maximum> 20.7 </staliro_maximum>
+        </WindSpeed>
+        <WindDirection>
+           <staliro_minimum> -179.0 </staliro_minimum>
+           <staliro_maximum> 179.0 </staliro_maximum>
+         </WindDirection>
+      </WeatherReport>
+      <WeatherReport Series="CMASI" OriginalFileName = "WeatherReport_6.xml">
+        <WindSpeed>
+            <staliro_minimum> 0.0 </staliro_minimum>
+            <staliro_maximum> 20.7 </staliro_maximum>
+        </WindSpeed>
+        <WindDirection>
+           <staliro_minimum> -179.0 </staliro_minimum>
+           <staliro_maximum> 179.0 </staliro_maximum>
+         </WindDirection>
+      </WeatherReport>
+</STALIRO_INIT_COND>

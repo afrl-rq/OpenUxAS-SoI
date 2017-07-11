@@ -26,6 +26,7 @@
 #include "UxAS_Log.h"
 
 #define STALIRO_SEND_BUFFER_SIZE 512
+#define STALIRO_HEART_BEAT_PERIOD_MS 10000
 
 namespace testgeneration
 {
@@ -47,6 +48,7 @@ namespace testgeneration
             bool sendTrajData(size_t length, void* data);
             bool receiveAck();
             void readInitCond();
+            bool sendHeartBeat(int64_t curTime);
             void setFileFieldMapPtr(std::map<std::string, 
                     std::map<std::string,
                     std::string> >* mapPtr);
@@ -76,7 +78,8 @@ namespace testgeneration
             double trajectoryBuffer[(STALIRO_SEND_BUFFER_SIZE-8)/8];
             void *trajectoryBufferPtr;
             bool trajectoryRequested;
-            int64_t m_maxSimulationDuration;
+            int64_t m_maxSimulationDuration_ms;
+            int64_t m_lastHeartBeatTime_ms;
             
         private:
             /** \brief Public, direct construction not permitted (singleton pattern) */
@@ -100,7 +103,8 @@ namespace testgeneration
             STALIRO_NAK = 5,
             STALIRO_TRAJ_INFO = 10,
             STALIRO_TRAJ_DATA = 11,
-            STALIRO_REQUEST_TRAJECTORY = 12
+            STALIRO_REQUEST_TRAJECTORY = 12,
+            STALIRO_HEART_BEAT = 20
         };
         struct s_StaliroMessage
         {
