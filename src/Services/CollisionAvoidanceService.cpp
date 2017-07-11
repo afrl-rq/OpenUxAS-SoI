@@ -574,8 +574,6 @@ namespace dmpl
 //-- GAMS variables and functions
 /********************************************************************/
 
-#include "GamsPlatformUXAS.hpp"
-
 // begin dmpl namespace
 namespace dmpl
 {
