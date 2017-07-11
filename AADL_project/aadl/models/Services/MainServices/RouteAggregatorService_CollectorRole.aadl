@@ -70,7 +70,7 @@ thread RouteAggregatorService_CollectorRole
         SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i; 
         TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i; 
         AirVehicleState_in: in event data port cmasi::AirVehicleState.i; 
-        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki.
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki. Per Derek, it is used for error reporting (or at least can be used for that.)
         RoutePlanRequest_out: out event data port route::RoutePlanRequest.i; 
         AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i; 
    	annex agree{**
@@ -116,7 +116,7 @@ thread RouteAggregatorService_CollectorRole
 			(previous_state = OPTIONS_WAIT) and all_task_plan_options_received;
 		
 		eq T_ROUTE_PENDING_TO_IDLE : bool =
-			(previous_state = OPTIONS_WAIT) and event(AssignmentCostMatrix_out);	
+			(previous_state = ROUTE_PENDING) and event(AssignmentCostMatrix_out);	--Note: Previously, I had previous_state = OPTIONS_WAIT by mistake; and the lemmas were not sufficient to catch it.
 		-------------------------------------------------------------	
 		--State machine guarantees
 				
@@ -140,6 +140,28 @@ thread RouteAggregatorService_CollectorRole
 		-------------------------------------------------------------
 		-- END STATE MACHINE LOGIC
 		-------------------------------------------------------------
+		-------------------------------------------------------------
+		-- The guarantees in this section capture correct component behavior.
+		-- The set is not necessarily complete.
+		
+		guarantee "Only produce an assignment cost matrix when the previous state was ROUTE_PENDING": 
+			event(AssignmentCostMatrix_out) => (previous_state = ROUTE_PENDING);
+	
+		guarantee "Only produce a route plan request when the previous state was ROUTE_PENDING": 
+			event(RoutePlanRequest_out) => (previous_state = ROUTE_PENDING);	
+			
+		-- Store the unique automation request being serviced since it could change (without an event)
+		--  on the next timestep. 
+		-- Modeler's Note: Since this service only services one request at a time, we can 
+		--  save off the one we are processing rather than using a variable for an arbitrary "request being serviced".
+		eq UniqueAutomationRequest_being_serviced : uxtask::UniqueAutomationRequest.i =
+			if event(UniqueAutomationRequest_in) then UniqueAutomationRequest_in
+			else pre(UniqueAutomationRequest_being_serviced);
+		
+		guarantee "Response ID in the route response should match the ID in the associated route request." :
+			event(AssignmentCostMatrix_out) => (AssignmentCostMatrix_out.CorrespondingAutomationRequestID = UniqueAutomationRequest_being_serviced.RequestID);
+		
+		
 	**};
 end RouteAggregatorService_CollectorRole;
 

@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[UxAS Requirements Elicitation]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15ce10cef5c"
+        name="UxAS Requirements Elicitation">
+      UxAS requirements are adequately elicited and documented in the [requirements documentation]
+
+      <c
+          id="__gsn__15ce112414e"
+          name="Reference">
+        [requirements documentation] is defined in [...]
+      </c>
+
+      <s
+          id="__gsn__15ce10d9b21"
+          name="Enumeration of Levels">
+        Argue adequate elicitation and documentation of each [level of requirements]
+
+        <c
+            id="__gsn__15ce110f3db"
+            name="Definitions">
+          [levels of requirements] are: level 1, level 2, ... , level n
+        </c>
+
+        <g
+            id="__gsn__15ce10f53e7"
+            name="UxAS Level 1 Requirements Elicitation">
+          UxAS level 1 requirements are adequately elicited and documented in the requirements documentation
+
+          <c
+              id="__gsn__15d3323d36d"
+              name="Reference">
+            Level 1 requirements as documented in [requirements documentation]
+          </c>
+
+          <s
+              id="__gsn__15ce110227a"
+              name="Enumeration of Criteria">
+            Argue adequate elicitation and documentation by satisfaction of identified [adequacy criteria]
+
+            <c
+                id="__gsn__15ce10e06f1"
+                name="Definition">
+              [adequacy criteria] are: correctness, completeness, and consistency
+            </c>
+
+            <g
+                id="__gsn__15ce1118555"
+                name="Requirements Correctness">
+              UxAS level 1 requirements are correct
+
+              <s
+                  id="__gsn__15ce116b1de"
+                  name="Inductive Support">
+                Argue correctness by inductive support by multiple means
+
+                <c
+                    id="__gsn__15d331bf3ae"
+                    name="Enumeration">
+                  [means] includes: trace to problem and correctness review
+                </c>
+
+                <g
+                    id="__gsn__15ce117ff3c"
+                    name="Trace to Problem">
+                  All UxAS level 1 requirements trace up to the [problem statement]
+
+                  <c
+                      id="__gsn__15ce11a12ec"
+                      name="Reference">
+                    [problem statement] is defined in [...]
+                  </c>
+
+                  <s
+                      id="__gsn__15ce1227305"
+                      name="Evidence Scheme">
+                    Traceability
+
+                    <e
+                        id="__gsn__15ce122b79e"
+                        name="Traceability">
+                      Each UxAS level 1 requirement traces to at least 1 element of the problem statement
+
+                      <c
+                          id="__gsn__15ce12392a4"
+                          name="Reference">
+                        UxAS level 1 requirements trace matrix
+                      </c>
+                    </e>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15ce11a439d"
+                    name="Correctness Review">
+                  All UxAS level 1 requirements are found to be correct in review
+
+                  <s
+                      id="__gsn__15ce11ab236"
+                      name="Evidence Scheme">
+                    Multiple Expert Review
+
+                    <e
+                        id="__gsn__15ce11c3609"
+                        name="Customer Review">
+                      All UxAS level 1 requirements are found to be correct in review with customer
+
+                      <c
+                          id="__gsn__15ce11c9c64"
+                          name="Reference">
+                        UxAS level 1 requirements customer review report
+                      </c>
+                    </e>
+
+                    <e
+                        id="__gsn__15ce11c39ac"
+                        name="Peer Review">
+                      All UxAS level 1 requirements are found to be correct in review with peers
+
+                      <c
+                          id="__gsn__15ce11d80e6"
+                          name="Reference">
+                        UxAS level 1 requirements peer review report
+                      </c>
+                    </e>
+                  </s>
+                </g>
+
+                <comment
+                    id="__gsn__15d332637cb"
+                    name="Argument Explication">
+                  This is an “experimental” strategy that I’m trying out for the first time, in which I’m claiming that these “means” I’ve presenting should help you believe in the claim, but might not fully convince you and certainly won’t convince you by themselves.
+                </comment>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15ce1118a4f"
+                name="Requirements Completeness">
+              UxAS level 1 requirements are complete
+
+              <s
+                  id="__gsn__15ce11e1aca"
+                  name="Inductive Support">
+                Argue completeness by inductive support by multiple means
+
+                <c
+                    id="__gsn__15d331ec1eb"
+                    name="Enumeration">
+                  [means] includes: problem coverage, completeness review, and derived requirements
+                </c>
+
+                <g
+                    id="__gsn__15ce11e2f8a"
+                    name="Problem Coverage">
+                  All elements of the [problem statement] are covered by UxAS level 1 requirements
+
+                  <c
+                      id="__gsn__15ce1264ed5"
+                      name="Reference">
+                    [problem statement] is defined in [...]
+                  </c>
+
+                  <s
+                      id="__gsn__15ce125b05d"
+                      name="Evidence Scheme">
+                    Traceability
+
+                    <e
+                        id="__gsn__15ce125b05e"
+                        name="Traceability">
+                      Each element of the problem traces to at least 1 UxAS level 1 requirement
+
+                      <c
+                          id="__gsn__15ce125b05f"
+                          name="Reference">
+                        UxAS level 1 requirements trace matrix
+                      </c>
+                    </e>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15ce11f697f"
+                    name="Completeness Review">
+                  UxAS level 1 requirements are found to be complete in review
+
+                  <s
+                      id="__gsn__15ce1267345"
+                      name="Evidence Scheme">
+                    Multiple Expert Review
+
+                    <e
+                        id="__gsn__15ce1267346"
+                        name="Customer Review">
+                      UxAS level 1 requirements are found to be complete in review with customer
+
+                      <c
+                          id="__gsn__15ce1267347"
+                          name="Reference">
+                        UxAS level 1 requirements customer review report
+                      </c>
+                    </e>
+
+                    <e
+                        id="__gsn__15ce1267348"
+                        name="Peer Review">
+                      UxAS level 1 requirements are found to be complete in review with peers
+
+                      <c
+                          id="__gsn__15ce1267349"
+                          name="Reference">
+                        UxAS level 1 requirements peer review report
+                      </c>
+                    </e>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15ce11f9d5c"
+                    name="Derived Requirements">
+                  All UxAS level 1 derived requirements are identified
+
+                  <s
+                      id="__gsn__15ce12a257f"
+                      name="Evidence Scheme">
+                    Traceability
+
+                    <e
+                        id="__gsn__15ce12a2580"
+                        name="Traceability">
+                      Each UxAS level 2 requirement traces to at least 1 UxAS level 1 requirement
+
+                      <c
+                          id="__gsn__15ce12a2581"
+                          name="Reference">
+                        UxAS level 2 requirements trace matrix
+                      </c>
+                    </e>
+                  </s>
+                </g>
+
+                <comment
+                    id="__gsn__15d33271e31"
+                    name="Argument Explication">
+                  This is an “experimental” strategy that I’m trying out for the first time, in which I’m claiming that these “means” I’ve presenting should help you believe in the claim, but might not fully convince you and certainly won’t convince you by themselves.
+                </comment>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15ce1118e77"
+                name="Requirements Consistency">
+              UxAS level 1 requirements are consistent
+
+              <comment
+                  id="__gsn__15d3327350e"
+                  name="Tony">
+                Leaving this undeveloped for now, because I’m not sure how to finish it
+              </comment>
+            </g>
+
+            <comment
+                id="__gsn__15d33254807"
+                name="Argument Explication">
+              This is straightforward enumeration over a set of defined adequacy criteria. The criteria shown here are a subset of a larger set that was identified in part at U Penn.
+            </comment>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15ce10fad18"
+            name="UxAS Level 2 Requirements Elicitation">
+          UxAS level 2 requirements are adequately elicited and documented in the requirements documentation
+
+          <c
+              id="__gsn__15d33242e0b"
+              name="Reference">
+            Level 2 requirements as documented in [requirements documentation]
+          </c>
+
+          <s
+              id="__gsn__15ce132d0c6"
+              name="Enumeration of Criteria">
+            {same as for level 1}
+
+            <comment
+                id="__gsn__15d332486f7"
+                name="Argument Explication">
+              Assume, for now, that the criteria are the same for level 2 as for level 1
+            </comment>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15ce10fd339"
+            repeat="true"
+            name="UxAS Level {n} Requirements Elicitation">
+          UxAS level {n} requirements are adequately elicited and documented in the requirements documentation
+
+          <c
+              id="__gsn__15d3324375c"
+              name="Reference">
+            Level {n} requirements as documented in [requirements documentation]
+          </c>
+
+          <s
+              id="__gsn__15ce1339bb3"
+              name="Enumeration of Criteria">
+            {same as for level n-1}
+
+            <comment
+                id="__gsn__15d3324f086"
+                name="Argument Explication">
+              Assume, for now, that the criteria are the same for level {n} as for level {n-1}
+            </comment>
+          </s>
+        </g>
+
+        <comment
+            id="__gsn__15d332158f6"
+            name="Argument Explication">
+          This is a straightforward enumeration of each level of requirements. We break over levels first, before breaking over criteria, because different levels might naturally support/require different criteria
+        </comment>
+      </s>
+    </g>
+  </gsn>
+</argument>

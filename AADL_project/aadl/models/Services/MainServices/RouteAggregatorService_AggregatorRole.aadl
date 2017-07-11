@@ -54,7 +54,7 @@ thread RouteAggregatorService_AggregatorRole
         AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i; 
         RouteRequest_in: in event data port route::RouteRequest.i; 
         RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
-        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki.
+        ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki. Per Derek, it is used for error reporting (or at least can be used for that.)
         RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
    	annex agree{**
@@ -127,7 +127,7 @@ thread RouteAggregatorService_AggregatorRole
 		-------------------------------------------------------------
 		-------------------------------------------------------------
 		-- The guarantees in this section capture correct component behavior.
-		-- The set is still not complete though.
+		-- The set is not necessarily complete.
 		
 		guarantee "Only produce a route response when previous state was PENDING": 
 			event(RouteResponse_out) => (previous_state = PENDING);
@@ -139,6 +139,7 @@ thread RouteAggregatorService_AggregatorRole
 		--   RouteRequest_in => within X we get a RouteResponse_out with a matching ID
 		--   We would need to assume that the route planners respond in a timely manner
 		--   in order to guarantee that.
+		-- Per Dereck, the route plan requests go out very quickly (could model as consecutive timesteps). Would take maybe 10 ms for the route planners to respond to each.
 
 		-------------------------------------------------------------
 		-- Guarantees that need arrays, or records mimicking arrays, to formally express.
@@ -150,6 +151,8 @@ thread RouteAggregatorService_AggregatorRole
 		-- somehow.	
 		
 		--Think of these Boolean variables as a predicates
+		--Q from Derek: Can we implement the behavior in the AADL implementation?
+		--Aaron thinks yes.
 		
 		eq route_response_consists_of_route_plan_responses_received : bool;
 		guarantee "The routes in RouteResponse_out are the route plan responses received." :
@@ -203,6 +206,9 @@ thread RouteAggregatorService_AggregatorRole
 		
 		-- Q: Is the ResponseID in the route plan responses enough to ensure the message is the response we're expecting? 
 		-- Do we have any system-level guarantees about uniqueness of these IDs? 
+		-- A from Derek: No.
+		-- All agreed it may be an issue that two tasks could make a request with the same ID. 
+		--  They would both think the response is for them. And this service could be confused too.
 			
 		------------------------------------------------------------
 		-- Below is some Q&A. Discussion held 6/13/17 with Jen, Aaron, Sean, Ben R., and John B. 
@@ -228,5 +234,10 @@ thread RouteAggregatorService_AggregatorRole
 
 	**};
 end RouteAggregatorService_AggregatorRole;
+
+-- Thought from Derek: It would be valuable to do some (simple) functions in AADL implementations. But 
+--   keep things like route planning to code rather than implementing here.
+--   Think about what could be moved here for message processing, state machines, etc.
+
 
 end RouteAggregatorService_AggregatorRole_Pkg;

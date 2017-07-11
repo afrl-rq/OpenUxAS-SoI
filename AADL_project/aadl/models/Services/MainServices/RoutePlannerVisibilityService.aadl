@@ -34,7 +34,7 @@ public
             KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
             AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
             RoutePlanRequest_in: in event data port route::RoutePlanRequest.i;
-            RouteRequest_in: in event data port route::RouteRequest.i;
+            RouteRequest_in: in event data port route::RouteRequest.i; --No longer used.
             GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
             KeepInZone_in: in event data port cmasi::KeepInZone.i;
             OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
@@ -50,8 +50,14 @@ public
         	
         	--Q: Both RouteRequest_in and RoutePlanRequest_in are listed as inputs here, but the Wiki only lists
         	-- RoutePlanRequest_in. Which is correct?
-        	--TODO: Check the code to answer this question.
+        	--A: Derek said that RouteRequest_in should be removed. It's there for historical reasons but is no longer used.
         	
+        	-----------------------------------------------
+        	-- Other notes from 7/10/17 review with Derek:
+        	-- The Keep In and Keep Out zones may be overlapping. These service needs to handle that appropriately.
+        	
+        	-- This service produces a cost (RouteCost in the corresponding RouteResponse in the RoutePlanResponseRoute) 
+        	--  of -1 if a route isn't possible (e.g., if the destination is in a Keep Out zone).
         	-----------------------------------------------
         	--Here are some easy guarantees for fields that simply need to match those in the request	
              	        		
@@ -77,11 +83,13 @@ public
         	-- If we can assume that we can respond in one timestep, then we don't need to store the request or worry about 
         	--  what to do if we get another request before we're done servicing the one we're working on.
         	--  I'll make a one-timestep draft and will relax that assumption if needed after a team discussion.
+        	-- Discussed with Aaron: We agreed that it shouldn't be one timestep since this is one of the "slower" services.
+        	-- Ideally, we'll put a bound on it (TBD by Derek).
         	
         	--I made this an if and only if. And the response occurs on the next timestep.
         	guarantee "A RoutePlanResponse is produced whenever a RoutePlanRequest is received.":
         		event(RoutePlanResponse_out) = (false -> pre(event(RoutePlanRequest_in)));
-        		
+        		        		
         	--I don't have any guarantees regarding the other inputs to this component.        	
         	--Q: What, if anything, should we say about those?
         	
