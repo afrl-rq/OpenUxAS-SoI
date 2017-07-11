@@ -884,10 +884,11 @@ namespace dmpl
                                 }
                                 unsetLockThread(thread0_x, thread0_y);
                                 unsetLockThread(cellsToLock);
-                                currWP = nextWP;
                                 thread0_x = thread0_xp;
                                 thread0_y = thread0_yp;
                                 setLockThread(thread0_x, thread0_y);
+                                currWP->setLatitude(nextPos.lat());
+                                currWP->setLongitude(nextPos.lng());
                                 setLockThread(cellsLoitered(currWP->getLongitude(),currWP->getLatitude()));
                                 thread0_state = NEXT;
                                 std::cerr << "current waypoint cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
