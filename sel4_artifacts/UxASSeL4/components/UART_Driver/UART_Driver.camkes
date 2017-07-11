@@ -42,6 +42,10 @@ component UART_Driver {
      //   uart_shim_obj.tb_encrypt2self_attributes <- tb_encrypt2self_attributes;
      //   uart_shim_obj.tb_self2encrypt_attributes <- tb_self2encrypt0_attributes;
 
+        uart_shim_obj.tb_in_uart_packet_attributes <- tb_in_uart_packet_attributes;
+        uart_shim_obj.tb_out_uart_packet_attributes <- tb_out_uart_packet0_attributes;
+        uart_shim_obj.tb_out_send_success0_attributes <- tb_out_send_success0_attributes;
+
         uart_shim_obj.priority = 250;
         uart_shim_obj.gen_fwd_priority = 101;
 

@@ -12,8 +12,8 @@
 #include <platsupport/serial.h>
 #include <camkes.h>
 
-//#define BAUD_RATE 115200
-#define BAUD_RATE 57600
+#define BAUD_RATE 115200
+//#define BAUD_RATE 57600
 
 static ps_chardevice_t serial_device;
 

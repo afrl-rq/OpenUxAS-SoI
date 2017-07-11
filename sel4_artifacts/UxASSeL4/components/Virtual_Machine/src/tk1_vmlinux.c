@@ -50,7 +50,7 @@ extern seL4_CPtr _fault_endpoint;
 //BEGIN SOI SPECIFIC STUFF
 
 void handle_mission_read(uint32_t * var){
-    printf("VM saw mission read from WM\n");
+    //printf("VM saw mission read from WM\n");
     uint32_t numBytes;
     tb_mission_read_dequeue(&numBytes);
     tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
@@ -106,23 +106,22 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
 //    return advance_fault(fault);
     int addr;
     uint8_t data;
-    static int bufIndex;
+    static uint32_t bufIndex;
     //MissionSoftware__mission_command_impl buf;
 
     addr = fault_get_address(fault);
     //printf("VM RECEIVED FAULT at addr:%x\n", addr);
 
     if(addr == 0xe0000001){
-        printf("VM RECEIVED FAULT at addr:%x\n", addr);
+        //this indicates the begining of a write
         bufIndex = 0;
     }else if(addr == 0xe0000002){
-        printf("VM RECEIVED FAULT at addr:%x\n", addr);
-        printf("BUFFER IS OF SIZE:%d\n", bufIndex);
-        bool alwaysTrue = true;
-        mission_write(&alwaysTrue);
+        //this indicates the end of a write
+        mission_write(&bufIndex);
     }else if(addr == 0xe0000000){
+        //this indicates data being written
         if(fault_is_write(fault)){
-            data = (uint8_t *)fault_get_data(fault);
+            data = (uint8_t)fault_get_data(fault);
             (*mission)[bufIndex++] = data;
         }
     }else{
@@ -451,7 +450,6 @@ configure_gpio(vm_t *vm)
 }
 
 #ifdef CONFIG_TK1_DEVICE_FWD
-
 struct generic_forward_cfg camkes_uart_d = {
   .read_fn = uartfwd_read,
   .write_fn = uartfwd_write
