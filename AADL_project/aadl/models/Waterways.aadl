@@ -42,6 +42,13 @@ public
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
         annex agree {**
         	guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+        	
+        	assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+        	
+        	eq event_RoutePlanRequest_in : bool;
+        	eq event_RoutePlanResponse_out : bool;
+        	guarantee "RoutePlannerVisibilityService responsiveness" : 
+        		whenever event_RoutePlanRequest_in occurs event_RoutePlanResponse_out occurs during [0.0,5.0];
         **};
     end waterways;
 
@@ -270,6 +277,10 @@ public
             prove isolation(this) 
         **};
         annex agree {**
+        		
+        	assign event_RoutePlanRequest_in = event(RoutePlannerVisibilityService.RoutePlanRequest_in);
+        	assign event_RoutePlanResponse_out = event(RoutePlannerVisibilityService.RoutePlanResponse_out);
+        		
         	-- We use AGREE connections to assert true for the cases where an 
         	--  input port is fed by multiple sources.
         	-- Note: AGREE will assume arbitrary values for the input ports on 
