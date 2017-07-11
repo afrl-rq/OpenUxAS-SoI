@@ -97,65 +97,9 @@ Libraries for XML and GPS message parsing have numerous forks without centralize
 
 ## Supported Operating Systems
 
-For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. Native Windows support is currently experimental—we recommend using an Ubuntu virtual machine for a smoother experience. 
+For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools installed, UxAS should build from source without issue. Support for Windows is available on Windows 7 and 10 using Visual Studio.
 
-Support for Windows is available on Windows 10, with some caveats.
-
-### For Windows 10 users only: Install "Bash on Ubuntu on Windows", Windows Subsystem for Linux (Optional)
-
-If you are a Windows 10 user and don't want to use VirtualBox (or otherwise don't have very many cores to play with), you also have the alternate option of installing a local Ubuntu 16.04 bash instance and trying to compile UxAS within that environment.
-
-To set this up:
-1. Update to the Windows 10 Creators Update
-1. [Install Bash on Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) for a Ubuntu 16.04 shell
-1. [Install XMing](https://sourceforge.net/projects/xming/) for an XWindows interface that allows GUI windows to be seen. At the bash command prompt, you'll also want to run each of these commands once:
-   - `echo "export DISPLAY=:0" >> ~/.bashrc`
-   - `sudo apt update & sudo apt install gedit`
-
-This has been tested-working for the UxAS project, but may not work for other packages or programs (such as ROS). :)
-
-### Windows: Install Ubuntu in Virtual Machine
-
-1. Download and install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-1. Download long term [stable Ubuntu release](https://www.ubuntu.com/download/desktop)
-1. Add virtual machine: in VirtualBox, select `New`
-   - In the `Name` field, type a name (e.g. UbuntuVM)
-   - With the `Type` drop-down, select `Linux`
-   - Confirm `Version` is `Ubuntu (64-bit)` and click `Next`
-   - Use slider to select memory size (at least 2GB is required, recommended 4+ GB), then click `Next`
-   - Select `Create a virtual hard disk now` and click `Create`
-   - Select `VDI (VirtualBox Disk Image)` and click `Next`
-   - Select `Dynamically allocated` and click `Next`
-   - Keep the name the same as the virtual machine name
-   - Select size (note: this is the max size) of virtual disk using slider
-    (required 12GB, recommended 50+ GB) and click `Create`
-1. With the virtual machine selected in VirtualBox, click `Start` arrow
-   - In the `Select start-up disk` window, click the file folder icon
-   - Navigate to the downloaded Ubuntu `.iso` file and click `Open`
-   - Click `Install Ubuntu`
-   - Select `Download updates while installing Ubuntu` and click `Continue`
-   - Confirm that `Erase disk and install Ubuntu` is selected and click `Install Now`
-   - Confirm the `Write changes to disk` warning (note this is to the virtual disk) and click `Continue`
-   - Select appropriate time zone and click `Continue`
-   - Choose appropriate keyboard layout (defaults to English (US)) and click `Continue`
-   - Complete the user name form, select `Log in automatically` and click `Continue`
-   - After installation, click `Restart Now`
-   - On `Please remove the installation medium, then press ENTER` sceen, press `ENTER`
-   - Upon reboot, open the search menu (top left icon) and type `updates`
-   - Select `Software Updater` and allow all updates
-   - Shutdown virtual machine (select gear/power icon on top right)
-1. In VirtualBox, select virtual machine then click `Settings` gear icon
-   - In the `Display` menu (3rd down, left side), select `Enable 3d Acceleration` and click `OK`
-   - In the `General` menu (1st on left), go to `Advanced` tab and choose
-    `Bidirectional` in `Shared Clipboard` drop-down menu then click `OK`
-1. Re-open virtual machine by clicking the `Start` arrow again
-   - In the VirtualBox menu (of the window containing the virtual machine), select Devices->Insert Guest Additions CD Image
-   - Click `Run` in the warning box
-   - Type password and click `Authenticate`
-   - Reboot VM
-1. Follow Ubuntu instructions for remainder of configuration
-
-### Installing Prerequisite Tools on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
+### Installing Prerequisite Tools on Ubuntu Linux -or- Mac OS X (Partially-Automated)
 
 The following is a bash script that helps to partially-automate the "installing prerequisite tools" processes that are documented in this README.md file below.
 
@@ -251,27 +195,38 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
 
 ### Prep and Build on Native Windows
 
-The native Windows build is currently experimental. See below for caveats, and contact @acfoltzer if you encounter problems.
-
-1. Install [Visual Studio 2017](https://www.visualstudio.com/downloads/) with the C++ workflow and support for Git and GitHub.
-1. Install the latest version of [Python 3.x](https://www.python.org/downloads/). In the installer, make sure to check the option to configure environment variables.
-1. Open a command prompt with administrator privileges, and install Meson: `pip install meson`.
-1. Download and install the [Boost libraries](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download).
-1. Use the Visual Studio Team Explorer to check out OpenUxAS; this is easiest by entering your GitHub credentials.
-1. Open the OpenUxAS folder in the Solution Explorer, right click it, and open a developer command prompt.
-1. In the command prompt, type:
-   ```
-   python prepare
-   meson.py build --backend=vs
-   ```
-1. Back in the Solution Explorer, you should now see a `build` directory containing a UxAS solution. Open that solution.
-1. In the Solution Explorer, right-click the `uxas` project, and click Build.
-1. To test your build, try running the `.bat` scripts in the `examples` directories (you will need to build OpenAMASE using NetBeans and a JDK for some of the examples).
+1. Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/downloads/)
+   - Ensure C++ selected in `Workloads` tab
+   - Ensure `Git for Windows` is selected in `Individual components` tab
+1. Install [Git](https://git-scm.com/download/win) with Bash shell
+1. Install [Python 3](https://www.python.org/ftp/python/3.6.1/python-3.6.1.exe)
+   - Make sure to check `Add Python 3.6 to PATH`
+   - Choose standard install (`Install Now`, requires admin)
+   - Verify installation by: `python --version` in `cmd` prompt
+   - Verify *pip* is also installed: `pip --version` in `cmd` prompt
+   - If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
+1. Install *meson*
+   - In `cmd` prompt **with admin priviledges**: `pip install meson`
+1. Install [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download)
+   - Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
+1. Pull UxAS repositories (from Git Bash shell)
+   - `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
+   - `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
+1. Auto-create the UxAS messaging library
+   - Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.1.0/LmcpGen.jar)
+   - Place `LmcpGen.jar` in `LmcpGen/dist` folder
+   - In the root UxAS directory, run `RunLmcpGen.bat`
+1. Prepare build
+   - Open VS command prompt (Tools -> Visual Studio Command Prompt)
+   - `python prepare`
+   - `meson.py build --backend=vs`
+1. Build project with Visual Studio
+   - Open project file `OpenUxAS.sln` in the `OpenUxAS/build` directory
+   - In the Solution Explorer, right-click the `uxas` project, and click `Build`
 
 #### Caveats
 
 - The Visual Studio backend for Meson mostly works, but will fail when regenerating build files. If you modify one of the `meson.build` files, delete the `build` directory and run `meson.py build --backend=vs` again.
-- The Ninja backend for Meson currently does not pull in the correct static Boost libraries. We have submitted a patch upstream to fix this, but it has not yet landed in a Meson release.
 - The UxAS test suite uses some hardcoded POSIX-style paths, and so does not currently work on Windows.
 
 # Configure and Build UxAS and Related Projects
