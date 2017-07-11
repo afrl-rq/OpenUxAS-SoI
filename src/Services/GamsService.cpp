@@ -269,7 +269,7 @@ namespace service
     virtual double get_accuracy (void) const
     {
         // we're assuming 1M accuracy in positioning
-        return 70.0;
+        return 175.0;
     }
 
     /**
