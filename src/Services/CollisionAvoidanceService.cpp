@@ -137,7 +137,7 @@ namespace
         int icellx = (int)(floor(cellx));
         double celly = (lat - (LAT_MIN - CELL_LAT / 2)) / CELL_LAT;
         int icelly = (int)(floor(celly));
-        return Cell(cellx, celly);
+        return Cell(icellx, icelly);
     }
 
     //-- return the GPS location of the center of a cell.
