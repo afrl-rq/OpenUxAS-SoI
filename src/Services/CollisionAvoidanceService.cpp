@@ -883,6 +883,7 @@ namespace dmpl
                                     return Integer(0);
                                 }
                                 unsetLockThread(thread0_x, thread0_y);
+                                unsetLockThread(cellsLoitered(currWP->getLongitude(),currWP->getLatitude()));
                                 unsetLockThread(cellsToLock);
                                 thread0_x = thread0_xp;
                                 thread0_y = thread0_yp;
