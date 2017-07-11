@@ -8,8 +8,10 @@
 #ifndef SRC_SERVICES_AUTONOMYMONITORS_KEEPOUTZONEMONITOR_H_
 #define SRC_SERVICES_AUTONOMYMONITORS_KEEPOUTZONEMONITOR_H_
 
-#include "Polygon.h"
-#include "MonitorBase.h"
+#include "afrl/cmasi/Polygon.h"
+#include "AutonomyMonitors/MonitorBase.h"
+#include "AutonomyMonitors/VehicleStateMessage.h"
+#include "afrl/cmasi/KeepOutZone.h"
 
 namespace uxas {
 namespace service {
@@ -19,19 +21,14 @@ namespace monitoring {
  */
 class KeepOutZoneMonitor: public MonitorBase {
 public:
-	KeepOutZoneMonitor(int64_t zoneID);
+	KeepOutZoneMonitor(std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone);
 	virtual ~KeepOutZoneMonitor();
-
-	void keepOutZonePolyhedron(std::vector<int64_t> vehicleIDs, afrl::cmasi::Polygon * p);
-	void keepOutZoneRectangle(std::vector<int64_t> vehicleIDs, afrl::cmasi::Rectangle * r);
-	void keepOutZoneCircle(std::vector<int64_t> vehicleIDs, afrl::cmasi::Circle * c);
-
-	virtual void addVehicleStateMessage(VehichleStateMessage const & vMessage) =0;
-	virtual bool isPropertySatisfied() =0;
-	virtual double propertyRobustness() = 0;
+	void addVehicleStateMessage(VehicleStateMessage const & vMessage);
+	bool isPropertySatisfied();
+	double propertyRobustness();
 
 protected:
-
+	std::shared_ptr<afrl::cmasi::KeepOutZone> _zone;
 
 };
 

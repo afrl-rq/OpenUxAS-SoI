@@ -9,6 +9,7 @@
 #define SRC_SERVICES_AUTONOMYMONITORS_MONITORBASE_H_
 
 #include "VehicleStateMessage.h"
+
 namespace uxas {
 namespace service {
 namespace monitoring {
@@ -25,10 +26,10 @@ namespace monitoring {
  */
 class MonitorBase {
 public:
-	MonitorBase(){};
-	virtual ~MonitorBase(){};
+	MonitorBase();
+	virtual ~MonitorBase();
 
-	virtual void addVehicleStateMessage(VehichleStateMessage const & vMessage) =0;
+	virtual void addVehicleStateMessage(VehicleStateMessage const & vMessage) =0;
 	virtual bool isPropertySatisfied() =0;
 	virtual double propertyRobustness() = 0;
 

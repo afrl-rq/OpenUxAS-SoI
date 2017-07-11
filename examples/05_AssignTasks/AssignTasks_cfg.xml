@@ -14,7 +14,8 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
-    
+    <Service Type="VehicleStateListenerService"/>
+    <Service Type="AutonomyMonitorServiceMain"/>
     <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
     param.turnType="FlyOver" GimbalPayloadId="101"/>
     <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
