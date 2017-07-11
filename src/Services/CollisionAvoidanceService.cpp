@@ -641,6 +641,64 @@ namespace dmpl
                 return res;
             }
 
+            bool adjacentCells(const Cell &cell1, const Cell &cell2)
+            {
+                if((cell1.first == cell2.first) &&
+                   ((cell1.second == cell2.second + 1) || (cell1.second == cell2.second - 1))) return true;
+
+                if((cell1.second == cell2.second) &&
+                   ((cell1.first == cell2.first + 1) || (cell1.first == cell2.first - 1))) return true;
+
+                return false;
+            }
+
+            bool diagonalCells(const Cell &cell1, const Cell &cell2)
+            {
+                return (((cell1.first == cell2.first + 1) || (cell1.first == cell2.first - 1)) &&
+                        ((cell1.second == cell2.second + 1) || (cell1.second == cell2.second - 1)));
+            }
+            
+            std::set<Cell> cellsTraversedRec(double x1, double y1, double x2, double y2)
+            {
+                //-- compute the cells that the two points are in
+                auto cell1 = GpsToCell(y1, x1);
+                auto cell2 = GpsToCell(y2, x2);
+
+                if(cell1 == cell2)
+                {
+                    std::set<Cell> res;
+                    res.insert(cell1);
+                    return res;
+                }
+
+                if(adjacentCells(cell1, cell2))
+                {
+                    std::set<Cell> res;
+                    res.insert(cell1);
+                    res.insert(cell2);
+                    return res;
+                }
+
+                if(diagonalCells(cell1, cell2))
+                {
+                    std::set<Cell> res;
+                    res.insert(cell1);
+                    res.insert(cell2);
+                    res.insert(Cell(cell1.first, cell2.second));
+                    res.insert(Cell(cell2.first, cell1.second));
+                    return res;
+                }
+
+                double xmid = (x1 + x2) / 2;
+                double ymid = (y1 + y2) / 2;
+
+                std::set<Cell> res1 = cellsTraversedRec(x1, y1, xmid, ymid);
+                std::set<Cell> res2 = cellsTraversedRec(xmid, ymid, x2, y2);
+
+                res1.insert(res2.begin(), res2.end());
+                return res1;
+            }
+            
             /***********************************/
             //-- given two points P1 and P2, compute the sequence of
             //-- cells that must be traversed if traveling in a
@@ -650,33 +708,16 @@ namespace dmpl
             /***********************************/
             std::set<Cell> cellsTraversed(double x1, double y1, double x2, double y2)
             {
-                //-- compute the cells that the two points are in
-                auto cell1 = GpsToCell(y1, x1);
-                auto cell2 = GpsToCell(y2, x2);
-
-                int minx = (cell1.first < cell2.first) ? cell1.first : cell2.first;
-                int maxx = (cell1.first > cell2.first) ? cell1.first : cell2.first;
-                int miny = (cell1.second < cell2.second) ? cell1.second : cell2.second;
-                int maxy = (cell1.second > cell2.second) ? cell1.second : cell2.second;
-
-                std::set<Cell> res;
-
-                //-- compute the cells in the rectangle whose diagonal
-                //-- is (minx, miny) and (maxx, maxy).
-                for(int i = minx;i <= maxx;++i)
-                {
-                    for(int j = miny;j <= maxy;++j)
-                    {
-                        res.insert(Cell(i,j));
-                    }
-                }
+                std::set<Cell> res = cellsTraversedRec(x1, y1, x2, y2);
 
                 //-- add the set of cells that may be traversed when
                 //-- loitering at (x2, y2).
+                /*
                 for(const auto &c : cellsLoitered(x2, y2))
                 {
                     res.insert(c);
                 }
+                */
 
                 return res;
             }
