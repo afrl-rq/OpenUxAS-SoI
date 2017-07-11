@@ -138,6 +138,7 @@ public
             conn1: port CmasiLineSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
             conn2: port ImpactLineSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
             conn3: port PatternSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
+            
             conn4: port TaskServiceBase.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             
             -- These are different planners
@@ -253,5 +254,30 @@ public
             conn116: port AssignmentCoordinatorTask.AutomationResponse_out -> TaskTrackerService.AutomationResponse_in;
             conn117: port PlanBuilderService.TaskImplementationRequest_out -> TaskServiceBase.TaskImplementationRequest_in;
             conn118: port RouteAggregatorService.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundBase.AssignmentCostMatrix_in;
+            
+--        annex agree {**
+--            -- We use AGREE connections to assert true for the cases where an 
+--            --  input port is fed by multiple sources.
+--            -- Note: AGREE will assume arbitrary values for the input ports on 
+--            --  these connections. Refinements may be needed to prove system-level 
+--            --  guarantees involving these ports.
+--            
+--            -- We don't have any of these currently because we only need them when
+--            -- both the source and destination components for multiple fan-in have 
+--            -- AGREE contracts.
+--            
+--            -- Implementing blocks of AGREE connections that will remain commented out
+--            -- until both sides get contracts
+--            
+--            -- Many to One connection block
+--            -- Target Port: Challenge_TelemetryReceiver.VideoRecord_in
+--            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+----            connection conn0: true;
+----            connection conn1: true;
+----            connection conn2: true;
+----            connection conn3: true;
+--            
+--            
+--        **};
     end uxas.i;
 end UxAS;
