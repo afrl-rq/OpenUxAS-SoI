@@ -6,10 +6,11 @@
 */
 
 #include "ServiceBase.h"
-#include "AutonomyMonitorServiceMain.h"
+#include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/cmasi/UniqueAutomationRequest.h"
+#include "uxas/messages/task/UniqueAutomationRequest.h"
+#include "uxas/messages/task/UniqueAutomationResponse.h"
 #include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -61,9 +62,9 @@ namespace uxas {
         // AirVehicleState
         addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
         // AutomationRequest
-        addSubscriptionAddress(afrl::messages::task::UniqueAutomationRequest::Subscription);
+        addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
         // AutomationResponse
-        addSubscriptionAddress(afrl::messages::task::UniqueAutomationResponse::Subscription);
+        addSubscriptionAddress(uxas::messages::task::UniqueAutomationResponse::Subscription);
         // Boundaries
         addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
         addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
@@ -82,6 +83,15 @@ namespace uxas {
         return true;
       }
 
+      bool AutonomyMonitorServiceMain::start(){
+        std::cout << "[Autonomy Monitoring Service Started]" << std::endl;
+        return true;
+      }
+
+      bool AutonomyMonitorServiceMain::terminate(){
+        std::cout << "[Autonomy Monitoring Service Terminated]" << std::endl;
+        return true;
+      }
 
       bool
       AutonomyMonitorServiceMain::initialize()
@@ -111,13 +121,13 @@ namespace uxas {
 
 
 
-        auto uniqueAutReq = std::dynamic_pointer_cast<afrl::messages::task::UniqueAutomationRequest>(receivedLmcpMessage -> m_object);
+        auto uniqueAutReq = std::dynamic_pointer_cast<uxas::messages::task::UniqueAutomationRequest>(receivedLmcpMessage -> m_object);
         if (uniqueAutReq){
           monitorDB -> processUniqueAutomationRequest(uniqueAutReq);
           return (false);
         }
 
-        auto uniqueAutResp = std::dynamic_pointer_cast<afrl::messages::task::UniqueAutomationResponse>(receivedLmcpMessage -> m_object);
+        auto uniqueAutResp = std::dynamic_pointer_cast<uxas::messages::task::UniqueAutomationResponse>(receivedLmcpMessage -> m_object);
         if (uniqueAutResp){
           monitorDB -> processUniqueAutomationResponse(uniqueAutResp);
           return (false);
@@ -141,7 +151,7 @@ namespace uxas {
           return false;
         }
 
-        auto areaOfInterest = PTR_CAST_TYP(afrl::impact::Areaofinterest, receivedLmcpMessage);
+        auto areaOfInterest = PTR_CAST_TYP(afrl::impact::AreaOfInterest, receivedLmcpMessage);
         if (areaOfInterest){
           monitorDB -> processAreaOfInterest(areaOfInterest);
           return false;

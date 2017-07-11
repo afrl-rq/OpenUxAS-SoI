@@ -21,6 +21,9 @@ srcs_services = [
   'Test_SimulationTime.cpp',
   'RoutePlannerVisibilityService.cpp',
   './AutonomyMonitors/VehicleStateListenerService.cpp',
+  './AutonomyMonitors/MonitorDB.cpp',
+  './AutonomyMonitors/MonitorUtils.cpp',
+  './AutonomyMonitors/AutonomyMonitorServiceMain.cpp',
   'WaypointPlanManagerService.cpp',
 ]
 

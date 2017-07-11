@@ -9,7 +9,9 @@
 
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/cmasi/UniqueAutomationRequest.h"
+#include "afrl/cmasi/OperatingRegion.h"
+#include "uxas/messages/task/UniqueAutomationRequest.h"
+#include "uxas/messages/task/UniqueAutomationResponse.h"
 #include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -32,8 +34,6 @@ namespace uxas {
       *  and the overall plan.
       **/
       class MonitorDB {
-      protected:
-        shared_ptr<afrl::cmasi::EntityState>
       public:
         /* Default Constructor */
         MonitorDB();
@@ -43,8 +43,8 @@ namespace uxas {
         /*-- Functions to record and parse automation related messages --*/
         bool processEntityState(std::shared_ptr<afrl::cmasi::EntityState> ptr);
         bool processEntityConfiguration(std::shared_ptr<afrl::cmasi::EntityConfiguration> ptr);
-        bool processUniqueAutomationRequest(std::shared_ptr<afrl::messages::task::UniqueAutomationRequest> ptr);
-        bool processUniqueAutomationResponse(std::shared_ptr<afrl::messages::task::UniqueAutomationResponse> ptr);
+        bool processUniqueAutomationRequest(std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> ptr);
+        bool processUniqueAutomationResponse(std::shared_ptr<uxas::messages::task::UniqueAutomationResponse> ptr);
         bool processOperatingRegion(std::shared_ptr<afrl::cmasi::OperatingRegion> ptr);
         bool processKeepInZone(std::shared_ptr<afrl::cmasi::KeepInZone> ptr);
         bool processKeepOutZone(std::shared_ptr<afrl::cmasi::KeepOutZone> ptr);
@@ -56,6 +56,14 @@ namespace uxas {
         /*-- Setup the required monitors --*/
 
         /*-- Monitor/Judge task completion status --*/
+
+      protected:
+        void registerVehicleState(int64_t id,
+            double lat,
+            double lon,
+            double alt,
+            std::vector<afrl::cmasi::Location3D*> cameraFootprint,
+            int64_t timestamp);
 
       };
     };

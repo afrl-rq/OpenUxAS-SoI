@@ -10,9 +10,10 @@
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
     <Service Type="VehicleStateListenerService"/>
+    <Service Type="AutonomyMonitorServiceMain"/>
     <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/>
     <Service Type="RouteAggregatorService" />
-    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />
     <Service Type="AutomationDiagramDataService"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
@@ -31,7 +32,7 @@
         <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="300"/>
         <Message MessageFileName="tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml" SendTime_ms="5000"/>
 	<Message MessageFileName="wind/weather_001.xml" SendTime_ms="6000" />
-	<Message MessageFileName="wind/weather_002.xml" SendTime_ms="30000" />	
+	<Message MessageFileName="wind/weather_002.xml" SendTime_ms="30000" />
 	<Message MessageFileName="wind/weather_003.xml" SendTime_ms="60000" />
 	<Message MessageFileName="wind/weather_004.xml" SendTime_ms="90000" />
 	<Message MessageFileName="wind/weather_005.xml" SendTime_ms="120000" />
@@ -42,8 +43,6 @@
     <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
-        
+
     </Service>
 </UxAS>
-
-
