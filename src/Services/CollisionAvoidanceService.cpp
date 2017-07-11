@@ -630,6 +630,8 @@ namespace dmpl
                 auto maxCell = GpsToCell(maxLat, maxLng);
 
                 std::set<Cell> res;
+
+                /*
                 for(int i = minCell.first;i <= maxCell.first;++i)
                 {
                     for(int j = minCell.second;j <= maxCell.second;++j)
@@ -637,7 +639,8 @@ namespace dmpl
                         res.insert(Cell(i,j));
                     }
                 }
-
+                */
+                
                 return res;
             }
 
@@ -712,12 +715,10 @@ namespace dmpl
 
                 //-- add the set of cells that may be traversed when
                 //-- loitering at (x2, y2).
-                /*
                 for(const auto &c : cellsLoitered(x2, y2))
                 {
                     res.insert(c);
                 }
-                */
 
                 return res;
             }
@@ -917,6 +918,7 @@ namespace dmpl
                                 thread0_x = thread0_xp;
                                 thread0_y = thread0_yp;
                                 setLockThread(thread0_x, thread0_y);
+                                setLockThread(cellsLoitered(currWP->getLongitude(),currWP->getLatitude()));
                                 thread0_state = NEXT;
                                 std::cerr << "current waypoint cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
                             }
