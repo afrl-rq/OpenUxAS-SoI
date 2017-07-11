@@ -958,7 +958,7 @@ namespace dmpl
             {
                 std::cerr << "current cell = (" << thread0_x << ',' << thread0_y << ") ...\n";
 
-                /*
+#if 1
                 //-- Begin function body
                 thread0_xp = thread0_xf;
                 thread0_yp = thread0_yf;
@@ -967,8 +967,7 @@ namespace dmpl
                 cellsToLock.clear();
                 cellsToLock = cellsTraversed(currWP->getLongitude(),currWP->getLatitude(),
                                              nextWP->getLongitude(),nextWP->getLatitude());
-                */
-
+#else
                 thread0_xp = thread0_x;
                 thread0_yp = thread0_y;
                 if ((thread0_x < thread0_xf))
@@ -996,6 +995,7 @@ namespace dmpl
                 
                 cellsToLock.clear();
                 cellsToLock.insert(Cell(thread0_xp, thread0_yp));
+#endif
                 
                 std::cerr << "next cell = (" << thread0_xp << ',' << thread0_yp << ") ...\n";
 
