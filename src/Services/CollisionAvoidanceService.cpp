@@ -116,6 +116,20 @@ void print_state(int _X,int _Y,int id, int x, int y, int xf, int yf)
 //-- end header files
 /********************************************************************/
 
+/********************************************************************/
+//-- Defining program-specific constants
+/********************************************************************/
+#define MSG_MARKER "message: "
+#define NEXT 1
+#define REQUEST 2
+#define WAITING 3
+#define MOVE 4
+#define X 10
+#define Y 10
+#define Z 10
+#define STRING_XML_COLLISION_AVOIDANCE "CollisionAvoidance"
+#define MAX_LOCK 10
+
 namespace
 {
     //-- minimum and maximum latitide and longitude of the visible
@@ -124,8 +138,8 @@ namespace
     const double LAT_MAX = 45.35;
     const double LNG_MIN = -121.02;
     const double LNG_MAX = -120.91;
-    const double CELL_LAT = (LAT_MAX - LAT_MIN) / 9;
-    const double CELL_LNG = (LNG_MAX - LNG_MIN) / 9;
+    const double CELL_LAT = (LAT_MAX - LAT_MIN) / (Y-1);
+    const double CELL_LNG = (LNG_MAX - LNG_MIN) / (X-1);
 
     //-- a cell id -- pair of X and Y coordinates
     typedef std::pair<int,int> Cell;
@@ -264,20 +278,6 @@ namespace dmpl
     //-- number of participating processes
     /********************************************************************/
     unsigned int processes (2);
-
-    /********************************************************************/
-    //-- Defining program-specific constants
-    /********************************************************************/
-#define MSG_MARKER "message: "
-#define NEXT 1
-#define REQUEST 2
-#define WAITING 3
-#define MOVE 4
-#define X 10
-#define Y 10
-#define Z 10
-#define STRING_XML_COLLISION_AVOIDANCE "CollisionAvoidance"
-#define MAX_LOCK 10
 
     /********************************************************************/
     //-- Begin defining variables for node uav
