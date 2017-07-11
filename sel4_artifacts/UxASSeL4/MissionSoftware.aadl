@@ -36,7 +36,12 @@ public
   	properties
     	Data_Model::Data_Representation => Array;
     	Data_Model::Base_Type => (classifier (Base_Types::Unsigned_8));
-    	Data_Model::Dimension => (5963744);
+    	-- The maximum size of a groomed mission command due to serialization 
+    	-- in UxAS using two byte integers to represent the size of the waypoint 
+    	-- list. 
+    	-- Data_Model::Dimension => (5963744);
+    	-- The maximum size if we restrict the size of waypoint lists to 255.
+    	Data_Model::Dimension => (23264);
 	end mission_command.impl;
 
 	process implementation Mission_Software.i
@@ -98,7 +103,10 @@ public
 	thread UART_Driver
 		features
 			out_uart_packet: out event data port SMACCM_DATA::UART_Packet.i;
-			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i;
+			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i {
+				-- Maximum possible size of mission command divided by 255.
+				Queue_Size => 23388;
+			};
 			out_send_success: out event data port Base_Types::Boolean;
 			
 			uartfwd: provides subprogram group access gen_fwd_inf;
@@ -126,20 +134,20 @@ public
 
 	thread Virtual_Machine
 		features
-			mission_write: out event data port Base_Types::Unsigned_32 {
+			mission_write: out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "mission_write";
 			};
-			mission_read : in event data port Base_Types::Unsigned_32 {
+			mission_read : in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read");
 			};
-			waypoint_write: in event data port Base_Types::Unsigned_32 {
+			waypoint_write: in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");
 			};
-			waypoint_read : out event data port Base_Types::Unsigned_32 {
+			waypoint_read : out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "waypoint_read";
 			};
 			mission: requires data access mission_command.impl {
-						Access_Right => READ_WRITE;
+				Access_Right => READ_WRITE;
 			};
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
@@ -157,20 +165,18 @@ public
 	
 	thread Waypoint_Manager
 		features
-
-			mission_read : out event data port Base_Types::Unsigned_32 {
+			mission_read : out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "mission_read";
 			};
-			mission_write : in event data port Base_Types::Unsigned_32 {
+			mission_write : in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_write");
 			};
-			waypoint_read : out event data port Base_Types::Unsigned_32 {
+			waypoint_read : out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "waypoint_read";
 			};
-			waypoint_write : in event data port Base_Types::Unsigned_32 {
+			waypoint_write : in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");				
 			};
-			
 			mission: requires data access mission_command.impl {
 				Access_Right => READ_WRITE;
 			};
@@ -185,6 +191,7 @@ public
 				TB_SYS::CommPrim_Source_Text => "out_uart_packet";
 			};
 		properties
+			Source_Text => ("mcutils/mcutils.c", "mcutils/mcutils.h");
 			Dispatch_Protocol => Periodic;
 			TB_SYS::Thread_Type => Active;
 			Priority => 150;
@@ -198,14 +205,13 @@ public
 	
 	thread Asset_Waypoint_Manager
 		features
-			
-			waypoint_write: out event data port Base_Types::Unsigned_32 {
+			waypoint_write: out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "waypoint_write";
 			};
-			waypoint_read_vm: in event data port Base_Types::Unsigned_32 {
+			waypoint_read_vm: in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_vm");
 			};
-			waypoint_read_wm: in event data port Base_Types::Unsigned_32 {
+			waypoint_read_wm: in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_wm");
 			};
 			waypoint: requires data access mission_command.impl {
@@ -213,8 +219,11 @@ public
 					};
 			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i{
 				TB_SYS::Compute_Entrypoint_Source_Text => ("in_uart_packet");
+				-- Maximum possible size of mission command divided by 255.
+				Queue_Size => 23388;
 			};
 		properties
+			Source_Text => ("mcutils/mcutils.c", "mcutils/mcutils.h");
 	        Dispatch_Protocol => Periodic;
 		    Period => 100 ms;
 	   		Priority => 151;

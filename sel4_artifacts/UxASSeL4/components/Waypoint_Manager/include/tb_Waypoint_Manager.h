@@ -48,22 +48,22 @@ void component_entry(const int64_t * periodic_dispatcher);
 
 
  void component_init(const int64_t *arg);
- bool tb_mission_read_enqueue(const uint32_t * tb_mission_read);
-bool mission_read(const uint32_t * tb_mission_read);
+ bool tb_mission_read_enqueue(const bool * tb_mission_read);
+bool mission_read(const bool * tb_mission_read);
  // reader prototype for tb_mission_write
-bool tb_mission_write_dequeue(uint32_t * tb_mission_write);
+bool tb_mission_write_dequeue(bool * tb_mission_write);
 // user dispatch entrypoints for port tb_mission_write
 
-void mission_write(const uint32_t * tb_mission_write);
+void mission_write(const bool * tb_mission_write);
 
 
- bool tb_waypoint_read_enqueue(const uint32_t * tb_waypoint_read);
-bool waypoint_read(const uint32_t * tb_waypoint_read);
+ bool tb_waypoint_read_enqueue(const bool * tb_waypoint_read);
+bool waypoint_read(const bool * tb_waypoint_read);
  // reader prototype for tb_waypoint_write
-bool tb_waypoint_write_dequeue(uint32_t * tb_waypoint_write);
+bool tb_waypoint_write_dequeue(bool * tb_waypoint_write);
 // user dispatch entrypoints for port tb_waypoint_write
 
-void waypoint_write(const uint32_t * tb_waypoint_write);
+void waypoint_write(const bool * tb_waypoint_write);
 
 
  // reader prototype for tb_in_send_success

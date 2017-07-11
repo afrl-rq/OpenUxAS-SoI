@@ -9,12 +9,12 @@ void component_init(const int64_t *arg){
 
 }
 
-void mission_read_vm(const uint32_t * tb_waypoint_read_vm) {
+void mission_read_vm(const bool * _UNUSED) {
 	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
 }
 
 
-void mission_read_wm(const uint32_t * tb_waypoint_read_wm) {
+void mission_read_wm(const const bool * _UNUSED) {
 	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
 }
 

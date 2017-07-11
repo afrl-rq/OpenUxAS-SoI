@@ -91,7 +91,7 @@ lemma mon_get_sender_id_wp[wp]:
   sorry
 
 definition is_queue :: "lifted_globals \<Rightarrow> bool" where
-  "is_queue s \<equiv> front_'' s < 1 \<and> length_'' s \<le> 1"
+  "is_queue s \<equiv> front_'' s < 23388 \<and> length_'' s \<le> 23388"
 
 definition the_queue :: "lifted_globals \<Rightarrow> SMACCM_DATA__UART_Packet_i_C queue" where
   "the_queue s \<equiv> (list_array (contents_'' s), unat (front_'' s), unat (length_'' s))"
@@ -100,7 +100,7 @@ fun queue_length :: "'a queue \<Rightarrow> nat" where
   "queue_length (xs, f, n) = n"
 
 lemma is_full_wp [wp]:
-"\<lbrace> \<lambda>s. if queue_length (the_queue s) = 1 then Q 1 s else Q 0 s \<rbrace>
+"\<lbrace> \<lambda>s. if queue_length (the_queue s) = 23388 then Q 1 s else Q 0 s \<rbrace>
   is_full'
  \<lbrace> \<lambda>r s. Q r s \<rbrace>!"
   apply (unfold is_full'_def)
@@ -118,7 +118,7 @@ lemma is_empty_wp [wp]:
   done
 
 lemma enqueue_full:
-  "\<lbrace> \<lambda>s. is_queue s \<and> queue_length (the_queue s) = 1 \<and> P s\<rbrace>
+  "\<lbrace> \<lambda>s. is_queue s \<and> queue_length (the_queue s) = 23388 \<and> P s\<rbrace>
    mon_enqueue' x
    \<lbrace> \<lambda>r s. r = 0 \<and> P s\<rbrace>!"
   apply (rule validNF_assume_pre)
@@ -136,7 +136,7 @@ lemma enqueue_not_full:
    (\<And>s n. P (s\<lparr>length_'' := n\<rparr>) = P s) \<Longrightarrow>
    \<lbrace> \<lambda>s. is_queue s \<and>
          q = the_queue s \<and>
-         queue_length q < 1 \<and>
+         queue_length q < 23388 \<and>
          is_valid_SMACCM_DATA__UART_Packet_i_C s x \<and>
          P s \<rbrace>
    mon_enqueue' x

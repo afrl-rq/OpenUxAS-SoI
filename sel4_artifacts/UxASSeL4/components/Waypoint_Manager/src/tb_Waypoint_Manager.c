@@ -102,10 +102,10 @@ void tb_timer_complete_callback(void *_ UNUSED) {
  ************************************************************************/
  
 bool mission_read
-(const uint32_t * tb_mission_read) {
+(const bool * tb_mission_read) {
     bool tb_result = true ; 
 
-    tb_result &= tb_mission_read0_enqueue((uint32_t *)tb_mission_read);
+    tb_result &= tb_mission_read0_enqueue((bool *)tb_mission_read);
 
     return tb_result;
 }
@@ -129,10 +129,10 @@ static void tb_mission_write_notification_handler(void * unused) {
  ************************************************************************/
  
 bool waypoint_read
-(const uint32_t * tb_waypoint_read) {
+(const bool * tb_waypoint_read) {
     bool tb_result = true ; 
 
-    tb_result &= tb_waypoint_read0_enqueue((uint32_t *)tb_waypoint_read);
+    tb_result &= tb_waypoint_read0_enqueue((bool *)tb_waypoint_read);
 
     return tb_result;
 }
@@ -218,8 +218,8 @@ void tb_entrypoint_Waypoint_Manager_Waypoint_Manager_initializer(const int64_t *
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_mission_write(const uint32_t * in_arg) {
-    mission_write((uint32_t *) in_arg);
+void tb_entrypoint_tb_Waypoint_Manager_mission_write(const bool * in_arg) {
+    mission_write((bool *) in_arg);
 
 }
 
@@ -231,8 +231,8 @@ void tb_entrypoint_tb_Waypoint_Manager_mission_write(const uint32_t * in_arg) {
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_waypoint_write(const uint32_t * in_arg) {
-    waypoint_write((uint32_t *) in_arg);
+void tb_entrypoint_tb_Waypoint_Manager_waypoint_write(const bool * in_arg) {
+    waypoint_write((bool *) in_arg);
 
 }
 
@@ -262,8 +262,8 @@ int run(void) {
 
     // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
-    uint32_t tb_mission_write;
-    uint32_t tb_waypoint_write;
+    bool tb_mission_write;
+    bool tb_waypoint_write;
     bool tb_in_send_success;
 
 
@@ -281,10 +281,10 @@ int run(void) {
             tb_occurred_periodic_dispatcher = false;
             tb_entrypoint_Waypoint_Manager_periodic_dispatcher(&tb_time_periodic_dispatcher);
         }
-        while (tb_mission_write_dequeue((uint32_t*)&tb_mission_write)) {
+        while (tb_mission_write_dequeue((bool*)&tb_mission_write)) {
             tb_entrypoint_tb_Waypoint_Manager_mission_write(&tb_mission_write);
         }
-        while (tb_waypoint_write_dequeue((uint32_t*)&tb_waypoint_write)) {
+        while (tb_waypoint_write_dequeue((bool*)&tb_waypoint_write)) {
             tb_entrypoint_tb_Waypoint_Manager_waypoint_write(&tb_waypoint_write);
         }
         while (tb_in_send_success_dequeue((bool*)&tb_in_send_success)) {

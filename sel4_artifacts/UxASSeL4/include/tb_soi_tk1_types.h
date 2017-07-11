@@ -75,7 +75,7 @@ typedef
          int32_t buf_len  ; 
       } SMACCM_DATA__UART_Packet_i ; 
 
-typedef uint8_t MissionSoftware__mission_command_impl [5963744]; 
+typedef uint8_t MissionSoftware__mission_command_impl [23264]; 
 
 typedef 
       struct tb_SMACCM_DATA__UART_Buffer_container { 

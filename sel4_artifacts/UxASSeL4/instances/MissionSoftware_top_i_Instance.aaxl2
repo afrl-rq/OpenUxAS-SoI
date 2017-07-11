@@ -42,7 +42,7 @@
         <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:ListValue">
-            <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+            <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
           </ownedValue>
         </ownedValue>
         <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>
@@ -83,7 +83,7 @@
         <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:ListValue">
-            <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+            <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
           </ownedValue>
         </ownedValue>
         <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>
@@ -239,6 +239,13 @@
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.0"/>
       </featureInstance>
       <featureInstance name="in_uart_packet" category="eventDataPort">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Communication_Properties.aadl#Communication_Properties.Queue_Size"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:IntegerLiteral" value="23388"/>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.1/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.1"/>
       </featureInstance>
       <featureInstance name="out_send_success" category="eventDataPort" direction="out">
@@ -292,7 +299,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="151"/>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.3"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Thread_Properties.aadl#Thread_Properties.Dispatch_Protocol"/>
@@ -301,7 +308,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.3/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Thread_Type"/>
@@ -310,7 +317,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.4"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.5"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Timing_Properties.aadl#Timing_Properties.Compute_Execution_Time"/>
@@ -324,14 +331,24 @@
             </maximum>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.5"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.6"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Sends_Events_To"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:StringLiteral" value="{{}}"/>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.6"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.7"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Timing_Properties.aadl#Timing_Properties.Period"/>
@@ -340,7 +357,7 @@
             <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.16/@ownedLiteral.3"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Stack_Size"/>
@@ -349,7 +366,7 @@
             <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.3"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.4"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -358,24 +375,34 @@
             <ownedListElement xsi:type="aadl2:StringLiteral" value="component_entry"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.7"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.8"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Initialize_Entrypoint_Source_Text"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:StringLiteral" value="component_init"/>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.8"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.9"/>
       </ownedPropertyAssociation>
       <featureInstance name="waypoint_write" category="eventDataPort" direction="out">
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.CommPrim_Source_Text"/>
@@ -384,24 +411,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.0"/>
       </featureInstance>
       <featureInstance name="waypoint_read_vm" category="eventDataPort">
@@ -409,10 +418,20 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -423,24 +442,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.1/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.1"/>
       </featureInstance>
       <featureInstance name="waypoint_read_wm" category="eventDataPort">
@@ -448,10 +449,20 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -462,27 +473,26 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.2/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.2"/>
       </featureInstance>
       <featureInstance name="in_uart_packet" category="eventDataPort">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Communication_Properties.aadl#Communication_Properties.Queue_Size"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:IntegerLiteral" value="23388"/>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.3/@ownedPropertyAssociation.1"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
           <ownedValue>
@@ -519,7 +529,7 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:ListValue">
-              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
             </ownedValue>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>
@@ -529,7 +539,7 @@
           <ownedValue>
             <ownedValue xsi:type="aadl2:IntegerLiteral" value="151"/>
           </ownedValue>
-          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.2"/>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.3"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Access_Right"/>
@@ -561,7 +571,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="150"/>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.3"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Thread_Properties.aadl#Thread_Properties.Dispatch_Protocol"/>
@@ -570,7 +580,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.3/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Thread_Type"/>
@@ -579,7 +589,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Timing_Properties.aadl#Timing_Properties.Compute_Execution_Time"/>
@@ -593,14 +603,24 @@
             </maximum>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.4"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.5"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Sends_Events_To"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:StringLiteral" value="{{}}"/>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.5"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.6"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Timing_Properties.aadl#Timing_Properties.Period"/>
@@ -609,7 +629,7 @@
             <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.16/@ownedLiteral.3"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.8"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.9"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Stack_Size"/>
@@ -618,7 +638,7 @@
             <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.3"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.4"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -627,24 +647,34 @@
             <ownedListElement xsi:type="aadl2:StringLiteral" value="component_entry"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.6"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.7"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Initialize_Entrypoint_Source_Text"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:StringLiteral" value="component_init"/>
         </ownedValue>
-        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.7"/>
+        <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.8"/>
       </ownedPropertyAssociation>
       <featureInstance name="mission_read" category="eventDataPort" direction="out">
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.CommPrim_Source_Text"/>
@@ -653,24 +683,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.0"/>
       </featureInstance>
       <featureInstance name="mission_write" category="eventDataPort">
@@ -678,10 +690,20 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -692,24 +714,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.1/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.1"/>
       </featureInstance>
       <featureInstance name="waypoint_read" category="eventDataPort" direction="out">
@@ -717,10 +721,20 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.CommPrim_Source_Text"/>
@@ -729,24 +743,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.2/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.2"/>
       </featureInstance>
       <featureInstance name="waypoint_write" category="eventDataPort">
@@ -754,10 +750,20 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -767,24 +773,6 @@
             </ownedValue>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.3/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
         </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.3"/>
       </featureInstance>
@@ -799,6 +787,16 @@
           <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:ListValue">
@@ -810,6 +808,16 @@
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.4"/>
       </featureInstance>
       <featureInstance name="out_uart_packet" category="eventDataPort" direction="out">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Programming_Properties.aadl#Programming_Properties.Source_Text"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.c"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="mcutils/mcutils.h"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.CommPrim_Source_Text"/>
           <ownedValue>
@@ -844,7 +852,7 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:ListValue">
-              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
             </ownedValue>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>
@@ -854,7 +862,7 @@
           <ownedValue>
             <ownedValue xsi:type="aadl2:IntegerLiteral" value="150"/>
           </ownedValue>
-          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.2"/>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.3"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Access_Right"/>
@@ -892,7 +900,7 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:ListValue">
-              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
             </ownedValue>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>
@@ -902,7 +910,7 @@
           <ownedValue>
             <ownedValue xsi:type="aadl2:IntegerLiteral" value="150"/>
           </ownedValue>
-          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.2"/>
+          <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.3"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Access_Right"/>
@@ -987,10 +995,10 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.CommPrim_Source_Text"/>
@@ -999,24 +1007,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.0"/>
       </featureInstance>
       <featureInstance name="mission_read" category="eventDataPort">
@@ -1024,10 +1014,10 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -1038,24 +1028,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.1/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.1"/>
       </featureInstance>
       <featureInstance name="waypoint_write" category="eventDataPort">
@@ -1063,10 +1035,10 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.Compute_Entrypoint_Source_Text"/>
@@ -1077,24 +1049,6 @@
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.2/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
-        </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.2"/>
       </featureInstance>
       <featureInstance name="waypoint_read" category="eventDataPort" direction="out">
@@ -1102,10 +1056,10 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Data_Representation"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
         </ownedPropertyAssociation>
         <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
           <property href="../../Plugin_Resources/tb_resource/TB_SYS.aadl#TB_SYS.CommPrim_Source_Text"/>
@@ -1113,24 +1067,6 @@
             <ownedValue xsi:type="aadl2:StringLiteral" value="waypoint_read"/>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.3/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Number_Representation"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../Plugin_Resources/Data_Model.aadl#/0/@ownedProperty.13/@ownedPropertyType/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
-        </ownedPropertyAssociation>
-        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
-          <property href="../../Plugin_Resources/Predeclared_Property_Sets/Memory_Properties.aadl#Memory_Properties.Data_Size"/>
-          <ownedValue>
-            <ownedValue xsi:type="aadl2:IntegerLiteral" value="4">
-              <unit href="../../Plugin_Resources/Predeclared_Property_Sets/AADL_Project.aadl#/0/@ownedPropertyType.15/@ownedLiteral.1"/>
-            </ownedValue>
-          </ownedValue>
-          <propertyAssociation href="../../Plugin_Resources/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
         </ownedPropertyAssociation>
         <feature xsi:type="aadl2:EventDataPort" href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.3"/>
       </featureInstance>
@@ -1159,7 +1095,7 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:ListValue">
-              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
             </ownedValue>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>
@@ -1207,7 +1143,7 @@
           <property href="../../Plugin_Resources/Data_Model.aadl#Data_Model.Dimension"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:ListValue">
-              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="5963744"/>
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="23264"/>
             </ownedValue>
           </ownedValue>
           <propertyAssociation href="../MissionSoftware.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedPropertyAssociation.2"/>

@@ -93,7 +93,7 @@ lemma mon_get_sender_id_wp[wp]:
 definition is_queue :: "lifted_globals \<Rightarrow> bool" where
   "is_queue s \<equiv> front_'' s < 1 \<and> length_'' s \<le> 1"
 
-definition the_queue :: "lifted_globals \<Rightarrow> 32 word queue" where
+definition the_queue :: "lifted_globals \<Rightarrow> 8 word queue" where
   "the_queue s \<equiv> (list_array (contents_'' s), unat (front_'' s), unat (length_'' s))"
 
 fun queue_length :: "'a queue \<Rightarrow> nat" where
@@ -137,11 +137,11 @@ lemma enqueue_not_full:
    \<lbrace> \<lambda>s. is_queue s \<and>
          q = the_queue s \<and>
          queue_length q < 1 \<and>
-         is_valid_w32 s x \<and>
+         is_valid_w8 s x \<and>
          P s \<rbrace>
    mon_enqueue' x
    \<lbrace> \<lambda>r s. r = 1 \<and>
-           the_queue s = enqueue q (heap_w32 s x) \<and>
+           the_queue s = enqueue q (heap_w8 s x) \<and>
            is_queue s \<and>
            P s \<rbrace>!"
 apply (unfold mon_enqueue'_def)
@@ -167,16 +167,16 @@ lemma dequeue_not_empty:
    \<lbrace> \<lambda>s. is_queue s \<and>
          q = the_queue s \<and>
          queue_length q > 0 \<and>
-         is_valid_w32 s x \<and>
+         is_valid_w8 s x \<and>
          P s \<rbrace>
    mon_dequeue' x
    \<lbrace> \<lambda>r s. r > 0 \<and>
-           dequeue q = (heap_w32 s x, the_queue s) \<and>
+           dequeue q = (heap_w8 s x, the_queue s) \<and>
            is_queue s \<and>
            P s \<rbrace>!"
 apply (unfold mon_dequeue'_def)
   apply wp
-  apply (metis (mono_tags, hide_lams) fun_upd_def is_queue_def the_queue_def tb_Virtual_Machine_waypoint_write_Monitor.heap_w32_update_def
+  apply (metis (mono_tags, hide_lams) fun_upd_def is_queue_def the_queue_def tb_Virtual_Machine_waypoint_write_Monitor.heap_w8_update_def
                   gr0_conv_Suc list_array_nth  lifted_globals.simps(3) lifted_globals.simps(4) not_less)
 done
 

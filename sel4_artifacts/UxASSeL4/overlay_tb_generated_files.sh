@@ -10,7 +10,7 @@ cp -r ./tb/soi_tk1/include ./
 rm -r ./interfaces/*
 for i in MissionSoftware__mission_command_impl_writer.idl4\
          bool_writer.idl4\
-         tb_Monitor_SMACCM_DATA__UART_Packet_i_1.idl4\
+         tb_Monitor_SMACCM_DATA__UART_Packet_i_23388.idl4\
          SMACCM_DATA__UART_Packet_i_writer.idl4\
          tb_Monitor_bool_1.idl4;
 do
