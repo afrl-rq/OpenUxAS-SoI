@@ -268,17 +268,11 @@ namespace dmpl
     /********************************************************************/
     //-- Defining program-specific constants
     /********************************************************************/
-#define BottomY -2.25
-#define BottomZ 0.0
-#define LeftX -2.25
-#define MOVE 4
 #define MSG_MARKER "message: "
 #define NEXT 1
 #define REQUEST 2
-#define RightX 2.25
-#define TopY 2.25
-#define TopZ 2.5
 #define WAITING 3
+#define MOVE 4
 #define X 10
 #define Y 10
 #define Z 10
@@ -561,8 +555,6 @@ namespace dmpl
         namespace node_uav_role_Uav
         {
             KnowledgeRecord
-            base_StartingPosition (engine::FunctionArguments & args, engine::Variables & vars);
-            KnowledgeRecord
             thread0_PULL (engine::FunctionArguments & args, engine::Variables & vars);
             KnowledgeRecord
             thread0_PUSH (engine::FunctionArguments & args, engine::Variables & vars);
@@ -759,25 +751,6 @@ namespace dmpl
                 mark_modified(missionOver[id]);
                 // Remodifying thread-specific group variables
                 return Integer (0);
-            }
-            //-- @InitSim
-            KnowledgeRecord
-            base_StartingPosition (engine::FunctionArguments & args, engine::Variables & vars)
-            {
-
-                //-- Declare local (parameter and temporary) variables
-
-
-                //-- Begin function body
-                {
-                    (void) (GRID_INIT ());
-                }
-                {
-                    (void) (GRID_PLACE (x, y, Integer (1)));
-                }
-
-                //-- Insert return statement, in case user program did not
-                return Integer(0);
             }
 
             KnowledgeRecord

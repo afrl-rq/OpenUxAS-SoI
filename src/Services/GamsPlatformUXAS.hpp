@@ -36,41 +36,6 @@ namespace dmpl
   /********************************************************************/
 
   /**
-   * Call before simulation start, and before calling GRID_PLACE, to initialize
-   * needed globals.
-   **/
-  void GRID_INIT()
-  {
-    grid_x = X;
-    grid_y = Y;
-    grid_z = Z;
-    grid_leftX = LeftX;
-    grid_rightX = RightX;
-    grid_topY = TopY;
-    grid_bottomY = BottomY;
-    grid_topZ = TopZ;
-    grid_bottomZ = BottomZ;
-    grid_cellX = (grid_rightX - grid_leftX) / (grid_x-1);
-    grid_cellY = (grid_bottomY - grid_topY) / (grid_y-1);
-    grid_cellZ = (grid_bottomZ - grid_topZ) / (grid_z-1);
-  }
-
-  /**
-   * Call before simulation start to initialize where the platform should spawn
-   *
-   * @param x the x coordinate (left/right from default V-REP perspective)
-   * @param y the y coordinate (up/down from default V-REP perspective)
-   * @param z the altitude
-   **/
-  void GRID_PLACE(double x, double y, double z)
-  {
-    //std::cerr << "GRID_PLACE" << x << " " << y << " "  << y << std::endl;
-    knowledge.set(".initial_x", grid_leftX + x * grid_cellX);
-    knowledge.set(".initial_y", grid_topY + y * grid_cellY);
-    knowledge.set(".initial_alt", grid_topZ + z * grid_cellZ);
-  }
-
-  /**
    * Call before simulation start to initialize where the platform should spawn
    *
    * @param x the x coordinate (left/right from default V-REP perspective)
