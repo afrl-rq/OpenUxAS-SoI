@@ -85,4 +85,7 @@ component Virtual_Machine {
     dataport MissionSoftware__mission_command_impl mission;
     dataport MissionSoftware__mission_command_impl waypoint;
 
+    //added by backes
+    has semaphore wm_read;
+
 }

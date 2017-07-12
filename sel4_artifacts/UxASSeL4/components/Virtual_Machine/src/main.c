@@ -578,6 +578,8 @@ extern const int __attribute__((weak)) base_prio;
 
 int 
 run(void) {
+    //tick waypoint_manager semaphore once
+    wm_read_wait();
     /* if the base_prio attribute is set, use it */
     if (&base_prio != NULL) {
        VM_PRIO = base_prio;

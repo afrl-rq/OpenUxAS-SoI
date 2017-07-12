@@ -8,12 +8,7 @@
 // ===============================================================================
 
 #include "LmcpObjectNetworkSerialBridge.h"
-
 #include "SerialHelper.h"
-
-//#include "avtas/lmcp/Factory.h"
-//#include "afrl/cmasi/ServiceStatus.h"
-
 #include "UxAS_Log.h"
 #include "Constants/UxAS_String.h"
 

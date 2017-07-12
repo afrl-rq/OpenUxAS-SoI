@@ -85,6 +85,8 @@ component Waypoint_Manager {
 
 
 
+    //added by backes
+    has mutex send_mutex;
 
     // Provided interfaces for shared data
 

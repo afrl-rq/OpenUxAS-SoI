@@ -49,10 +49,12 @@ extern seL4_CPtr _fault_endpoint;
 
 //BEGIN SOI SPECIFIC STUFF
 
+bool wm_read = false;
 void handle_mission_read(uint32_t * var){
     //printf("VM saw mission read from WM\n");
     uint32_t numBytes;
     tb_mission_read_dequeue(&numBytes);
+    wm_read_post();
     tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
 }
 
@@ -118,6 +120,9 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
     }else if(addr == 0xe0000002){
         //this indicates the end of a write
         mission_write(&bufIndex);
+        //this is kind of bad because the VM will halt
+        //execution until everything is has been sent to the AP
+        wm_read_wait();
     }else if(addr == 0xe0000000){
         //this indicates data being written
         if(fault_is_write(fault)){
