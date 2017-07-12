@@ -66,8 +66,12 @@ namespace uxas {
         return true;
       }
       bool MonitorDB::processKeepInZone(std::shared_ptr<afrl::cmasi::KeepInZone> ptr){
+<<<<<<< HEAD
           KeepInZoneMonitor * kizm  = new KeepInZoneMonitor(ptr);
           return true;
+=======
+        return true;
+>>>>>>> 3972b415385d60c3530cc21676c24826b57f7cda
       }
       bool MonitorDB::processKeepOutZone(std::shared_ptr<afrl::cmasi::KeepOutZone> ptr){
         KeepOutZoneMonitor * kozm = new KeepOutZoneMonitor(ptr);
