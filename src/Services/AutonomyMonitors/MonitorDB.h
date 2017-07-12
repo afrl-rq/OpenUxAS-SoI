@@ -22,6 +22,9 @@
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/AreaOfInterest.h"
 
+#include "AutonomyMonitors/VehicleStateMessage.h"
+#include "AutonomyMonitors/MonitorBase.h"
+
 namespace uxas {
   namespace service {
     namespace monitoring {
@@ -34,6 +37,9 @@ namespace uxas {
       *  and the overall plan.
       **/
       class MonitorDB {
+      private:
+        std::vector<MonitorBase*> allMonitors;
+        std::vector<VehicleStateMessage> allVehicleStateMessages;
       public:
         /* Default Constructor */
         MonitorDB();
@@ -58,12 +64,9 @@ namespace uxas {
         /*-- Monitor/Judge task completion status --*/
 
       protected:
-        void registerVehicleState(int64_t id,
-            double lat,
-            double lon,
-            double alt,
-            std::vector<afrl::cmasi::Location3D*> cameraFootprint,
-            int64_t timestamp);
+        void registerVehicleState(VehicleStateMessage  vMessage);
+        void addMonitor(MonitorBase * what) ;
+
 
       };
     };

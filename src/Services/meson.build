@@ -24,6 +24,9 @@ srcs_services = [
   './AutonomyMonitors/MonitorDB.cpp',
   './AutonomyMonitors/MonitorUtils.cpp',
   './AutonomyMonitors/AutonomyMonitorServiceMain.cpp',
+  './AutonomyMonitors/MonitorBase.cpp',
+  './AutonomyMonitors/KeepOutZoneMonitor.cpp',
+  './AutonomyMonitors/KeepInZoneMonitor.cpp',
   'WaypointPlanManagerService.cpp',
 ]
 
