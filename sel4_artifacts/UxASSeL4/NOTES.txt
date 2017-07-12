@@ -1,0 +1,3 @@
+- If you need to change the mcutils code change it in the "mcutils"
+  directory and then rerun the trusted build tool. Maybe change this
+  to symbolic links?
