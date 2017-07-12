@@ -31,6 +31,7 @@ static void write_callback(ps_chardevice_t* device,
                            enum chardev_status stat,
                            size_t bytes_transfered,
                            void* token) {
+    write_sem_post();
     const bool b = true;
     tb_out_send_success0_enqueue(/* unused */ &b);
 }
@@ -38,6 +39,7 @@ static void write_callback(ps_chardevice_t* device,
 static void in_uart_packet_callback(void *unused) {
     SMACCM_DATA__UART_Packet_i packet;
     while (tb_in_uart_packet_dequeue(&packet)) {
+        write_sem_wait();
         device_lock();
         int result = ps_cdev_write(&serial_device,
                                    &packet.buf,

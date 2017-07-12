@@ -21,4 +21,5 @@ component uart_shim {
     dataport Buf tk1_uart_regs;
     consumes DataAvailable interrupt;
     has mutex device;
+    has semaphore write_sem;
 }
