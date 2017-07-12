@@ -1,7 +1,0 @@
-[package]
-name = "lmcp"
-version = "0.1.0"
-authors = ["Adam C. Foltzer <acfoltzer@galois.com>"]
-
-[dependencies]
-libc = "0.2.24"
