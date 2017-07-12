@@ -102,7 +102,7 @@ public
         	-- detecting conflict between two moving air vehicles (moving circle avoidance region) is this:
         	--  There is a 2-dimenstional conflict in [B,T] if and only if there exists a time t in [B,T] such that
         	--  the relative ownship position s+t*v is strictly less than D from the origin, i.e., if and only if the 
-        	--  Euclideant norm ||s+t*v|| < D, where D is the horizontal buffer, s and v are the position and velocity
+        	--  Euclidean norm ||s+t*v|| < D, where D is the horizontal buffer, s and v are the position and velocity
         	--  of the ownship relative to the intruder.
         	-- And this does not even take into account multiple vehicles or multiple waypoints on a flightplan 
         	--  (both of which require iteration and using the spec above)!
