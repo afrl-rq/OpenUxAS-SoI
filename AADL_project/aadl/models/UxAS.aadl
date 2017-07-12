@@ -138,6 +138,7 @@ public
             conn1: port CmasiLineSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
             conn2: port ImpactLineSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
             conn3: port PatternSearchTask.VideoRecord_out -> Challenge_TelemetryReceiver.VideoRecord_in;
+            
             conn4: port TaskServiceBase.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             
             -- These are different planners
@@ -162,96 +163,268 @@ public
             conn25: port AirVehicleState_in -> TaskManagerService.AirVehicleState_in;
             conn26: port AirVehicleState_in -> TaskServiceBase.AirVehicleState_in;
             conn27: port AirVehicleState_in -> TaskTrackerService.AirVehicleState_in;
+            
             conn28: port PlanBuilderService.UniqueAutomationResponse_out -> AutomationDiagramDataService.UniqueAutomationResponse_in;
             conn29: port PlanBuilderService.UniqueAutomationResponse_out -> AutomationRequestValidatorService.UniqueAutomationResponse_in;
             conn30: port PlanBuilderService.UniqueAutomationResponse_out -> AssignmentCoordinatorTask.UniqueAutomationResponse_in;
             conn31: port PlanBuilderService.UniqueAutomationResponse_out -> TaskServiceBase.UniqueAutomationResponse_in;
+            
             conn32: port AssignmentCoordinatorTask.TaskAutomationRequest_out -> AutomationRequestValidatorService.TaskAutomationRequest_in;
+            
             conn33: port RouteAggregatorService.RouteResponse_out -> AngledAreaSearchTask.RouteResponse_in;
             conn34: port RouteAggregatorService.RouteResponse_out -> CmasiAreaSearchTask.RouteResponse_in;
             conn35: port RouteAggregatorService.RouteResponse_out -> CordonTask.RouteResponse_in;
             conn36: port RouteAggregatorService.RouteResponse_out -> PatternSearchTask.RouteResponse_in;
+            
             conn37: port TaskServiceBase.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
+            
             conn38: port BatchSummaryService.RoutePlanRequest_out -> OsmPlannerService.RoutePlanRequest_in;
             conn39: port BatchSummaryService.RoutePlanRequest_out -> RoutePlannerService.RoutePlanRequest_in;
             conn40: port BatchSummaryService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            
             conn41: port RouteAggregatorService.RoutePlanRequest_out -> OsmPlannerService.RoutePlanRequest_in;
             conn42: port RouteAggregatorService.RoutePlanRequest_out -> RoutePlannerService.RoutePlanRequest_in;
             conn43: port RouteAggregatorService.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            
             conn44: port AngledAreaSearchTask.RouteRequest_out -> OsmPlannerService.RouteRequest_in;
             conn45: port AngledAreaSearchTask.RouteRequest_out -> RoutePlannerService.RouteRequest_in;
             conn46: port AngledAreaSearchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
+            
             conn47: port CmasiAreaSearchTask.RouteRequest_out -> OsmPlannerService.RouteRequest_in;
             conn48: port CmasiAreaSearchTask.RouteRequest_out -> RoutePlannerService.RouteRequest_in;
             conn49: port CmasiAreaSearchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
+            
             conn50: port PatternSearchTask.RouteRequest_out -> OsmPlannerService.RouteRequest_in;
             conn51: port PatternSearchTask.RouteRequest_out -> RoutePlannerService.RouteRequest_in;
             conn52: port PatternSearchTask.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
+            
             conn53: port TaskServiceBase.RouteRequest_out -> OsmPlannerService.RouteRequest_in;
             conn54: port TaskServiceBase.RouteRequest_out -> RoutePlannerService.RouteRequest_in;
             conn55: port TaskServiceBase.RouteRequest_out -> RoutePlannerVisibilityService.RouteRequest_in;
+            
             conn56: port BatchSummaryService.EgressRouteRequest_out -> OsmPlannerService.EgressRouteRequest_in;
             conn57: port CordonTask.EgressRouteRequest_out -> OsmPlannerService.EgressRouteRequest_in;
+            
             conn58: port AssignmentCoordinatorTask.AssignmentCoordination_out -> AssignmentCoordinatorTask.AssignmentCoordination_in;
+            
             conn59: port OperatingRegionStateService.OperatingRegion_out -> AutomationDiagramDataService.OperatingRegion_in;
             conn60: port OperatingRegionStateService.OperatingRegion_out -> AutomationRequestValidatorService.OperatingRegion_in;
             conn61: port OperatingRegionStateService.OperatingRegion_out -> RoutePlannerService.OperatingRegion_in;
             conn62: port OperatingRegionStateService.OperatingRegion_out -> RoutePlannerVisibilityService.OperatingRegion_in;
+            
             conn63: port AutomationRequestValidatorService.ImpactAutomationResponse_out -> SerialAutomationRequestTestService.ImpactAutomationResponse_in;
+            
             conn64: port SensorManagerService.SensorFootprintResponse_out -> AngledAreaSearchTask.SensorFootprintResponse_in;
             conn65: port SensorManagerService.SensorFootprintResponse_out -> CmasiAreaSearchTask.SensorFootprintResponse_in;
             conn66: port SensorManagerService.SensorFootprintResponse_out -> PatternSearchTask.SensorFootprintResponse_in;
+            
             conn67: port AssignmentTreeBranchBoundBase.TaskAssignmentSummary_out -> PlanBuilderService.TaskAssignmentSummary_in;
+            
             conn68: port OsmPlannerService.EgressRouteResponse_out -> BatchSummaryService.EgressRouteResponse_in;
             conn69: port OsmPlannerService.EgressRouteResponse_out -> CordonTask.EgressRouteResponse_in;
+            
             conn70: port AngledAreaSearchTask.SensorFootprintRequests_out -> SensorManagerService.SensorFootprintRequests_in;
             conn71: port CmasiAreaSearchTask.SensorFootprintRequests_out -> SensorManagerService.SensorFootprintRequests_in;
             conn72: port PatternSearchTask.SensorFootprintRequests_out -> SensorManagerService.SensorFootprintRequests_in;
+            
             conn73: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentTreeBranchBoundBase.UniqueAutomationRequest_in;
             conn74: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
             conn75: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
             conn76: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> RouteAggregatorService.UniqueAutomationRequest_in;
             conn77: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> TaskServiceBase.UniqueAutomationRequest_in;
+            
             conn78: port TaskManagerService.UniqueAutomationRequest_out -> AssignmentTreeBranchBoundBase.UniqueAutomationRequest_in;
             conn79: port TaskManagerService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
             conn80: port TaskManagerService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
             conn81: port TaskManagerService.UniqueAutomationRequest_out -> RouteAggregatorService.UniqueAutomationRequest_in;
             conn82: port TaskManagerService.UniqueAutomationRequest_out -> TaskServiceBase.UniqueAutomationRequest_in;
+            
             conn83: port BlockadeTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn84: port BlockadeTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn85: port CmasiLineSearchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn86: port CmasiLineSearchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn87: port CmasiPointSearchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn88: port CmasiPointSearchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn89: port CommRelayTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn90: port CommRelayTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn91: port CordonTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn92: port CordonTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn93: port EscortTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn94: port EscortTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn95: port ImpactLineSearchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn96: port ImpactLineSearchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn97: port ImpactPointSearchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn98: port ImpactPointSearchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn99: port MultiVehicleWatchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn100: port MultiVehicleWatchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn101: port OverwatchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn102: port OverwatchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn103: port PatternSearchTask.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn104: port PatternSearchTask.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn105: port TaskServiceBase.TaskPlanOptions_out -> AssignmentTreeBranchBoundBase.TaskPlanOptions_in;
             conn106: port TaskServiceBase.TaskPlanOptions_out -> RouteAggregatorService.TaskPlanOptions_in;
+            
             conn107: port AutomationRequestValidatorService.AutomationResponse_out -> SerialAutomationRequestTestService.AutomationResponse_in;
             conn108: port AutomationRequestValidatorService.AutomationResponse_out -> WaypointPlanManagerService.AutomationResponse_in;
             conn109: port AutomationRequestValidatorService.AutomationResponse_out -> EscortTask.AutomationResponse_in;
             conn110: port AutomationRequestValidatorService.AutomationResponse_out -> TaskManagerService.AutomationResponse_in;
             conn111: port AutomationRequestValidatorService.AutomationResponse_out -> TaskTrackerService.AutomationResponse_in;
+            
             conn112: port AssignmentCoordinatorTask.AutomationResponse_out -> SerialAutomationRequestTestService.AutomationResponse_in;
             conn113: port AssignmentCoordinatorTask.AutomationResponse_out -> WaypointPlanManagerService.AutomationResponse_in;
             conn114: port AssignmentCoordinatorTask.AutomationResponse_out -> EscortTask.AutomationResponse_in;
             conn115: port AssignmentCoordinatorTask.AutomationResponse_out -> TaskManagerService.AutomationResponse_in;
             conn116: port AssignmentCoordinatorTask.AutomationResponse_out -> TaskTrackerService.AutomationResponse_in;
+            
             conn117: port PlanBuilderService.TaskImplementationRequest_out -> TaskServiceBase.TaskImplementationRequest_in;
+            
             conn118: port RouteAggregatorService.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundBase.AssignmentCostMatrix_in;
+            
+        annex agree {**
+            -- We use AGREE connections to assert true for the cases where an 
+            --  input port is fed by multiple sources.
+            -- Note: AGREE will assume arbitrary values for the input ports on 
+            --  these connections. Refinements may be needed to prove system-level 
+            --  guarantees involving these ports.
+            
+            -- We don't have any of these currently because we only need them when
+            -- both the source and destination components for multiple fan-in have 
+            -- AGREE contracts.
+            
+            -- Implementing blocks of AGREE connections that will remain commented out
+            -- until both sides get contracts
+            
+            -- Many to One connection block
+            -- Target Port: Challenge_TelemetryReceiver.VideoRecord_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn0: true;
+--            connection conn1: true;
+--            connection conn2: true;
+--            connection conn3: true;
+
+            -- Many to One connection block
+            -- Target Port: BatchSummaryService.RoutePlanResponse_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn5: true;
+--            connection conn8: true;
+--            connection conn11: true;
+            
+            -- Many to One connection block
+            -- Target Port: BatchSummaryService.RoutePlanResponse_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn6: true;
+--            connection conn9: true;
+--            connection conn12: true;
+            
+            -- Many to One connection block
+            -- Target Port: OsmPlannerService.RouteRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn44: true;
+--            connection conn47: true;
+--            connection conn50: true;
+--            connection conn53: true;
+            
+            -- Many to One connection block
+            -- Target Port: RoutePlannerService.RouteRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn45: true;
+--            connection conn48: true;
+--            connection conn51: true;
+--            connection conn54: true;
+            
+            -- Many to One connection block
+            -- Target Port: RoutePlannerVisibilityService.RouteRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn46: true;
+--            connection conn49: true;
+--            connection conn52: true;
+--            connection conn55: true;
+            
+            -- Many to One connection block
+            -- Target Port: OsmPlannerService.EgressRouteRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn56: true;
+--            connection conn57: true;
+            
+            -- Many to One connection block
+            -- Target Port: SensorManagerService.SensorFootprintRequests_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn70: true;
+--            connection conn71: true;
+--            connection conn72: true;
+
+            -- Many to One connection block
+            -- Target Port: AssignmentTreeBranchBoundBase.UniqueAutomationRequest_in
+            connection conn73: true;
+            connection conn78: true;
+            
+            -- Many to One connection block
+            -- Target Port: AutomationDiagramDataService.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn74: true;
+--            connection conn79: true;
+            
+            -- Many to One connection block
+            -- Target Port: PlanBuilderService.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+            connection conn75: true;
+            connection conn80: true;
+            
+            -- Many to One connection block
+            -- Target Port: RouteAggregatorService.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+            connection conn76: true;
+            connection conn81: true;
+            
+            -- Many to One connection block
+            -- Target Port: TaskServiceBase.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+            connection conn77: true;
+            connection conn82: true;
+            
+            -- Many to One connection block
+            -- Target Port: AssignmentTreeBranchBoundBase.TaskPlanOptions_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn85: true;
+--            connection conn87: true;
+--            connection conn89: true;
+--            connection conn91: true;
+--            connection conn93: true;
+--            connection conn95: true;
+--            connection conn97: true;
+--            connection conn99: true;
+--            connection conn101: true;
+--            connection conn103: true;
+--            connection conn105: true;
+            
+            -- Many to One connection block
+            -- Target Port: AssignmentTreeBranchBoundBase.TaskPlanOptions_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn86: true;
+--            connection conn88: true;
+--            connection conn90: true;
+--            connection conn92: true;
+--            connection conn94: true;
+--            connection conn96: true;
+--            connection conn98: true;
+--            connection conn100: true;
+--            connection conn102: true;
+--            connection conn104: true;
+--            connection conn106: true;          
+            
+            
+            
+        **};
     end uxas.i;
 end UxAS;

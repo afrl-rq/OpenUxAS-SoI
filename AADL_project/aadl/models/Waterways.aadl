@@ -42,6 +42,13 @@ public
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
         annex agree {**
         	guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+        	
+        	assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+        	
+        	eq event_RoutePlanRequest_in : bool;
+        	eq event_RoutePlanResponse_out : bool;
+        	guarantee "RoutePlannerVisibilityService responsiveness" : 
+        		whenever event_RoutePlanRequest_in occurs event_RoutePlanResponse_out occurs during [0.0,5.0];
         **};
     end waterways;
 
@@ -76,6 +83,8 @@ public
             RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
     	connections
     		
+    		-- Connections that notify the AutomationRequestValidatorService that a task is initialized
+    		-- > Connection Type: Many to One - Will need AGREE connections to support analysis
             conn0: port AngledAreaSearchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn1: port AssignmentCoordinatorTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn2: port BlockadeTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
@@ -148,6 +157,8 @@ public
             conn67: port PlanBuilderService.UniqueAutomationResponse_out -> PatternSearchTask.UniqueAutomationResponse_in;
             conn69: port AssignmentCoordinatorTask.TaskAutomationRequest_out -> AutomationRequestValidatorService.TaskAutomationRequest_in;
    
+            -- Connections that notify the PlanBuilderService that a TaskImplementationResponse is available
+            -- > Connection Type: Many to One - Will need AGREE connections to support analysis
             conn70: port AngledAreaSearchTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
             conn71: port AssignmentCoordinatorTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
             conn72: port BlockadeTask.TaskImplementationResponse_out -> PlanBuilderService.TaskImplementationResponse_in;
@@ -191,8 +202,12 @@ public
             conn113: port TaskManagerService.CreateNewService_out -> OverwatchTask.CreateNewService_in;
             conn114: port TaskManagerService.CreateNewService_out -> PatternSearchTask.CreateNewService_in;
             conn116: port AssignmentCoordinatorTask.AssignmentCoordination_out -> AssignmentCoordinatorTask.AssignmentCoordination_in;
-            conn117: port AutomationRequestValidatorService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
+            
+            -- AWF20170711: This port shows a component whose output is an input to itself. Is this correct?
+--            conn117: port AutomationRequestValidatorService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
             conn118: port PlanBuilderService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
+            
+            
             conn119: port TaskManagerService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
             conn120: port TaskManagerService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
             conn121: port TaskManagerService.UniqueAutomationRequest_out -> AngledAreaSearchTask.UniqueAutomationRequest_in;
@@ -209,6 +224,8 @@ public
             conn132: port TaskManagerService.UniqueAutomationRequest_out -> MultiVehicleWatchTask.UniqueAutomationRequest_in;
             conn133: port TaskManagerService.UniqueAutomationRequest_out -> OverwatchTask.UniqueAutomationRequest_in;
             conn134: port TaskManagerService.UniqueAutomationRequest_out -> PatternSearchTask.UniqueAutomationRequest_in;
+            
+            
             conn136: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
             conn137: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
             conn138: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AngledAreaSearchTask.UniqueAutomationRequest_in;
@@ -260,18 +277,148 @@ public
             prove isolation(this) 
         **};
         annex agree {**
+        		
+        	assign event_RoutePlanRequest_in = event(RoutePlannerVisibilityService.RoutePlanRequest_in);
+        	assign event_RoutePlanResponse_out = event(RoutePlannerVisibilityService.RoutePlanResponse_out);
+        		
         	-- We use AGREE connections to assert true for the cases where an 
         	--  input port is fed by multiple sources.
         	-- Note: AGREE will assume arbitrary values for the input ports on 
         	--  these connections. Refinements may be needed to prove system-level 
         	--  guarantees involving these ports.
         	
-        	--We don't have any of these currently because we only need them when
+        	-- We don't have any of these currently because we only need them when
         	-- both the source and destination components for multiple fan-in have 
         	-- AGREE contracts.
         	
-        	connection conn117: true;
-			connection conn118: true;
+        	-- Implementing blocks of AGREE connections that will remain commented out
+        	-- until both sides get contracts
+        	
+        	-- Many to One connection block 
+        	-- Target Port: AutomationRequestValidatorService.TaskInitialized_in
+        	-- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn0: true;
+--            connection conn1: true;
+--            connection conn2: true;
+--            connection conn3: true;
+--            connection conn4: true;
+--            connection conn5: true;
+--            connection conn6: true;
+--            connection conn7: true;
+--            connection conn8: true;
+--            connection conn9: true;
+--            connection conn10: true;
+--            connection conn11: true;
+--            connection conn12: true;
+--            connection conn13: true;
+
+            -- Many to One connection block 
+            -- Target Port: PlanBuilderService.TaskImplementationResponse_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection
+--            connection conn70: true;
+--            connection conn71: true;
+--            connection conn72: true;
+--            connection conn73: true;
+--            connection conn74: true;
+--            connection conn75: true;
+--            connection conn76: true;
+--            connection conn77: true;
+--            connection conn78: true;
+--            connection conn79: true;
+--            connection conn80: true;
+--            connection conn81: true;
+--            connection conn82: true;
+--            connection conn83: true;
+
+            -- Many to One connection block
+            -- Target Port: PlanBuilderService.UniqueAutomationRequest_in
+            connection conn120: true;
+            connection conn137: true;
+            
+            -- Many to One connection block
+            -- Target Port: AngledAreaSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn121: true;
+--            connection conn138: true;
+            
+            -- Many to One connection block
+            -- Target Port: AssignmentCoordinatorTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn122: true;
+--            connection conn139: true;
+            
+            -- Many to One connection block
+            -- Target Port: BlockadeTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn123: true;
+--            connection conn140: true;
+            
+            -- Many to One connection block
+            -- Target Port: CmasiAreaSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn124: true;
+--            connection conn141: true;
+            
+            -- Many to One connection block
+            -- Target Port: CmasiLineSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn125: true;
+--            connection conn142: true;
+            
+            -- Many to One connection block
+            -- Target Port: CmasiPointSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn126: true;
+--            connection conn143: true;
+            
+            -- Many to One connection block
+            -- Target Port: CommRelayTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn127: true;
+--            connection conn144: true;
+            
+            -- Many to One connection block
+            -- Target Port: CordonTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn128: true;
+--            connection conn145: true;
+            
+            -- Many to One connection block
+            -- Target Port: EscortTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn129: true;
+--            connection conn146: true;
+            
+            -- Many to One connection block
+            -- Target Port: ImpactLineSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn130: true;
+--            connection conn147: true;
+            
+            -- Many to One connection block
+            -- Target Port: ImpactPointSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn131: true;
+--            connection conn148: true;
+            
+            -- Many to One connection block
+            -- Target Port: MultiVehicleWatchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn132: true;
+--            connection conn149: true;
+            
+            -- Many to One connection block
+            -- Target Port: OverwatchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn133: true;
+--            connection conn150: true;
+            
+            -- Many to One connection block
+            -- Target Port: PatternSearchTask.UniqueAutomationRequest_in
+            -- Note: Uncomment when the connection gets AGREE contracts on both sides of connection 
+--            connection conn134: true;
+--            connection conn151: true;
+			
         **};
             
     end waterways.i;
