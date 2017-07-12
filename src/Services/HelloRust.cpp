@@ -24,6 +24,10 @@
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
 
+// include Factory and ByteBuffer to do serialization to Rust
+#include "avtas/lmcp/ByteBuffer.h"
+#include "avtas/lmcp/Factory.h"
+
 // print outs
 #include <iostream>     // std::cout, cerr, etc
 
@@ -102,7 +106,11 @@ bool HelloRust::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
         //receive message
         auto keyValuePairIn = std::static_pointer_cast<afrl::cmasi::KeyValuePair> (receivedLmcpMessage->m_object);
         std::cout << "*** RECEIVED:: Received Id[" << m_serviceId << "] Sent Id[" << keyValuePairIn->getKey() << "] Message[" << keyValuePairIn->getValue() << "] *** " << std::endl;
-	processReceivedLmcpMessage_rs();
+
+	//serialize message and pass to Rust
+	avtas::lmcp::ByteBuffer * lmcpByteBuffer = avtas::lmcp::Factory::packMessage(keyValuePairIn.get(), true);
+	processReceivedLmcpMessage_rs(lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
+	delete lmcpByteBuffer;
     }
     return false;
 }

@@ -81,6 +81,8 @@ if not get_option('afrl_internal')
   subdir('src/LMCP')
 endif
 
+subdir('src/LMCP/rs')
+
 subdir('src/Communications')
 
 subdir('src/Tasks')

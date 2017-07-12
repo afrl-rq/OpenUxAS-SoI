@@ -12,7 +12,24 @@
  * Author: acfoltzer
  */
 
+extern crate lmcp_rs;
+use lmcp_rs::*;
+
+use std::slice;
+
 #[no_mangle]
-pub extern "C" fn processReceivedLmcpMessage_rs() {
+pub extern "C" fn processReceivedLmcpMessage_rs(buf: *const u8, len: usize) {
+    let buf_slice = unsafe {
+        slice::from_raw_parts(buf, len)
+    };
     println!("Hello, Rust!");
+    println!("Got {} bytes!", buf_slice.len());
+    println!("Raw bytes: {:?}", buf_slice);
+    let msg = lmcp_msg_deser(buf_slice).unwrap().unwrap();
+    println!("msg={:?}", msg);
+    if let LmcpType::KeyValuePair(kv) = msg {
+        let k = String::from_utf8(kv.key).unwrap();
+        let v = String::from_utf8(kv.value).unwrap();
+        println!("key= {}, value = {}", k, v);
+    }
 }
