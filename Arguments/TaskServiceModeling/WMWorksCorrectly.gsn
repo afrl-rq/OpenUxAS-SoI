@@ -47,7 +47,7 @@
         <g
             id="__gsn__15d37e4dfe8"
             name="On seL4">
-          The waypoint manager (WM) is running on the seL4 OS
+          The waypoint manager (WM) is running on the seL4 microkernel
 
           <e
               id="__gsn__15d37e4dfe9"
@@ -59,7 +59,7 @@
         <g
             id="__gsn__15d37e4dfea"
             name="seL4 Configured Correctly">
-          The seL4 OS is configured to {not allow programs running on it to starve, …}
+          The seL4 microkernel is configured to {not allow programs running on it to starve, …}
         </g>
 
         <g

@@ -234,6 +234,7 @@
 
                     <g
                         id="__gsn__15d3732ffc0"
+                        color="gold"
                         name="Flight into Terrain">
                       UxAS will return home with probability &gt; {X5} when output waypoints from VM are into terrain
 
@@ -268,6 +269,7 @@
 
                     <g
                         id="__gsn__15d37fce816"
+                        color="gold"
                         name="Invalid Flight Envelope">
                       Waypoints describe an unsafe flight envelope
 
