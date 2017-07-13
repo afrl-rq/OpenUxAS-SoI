@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[WM Works Correctly]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15d37e4d375"
+        name="WM Works Correctly">
+      Waypoint manager (WM) always [works correctly]
+
+      <c
+          id="__gsn__15d37e51975"
+          name="Definition">
+        [Works correctly] means that the waypoint manager has the following desired properties {runs on a provably safe OS, corrupted waypoints are not accepted, [insane] waypoints are not accepted, …}
+      </c>
+
+      <s
+          id="__gsn__15d37e4dfe7"
+          name="Strategy">
+        Argue transitively over operational properties
+
+        <g
+            id="__gsn__15d37e4dfe8"
+            name="On seL4">
+          The waypoint manager (WM) is running on the seL4 OS
+
+          <e
+              id="__gsn__15d37e4dfe9"
+              name="Evidence">
+            WM documentation
+          </e>
+        </g>
+
+        <g
+            id="__gsn__15d37e4dfea"
+            name="seL4 Configured Correctly">
+          The seL4 OS is configured to {not allow programs running on it to starve, …}
+        </g>
+
+        <g
+            id="__gsn__15d37e4dfeb"
+            name="WM is Correct">
+          Waypoint manager (WM) is [correct]
+
+          <c
+              id="__gsn__15d37e4dfec"
+              name="Definition">
+            [Is correct] means that the waypoint manager has the following desired properties {corrupted waypoints are not accepted, [insane] waypoints are not accepted, …}
+
+            <c
+                id="__gsn__15d37e4dfed"
+                name="Definition">
+              [Insane] means that waypoints fail sanity checks, such as being below an acceptable altitude (e.g., having a negative altitude for some scenarios)
+            </c>
+          </c>
+
+          <s
+              id="__gsn__15d37e4dfee"
+              name="Strategy">
+            Argue transitively over levels of development
+
+            <g
+                id="__gsn__15d37e4dfef"
+                name="Requirements">
+              The necessary properties have been sufficiently and correctly identified
+
+              <c
+                  id="__gsn__15d3805ae5e"
+                  name="Req1">
+                Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+              </c>
+
+              <c
+                  id="__gsn__15d38198438"
+                  name="Req2">
+                Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+              </c>
+
+              <c
+                  id="__gsn__15d3822d31b"
+                  name="Req3">
+                Working correctly requires that replacing a waypoint list with a valid waypoint list will result in that valid waypoint list being active
+              </c>
+
+              <c
+                  id="__gsn__15d382418ec"
+                  name="Req4">
+                Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives a list that does not comply with a recognized waypoint list format retains its valid list
+              </c>
+
+              <c
+                  id="__gsn__15d38258702"
+                  name="Req5">
+                Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives more input than it can handle always contains a valid list
+              </c>
+
+              <c
+                  id="__gsn__15d382934cf"
+                  name="Req6">
+                Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives a list that would fly it into terrain retains its valid list
+              </c>
+
+              <c
+                  id="__gsn__15d3829f6be"
+                  name="Req7">
+                Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives a list that would result in an unsafe flight envelope retains its valid list
+              </c>
+
+              <c
+                  id="__gsn__15d382a2e56"
+                  link="Requirements.txt"
+                  name="Comprehensive Requirements">
+                Requirements are listed in document Requirements.txt
+              </c>
+
+              <e
+                  id="__gsn__15d37e4dff0"
+                  name="Evidence">
+                Requirements review document
+              </e>
+            </g>
+
+            <g
+                id="__gsn__15d37e4dff1"
+                name="Specification">
+              The specification has the desired properties identifed in the requirements
+
+              <e
+                  id="__gsn__15d37e4dff2"
+                  name="Evidence">
+                Isabelle HOL output?
+              </e>
+            </g>
+
+            <g
+                id="__gsn__15d37e4dff3"
+                name="Implementation">
+              Waypoint manager (WM) satisfies the specification
+
+              <e
+                  id="__gsn__15d37e4dff4"
+                  name="Evidence">
+                AutoCorres
+              </e>
+            </g>
+          </s>
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
