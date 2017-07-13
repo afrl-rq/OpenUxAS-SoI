@@ -58,21 +58,15 @@
 
         <g
             id="__gsn__15c79fee66d"
-            name="Code Adheres to Standards">
+            color="lightgrey"
+            name="Code Adheres to Imposed Standards">
           Code adheres to appropriate standards
 
           <c
               id="__gsn__15c7a118963"
               name="Context">
-            Appropriate standards include SEI CERT C++ Coding Standard, …
+            There are no imposed standards
           </c>
-
-          <m
-              id="__gsn__15c7a1c2d46"
-              link="CodeStandards.gsn"
-              name="Code Adheres to Standards">
-            Code adheres to appropriate standards
-          </m>
         </g>
 
         <g
@@ -132,19 +126,21 @@
             <g
                 id="__gsn__15c7a59d833"
                 name="Code Adheres to Standards">
-              Code adheres to appropriate standards
+              Code adheres to [sufficient code standards]
 
-              <c
+              <away-context
                   id="__gsn__15c7a59d834"
-                  name="Context">
-                Appropriate standards include SEI CERT C++ Coding Standard, …
-              </c>
+                  link="CodeStandards.gsn#TopLevelContext"
+                  color="tomato"
+                  name="Definition">
+                [Sufficient C standard] means one with {tool support, a good reputation, takes safety into proper consideration, allows language features essential to the application, and is applicable to certification}
+              </away-context>
 
               <m
                   id="__gsn__15c7a59d835"
                   link="CodeStandards.gsn"
                   name="Code Adheres to Standards">
-                Code adheres to appropriate standards
+                Code adheres to [sufficient code standards]
               </m>
             </g>
           </s>

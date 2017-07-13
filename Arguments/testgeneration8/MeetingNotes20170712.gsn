@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15d3738a6ad"
+        name="Claims from subteams">
+
+      <g
+          id="__gsn__15d374af11e"
+          name="Sriram">
+        Checker and tests add confidence in correctness separate from confidence in planner
+
+        <c
+            id="__gsn__15d37393463"
+            name="Context">
+          Line search tasks were failing, verify that all tasks that were specified are carried out, don't want monitor to slow down UxAS, tool is S-TaLiRo
+        </c>
+
+        <c
+            id="__gsn__15d373cd352"
+            name="Context">
+          Failure during runtime raises alert (some other system responsible for deciding what to do — replanning is one option)
+        </c>
+
+        <c
+            id="__gsn__15d3749e96d"
+            name="Context">
+          Checker/tests can also check timing constrains for plan
+        </c>
+      </g>
+
+      <g
+          id="__gsn__15d374b424e"
+          name="Goal">
+        Unsuccessful red team attacks add confidence in integrity of communication system
+
+        <c
+            id="__gsn__15d374b784e"
+            name="Context">
+          Red team type testing —&nbsp;tried DoS attack, finding errors (e.g., from 0mq), suggests verification scheme is required for preventing malicious attacks
+        </c>
+      </g>
+
+      <g
+          id="__gsn__15d3771babb"
+          name="Cat">
+        Using Gazebo rather than AMASE for testing allows for higher-fidelity models to increase confidence in results of tests and for better planning
+
+        <a
+            id="__gsn__15d377216e0"
+            name="Assumption">
+          RoS expects static message types
+        </a>
+
+        <j
+            id="__gsn__15d3772b18f"
+            name="Justification">
+          .message to .xml should be fine because…
+        </j>
+
+        <a
+            id="__gsn__15d3773958a"
+            name="Assumption">
+          Casts are legitimate
+        </a>
+
+        <c
+            id="__gsn__15d3773d4a1"
+            name="Context">
+          Want to integrate RoS via Gazebo
+        </c>
+      </g>
+    </g>
+  </gsn>
+</argument>
