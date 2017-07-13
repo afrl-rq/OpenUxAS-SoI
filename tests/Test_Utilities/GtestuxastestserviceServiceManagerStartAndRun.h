@@ -5,6 +5,8 @@
 #include "MessageLoggerDataService.h"
 #include "LmcpObjectNetworkServer.h"
 #include "ZeroMqFabric.h"
+#include "avtas/lmcp/Object.h"
+#include "avtas/lmcp/LmcpXMLReader.h"
 
 #include "UxAS_ConfigurationManager.h"
 #include "UxAS_Log.h"
@@ -12,6 +14,7 @@
 
 #include <SQLiteCpp/Database.h>
 #include <SQLiteCpp/SQLiteCpp.h>
+#include <vector>
 
 #include "stdUniquePtr.h"
 
@@ -103,7 +106,7 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
     UXAS_LOG_INFORM("END gtestuxastestserviceServiceManagerStartAndRun");
 };
 
-int32_t CountMessagesInLogDb(const std::string& logFilePath, const std::string& message)
+int32_t CountMessagesInLogDb(const std::string& logFilePath, const std::string& messageType)
 {
     int32_t messageCount{-1};
 
@@ -113,7 +116,7 @@ int32_t CountMessagesInLogDb(const std::string& logFilePath, const std::string& 
         // file is there, now reopen in sqlite
         dbFile.close();
         auto m_db = uxas::stduxas::make_unique<SQLite::Database>(logFilePath, SQLITE_OPEN_READWRITE);
-        std::string sqlStmt = "SELECT descriptor FROM msg WHERE descriptor = \"" + message + "\"";
+        std::string sqlStmt = "SELECT descriptor FROM msg WHERE descriptor = \"" + messageType + "\"";
         SQLite::Statement selectStatements(*(m_db.get()), sqlStmt);
         messageCount = 0;
         while (selectStatements.executeStep())
@@ -121,8 +124,27 @@ int32_t CountMessagesInLogDb(const std::string& logFilePath, const std::string& 
             //std::cout << "selectStatements.getColumn(0).getInt64()[" << selectStatements.getColumn(0).operator const std::string() << "]" << std::endl;
             messageCount++;
         }
-        std::cout << "*** message[" << message << "] messageCount[" << messageCount << "]" << std::endl;
+        std::cout << "*** message[" << messageType << "] messageCount[" << messageCount << "]" << std::endl;
     }
     return (messageCount);
+}
+
+void ReportMessagesInLogDb(const std::string& logFilePath, const std::string& messageType, std::vector< std::shared_ptr<avtas::lmcp::Object> >& messages)
+{
+    std::ifstream dbFile(logFilePath);
+    if (dbFile.is_open())
+    {
+        // file is there, now reopen in sqlite
+        dbFile.close();
+        auto m_db = uxas::stduxas::make_unique<SQLite::Database>(logFilePath, SQLITE_OPEN_READWRITE);
+        std::string sqlStmt = "SELECT descriptor, xml FROM msg WHERE descriptor = \"" + messageType + "\"";
+        SQLite::Statement selectStatements(*(m_db.get()), sqlStmt);
+        while (selectStatements.executeStep())
+        {
+            auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::xml::readXML(selectStatements.getColumn(1)));
+            if(obj)
+                messages.push_back(obj);
+        }
+    }
 }
 

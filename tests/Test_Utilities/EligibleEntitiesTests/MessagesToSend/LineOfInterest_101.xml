@@ -1,0 +1,14 @@
+<LineOfInterest Series="IMPACT">
+  <LineID>101</LineID>
+  <Line>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.6529898780936</Longitude><Latitude>-22.76164595107114</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.665458259377</Longitude><Latitude>-22.76203701966352</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.6845234173878</Longitude><Latitude>-22.76489559067056</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.6978101401758</Longitude><Latitude>-22.76110620007631</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.7225687796467</Longitude><Latitude>-22.75951704075627</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.7251389062663</Longitude><Latitude>-22.74988170800823</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.7252968339042</Longitude><Latitude>-22.74934893235569</Latitude></Location3D>
+   <Location3D Series="CMASI"><Altitude>10.0</Altitude><Longitude>150.7228480651017</Longitude><Latitude>-22.74602594690996</Latitude></Location3D>
+  </Line>
+</LineOfInterest>
+

@@ -73,6 +73,8 @@ public:
 
     AddressedMessage() { };
 
+    virtual ~AddressedMessage() { }
+
     bool
     setAddressAndPayload(const std::string address, const std::string payload)
     {

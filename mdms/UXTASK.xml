@@ -303,6 +303,10 @@
             <Field Name="TimeThreshold" Type="int64" Units="milliseconds since 1 Jan 1970" />
             <!-- Time that this task is assigned to be completed. -->
             <Field Name="TimeTaskCompleted" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Maximum wait time that this task is assigned to be completed by a specific vehicle. -->
+            <Field Name="TimeDelayMax" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Number of starting time partitions. -->
+            <Field Name="NumOfTimePartition" Type="int64"/>
         </Struct>
         
         <!-- A completed assignment consisting of an <b>ordered</b> list of tasks -->

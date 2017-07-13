@@ -78,8 +78,6 @@ CommRelayTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -238,11 +236,10 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         // extract location of tower
         int64_t towerId = m_CommRelayTask->getTowerID();
         std::shared_ptr<afrl::cmasi::Location3D> towerLocation{nullptr};
-        bool towerEnabled = false;
+
         if (m_idVsEntityState.find(towerId) != m_idVsEntityState.end())
         {
             towerLocation.reset(m_idVsEntityState[towerId]->getLocation()->clone());
-            towerEnabled = static_cast<afrl::impact::RadioTowerState*> (m_idVsEntityState[towerId].get())->getEnabled();
         }
 
         if (!towerLocation)
@@ -253,7 +250,6 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
                 {
                     auto config = std::static_pointer_cast<afrl::impact::RadioTowerConfiguration>(m_idVsEntityConfiguration[towerId]);
                     towerLocation.reset(config->getPosition()->clone());
-                    towerEnabled = config->getEnabled();
                 }
             }
         }

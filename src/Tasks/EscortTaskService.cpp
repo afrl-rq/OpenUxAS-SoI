@@ -76,8 +76,6 @@ EscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -263,7 +261,6 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
     if (m_supportedEntityStateLast)
     {
         // extract location of desired entity to track
-        int64_t trackId = m_escortTask->getSupportedEntityID();
         std::shared_ptr<afrl::cmasi::Location3D> targetLocation;
         double targetHeading = 0.0;
         double targetSpeed = 0.0;

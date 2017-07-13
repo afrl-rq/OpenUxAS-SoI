@@ -52,23 +52,22 @@ namespace n_FrameworkLib
         typedef CTaskAssignment::V_TASKASSIGNMENT_CONST_IT_t V_TASKASSIGNMENT_CONST_IT_t;
 
     public:
-    public:
 
         CAssignment(double dDistancePrevious = 0.0)
-        : m_dDistanceTotalTemp_m(0),
-        m_iWaypointCurrent(-1),
-        m_iLastTaskID(-1),
-        m_iWaypointID_next(1),
-        m_dMinimumWaypointSeparation_m((std::numeric_limits<double>::max)()),
-        m_iMaximumNumberWaypoints((std::numeric_limits<int>::max)()),
-        m_iMinimumNumberWaypointsForTurn(8),
-        m_dMinimumAssignmentSeparation_m(0.0),
-        m_dNewAssignmentOnsetDelay_s(0.0),
-        m_dDangerDistance((std::numeric_limits<double>::max)()),
-        m_dDistanceTotalPrevious_m(dDistancePrevious),
-        m_iNumberAssignments(0),
-        m_dHeadingFinal_rad(0.0)
- { };
+    		: m_iWaypointCurrent(-1),
+			  m_iNumberAssignments(0),
+			  m_dHeadingFinal_rad(0.0),
+			  m_dDistanceTotalPrevious_m(dDistancePrevious),
+			  m_dDistanceTotalTemp_m(0),
+			  m_iLastTaskID(-1),
+			  m_iWaypointID_next(1),
+			  m_dMinimumWaypointSeparation_m((std::numeric_limits<double>::max)()),
+			  m_iMaximumNumberWaypoints((std::numeric_limits<int>::max)()),
+			  m_iMinimumNumberWaypointsForTurn(8),
+			  m_dMinimumAssignmentSeparation_m(0.0),
+			  m_dNewAssignmentOnsetDelay_s(0.0),
+			  m_dDangerDistance((std::numeric_limits<double>::max)())
+    	{ };
 
         CAssignment(int iID, double dPositionX_m, double dPositionY_m, double dPositionZ_m, double dHeadingFinal, double dDistancePrevious = 0.0,
                 const double& dMinimumWaypointSeparation_m = (std::numeric_limits<double>::max)(),
@@ -79,19 +78,20 @@ namespace n_FrameworkLib
                 const int& iMinimumNumberWaypointsForTurn = 8,
                 const double& dMaximumTimeEndurance_s = (std::numeric_limits<double>::max)(),
                 const double& dDangerDistance = (std::numeric_limits<double>::max)())
-        : m_dDistanceTotalTemp_m(0),
-        m_iWaypointCurrent(-1),
-        m_iLastTaskID(iID),
-        m_iWaypointID_next(1),
-        m_dMinimumWaypointSeparation_m(dMinimumWaypointSeparation_m),
-        m_iMaximumNumberWaypoints(iMaximumNumberWaypoints),
-        m_iMinimumNumberWaypointsForTurn(iMinimumNumberWaypointsForTurn),
-        m_dMinimumAssignmentSeparation_m(dMinimumAssignmentSeparation_m),
-        m_dNewAssignmentOnsetDelay_s(dNewAssignmentOnsetDelay_s),
-        m_dDangerDistance(dDangerDistance),
-        m_dDistanceTotalPrevious_m(dDistancePrevious),
-        m_iNumberAssignments(0),
-        m_dHeadingFinal_rad(dHeadingFinal) {
+        	: m_iWaypointCurrent(-1),
+			  m_iNumberAssignments(0),
+			  m_dHeadingFinal_rad(dHeadingFinal),
+			  m_dDistanceTotalPrevious_m(dDistancePrevious),
+			  m_dDistanceTotalTemp_m(0),
+			  m_iLastTaskID(iID),
+			  m_iWaypointID_next(1),
+			  m_dMinimumWaypointSeparation_m(dMinimumWaypointSeparation_m),
+			  m_iMaximumNumberWaypoints(iMaximumNumberWaypoints),
+			  m_iMinimumNumberWaypointsForTurn(iMinimumNumberWaypointsForTurn),
+			  m_dMinimumAssignmentSeparation_m(dMinimumAssignmentSeparation_m),
+			  m_dNewAssignmentOnsetDelay_s(dNewAssignmentOnsetDelay_s),
+			  m_dDangerDistance(dDangerDistance)
+        {
             iAddWaypoint(CWaypoint(dPositionX_m, dPositionY_m, dPositionZ_m));
         };
 
@@ -265,7 +265,6 @@ namespace n_FrameworkLib
             int iWaypointIndexAfter(0);
             double dNewSegmentLength(0.0);
             if (bCalculateFuturePositionBasedOnDistance(iWaypointIndexStart, dDistanceFromLastPoint, basePositionHeadingCalculated, iWaypointIndexAfter, dNewSegmentLength)) {
-                V_WAYPOINT_IT_t itWaypointBefore = vwayGetWaypoints().begin() + (iWaypointIndexAfter - 1);
                 V_WAYPOINT_IT_t itWaypointAfter = vwayGetWaypoints().begin() + iWaypointIndexAfter;
                 CWaypoint wayTemp = *itWaypointAfter;
 
@@ -279,7 +278,7 @@ namespace n_FrameworkLib
                 //fix original after waypoint
                 itWaypointAfter->dGetSegmentLength() -= dNewSegmentLength;
 
-                V_WAYPOINT_IT_t itWaypointNew = vwayGetWaypoints().insert(itWaypointAfter, wayTemp);
+                vwayGetWaypoints().insert(itWaypointAfter, wayTemp);
             }
 
             return (bSuccess);

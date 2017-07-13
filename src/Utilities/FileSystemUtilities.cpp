@@ -41,9 +41,9 @@ namespace utilities
 
     bool c_FileSystemUtilities::bFindUniqueFileName(const std::string& strFileNameBase, const std::string& strPath,std::string& strPathFileName, const bool& isAddExtension)
     {
-        bool bSuccess(true);
-        std::stringstream sstrErrors;
-        if (bSuccess = bCreateDirectory(strPath, sstrErrors))
+    	std::stringstream sstrErrors;
+        const bool bSuccess = bCreateDirectory(strPath, sstrErrors);
+        if (bSuccess)
         {
             // check to see how many files are in directory
             size_t szNumberFiles(0);

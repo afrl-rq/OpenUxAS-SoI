@@ -1,0 +1,35 @@
+<KeepOutZone Series="CMASI">
+  <ZoneType>Physical</ZoneType>
+  <ZoneID>11</ZoneID>
+  <MinAltitude>-3.40282346638529e+38</MinAltitude>
+  <MaxAltitude>3.40282346638529e+38</MaxAltitude>
+  <AffectedAircraft>
+  </AffectedAircraft>
+  <StartTime>0</StartTime>
+  <EndTime>0</EndTime>
+  <Padding>60.9599990844727</Padding>
+  <Label>KeepOut_11</Label>
+  <Boundary>
+   <Polygon Series="CMASI">
+     <BoundaryPoints>
+      <Location3D Series="CMASI">
+        <Latitude>-22.715</Latitude>
+        <Longitude>150.63</Longitude>
+      </Location3D>
+      <Location3D Series="CMASI">
+        <Latitude>-22.715</Latitude>
+        <Longitude>150.65</Longitude>
+      </Location3D>
+      <Location3D Series="CMASI">
+        <Latitude>-22.710</Latitude>
+        <Longitude>150.65</Longitude>
+      </Location3D>
+      <Location3D Series="CMASI">
+        <Latitude>-22.710</Latitude>
+        <Longitude>150.63</Longitude>
+      </Location3D>
+     </BoundaryPoints>
+   </Polygon>
+  </Boundary>
+</KeepOutZone>
+

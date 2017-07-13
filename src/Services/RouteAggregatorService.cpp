@@ -224,6 +224,16 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
     m_pendingAutoReq[reqId] = std::unordered_set<int64_t>();
     std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendAirPlanRequest;
     std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendGroundPlanRequest;
+    
+    // if the 'EntityList' is empty, then ALL vehicles are considered eligible
+    if(areq->getOriginalRequest()->getEntityList().empty())
+    {
+        for(auto entity : m_entityStates)
+        {
+            areq->getOriginalRequest()->getEntityList().push_back(entity.second->getID());
+        }
+    }
+    
 
     // to minimize network traffic make a separate request for each vehicle
     for (size_t v = 0; v < areq->getOriginalRequest()->getEntityList().size(); v++)
@@ -374,6 +384,7 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
     {
         CheckAllRoutePlans();
     }
+
 }
 
 void RouteAggregatorService::HandleRouteRequest(std::shared_ptr<uxas::messages::route::RouteRequest> request)
@@ -533,17 +544,6 @@ void RouteAggregatorService::SendMatrix(int64_t autoKey)
             auto taskpair = m_routeTaskPairing.find(rId);
             if (taskpair != m_routeTaskPairing.end())
             {
-                int64_t optionCost = 0;
-                if (m_taskOptions.find(taskpair->second->taskId) != m_taskOptions.end())
-                {
-                    for (auto& opt : m_taskOptions[taskpair->second->taskId]->getOptions())
-                    {
-                        if (opt->getOptionID() == taskpair->second->taskOption)
-                        {
-                            optionCost = opt->getCost();
-                        }
-                    }
-                }
                 if (plan->second.second->getRouteCost() < 0)
                 {
                     routesNotFound << "V[" << taskpair->second->vehicleId << "](" << taskpair->second->prevTaskId << "," << taskpair->second->prevTaskOption << ")-(" << taskpair->second->taskId << "," << taskpair->second->taskOption << ")" << std::endl;

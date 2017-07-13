@@ -254,6 +254,16 @@ void AutomationDiagramDataService::ProcessUniqueAutomationResponse(std::shared_p
         {
             // 3) collect all of the tasks, zones, operation regions, entityStates(?),process inputs into files for python, save into directory
             //STATES
+            
+            // if the 'EntityList' is empty, then ALL vehicles are considered eligible
+            if(itUniqueAutomationRequest->second->getOriginalRequest()->getEntityList().empty())
+            {
+                for(auto entity : m_idVsLastEntityState)
+                {
+                    itUniqueAutomationRequest->second->getOriginalRequest()->getEntityList().push_back(entity.second->getID());
+                }
+            }
+            
             for (auto& entityId : itUniqueAutomationRequest->second->getOriginalRequest()->getEntityList())
             {
                 bool isFoundEntityState{false};

@@ -5,7 +5,7 @@ conf = configuration_data()
 link_args = []
 
 os = target_machine.system()
-if os == 'linux'
+if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
@@ -76,7 +76,6 @@ lib_pugixml             = sub_pugixml.get_variable('lib')
 subdir('src/DPSS')
 
 subdir('src/VisilibityLib')
-
 if not get_option('afrl_internal')
   subdir('src/LMCP')
 endif
@@ -128,13 +127,11 @@ deps = [
 ]
 
 # OpenGL, specifically the GLU library
-if not meson.is_cross_build()
-  deps += [dependency('gl')]
-  if os == 'linux'
-    deps += [dependency('glu')]
-  elif os == 'windows'
-    deps += [cpp.find_library('glu32')]
-  endif
+deps += [dependency('gl')]
+if os.startswith('linux')
+  deps += [dependency('glu')]
+elif os == 'windows'
+  deps += [cpp.find_library('glu32')]
 endif
 
 cpp_args = []
@@ -165,6 +162,7 @@ executable(
     incs_lmcp,
   ],
   link_with: libs,
+  install: true,
 )
 
 subdir('tests')

@@ -60,7 +60,7 @@ public:
         if (first != last)
         {
             m_compositionString += " .(";
-            int64_t index = 0;
+            size_t index = 0;
             for (; first != last; first++) // loop over vehicle (or location) IDs in permutation
             {
                 if (m_isVehicleConstrained)
@@ -135,8 +135,6 @@ CordonTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
 

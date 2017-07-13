@@ -52,18 +52,18 @@ namespace n_FrameworkLib
 /*        Constructors                                 */
 /****************************************************/
 CGrid::CGrid(const CGrid& grid) :
-//Polygon_Points (0),
 //VGrid(0), 
 //Index(0),
 //UpperBound(0),
-XGridResolution(0),
-YGridResolution(0),
-TotalCells(0),
-NearEpsilon(1e-9),
+//Polygon_Points (0),
 xdelta(0),
 ydelta(0),
 inv_xdelta(0),
 inv_ydelta(0),
+XGridResolution(0),
+YGridResolution(0),
+TotalCells(0),
+NearEpsilon(1e-9),
 dHUGE(1.797693134862315e+308),
 GR_FULL_VERT(0x01),
 GR_FULL_HORZ(0x02),
@@ -93,18 +93,18 @@ GC_T_EDGE_CLEAR(GC_T_EDGE_HIT)
 CGrid::CGrid(std::vector<int32_t>& viVerticies,V_POSITION_t& vposVertexContainer, int x_grid_resolution, 
              int y_grid_resolution, CPosition &min, CPosition &max,
              stringstream &sstrErrorMessage):
-//Polygon_Points (polygon_points),
 //VGrid(0), 
 //Index(0),
 //UpperBound(0),
-XGridResolution(x_grid_resolution),
-YGridResolution(y_grid_resolution),
-TotalCells(x_grid_resolution*y_grid_resolution),
-NearEpsilon(1e-9),
+//Polygon_Points (polygon_points),
 xdelta(0),
 ydelta(0),
 inv_xdelta(0),
 inv_ydelta(0),
+XGridResolution(x_grid_resolution),
+YGridResolution(y_grid_resolution),
+TotalCells(x_grid_resolution*y_grid_resolution),
+NearEpsilon(1e-9),
 dHUGE(1.797693134862315e+308),
 GR_FULL_VERT(0x01),
 GR_FULL_HORZ(0x02),
@@ -155,10 +155,9 @@ TryAgain:
         gly[i] = min.m_east_m + i * ydelta;
     gly[i] = max.m_east_m;
     
-    Index = VGrid.begin();
     UpperBound = VGrid.end();
     
-    for ( Index; Index < UpperBound ; Index++) {
+    for ( Index = VGrid.begin(); Index < UpperBound ; Index++) {
         Index->tot_edges = 0;
         Index->gc_flags = 0x0;
         Index->Data = 0;
@@ -169,7 +168,13 @@ TryAgain:
 //    CPolygon::Point *vtxa, *vtxb;
     CPosition *vtxa, *vtxb;
     Cell *p_gc;
-    double xdiff, ydiff, tmax, xdir, ydir, t_near, tx, ty, inv_x, inv_y, tgcx, tgcy;
+    double xdiff, ydiff, tmax, xdir, ydir, t_near, tx, ty, inv_x, inv_y;
+    // For distinct locations, there must be a difference in either the north or east directions,
+    // so tx and ty can't both be set to dHUGE leading into iterative loop.  The variables tgcx and
+    // tgcy used are set in all branches for all other cases, so the conditional branch selected
+    // will never try and use the uninitialized tgcx/tgcy.  Both values are initialized to zero
+    // to dismiss a compiler warning regarding use of potentially uninitialized variables.
+    double tgcx(0), tgcy(0);
     double vx0, vy0, vx1, vy1;
     int gcx, gcy, sign_x, y_flag;
 //    vtx0 = (Polygon_Points.end() - 1 );
@@ -402,12 +407,11 @@ CGrid::~CGrid()
     
     if ( VGrid.size() ) {                        // skip if zero lenght - nothing to delete
         
-        Index = VGrid.begin();
         UpperBound = VGrid.end();
         
         // Delete Cell structures and then clear vector
         
-        for (Index ; Index < UpperBound ; Index ++ ) {
+        for (Index = VGrid.begin() ; Index < UpperBound ; Index ++ ) {
 #if DEBUG_FLAG==1
             if (DEBUG_FLAG) 
                 sstrPrintMessage << "deleting Grid \"CellData\"\n";
@@ -502,19 +506,17 @@ void CGrid::Print() {
     if (METHOD_DEBUG)
         cout << "Cgrid Print() Method\n";
     
-    Index = VGrid.begin();
     UpperBound = VGrid.end();
     int i = 0;
     
-    for (Index ; Index < UpperBound ; Index++) {
+    for (Index = VGrid.begin() ; Index < UpperBound ; Index++) {
         cout << "\n Grid Cell " << i++ << "\n";
         printf("\nTOTAL EDGES:    %d    GC_FLAGS:    %u\n", Index->tot_edges, Index->gc_flags );
         
         if (Index->Data) {
-            DIndex = Index->Data->begin();
             DUpperBound = Index->Data->end();
             
-            for (DIndex; DIndex < DUpperBound ; DIndex++) {
+            for (DIndex = Index->Data->begin(); DIndex < DUpperBound ; DIndex++) {
                 
                 cout << "    xa,ya: " << DIndex->xa << "," << DIndex->ya << " ax, ay: " << DIndex->ax << "," << DIndex->ay << " slope " << DIndex->slope << "\n";
                 cout << "    minx: " << DIndex->minx << " maxx: " << DIndex->maxx << " miny: " << DIndex->miny << " maxy: " << DIndex->maxy << "\n";
@@ -636,7 +638,7 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
             //left edge is clear, shoot X-ray
             inside_flag = (gc_flags & GC_BL_IN)? 1 : 0 ;
             
-            for ( DIndex; DIndex < DUpperBound ; DIndex++ ) {
+            for ( ; DIndex < DUpperBound ; DIndex++ ) {
                 
                 // test if y is between edges 
                 if ( y >= DIndex->miny && y < DIndex->maxy ) {
@@ -670,7 +672,7 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
             // note - this next statement requires that GC_BL_IN is 1 
             inside_flag = (gc_flags & GC_BL_IN ) ? 1 : 0 ;
             
-            for ( DIndex ; DIndex < DUpperBound ; DIndex++ ) {
+            for ( ; DIndex < DUpperBound ; DIndex++ ) {
                 
                 // test if x is between edges 
                 if ( x >= DIndex->minx && x < DIndex->maxx ) {
@@ -704,7 +706,7 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
             // by miny or somesuch, and so be able to cut testing
             // short when the list's miny > point.y .
             
-            for ( DIndex ; DIndex < DUpperBound ; DIndex++ ) {
+            for ( ; DIndex < DUpperBound ; DIndex++ ) {
                 
                 // test if y is between edges 
                 if ( y >= DIndex->miny && y < DIndex->maxy ) {
@@ -734,7 +736,7 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
             // CASE 4:    top edge is clear, shoot Y+ ray 
         case (3<<10):
             inside_flag = (gc_flags & GC_TR_IN) ? 1 : 0 ;
-            for ( DIndex ; DIndex < DUpperBound ; DIndex++ ) {
+            for ( ; DIndex < DUpperBound ; DIndex++ ) {
                 // test if x is between edges 
                 if ( x >= DIndex->minx && x < DIndex->maxx ) {
                     if ( y <= DIndex->miny ) {
@@ -769,7 +771,7 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
             cornerx = glx[ (int)xcell ];
             cornery = gly[ (int)ycell ];
             
-            for (DIndex ; DIndex < DUpperBound ; DIndex++ ) {
+            for ( ; DIndex < DUpperBound ; DIndex++ ) {
                 
                 // quick out test: if test point is
                 // less than minx & miny, edge cannot overlap.
@@ -833,10 +835,9 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
             DIndex = p_gr->begin();
             
             CPosition *vertexA = 0, *vertexB = 0;
-            double dCollinear;
-                        CPosition posX(x,y);
+            CPosition posX(x,y);
             
-            for (DIndex ; DIndex < DUpperBound ; DIndex++ ) 
+            for ( ; DIndex < DUpperBound ; DIndex++ )
                         {
                                 //def is_on(a, b, c):
                                 //    "Return true iff point c intersects the line segment from a to b."
@@ -873,7 +874,7 @@ bool CGrid::InPolygon(double x, double y, double z, const CPosition &min, string
                                 {
                                     inside_flag = 1;
                                     break;
-                }       //if ( (dCollinear < 1e-2 ) && (dCollinear > -1e-2) )
+                }
             } 
         } 
     }
