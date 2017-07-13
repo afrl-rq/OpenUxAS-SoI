@@ -214,11 +214,6 @@ namespace testgeneration
                     readInitCond();
                     sendAck(testgeneration::staliro::STALIRO_ACK);
                 }
-                if (cmd == testgeneration::staliro::STALIRO_TASK)
-                {
-                    readTask();
-                    sendAck(testgeneration::staliro::STALIRO_ACK);
-                }
                 else if (cmd == testgeneration::staliro::STALIRO_START_SIM)
                 {
                     allReceived = true;
@@ -294,13 +289,6 @@ namespace testgeneration
             fileFieldMapPtr = mapPtr;
         }
         
-        void c_CommunicationInterface::setTaskFileFieldMapPtr(
-                std::map<std::string, std::map<std::string, 
-                std::vector<double>> >* mapPtr)
-        {
-            taskFileFieldMapPtr = mapPtr;
-        }
-        
         void c_CommunicationInterface::readInitCond()
         {
             std::string fileName = readFieldString();
@@ -308,15 +296,6 @@ namespace testgeneration
             std::string value = readFieldString();
             
             (*fileFieldMapPtr)[fileName].insert(std::make_pair(fieldName, value));
-        }
-        
-        void c_CommunicationInterface::readTask()
-        {
-            std::string fileName = readFieldString();
-            std::string fieldName = readFieldString();
-            std::vector<double> valueArr = readFieldArray();
-            
-            (*taskFileFieldMapPtr)[fileName].insert(std::make_pair(fieldName, valueArr));
         }
         
         std::string c_CommunicationInterface::readFieldString()

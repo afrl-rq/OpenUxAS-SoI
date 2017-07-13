@@ -72,8 +72,6 @@ SendTestMessagesService::configure(const pugi::xml_node& serviceXmlNode)
     bool isSuccess{true};
     std::map<std::string, std::map<std::string, std::string> > fileFieldMap;
     std::map<std::string, std::map<std::string, std::string> >::iterator fileFieldMapIter;
-    std::map<std::string, std::map<std::string, std::vector<double> > taskFileFieldMap;
-    std::map<std::string, std::map<std::string, std::vector<double> >::iterator taskFileFieldMapIter;
     
     //bool doesTestGeneratorExist{false};
     int testGeneratorInterfacePort;
@@ -88,7 +86,6 @@ SendTestMessagesService::configure(const pugi::xml_node& serviceXmlNode)
         staliroInterface->createServer(testGeneratorInterfacePort);
         staliroInterface->acceptConnection();
         staliroInterface->setFileFieldMapPtr(&fileFieldMap);
-        staliroInterface->setTaskFileFieldMapPtr(&taskFileFieldMap);
         staliroInterface->receiveCommands();
     }
     else
@@ -202,12 +199,6 @@ SendTestMessagesService::configure(const pugi::xml_node& serviceXmlNode)
                                     }
                                 }
                             }
-                        }
-                        
-                        taskFileFieldMapIter = taskFileFieldMap.find(fileName);
-                        if (taskFileFieldMapIter != taskFileFieldMap.end())
-                        {
-                            
                         }
                     }
 

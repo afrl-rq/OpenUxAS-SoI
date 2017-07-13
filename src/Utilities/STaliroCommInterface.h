@@ -70,7 +70,6 @@ namespace testgeneration
             bool isConnected;
             struct sockaddr_in serverAddress;
             std::map<std::string, std::map<std::string, std::string> >* fileFieldMapPtr;
-            std::map<std::string, std::map<std::string, std::vector<double>> >* taskFileFieldMapPtr;
             std::string readFieldString();
             std::vector<double> readFieldArray();
             bool sendAck(uint32_t ackReply);
@@ -107,7 +106,6 @@ namespace testgeneration
             STALIRO_START_SIM = 3,
             STALIRO_ACK = 4,
             STALIRO_NAK = 5,
-            STALIRO_TASK = 6,
             STALIRO_TRAJ_INFO = 10,
             STALIRO_TRAJ_DATA = 11,
             STALIRO_REQUEST_TRAJECTORY = 12,
