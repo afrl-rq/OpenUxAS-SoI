@@ -6,6 +6,8 @@
 
 #define WP_HDR_LEN 15
 
+#define MC_SZ(waypoints) (sizeof(mc_t)-(MAX_WAYPOINTS*sizeof(wp_t))+(waypoints*sizeof(wp_t)))
+
 struct  __attribute__((packed)) wp_struct {
   char header[WP_HDR_LEN];
   uint64_t /*double*/ latitude;

@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <string.h>
 
+
 #define BSWAP(E) (sizeof(E) == 8 ? E = __builtin_bswap64(E) :\
                   (sizeof(E) == 4 ? E = __builtin_bswap32(E) :\
                    (sizeof(E) == 2 ? E = __builtin_bswap16(E) :\
@@ -24,7 +25,7 @@ uint32_t Checksum(const uint8_t * p, const size_t len)
   /* assumption: p is not NULL. */
   assert(p != NULL);
   
-  for (size_t i = 0; i < len - sizeof(uint32_t); i++) {
+  for (size_t i = 0; i < len; i++) {
     sum += (uint32_t) p[i];
   }
   return sum & 0x00000000FFFFFFFF;
@@ -70,20 +71,18 @@ bool FixCopiedMC(mc_t * mc_ptr) {
     BSWAP(mc_ptr->full.waypoints[i].associatedtasksize);
   }
 
-  /* The serialized waypoints are followed by the starting waypoint. */
-  mc_ptr->full.startingwaypoint = *((uint64_t*)(mc_ptr->full.waypoints + i));
-  BSWAP(mc_ptr->full.startingwaypoint);
-
-  /* The mission command serialization ends with a checksump */
-  mc_ptr->full.checksum =
-    *((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1));
-  BSWAP(mc_ptr->full.checksum);
-
   /* Zeroize the unused waypoints. */
   memset(mc_ptr->full.waypoints + i, 0, sizeof(wp_t) * (MAX_WAYPOINTS-i));
 
+  //so the last waypoint and checksum actually live right at the end of the
+  //waypoint list. So this can be at a different spot in the struct depending
+  //on the number of waypoints
+
+  BSWAP(*((uint64_t*)(mc_ptr->full.waypoints + i)));
+  BSWAP(*((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1)));
+
   /* Ensure the checksum is correct. */
-  return mc_ptr->full.checksum == Checksum((uint8_t *)mc_ptr,sizeof(mc_t));
+  return *((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1)) == Checksum((uint8_t *)mc_ptr, MC_SZ(mc_ptr->full.waypointssize)-sizeof(uint32_t));
 }
 
 void UnFixCopiedMC(mc_t * mc_ptr) {
@@ -99,6 +98,8 @@ void UnFixCopiedMC(mc_t * mc_ptr) {
   BSWAP(mc_ptr->full.vehicleactionlistsize);
   BSWAP(mc_ptr->full.commandstatus);
   
+  //mc_ptr->full.startingwaypoint = *((uint64_t*)(mc_ptr->full.waypoints + i));
+  BSWAP(mc_ptr->full.startingwaypoint);
   /* Swap all the fields in each waypoint. */
   for(i = 0;i < mc_ptr->full.waypointssize; i++) {
     BSWAP(mc_ptr->full.waypoints[i].latitude);
@@ -117,18 +118,9 @@ void UnFixCopiedMC(mc_t * mc_ptr) {
     BSWAP(mc_ptr->full.waypoints[i].associatedtasksize);
   }
 
-  BSWAP(mc_ptr->full.waypointssize);
-  /* The serialized waypoints are followed by the starting waypoint. */
-  mc_ptr->full.startingwaypoint = *((uint64_t*)(mc_ptr->full.waypoints + i));
-  BSWAP(mc_ptr->full.startingwaypoint);
+  BSWAP(*((uint64_t*)(mc_ptr->full.waypoints + i)));
+  BSWAP(*((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1)));
 
-  /* The mission command serialization ends with a checksump */
-  mc_ptr->full.checksum =
-    *((uint32_t *)(((uint64_t*)(mc_ptr->full.waypoints + i)) + 1));
-  BSWAP(mc_ptr->full.checksum);
-
-  /* Zeroize the unused waypoints. */
-  memset(mc_ptr->full.waypoints + i, 0, sizeof(wp_t) * (MAX_WAYPOINTS-i));
 }
 
 /* DeserializeMCFromFile: Deserialize a mission command reading from a
@@ -255,7 +247,7 @@ bool MCWaypointSubSequence(const mc_t * orig_mc_ptr,
   mc_new_ptr->full.waypoints[i - 1].nxid = mc_new_ptr->full.waypoints[i - 1].id;
   mc_new_ptr->full.startingwaypoint = id;
   mc_new_ptr->full.waypointssize = i;
-  mc_new_ptr->full.checksum = Checksum((uint8_t*)mc_new_ptr,sizeof(mc_t));
+  *((uint32_t *)(((uint64_t*)(mc_new_ptr->full.waypoints + i)) + 1)) = Checksum((uint8_t*)mc_new_ptr,MC_SZ(mc_new_ptr->full.waypointssize)-sizeof(uint32_t));
   return true;
 }
 
