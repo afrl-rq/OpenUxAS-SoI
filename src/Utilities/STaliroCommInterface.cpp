@@ -214,6 +214,11 @@ namespace testgeneration
                     readInitCond();
                     sendAck(testgeneration::staliro::STALIRO_ACK);
                 }
+                if (cmd == testgeneration::staliro::STALIRO_TASK)
+                {
+                    readTask();
+                    sendAck(testgeneration::staliro::STALIRO_ACK);
+                }
                 else if (cmd == testgeneration::staliro::STALIRO_START_SIM)
                 {
                     allReceived = true;
@@ -289,6 +294,13 @@ namespace testgeneration
             fileFieldMapPtr = mapPtr;
         }
         
+        void c_CommunicationInterface::setTaskFileFieldMapPtr(
+                std::map<std::string, std::map<std::string, 
+                std::vector<double>> >* mapPtr)
+        {
+            taskFileFieldMapPtr = mapPtr;
+        }
+        
         void c_CommunicationInterface::readInitCond()
         {
             std::string fileName = readFieldString();
@@ -296,6 +308,15 @@ namespace testgeneration
             std::string value = readFieldString();
             
             (*fileFieldMapPtr)[fileName].insert(std::make_pair(fieldName, value));
+        }
+        
+        void c_CommunicationInterface::readTask()
+        {
+            std::string fileName = readFieldString();
+            std::string fieldName = readFieldString();
+            std::vector<double> valueArr = readFieldArray();
+            
+            (*taskFileFieldMapPtr)[fileName].insert(std::make_pair(fieldName, valueArr));
         }
         
         std::string c_CommunicationInterface::readFieldString()
@@ -336,7 +357,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg length!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg!");
                     msgLen = 0;
                 }
             }
@@ -344,6 +365,52 @@ namespace testgeneration
             return retStr;
         }
         
+        std::vector<double> c_CommunicationInterface::readFieldArray()
+        {
+            uint32_t msgLen = 0;
+            uint readCnt = 0;
+            uint tmpReadCnt = 0;
+            std::vector<double> retVector;
+            double tempDbl = 0.0;
+            
+            // Read Msg length
+            while (readCnt < sizeof(msgLen))
+            {
+                tmpReadCnt = recv( clientSocket, &msgLen + readCnt, sizeof(msgLen) - readCnt, 0);
+                if (tmpReadCnt >= 0)
+                {
+                    readCnt += tmpReadCnt;
+                }
+                else
+                {
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg length!");
+                    msgLen = 0;
+                }
+            }
+            readCnt = 0;
+            
+            // Read Msg
+            while (readCnt < msgLen)
+            {
+                // Read 1 double at a time:
+                uint dblReadCount = 0;
+                while (dblReadCount < sizeof(tempDbl))
+                {
+                    tmpReadCnt = recv( clientSocket, &tempDbl + dblReadCount, sizeof(tempDbl)-dblReadCount, 0);
+                    if (tmpReadCnt >= 0)
+                    {
+                        dblReadCount += tmpReadCnt;
+                    }
+                    else
+                    {
+                        UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read double!");
+                    }
+                }
+                retVector.push_back(tempDbl);
+                readCnt++;
+            }
+            return retVector;
+        }
         
         bool c_CommunicationInterface::sendTrajInfo(uint32_t numColumns, 
                 uint32_t numRows)

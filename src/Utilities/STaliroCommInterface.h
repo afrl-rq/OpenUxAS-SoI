@@ -48,10 +48,14 @@ namespace testgeneration
             bool sendTrajData(size_t length, void* data);
             bool receiveAck();
             void readInitCond();
+            void readTask();
             bool sendHeartBeat(int64_t curTime);
             void setFileFieldMapPtr(std::map<std::string, 
                     std::map<std::string,
                     std::string> >* mapPtr);
+            void setTaskFileFieldMapPtr(std::map<std::string, 
+                    std::map<std::string,
+                    std::vector<double>> >* mapPtr);
             void addTrajectoryRow(uint32_t curRowNumber, 
                     uint32_t totalNumOfRows, 
                     uint32_t numElementsInRow, 
@@ -66,7 +70,9 @@ namespace testgeneration
             bool isConnected;
             struct sockaddr_in serverAddress;
             std::map<std::string, std::map<std::string, std::string> >* fileFieldMapPtr;
+            std::map<std::string, std::map<std::string, std::vector<double>> >* taskFileFieldMapPtr;
             std::string readFieldString();
+            std::vector<double> readFieldArray();
             bool sendAck(uint32_t ackReply);
             void resetSendBuffer();
             bool addToSendBuffer(void * data, size_t dataLength);
@@ -101,6 +107,7 @@ namespace testgeneration
             STALIRO_START_SIM = 3,
             STALIRO_ACK = 4,
             STALIRO_NAK = 5,
+            STALIRO_TASK = 6,
             STALIRO_TRAJ_INFO = 10,
             STALIRO_TRAJ_DATA = 11,
             STALIRO_REQUEST_TRAJECTORY = 12,
