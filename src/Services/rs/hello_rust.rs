@@ -12,7 +12,6 @@
  * Author: acfoltzer
  */
 
-extern crate lmcp_rs;
 use lmcp_rs::*;
 
 use std::slice;

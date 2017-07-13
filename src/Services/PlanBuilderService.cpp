@@ -27,7 +27,8 @@
 #include "afrl/impact/SurfaceVehicleState.h"
 #include "afrl/cmasi/ServiceStatus.h"
 
-
+#include "avtas/lmcp/ByteBuffer.h"
+#include "avtas/lmcp/Factory.h"
 
 #include "pugixml.hpp"
 
@@ -56,9 +57,13 @@ PlanBuilderService::ServiceBase::CreationRegistrar<PlanBuilderService>
 PlanBuilderService::s_registrar(PlanBuilderService::s_registryServiceTypeNames());
 
 PlanBuilderService::PlanBuilderService()
-: ServiceBase(PlanBuilderService::s_typeName(), PlanBuilderService::s_directoryName()) { };
+: ServiceBase(PlanBuilderService::s_typeName(), PlanBuilderService::s_directoryName()) {
+  m_PlanBuilder = plan_builder_new();
+}
 
-PlanBuilderService::~PlanBuilderService() { };
+PlanBuilderService::~PlanBuilderService() {
+  plan_builder_delete(m_PlanBuilder);
+}
 
 bool
 PlanBuilderService::configure(const pugi::xml_node& ndComponent)
@@ -84,6 +89,9 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
     addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+
+    plan_builder_configure(m_PlanBuilder, m_assignmentStartPointLead_m);
+
     return (isSuccess);
 }
 
@@ -97,6 +105,11 @@ bool
 PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 //example: if (afrl::cmasi::isServiceStatus(receivedLmcpMessage->m_object.get()))
 {
+  avtas::lmcp::ByteBuffer * lmcpByteBuffer = avtas::lmcp::Factory::packMessage(receivedLmcpMessage->m_object.get(), true);
+  plan_builder_process_received_lmcp_message(m_PlanBuilder, lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
+  delete lmcpByteBuffer;
+
+
     if (receivedLmcpMessage->m_object->getFullLmcpTypeName() == uxas::messages::task::TaskAssignmentSummary::Subscription)
     {
         processTaskAssignmentSummary(std::static_pointer_cast<uxas::messages::task::TaskAssignmentSummary>(receivedLmcpMessage->m_object));
