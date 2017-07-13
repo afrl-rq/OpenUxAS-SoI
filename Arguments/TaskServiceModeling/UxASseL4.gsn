@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[UxAS Returns Home]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15d36f2cc08"
+        name="UxAS Returns Home">
+      UxAS will eventually return home with probability &gt; {X}
+
+      <c
+          id="__gsn__15d370a22f1"
+          name="Context">
+        All UxAS services run on a Linux VM on the seL4 microkernel
+      </c>
+
+      <a
+          id="__gsn__15d37c184d1"
+          name="Assumption">
+        Autopilot always works
+      </a>
+
+      <s
+          id="__gsn__15d37c2c9f0"
+          name="Strategy">
+        Argue over key architectural features
+
+        <g
+            id="__gsn__15d37d43e90"
+            name="VM Services">
+          Any waypoint list sent by UxAS services will always end with a waypoint leading to an obstruction-free path home
+        </g>
+
+        <g
+            id="__gsn__15d37c35598"
+            name="WM Knows Way Home">
+          The waypoint manager (WM) always has a complete waypoint list to home
+
+          <a
+              id="__gsn__15d37c7204c"
+              name="Assumption">
+            Waypoint manager begins mission with a valid waypoint list to home
+          </a>
+
+          <a
+              id="__gsn__15d384557a6"
+              name="Assumption">
+            Any waypoint list sent by UxAS services will always end with a waypoint leading to an obstruction-free path home
+          </a>
+
+          <s
+              id="__gsn__15d37123947"
+              name="Strategy">
+            Argue over gross states of Linux VM
+
+            <c
+                id="__gsn__15d37190c28"
+                name="Mutual Independence">
+              A crashed VM is not considered to be compromised (events are mutually exclusive)
+            </c>
+
+            <j
+                id="__gsn__15d37188f68"
+                name="Justification">
+              X = X2 * (1 - C1 - C2) + X3 * C1&nbsp;+&nbsp;X4 * C2
+            </j>
+
+            <g
+                id="__gsn__15d3713dff6"
+                name="Compromised VM">
+              UxAS returns home with probability &gt; {X3} with compromised VM
+
+              <a
+                  id="__gsn__15d371845f9"
+                  name="Probability">
+                Probability of VM being compromised is {C1}
+              </a>
+
+              <j
+                  id="__gsn__15d372ad6b0"
+                  name="Justification">
+                {X3} is relatively small on the assumption that {C1} is small
+
+                <a
+                    id="__gsn__15d372b4af0"
+                    name="Assumption">
+                  {C1} is small
+                </a>
+              </j>
+
+              <c
+                  id="__gsn__15d37f2ae56"
+                  name="Context">
+                Being compromised can happen from either a malicious source or a random fault
+              </c>
+
+              <s
+                  id="__gsn__15d382f10d3"
+                  name="Strategy">
+                Argue transitively that possible modes of being compromised are identified and then handled
+
+                <g
+                    id="__gsn__15d381c6af2"
+                    name="Modes of Being Compromised Identified">
+                  All possible modes of being compromised have been identified
+
+                  <e
+                      id="__gsn__15d3830c0e8"
+                      name="Evidence">
+                    Reviewed document describing enumerated modes of corruption and processs for identification
+                  </e>
+                </g>
+
+                <g
+                    id="__gsn__15d382fede1"
+                    name="Modes of Being Compromised Mitigated">
+                  All possible modes of being compromised have been mitigated
+
+                  <s
+                      id="__gsn__15d372c018f"
+                      name="Strategy">
+                    Argue over possible modes of being compromised
+
+                    <c
+                        id="__gsn__15d381b0224"
+                        name="Enumeration">
+                      Possible modes of the virtual machine (VM) being compromised includes {garbage output, denial of service, path that flies into terrain, path with an invalid flight envelope, and flight to an enemy control point}
+                    </c>
+
+                    <j
+                        id="__gsn__15d3bd8cfe3"
+                        name="Justification">
+                      Assigning probabilities to modes of being compromised is misleading for an adaptable antagonist
+                    </j>
+
+                    <g
+                        id="__gsn__15d3730df23"
+                        name="Garbage Output">
+                      UxAS will returh home with probability &gt; {X4} when output waypoints from VM is [garbage]
+
+                      <c
+                          id="__gsn__15d37fa60c8"
+                          name="Definition">
+                        [Garbage] means that the list is not in valid waypiont list format
+                      </c>
+
+                      <m
+                          id="__gsn__15d37e6392b"
+                          link="WMWorksCorrectly.gsn"
+                          name="WM Works Correctly">
+                        Waypoint manager (WM) always [works correctly]
+
+                        <away-context
+                            id="__gsn__15d3821ecbe"
+                            link="WMWorksCorrectly.gsn#Req1"
+                            name="Req1">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d38225d83"
+                            link="WMWorksCorrectly.gsn#Req2"
+                            name="Req2">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d38231d3e"
+                            link="WMWorksCorrectly.gsn#Req4"
+                            name="Req4">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives a list that does not comply with a recognized waypoint list format retains its valid list
+                        </away-context>
+                      </m>
+                    </g>
+
+                    <g
+                        id="__gsn__15d37531bb0"
+                        name="Denial of Service">
+                      UxAS will returh home with probability &gt; {X4} when compromiser uses a DoS attack on the VM
+
+                      <m
+                          id="__gsn__15d37e63f1e"
+                          link="WMWorksCorrectly.gsn"
+                          name="WM Works Correctly">
+                        Waypoint manager (WM) always [works correctly]
+
+                        <away-context
+                            id="__gsn__15d3822403e"
+                            link="WMWorksCorrectly.gsn#Req1"
+                            name="Req1">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d382265ea"
+                            link="WMWorksCorrectly.gsn#Req2"
+                            name="Req2">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d38246633"
+                            link="WMWorksCorrectly.gsn#Req5"
+                            name="Req5">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives more input than it can handle always contains a valid list
+                        </away-context>
+                      </m>
+                    </g>
+
+                    <g
+                        id="__gsn__15d3732ffc0"
+                        name="Flight into Terrain">
+                      UxAS will return home with probability &gt; {X5} when output waypoints from VM are into terrain
+
+                      <m
+                          id="__gsn__15d37e64aa8"
+                          link="WMWorksCorrectly.gsn"
+                          name="WM Works Correctly">
+                        Waypoint manager (WM) always [works correctly]
+
+                        <away-context
+                            id="__gsn__15d382211d3"
+                            link="WMWorksCorrectly.gsn#Req1"
+                            name="Req1">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d38226ae7"
+                            link="WMWorksCorrectly.gsn#Req2"
+                            name="Req2">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d382841ed"
+                            link="WMWorksCorrectly.gsn#Req6"
+                            name="Req6">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives a list that would fly it into terrain retains its valid list
+                        </away-context>
+                      </m>
+                    </g>
+
+                    <g
+                        id="__gsn__15d37fce816"
+                        name="Invalid Flight Envelope">
+                      Waypoints describe an unsafe flight envelope
+
+                      <m
+                          id="__gsn__15d37fd58f7"
+                          link="WMWorksCorrectly.gsn"
+                          name="WM Works Correctly">
+                        Waypoint manager (WM) always [works correctly]
+
+                        <away-context
+                            id="__gsn__15d382227de"
+                            link="WMWorksCorrectly.gsn#Req1"
+                            name="Req1">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d38227410"
+                            link="WMWorksCorrectly.gsn#Req2"
+                            name="Req2">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+                        </away-context>
+
+                        <away-context
+                            id="__gsn__15d38296d3f"
+                            link="WMWorksCorrectly.gsn#Req7"
+                            name="Req7">
+                          Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) which receives a list that would result in an unsafe flight envelope retains its valid list
+                        </away-context>
+                      </m>
+                    </g>
+
+                    <g
+                        id="__gsn__15d3734120f"
+                        color="faa"
+                        name="Flight to Enemy Control Point">
+                      UxAS will not return home when waypoints direct UxAS to enemy control point
+
+                      <c
+                          id="__gsn__15d37352286"
+                          color="faa"
+                          name="Probability">
+                        This mode results in {X3} being essentially zero.
+                      </c>
+                    </g>
+                  </s>
+                </g>
+              </s>
+            </g>
+
+            <g
+                id="__gsn__15d3712df05"
+                name="Crashed VM">
+              UxAS returns home with probability &gt; {X4} when VM has crashed
+
+              <a
+                  id="__gsn__15d3717f7c9"
+                  name="Probability">
+                Probability of VM crashing is {C2}
+              </a>
+
+              <c
+                  id="__gsn__15d37f70ee2"
+                  name="Context">
+                A crashed VM means that autonomous craft will be unable to avoid obstacles
+              </c>
+
+              <c
+                  id="__gsn__15d37f6f053"
+                  name="Context">
+                Severe weather will reduce value of {X4}
+              </c>
+
+              <m
+                  id="__gsn__15d37e5d551"
+                  name="WM Works Correctly">
+                Waypoint manager (WM) always [works correctly]
+
+                <away-context
+                    id="__gsn__15d37e68af1"
+                    link="WMWorksCorrectly.gsn#Req1"
+                    name="Req1">
+                  Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+                </away-context>
+
+                <away-context
+                    id="__gsn__15d381866e8"
+                    link="WMWorksCorrectly.gsn#Req2"
+                    name="Req2">
+                  Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+                </away-context>
+              </m>
+            </g>
+
+            <g
+                id="__gsn__15d37127546"
+                name="Uncompromised, Running VM">
+              UxAS returns home with probability &gt; {X2} with an uncompromised, running VM
+
+              <c
+                  id="__gsn__15d371987cf"
+                  name="Probability">
+                Probability of VM running and being uncompromised is {1-C1-C2}
+              </c>
+
+              <m
+                  id="__gsn__15d37e60f11"
+                  link="WMWorksCorrectly.gsn"
+                  name="WM Works Correctly">
+                Waypoint manager (WM) always [works correctly]
+
+                <away-context
+                    id="__gsn__15d37e79a83"
+                    link="WMWorksCorrectly.gsn#Req1"
+                    name="Req1">
+                  Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to serve waypoints from that list to the autopilot (AP)
+                </away-context>
+
+                <away-context
+                    id="__gsn__15d38192b88"
+                    link="WMWorksCorrectly.gsn#Req2"
+                    name="Req2">
+                  Working correctly requires that a waypoint manager (WM) with a valid list (i.e., one that contains home) continues to have a valid list as it pops waypoints
+                </away-context>
+
+                <away-context
+                    id="__gsn__15d381d833a"
+                    link="WMWorksCorrectly.gsn#Req3"
+                    name="Req3">
+                  Working correctly requires that replacing a waypoint list with a valid waypoint list will result in that valid waypoint list being active
+                </away-context>
+              </m>
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15d37c4f976"
+            name="AP Receives WP from WM">
+          The autopilot (AP) reliably receives waypoints (WP) from the waypoint manager (WM)
+
+          <s
+              id="__gsn__15d37caaeb1"
+              name="Strategy">
+            Argue transitively from {architecture provides channel from waypoint manager (WM) to autopilot (AP) and the WM-AP channel is reliable}
+
+            <g
+                id="__gsn__15d37cb62a8"
+                name="Arch. Connects WM to AP">
+              Architecture connects waypoint manager (WM) to autopilot (AP)
+
+              <e
+                  id="__gsn__15d37cc0360"
+                  name="Evidence">
+                AADL architecture/Resolute
+              </e>
+            </g>
+
+            <g
+                id="__gsn__15d37cc3b60"
+                name="WM-AP Channel is Reliable">
+              The waypoint manager (WM) to autopilot channel (AP) is reliable
+
+              <s
+                  id="__gsn__15d37cccf87"
+                  name="Strategy">
+                Argue over channel components
+
+                <g
+                    id="__gsn__15d37cd518f"
+                    name="WM-seL4_out is Reliable">
+                  Channel from the waypoint manager (WM) to the output of the seL4 OS is reliable
+
+                  <c
+                      id="__gsn__15d37d03d6c"
+                      name="Context">
+                    Connection from waypoint manager to the seL4 output is via UART
+                  </c>
+                </g>
+
+                <g
+                    id="__gsn__15d37cef485"
+                    name="sel4_out-AP is Reliable">
+                  Channel from the sel4 OS to the autopilot (AP) is reliable
+
+                  <c
+                      id="__gsn__15d37cf7d24"
+                      name="Context">
+                    Connection between seL4 to AP is a physical wire
+                  </c>
+                </g>
+              </s>
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15d37c7db43"
+            name="AP Works Correctly">
+          Autopilot (AP) follows waypoint list home within distance epsilon of spline connecting waypoints
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>
