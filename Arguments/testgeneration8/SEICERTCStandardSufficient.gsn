@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15d2cabc365"
+        name="SEI CERT C Standard Suffices">
+      The {SEI CERT C Standard} is a [sufficient C standard]
+
+      <c
+          id="__gsn__15d2cad9b8f"
+          name="Definition">
+        [Sufficient C standard] means one with {tool support, a good reputation, takes safety into proper consideration, allows language features essential to the application, and is applicable to certification}/
+      </c>
+
+      <s
+          id="__gsn__15d2cb34679"
+          name="Strategy">
+        Argue over components of sufficiency
+
+        <g
+            id="__gsn__15d31bfb569"
+            name="Standard Serves Purpose">
+          Standard ensures that software does what it should and doesn't do what it shouldn't
+
+          <g
+              id="__gsn__15d2cb4aec3"
+              name="Consideration for Safety">
+            The SEI CERT C standard takes safety into proper consideration
+          </g>
+
+          <g
+              id="__gsn__15d31bc1a73"
+              name="Consideration for Security">
+            The SEI CERT C standard takes security into proper consideration
+          </g>
+
+          <g
+              id="__gsn__15d31c0b566"
+              name="Funcitonal Properties">
+            (mumble)
+          </g>
+        </g>
+
+        <g
+            id="__gsn__15d2cb385cc"
+            name="Tool Support">
+          The SEI CERT C standard has adequate tool support
+        </g>
+
+        <g
+            id="__gsn__15d31e6999c"
+            name="Usability">
+          Standard is "usable"
+
+          <g
+              id="__gsn__15d319558c0"
+              name="Sufficiently Expressive">
+            The SEI CERT C standard allows language features essential to the application
+          </g>
+
+          <g
+              id="__gsn__15d31e71fad"
+              name="Computational Overhead">
+            Standard does not encourage practices that significantly tax computational resources {memory, time, …}
+          </g>
+
+          <g
+              id="__gsn__15d31e78bb3"
+              name="Implementation Overhead">
+            Standard does not place undue burden on developers (expand)
+          </g>
+        </g>
+
+        <g
+            id="__gsn__15d2cb51c52"
+            name="Applicable to Certification">
+          The SEI CERT C standard is applicable to certification
+        </g>
+
+        <g
+            id="__gsn__15d2cb40d64"
+            color="tomato"
+            name="Good Reputation">
+          The SEI CERT C standard has a good reputation
+        </g>
+      </s>
+    </g>
+  </gsn>
+</argument>

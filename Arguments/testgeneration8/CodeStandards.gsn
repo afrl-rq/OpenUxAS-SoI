@@ -31,12 +31,13 @@
     <g
         id="__gsn__15c7a56de19"
         name="Code Adheres to Standards">
-      Code adheres to appropriate standards
+      Code adheres to [sufficient code standards]
 
       <c
           id="__gsn__15c7a57101e"
-          name="Context">
-        Appropriate standards include SEI CERT C++ Coding Standard, …
+          color="tomato"
+          name="Definition">
+        [Sufficient standard] means one with {tool support, a good reputation, takes safety into proper consideration, allows language features essential to the application, and is applicable to certification}/
       </c>
 
       <s
@@ -47,7 +48,7 @@
         <g
             id="__gsn__15ca6d505c4"
             name="Goal">
-          C code adheres to standards
+          C code adheres to a [sufficient C standard]
 
           <c
               id="__gsn__15c87dd9895"
@@ -55,22 +56,28 @@
             Currently the only C code is 3rd party
           </c>
 
+          <c
+              id="__gsn__15d2caed3cf"
+              name="Definition">
+            [Sufficient C standard] means one with tool support, a good reputation, takes safety into proper consideration, allows language features essential to the application, and is applicable to certification
+          </c>
+
           <s
               id="__gsn__15c7a572f39"
               name="Strategy">
-            Argue over C coding standards
+            Argue that code adheres to an existing [sufficient C standard]
 
             <c
-                id="__gsn__15ca6d818d9"
+                id="__gsn__15d2cb91aeb"
                 name="Context">
-              Considerations for choosing language standards: tool support, reputation, safety considerations, certification
+              C Standards identified as being sufficient are (SEI CERT C Standard, MISRA C)
             </c>
 
             <g
                 id="__gsn__15c87d4ccd5"
                 optional="true"
-                name="SEI CERT C Standard">
-              C code adheres to SEI CERT C++ Coding Standard
+                name="SEI CERT C:2016 Standard">
+              C code adheres to SEI CERT C:2016 Coding Standard
 
               <c
                   id="__gsn__15c87db530d"
@@ -88,36 +95,17 @@
 
               <j
                   id="__gsn__15ca6e0a860"
+                  confidence="SEICERTCStandardSufficient.gsn"
                   name="Justification">
                 Standard has tool support, a good reputation, takes safety into proper consideration, and is applicable to certification
-
-                <j
-                    id="__gsn__15ca6e0c9d6"
-                    name="Justification (Tool Support)">
-                </j>
-
-                <j
-                    id="__gsn__15ca6df0561"
-                    name="Justification (Reputation)">
-                </j>
-
-                <j
-                    id="__gsn__15ca6dfa7c8"
-                    name="Justification (Safety Considerations)">
-                </j>
-
-                <j
-                    id="__gsn__15ca6dff5a8"
-                    name="Justification (Certification)">
-                </j>
               </j>
             </g>
 
             <g
                 id="__gsn__15ca6d9743f"
                 optional="true"
-                name="MISRA C">
-              Code adheres to MISRA C coding standard
+                name="MISRA C3">
+              Code adheres to MISRA C:2012 (MISRA C3) coding standard
 
               <c
                   id="__gsn__15ca6da52fe"
@@ -142,13 +130,19 @@
           <c
               id="__gsn__15ca6d86feb"
               name="Definition">
-            [Sufficient C++ standard] means one with tool support, a good reputation, takes safety into proper consideration, and is applicable to certification
+            [Sufficient C++ standard] means one with tool support, a good reputation, takes safety into proper consideration, allows language features essential to the application, and is applicable to certification
           </c>
 
           <s
               id="__gsn__15ca6d7875a"
               name="Strategy">
-            Argue over C++ coding standards
+            Argue that code adheres to an existing [sufficient C++ standard]
+
+            <c
+                id="__gsn__15d2cc5f7b9"
+                name="Enumeration">
+              C++ Standards identified as being sufficient are [JSF C++ Standard, Orion Coding Standard, SEI CERT C++ Standard, 2008 MISRA C++ Standard]
+            </c>
 
             <g
                 id="__gsn__15ca6dd55f3"
@@ -258,53 +252,12 @@
                 Errata for for SEI Cert C++ Coding Standard (2016 Edition)
               </c>
 
-              <s
-                  id="__gsn__15ca70ac1c8"
-                  name="Strategy">
-                Argue over adherence and sufficiency
-
-                <g
-                    id="__gsn__15ca70ac1c9"
-                    name="SEI CERT C++ Adherence">
-                  Code adheres to the SEI CERT C++ Coding Standard
-                </g>
-
-                <g
-                    id="__gsn__15ca70ac1ca"
-                    name="SEI CERT C++ Sufficiency">
-                  The SEI CERT C++ Coding Standard is a [sufficient C++ standard]
-
-                  <s
-                      id="__gsn__15ca70ac1cb"
-                      name="Strategy">
-                    Argue over components of a [sufficient C++ standard]
-
-                    <g
-                        id="__gsn__15ca70ac1cc"
-                        name="SEI CERT Tool Support">
-                      SEI CERT has industrial-scale tool support
-                    </g>
-
-                    <g
-                        id="__gsn__15ca70ac1cd"
-                        name="SEI CERT C++ Reputation">
-                      SEI CERT C++ is respected in the safety and security communities
-                    </g>
-
-                    <g
-                        id="__gsn__15ca70ac1ce"
-                        name="SEI CERT C++ Safety Considerations">
-                      SEI CERT C++ takes safety into proper consideration
-                    </g>
-
-                    <g
-                        id="__gsn__15ca70ac1cf"
-                        name="SEI CERT C++ Certification Applicability">
-                      SEI CERT C++ is applicable to certification for the UxAS
-                    </g>
-                  </s>
-                </g>
-              </s>
+              <j
+                  id="__gsn__15d2cbb35e0"
+                  confidence="SEICERTCppStandardSufficient.gsn"
+                  name="Justification">
+                Standard has tool support, a good reputation, takes safety into proper consideration, and is applicable to certification
+              </j>
 
               <comment
                   id="__gsn__15c88525276"
