@@ -243,7 +243,7 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
                 sendSharedLmcpObjectBroadcastMessage(serviceStatus);
             }
 
-        }
+        } // isNewEntity
         m_entityIdVsTaskImplementationRequests[(*itTask)->getAssignedVehicle()]->push_back(taskImplementationRequest);
     } //for(auto itTask=taskAssignmentSummary->getTaskList().begin();itTask!=taskAssignmen
 

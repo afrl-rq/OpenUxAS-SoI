@@ -40,10 +40,12 @@
 
 use lmcp_rs::*;
 use lmcp_rs::afrl::cmasi::entity_state::*;
+use lmcp_rs::uxas::messages::task::task_assignment_summary::*;
 use lmcp_rs::uxas::messages::task::task_implementation_request::*;
 use lmcp_rs::uxas::messages::task::task_implementation_response::*;
 use lmcp_rs::uxas::messages::task::unique_automation_request::*;
 
+use std::borrow::BorrowMut;
 use std::collections::*;
 use std::slice;
 
@@ -100,28 +102,68 @@ const STARTING_WAYPOINT_ID: i64 = 100000000;
 pub extern "C" fn plan_builder_new() -> *mut PlanBuilder {
     let pb = PlanBuilder::default();
     println!("made one! {:?}", pb);
+    // relinquish ownership
     Box::into_raw(Box::new(pb))
 }
 
 #[no_mangle]
 pub extern "C" fn plan_builder_delete(raw_pb: *mut PlanBuilder) {
-    // reestablish ownership so it deallocates
+    // reclaim ownership so it deallocates
     unsafe { Box::from_raw(raw_pb); }
 }
 
 #[no_mangle]
 pub extern "C" fn plan_builder_configure(raw_pb: *mut PlanBuilder, lead: f64) {
-    unsafe {
-        (*raw_pb).assignment_start_point_lead_m = lead;
-    }
+    unsafe { (*raw_pb).assignment_start_point_lead_m = lead; }
 
 }
 
 #[no_mangle]
 pub extern "C" fn plan_builder_process_received_lmcp_message(raw_pb: *mut PlanBuilder, msg_buf: *const u8, msg_len: u32) {
+    // reclaim ownership
+    let mut pb_box = unsafe { Box::from_raw(raw_pb) };
     let msg_buf_slice = unsafe { slice::from_raw_parts(msg_buf, msg_len as usize) };
     if let Ok(Some(msg)) = lmcp_msg_deser(msg_buf_slice) {
+        let pb: &mut PlanBuilder = pb_box.borrow_mut();
+        match msg {
+            LmcpType::TaskAssignmentSummary(tas) => pb.process_task_assignment_summary(tas),
+            _ => println!("Unhandled LMCP message {:?}", msg)
+        }
     } else {
-        println!("[plan_builder.rs] LMCP deserialization error!");
+        println!("LMCP deserialization error!");
+    }
+    // relinquish ownership
+    Box::into_raw(pb_box);
+}
+
+impl PlanBuilder {
+    fn process_task_assignment_summary(&mut self, tas: TaskAssignmentSummary) {
+    // reset for new set of plans
+    self.task_implementation_id = 0;
+    self.task_implementation_requests.clear();
+    self.task_implementation_responses.clear();
+    }
+}
+
+impl PlanBuilder {
+    fn next_implementation_id(&mut self) -> i64 {
+        match self.task_implementation_id.checked_add(1) {
+            None => panic!("next_implementation_id overflowed!"),
+            Some(x) => { self.task_implementation_id = x; x },
+        }
+    }
+
+    fn starting_waypoint_id(&self) -> i64 {
+        match self.task_implementation_id.checked_mul(STARTING_WAYPOINT_ID) {
+            None => panic!("starting_waypoint_id overflowed!"),
+            Some(x) => x,
+        }
+    }
+
+    fn next_command_id(&mut self) -> i64 {
+        match self.command_id.checked_add(1) {
+            None => panic!("next_command_id overflowed!"),
+            Some(x) => { self.command_id = x; x },
+        }
     }
 }
