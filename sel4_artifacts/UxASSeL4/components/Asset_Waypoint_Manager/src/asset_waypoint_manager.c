@@ -21,5 +21,6 @@ void mission_read_wm(const const bool * _UNUSED) {
 
 void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
 
+    printf("asset manager got a packet!!!!!!\n");
 
 }
