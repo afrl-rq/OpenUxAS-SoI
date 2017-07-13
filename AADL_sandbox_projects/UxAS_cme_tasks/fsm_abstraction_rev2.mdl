@@ -17,7 +17,7 @@ Model {
       BusOutputAsStruct	      "off"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.80"
+    ComputedModelVersion    "1.81"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -50,7 +50,7 @@ Model {
       $ObjectID		      3
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [1592.0, -8.0, 2064.0, 1128.0]
+      Location		      [1592.0, 0.0, 2064.0, 1128.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		4
@@ -72,11 +72,11 @@ Model {
 	$ObjectID		6
 	$ClassName		"Simulink.EditorInfo"
 	IsActive		[1]
-	ViewObjType		"SimulinkTopLevel"
-	LoadSaveID		"0"
+	ViewObjType		"SimulinkSubsys"
+	LoadSaveID		"548"
 	Extents			[1821.0, 953.0]
-	ZoomFactor		[3.3078470824949697]
-	Offset			[76.923053527980528, 70.2676399026764]
+	ZoomFactor		[0.4636591478696741]
+	Offset			[-1455.2270270270274, -3.1945945945947187]
       }
     }
   }
@@ -86,9 +86,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "elliocm"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu Jul 13 10:36:03 2017"
-  RTWModifiedTimeStamp	  421842959
-  ModelVersionFormat	  "1.%<AutoIncrement:80>"
+  LastModifiedDate	  "Thu Jul 13 13:36:50 2017"
+  RTWModifiedTimeStamp	  421853792
+  ModelVersionFormat	  "1.%<AutoIncrement:81>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -967,8 +967,8 @@ Model {
   }
   System {
     Name		    "fsm_abstraction_rev2"
-    Location		    [1592, -8, 3656, 1120]
-    Open		    on
+    Location		    [1592, 0, 3656, 1128]
+    Open		    off
     ModelBrowserVisibility  on
     ModelBrowserWidth	    200
     ScreenColor		    "white"
@@ -1002,7 +1002,7 @@ Model {
       Variant		      off
       System {
 	Name			"FiniteStateMachine"
-	Location		[1592, -8, 3656, 1120]
+	Location		[1592, 0, 3656, 1128]
 	Open			off
 	ModelBrowserVisibility	on
 	ModelBrowserWidth	200
@@ -1043,7 +1043,7 @@ Model {
 	  Variant		  off
 	  System {
 	    Name		    "TaskServiceBase"
-	    Location		    [1592, -8, 3656, 1120]
+	    Location		    [1592, 0, 3656, 1128]
 	    Open		    off
 	    ModelBrowserVisibility  on
 	    ModelBrowserWidth	    200
@@ -1093,8 +1093,8 @@ Model {
 	      Variant		      off
 	      System {
 		Name			"Actions"
-		Location		[1592, -8, 3656, 1120]
-		Open			off
+		Location		[1592, 0, 3656, 1128]
+		Open			on
 		ModelBrowserVisibility	on
 		ModelBrowserWidth	200
 		ScreenColor		"white"
@@ -2085,10 +2085,7 @@ Model {
 		    FixedWidth		    off
 		    HorizontalAlignment	    "left"
 		    VerticalAlignment	    "top"
-		    FontName		    "Helvetica"
-		    FontSize		    10
-		    FontWeight		    "normal"
-		    FontAngle		    "normal"
+		    ZOrder		    -1
 		    }
 		    Annotation {
 		    SID			    "970"
@@ -2112,8 +2109,7 @@ Model {
 		  ZOrder		  260
 		  BackgroundColor	  "green"
 		  IfExpression		  "u1==0.0"
-		  ElseIfExpressions	  "u1==1.0, u1==2.0, u1==3.0, u1==4.0, u1==5.0, u1==6.0, u1==7.0"
-		  ShowElse		  off
+		  ElseIfExpressions	  "u1==1.0, u1==2.0, u1==3.0, u1==4.0, u1==5.0, u1==6.0"
 		}
 		Block {
 		  BlockType		  SubSystem
@@ -2306,6 +2302,7 @@ Model {
 		    FixedWidth		    off
 		    HorizontalAlignment	    "left"
 		    VerticalAlignment	    "top"
+		    ZOrder		    -1
 		    }
 		    Annotation {
 		    SID			    "433"
@@ -2522,10 +2519,6 @@ Model {
 		    HorizontalAlignment	    "left"
 		    VerticalAlignment	    "top"
 		    ZOrder		    -1
-		    FontName		    "Helvetica"
-		    FontSize		    10
-		    FontWeight		    "normal"
-		    FontAngle		    "normal"
 		    }
 		    Annotation {
 		    SID			    "1021"
@@ -3240,10 +3233,6 @@ Model {
 		    HorizontalAlignment	    "left"
 		    VerticalAlignment	    "top"
 		    ZOrder		    -1
-		    FontName		    "Helvetica"
-		    FontSize		    10
-		    FontWeight		    "normal"
-		    FontAngle		    "normal"
 		    }
 		  }
 		}
@@ -3817,14 +3806,14 @@ Model {
       "3922 0.686274509803922 0.686274509803922],'ColorOrder',[1 1 0.0666666666666667;0.0745098039215686 0.623529411764"
       "706 1;1 0.411764705882353 0.16078431372549;0.392156862745098 0.831372549019608 0.0745098039215686;0.717647058823"
       "529 0.274509803921569 1;0.0588235294117647 1 1;1 0.0745098039215686 0.650980392156863],'Title','%<SignalLabel>',"
-      "'LinePropertiesCache',{{}},'UserDefinedChannelNames',{{}},'NumLines',1,'LineNames',{{'TaskServiceBase'}},'ShowCo"
-      "ntent',true,'Placement',1)},'DisplayPropertyDefaults',struct('MinYLimReal','-0.875','MaxYLimReal','7.875','YLabe"
-      "lReal','','MinYLimMag','0.00000','MaxYLimMag','7.875','LegendVisibility','off','XGrid',true,'YGrid',true,'PlotMa"
-      "gPhase',false,'AxesColor',[0 0 0],'AxesTickColor',[0.686274509803922 0.686274509803922 0.686274509803922],'Color"
-      "Order',[0.0745098039215686 0.623529411764706 1;1 0.411764705882353 0.16078431372549;1 1 0.0666666666666667;0.717"
-      "647058823529 0.274509803921569 1;0.392156862745098 0.831372549019608 0.0745098039215686;0.0588235294117647 1 1;1"
-      " 0.0745098039215686 0.650980392156863])),extmgr.Configuration('Tools','Plot Navigation',true),extmgr.Configurati"
-      "on('Tools','Measurements',true,'Version','2015b')),'Version','2015b','VisibleAtModelOpen','on')"
+      "'LinePropertiesCache',{{}},'UserDefinedChannelNames',{{}},'NumLines',0,'LineNames',{{[]}},'ShowContent',true,'Pl"
+      "acement',1)},'DisplayPropertyDefaults',struct('MinYLimReal','-0.875','MaxYLimReal','7.875','YLabelReal','','MinY"
+      "LimMag','0.00000','MaxYLimMag','7.875','LegendVisibility','off','XGrid',true,'YGrid',true,'PlotMagPhase',false,'"
+      "AxesColor',[0 0 0],'AxesTickColor',[0.686274509803922 0.686274509803922 0.686274509803922],'ColorOrder',[0.07450"
+      "98039215686 0.623529411764706 1;1 0.411764705882353 0.16078431372549;1 1 0.0666666666666667;0.717647058823529 0."
+      "274509803921569 1;0.392156862745098 0.831372549019608 0.0745098039215686;0.0588235294117647 1 1;1 0.074509803921"
+      "5686 0.650980392156863])),extmgr.Configuration('Tools','Plot Navigation',true),extmgr.Configuration('Tools','Mea"
+      "surements',true,'Version','2015b')),'Version','2015b','VisibleAtModelOpen','on')"
     }
     Line {
       ZOrder		      1
