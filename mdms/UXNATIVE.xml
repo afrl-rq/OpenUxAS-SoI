@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>2</Version>
+    <Version>3</Version>
     
     <StructList>
         
@@ -28,8 +28,20 @@
         <Struct Name="CreateNewService" >
             <!-- Globally unique ID for this service. Negative ServiceIDs are invalid. If ServiceID == 0, then a unique service ID will be generated.  -->
             <Field Name="ServiceID" Type="int64"  Default="0"/>
-            <!-- XML configuration for this service -->
-            <Field Name="XmlConfiguration" Type="string[]" />
+            <!-- XML configuration for this service (i.e. options in XML format) -->
+            <Field Name="XmlConfiguration" Type="string" />
+            <!-- Existing entity configurations in the system when this new service is created -->
+            <Field Name="EntityConfigurations" Type="CMASI/EntityConfiguration[]" MaxArrayLength="16" />
+            <!-- Existing entity states in the system when this new service is created -->
+            <Field Name="EntityStates" Type="CMASI/EntityState[]" MaxArrayLength="16" />
+            <!-- Existing mission commands for vehicles in the system when this new service is created -->
+            <Field Name="MissionCommands" Type="CMASI/MissionCommand[]" MaxArrayLength="16" />
+            <!-- Defined areas of interest at time of service creation -->
+            <Field Name="Areas" Type="IMPACT/AreaOfInterest[]" MaxArrayLength="64" />
+            <!-- Defined lines of interest at time of service creation -->
+            <Field Name="Lines" Type="IMPACT/LineOfInterest[]" MaxArrayLength="64" />
+            <!-- Defined points of interest at time of service creation -->
+            <Field Name="Points" Type="IMPACT/PointOfInterest[]" MaxArrayLength="64" />
         </Struct>
         
         <!-- Remove an existing service from UxAS -->
@@ -77,7 +89,7 @@
         mission command used to complete the sub-tasks is returned. -->
         <Struct Name="SubTaskExecution" >
             <!-- List of tasks that current entity should complete -->
-            <Field Name="SubTasks" Type="CMASI/Task[]" />
+            <Field Name="SubTasks" Type="CMASI/Task[]" MaxArrayLength="16" />
             <!-- Enable strict ordering -->
             <Field Name="StrictOrder" Type="bool" Default="false" />
         </Struct>
@@ -85,9 +97,9 @@
         <!-- Command an entity to perform a complete task assignment for the entire team and then execute own role -->
         <Struct Name="SubTaskAssignment" >
             <!-- List of tasks that current team should complete -->
-            <Field Name="SubTasks" Type="CMASI/Task[]" />
+            <Field Name="SubTasks" Type="CMASI/Task[]" MaxArrayLength="16" />
             <!-- Neighboring entities to consider -->
-            <Field Name="Neighbors" Type="CMASI/EntityState[]" />
+            <Field Name="Neighbors" Type="CMASI/EntityState[]" MaxArrayLength="16" />
         </Struct>
     
         <!-- Message to enable onboard processor to send commands to the autopilot, and the gimbal -->

@@ -1,0 +1,28 @@
+<RendezvousTask Series="UXTASK">
+
+  <EligibleEntities>
+    <int64>1000</int64>
+    <int64>2000</int64>
+  </EligibleEntities>
+
+  <NumberOfParticipants>2</NumberOfParticipants>
+  <Location>
+   <Location3D Series="CMASI">
+      <Latitude>-22.7288</Latitude>
+      <Longitude>150.6297</Longitude>
+     <Altitude>300</Altitude>
+     <AltitudeType>AGL</AltitudeType>
+   </Location3D>
+  </Location>
+  <Heading>90</Heading>
+  <MultiLocationRendezvous>false</MultiLocationRendezvous>
+
+  <TaskID>101</TaskID>
+  <Label>Rendezvous</Label>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</PointSearchTask>
+

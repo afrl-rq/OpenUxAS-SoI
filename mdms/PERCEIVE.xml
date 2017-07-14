@@ -28,7 +28,7 @@
             <Field Name="PerceiverID" Type="uint32"/>
 
             <!-- The IDs of the payloads that reported this perception. -->
-            <Field Name="PerceiverPayloads" Type="uint32[]"/>
+            <Field Name="PerceiverPayloads" Type="uint32[]" MaxArrayLength="8" />
 
             <!-- The perceived target velocity in three-dimensions.  The velocity should be stated
                  in tangential-plane coordinates using the North-East-Down coordinate system.
