@@ -304,7 +304,9 @@ namespace task
         int64_t m_latestUniqueAutomationRequestId{0};
         
         /*! \brief  copy of all known  <B><i>EntityConfiguration</i></B>s*/
-        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_idVsEntityConfiguration;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_entityConfigurations;
+        /*! \brief  copy of all known  <B><i>EntityConfiguration</i></B>s*/
+        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_entityStates;
 
         //ROUTING
         /*! \brief used as an offset to "mangle" the taskId into route Ids (using multiplier instead of shift to make Id human readable) */
@@ -333,27 +335,22 @@ namespace task
          * performing this task */
         std::unordered_set<int64_t> m_activeEntities;
         
-        ///// TASK SPECIFIC 
-        /*! \brief  the <B><i>AreaOfInterest</i></B> required by this task. 
+        /*! \brief  all <B><i>AreaOfInterest</i></B> objects. 
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
-        std::shared_ptr<afrl::impact::AreaOfInterest> m_areaOfInterest;
-        /*! \brief  the <B><i>LineOfInterest</i></B> required by this task. 
-         * NOTE: Object received before task creation are only available when 
-         * configured in the @ref c_Component_TaskManager*/
-        std::shared_ptr<afrl::impact::LineOfInterest> m_lineOfInterest;
-        /*! \brief  the <B><i>PointOfInterest</i></B> required by this task. 
-         * NOTE: Object received before task creation are only available when 
-         * configured in the @ref c_Component_TaskManager*/
-        std::shared_ptr<afrl::impact::PointOfInterest> m_pointOfInterest;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::AreaOfInterest> > m_areasOfInterest;
         /*! \brief  all <B><i>LineOfInterest</i></B> objects. 
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
-        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::LineOfInterest> > m_idVsLineOfInterest;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::LineOfInterest> > m_linesOfInterest;
+        /*! \brief  all <B><i>PointOfInterest</i></B> objects. 
+         * NOTE: Object received before task creation are only available when 
+         * configured in the @ref c_Component_TaskManager*/
+        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::PointOfInterest> > m_pointsOfInterest;
         /*! \brief  the current <B><i>MissionCommand</i></B> for all entities. 
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
-        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_vehicleIdVsCurrentMission;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_currentMissions;
 
         
         

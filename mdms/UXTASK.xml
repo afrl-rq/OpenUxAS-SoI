@@ -53,7 +53,7 @@
                  Only used when 'MultiLocationRendezvous' is set to 'true'. If the 
                  EntityID fields are non-zero, they must correspond to an eligible
                  vehicle and only that particular entity can be. -->
-            <Field Name="RendezvousStates" Type="PlanningState[]" />
+            <Field Name="RendezvousStates" Type="PlanningState[]" MaxArrayLength="16" />
         </Struct>
 
         <!-- The state of an entity to be used as the initial planning state when 
@@ -98,7 +98,7 @@
             <!-- The initial states of entities used in planning. Note: if an eligible
             entity does not have a PlanningState, then it must be obtained from the entity
             in an {@link AssignmentCoordination} message. -->
-            <Field Name="PlanningStates" Type="PlanningState[]" />
+            <Field Name="PlanningStates" Type="PlanningState[]" MaxArrayLength="16" />
         </Struct>
         <!-- A CMASI automation request (with Identifier) that is sent by tasks. -->
         <Struct Name="TaskAutomationRequest">
@@ -113,7 +113,7 @@
             <!-- The initial states of entities used in planning. Note: if an eligible
             entity does not have a PlanningState, then it's most recent EntityState is used for 
             plannning. -->
-            <Field Name="PlanningStates" Type="PlanningState[]" />
+            <Field Name="PlanningStates" Type="PlanningState[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- A CMASI automation response (with Identifier) that is sent back to tasks. -->
@@ -124,7 +124,7 @@
             <!-- Original automation request without a unique identifier -->
             <Field Name="OriginalResponse" Type="CMASI/AutomationResponse" />
             <!-- The final states of entities when the plan is completed. -->
-            <Field Name="FinalStates" Type="PlanningState[]" />
+            <Field Name="FinalStates" Type="PlanningState[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- Patches CMASI automation request to add a unique identifier -->
@@ -140,7 +140,7 @@
             <!-- The initial states of entities used in planning. Note: if an eligible
             entity does not have a PlanningState, then it's most recent EntityState is used for 
             plannning. -->
-            <Field Name="PlanningStates" Type="PlanningState[]" />
+            <Field Name="PlanningStates" Type="PlanningState[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- Patches CMASI automation response to add a unique identifier -->
@@ -151,7 +151,7 @@
             <!-- Original automation request without a unique identifier -->
             <Field Name="OriginalResponse" Type="CMASI/AutomationResponse" />
             <!-- The final states of entities when the plan is completed. -->
-            <Field Name="FinalStates" Type="PlanningState[]" />
+            <Field Name="FinalStates" Type="PlanningState[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- Request to compute a set of sensor footprints from possible vehicles in the system -->
@@ -159,7 +159,7 @@
             <!-- Request ID for correlating to response -->
             <Field Name="RequestID" Type="int64" />
             <!-- Request ID for correlating to response -->
-            <Field Name="Footprints" Type="FootprintRequest[]" />
+            <Field Name="Footprints" Type="FootprintRequest[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- Request to compute potential eligible sensor footprint for a single vehicle at
@@ -171,18 +171,18 @@
             <Field Name="VehicleID" Type="int64" />
             <!-- Camera wavelength to be considered. If list is empty, planner
             should plan for all available sensors on each entity -->
-            <Field Name="EligibleWavelengths" Type="CMASI/WavelengthBand[]" />
+            <Field Name="EligibleWavelengths" Type="CMASI/WavelengthBand[]" MaxArrayLength="8" />
             <!-- Desired ground sample distance for an eligible sensor. If list is
             empty, then footprint calculation uses the max ground sample distance
             for the specified altitude. -->
-            <Field Name="GroundSampleDistances" Type="real32[]" />
+            <Field Name="GroundSampleDistances" Type="real32[]" MaxArrayLength="8" />
             <!-- AGL Altitude to consider during sensor information calculation.
             If 'AglAltitudes' list is empty, sensor planner should use nominal
             altitude from entity configurations -->
-            <Field Name="AglAltitudes" Type="real32[]" Units="meters" />
+            <Field Name="AglAltitudes" Type="real32[]" MaxArrayLength="8" Units="meters" />
             <!-- Desired camera elevation angles. If list is empty, then uses an
             optimal elevation angle for achieving max GSD -->
-            <Field Name="ElevationAngles" Type="real32[]" Units="deg" />
+            <Field Name="ElevationAngles" Type="real32[]" MaxArrayLength="8" Units="deg" />
         </Struct>
         
         <!-- Description of a sensor footprint -->
@@ -233,7 +233,7 @@
             <!-- ID matching initial request ID -->
             <Field Name="ResponseID" Type="int64" />
             <!-- All sensor footprints calculated during request -->
-            <Field Name="Footprints" Type="SensorFootprint[]" />
+            <Field Name="Footprints" Type="SensorFootprint[]" MaxArrayLength="65535" />
         </Struct>
         
         <!-- Request to generate waypoints enroute to the task as well as to complete a task.
@@ -243,6 +243,8 @@
         <Struct Name="TaskImplementationRequest">
             <!-- Request ID for correlating to matching response -->
             <Field Name="RequestID" Type="int64" />
+            <!-- This task implementation request is part of fulfilling a unique automation request -->
+            <Field Name="CorrespondingAutomationRequestID" Type="int64" />
             <!-- Starting waypoint ID that task must use when building response. Note that
             Plan Builder reserves all values greater than 1,000,000,000. Therefore all
             *internal* task waypoints must be less than 1e9 and can be obtained from the
@@ -266,7 +268,7 @@
             <Field Name="TimeThreshold" Type="int64" Units="milliseconds since 1 Jan 1970" />
             <!-- Predicted locations and headings of all other entities at the point
                  in the mission when this option is to be conducted. -->
-            <Field Name="NeighborLocations" Type="PlanningState[]" />
+            <Field Name="NeighborLocations" Type="PlanningState[]" MaxArrayLength="65535" />
         </Struct>
         
         <!-- Response to a final task implementation request (one for each vehicle assigned).
@@ -277,6 +279,8 @@
         <Struct Name="TaskImplementationResponse">
             <!-- Response ID that matches the initial request -->
             <Field Name="ResponseID" Type="int64" />
+            <!-- This task implementation response is part of fulfilling a unique automation request -->
+            <Field Name="CorrespondingAutomationRequestID" Type="int64" />
             <!-- Task ID -->
             <Field Name="TaskID" Type="int64" />
             <!-- Option ID that was selected for this task -->
@@ -284,7 +288,7 @@
             <!-- Vehicle ID -->
             <Field Name="VehicleID" Type="int64" />
             <!-- Waypoints that implement this task for the indicated vehicle -->
-            <Field Name="TaskWaypoints" Type="CMASI/Waypoint[]" />
+            <Field Name="TaskWaypoints" Type="CMASI/Waypoint[]" MaxArrayLength="1024" />
             <!-- Vehicle location when this task is complete -->
             <Field Name="FinalLocation" Type="CMASI/Location3D" />
             <!-- Vehicle heading when this task is complete -->
@@ -303,11 +307,13 @@
             automation request). A process algebra string with only task IDs. -->
             <Field Name="TaskLevelRelationship" Type="string" />
             <!-- List of all tasks that this cost matrix includes -->
-            <Field Name="TaskList" Type="int64[]" />
+            <Field Name="TaskList" Type="int64[]" MaxArrayLength="16" />
             <!-- Operating region that was used during matrix calculation -->
             <Field Name="OperatingRegion" Type="int64" />
-            <!-- Set of task-to-task timings for each requested vehicle -->
-            <Field Name="CostMatrix" Type="TaskOptionCost[]" />
+            <!-- Set of task-to-task timings for each requested vehicle.
+                 Assume 'T' max tasks [16], 'O' max options per task [8], 'V' max vehicles [16]:
+                 then max number of elements in matrix is 'V*T*O + (T*O)^2' [18432] -->
+            <Field Name="CostMatrix" Type="TaskOptionCost[]" MaxArrayLength="18432" />
         </Struct>
         
         <!-- Single task option cost for a particular vehicle -->
@@ -349,7 +355,7 @@
             <!-- Operating region which was considered during this assignment -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- Ordered list of tasks to be completed -->
-            <Field Name="TaskList" Type="TaskAssignment[]" />
+            <Field Name="TaskList" Type="TaskAssignment[]" MaxArrayLength="256" />
         </Struct>
 
         <!-- Start/end locations and headings and cost for implementing the task from this configuration -->
@@ -359,7 +365,7 @@
             <!-- ID for this option -->
             <Field Name="OptionID" Type="int64" />
             <!-- Eligible entities for completing this option with identical cost to complete. If list is empty, then all vehicles are assumed to be eligible. -->
-            <Field Name="EligibleEntities" Type="int64[]" />
+            <Field Name="EligibleEntities" Type="int64[]" MaxArrayLength="16" />
             <!-- Cost to complete option in terms of time (given in milliseconds) -->
             <Field Name="Cost" Type="int64" Units="milliseconds"/>
             <!-- Start location entering the option -->
@@ -380,8 +386,9 @@
             <Field Name="TaskID" Type="int64" />
             <!-- Process algebra string encoding all of the different options -->
             <Field Name="Composition" Type="string" />
-            <!-- List of options -->
-            <Field Name="Options" Type="TaskOption[]" />
+            <!-- List of options. NOTE for computational reasons, the larger the number
+            of options, the much greater the computation -->
+            <Field Name="Options" Type="TaskOption[]" MaxArrayLength="64" />
         </Struct>
         
         <!-- Place a task in a 'paused' state where it no longer sends commands to any entities -->
@@ -409,7 +416,7 @@
             <!-- Percentage of progress on task -->
             <Field Name="PercentComplete" Type="real32" />
             <!-- Entities that are working this task -->
-            <Field Name="EntitiesEngaged" Type="int64[]" />
+            <Field Name="EntitiesEngaged" Type="int64[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- Optional task progress query -->
@@ -441,7 +448,7 @@
             <!-- Task ID that was just completed -->
             <Field Name="TaskID" Type="int64" />
             <!-- Entity IDs that completed the task -->
-            <Field Name="EntitiesInvolved" Type="int64[]" />
+            <Field Name="EntitiesInvolved" Type="int64[]" MaxArrayLength="16" />
             <!-- Time that this task was completed. -->
             <Field Name="TimeTaskCompleted" Type="int64" Units="milliseconds since 1 Jan 1970" />
         </Struct>
@@ -449,9 +456,9 @@
         <!-- Task cancel message -->
         <Struct Name="CancelTask" >
             <!-- List of vehicle IDs that are directed to cancel tasks. If empty, all vehicles currently on a listed task will be directed to cancel. -->
-            <Field Name="Vehicles" Type="int64[]" />
+            <Field Name="Vehicles" Type="int64[]" MaxArrayLength="16" />
             <!-- Task ID(s) to be removed from task lists of indicated vehicles. If empty, then only the current task is removed. -->
-            <Field Name="CanceledTasks" Type="int64[]" />
+            <Field Name="CanceledTasks" Type="int64[]" MaxArrayLength="16" />
         </Struct>
         
     </StructList>

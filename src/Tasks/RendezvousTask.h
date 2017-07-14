@@ -19,6 +19,7 @@
 
 #include "TaskServiceBase.h"
 #include "uxas/messages/task/TaskImplementationRequest.h"
+#include "uxas/messages/task/TaskAssignmentSummary.h"
 
 #include <unordered_map>
 
@@ -125,15 +126,39 @@ private:
     
     bool processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
 
-    void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;
-
     void buildTaskPlanOptions() override;
+    
     bool isProcessTaskImplementationRouteResponse(std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse,
                 std::shared_ptr<TaskOptionClass>& taskOptionClass,
                 int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route) override;
 
 private:
-    // storage for the option entries
+    
+    /** \class PairHash
+    * 
+    * \par The <B><i>PairHash</i></B> is aStruct used to implement  a hash 
+    * function that creates a (relatively unique) hash from two double arguments.
+    * The hash is used by the <B><i>std::unordered_map</i></B> class to permit
+    * the use of <B><i>std::pair</i></B> in the index.
+    * 
+    * @n
+    */
+    struct IntPairHash
+    {
+        typedef std::pair<int64_t, int64_t> argument_type;
+        typedef std::size_t result_type;
+
+        result_type operator()(argument_type const& s) const {
+            result_type const h1(std::hash<int64_t>()(s.first));
+            result_type const h2(std::hash<int64_t>()(s.second));
+            result_type returnValue = h1 ^ (h2 << 1);
+            return returnValue;
+        }
+    };
+        
+    // storage for tracking neighbor positions
+    std::unordered_map< std::pair<int64_t,int64_t>, std::shared_ptr<uxas::messages::task::TaskImplementationRequest>, IntPairHash > m_implementationRequest;
+    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> > m_assignmentSummary;
     
 };
 

@@ -17,6 +17,7 @@
 // include header for this service
 #include "RendezvousTask.h"
 #include "uxas/messages/task/RendezvousTask.h"
+#include "uxas/messages/task/TaskOption.h"
 
 // namespace definitions
 namespace uxas  // uxas::
@@ -43,6 +44,11 @@ bool
 RendezvousTask::configureTask(const pugi::xml_node& ndComponent)
 {
     UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Configuring Rendezvous Task!" );
+    
+    // add subscription to TaskAssignmentSummary to determine the complete
+    // set of vehicles assigned to this task
+    addSubscriptionAddress(uxas::messages::task::TaskImplementationRequest::Subscription);
+    
     return true;
 }
 
@@ -66,30 +72,42 @@ bool RendezvousTask::terminateTask()
     
 bool RendezvousTask::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject)
 {
-    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling: ", receivedLmcpObject->getFullLmcpTypeName());
+    if(uxas::messages::task::isTaskImplementationRequest(receivedLmcpObject))
+    {
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling: ", receivedLmcpObject->getFullLmcpTypeName());
+        auto implReq = std::static_pointer_cast<uxas::messages::task::TaskImplementationRequest>(receivedLmcpObject);
+        if(m_task && implReq->getTaskID() == m_task->getTaskID())
+        {
+            m_implementationRequest[std::make_pair(implReq->getVehicleID(), implReq->getCorrespondingAutomationRequestID())] = implReq;
+        }
+    }
+    else if(uxas::messages::task::isTaskAssignmentSummary(receivedLmcpObject))
+    {
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling: ", receivedLmcpObject->getFullLmcpTypeName());
+        auto assignSummary = std::static_pointer_cast<uxas::messages::task::TaskAssignmentSummary>(receivedLmcpObject);
+        m_assignmentSummary[assignSummary->getCorrespondingAutomationRequestID()] = assignSummary;
+    }
+    
     return false;
-}
-
-void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)
-{
-    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling active state!");
 }
 
 void RendezvousTask::buildTaskPlanOptions()
 {
     UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task building options!");
     
-    int64_t optionId(1);
     int64_t taskId(m_task->getTaskID());
-    
     auto rtask = std::static_pointer_cast<uxas::messages::task::RendezvousTask>(m_task);
-    if(rtask->getNumberOfParticipants() == rtask->getEligibleEntities().size())
+    
+    // add an option for every eligible entity
+    for (auto itEligibleEntities = m_speedAltitudeVsEligibleEntityIds.begin();
+            itEligibleEntities != m_speedAltitudeVsEligibleEntityIds.end();
+            itEligibleEntities++)
     {
-        for(auto v : rtask->getEligibleEntities())
+        for (auto v : itEligibleEntities->second)
         {
             auto taskOption = new uxas::messages::task::TaskOption;
             taskOption->setTaskID(taskId);
-            taskOption->setOptionID(optionId++);
+            taskOption->setOptionID(v);
             taskOption->getEligibleEntities().push_back(v);
             taskOption->setStartLocation(rtask->getLocation()->clone());
             taskOption->setStartHeading(rtask->getHeading());
@@ -101,6 +119,8 @@ void RendezvousTask::buildTaskPlanOptions()
         }
     }
 
+    // force all eligible entities to participate in the task
+    // TODO: create all subsets of eligible entities of size rtask->getNumberOfParticipants()
     std::string compositionString(".(");
     for (auto itOption : m_taskPlanOptions->getOptions())
     {

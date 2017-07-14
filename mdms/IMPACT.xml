@@ -155,7 +155,7 @@
         <!-- Indicates the IMPACT specific payloads carried by an entity -->
         <Struct Name="ImpactPayloadConfiguration" Extends="PayloadConfiguration" Series="CMASI" >
             <!-- Payloads available for this entity -->
-            <Field Name="AvailablePayloads" Type="ImpactPayloadType[]" />
+            <Field Name="AvailablePayloads" Type="ImpactPayloadType[]" MaxArrayLength="16"  />
         </Struct>
         
         <!-- Indicator for use of an IMPACT payload -->
@@ -182,9 +182,9 @@
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
             <!-- An array of vehicles (by ID) to consider when planning -->
-            <Field Name="Vehicles" Type="int64[]" />
+            <Field Name="Vehicles" Type="int64[]" MaxArrayLength="16"  />
             <!-- List of task IDs to be planned to -->
-            <Field Name="TaskList" Type="int64[]" />
+            <Field Name="TaskList" Type="int64[]" MaxArrayLength="16"  />
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- Flag to report timing between tasks -->
@@ -192,7 +192,7 @@
             <!-- Flag to report timing between incremental progress on task and subsequent tasks -->
             <Field Name="ComputeInterTaskToTaskTiming" Type="bool" Default="false" />
             <!-- List of task percentages along task to plan from -->
-            <Field Name="InterTaskPercentage" Type="real32[]" />
+            <Field Name="InterTaskPercentage" Type="real32[]" MaxArrayLength="32" />
         </Struct>
         
         <!-- Batch Route plan response with vehicle-to-task timing reported. -->
@@ -200,7 +200,7 @@
             <!-- Response ID matching request from ({@link BatchRoutePlanRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- Set of task-to-task timings for each requested vehicle -->
-            <Field Name="VehicleTiming" Type="TaskTimingPair[]" />
+            <Field Name="VehicleTiming" Type="TaskTimingPair[]" MaxArrayLength="8192" />
         </Struct>
         
         <!-- Single task/vehicle timing information capturing the estimated time for
@@ -223,11 +223,11 @@
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
             <!-- An array of vehicles (by ID) to consider when planning -->
-            <Field Name="Vehicles" Type="int64[]" />
+            <Field Name="Vehicles" Type="int64[]" MaxArrayLength="16" />
             <!-- List of task IDs to be planned to -->
-            <Field Name="TaskList" Type="int64[]" />
+            <Field Name="TaskList" Type="int64[]" MaxArrayLength="16" />
             <!-- List of task percentages along task to plan from -->
-            <Field Name="InterTaskPercentage" Type="real32[]" />
+            <Field Name="InterTaskPercentage" Type="real32[]" MaxArrayLength="32" />
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
         </Struct>
@@ -237,7 +237,7 @@
             <!-- Response ID matching request from ({@link BatchSummaryRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- Set of vehicle-to-task and task-to-task summaries including timing, communication, and remaining energy -->
-            <Field Name="Summaries" Type="TaskSummary[]" />
+            <Field Name="Summaries" Type="TaskSummary[]" MaxArrayLength="512" />
         </Struct>
         
         <!-- Summary information that describes a particular way to carry out the task.
@@ -251,7 +251,7 @@
             <!-- Summary of information for each vehicle used simultaneously to complete this task.
             If there are zero performing vehicles, then 'TaskID' cannot be completed with any set of
             available vehicles in the system. -->
-            <Field Name="PerformingVehicles" Type="VehicleSummary[]" />
+            <Field Name="PerformingVehicles" Type="VehicleSummary[]" MaxArrayLength="16" />
             <!-- Task cannot be completed as specified and is using best effort. Estimated percent
             achieved while using best effort strategy. -->
             <Field Name="BestEffort" Type="real32" Units="%" Default="100.0" />
@@ -320,7 +320,7 @@
             <!-- Standard CMASI Automation request -->
             <Field Name="TrialRequest" Type="AutomationRequest" Series="CMASI" />
             <!-- Override nominal speed/alt. If a vehicle is not in list, its nominal speed/alt is used -->
-            <Field Name="OverridePlanningConditions" Type="SpeedAltPair[]" />
+            <Field Name="OverridePlanningConditions" Type="SpeedAltPair[]" MaxArrayLength="16" />
             <!-- Associated play ID -->
             <Field Name="PlayID" Type="int64" />
             <!-- Associated solution ID -->
@@ -342,7 +342,7 @@
             <!-- Flag indicating 'sandbox', i.e. not to be implemented -->
             <Field Name="Sandbox" Type="bool" Default="false" />
             <!-- Set of vehicle-to-task summaries that will be implemented by this automation response. Including timing, communication, and remaining energy -->
-            <Field Name="Summaries" Type="TaskSummary[]" />
+            <Field Name="Summaries" Type="TaskSummary[]" MaxArrayLength="512" />
         </Struct>
         
         <!-- Point of interest -->
@@ -361,7 +361,7 @@
             <Field Name="LineID" Type="int64" />
             
             <!-- List of points to search -->
-            <Field Name="Line" Type="Location3D[]" Series="CMASI" />
+            <Field Name="Line" Type="Location3D[]" MaxArrayLength="1024" Series="CMASI" />
         </Struct>
         
         <!-- Area of interest -->
@@ -386,7 +386,7 @@
             <Field Name="StandoffDistance" Type="real32" Units="meter" Default="0" />
 
             <!-- A list of acceptable look-angles for this task.  Each wedge is defined relative to true North. To be a valid look angle, a sensor must be looking from a direction within the bounds of the wedge. -->
-            <Field Name="ViewAngleList" Type="Wedge[]" Series="CMASI" />
+            <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" Series="CMASI" />
 			
             <!-- Loiter action to complete to fulfill task. If null, then simply points camera but main trajectory does not change. Otherwise, completes the specified loiter action. -->
             <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Default="null"/>
@@ -429,7 +429,7 @@
             <Field Name="LineID" Type="int64" />
 
             <!-- Defines a list of acceptable look-angles for this task.  See the documentation above for details. -->
-            <Field Name="ViewAngleList" Type="Wedge[]" Series="CMASI" />
+            <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" Series="CMASI" />
 
             <!-- If true, the ViewAngleList specifies inertial (North-East) angles. See documentation above. -->
             <Field Name="UseInertialViewAngles" Type="bool" Default="false"/>
@@ -503,7 +503,7 @@
             <Field Name="RouteID" Type="int64" />
 			
             <!-- Waypoints that the supported entity is presumed to be following if 'RouteID' is zero -->
-            <Field Name="PrescribedWaypoints" Type="CMASI/Waypoint[]" />
+            <Field Name="PrescribedWaypoints" Type="CMASI/Waypoint[]" MaxArrayLength="1024" />
             
             <!-- Distance ahead (positive) or behind (negative) that the vehicle will provide
             surveillance relative to 'SupportedEntityID's location on route 'RouteID' -->
@@ -513,7 +513,7 @@
         <!-- Requests the latest configurations for vehicles in the system -->
         <Struct Name="ConfigurationRequest">
             <!-- Vehicle IDs for which the corresponding configuration should be sent. If the list is empty, all available configurations should be sent in response. -->
-            <Field Name="VehicleID" Type="int64[]" />
+            <Field Name="VehicleID" Type="int64[]" MaxArrayLength="16" />
         </Struct>
         
         <!-- Provides information regarding a vehicle's configuration items. -->

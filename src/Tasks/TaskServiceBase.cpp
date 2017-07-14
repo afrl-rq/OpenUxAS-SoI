@@ -36,7 +36,6 @@
 
 #define MAX_TOTAL_COST_MS (INT64_MAX / 1000)
 #define STRING_XML_TYPE "Type"
-#define STRING_XML_ENTITY_CONFIGURATIONS "EntityConfigurations"
 
 namespace uxas
 {
@@ -95,137 +94,63 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
         CERR_FILE_LINE_MSG(sstrErrors.str())
         isSuccessful = false;
     }
-    pugi::xml_node entityConfiguratons = serviceXmlNode.child(STRING_XML_ENTITY_CONFIGURATIONS);
-    if (entityConfiguratons)
+    
+    for (pugi::xml_node currentXmlNode = serviceXmlNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
-        for (auto ndEntityConfiguration = entityConfiguratons.first_child(); ndEntityConfiguration; ndEntityConfiguration = ndEntityConfiguration.next_sibling())
+        if(currentXmlNode.attribute("Series").empty())
+            continue;
+        
+        std::stringstream stringStream;
+        currentXmlNode.print(stringStream);
+        avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
+        if(object == nullptr)
+            continue;
+            
+        if ( dynamic_cast<afrl::cmasi::EntityConfiguration*>(object) )
         {
-            auto entityConfiguration = generateEntityConfiguration(ndEntityConfiguration);
-            if (entityConfiguration)
+            std::shared_ptr<afrl::cmasi::EntityConfiguration> entityConfiguration;
+            entityConfiguration.reset(static_cast<afrl::cmasi::EntityConfiguration*>(object->clone()));
+            auto foundEntity = std::find(m_task->getEligibleEntities().begin(), m_task->getEligibleEntities().end(), entityConfiguration->getID());
+            if(m_task->getEligibleEntities().empty() || foundEntity != m_task->getEligibleEntities().end())
             {
-                auto foundEntity = std::find(m_task->getEligibleEntities().begin(), m_task->getEligibleEntities().end(), entityConfiguration->getID());
-                if(m_task->getEligibleEntities().empty() || foundEntity != m_task->getEligibleEntities().end())
-                {
-                    m_idVsEntityConfiguration.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
-                    auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
-                    auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-                    m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
-                }
-            }
-            else
-            {
-                std::stringstream errorStream;
-                ndEntityConfiguration.print(errorStream);
-
-                sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could not find the EntityConfiguration in ["
-                        << errorStream.str() << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
+                m_entityConfigurations.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
+                auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
+                auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
+                m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
             }
         }
-    }
-
-    pugi::xml_node linesOfInterest = serviceXmlNode.child("LinesOfInterest");
-    if (linesOfInterest)
-    {
-        for (auto ndLineOfInterest = linesOfInterest.first_child(); ndLineOfInterest; ndLineOfInterest = ndLineOfInterest.next_sibling())
+        else if ( dynamic_cast<afrl::cmasi::EntityState*>(object) )
         {
-            std::stringstream stringStream;
-            ndLineOfInterest.print(stringStream);
-            std::shared_ptr<afrl::impact::LineOfInterest> lineOfInterest;
-            avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-            if ((object != nullptr) && (afrl::impact::isLineOfInterest(object)))
-            {
-                lineOfInterest.reset(static_cast<afrl::impact::LineOfInterest*> (object));
-                m_idVsLineOfInterest[lineOfInterest->getLineID()] = lineOfInterest;
-                object = nullptr;
-            }
-            else
-            {
-                sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could not convert a LineOfInterest in [" << ndLineOfInterest << "]" << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
-            }
+            std::shared_ptr<afrl::cmasi::EntityState> entityState;
+            entityState.reset(static_cast<afrl::cmasi::EntityState*>(object->clone()));
+            m_entityStates[entityState->getID()] = entityState;
         }
-    }
-
-    pugi::xml_node missionCommands = serviceXmlNode.child("MissionCommands");
-    if (missionCommands)
-    {
-        for (auto ndMissionCommand = missionCommands.first_child(); ndMissionCommand; ndMissionCommand = ndMissionCommand.next_sibling())
+        else if(afrl::cmasi::isMissionCommand(object))
         {
-            std::stringstream stringStream;
-            ndMissionCommand.print(stringStream);
             std::shared_ptr<afrl::cmasi::MissionCommand> missionCommand;
-            avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-            if ((object != nullptr) && (afrl::cmasi::isMissionCommand(object)))
-            {
-                missionCommand.reset(static_cast<afrl::cmasi::MissionCommand*> (object));
-                m_vehicleIdVsCurrentMission[missionCommand->getVehicleID()] = missionCommand;
-                object = nullptr;
-            }
-            else
-            {
-                sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could not convert a MissionCommand in [" << ndMissionCommand << "]" << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
-            }
+            missionCommand.reset(static_cast<afrl::cmasi::MissionCommand*>(object->clone()));
+            m_currentMissions[missionCommand->getVehicleID()] = missionCommand;
         }
-    }
-
-    pugi::xml_node areaOfInterestNode = serviceXmlNode.child("AreaOfInterest");
-    if (areaOfInterestNode)
-    {
-        std::stringstream stringStream;
-        areaOfInterestNode.print(stringStream);
-        avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-        if ((object != nullptr) && (afrl::impact::isAreaOfInterest(object)))
+        else if(afrl::impact::isAreaOfInterest(object))
         {
-            m_areaOfInterest.reset(static_cast<afrl::impact::AreaOfInterest*> (object));
-            object = nullptr;
+            std::shared_ptr<afrl::impact::AreaOfInterest> areaOfInterest;
+            areaOfInterest.reset(static_cast<afrl::impact::AreaOfInterest*>(object->clone()));
+            m_areasOfInterest[areaOfInterest->getAreaID()] = areaOfInterest;
         }
-        else
+        else if(afrl::impact::isLineOfInterest(object))
         {
-            sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could find a AreaOfInterest in [" << serviceXmlNode.name() << "]" << std::endl;
-            CERR_FILE_LINE_MSG(sstrErrors.str())
-            isSuccessful = false;
+            std::shared_ptr<afrl::impact::LineOfInterest> lineOfInterest;
+            lineOfInterest.reset(static_cast<afrl::impact::LineOfInterest*>(object->clone()));
+            m_linesOfInterest[lineOfInterest->getLineID()] = lineOfInterest;
         }
-    }
-    pugi::xml_node lineOfInterestNode = serviceXmlNode.child("LineOfInterest");
-    if (lineOfInterestNode)
-    {
-        std::stringstream stringStream;
-        lineOfInterestNode.print(stringStream);
-        avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-        if ((object != nullptr) && (afrl::impact::isLineOfInterest(object)))
+        else if(afrl::impact::isPointOfInterest(object))
         {
-            m_lineOfInterest.reset(static_cast<afrl::impact::LineOfInterest*> (object));
-            object = nullptr;
+            std::shared_ptr<afrl::impact::PointOfInterest> pointOfInterest;
+            pointOfInterest.reset(static_cast<afrl::impact::PointOfInterest*>(object->clone()));
+            m_pointsOfInterest[pointOfInterest->getPointID()] = pointOfInterest;
         }
-        else
-        {
-            sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could find a LineOfInterest in [" << serviceXmlNode.name() << "]" << std::endl;
-            CERR_FILE_LINE_MSG(sstrErrors.str())
-            isSuccessful = false;
-        }
-    }
-    pugi::xml_node pointOfInterestNode = serviceXmlNode.child("PointOfInterest");
-    if (pointOfInterestNode)
-    {
-        std::stringstream stringStream;
-        pointOfInterestNode.print(stringStream);
-        avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-        if ((object != nullptr) && (afrl::impact::isPointOfInterest(object)))
-        {
-            m_pointOfInterest.reset(static_cast<afrl::impact::PointOfInterest*> (object));
-            object = nullptr;
-        }
-        else
-        {
-            sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could find a PointOfInterest in [" << serviceXmlNode.name() << "]" << std::endl;
-            CERR_FILE_LINE_MSG(sstrErrors.str())
-            isSuccessful = false;
-        }
+        
+        delete object;
     }
 
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
@@ -282,6 +207,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
     if (entityState)
     {
+        m_entityStates[entityState->getID()] = entityState;
         if (m_assignedVehicleIds.find(entityState->getID()) != m_assignedVehicleIds.end())
         {
             bool isOnTask = std::find(entityState->getAssociatedTasks().begin(),
@@ -332,7 +258,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
         auto foundEntity = std::find(m_task->getEligibleEntities().begin(), m_task->getEligibleEntities().end(), entityConfiguration->getID());
         if(m_task->getEligibleEntities().empty() || foundEntity != m_task->getEligibleEntities().end())
         {
-            m_idVsEntityConfiguration.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
+            m_entityConfigurations.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
             auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
             auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
             m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
@@ -691,16 +617,17 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 // this is an error!!!!
                                 totalCost = MAX_TOTAL_COST_MS;
                             }
+                            // update total task cost to include en-route time
+                            itTaskOptionClass->second->m_taskOption->setCost(totalCost);
                         }
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        itTaskOptionClass->second->m_taskOption->setCost(totalCost);
                         auto pRoutePlan = std::shared_ptr<uxas::messages::route::RoutePlan>(routePlan->clone());
                         itTaskOptionClass->second->m_orderedRouteIdVsPlan[routePlan->getRouteID()] = pRoutePlan;
                         // once all of the routePlans have been received, build the response and send it out
                         if (itTaskOptionClass->second->m_pendingRouteIds.empty())
                         {
-                            auto itEntityConfiguration = m_idVsEntityConfiguration.find(vehicleId);
-                            if (itEntityConfiguration != m_idVsEntityConfiguration.end())
+                            auto itEntityConfiguration = m_entityConfigurations.find(vehicleId);
+                            if (itEntityConfiguration != m_entityConfigurations.end())
                             {
                                 // build a TaskImplementationResponse
                                 auto taskImplementationResponse = std::make_shared<uxas::messages::task::TaskImplementationResponse>();
@@ -710,13 +637,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 taskImplementationResponse->setVehicleID(vehicleId);
                                 taskImplementationResponse->setFinalLocation(itTaskOptionClass->second->m_taskOption->getEndLocation()->clone());
                                 taskImplementationResponse->setFinalHeading(itTaskOptionClass->second->m_taskOption->getEndHeading());
-                                // calculate the cost
-                                auto assignmentCost = MAX_TOTAL_COST_MS;
-                                if (routePlan->getRouteCost() > 0)
-                                {
-                                    assignmentCost = routePlan->getRouteCost() + itTaskOptionClass->second->m_taskOption->getCost();
-                                }
-                                taskImplementationResponse->setFinalTime(itTaskImplementationRequest->second->getStartTime() + assignmentCost);
+                                taskImplementationResponse->setFinalTime(itTaskImplementationRequest->second->getStartTime() + itTaskOptionClass->second->m_taskOption->getCost());
                                 int64_t waypointId = itTaskImplementationRequest->second->getStartingWaypointID();
                                 // waypoints from the saved routes
                                 bool isFirstWaypoint = true;
@@ -839,8 +760,6 @@ std::shared_ptr<afrl::cmasi::Task> TaskServiceBase::generateTaskObject(const pug
         {
             auto task = dynamic_cast<afrl::cmasi::Task*> (object);
             taskPointer.reset(task);
-            task = nullptr;
-            object = nullptr;
         }
     }
     return (taskPointer);
@@ -856,7 +775,6 @@ std::shared_ptr<afrl::cmasi::EntityConfiguration> TaskServiceBase::generateEntit
     if (object != nullptr)
     {
         entityConfiguration.reset(static_cast<afrl::cmasi::EntityConfiguration*> (object));
-        object = nullptr;
     }
     return (entityConfiguration);
 }
