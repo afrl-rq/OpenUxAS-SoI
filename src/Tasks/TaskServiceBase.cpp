@@ -152,6 +152,11 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
         
         delete object;
     }
+    
+    // set a (likely) unique ID from the task ID
+    m_uniqueRouteRequestId = (rand() << 16) + m_task->getTaskID();
+    if(m_uniqueRouteRequestId < 0)
+        m_uniqueRouteRequestId = -m_uniqueRouteRequestId;
 
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
@@ -418,42 +423,36 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
 int64_t TaskServiceBase::getOptionRouteId(const int64_t& OptionId)
 {
-    return (getRouteId(RouteTypeEnum::OPTION, OptionId));
+    m_routeType[m_uniqueRouteRequestId] = RouteTypeEnum::OPTION;
+    m_routeOption[m_uniqueRouteRequestId] = OptionId;
+    return m_uniqueRouteRequestId++; // post increment
 }
 
 int64_t TaskServiceBase::getImplementationRouteId(const int64_t& OptionId)
 {
-    return (getRouteId(RouteTypeEnum::IMPLEMENTATION, OptionId));
-}
-
-int64_t TaskServiceBase::getRouteId(const RouteTypeEnum& routeTypeEnum, const int64_t& OptionId)
-{
-    return ((static_cast<int64_t> (routeTypeEnum) * m_implementationMangleMultiplier) + (m_task->getTaskID() * m_taskMangleMultiplier) + OptionId);
+    m_routeType[m_uniqueRouteRequestId] = RouteTypeEnum::IMPLEMENTATION;
+    m_routeOption[m_uniqueRouteRequestId] = OptionId;
+    return m_uniqueRouteRequestId++; // post increment
 }
 
 int64_t TaskServiceBase::getOptionIdFromRouteId(const int64_t& routeId)
 {
-    int64_t returnValue = routeId % m_implementationMangleMultiplier;
-    returnValue %= m_taskMangleMultiplier;
-    return (returnValue);
-}
-
-int64_t TaskServiceBase::getTaskFromRouteId(const int64_t& routeId)
-{
-    int64_t returnValue = routeId % m_implementationMangleMultiplier;
-    returnValue /= m_taskMangleMultiplier;
-    return (returnValue);
+    auto findID = m_routeOption.find(routeId);
+    if(findID != m_routeOption.end())
+    {
+        return m_routeOption[routeId];
+    }
+    return 0;
 }
 
 TaskServiceBase::RouteTypeEnum TaskServiceBase::getRouteTypeFromRouteId(const int64_t& routeId)
 {
-    int64_t returnValue = routeId / m_implementationMangleMultiplier;
-    RouteTypeEnum returnType = RouteTypeEnum::UNKNOWN;
-    if (returnValue < static_cast<int64_t> (RouteTypeEnum::NUMBER_OF_VALUES))
+    auto findID = m_routeType.find(routeId);
+    if(findID != m_routeType.end())
     {
-        returnType = static_cast<RouteTypeEnum> (returnValue);
+        return m_routeType[routeId];
     }
-    return (returnType);
+    return RouteTypeEnum::UNKNOWN;
 }
 
 void TaskServiceBase::buildAndSendImplementationRouteRequestBase(const int64_t& optionId,
