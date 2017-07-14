@@ -87,6 +87,7 @@ else # update the local repo
     git checkout $BRANCH
     cd ..
 fi
+echo " "
 
 if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     cd $WORKSPACEDIR
@@ -123,7 +124,10 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
 elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
     cd $WORKSPACEDIR
     echo "Checkout + compile OpenAMASE:"
-    if [ ! -d "OpenAMASE" ]; then # pull down the repo for the first time
+    if [ ! -d "OpenAMASE/.git" ]; then # pull down the repo for the first time
+        if [ -d "OpenAMASE" ]; then # can't git pull into existing dir, so remove dir first
+            rm -rf OpenAMASE
+        fi
         git clone https://github.com/$REPO_SOURCE_OA/OpenAMASE.git
         FIRST_TIME=1
     else # update the local repo
@@ -131,9 +135,11 @@ elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
         git pull
         cd ..
     fi
+    mkdir -p OpenAMASE/OpenAMASE/dist
     echo "Loading provided Netbeans project for compile..."
     #echo "If you didn't download the OpenAMASE.jar file, then:"
-    echo "Please click 'Build' inside the project."
+    echo "Please double-click on the 'project.xml' file in the project to open the file."
+    echo "Then click 'Build' inside the project, and 'Build Anyway' in the 'Build Project' dialogue box (it's fine)."
     echo "Once you're done..."
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
     cd $WORKSPACEDIR/OpenAMASE/OpenAMASE
@@ -175,7 +181,10 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
 elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
     cd $WORKSPACEDIR
     echo "Checkout + compile LmcpGen:"
-    if [ ! -d "LmcpGen" ]; then # pull down the repo for the first time
+    if [ ! -d "LmcpGen/.git" ]; then # pull down the repo for the first time
+        if [ -d "LmcpGen" ]; then # can't git pull into existing dir, so remove dir first
+            rm -rf LmcpGen
+        fi
         git clone https://github.com/$REPO_SOURCE_LG/LmcpGen.git
         FIRST_TIME=1
     else # update the local repo
@@ -183,9 +192,11 @@ elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
         git pull
         cd ..
     fi
+    mkdir -p LmcpGen/dist
     echo "Loading provided Netbeans project for compile..."
-    echo "If you didn't download the LmcpGen.jar file, then:"
-    echo "Please click 'Build' inside the project."
+    #echo "If you didn't download the LmcpGen.jar file, then:"
+    echo "Please double-click on the 'project.xml' file in the project (open the file)."
+    echo "Then click 'Build' inside the project, and 'Build Anyway' in the 'Build Project' dialogue box (it's fine)."
     echo "Once you're done..."
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
     cd $WORKSPACEDIR/LmcpGen
@@ -208,6 +219,10 @@ sh RunLmcpGen.sh
 echo "Preparing UxAS specific patches to external libraries..."
 ./prepare
 echo "*** Note that ./prepare will need to be run again any time a file is modified in one of the /3rd/wrap_patches subdirectories or the /3rd/*.wrap.tmpl files, or any time you move or rename your source tree. ***"
+
+if [ ! -d "$WORKSPACEDIR/OpenUxAS/build" ]; then # if build directory doesn't exist, meson wasn't run yet
+    FIRST_TIME=1
+fi
 
 if [ $FIRST_TIME -eq 1 ]; then
     cd $WORKSPACEDIR/OpenUxAS

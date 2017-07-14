@@ -57,7 +57,7 @@ AssignmentCoordinatorTaskService::AssignmentCoordinatorTaskService()
 
 AssignmentCoordinatorTaskService::~AssignmentCoordinatorTaskService()
 {
-    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~PisrTaskService()");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~AssignmentCoordinatorTaskService()");
 };
 
 bool

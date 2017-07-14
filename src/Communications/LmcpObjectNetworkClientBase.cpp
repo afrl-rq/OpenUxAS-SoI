@@ -447,7 +447,7 @@ LmcpObjectNetworkClientBase::deserializeMessage(const std::string& payload)
     lmcpByteBuffer.allocate(payload.size());
     lmcpByteBuffer.rewind();
 
-    for (int32_t charIndex = 0; charIndex < payload.size(); charIndex++)
+    for (size_t charIndex = 0; charIndex < payload.size(); charIndex++)
     {
         lmcpByteBuffer.putByte(payload[charIndex]); // TODO REVIEW
     }

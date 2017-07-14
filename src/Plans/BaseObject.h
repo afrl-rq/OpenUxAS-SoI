@@ -49,9 +49,9 @@ public:
                 const double& dPositionY,
                 const double& dPositionZ,
                 const double& Psi_rad)
-        :m_iID(iID),
-        m_dPsi_rad(Psi_rad),
-        CPosition(dPositionX,dPositionY,dPositionZ)
+        :CPosition(dPositionX,dPositionY,dPositionZ),
+		m_iID(iID),
+        m_dPsi_rad(Psi_rad)
     {};
     CBaseObject(const int& iID)
         :m_iID(iID)
@@ -87,8 +87,6 @@ public:
     int64_t m_iID{-1};
     double m_dPsi_rad{0.0};
     bool m_bValidStartHeading{true};
-
-
 };
 
 

@@ -5,7 +5,7 @@ conf = configuration_data()
 link_args = []
 
 os = target_machine.system()
-if os == 'linux'
+if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
@@ -130,13 +130,11 @@ deps = [
 ]
 
 # OpenGL, specifically the GLU library
-if not meson.is_cross_build()
-  deps += [dependency('gl')]
-  if os == 'linux'
-    deps += [dependency('glu')]
-  elif os == 'windows'
-    deps += [cpp.find_library('glu32')]
-  endif
+deps += [dependency('gl')]
+if os.startswith('linux')
+  deps += [dependency('glu')]
+elif os == 'windows'
+  deps += [cpp.find_library('glu32')]
 endif
 
 cpp_args = []
@@ -159,7 +157,7 @@ executable(
       'src/Includes',
       'src/Services',
       '3rd/cppzmq-4.2.1',
-      '3rd/zeromq-4.1.1/include',
+      '3rd/zeromq-4.1.6/include',
       '3rd/PugiXML/src',
       '3rd/sqlite-amalgamation-3120200',
       '3rd/SQLiteCpp-1.3.1/include',
@@ -167,6 +165,7 @@ executable(
     incs_lmcp,
   ],
   link_with: libs,
+  install: true,
 )
 
 subdir('tests')

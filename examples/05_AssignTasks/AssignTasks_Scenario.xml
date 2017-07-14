@@ -1,0 +1,615 @@
+<?xml version="1.0" ?>
+
+<AMASE>
+    <ScenarioEventList>
+        <AirVehicleConfiguration Series="CMASI">
+            <MinimumSpeed>20.0</MinimumSpeed>
+            <MaximumSpeed>35.0</MaximumSpeed>
+            <NominalFlightProfile>
+                <FlightProfile Series="CMASI">
+                    <Name/>
+                    <Airspeed>22.0</Airspeed>
+                    <PitchAngle>0.0</PitchAngle>
+                    <VerticalSpeed>0.0</VerticalSpeed>
+                    <MaxBankAngle>20.0</MaxBankAngle>
+                    <EnergyRate>3.0E-4</EnergyRate>
+                </FlightProfile>
+            </NominalFlightProfile>
+            <AlternateFlightProfiles>
+                <FlightProfile Series="CMASI">
+                    <Name/>
+                    <Airspeed>22.0</Airspeed>
+                    <PitchAngle>0.0</PitchAngle>
+                    <VerticalSpeed>5.0</VerticalSpeed>
+                    <MaxBankAngle>20.0</MaxBankAngle>
+                    <EnergyRate>3.0E-4</EnergyRate>
+                </FlightProfile>
+            </AlternateFlightProfiles>
+            <AvailableLoiterTypes/>
+            <AvailableTurnTypes/>
+            <MinimumAltitude>0.0</MinimumAltitude>
+            <MinAltitudeType>AGL</MinAltitudeType>
+            <MaximumAltitude>1000000.0</MaximumAltitude>
+            <MaxAltitudeType>MSL</MaxAltitudeType>
+            <ID>1</ID>
+            <Affiliation>Unknown</Affiliation>
+            <EntityType/>
+            <Label/>
+            <NominalSpeed>22.0</NominalSpeed>
+            <NominalAltitude>500.0</NominalAltitude>
+            <NominalAltitudeType>AGL</NominalAltitudeType>
+            <PayloadConfigurationList>
+                <CameraConfiguration Series="CMASI">
+                    <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+                    <FieldOfViewMode>Discrete</FieldOfViewMode>
+                    <MinHorizontalFieldOfView>0.11</MinHorizontalFieldOfView>
+                    <MaxHorizontalFieldOfView>45.0</MaxHorizontalFieldOfView>
+                    <DiscreteHorizontalFieldOfViewList>
+                        <real32>45.0</real32>
+                        <real32>22.0</real32>
+                        <real32>7.6</real32>
+                        <real32>3.7</real32>
+                        <real32>0.63</real32>
+                        <real32>0.11</real32>
+                    </DiscreteHorizontalFieldOfViewList>
+                    <VideoStreamHorizontalResolution>1024</VideoStreamHorizontalResolution>
+                    <VideoStreamVerticalResolution>768</VideoStreamVerticalResolution>
+                    <PayloadID>1001</PayloadID>
+                    <PayloadKind/>
+                    <Parameters/>
+                </CameraConfiguration>
+                <GimbalConfiguration Series="CMASI">
+                    <SupportedPointingModes/>
+                    <MinAzimuth>-180.0</MinAzimuth>
+                    <MaxAzimuth>180.0</MaxAzimuth>
+                    <IsAzimuthClamped>true</IsAzimuthClamped>
+                    <MinElevation>-130.0</MinElevation>
+                    <MaxElevation>40.0</MaxElevation>
+                    <IsElevationClamped>true</IsElevationClamped>
+                    <MinRotation>0.0</MinRotation>
+                    <MaxRotation>0.0</MaxRotation>
+                    <IsRotationClamped>true</IsRotationClamped>
+                    <MaxAzimuthSlewRate>115.0</MaxAzimuthSlewRate>
+                    <MaxElevationSlewRate>115.0</MaxElevationSlewRate>
+                    <MaxRotationRate>0.0</MaxRotationRate>
+                    <ContainedPayloadList>
+                        <int64>1001</int64>
+                    </ContainedPayloadList>
+                    <PayloadID>101</PayloadID>
+                    <PayloadKind/>
+                    <Parameters/>
+                </GimbalConfiguration>
+            </PayloadConfigurationList>
+            <Info/>
+        </AirVehicleConfiguration>
+        <AirVehicleState Series="CMASI">
+            <Airspeed>0.0</Airspeed>
+            <VerticalSpeed>0.0</VerticalSpeed>
+            <WindSpeed>0.0</WindSpeed>
+            <WindDirection>0.0</WindDirection>
+            <ID>1</ID>
+            <u>0.0</u>
+            <v>0.0</v>
+            <w>0.0</w>
+            <udot>0.0</udot>
+            <vdot>0.0</vdot>
+            <wdot>0.0</wdot>
+            <Heading>0.0</Heading>
+            <Pitch>0.0</Pitch>
+            <Roll>0.0</Roll>
+            <p>0.0</p>
+            <q>0.0</q>
+            <r>0.0</r>
+            <Course>0.0</Course>
+            <Groundspeed>0.0</Groundspeed>
+            <Location>
+                <Location3D Series="CMASI">
+                    <Latitude>25.185516367326773</Latitude>
+                    <Longitude>-80.86098443548511</Longitude>
+                    <Altitude>100.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </Location>
+            <EnergyAvailable>100.0</EnergyAvailable>
+            <ActualEnergyRate>0.0</ActualEnergyRate>
+            <PayloadStateList/>
+            <CurrentWaypoint>0</CurrentWaypoint>
+            <CurrentCommand>0</CurrentCommand>
+            <Mode>Waypoint</Mode>
+            <AssociatedTasks/>
+            <Time>0</Time>
+            <Info/>
+        </AirVehicleState>
+        <AirVehicleConfiguration Series="CMASI">
+            <MinimumSpeed>20.0</MinimumSpeed>
+            <MaximumSpeed>35.0</MaximumSpeed>
+            <NominalFlightProfile>
+                <FlightProfile Series="CMASI">
+                    <Name/>
+                    <Airspeed>22.0</Airspeed>
+                    <PitchAngle>0.0</PitchAngle>
+                    <VerticalSpeed>0.0</VerticalSpeed>
+                    <MaxBankAngle>20.0</MaxBankAngle>
+                    <EnergyRate>3.0E-4</EnergyRate>
+                </FlightProfile>
+            </NominalFlightProfile>
+            <AlternateFlightProfiles>
+                <FlightProfile Series="CMASI">
+                    <Name/>
+                    <Airspeed>22.0</Airspeed>
+                    <PitchAngle>0.0</PitchAngle>
+                    <VerticalSpeed>5.0</VerticalSpeed>
+                    <MaxBankAngle>20.0</MaxBankAngle>
+                    <EnergyRate>3.0E-4</EnergyRate>
+                </FlightProfile>
+            </AlternateFlightProfiles>
+            <AvailableLoiterTypes/>
+            <AvailableTurnTypes/>
+            <MinimumAltitude>0.0</MinimumAltitude>
+            <MinAltitudeType>AGL</MinAltitudeType>
+            <MaximumAltitude>1000000.0</MaximumAltitude>
+            <MaxAltitudeType>MSL</MaxAltitudeType>
+            <ID>2</ID>
+            <Affiliation>Unknown</Affiliation>
+            <EntityType/>
+            <Label/>
+            <NominalSpeed>22.0</NominalSpeed>
+            <NominalAltitude>500.0</NominalAltitude>
+            <NominalAltitudeType>AGL</NominalAltitudeType>
+            <PayloadConfigurationList>
+                <CameraConfiguration Series="CMASI">
+                    <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+                    <FieldOfViewMode>Discrete</FieldOfViewMode>
+                    <MinHorizontalFieldOfView>0.11</MinHorizontalFieldOfView>
+                    <MaxHorizontalFieldOfView>45.0</MaxHorizontalFieldOfView>
+                    <DiscreteHorizontalFieldOfViewList>
+                        <real32>45.0</real32>
+                        <real32>22.0</real32>
+                        <real32>7.6</real32>
+                        <real32>3.7</real32>
+                        <real32>0.63</real32>
+                        <real32>0.11</real32>
+                    </DiscreteHorizontalFieldOfViewList>
+                    <VideoStreamHorizontalResolution>1024</VideoStreamHorizontalResolution>
+                    <VideoStreamVerticalResolution>768</VideoStreamVerticalResolution>
+                    <PayloadID>1002</PayloadID>
+                    <PayloadKind/>
+                    <Parameters/>
+                </CameraConfiguration>
+                <GimbalConfiguration Series="CMASI">
+                    <SupportedPointingModes/>
+                    <MinAzimuth>-180.0</MinAzimuth>
+                    <MaxAzimuth>180.0</MaxAzimuth>
+                    <IsAzimuthClamped>false</IsAzimuthClamped>
+                    <MinElevation>-130.0</MinElevation>
+                    <MaxElevation>40.0</MaxElevation>
+                    <IsElevationClamped>true</IsElevationClamped>
+                    <MinRotation>0.0</MinRotation>
+                    <MaxRotation>0.0</MaxRotation>
+                    <IsRotationClamped>true</IsRotationClamped>
+                    <MaxAzimuthSlewRate>115.0</MaxAzimuthSlewRate>
+                    <MaxElevationSlewRate>115.0</MaxElevationSlewRate>
+                    <MaxRotationRate>0.0</MaxRotationRate>
+                    <ContainedPayloadList>
+                        <int64>1002</int64>
+                    </ContainedPayloadList>
+                    <PayloadID>102</PayloadID>
+                    <PayloadKind/>
+                    <Parameters/>
+                </GimbalConfiguration>
+            </PayloadConfigurationList>
+            <Info/>
+        </AirVehicleConfiguration>
+        <AirVehicleState Series="CMASI">
+            <Airspeed>0.0</Airspeed>
+            <VerticalSpeed>0.0</VerticalSpeed>
+            <WindSpeed>0.0</WindSpeed>
+            <WindDirection>0.0</WindDirection>
+            <ID>2</ID>
+            <u>0.0</u>
+            <v>0.0</v>
+            <w>0.0</w>
+            <udot>0.0</udot>
+            <vdot>0.0</vdot>
+            <wdot>0.0</wdot>
+            <Heading>0.0</Heading>
+            <Pitch>0.0</Pitch>
+            <Roll>0.0</Roll>
+            <p>0.0</p>
+            <q>0.0</q>
+            <r>0.0</r>
+            <Course>0.0</Course>
+            <Groundspeed>0.0</Groundspeed>
+            <Location>
+                <Location3D Series="CMASI">
+                    <Latitude>25.44179557110271</Latitude>
+                    <Longitude>-80.65038781016004</Longitude>
+                    <Altitude>100.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </Location>
+            <EnergyAvailable>100.0</EnergyAvailable>
+            <ActualEnergyRate>0.0</ActualEnergyRate>
+            <PayloadStateList/>
+            <CurrentWaypoint>0</CurrentWaypoint>
+            <CurrentCommand>0</CurrentCommand>
+            <Mode>Waypoint</Mode>
+            <AssociatedTasks/>
+            <Time>0</Time>
+            <Info/>
+        </AirVehicleState>
+        <PointSearchTask Series="CMASI">
+            <SearchLocation>
+                <Location3D Series="CMASI">
+                    <Latitude>25.533507526969014</Latitude>
+                    <Longitude>-80.85624126824806</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </SearchLocation>
+            <StandoffDistance>0.0</StandoffDistance>
+            <ViewAngleList/>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>1</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </PointSearchTask>
+        <PointSearchTask Series="CMASI">
+            <SearchLocation>
+                <Location3D Series="CMASI">
+                    <Latitude>25.330369830330564</Latitude>
+                    <Longitude>-80.54224359715526</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </SearchLocation>
+            <StandoffDistance>0.0</StandoffDistance>
+            <ViewAngleList/>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>2</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </PointSearchTask>
+        <LineSearchTask Series="CMASI">
+            <PointList>
+                <Location3D Series="CMASI">
+                    <Latitude>25.446938297599885</Latitude>
+                    <Longitude>-80.85149810101102</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.456366629511372</Latitude>
+                    <Longitude>-80.79078556037676</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.512079499897446</Latitude>
+                    <Longitude>-80.76327519040186</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.548078585377677</Latitude>
+                    <Longitude>-80.70540855010984</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.551507069709128</Latitude>
+                    <Longitude>-80.64849054326521</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.551507069709128</Latitude>
+                    <Longitude>-80.64849054326521</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </PointList>
+            <ViewAngleList/>
+            <UseInertialViewAngles>false</UseInertialViewAngles>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>3</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </LineSearchTask>
+        <LineSearchTask Series="CMASI">
+            <PointList>
+                <Location3D Series="CMASI">
+                    <Latitude>25.176945156498146</Latitude>
+                    <Longitude>-80.77371015832335</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.192373335989675</Latitude>
+                    <Longitude>-80.69781948253053</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.22065833172414</Latitude>
+                    <Longitude>-80.66177141152893</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.265228628033</Latitude>
+                    <Longitude>-80.67220637945044</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.28837089727029</Latitude>
+                    <Longitude>-80.73481618697953</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.327798467081973</Latitude>
+                    <Longitude>-80.72627848595286</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.334655435744875</Latitude>
+                    <Longitude>-80.64849054326518</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </PointList>
+            <ViewAngleList/>
+            <UseInertialViewAngles>false</UseInertialViewAngles>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>4</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </LineSearchTask>
+        <AreaSearchTask Series="CMASI">
+            <SearchArea>
+                <Polygon Series="CMASI">
+                    <BoundaryPoints>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.5223649528918</Latitude>
+                            <Longitude>-80.56690806678793</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.549792827543403</Latitude>
+                            <Longitude>-80.54319223060267</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.551507069709128</Latitude>
+                            <Longitude>-80.49101739099511</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.515507984228897</Latitude>
+                            <Longitude>-80.4710960885995</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.46836632467145</Latitude>
+                            <Longitude>-80.4891201241003</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.47779465658294</Latitude>
+                            <Longitude>-80.54414086405009</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </BoundaryPoints>
+                </Polygon>
+            </SearchArea>
+            <ViewAngleList/>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>5</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </AreaSearchTask>
+        <AreaSearchTask Series="CMASI">
+            <SearchArea>
+                <Circle Series="CMASI">
+                    <CenterPoint>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.377082929346578</Latitude>
+                            <Longitude>-80.83489701568129</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </CenterPoint>
+                    <Radius>3374.1794</Radius>
+                </Circle>
+            </SearchArea>
+            <ViewAngleList/>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>6</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </AreaSearchTask>
+        <KeepOutZone Series="CMASI">
+            <ZoneType>Physical</ZoneType>
+            <ZoneID>1</ZoneID>
+            <MinAltitude>0.0</MinAltitude>
+            <MinAltitudeType>AGL</MinAltitudeType>
+            <MaxAltitude>5000.0</MaxAltitude>
+            <MaxAltitudeType>MSL</MaxAltitudeType>
+            <AffectedAircraft/>
+            <StartTime>0</StartTime>
+            <EndTime>0</EndTime>
+            <Padding>0.0</Padding>
+            <Label/>
+            <Boundary>
+                <Rectangle Series="CMASI">
+                    <CenterPoint>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.401510880208175</Latitude>
+                            <Longitude>-80.52232229475965</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </CenterPoint>
+                    <Width>8981.193</Width>
+                    <Height>4564.5303</Height>
+                    <Rotation>0.0</Rotation>
+                </Rectangle>
+            </Boundary>
+        </KeepOutZone>
+        <KeepOutZone Series="CMASI">
+            <ZoneType>Physical</ZoneType>
+            <ZoneID>2</ZoneID>
+            <MinAltitude>0.0</MinAltitude>
+            <MinAltitudeType>AGL</MinAltitudeType>
+            <MaxAltitude>5000.0</MaxAltitude>
+            <MaxAltitudeType>MSL</MaxAltitudeType>
+            <AffectedAircraft/>
+            <StartTime>0</StartTime>
+            <EndTime>0</EndTime>
+            <Padding>0.0</Padding>
+            <Label/>
+            <Boundary>
+                <Polygon Series="CMASI">
+                    <BoundaryPoints>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.298656350264643</Latitude>
+                            <Longitude>-80.88375163822296</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.298656350264643</Latitude>
+                            <Longitude>-80.81829593035165</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.266942870198726</Latitude>
+                            <Longitude>-80.78888829348193</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.24208635879571</Latitude>
+                            <Longitude>-80.81165549621979</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.24208635879571</Latitude>
+                            <Longitude>-80.88375163822296</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.26779999128159</Latitude>
+                            <Longitude>-80.9065188409608</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </BoundaryPoints>
+                </Polygon>
+            </Boundary>
+        </KeepOutZone>
+        <KeepInZone Series="CMASI">
+            <ZoneID>3</ZoneID>
+            <MinAltitude>0.0</MinAltitude>
+            <MinAltitudeType>AGL</MinAltitudeType>
+            <MaxAltitude>5000.0</MaxAltitude>
+            <MaxAltitudeType>MSL</MaxAltitudeType>
+            <AffectedAircraft/>
+            <StartTime>0</StartTime>
+            <EndTime>0</EndTime>
+            <Padding>0.0</Padding>
+            <Label/>
+            <Boundary>
+                <Rectangle Series="CMASI">
+                    <CenterPoint>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.371511642307972</Latitude>
+                            <Longitude>-80.68928178150387</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </CenterPoint>
+                    <Width>54229.61</Width>
+                    <Height>48688.32</Height>
+                    <Rotation>0.0</Rotation>
+                </Rectangle>
+            </Boundary>
+        </KeepInZone>
+        <OperatingRegion Series="CMASI">
+            <ID>10</ID>
+            <KeepInAreas>
+                <int64>3</int64>
+            </KeepInAreas>
+            <KeepOutAreas>
+                <int64>1</int64>
+                <int64>2</int64>
+            </KeepOutAreas>
+        </OperatingRegion>
+        <AutomationRequest Series="CMASI">
+            <EntityList>
+                <int64>1</int64>
+                <int64>2</int64>
+            </EntityList>
+            <TaskList>
+                <int64>1</int64>
+                <int64>2</int64>
+                <int64>3</int64>
+                <int64>4</int64>
+                <int64>5</int64>
+                <int64>6</int64>
+            </TaskList>
+            <TaskRelationships>.(p1 p2 p3 p4 p5 p6)</TaskRelationships>
+            <OperatingRegion>10</OperatingRegion>
+            <RedoAllTasks>false</RedoAllTasks>
+        </AutomationRequest>
+    </ScenarioEventList>
+    <ScenarioData/>
+</AMASE>

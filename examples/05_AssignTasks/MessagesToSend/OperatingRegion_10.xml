@@ -1,0 +1,10 @@
+    <OperatingRegion Series="CMASI">
+      <ID>10</ID>
+      <KeepInAreas>
+        <int64>3</int64>
+      </KeepInAreas>
+      <KeepOutAreas>
+        <int64>1</int64>
+        <int64>2</int64>
+      </KeepOutAreas>
+    </OperatingRegion>

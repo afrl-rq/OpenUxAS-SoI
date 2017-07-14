@@ -1,0 +1,55 @@
+    <AreaSearchTask Series="CMASI">
+      <SearchArea>
+        <Polygon Series="CMASI">
+          <BoundaryPoints>
+            <Location3D Series="CMASI">
+              <Latitude>25.5223649528918</Latitude>
+              <Longitude>-80.56690806678793</Longitude>
+              <Altitude>0.0</Altitude>
+              <AltitudeType>MSL</AltitudeType>
+            </Location3D>
+            <Location3D Series="CMASI">
+              <Latitude>25.549792827543403</Latitude>
+              <Longitude>-80.54319223060267</Longitude>
+              <Altitude>0.0</Altitude>
+              <AltitudeType>MSL</AltitudeType>
+            </Location3D>
+            <Location3D Series="CMASI">
+              <Latitude>25.551507069709128</Latitude>
+              <Longitude>-80.49101739099511</Longitude>
+              <Altitude>0.0</Altitude>
+              <AltitudeType>MSL</AltitudeType>
+            </Location3D>
+            <Location3D Series="CMASI">
+              <Latitude>25.515507984228897</Latitude>
+              <Longitude>-80.4710960885995</Longitude>
+              <Altitude>0.0</Altitude>
+              <AltitudeType>MSL</AltitudeType>
+            </Location3D>
+            <Location3D Series="CMASI">
+              <Latitude>25.46836632467145</Latitude>
+              <Longitude>-80.4891201241003</Longitude>
+              <Altitude>0.0</Altitude>
+              <AltitudeType>MSL</AltitudeType>
+            </Location3D>
+            <Location3D Series="CMASI">
+              <Latitude>25.47779465658294</Latitude>
+              <Longitude>-80.54414086405009</Longitude>
+              <Altitude>0.0</Altitude>
+              <AltitudeType>MSL</AltitudeType>
+            </Location3D>
+          </BoundaryPoints>
+        </Polygon>
+      </SearchArea>
+      <ViewAngleList/>
+      <DesiredWavelengthBands/>
+      <DwellTime>0</DwellTime>
+      <GroundSampleDistance>0.0</GroundSampleDistance>
+      <TaskID>5</TaskID>
+      <Label/>
+      <EligibleEntities/>
+      <RevisitRate>0.0</RevisitRate>
+      <Parameters/>
+      <Priority>0</Priority>
+      <Required>true</Required>
+    </AreaSearchTask>
