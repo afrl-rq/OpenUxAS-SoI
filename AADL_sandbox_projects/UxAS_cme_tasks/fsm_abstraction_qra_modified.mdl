@@ -1,26 +1,41 @@
 Model {
-  Name			  "fsm_abstraction_rev2"
-  Version		  8.6
-  MdlSubVersion		  0
-  SavedCharacterEncoding  "windows-1252"
+  Name			  "fsm_abstraction"
+  Version		  8.9
+  SavedCharacterEncoding  "ISO-8859-1"
   GraphicalInterface {
     NumRootInports	    1
     Inport {
       Name		      "fails"
       BusObject		      ""
       OutputFunctionCall      "off"
+      UnitExpr		      "inherit"
     }
     NumRootOutports	    1
     Outport {
       Name		      "STATE"
       BusObject		      ""
       BusOutputAsStruct	      "off"
+      UnitExpr		      "inherit"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.84"
+    ComputedModelVersion    "1.79"
     NumModelReferences	    0
     NumTestPointedSignals   0
+    NumProvidedFunctions    0
+    NumRequiredFunctions    0
+    NumResetEvents	    0
+    HasInitializeEvent	    0
+    HasTerminateEvent	    0
+    IsExportFunctionModel   0
+    NumParameterArguments   0
+    OrderedModelArguments   1
   }
+  LogicAnalyzerGraphicalSettings ""
+  LogicAnalyzerPlugin	  "on"
+  LogicAnalyzerSignalOrdering ""
+  DiagnosticSuppressor	  "on"
+  SuppressorTable	  "22 serialization::archive 11 0 6 0 0 0 0 0"
+  SLCCPlugin		  "on"
   slprops.hdlmdlprops {
     $PropName		    "HDLParams"
     $ObjectID		    1
@@ -28,7 +43,7 @@ Model {
       Type		      "Cell"
       Dimension		      2
       Cell		      "HDLSubsystem"
-      Cell		      "fsm_abstraction_rev2"
+      Cell		      "fsm_abstraction"
       PropName		      "mdlProps"
     }
   }
@@ -41,6 +56,7 @@ Model {
   MinMaxOverflowArchiveMode "Overwrite"
   FPTRunName		  "Run 1"
   MaxMDLFileLineLength	  120
+  LastSavedArchitecture	  "maci64"
   Object {
     $PropName		    "BdWindowsInfo"
     $ObjectID		    2
@@ -50,7 +66,7 @@ Model {
       $ObjectID		      3
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [1592.0, 0.0, 2064.0, 1128.0]
+      Location		      [0.0, 23.0, 1876.0, 1057.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		4
@@ -72,23 +88,47 @@ Model {
 	$ObjectID		6
 	$ClassName		"Simulink.EditorInfo"
 	IsActive		[1]
-	ViewObjType		"SimulinkTopLevel"
-	LoadSaveID		"0"
-	Extents			[1821.0, 953.0]
-	ZoomFactor		[3.790983606557377]
-	Offset			[60.82486486486485, 78.307027027027019]
+	ViewObjType		"SimulinkSubsys"
+	LoadSaveID		"548"
+	Extents			[1648.0, 881.0]
+	ZoomFactor		[0.8]
+	Offset			[-582.71421331574993, 9.3140875341928222]
       }
+      Object {
+	$PropName		"DockComponentsInfo"
+	$ObjectID		7
+	$ClassName		"Simulink.DockComponentInfo"
+	Type			"GLUE2:PropertyInspector"
+	ID			"Property Inspector"
+	Visible			[0]
+	CreateCallback		""
+	UserData		""
+	Floating		[0]
+	DockPosition		"Right"
+	Width			[640]
+	Height			[480]
+      }
+      WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAADrPwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
+      "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQBAAAARgAAA6wAAAByAP///wAAAAEAAAAAAAAAAPwCA"
+      "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
+      "QBjAHQAbwByAAAAAAD/////AAAALgD///8AAAaWAAADrAAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
+      "////wEAAACE/////wAAAAAAAAAA/////wEAAAD2/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAF6/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAPf/////wAAAAAAAAAA/"
+      "////wEAAAQO/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
     }
   }
+  HideAutomaticNames	  on
   Created		  "Thu Aug 29 13:41:19 2013"
   Creator		  "elliocm"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "elliocm"
+  LastModifiedBy	  "dstaple"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu Jul 13 15:54:25 2017"
-  RTWModifiedTimeStamp	  421862062
-  ModelVersionFormat	  "1.%<AutoIncrement:84>"
+  LastModifiedDate	  "Thu Jul 13 14:53:41 2017"
+  RTWModifiedTimeStamp	  421858416
+  ModelVersionFormat	  "1.%<AutoIncrement:79>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -96,6 +136,11 @@ Model {
   WideLines		  off
   ShowLineDimensions	  off
   ShowPortDataTypes	  on
+  PortDataTypeDisplayFormat "AliasTypeOnly"
+  ShowEditTimeErrors	  on
+  ShowEditTimeWarnings	  on
+  ShowEditTimeAdvisorChecks off
+  ShowPortUnits		  off
   ShowDesignRanges	  off
   ShowLoopsOnError	  on
   IgnoreBidirectionalLines off
@@ -104,6 +149,7 @@ Model {
   ShowSignalResolutionIcons on
   ShowViewerIcons	  on
   SortedOrder		  off
+  VariantCondition	  off
   ExecutionContextIcon	  off
   ShowLinearizationAnnotations on
   ShowVisualizeInsertedRTB on
@@ -114,8 +160,10 @@ Model {
   ToolBar		  on
   StatusBar		  on
   BrowserShowLibraryLinks off
+  FunctionConnectors	  off
   BrowserLookUnderMasks	  off
   SimulationMode	  "normal"
+  VisualizeLoggedSignalsWhenLoggingToFile off
   PauseTimes		  "5"
   NumberOfSteps		  1
   SnapshotBufferSize	  10
@@ -130,14 +178,14 @@ Model {
   TryForcingSFcnDF	  off
   Object {
     $PropName		    "DataLoggingOverride"
-    $ObjectID		    7
+    $ObjectID		    8
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
-    model_		    "fsm_abstraction_rev2"
+    model_		    "fsm_abstraction"
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
       Dimension		      1
-      Cell		      "fsm_abstraction_rev2"
+      Cell		      "fsm_abstraction"
       PropName		      "logAsSpecifiedByModels_"
     }
     Array {
@@ -170,18 +218,23 @@ Model {
   ExtModeAutoUpdateStatusClock on
   ShowModelReferenceBlockVersion off
   ShowModelReferenceBlockIO off
+  OrderedModelArguments	  on
   Array {
     Type		    "Handle"
     Dimension		    1
     Simulink.ConfigSet {
-      $ObjectID		      8
-      Version		      "1.15.1"
+      $ObjectID		      9
+      Version		      "1.17.0"
+      DisabledProps	      []
+      Description	      ""
       Array {
 	Type			"Handle"
 	Dimension		10
 	Simulink.SolverCC {
-	  $ObjectID		  9
-	  Version		  "1.15.1"
+	  $ObjectID		  10
+	  Version		  "1.17.0"
+	  DisabledProps		  []
+	  Description		  ""
 	  StartTime		  "0.0"
 	  StopTime		  "10"
 	  AbsTol		  "auto"
@@ -198,7 +251,7 @@ Model {
 	  MinStep		  "auto"
 	  MaxConsecutiveMinStep	  "1"
 	  RelTol		  "1e-3"
-	  SolverMode		  "Auto"
+	  EnableMultiTasking	  on
 	  EnableConcurrentExecution off
 	  ConcurrentTasks	  off
 	  Solver		  "ode4"
@@ -215,10 +268,13 @@ Model {
 	  AutoInsertRateTranBlk	  off
 	  SampleTimeConstraint	  "Unconstrained"
 	  InsertRTBMode		  "Whenever possible"
+	  SampleTimeProperty	  []
 	}
 	Simulink.DataIOCC {
-	  $ObjectID		  10
-	  Version		  "1.15.1"
+	  $ObjectID		  11
+	  Version		  "1.17.0"
+	  DisabledProps		  []
+	  Description		  ""
 	  Decimation		  "1"
 	  ExternalInput		  "[t, u]"
 	  FinalStateName	  "xFinal"
@@ -250,11 +306,14 @@ Model {
 	  OutputTimes		  "[]"
 	  ReturnWorkspaceOutputsName "out"
 	  Refine		  "1"
+	  LoggingToFile		  off
+	  DatasetSignalFormat	  "timeseries"
+	  LoggingFileName	  "out.mat"
 	  LoggingIntervals	  "[-inf, inf]"
 	}
 	Simulink.OptimizationCC {
-	  $ObjectID		  11
-	  Version		  "1.15.1"
+	  $ObjectID		  12
+	  Version		  "1.17.0"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    8
@@ -268,6 +327,7 @@ Model {
 	    Cell		    "UseSpecifiedMinMax"
 	    PropName		    "DisabledProps"
 	  }
+	  Description		  ""
 	  BlockReduction	  on
 	  BooleanDataType	  on
 	  ConditionallyExecuteInputs on
@@ -283,6 +343,7 @@ Model {
 	  CachingGlobalReferences off
 	  GlobalBufferReuse	  on
 	  StrengthReduction	  off
+	  AdvancedOptControl	  ""
 	  ExpressionFolding	  on
 	  BooleansAsBitfields	  off
 	  BitfieldContainerType	  "uint_T"
@@ -302,16 +363,25 @@ Model {
 	  NoFixptDivByZeroProtection off
 	  EfficientFloat2IntCast  off
 	  EfficientMapNaN2IntZero on
-	  OptimizeModelRefInitCode off
 	  LifeSpan		  "inf"
 	  MaxStackSize		  "Inherit from target"
 	  BufferReusableBoundary  on
 	  SimCompilerOptimization "off"
 	  AccelVerboseBuild	  off
+	  OptimizeBlockOrder	  "off"
+	  OptimizeDataStoreBuffers on
+	  BusAssignmentInplaceUpdate on
 	}
 	Simulink.DebuggingCC {
-	  $ObjectID		  12
-	  Version		  "1.15.1"
+	  $ObjectID		  13
+	  Version		  "1.17.0"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    1
+	    Cell		    "UseOnlyExistingSharedCode"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
 	  RTPrefix		  "error"
 	  ConsistencyChecking	  "none"
 	  ArrayBoundsChecking	  "none"
@@ -359,11 +429,12 @@ Model {
 	  UnnecessaryDatatypeConvMsg "none"
 	  VectorMatrixConversionMsg "none"
 	  InvalidFcnCallConnMsg	  "error"
-	  FcnCallInpInsideContextMsg "EnableAllAsError"
+	  FcnCallInpInsideContextMsg "error"
 	  SignalLabelMismatchMsg  "none"
 	  UnconnectedInputMsg	  "warning"
 	  UnconnectedOutputMsg	  "warning"
 	  UnconnectedLineMsg	  "warning"
+	  UseOnlyExistingSharedCode "error"
 	  SFcnCompatibilityMsg	  "none"
 	  FrameProcessingCompatibilityMsg "error"
 	  UniqueDataStoreMsg	  "none"
@@ -371,6 +442,7 @@ Model {
 	  RootOutportRequireBusObject "warning"
 	  AssertControl		  "UseLocalSettings"
 	  AllowSymbolicDim	  off
+	  RowMajorDimensionSupport off
 	  ModelReferenceIOMsg	  "none"
 	  ModelReferenceMultiInstanceNormalModeStructChecksumCheck "error"
 	  ModelReferenceVersionMismatchMessage "none"
@@ -387,21 +459,34 @@ Model {
 	  BusNameAdapt		  "WarnAndRepair"
 	  NonBusSignalsTreatedAsBus "none"
 	  SymbolicDimMinMaxWarning "warning"
+	  LossOfSymbolicDimsSimulationWarning "warning"
+	  LossOfSymbolicDimsCodeGenerationWarning "error"
+	  SymbolicDimsDataTypeCodeGenerationDiagnostic "error"
 	  BlockIODiagnostic	  "none"
 	  SFUnusedDataAndEventsDiag "warning"
 	  SFUnexpectedBacktrackingDiag "warning"
 	  SFInvalidInputDataAccessInChartInitDiag "warning"
 	  SFNoUnconditionalDefaultTransitionDiag "warning"
 	  SFTransitionOutsideNaturalParentDiag "warning"
-	  SFUnconditionalTransitionShadowingDiag "warning"
+	  SFUnreachableExecutionPathDiag "warning"
 	  SFUndirectedBroadcastEventsDiag "warning"
 	  SFTransitionActionBeforeConditionDiag	"warning"
 	  SFOutputUsedAsStateInMooreChartDiag "error"
+	  SFTemporalDelaySmallerThanSampleTimeDiag "warning"
+	  SFSelfTransitionDiag	  "warning"
+	  SFExecutionAtInitializationDiag "none"
+	  SFMachineParentedDataDiag "warning"
 	  IntegerSaturationMsg	  "warning"
+	  AllowedUnitSystems	  "all"
+	  UnitsInconsistencyMsg	  "warning"
+	  AllowAutomaticUnitConversions	on
+	  UnitDatabase		  ""
 	}
 	Simulink.HardwareCC {
-	  $ObjectID		  13
-	  Version		  "1.15.1"
+	  $ObjectID		  14
+	  Version		  "1.17.0"
+	  DisabledProps		  []
+	  Description		  ""
 	  ProdBitPerChar	  8
 	  ProdBitPerShort	  16
 	  ProdBitPerInt		  32
@@ -410,6 +495,8 @@ Model {
 	  ProdBitPerFloat	  32
 	  ProdBitPerDouble	  64
 	  ProdBitPerPointer	  32
+	  ProdBitPerSizeT	  32
+	  ProdBitPerPtrDiffT	  32
 	  ProdLargestAtomicInteger "Char"
 	  ProdLargestAtomicFloat  "None"
 	  ProdIntDivRoundTo	  "Undefined"
@@ -426,6 +513,8 @@ Model {
 	  TargetBitPerFloat	  32
 	  TargetBitPerDouble	  64
 	  TargetBitPerPointer	  32
+	  TargetBitPerSizeT	  32
+	  TargetBitPerPtrDiffT	  32
 	  TargetLargestAtomicInteger "Char"
 	  TargetLargestAtomicFloat "None"
 	  TargetShiftRightIntArith on
@@ -438,10 +527,14 @@ Model {
 	  TargetHWDeviceType	  "Specified"
 	  TargetUnknown		  off
 	  ProdEqTarget		  on
+	  UseEmbeddedCoderFeatures on
+	  UseSimulinkCoderFeatures on
 	}
 	Simulink.ModelReferenceCC {
-	  $ObjectID		  14
-	  Version		  "1.15.1"
+	  $ObjectID		  15
+	  Version		  "1.17.0"
+	  DisabledProps		  []
+	  Description		  ""
 	  UpdateModelReferenceTargets "IfOutOfDateOrStructuralChange"
 	  EnableRefExpFcnMdlSchedulingChecks on
 	  CheckModelReferenceTargetMessage "error"
@@ -450,14 +543,28 @@ Model {
 	  ParallelModelReferenceMATLABWorkerInit "None"
 	  ModelReferenceNumInstancesAllowed "Multi"
 	  PropagateVarSize	  "Infer from blocks in model"
+	  ModelDependencies	  ""
 	  ModelReferencePassRootInputsByReference on
 	  ModelReferenceMinAlgLoopOccurrences off
 	  PropagateSignalLabelsOutOfModel off
 	  SupportModelReferenceSimTargetCustomCode off
 	}
 	Simulink.SFSimCC {
-	  $ObjectID		  15
-	  Version		  "1.15.1"
+	  $ObjectID		  16
+	  Version		  "1.17.0"
+	  DisabledProps		  []
+	  Description		  ""
+	  SimCustomSourceCode	  ""
+	  SimCustomHeaderCode	  ""
+	  SimCustomInitializer	  ""
+	  SimCustomTerminator	  ""
+	  SimReservedNameArray	  []
+	  SimUserSources	  ""
+	  SimUserIncludeDirs	  ""
+	  SimUserLibraries	  ""
+	  SimUserDefines	  ""
+	  SimCustomCompilerFlags  ""
+	  SimCustomLinkerFlags	  ""
 	  SFSimEcho		  on
 	  SimCtrlC		  on
 	  SimIntegrity		  on
@@ -465,14 +572,19 @@ Model {
 	  SimParseCustomCode	  on
 	  SimBuildMode		  "sf_incremental_build"
 	  SimGenImportedTypeDefs  off
+	  ModelFunctionsGlobalVisibility "on"
+	  CompileTimeRecursionLimit 50
+	  EnableRuntimeRecursion  on
+	  MATLABDynamicMemAlloc	  on
+	  MATLABDynamicMemAllocThreshold 65536
 	}
 	Simulink.RTWCC {
 	  $BackupClass		  "Simulink.RTWCC"
-	  $ObjectID		  16
-	  Version		  "1.15.1"
+	  $ObjectID		  17
+	  Version		  "1.17.0"
 	  Array {
 	    Type		    "Cell"
-	    Dimension		    15
+	    Dimension		    16
 	    Cell		    "IncludeHyperlinkInReport"
 	    Cell		    "GenerateTraceInfo"
 	    Cell		    "GenerateTraceReport"
@@ -488,14 +600,17 @@ Model {
 	    Cell		    "CodeExecutionProfiling"
 	    Cell		    "CodeProfilingSaveOptions"
 	    Cell		    "CodeProfilingInstrumentation"
+	    Cell		    "GenerateMissedCodeReplacementReport"
 	    PropName		    "DisabledProps"
 	  }
 	  SystemTargetFile	  "grt.tlc"
+	  HardwareBoard		  "None"
 	  TLCOptions		  ""
 	  GenCodeOnly		  off
 	  MakeCommand		  "make_rtw"
 	  GenerateMakefile	  on
 	  PackageGeneratedCodeAndArtifacts off
+	  PackageName		  ""
 	  TemplateMakefile	  "grt_default_tmf"
 	  PostCodeGenCommand	  ""
 	  Description		  ""
@@ -503,14 +618,25 @@ Model {
 	  SaveLog		  off
 	  RTWVerbose		  on
 	  RetainRTWFile		  off
+	  RTWBuildHooks		  []
 	  ProfileTLC		  off
 	  TLCDebug		  off
 	  TLCCoverage		  off
 	  TLCAssert		  off
 	  RTWUseLocalCustomCode	  off
 	  RTWUseSimCustomCode	  off
+	  CustomSourceCode	  ""
+	  CustomHeaderCode	  ""
+	  CustomInclude		  ""
+	  CustomSource		  ""
+	  CustomLibrary		  ""
+	  CustomDefine		  ""
+	  CustomLAPACKCallback	  ""
+	  CustomInitializer	  ""
+	  CustomTerminator	  ""
 	  Toolchain		  "Automatically locate an installed toolchain"
 	  BuildConfiguration	  "Faster Builds"
+	  CustomToolchainOptions  []
 	  IncludeHyperlinkInReport off
 	  LaunchReport		  off
 	  PortableWordSizes	  off
@@ -532,6 +658,7 @@ Model {
 	  GenerateCodeReplacementReport	off
 	  GenerateMissedCodeReplacementReport off
 	  RTWCompilerOptimization "off"
+	  ObjectivePriorities	  []
 	  RTWCustomCompilerOptimizations ""
 	  CheckMdlBeforeBuild	  "Off"
 	  SharedConstantsCachingThreshold 1024
@@ -539,11 +666,11 @@ Model {
 	    Type		    "Handle"
 	    Dimension		    2
 	    Simulink.CodeAppCC {
-	      $ObjectID		      17
-	      Version		      "1.15.1"
+	      $ObjectID		      18
+	      Version		      "1.17.0"
 	      Array {
 		Type			"Cell"
-		Dimension		22
+		Dimension		27
 		Cell			"IgnoreCustomStorageClasses"
 		Cell			"IgnoreTestpoints"
 		Cell			"InsertBlockDesc"
@@ -566,8 +693,15 @@ Model {
 		Cell			"CustomSymbolStrTmpVar"
 		Cell			"CustomSymbolStrMacro"
 		Cell			"ReqsInCode"
+		Cell			"CustomSymbolStrModelFcn"
+		Cell			"CustomSymbolStrUtil"
+		Cell			"CustomSymbolStrEmxType"
+		Cell			"CustomSymbolStrEmxFcn"
+		Cell			"CustomUserTokenString"
 		PropName		"DisabledProps"
 	      }
+	      Description	      ""
+	      Comment		      ""
 	      ForceParamTrailComments off
 	      GenerateComments	      on
 	      CommentStyle	      "Auto"
@@ -589,31 +723,41 @@ Model {
 	      CustomSymbolStrType     "$N$R$M_T"
 	      CustomSymbolStrField    "$N$M"
 	      CustomSymbolStrFcn      "$R$N$M$F"
+	      CustomSymbolStrModelFcn "$R$N"
 	      CustomSymbolStrFcnArg   "rt$I$N$M"
 	      CustomSymbolStrBlkIO    "rtb_$N$M"
 	      CustomSymbolStrTmpVar   "$N$M"
 	      CustomSymbolStrMacro    "$R$N$M"
 	      CustomSymbolStrUtil     "$N$C"
+	      CustomSymbolStrEmxType  "emxArray_$M$N"
+	      CustomSymbolStrEmxFcn   "emx$M$N"
+	      CustomUserTokenString   ""
+	      CustomCommentsFcn	      ""
 	      DefineNamingRule	      "None"
+	      DefineNamingFcn	      ""
 	      ParamNamingRule	      "None"
+	      ParamNamingFcn	      ""
 	      SignalNamingRule	      "None"
+	      SignalNamingFcn	      ""
 	      InsertBlockDesc	      off
 	      InsertPolySpaceComments off
 	      SimulinkBlockComments   on
 	      MATLABSourceComments    off
 	      EnableCustomComments    off
+	      InternalIdentifierFile  ""
 	      InternalIdentifier      "Shortened"
 	      InlinedPrmAccess	      "Literals"
 	      ReqsInCode	      off
 	      UseSimReservedNames     off
+	      ReservedNameArray	      []
 	    }
 	    Simulink.GRTTargetCC {
 	      $BackupClass	      "Simulink.TargetCC"
-	      $ObjectID		      18
-	      Version		      "1.15.1"
+	      $ObjectID		      19
+	      Version		      "1.17.0"
 	      Array {
 		Type			"Cell"
-		Dimension		14
+		Dimension		17
 		Cell			"GeneratePreprocessorConditionals"
 		Cell			"IncludeMdlTerminateFcn"
 		Cell			"GenerateAllocFcn"
@@ -628,8 +772,12 @@ Model {
 		Cell			"SupportComplex"
 		Cell			"SupportAbsoluteTime"
 		Cell			"SupportContinuousTime"
+		Cell			"ExistingSharedCode"
+		Cell			"RemoveDisableFunc"
+		Cell			"RemoveResetFunc"
 		PropName		"DisabledProps"
 	      }
+	      Description	      ""
 	      TargetFcnLib	      "ansi_tfl_table_tmw.mat"
 	      TargetLibSuffix	      ""
 	      TargetPreCompLibLocation ""
@@ -637,11 +785,11 @@ Model {
 	      TargetLangStandard      "C89/C90 (ANSI)"
 	      CodeReplacementLibrary  "None"
 	      UtilityFuncGeneration   "Auto"
-	      ERTMultiwordTypeDef     "System defined"
-	      ERTMultiwordLength      256
+	      MultiwordTypeDef	      "System defined"
 	      MultiwordLength	      2048
 	      GenerateFullHeader      on
 	      InferredTypesCompatibility off
+	      ExistingSharedCode      ""
 	      GenerateSampleERTMain   off
 	      GenerateTestInterfaces  off
 	      ModelReferenceCompliant on
@@ -666,6 +814,8 @@ Model {
 	      PurelyIntegerCode	      off
 	      SupportContinuousTime   on
 	      SupportNonInlinedSFcns  on
+	      RemoveDisableFunc	      off
+	      RemoveResetFunc	      off
 	      SupportVariableSizeSignals off
 	      ParenthesesLevel	      "Nominal"
 	      CastingMode	      "Nominal"
@@ -673,10 +823,14 @@ Model {
 	      ModelStepFunctionPrototypeControlCompliant off
 	      CPPClassGenCompliant    on
 	      AutosarCompliant	      off
+	      MDXCompliant	      off
 	      GRTInterface	      off
 	      GenerateAllocFcn	      off
 	      UseToolchainInfoCompliant	on
 	      GenerateSharedConstants on
+	      CoderGroups	      []
+	      AccessMethods	      []
+	      LookupTableObjectStructAxisOrder "1,2,3,4,..."
 	      UseMalloc		      off
 	      ExtMode		      off
 	      ExtModeStaticAlloc      off
@@ -684,6 +838,7 @@ Model {
 	      ExtModeStaticAllocSize  1000000
 	      ExtModeTransport	      0
 	      ExtModeMexFile	      "ext_comm"
+	      ExtModeMexArgs	      ""
 	      ExtModeIntrfLevel	      "Level1"
 	      RTWCAPISignals	      off
 	      RTWCAPIParams	      off
@@ -696,14 +851,21 @@ Model {
 	  }
 	}
 	SlCovCC.ConfigComp {
-	  $ObjectID		  19
-	  Version		  "1.15.1"
+	  $ObjectID		  20
+	  Version		  "1.17.0"
+	  DisabledProps		  []
 	  Description		  "Simulink Coverage Configuration Component"
 	  Name			  "Simulink Coverage"
+	  CovEnable		  off
+	  CovScope		  "EntireSystem"
+	  CovIncludeTopModel	  on
 	  RecordCoverage	  off
 	  CovPath		  "/"
 	  CovSaveName		  "covdata"
+	  CovCompData		  ""
 	  CovMetricSettings	  "dw"
+	  CovFilter		  ""
+	  CovHTMLOptions	  ""
 	  CovNameIncrementing	  off
 	  CovHtmlReporting	  on
 	  CovForceBlockReductionOff on
@@ -712,8 +874,13 @@ Model {
 	  CovSaveSingleToWorkspaceVar on
 	  CovCumulativeVarName	  "covCumulativeData"
 	  CovCumulativeReport	  off
+	  CovSaveOutputData	  on
+	  CovOutputDir		  "slcov_output/$ModelName$"
+	  CovDataFileName	  "$ModelName$_cvdata"
+	  CovShowResultsExplorer  on
 	  CovReportOnPause	  on
-	  CovModelRefEnable	  "Off"
+	  CovModelRefEnable	  "off"
+	  CovModelRefExcluded	  ""
 	  CovExternalEMLEnable	  off
 	  CovSFcnEnable		  on
 	  CovBoundaryAbsTol	  1e-05
@@ -721,10 +888,12 @@ Model {
 	  CovUseTimeInterval	  off
 	  CovStartTime		  0
 	  CovStopTime		  0
+	  CovMcdcMode		  "Masking"
 	}
 	hdlcoderui.hdlcc {
-	  $ObjectID		  20
-	  Version		  "1.15.1"
+	  $ObjectID		  21
+	  Version		  "1.17.0"
+	  DisabledProps		  []
 	  Description		  "HDL Coder custom configuration component"
 	  Name			  "HDL Coder"
 	  Array {
@@ -738,18 +907,19 @@ Model {
 	PropName		"Components"
       }
       Name		      "Configuration"
+      ExtraOptions	      ""
       CurrentDlgPage	      "Solver"
-      ConfigPrmDlgPosition     [ 384, 120, 1496, 838 ] 
+      ConfigPrmDlgPosition    [ 384, 120, 1496, 838 ]
     }
     PropName		    "ConfigurationSets"
   }
   Simulink.ConfigSet {
     $PropName		    "ActiveConfigurationSet"
-    $ObjectID		    8
+    $ObjectID		    9
   }
   Object {
     $PropName		    "DataTransfer"
-    $ObjectID		    21
+    $ObjectID		    22
     $ClassName		    "Simulink.GlobalDataTransfer"
     DefaultTransitionBetweenSyncTasks "Ensure deterministic transfer (maximum delay)"
     DefaultTransitionBetweenAsyncTasks "Ensure data integrity only"
@@ -768,6 +938,7 @@ Model {
     FontWeight		    "normal"
     FontAngle		    "normal"
     ShowName		    on
+    HideAutomaticName	    on
     BlockRotation	    0
     BlockMirror		    off
   }
@@ -792,8 +963,8 @@ Model {
   MaskDefaults {
     SelfModifiable	    "off"
     IconFrame		    "on"
-    IconOpaque		    "on"
-    RunInitForIconRedraw    "off"
+    IconOpaque		    "opaque"
+    RunInitForIconRedraw    "analyze"
     IconRotate		    "none"
     PortRotate		    "default"
     IconUnits		    "autoscale"
@@ -830,6 +1001,24 @@ Model {
       PreserveConstantTs      off
     }
     Block {
+      BlockType		      Delay
+      DelayLengthSource	      "Dialog"
+      DelayLength	      "2"
+      DelayLengthUpperLimit   "100"
+      InitialConditionSource  "Dialog"
+      InitialCondition	      "0.0"
+      ExternalReset	      "None"
+      ShowEnablePort	      off
+      PreventDirectFeedthrough off
+      DiagnosticForDelayLength "None"
+      RemoveDelayLengthCheckInGeneratedCode off
+      InputProcessing	      "Elements as channels (sample based)"
+      UseCircularBuffer	      off
+      SampleTime	      "-1"
+      StateMustResolveToSignalObject off
+      CodeGenStateStorageClass "Auto"
+    }
+    Block {
       BlockType		      Demux
       Outputs		      "4"
       DisplayOption	      "none"
@@ -864,6 +1053,7 @@ Model {
       OutDataTypeStr	      "Inherit: auto"
       LockScale		      off
       BusOutputAsStruct	      off
+      Unit		      "inherit"
       PortDimensions	      "-1"
       VarSizeSig	      "Inherit"
       SampleTime	      "-1"
@@ -888,20 +1078,27 @@ Model {
       OutDataTypeStr	      "Inherit: auto"
       LockScale		      off
       BusOutputAsStruct	      off
+      Unit		      "inherit"
       PortDimensions	      "-1"
       VarSizeSig	      "Inherit"
       SampleTime	      "-1"
       SignalType	      "auto"
       SamplingMode	      "auto"
+      EnsureOutportIsVirtual  off
       SourceOfInitialOutputValue "Dialog"
       OutputWhenDisabled      "held"
       InitialOutput	      "[]"
+      MustResolveToSignalObject	off
+    }
+    Block {
+      BlockType		      Scope
+      DefaultConfigurationName "Simulink.scopes.TimeScopeBlockCfg"
+      Floating		      off
     }
     Block {
       BlockType		      SignalConversion
       ConversionOutput	      "Signal copy"
       OutDataTypeStr	      "Inherit: auto"
-      OverrideOpt	      off
     }
     Block {
       BlockType		      SubSystem
@@ -911,7 +1108,6 @@ Model {
       TreatAsAtomicUnit	      off
       MinAlgLoopOccurrences   off
       PropExecContextOutsideSubsystem off
-      CheckFcnCallInpInsideContextMsg off
       SystemSampleTime	      "-1"
       RTWSystemCode	      "Auto"
       RTWFcnNameOpts	      "Auto"
@@ -931,6 +1127,8 @@ Model {
       MaskHideContents	      off
       SFBlockType	      "NONE"
       GeneratePreprocessorConditionals off
+      PropagateVariantConditions off
+      TreatAsGroupedWhenPropagatingVariantConditions on
       ContentPreviewEnabled   off
       IsWebBlock	      off
     }
@@ -960,9 +1158,10 @@ Model {
     }
   }
   System {
-    Name		    "fsm_abstraction_rev2"
-    Location		    [1592, 0, 3656, 1128]
-    Open		    on
+    Name		    "fsm_abstraction"
+    Location		    [0, 23, 1876, 1080]
+    Open		    off
+    PortBlocksUseCompactNotation off
     ModelBrowserVisibility  on
     ModelBrowserWidth	    200
     ScreenColor		    "white"
@@ -973,14 +1172,14 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "379"
+    ZoomFactor		    "354"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "1142"
+    SIDHighWatermark	    "1133"
     Block {
       BlockType		      Inport
       Name		      "fails"
       SID		      "418"
-      Position		      [150, 213, 180, 227]
+      Position		      [150, 168, 180, 182]
       ZOrder		      116
       IconDisplay	      "Port number"
       OutDataTypeStr	      "boolean"
@@ -996,8 +1195,9 @@ Model {
       Variant		      off
       System {
 	Name			"FiniteStateMachine"
-	Location		[1592, 0, 3656, 1128]
+	Location		[0, 23, 1876, 1080]
 	Open			off
+	PortBlocksUseCompactNotation off
 	ModelBrowserVisibility	on
 	ModelBrowserWidth	200
 	ScreenColor		"white"
@@ -1008,7 +1208,7 @@ Model {
 	TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
 	TiledPageScale		1
 	ShowPageBoundaries	off
-	ZoomFactor		"177"
+	ZoomFactor		"150"
 	Block {
 	  BlockType		  Inport
 	  Name			  "fails"
@@ -1037,8 +1237,9 @@ Model {
 	  Variant		  off
 	  System {
 	    Name		    "TaskServiceBase"
-	    Location		    [1592, 0, 3656, 1128]
+	    Location		    [0, 23, 1876, 1080]
 	    Open		    off
+	    PortBlocksUseCompactNotation off
 	    ModelBrowserVisibility  on
 	    ModelBrowserWidth	    200
 	    ScreenColor		    "white"
@@ -1049,7 +1250,7 @@ Model {
 	    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
 	    TiledPageScale	    1
 	    ShowPageBoundaries	    off
-	    ZoomFactor		    "281"
+	    ZoomFactor		    "175"
 	    Block {
 	      BlockType		      Inport
 	      Name		      "fails"
@@ -1087,8 +1288,9 @@ Model {
 	      Variant		      off
 	      System {
 		Name			"Actions"
-		Location		[1592, 0, 3656, 1128]
-		Open			off
+		Location		[0, 23, 1876, 1080]
+		Open			on
+		PortBlocksUseCompactNotation off
 		ModelBrowserVisibility	on
 		ModelBrowserWidth	200
 		ScreenColor		"white"
@@ -1099,7 +1301,7 @@ Model {
 		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
 		TiledPageScale		1
 		ShowPageBoundaries	off
-		ZoomFactor		"46"
+		ZoomFactor		"80"
 		Block {
 		  BlockType		  Inport
 		  Name			  "fails"
@@ -1138,8 +1340,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "Active"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -1183,7 +1386,7 @@ Model {
 		    SID			    "1084"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
-		    ActionType		    "else"
+		    ActionType		    "elseif"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -1208,6 +1411,16 @@ Model {
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
 		    Value		    "1.0"
+		    }
+		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "1088"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    DelayLength		    "100"
 		    }
 		    Block {
 		    BlockType		    From
@@ -1255,6 +1468,7 @@ Model {
 		    SID			    "1093"
 		    Position		    [960, 74, 1000, 116]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -1275,15 +1489,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1141"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    286
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -1308,10 +1513,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    13
+		    ZOrder		    3
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -1330,8 +1535,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    14
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    6
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -1384,7 +1589,7 @@ Model {
 		    Annotation {
 		    SID			    "1098"
 		    Name		    "// ACTIVE"
-		    Position		    [464, 79, 515, 96]
+		    Position		    [439, 71, 493, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -1400,7 +1605,7 @@ Model {
 		    "p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent"
 		    ":0px;\"><span style=\" font-size:11px; font-style:italic; color:#c00000;\">Task Execution Model</span></p></body"
 		    "></html>"
-		    Position		    [550, 214, 662, 230]
+		    Position		    [550, 214, 659, 227]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -1434,8 +1639,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "FinalRoutes"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -1489,6 +1695,16 @@ Model {
 		    Value		    "7.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "1048"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    DelayLength		    "3"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From3"
 		    SID			    "1049"
@@ -1518,6 +1734,7 @@ Model {
 		    SID			    "1052"
 		    Position		    [825, 119, 865, 161]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -1528,15 +1745,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1139"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    281
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -1561,8 +1769,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    12
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    3
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -1584,10 +1792,10 @@ Model {
 		    DstPort		    2
 		    }
 		    Line {
-		    ZOrder		    11
+		    ZOrder		    6
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -1607,7 +1815,7 @@ Model {
 		    Annotation {
 		    SID			    "1056"
 		    Name		    "Simple Model for\nRouteAggregatorService - AGGREGATOR ROLE"
-		    Position		    [550, 214, 780, 242]
+		    Position		    [550, 214, 770, 236]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -1618,7 +1826,7 @@ Model {
 		    Annotation {
 		    SID			    "1055"
 		    Name		    "// FINALROUTES"
-		    Position		    [466, 79, 560, 96]
+		    Position		    [419, 71, 514, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -1634,9 +1842,8 @@ Model {
 		  SID			  "1023"
 		  Position		  [555, 1245, 675, 1265]
 		  ZOrder		  324
-		  BackgroundColor	  "red"
 		  ShowName		  off
-		  GotoTag		  "Fail_OptionsPublished"
+		  GotoTag		  "Fail_OptionPublished"
 		}
 		Block {
 		  BlockType		  From
@@ -1859,9 +2066,8 @@ Model {
 		  SID			  "1114"
 		  Position		  [135, 340, 270, 360]
 		  ZOrder		  349
-		  BackgroundColor	  "red"
 		  ShowName		  off
-		  GotoTag		  "Fail_OptionsPublished"
+		  GotoTag		  "Fail_OptionPublished"
 		}
 		Block {
 		  BlockType		  Goto
@@ -1902,8 +2108,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "Idle"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -1957,6 +2164,15 @@ Model {
 		    Value		    "2.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "963"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From3"
 		    SID			    "964"
@@ -1986,6 +2202,7 @@ Model {
 		    SID			    "967"
 		    Position		    [825, 119, 865, 161]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -1996,15 +2213,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1135"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    279
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -2029,10 +2237,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    10
+		    ZOrder		    3
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -2051,8 +2259,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    9
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    6
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -2075,7 +2283,7 @@ Model {
 		    Annotation {
 		    SID			    "1004"
 		    Name		    "Simple Model for\nUniqueAutomationRequest Receipt"
-		    Position		    [540, 199, 708, 227]
+		    Position		    [540, 199, 697, 221]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2086,7 +2294,7 @@ Model {
 		    Annotation {
 		    SID			    "970"
 		    Name		    "// IDLE"
-		    Position		    [466, 79, 504, 96]
+		    Position		    [447, 71, 485, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2105,7 +2313,8 @@ Model {
 		  ZOrder		  260
 		  BackgroundColor	  "green"
 		  IfExpression		  "u1==0.0"
-		  ElseIfExpressions	  "u1==1.0, u1==2.0, u1==3.0, u1==4.0, u1==5.0, u1==6.0"
+		  ElseIfExpressions	  "u1==1.0, u1==2.0, u1==3.0, u1==4.0, u1==5.0, u1==6.0, u1==7.0"
+		  ShowElse		  off
 		}
 		Block {
 		  BlockType		  SubSystem
@@ -2119,8 +2328,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "Init"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -2131,7 +2341,7 @@ Model {
 		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
 		    TiledPageScale	    1
 		    ShowPageBoundaries	    off
-		    ZoomFactor		    "200"
+		    ZoomFactor		    "125"
 		    Block {
 		    BlockType		    Inport
 		    Name		    "state"
@@ -2174,6 +2384,16 @@ Model {
 		    Value		    "1.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "953"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    DelayLength		    "10"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From3"
 		    SID			    "458"
@@ -2203,6 +2423,7 @@ Model {
 		    SID			    "430"
 		    Position		    [825, 119, 865, 161]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -2213,15 +2434,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1134"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    278
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -2246,10 +2458,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    21
+		    ZOrder		    16
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -2268,8 +2480,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    22
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    17
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -2292,7 +2504,7 @@ Model {
 		    Annotation {
 		    SID			    "1003"
 		    Name		    "Simple Model\nfor Task Initialization"
-		    Position		    [559, 182, 658, 210]
+		    Position		    [559, 182, 650, 204]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2303,7 +2515,7 @@ Model {
 		    Annotation {
 		    SID			    "433"
 		    Name		    "// INIT"
-		    Position		    [466, 79, 499, 96]
+		    Position		    [450, 71, 484, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2335,8 +2547,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "OptionRoutes"
-		    Location		    [1592, 0, 3656, 1128]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -2347,7 +2560,7 @@ Model {
 		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
 		    TiledPageScale	    1
 		    ShowPageBoundaries	    off
-		    ZoomFactor		    "190"
+		    ZoomFactor		    "150"
 		    Block {
 		    BlockType		    Inport
 		    Name		    "state"
@@ -2390,6 +2603,16 @@ Model {
 		    Value		    "4.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "1014"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    DelayLength		    "50"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From3"
 		    SID			    "1015"
@@ -2419,6 +2642,7 @@ Model {
 		    SID			    "1018"
 		    Position		    [825, 119, 865, 161]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -2429,15 +2653,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1137"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    279
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -2462,8 +2677,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    10
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    3
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -2485,10 +2700,10 @@ Model {
 		    DstPort		    2
 		    }
 		    Line {
-		    ZOrder		    9
+		    ZOrder		    6
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -2508,7 +2723,7 @@ Model {
 		    Annotation {
 		    SID			    "1022"
 		    Name		    "Simple Model for\nRouteAggregatorService - COLLECTOR ROLE"
-		    Position		    [550, 214, 770, 242]
+		    Position		    [550, 214, 760, 236]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2519,7 +2734,7 @@ Model {
 		    Annotation {
 		    SID			    "1021"
 		    Name		    "// OPTIONROUTES"
-		    Position		    [466, 79, 572, 96]
+		    Position		    [413, 71, 520, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2541,8 +2756,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "OptionSelected"
-		    Location		    [1592, 0, 3656, 1128]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -2553,7 +2769,7 @@ Model {
 		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
 		    TiledPageScale	    1
 		    ShowPageBoundaries	    off
-		    ZoomFactor		    "166"
+		    ZoomFactor		    "125"
 		    Block {
 		    BlockType		    Inport
 		    Name		    "state"
@@ -2613,6 +2829,16 @@ Model {
 		    Value		    "7.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "1063"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    DelayLength		    "3"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From1"
 		    SID			    "1077"
@@ -2658,6 +2884,7 @@ Model {
 		    SID			    "1067"
 		    Position		    [960, 74, 1000, 116]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -2678,15 +2905,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1140"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    288
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -2711,10 +2929,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    14
+		    ZOrder		    3
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -2733,8 +2951,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    15
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    6
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -2787,7 +3005,7 @@ Model {
 		    Annotation {
 		    SID			    "1071"
 		    Name		    "// OPTIONSELECTED"
-		    Position		    [466, 79, 586, 96]
+		    Position		    [406, 71, 527, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2809,7 +3027,7 @@ Model {
 		    "ion w/ Derek</span></p>\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-b"
 		    "lock-indent:0; text-indent:0px;\"><span style=\" font-size:11px; font-style:italic; color:#c00000;\">ROUTE COLLE"
 		    "CTOR</span></p></body></html>"
-		    Position		    [550, 214, 818, 272]
+		    Position		    [550, 214, 815, 260]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2832,8 +3050,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "OptionsPublished"
-		    Location		    [1592, 0, 3656, 1128]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -2887,6 +3106,15 @@ Model {
 		    Value		    "5.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "1031"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From3"
 		    SID			    "1032"
@@ -2916,6 +3144,7 @@ Model {
 		    SID			    "1035"
 		    Position		    [825, 119, 865, 161]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -2926,15 +3155,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1138"
-		    Position		    [500, 158, 535, 192]
-		    ZOrder		    279
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -2959,10 +3179,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    9
+		    ZOrder		    3
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -2981,10 +3201,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    10
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    6
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
-		    Points		    [153, 0; 0, -20]
+		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
 		    DstPort		    3
 		    }
@@ -3005,7 +3225,7 @@ Model {
 		    Annotation {
 		    SID			    "1039"
 		    Name		    "// OPTIONSPUBLISHED"
-		    Position		    [466, 79, 599, 96]
+		    Position		    [400, 71, 533, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -3016,7 +3236,7 @@ Model {
 		    Annotation {
 		    SID			    "1038"
 		    Name		    "Simple Model for\nTaskImplementationRequest Receipt"
-		    Position		    [550, 214, 724, 242]
+		    Position		    [550, 214, 714, 236]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -3038,8 +3258,9 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "SensorRequest"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [0, 23, 1876, 1080]
 		    Open		    off
+		    PortBlocksUseCompactNotation off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
 		    ScreenColor		    "white"
@@ -3093,6 +3314,16 @@ Model {
 		    Value		    "3.0"
 		    }
 		    Block {
+		    BlockType		    Delay
+		    Name		    "Delay"
+		    SID			    "995"
+		    Ports		    [1, 1]
+		    Position		    [495, 158, 530, 192]
+		    ZOrder		    277
+		    InputPortMap	    "u0"
+		    DelayLength		    "3"
+		    }
+		    Block {
 		    BlockType		    From
 		    Name		    "From3"
 		    SID			    "996"
@@ -3122,6 +3353,7 @@ Model {
 		    SID			    "999"
 		    Position		    [825, 119, 865, 161]
 		    ZOrder		    250
+		    OverrideOpt		    off
 		    }
 		    Block {
 		    BlockType		    Switch
@@ -3132,15 +3364,6 @@ Model {
 		    Criteria		    "u2 ~= 0"
 		    InputSameDT		    off
 		    SaturateOnIntegerOverflow off
-		    }
-		    Block {
-		    BlockType		    UnitDelay
-		    Name		    "Unit Delay"
-		    SID			    "1136"
-		    Position		    [495, 158, 530, 192]
-		    ZOrder		    279
-		    InputProcessing	    "Elements as channels (sample based)"
-		    SampleTime		    "-1"
 		    }
 		    Block {
 		    BlockType		    Outport
@@ -3165,10 +3388,10 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    9
+		    ZOrder		    3
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Delay"
 		    DstPort		    1
 		    }
 		    Line {
@@ -3187,8 +3410,8 @@ Model {
 		    DstPort		    1
 		    }
 		    Line {
-		    ZOrder		    10
-		    SrcBlock		    "Unit Delay"
+		    ZOrder		    6
+		    SrcBlock		    "Delay"
 		    SrcPort		    1
 		    Points		    [171, 0; 0, -20]
 		    DstBlock		    "Switch2"
@@ -3211,7 +3434,7 @@ Model {
 		    Annotation {
 		    SID			    "1002"
 		    Name		    "// SENSORREQUEST"
-		    Position		    [466, 79, 586, 96]
+		    Position		    [406, 71, 526, 85]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -3222,7 +3445,7 @@ Model {
 		    Annotation {
 		    SID			    "1005"
 		    Name		    "Simple Model for\nSensorManagerService Receipt"
-		    Position		    [550, 214, 700, 242]
+		    Position		    [550, 214, 692, 236]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -3790,6 +4013,7 @@ Model {
       ZOrder		      1
       SrcBlock		      "fails"
       SrcPort		      1
+      Points		      [30, 0; 0, 45]
       DstBlock		      "FiniteStateMachine"
       DstPort		      1
     }
@@ -3803,7 +4027,7 @@ Model {
     Annotation {
       SID		      "863"
       Name		      "Task-Services Team\nAFRL Summer of Innovation 2017"
-      Position		      [300, 95, 463, 123]
+      Position		      [219, 81, 371, 103]
       InternalMargins	      [0, 0, 0, 0]
       FixedHeight	      off
       FixedWidth	      off
