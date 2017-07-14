@@ -186,9 +186,9 @@ namespace task
 
     protected:
 
-        /** \brief used to assign values to the different type of routes. These
-         * values are mangled into the <B><i>RoutePlanRequest</i></B> ID to 
-         * differentiate the RoutePlanResponses */
+        /** \brief Used to assign values to the different type of routes. A
+         * mapping is maintained from <B><i>RoutePlanRequest</i></B> ID to 
+         * differentiate type of request made (see m_routeType) */
         enum class RouteTypeEnum
         {
             UNKNOWN = 0,
