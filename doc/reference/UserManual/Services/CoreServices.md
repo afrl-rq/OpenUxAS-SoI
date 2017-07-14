@@ -42,40 +42,40 @@ next in the queue or transition to **idle** if the queue is empty.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *AutomationRequest*        | Primary message to request a set of Tasks to be completed     |
-|                            | by a set of vehicles in a particular airspace configuration   |
+|     (1 ms work)            | by a set of vehicles in a particular airspace configuration   |
 |                            | (described by an *OperatingRegion*).                          |
 +----------------------------+---------------------------------------------------------------+
 | *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
-|                            | by entity configuration messages. Any vehicle requested in    |
+|     (0 ms work)            | by entity configuration messages. Any vehicle requested in    |
 |                            | an *AutomationRequest* must previously be described by an     |
 |                            | associated *EntityConfiguration*.                             |
 +----------------------------+---------------------------------------------------------------+
 | *EntityState*              | Describes the actual state of a vehicle in the system         |
-|                            | including position, speed, and fuel status. Each vehicle in   |
+|     (0 ms work)            | including position, speed, and fuel status. Each vehicle in   |
 |                            | an *AutomationRequest* must have reported its state.          |
 +----------------------------+---------------------------------------------------------------+
 | *Task*                     | Details a particular task that will be referenced (by ID) in  |
-|                            | an *AutomationRequest*.                                       |
+|     (1 ms work)            | an *AutomationRequest*.                                       |
 +----------------------------+---------------------------------------------------------------+
 | *TaskInitialized*          | Indicates that a particular task is ready to proceed with the |
-|                            | task assignment sequence. Each task requested in              |
+|     (0 ms work)            | task assignment sequence. Each task requested in              |
 |                            | the *AutomationRequest* must be initialized before a          |
 |                            | *UniqueAutomationRequest* is published.                       |
 +----------------------------+---------------------------------------------------------------+
 | *KeepOutZone*              | Polygon description of a region in which vehicles must not    |
-|                            | travel. If referenced by the *OperatingRegion* in the         |
+|     (0 ms work)            | travel. If referenced by the *OperatingRegion* in the         |
 |                            | *AutomationRequest*, zone must exist for request to be valid. |
 +----------------------------+---------------------------------------------------------------+
 | *KeepInZone*               | Polygon description of a region in which vehicles must remain |
-|                            | during travel. If referenced by the *OperatingRegion* in the  |
+|     (0 ms work)            | during travel. If referenced by the *OperatingRegion* in the  |
 |                            | *AutomationRequest*, zone must exist for request to be valid. |
 +----------------------------+---------------------------------------------------------------+
 | *OperatingRegion*          | Collection of *KeepIn* and *KeepOut* zones that describe the  |
-|                            | allowable space for vehicular travel. Must be defined for     |
+|     (1 ms work)            | allowable space for vehicular travel. Must be defined for     |
 |                            | *AutomationRequest* to be valid.                              |
 +----------------------------+---------------------------------------------------------------+
 | *UniqueAutomationResponse* | Completed response from the rest of the task assignment       |
-|                            | process. Indicates that the next *AutomationRequest* is ready |
+|     (1 ms work)            | process. Indicates that the next *AutomationRequest* is ready |
 |                            | to be processed.                                              |
 +----------------------------+---------------------------------------------------------------+
 
@@ -120,28 +120,29 @@ original Task.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *Task*                     | Primary message that describes a particular task. The task    |
-|                            | manager will make the appropriate service creation message    |
+|     (1 ms work)            | manager will make the appropriate service creation message    |
 |                            | to build a service that directly handles this requested Task. |
 +----------------------------+---------------------------------------------------------------+
 | *RemoveTasks*              | Indicates that Task is no longer needed and will not be       |
-|                            | included in future *AutomationRequest* messages. Task manager |
+|     (1 ms work)            | included in future *AutomationRequest* messages. Task manager |
 |                            | will send the proper *KillService* message to remove the      |
 |                            | service that was constructed to handle the requested Task.    |
 +----------------------------+---------------------------------------------------------------+
 | *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
-|                            | by entity configuration messages. New Tasks are informed of   |
+|     (0 ms work)            | by entity configuration messages. New Tasks are informed of   |
 |                            | all known entities upon creation.                             |
 +----------------------------+---------------------------------------------------------------+
 | *EntityState*              | Describes the actual state of a vehicle in the system         |
-|                            | including position, speed, and fuel status. New Tasks are     |
+|     (0 ms work)            | including position, speed, and fuel status. New Tasks are     |
 |                            | informed of all known entity states upon creation.            |
 +----------------------------+---------------------------------------------------------------+
 | *AreaOfInterest*           | Describes known geometries of areas, lines, and points. New   |
 | *LineOfInterest*           | Tasks are informed of all such named areas upon creation.     |
 | *PointOfInterest*          |                                                               |
+|     (0 ms work)            |                                                               |
 +----------------------------+---------------------------------------------------------------+
 | *MissionCommand*           | Describes current set of waypoints that a vehicle is          |
-|                            | following. New Tasks are informed of all known current        |
+|     (0 ms work)            | following. New Tasks are informed of all known current        |
 |                            | waypoint routes upon creation.                                |
 +----------------------------+---------------------------------------------------------------+
 
@@ -237,19 +238,19 @@ transitions to the **Idle** state.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *UniqueAutomationRequest*  | Indicates which *Tasks* are to be considered as well as the   |
-|                            | set of vehicles that can be used to fulfill those *Tasks*.    |
+|     (2 ms work)            | set of vehicles that can be used to fulfill those *Tasks*.    |
 |                            | Upon reception of this message, if a *Task* ID is included,   |
 |                            | it will publish *TaskPlanOptions*.                            |
 +----------------------------+---------------------------------------------------------------+
 |*TaskImplementationRequest* | After an assignment has been made, each *Task* involved is    |
-|                            | requested to build the final set of waypoints that complete   |
+|     (2 ms work)            | requested to build the final set of waypoints that complete   |
 |                            | the *Task* and corresponding selected option. A *Task* must   |
 |                            | build the route **to** the *Task* as well as waypoints that   |
 |                            | implement the *Task*. For each on-task waypoint, the          |
 |                            | *AssociatedTaskList* must include the *Task* ID.              |
 +----------------------------+---------------------------------------------------------------+
 | *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
-|                            | by entity configuration messages. *Tasks* can reason over     |
+|     (0 ms work)            | by entity configuration messages. *Tasks* can reason over     |
 |                            | sensor and vehicle capabilites to present the proper options  |
 |                            | to other parts of the system. If a vehicle does not have the  |
 |                            | capability to fulfill the *Task* (e.g. does not have a proper |
@@ -257,14 +258,14 @@ transitions to the **Idle** state.
 |                            | the list of eligible entities reported as part of an option.  |
 +----------------------------+---------------------------------------------------------------+
 | *EntityState*              | Describes the actual state of a vehicle in the system         |
-|                            | including position, speed, and fuel status. This message is   |
+|     (0 ms work)            | including position, speed, and fuel status. This message is   |
 |                            | primary feedback mechanism used for *Tasks* to switch to an   |
 |                            | **Active** state. When a *Task* ID is listed in the           |
 |                            | *AssociatedTaskList* of an *EntityState* message, the *Task*  |
 |                            | is allowed to update waypoints and sensor commands at will.   |
 +----------------------------+---------------------------------------------------------------+
 | *RouteResponse*            | Collection of route plans that fulfill a set of requests for  |
-|                            | navigation through an *OperatingRegion*. A *Task* must        |
+|     (1 ms work)            | navigation through an *OperatingRegion*. A *Task* must        |
 |                            | request the waypoints to route a vehicle from its last        |
 |                            | to the start of the *Task*. Additionally, this message        |
 |                            | can be used to obtain on-task waypoints.                      |
@@ -339,20 +340,20 @@ responsive and efficient.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *RoutePlanRequest*         | Primary message that describes a route plan request. A        |
-|                            | request considers only a single vehicle in a single           |
+|     (10 ms work)           | request considers only a single vehicle in a single           |
 |                            | *OperatingRegion* although it can request multiple pairs of   |
 |                            | start and end locations with a single message.                |
 +----------------------------+---------------------------------------------------------------+
 | *KeepOutZone*              | Polygon description of a region in which vehicles must not    |
-|                            | travel. This service will track all *KeepOutZones* to compose |
+|     (0 ms work)            | travel. This service will track all *KeepOutZones* to compose |
 |                            | them upon reception of an *OperatingRegion*.                  |
 +----------------------------+---------------------------------------------------------------+
 | *KeepInZone*               | Polygon description of a region in which vehicles must remain |
-|                            | during travel. This service will track all *KeepInZones* to   |
+|     (0 ms work)            | during travel. This service will track all *KeepInZones* to   |
 |                            | compose them upon reception of an *OperatingRegion*.          |
 +----------------------------+---------------------------------------------------------------+
 | *OperatingRegion*          | Collection of *KeepIn* and *KeepOut* zones that describe the  |
-|                            | allowable space for vehicular travel. When received, this     |
+|     (20 ms work)           | allowable space for vehicular travel. When received, this     |
 |                            | service creates a visibility graph considering the zones      |
 |                            | referenced by this *OperatingRegion*. Upon *RoutePlanRequest* |
 |                            | the visibility graph corresponding to the *OperatingRegion*   |
@@ -360,14 +361,14 @@ responsive and efficient.
 |                            | and perform the shortest path search.                         |
 +----------------------------+---------------------------------------------------------------+
 | *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
-|                            | by entity configuration messages. This service calculates the |
+|     (20 ms work)           | by entity configuration messages. This service calculates the |
 |                            | minimum turn radius of the entity by using the max bank angle |
 |                            | and nominal speed. Requested routes are then returned at the  |
 |                            | nominal speed and with turns approximating the minimum turn   |
 |                            | radius.                                                       | 
 +----------------------------+---------------------------------------------------------------+
 | "AircraftPathPlanner"      | In addition to subscribing to the above broadcasted messages, |
-|                            | this service also subscribes to the group mailbox for         |
+|     (10 ms work)           | this service also subscribes to the group mailbox for         |
 |                            | path planners that service aircraft requests. Upon reception  |
 |                            | of a message on this channel, the service will check for one  |
 |                            | of the above messages and process it as if it came from over  |
@@ -428,18 +429,18 @@ each aggregate request made to it.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *RouteRequest*             | Primary message that requests a large number of routes for    |
-|                            | potentially heterogeneous vehicles. The *Aggregator* will     |
+|     (3 ms work)            | potentially heterogeneous vehicles. The *Aggregator* will     |
 |                            | make a series of *RoutePlanRequests* to the appropriate       |
 |                            | planners to fulfill this request.                             |
 +----------------------------+---------------------------------------------------------------+
 | *EntityConfiguration*      | Vehicle capabilities (e.g. allowable speeds) are described    |
-|                            | by entity configuration messages. This service uses the       |
+|     (0 ms work)            | by entity configuration messages. This service uses the       |
 |                            | *EntityConfiguration* to determine which type of vehicle      |
 |                            | corresponds to a specific ID so that ground planners are used |
 |                            | for ground vehicles and air planners are used for aircraft.   | 
 +----------------------------+---------------------------------------------------------------+
 | *RoutePlanResponse*        | This message is the fulfillment of a single vehicle route     |
-|                            | plan request which the *Aggregator* catalogues until the      |
+|     (1 ms work)            | plan request which the *Aggregator* catalogues until the      |
 |                            | complete set of expected responses is received.               |
 +----------------------------+---------------------------------------------------------------+
 
@@ -492,26 +493,26 @@ are associated with the unique ID from each *UniqueAutomationRequest*.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *UniqueAutomationRequest*  | Primary message that initiates the collection of options sent |
-|                            | from each *Task* via the *TaskPlanOptions* message. A list of |
+|     (1 ms work)            | from each *Task* via the *TaskPlanOptions* message. A list of |
 |                            | all *Tasks* included in the *UniqueAutomationRequest* is made |
 |                            | upon reception of this message and later used to ensure that  |
 |                            | all included *Tasks* have responded.                          |
 +----------------------------+---------------------------------------------------------------+
 | *TaskPlanOptions*          | Primary message from *Tasks* that prescribe available start   |
-|                            | and end locations for each option as well as cost to complete |
+|     (2 ms work)            | and end locations for each option as well as cost to complete |
 |                            | the option. In the **RoutePending** state, the *Collector*    |
 |                            | will use the current location of the vehicle to create paths  |
 |                            | from each vehicle to each task option and from each task      |
 |                            | option to every other task option.                            |
 +----------------------------+---------------------------------------------------------------+
 | *EntityState*              | Describes the actual state of a vehicle in the system         |
-|                            | including position, speed, and fuel status. This message is   |
+|     (0 ms work)            | including position, speed, and fuel status. This message is   |
 |                            | used to create routes and cost estimates from the associated  |
 |                            | vehicle position and heading to the task option start         |
 |                            | locations.                                                    |
 +----------------------------+---------------------------------------------------------------+
 | *RoutePlanResponse*        | This message is the fulfillment of a single vehicle route     |
-|                            | plan request which the *Collector* catalogues until the       |
+|     (2 ms work)            | plan request which the *Collector* catalogues until the       |
 |                            | complete set of expected responses is received.               |
 +----------------------------+---------------------------------------------------------------+
 
@@ -591,19 +592,19 @@ returns to the **idle** state.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *UniqueAutomationRequest*  | Sentinel message that initiates the collection of options sent|
-|                            | from each *Task* via the *TaskPlanOptions* message. A list of |
+|     (0 ms work)            | from each *Task* via the *TaskPlanOptions* message. A list of |
 |                            | all *Tasks* included in the *UniqueAutomationRequest* is made |
 |                            | upon reception of this message and later used to ensure that  |
 |                            | all included *Tasks* have responded.                          |
 +----------------------------+---------------------------------------------------------------+
 | *TaskPlanOptions*          | Primary message from *Tasks* that prescribe available start   |
-|                            | and end locations for each option as well as cost to complete |
+|     (0 ms work)            | and end locations for each option as well as cost to complete |
 |                            | the option. In the **wait** state, this service will store    |
 |                            | all reported options for use in calculating mission cost for  |
 |                            | vehicles when considering possible assignments.               |
 +----------------------------+---------------------------------------------------------------+
 | *AssignmentCostMatrix*     | Primary message that initiates the task assignment            |
-|                            | optimization. This message contains the task-to-task routing  |
+|    (1500 ms work)          | optimization. This message contains the task-to-task routing  |
 |                            | cost estimates and is a key factor in determining which       |
 |                            | vehicle could most efficiently reach a *Task*. Coupled with   |
 |                            | the on-task costs captured in the *TaskPlanOptions*, a        |
@@ -659,25 +660,25 @@ point, the *PlanBuilderService* returns to the **idle** state.
 | Message Subscription       | Description                                                   |
 +============================+===============================================================+
 | *TaskAssignmentSummary*    | Primary message that dictates the proper order and vehicle    |
-|                            | assignment to efficiently carry out the requested mission.    |
+|     (2 ms work)            | assignment to efficiently carry out the requested mission.    |
 |                            | Upon reception of this messsage, the *PlanBuilderService*     |
 |                            | queries each *Task* in order for the final waypoint paths.    |
 +----------------------------+---------------------------------------------------------------+
 | *EntityState*              | Describes the actual state of a vehicle in the system         |
-|                            | including position, speed, and fuel status. This message is   |
+|     (0 ms work)            | including position, speed, and fuel status. This message is   |
 |                            | used to inform the first *Task* of the location of the        |
 |                            | vehicles. Subsequent *Tasks* use the predicted positions and  |
 |                            | headings of vehicles after previous *Tasks* have reported     |
 |                            | waypoints earlier in the mission.                             |
 +----------------------------+---------------------------------------------------------------+
 |*TaskImplementationResponse*| Primary message that each *Task* reports to inform this       |
-|                            | service of the precise waypoints that need to be followed to  |
+|     (2 ms work)            | service of the precise waypoints that need to be followed to  |
 |                            | reach the *Task* and carry it out correctly. The ordered      |
 |                            | collection of these messages are used to build the final      |
 |                            | *UniqueAutomationResponse*.                                   |
 +----------------------------+---------------------------------------------------------------+
 | *UniqueAutomationRequest*  | Informs this service of a new mission request in the system.  |
-|                            | Contains the desired starting locations and headings of the   |
+|     (0 ms work)            | Contains the desired starting locations and headings of the   |
 |                            | vehicles that are to be considered as part of the solution.   |
 +----------------------------+---------------------------------------------------------------+
 

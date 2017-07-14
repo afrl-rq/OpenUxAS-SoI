@@ -22,6 +22,8 @@ if __name__ == '__main__':
 
     # main loop: receive a message, then process it
     while True:
+        print("--------------------------------------------")
+        
         data = socket_sub.recv()
         # messages are single part with a header followed by
         # serialized LMCP
@@ -46,11 +48,29 @@ if __name__ == '__main__':
         # convert to JSON
         d = obj.toDict()
         j = json.dumps(d)
+        print("obj.toDict(): '%r'\n" % d)
+        print("JSON 'dumps' from dict: '%r'\n\n" % j)
 
 	    # convert from JSON
-        d = json.loads(j)
-        obj = factory.unpackFromDict(d)
-        
+        d2 = json.loads(j)
+        obj2 = factory.unpackFromDict(d2)
+        print("dict loaded from json: '%r'\n" % d2)
+        print("type(obj): %r" % type(obj2))
+        print("obj unpacked from dict: '%r'\n\n" % obj2)
+
+        print("d2 same as original d? %r" % (d == d2,))
+        if not (obj == obj2):
+            #print("obj = '%s'" % obj.toString())
+            #print("obj2 = '%s'" % obj2.toString())
+            dd1 = obj.toDict()
+            dd2 = obj2.toDict()
+            # exporting back to dicts, to see whether the DATA really is different (not just listed as diff b/c diff subobjects)
+            print("dicts-from-class-objects the same? %r" % (dd1 == dd2,))
+            if not (dd1 == dd2):
+                print("obj2 not same as original obj and dicts show different data, too (yikes!!)")
+                print("dict obj = '%s'" % str(dd1))
+                print("dict obj2 = '%s'" % str(dd2))        
+
         # syntax to create an object from scratch
         obj = factory.createObjectByName("CMASI", "KeyValuePair")
         obj.set_Key("Hello")
@@ -61,4 +81,5 @@ if __name__ == '__main__':
         smsg = LMCPFactory.packMessage(obj, True)
         socket_send.send(header + smsg)
         print("  Sent:   " + obj.FULL_LMCP_TYPE_NAME)
+
 
