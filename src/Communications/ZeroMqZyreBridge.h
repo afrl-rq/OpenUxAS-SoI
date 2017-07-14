@@ -13,6 +13,7 @@
 #include "UxAS_Zyre.h"
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <set>
