@@ -31,99 +31,345 @@
     <g
         id="__gsn__15d15364bdd"
         name="State Machine Correctness">
-      All AGREE state machines are correct
+      The AGREE state machine specification is correct
+
+      <c
+          id="__gsn__15d36b1c8ea"
+          name="Context">
+        {AGREE specification}
+      </c>
+
+      <c
+          id="__gsn__15d382a8e4b"
+          name="Definition">
+        [Correct State Machine]: State machine correctness is defined by the decomposition within the argument structure.
+
+        <j
+            id="__gsn__15d382b0391"
+            name="Justification">
+          The complexity of the concept of correctness cannot be easily defined without fully enumerating the contents of the argument.
+        </j>
+      </c>
+
+      <a
+          id="__gsn__15d382c37ae"
+          name="Assumption">
+        A correct specification does not need to consider if the specification is satisfied by the implementation.
+      </a>
 
       <s
           id="__gsn__15d153893ec"
           name="Strategy">
-        Argue correctness of each component’s internal AGREE state machine representation
+        Argue correctness of each AADL component’s internal AGREE state machine representation
 
         <g
             id="__gsn__15d15389a52"
             repeat="true"
-            name="{Component} State Machine">
-          {Component} state agree state machine is correct.
+            name="{Component} State Machine  Correctness">
+          {Component}  AGREE state machine specification is correct.
 
           <c
               id="__gsn__15d18a60010"
               name="Context">
-            {component FSM}
+            {component AGREE state machine}
+          </c>
+
+          <c
+              id="__gsn__15d3829a03d"
+              name="Definition">
+            [Correct]:
           </c>
 
           <s
               id="__gsn__15d1536fdc8"
               name="Strategy">
-            Argue correctness of each characteristic of a \finite state machine
+            Argue correctness of each characteristic of a finite state machine
 
             <c
                 id="__gsn__15d15452280"
                 name="Context">
-              {states}
+              {AGREE states set}
             </c>
 
             <c
                 id="__gsn__15d15450d67"
                 name="Context">
-              {transitions}
+              {AGREE transitions set}
             </c>
 
             <c
                 id="__gsn__15d15400fcd"
                 name="Context">
-              {start state}
+              {AGREE start state}
             </c>
 
             <c
                 id="__gsn__15d153e56c8"
                 name="Context">
-              {terminal states}
+              {AGREE terminal states set}
             </c>
+
+            <a
+                id="__gsn__15d38443b70"
+                name="Assumption">
+              State machine inputs and outputs are assumed to be correct (addressed as general correctness properties of the model and not specifically with respect to the state machine). Inputs and outputs are indirectly assessed with respect to correctness of transition and state behavior.
+            </a>
 
             <g
                 id="__gsn__15d1537066f"
                 name="Correct States">
-              {component} states are correct
+              The component’s AGREE states are correct.
 
               <s
                   id="__gsn__15d154ccff4"
                   name="Strategy">
+                Argue over the characteristics of correct AGREE states
 
                 <g
-                    id="__gsn__15d154cd3cc"
-                    name="State Verification">
+                    id="__gsn__15d379518f9"
+                    name="Correct State Behavior">
+                  All states in the state set for the component defined in the AGREE model have the correct state behavior.
 
-                  <comment
-                      id="__gsn__15d18b996d6"
-                      name="Rodes">
-                    Underneath this claim, the argument could be supported by further decomposition i.e., the implementation.
-                  </comment>
+                  <s
+                      id="__gsn__15d3795f786"
+                      name="Strategy">
+                    Argue correct behavior for each individual state.
+
+                    <c
+                        id="__gsn__15d37963985"
+                        name="Context">
+                      {set of AGREE states}
+                    </c>
+
+                    <g
+                        id="__gsn__15d379656c6"
+                        repeat="true"
+                        name="{State} Behavior Correctness">
+                      {State} behavior is correct
+
+                      <c
+                          id="__gsn__15d37969e24"
+                          name="Context">
+                        {state}
+                      </c>
+
+                      <s
+                          id="__gsn__15d381731f8"
+                          name="Strategy">
+                        Argue correct state behavior by {misc. model validation} and mitigation of design faults
+
+                        <c
+                            id="__gsn__15d386851f4"
+                            name="Definition">
+                          [Design Fault]: An error in the design undermining assurance properties and/or functionality as is intended within the design specification.
+                        </c>
+
+                        <j
+                            id="__gsn__15d386d0c4f"
+                            name="Justification">
+                          This strategy is cross-cutting and potentially overlapping. Validation involves reviews with domain experts and analysis of available documentation and artifacts. Fault mitigation examines the model from a separate angle, looking for possible ways in which the model may have been incorrectly specified. Ideally no model is validated that has residual faults, but these faults capture best practices, and expert defined standards of developing “bug free” specifications.
+                        </j>
+
+                        <g
+                            id="__gsn__15d3817a25c"
+                            color="lime"
+                            repeat="true"
+                            name="{Misc. Model Validation}">
+                          {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                          <comment
+                              id="__gsn__15d381ae475"
+                              name="Example Validation">
+                            AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                          </comment>
+                        </g>
+
+                        <g
+                            id="__gsn__15d381ff515"
+                            name="Design Fault Mitigation">
+                          All faults contributing to the correct specification of state behavior are mitigated.
+
+                          <s
+                              id="__gsn__15d3796c1d7"
+                              name="Strategy">
+                            Argue absence of individual identified design faults contributing to incorrect state behavior specification.
+
+                            <c
+                                id="__gsn__15d386ac842"
+                                confidence="TBD"
+                                color="lightgray"
+                                name="Context">
+                              {identified design faults}
+
+                              <comment
+                                  id="__gsn__15d386af868"
+                                  name="Rodes">
+                                A work in progress. Towards an AGREE development standard.
+                              </comment>
+                            </c>
+
+                            <g
+                                id="__gsn__15d36f1c4ea"
+                                name="Abstraction Correctness">
+                              All abstractions within the state are correct.
+
+                              <c
+                                  id="__gsn__15d386c281d"
+                                  color="lightgray"
+                                  name="Definition">
+                                [State abstractions]: {TBD}
+
+                                <comment
+                                    id="__gsn__15d386c5775"
+                                    name="Rodes">
+                                  A work in progress.
+                                </comment>
+                              </c>
+
+                              <c
+                                  id="__gsn__15d3878b8c7"
+                                  color="lightgray"
+                                  name="Definition">
+                                [Correct State Abstractions]: {TBD}
+
+                                <comment
+                                    id="__gsn__15d3878fab8"
+                                    name="Rodes">
+                                  A work in progress.
+                                </comment>
+                              </c>
+
+                              <g
+                                  id="__gsn__15d388a165e"
+                                  color="lime"
+                                  repeat="true"
+                                  name="{Misc. Model Validation}">
+                                {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                                <comment
+                                    id="__gsn__15d388a165f"
+                                    name="Example Validation">
+                                  AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                                </comment>
+                              </g>
+                            </g>
+
+                            <g
+                                id="__gsn__15d374391ea"
+                                color="lightgray"
+                                name="Preservation of variables">
+
+                              <comment
+                                  id="__gsn__15d387aef42"
+                                  name="Rodes">
+                                A work in progress.
+                              </comment>
+                            </g>
+
+                            <g
+                                id="__gsn__15d379a09bc"
+                                name="State Identifier Uniqueness (Model Correctness)">
+                              All AGREE state identifiers are unique.
+
+                              <c
+                                  id="__gsn__15d379a09bd"
+                                  name="Definition">
+                                [Unique AGREE State Identifiers]: identifiers used to represent different states do not share the same identifier name or underlying value.
+                              </c>
+
+                              <j
+                                  id="__gsn__15d379a09be"
+                                  name="Justification">
+                                It is possible to specify state identifiers in AGREE that have the same underlying value. As a result, the model may look correct in that different identifiers are used, but be incorrect since their underlying values are not unique. Failure to have unique state identifiers will result in a failure to correctly specify a state transition.
+                              </j>
+
+                              <s
+                                  id="__gsn__15d379a09bf"
+                                  name="Evidence Scheme">
+                                {AGREE Lemma idiom}
+                              </s>
+                            </g>
+                          </s>
+                        </g>
+                      </s>
+                    </g>
+                  </s>
                 </g>
 
                 <g
-                    id="__gsn__15d154cd6f8"
-                    name="State Validation">
-
-                  <c
-                      id="__gsn__15d1567f890"
-                      name="Context">
-                    {correct}
-                  </c>
+                    id="__gsn__15d36d80528"
+                    name="Complete and Necessary States">
+                  The state set defined in the AGREE model is complete and contains only necessary states.
 
                   <s
-                      id="__gsn__15d15568763"
+                      id="__gsn__15d379cd9ef"
                       name="Strategy">
+                    Argue state completeness and necessity separately
 
                     <g
-                        id="__gsn__15d1556b7a2"
-                        name="Behavior Correctness">
+                        id="__gsn__15d379cd9f0"
+                        name="Complete">
+                      The state set defined in the AGREE model is complete
+
+                      <s
+                          id="__gsn__15d379cd9f1"
+                          name="Strategy">
+                        Argue state set completeness by {misc. model validation}
+
+                        <g
+                            id="__gsn__15d3839a659"
+                            color="lime"
+                            repeat="true"
+                            name="{Misc. Model Validation}">
+                          {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                          <comment
+                              id="__gsn__15d3839a65a"
+                              name="Example Validation">
+                            AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                          </comment>
+                        </g>
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15d379cd9f8"
+                        name="Necessary">
+                      The state set defined in the AGREE model contains only necessary states
+
+                      <s
+                          id="__gsn__15d38255ebe"
+                          name="Strategy">
+                        Argue necessity of the state set by {misc. model validation} and demonstration no other states are possible in the model.
+
+                        <g
+                            id="__gsn__15d3839b05c"
+                            color="lime"
+                            repeat="true"
+                            name="{Misc. Model Validation}">
+                          {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                          <comment
+                              id="__gsn__15d3839b05d"
+                              name="Example Validation">
+                            AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                          </comment>
+                        </g>
+
+                        <g
+                            id="__gsn__15d379d782a"
+                            name="Exclusive States">
+                          No states, other than those defined in the AGREE state set, are possible in the AGREE model (the component’s states as defined within the state set are the only possible state transitions).
+
+                          <s
+                              id="__gsn__15d379ef0c0"
+                              name="Evidence Scheme">
+                            {AGREE Lemma idiom}
+                          </s>
+                        </g>
+                      </s>
                     </g>
                   </s>
-
-                  <comment
-                      id="__gsn__15d17cd6497"
-                      name="Rodes">
-                    Should include checks that the state machine infrastructure is valid and properly applied (e.g., what if the int representation is accidentally repeated?).
-                  </comment>
                 </g>
 
                 <comment
@@ -137,167 +383,651 @@
             <g
                 id="__gsn__15d15372999"
                 name="Correct Transitions">
-              {Component} state machine transitions correctly between states
+              The component’s AGREE transitions are correct
+
+              <a
+                  id="__gsn__15d37c02294"
+                  name="Assumption">
+                Assume correct AGREE states
+              </a>
 
               <s
-                  id="__gsn__15d154c50be"
+                  id="__gsn__15d37131e97"
                   name="Strategy">
-                Argue by verification that {state transitions} ...
+                Argue over characteristics of correct AGREE state transitions
+
+                <a
+                    id="__gsn__15d32a2bb20"
+                    name="Assumption">
+                  Unreachable states and transitions, and non-exclusive states and transitions is indicative that the state machine is not correctly specified in the design.
+                </a>
+
+                <c
+                    id="__gsn__15d3877a362"
+                    color="lightgray"
+                    name="Context">
+                  {correct transition characteristics}
+
+                  <c
+                      id="__gsn__15d3755aed5"
+                      name="Definition">
+                    [Transition reachable]: a transition is reachable there exists a state machine execution path where the transition is taken.
+                  </c>
+
+                  <c
+                      id="__gsn__15d3755aed6"
+                      name="Definition">
+                    [State reachability]: a given state is reachable if a state machine execution path exists by which the state is entered.
+                  </c>
+
+                  <comment
+                      id="__gsn__15d38777e2a"
+                      name="Rodes">
+                    Work in progress
+                  </comment>
+                </c>
 
                 <g
-                    id="__gsn__15d154c61ae"
-                    name="Transition Verification">
-                  {TBD}
+                    id="__gsn__15d3713ad1e"
+                    name="Correct Transition Behavior">
+                  All transitions in the transition set for the component defined in the AGREE model have the correct transition behavior.
+
+                  <c
+                      id="__gsn__15d3715b0b9"
+                      name="Definition">
+                    [Correct Transition Behavior]: The source and destination states are correct and the transition conditions are correct.
+                  </c>
 
                   <s
-                      id="__gsn__15d18a42a84"
+                      id="__gsn__15d371607f4"
                       name="Strategy">
-                    {TBD}
+                    Argue transition correctness for each individual transition
 
                     <c
-                        id="__gsn__15d18a82b3e"
-                        name="Definition">
-                      [Transition reachable]: a transition is reachable there exists a state machine execution path where the transition is taken.
+                        id="__gsn__15d3718720d"
+                        name="Context">
+                      {set of AGREE transitions}
                     </c>
 
-                    <c
-                        id="__gsn__15d18a5b696"
-                        name="Definition">
-                      [State reachability]: a given state is reachable if a state machine execution path exists by which the state is entered.
-                    </c>
-
-                    <m
-                        id="__gsn__15d15568d83"
-                        link="state_reachability.gsn"
-                        name="Reachable {Component} States">
-                      All states of {component} are reachable
-
-                      <j
-                          id="__gsn__15d18a686c4"
-                          name="Justification">
-                        Unreachable states may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
-                      </j>
-                    </m>
-
                     <g
-                        id="__gsn__15d18b94a16"
-                        name="Exclusive Reachable State Set">
-                      No states are reachable other than {states}
+                        id="__gsn__15d37170c9c"
+                        repeat="true"
+                        name="{Transition} Behavior  Correctness">
+                      {Transition} behavior is correct
 
-                      <j
-                          id="__gsn__15d18bee746"
-                          name="Justification">
-                        This is not the same as state “completeness”, but a check that the state machine can’t somehow transition to other undefined states. If it could, the state machine may be erroneous or other states exists that were not defined.
-                      </j>
-                    </g>
-
-                    <m
-                        id="__gsn__15d15565d04"
-                        link="transition_reachability.gsn"
-                        name="Reachable State Transitions">
-                      All transitions between {component} states are reachable.
-
-                      <j
-                          id="__gsn__15d18a7de92"
-                          name="Justification">
-                        Unexecutable transition may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
-                      </j>
-                    </m>
-
-                    <g
-                        id="__gsn__15d18aba4ad"
-                        name="Exclusive Transition Set">
-                      No state transitions, other than {state transitions}, exist.
-
-                      <j
-                          id="__gsn__15d18b4345f"
-                          name="Justification">
-                        This is a separate concern from “completeness”. This claim asks whether the given set of transitions is the exclusive set of transitions. If another transition exists, it isn’t necessarily the state machine transitions are incomplete, but it could mean there is an error in the state machine.
-                      </j>
-                    </g>
-
-                    <g
-                        id="__gsn__15d190896a6"
-                        name="Transition Guarantees Satisfied">
-                      {implementation of the spec is correct?}
+                      <c
+                          id="__gsn__15d37185a82"
+                          name="Context">
+                        {transition}
+                      </c>
 
                       <s
-                          id="__gsn__15d1909d5ca"
+                          id="__gsn__15d3717c8e7"
                           name="Strategy">
-                        Argue over each transition
+                        Argue over the characteristics of correct transition behavior.
+
+                        <c
+                            id="__gsn__15d3717ff0b"
+                            name="Definition">
+                          [Correct Transition Behavior]: The source and destination states are correct and the transition conditions are correct.
+                        </c>
 
                         <g
-                            id="__gsn__15d1909dae4"
+                            id="__gsn__15d3716ca0d"
+                            name="Intended Source and Destination">
+                          The source and destination states for the transition are the intended states.
+
+                          <s
+                              id="__gsn__15d371c560a"
+                              name="Strategy">
+                            Argue the destination state is correct and the source state are intended separately
+
+                            <g
+                                id="__gsn__15d371eb9d1"
+                                name="Destination Correctness">
+                              The transition destination state is the intended destination.
+
+                              <s
+                                  id="__gsn__15d387a218a"
+                                  name="Strategy">
+                                Argue destination state  correctness by {misc. model validation} and mitigation of design faults
+
+                                <c
+                                    id="__gsn__15d387a218b"
+                                    name="Definition">
+                                  [Design Fault]: An error in the design undermining assurance properties and/or functionality as is intended within the design specification.
+                                </c>
+
+                                <j
+                                    id="__gsn__15d387a218c"
+                                    name="Justification">
+                                  This strategy is cross-cutting and potentially overlapping. Validation involves reviews with domain experts and analysis of available documentation and artifacts. Fault mitigation examines the model from a separate angle, looking for possible ways in which the model may have been incorrectly specified. Ideally no model is validated that has residual faults, but these faults capture best practices, and expert defined standards of developing “bug free” specifications.
+                                </j>
+
+                                <g
+                                    id="__gsn__15d383ba81f"
+                                    color="lime"
+                                    repeat="true"
+                                    name="{Misc. Model Validation}">
+                                  {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                                  <comment
+                                      id="__gsn__15d383ba820"
+                                      name="Example Validation">
+                                    AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                                  </comment>
+                                </g>
+
+                                <g
+                                    id="__gsn__15d3825dff0"
+                                    name="Design Fault Mitigation">
+                                  All faults contributing to incorrectly specifying the intended state definition are mitigated.
+
+                                  <s
+                                      id="__gsn__15d3825f772"
+                                      name="Strategy">
+                                    Argue absence of individual identified design faults contributing to incorrect destination state specification.
+
+                                    <c
+                                        id="__gsn__15d388171ae"
+                                        confidence="TBD"
+                                        color="lightgray"
+                                        name="Context">
+                                      {identified design faults}
+
+                                      <comment
+                                          id="__gsn__15d388171af"
+                                          name="Rodes">
+                                        A work in progress. Towards an AGREE development standard.
+                                      </comment>
+                                    </c>
+
+                                    <g
+                                        id="__gsn__15d371c5a69"
+                                        name="State Identifier Uniqueness (Model Correctness)">
+                                      All AGREE state identifiers are unique.
+
+                                      <c
+                                          id="__gsn__15d371de3a0"
+                                          name="Definition">
+                                        [Unique AGREE State Identifiers]: identifiers used to represent different states do not share the same identifier name or underlying value.
+                                      </c>
+
+                                      <j
+                                          id="__gsn__15d372045db"
+                                          name="Justification">
+                                        It is possible to specify state identifiers in AGREE that have the same underlying value. As a result, the model may look correct in that different identifiers are used, but be incorrect since their underlying values are not unique. Failure to have unique state identifiers will result in a failure to correctly specify a state transition.
+                                      </j>
+
+                                      <s
+                                          id="__gsn__15d3721956f"
+                                          name="Evidence Scheme">
+                                        {AGREE Lemma idiom}
+                                      </s>
+                                    </g>
+                                  </s>
+                                </g>
+                              </s>
+                            </g>
+
+                            <g
+                                id="__gsn__15d3722aa1b"
+                                name="Source Correctness (Appropriate Transition)">
+                              The transition is an intended transition out of the source state.
+
+                              <s
+                                  id="__gsn__15d38263b42"
+                                  name="Strategy">
+                                Argue source state correctness by {misc. model validation}
+
+                                <g
+                                    id="__gsn__15d38422f7a"
+                                    color="lime"
+                                    repeat="true"
+                                    name="{Misc. Model Validation}">
+                                  {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                                  <comment
+                                      id="__gsn__15d38422f7b"
+                                      name="Example Validation">
+                                    AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                                  </comment>
+                                </g>
+                              </s>
+                            </g>
+                          </s>
+                        </g>
+
+                        <g
+                            id="__gsn__15d3716c435"
+                            name="Transition Condition Correctness">
+                          The conditions under which the transition is triggered are intended.
+
+                          <s
+                              id="__gsn__15d3719ab4b"
+                              name="Strategy">
+                            Argue trandition conditions are intended by {misc. model validation} and mitigation of design faults
+
+                            <c
+                                id="__gsn__15d388d06cd"
+                                name="Definition">
+                              [Design Fault]: An error in the design undermining assurance properties and/or functionality as is intended within the design specification.
+                            </c>
+
+                            <j
+                                id="__gsn__15d388cfbb3"
+                                name="Justification">
+                              This strategy is cross-cutting and potentially overlapping. Validation involves reviews with domain experts and analysis of available documentation and artifacts. Fault mitigation examines the model from a separate angle, looking for possible ways in which the model may have been incorrectly specified. Ideally no model is validated that has residual faults, but these faults capture best practices, and expert defined standards of developing “bug free” specifications.
+                            </j>
+
+                            <g
+                                id="__gsn__15d383bc3cf"
+                                color="lime"
+                                repeat="true"
+                                name="{Misc. Model Validation}">
+                              {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                              <comment
+                                  id="__gsn__15d383bc3d0"
+                                  name="Example Validation">
+                                AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                              </comment>
+                            </g>
+
+                            <g
+                                id="__gsn__15d38437c48"
+                                name="Design Hazard Mitigation">
+                              All faults contributing to incorrectly specifying a transition condition are mitigated.
+
+                              <s
+                                  id="__gsn__15d375950f8"
+                                  name="Strategy">
+                                Argue absence of individual identified design faults contributing to incorrect transition condition specification.
+
+                                <c
+                                    id="__gsn__15d3888e627"
+                                    confidence="TBD"
+                                    color="lightgray"
+                                    name="Context">
+                                  {identified design faults}
+
+                                  <comment
+                                      id="__gsn__15d3888e628"
+                                      name="Rodes">
+                                    A work in progress. Towards an AGREE development standard.
+                                  </comment>
+                                </c>
+
+                                <g
+                                    id="__gsn__15d3719b6db"
+                                    name="Consistent Transition Edge">
+                                  The AGREE transition uses the prescribed transition edge.
+
+                                  <c
+                                      id="__gsn__15d373c3cf8"
+                                      name="Definition">
+                                    [Transition Edge]: Transitions may occur in the same time step in which a transition condition occurs, or the transition occurs on the next time step after a transition condition occurs. This difference is somewhat analogous to rising edge and falling edge signals.
+                                  </c>
+
+                                  <c
+                                      id="__gsn__15d373e02d5"
+                                      name="Context">
+                                    {prescribed transition edge}
+                                  </c>
+
+                                  <j
+                                      id="__gsn__15d373de9ac"
+                                      name="Justification">
+                                    Failure to understand and consistently apply transition edges has been observed to lead to incorrect specs.
+                                  </j>
+
+                                  <s
+                                      id="__gsn__15d373f128c"
+                                      name="Evidence Scheme">
+                                    {AGREE Lemma idiom}
+                                  </s>
+                                </g>
+
+                                <g
+                                    id="__gsn__15d37489b88"
+                                    name="Correct Transition Edge Idioms">
+                                  The AGREE transition correctly models the transition for the prescribed transition edge.
+
+                                  <c
+                                      id="__gsn__15d3749837d"
+                                      name="Context">
+                                    {prescribed transition edge}
+                                  </c>
+
+                                  <c
+                                      id="__gsn__15d37499eb4"
+                                      name="Definition">
+                                    [Transition Edge]: Transitions may occur in the same time step in which a transition condition occurs, or the transition occurs on the next time step after a transition condition occurs. This difference is somewhat analogous to rising edge and falling edge signals.
+                                  </c>
+
+                                  <s
+                                      id="__gsn__15d3749ce1e"
+                                      color="lightgray"
+                                      name="Strategy">
+                                    {tbd}
+
+                                    <g
+                                        id="__gsn__15d3719bb69"
+                                        name="TBD">
+                                      Non-transition conditions accounted for.
+                                    </g>
+
+                                    <g
+                                        id="__gsn__15d374bb48e"
+                                        repeat="true"
+                                        name="TBD">
+                                      {transition edge specific claims}
+                                    </g>
+
+                                    <comment
+                                        id="__gsn__15d374b0b32"
+                                        name="Rodes">
+                                      Argue over idioms generated based on experience for appropriately modeling state machines with the given transition edge.
+                                    </comment>
+
+                                    <comment
+                                        id="__gsn__15d3889529c"
+                                        name="Rodes">
+                                      Work in progress
+                                    </comment>
+                                  </s>
+                                </g>
+
+                                <g
+                                    id="__gsn__15d3889c700"
+                                    name="Abstraction Correctness">
+                                  All abstractions within the transition are correct.
+
+                                  <c
+                                      id="__gsn__15d3889c701"
+                                      color="lightgray"
+                                      name="Definition">
+                                    [State abstractions]: {TBD}
+
+                                    <comment
+                                        id="__gsn__15d3889c702"
+                                        name="Rodes">
+                                      A work in progress.
+                                    </comment>
+                                  </c>
+
+                                  <c
+                                      id="__gsn__15d3889c703"
+                                      color="lightgray"
+                                      name="Definition">
+                                    [Correct State Abstractions]: {TBD}
+
+                                    <comment
+                                        id="__gsn__15d3889c704"
+                                        name="Rodes">
+                                      A work in progress.
+                                    </comment>
+                                  </c>
+
+                                  <g
+                                      id="__gsn__15d38425eb6"
+                                      color="lime"
+                                      repeat="true"
+                                      name="{Misc. Model Validation}">
+                                    {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                                    <comment
+                                        id="__gsn__15d38425eb7"
+                                        name="Example Validation">
+                                      AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                                    </comment>
+                                  </g>
+                                </g>
+                              </s>
+                            </g>
+                          </s>
+                        </g>
+                      </s>
+                    </g>
+                  </s>
+                </g>
+
+                <g
+                    id="__gsn__15d371347ef"
+                    name="Complete and Necessary Transitions">
+                  The transition set defined in the AGREE model is complete and contains only necessary transitions.
+
+                  <s
+                      id="__gsn__15d374ee4f0"
+                      name="Strategy">
+                    Argue transition completeness and necessity separately
+
+                    <g
+                        id="__gsn__15d374eecfa"
+                        name="Complete">
+                      The AGREE transition set is complete (no transitions are missing)
+
+                      <s
+                          id="__gsn__15d38268df1"
+                          name="Strategy">
+                        Argue complete AGREE transitions by {misc. model validation}
+
+                        <g
+                            id="__gsn__15d383bd707"
+                            color="lime"
                             repeat="true"
-                            name="{Transition} Guarantee Satisfied">
+                            name="{Misc. Model Validation}">
+                          {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                          <comment
+                              id="__gsn__15d383bd708"
+                              name="Example Validation">
+                            AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                          </comment>
                         </g>
                       </s>
                     </g>
 
-                    <comment
-                        id="__gsn__15d18f987de"
-                        name="Rodes">
-                      This strategy is effectively an enumeration over defined characteristics of “correct transition verification”.
-                    </comment>
+                    <g
+                        id="__gsn__15d374f0cf5"
+                        name="Necessary">
+                      The AGREE transition set only contains necessary transitions (no unnecessary transitions)
+
+                      <s
+                          id="__gsn__15d3826e260"
+                          name="Strategy">
+                        Argue necessity of state transitions by {misc. model validation} and demonstration no other transitions are possible in the model.
+
+                        <g
+                            id="__gsn__15d383be5d6"
+                            color="lime"
+                            repeat="true"
+                            name="{Misc. Model Validation}">
+                          {Various validation of the model with domain experts demonstrating the model captures the intended state machine}
+
+                          <comment
+                              id="__gsn__15d383be5d7"
+                              name="Example Validation">
+                            AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
+                          </comment>
+                        </g>
+
+                        <g
+                            id="__gsn__15d3713b716"
+                            name="Exclusive Transition Set">
+                          No other transitions other than those in the AGREE transition set are possible within the AGREE mode (the component’s transitions as defined within the transition set are the only possible state transitions).
+
+                          <j
+                              id="__gsn__15d37b2d29b"
+                              color="pink"
+                              name="Justification">
+                            {this is here because it is possible to have additional states and we considered the analogous problem for transitions}
+                          </j>
+
+                          <c
+                              id="__gsn__15d37b57187"
+                              name="Context">
+                            {TBD: example}
+                          </c>
+
+                          <s
+                              id="__gsn__15d374ce15d"
+                              name="Evidence Scheme">
+                            {AGREE Lemma idiom}
+                          </s>
+                        </g>
+                      </s>
+                    </g>
                   </s>
                 </g>
 
                 <g
-                    id="__gsn__15d154c649f"
-                    name="Transition Validation">
-                  {tbd}
+                    id="__gsn__15d3785fc8d"
+                    color="Pink"
+                    name="State Reachability">
+                  All states in the set of AGREE states for the component are reachable {within the specified time bound}.
 
                   <c
-                      id="__gsn__15d1567e0e0"
-                      name="Context">
-                    {correct}
+                      id="__gsn__15d3785fc8f"
+                      name="Definition">
+                    [State reachability]: a given state is reachable if a state machine execution path exists by which the state is entered.
                   </c>
 
+                  <j
+                      id="__gsn__15d3750c905"
+                      name="Justification">
+                    Unreachable states may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
+                  </j>
+
+                  <a
+                      id="__gsn__15d37b77a06"
+                      name="Assumption">
+                    There are no legitimately defined unreachable states
+                  </a>
+
                   <s
-                      id="__gsn__15d1554ada3"
+                      id="__gsn__15d3785fc92"
                       name="Strategy">
-                    {TBD}
+                    Argue reachability of each state individually and completeness of the set of states.
 
                     <g
-                        id="__gsn__15d1554b5c3"
-                        name="Correct State Connections">
-                    </g>
+                        id="__gsn__15d3785fc97"
+                        repeat="true"
+                        name="{State} Reachable">
+                      There exists a trace for which state {State} is reachable.
 
-                    <g
-                        id="__gsn__15d1556e40a"
-                        name="Correct Transition Behavior">
-                    </g>
+                      <a
+                          id="__gsn__15d3785fc98"
+                          name="Assumption">
+                        Reachability is only considered at this level with respect to the component in isolation. This means we assume all inputs (as constrained by any component assumptions) are possible. In the larger system, states may not be reachable (i.e., an input may not be globally possible under system constraints).
+                      </a>
 
-                    <g
-                        id="__gsn__15d18ab40b3"
-                        name="Complete Transition Set">
+                      <c
+                          id="__gsn__15d385b9af4"
+                          name="Context">
+                        {state}
+                      </c>
 
-                      <comment
-                          id="__gsn__15d18ae6aec"
-                          name="Rodes">
-                        There are no other transitions that should have been specified.
-                      </comment>
+                      <s
+                          id="__gsn__15d3785fc9a"
+                          name="Evidence Scheme">
+                        {AGREE state reachability idiom}
+
+                        <c
+                            id="__gsn__15d3785fc9b"
+                            name="Context">
+                          {idiom documentation}
+                        </c>
+
+                        <e
+                            id="__gsn__15d3785fc9c"
+                            name="Evidence">
+                          {Agree lemma witness for the state}
+                        </e>
+                      </s>
                     </g>
                   </s>
                 </g>
 
-                <comment
-                    id="__gsn__15d15526110"
-                    name="Rodes">
-                  TODO: Only transitions under specific transitions, the transitions are appropriate (connected to the right states), not erroneously specified
-                </comment>
+                <g
+                    id="__gsn__15d3786c691"
+                    color="pink"
+                    name="Reachable State Transitions">
+                  All transitions in the set of AGREE transitions for the component are reachable {within the specified time bound}.
+
+                  <c
+                      id="__gsn__15d3786c694"
+                      name="Definition">
+                    [Transition reachable]: a transition is reachable there exists a state machine execution path where the transition is taken.
+                  </c>
+
+                  <j
+                      id="__gsn__15d3751728a"
+                      name="Justification">
+                    Unexecutable transition may indicate an over-engineered architecture or an error in architecture design (i.e., an incorrectly specified finite state machine).
+                  </j>
+
+                  <a
+                      id="__gsn__15d37b7c160"
+                      name="Assumption">
+                    There are no legitimately unreachable transitions.
+                  </a>
+
+                  <s
+                      id="__gsn__15d3786c696"
+                      name="Strategy">
+                    Argue reachability of each state individually and completeness of the set.
+
+                    <g
+                        id="__gsn__15d3786c69b"
+                        repeat="true"
+                        name="{Transition} Reachable">
+                      There exists a trace for which the {transition} is reachable.
+
+                      <c
+                          id="__gsn__15d385c2cb2"
+                          name="Context">
+                        {transition}
+                      </c>
+
+                      <s
+                          id="__gsn__15d3786c69c"
+                          name="Evidence Scheme">
+                        {AGREE transition reachability idiom}
+
+                        <c
+                            id="__gsn__15d3786c69d"
+                            name="Context">
+                          {idiom documentation}
+                        </c>
+
+                        <e
+                            id="__gsn__15d3786c69e"
+                            name="Evidence">
+                          {Agree lemma witness for transition reachability}
+                        </e>
+                      </s>
+                    </g>
+                  </s>
+                </g>
               </s>
             </g>
 
             <g
                 id="__gsn__15d153738a0"
                 name="Correct Start State">
-              {Component} state machine is initialized at the correct start state.
+              The component’s AGREE state machine is initialized at the correct start state.
+
+              <a
+                  id="__gsn__15d37e678af"
+                  name="Assumption">
+                The set of transitions and states are correct
+              </a>
 
               <s
                   id="__gsn__15d153ef2e8"
                   name="Strategy">
-                Argue by verification that {start state} is the start state in the spec. and that  {start state} is the intended state machine start state.
+                Argue by verification that {start state} is the start state in the spec. and that {start state} is the intended state machine start state.
 
                 <j
                     id="__gsn__15d18299ceb"
@@ -306,14 +1036,44 @@
                 </j>
 
                 <g
+                    id="__gsn__15d153f0ef6"
+                    name="Start State Validation">
+                  The component’s start state is the intended start state.
+
+                  <c
+                      id="__gsn__15d1565bc9a"
+                      name="Context">
+                    {intended start state}
+                  </c>
+
+                  <s
+                      id="__gsn__15d36fe92e8"
+                      name="Evidence Scheme">
+                    Manual inspection/review of the AGREE model compared to system specification documents and system requirements with system developers.
+
+                    <c
+                        id="__gsn__15d36fe92e9"
+                        name="Context">
+                      {System specification documents (must include any informal documentation, other documents of state machine models, and the AADL model}
+                    </c>
+
+                    <e
+                        id="__gsn__15d36fe92ea"
+                        name="Evidence">
+                      {inspection report and sign off}
+                    </e>
+                  </s>
+                </g>
+
+                <g
                     id="__gsn__15d153ef6b8"
-                    name="Start State Verification">
-                  {Component} start state is {start state}
+                    name="Start State Model Verification">
+                  The component’s AGREE state machine model starts in {start state}.
 
                   <s
                       id="__gsn__15d153b18ec"
                       name="Evidence Scheme">
-                    {AGREE lemma for start states  }
+                    {AGREE lemma for start states }
 
                     <c
                         id="__gsn__15d153b18ed"
@@ -328,49 +1088,31 @@
                     </e>
                   </s>
                 </g>
-
-                <g
-                    id="__gsn__15d153f0ef6"
-                    name="Start State Validation">
-                  {Component} {start state} is the intended start state.
-
-                  <c
-                      id="__gsn__15d1565bc9a"
-                      name="Context">
-                    {intended start state}
-                  </c>
-
-                  <s
-                      id="__gsn__15d153a3958"
-                      name="Evidence Scheme">
-                    {manual inspection}
-
-                    <e
-                        id="__gsn__15d153a3959"
-                        name="Evidence">
-                      {inspection report and sign off}
-
-                      <comment
-                          id="__gsn__15d15419e64"
-                          name="Rodes">
-                        Must include consistency check with AADL or subdivide this argument to include AADL consistency as one assessment.
-                      </comment>
-                    </e>
-                  </s>
-                </g>
               </s>
             </g>
 
             <g
                 id="__gsn__15d153748c8"
+                optional="true"
                 name="Correct Terminal States">
-              {Component} state machine terminates in the correct terminal states
+              The component’s AGREE state machine terminates in the correct terminal states
+
+              <c
+                  id="__gsn__15d36f68e50"
+                  name="Definition">
+                [Terminates]: {termination definition}
+              </c>
+
+              <a
+                  id="__gsn__15d37e5deaa"
+                  name="Assumption">
+                The set of transitions and states are correct
+              </a>
 
               <s
                   id="__gsn__15d153ca91a"
-                  optional="true"
                   name="Strategy">
-                Argue by verification that {terminal states} are the only terminal states of the state machine spec and {terminal states} are complete.
+                Argue correct terminal states by validation that the terminal states are intended and the model only terminates in the defined terminal states.
 
                 <j
                     id="__gsn__15d1824d2cf"
@@ -379,14 +1121,50 @@
                 </j>
 
                 <g
+                    id="__gsn__15d1566f888"
+                    name="Terminal States Validation">
+                  The set of the component’s terminal states is complete and necessary
+
+                  <c
+                      id="__gsn__15d36f8f571"
+                      name="Definition">
+                    [Complete]: All terminal states that should be present are present
+                  </c>
+
+                  <c
+                      id="__gsn__15d36f94586"
+                      name="Definition">
+                    [Necessary]: Only terminal states that should be present are present.
+                  </c>
+
+                  <s
+                      id="__gsn__15d36f9cd55"
+                      name="Evidence Scheme">
+                    Manual inspection/review of the AGREE model compared to system specification documents and system requirements with system developers.
+
+                    <c
+                        id="__gsn__15d36fd9d06"
+                        name="Context">
+                      {System specification documents (must include any informal documentation, other documents of state machine models, and the AADL model}
+                    </c>
+
+                    <e
+                        id="__gsn__15d153d3e21"
+                        name="Evidence">
+                      {inspection report and sign off}
+                    </e>
+                  </s>
+                </g>
+
+                <g
                     id="__gsn__15d153cb420"
-                    name="Terminal State Verification">
-                  {Component} only terminates in {terminal states}
+                    name="Terminal State Model Verification">
+                  The component’s AGREE state machine model only terminates in the defined terminal states.
 
                   <s
                       id="__gsn__15d154f1546"
                       name="Evidence Scheme">
-                    {AGREE lemma for terminal states  }
+                    {AGREE lemma for terminal states }
 
                     <c
                         id="__gsn__15d154f1547"
@@ -401,43 +1179,6 @@
                     </e>
                   </s>
                 </g>
-
-                <g
-                    id="__gsn__15d1566f888"
-                    name="Terminal States Completeness">
-                  The set {terminal states} is complete
-
-                  <s
-                      id="__gsn__15d153d3e20"
-                      name="Evidence Scheme">
-                    {manual inspection}
-
-                    <e
-                        id="__gsn__15d153d3e21"
-                        name="Evidence">
-                      {inspection report and sign off}
-
-                      <comment
-                          id="__gsn__15d1544a690"
-                          name="Rodes">
-                        Must include consistency check with AADL or subdivide this argument to include AADL consistency as one assessment.
-                      </comment>
-                    </e>
-                  </s>
-                </g>
-              </s>
-
-              <s
-                  id="__gsn__15d181f318b"
-                  optional="true"
-                  name="Evidence Scheme">
-                {lack of terminal states}
-
-                <e
-                    id="__gsn__15d181fb400"
-                    name="Evidence">
-                  {the state machine has no terminal states}
-                </e>
               </s>
             </g>
 
@@ -460,12 +1201,30 @@
             name="TBD">
           Use of the correct infrastructure for all components?
         </g>
+
+        <g
+            id="__gsn__15d32c11d9b"
+            name="Goal">
+          composition of states (but does not include full reachability, gets into system level properties)
+        </g>
+
+        <g
+            id="__gsn__15d3874c940"
+            name="Goal">
+          system level reachability?
+        </g>
       </s>
 
       <comment
-          id="__gsn__15d18611afe"
+          id="__gsn__15d382ba099"
           name="Rodes">
-        TODO: argument should take into account we may have implementations in the future.
+        We are looking at the AADL model admitting that in some cases the model is the spec, and yet in some cases it is a refinement of another spec. This means some times we may want to validate the model against reviews, and in other cases we validate against other models/documents.
+      </comment>
+
+      <comment
+          id="__gsn__15d37d3eb6c"
+          name="Rodes">
+        General note: any use of a lemma to produce a “witness” should require the user to examine and approve the counterexample. Chris has discussed the possibility of visualizing counterexamples in simulink as a possible “tool” for this purpose.
       </comment>
     </g>
   </gsn>

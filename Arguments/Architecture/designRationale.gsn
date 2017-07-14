@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<argument>
+  <properties>
+    <title>
+      <![CDATA[New Argument]]>
+    </title>
+    <author>
+      <![CDATA[]]>
+    </author>
+    <version>
+      <![CDATA[]]>
+    </version>
+    <date>
+      <![CDATA[]]>
+    </date>
+    <status>
+      <![CDATA[]]>
+    </status>
+    <prefix>
+      <![CDATA[]]>
+    </prefix>
+    <confidence>
+      <![CDATA[false]]>
+    </confidence>
+    <note>
+      <![CDATA[]]>
+    </note>
+  </properties>
+
+  <gsn>
+    <g
+        id="__gsn__15d36f4775f"
+        name="Design Rationale">
+      The architecture presents a solution to the problem of tasking the team of UAVs.
+
+      <s
+          id="__gsn__15d36f5ab22"
+          name="Enumeration">
+        Argue over identified desired solution properties
+
+        <c
+            id="__gsn__15d36f641d2"
+            name="Properties">
+        </c>
+
+        <c
+            id="__gsn__15d36f6d242"
+            name="Hardware">
+          The following is the specification of hardware on which UxAS operates. 1) Memory - cellphone grade processor like Odrioid (...)
+        </c>
+
+        <a
+            id="__gsn__15d36f910ff"
+            name="Mission Assumptions">
+          1)Vehicles are altitude deconflicted/segregated, 2) vehicles fly at constant speeds, 3) 5-10 assets running concurrently, 4) GPS signal always available and accurate
+        </a>
+
+        <a
+            id="__gsn__15d36fc9259"
+            name="Software Configuration">
+          1) Zyre, 2) 0mq, 3) LMCP
+        </a>
+
+        <g
+            id="__gsn__15d36f637d1"
+            name="Automation">
+          The automation of tasks is supports by the design of a suite of services
+
+          <c
+              id="__gsn__15d37005434"
+              name="Tasks">
+            Assignment Coordinator, Blockage, CMASI area Search, CMASI Line Search, CMASI Point Search, Communications Relay, Cordon, Escort...
+          </c>
+        </g>
+
+        <g
+            id="__gsn__15d36f63b2a"
+            name="Efficient Execution">
+          Short loop between automation request and execution of said request
+
+          <s
+              id="__gsn__15d373fe2fd"
+              name="Design Properties">
+            Argue that a collection of design-enforced properties constitute efficient execution.
+
+            <g
+                id="__gsn__15d379b8888"
+                name="Highly Responsive Planning">
+              UxAS has highly responsive planning that contributes to efficient execution.
+
+              <c
+                  id="__gsn__15d3bebfc40"
+                  name="Importance">
+                {The importance of highly responsive planning is discussed here}
+              </c>
+
+              <s
+                  id="__gsn__15d37e232cc"
+                  name="Architectural Argument">
+                By Components or Groups of Components
+
+                <j
+                    id="__gsn__15d3bfb8f1e"
+                    name="Justification">
+                  TBD. Requires engineers consider the rest of the system to write the summary here.
+                </j>
+
+                <g
+                    id="__gsn__15d37e281d9"
+                    name="AssuranceTreeBranchService">
+                  The assuranceTreeBranchService is highly responsive to planning requests.
+
+                  <s
+                      id="__gsn__15d3bd80438"
+                      name="Properties">
+                    Argue by the design properties that contribute to the system characteristic.
+
+                    <g
+                        id="__gsn__15d3bd8c1f2"
+                        name="Bound Computation">
+                      AssignmentTreeBranchBoundService has a worst-case bounds on computation
+
+                      <s
+                          id="__gsn__15d3bdc5e03"
+                          name="Argue by Algorithm Design">
+
+                        <g
+                            id="__gsn__15d3bdd1d35"
+                            name="Feasible Depth-First Search Path">
+                          An initial depth-first, greedy algorithm finds a feasible solution path in reasonable time.
+
+                          <s
+                              id="__gsn__15d3be67eeb"
+                              name="Argue by Expected Case">
+
+                            <g
+                                id="__gsn__15d3be265d3"
+                                name="Generally Efficient Feasible Path Search">
+                              The mission goal constraints are often under-constrained, and so many paths leads to solutions.
+
+                              <e
+                                  id="__gsn__15d3be6d8e1"
+                                  name="Evidence">
+                                A description of typical mission constraints and a model of the size of the solution set relative to the search space.
+                              </e>
+                            </g>
+                          </s>
+                        </g>
+
+                        <g
+                            id="__gsn__15d3be33d5d"
+                            name="Bounded Backtracking Optimization">
+                          The search space surrounding the feasible solution is explored by backtracking and pruning based on best case cost found.
+
+                          <s
+                              id="__gsn__15d3be8be6d"
+                              name="Argue by Algorithm">
+
+                            <g
+                                id="__gsn__15d3be92442"
+                                name="Pruned Search">
+                              as more efficient solutions are discovered, any partial solution that exeeds the cost of the current best solution will immediately be abandoned (cut) to focus search effort in the part of the space that could possibly lead to better solutions.
+                            </g>
+
+                            <g
+                                id="__gsn__15d3be927f3"
+                                name="Bounded Tree Depth">
+                              search progresses until all possibilities have been exhausted or a pre-determined tree size has been searched.
+
+                              <e
+                                  id="__gsn__15d3bea48bd"
+                                  name="Evidence">
+                                Show by specification-level algorithm proof
+                              </e>
+                            </g>
+                          </s>
+                        </g>
+                      </s>
+                    </g>
+                  </s>
+
+                  <comment
+                      id="__gsn__15d3bfd5642"
+                      name="This is an example sub-argument">
+                    This is an example sub-argument that was captured from the Core Services Description page on the wiki.
+                  </comment>
+                </g>
+              </s>
+            </g>
+          </s>
+        </g>
+
+        <g
+            id="__gsn__15d37029bff"
+            name="Near Time-Optimal">
+          Ensure mission plans that conform to process algebra string are nearly “time optimal"
+        </g>
+
+        <g
+            id="__gsn__15d37036965"
+            name="Geometrically Constrained">
+          Mission plans conform to geometric inclusion/exclusion zones.
+        </g>
+
+        <g
+            id="__gsn__15d3bf03a5f"
+            repeat="true"
+            name="Property {P}">
+          Argue that the system design has a thematic important property {P}
+
+          <s
+              id="__gsn__15d3bf09bfa"
+              name="Design Properties">
+            Argue that a collection of design-enforced properties constitute the system level property {P}
+
+            <g
+                id="__gsn__15d3bf09c0f"
+                repeat="true"
+                name="Design Feature {F} of the System">
+              Description of the design feature property {F} contributing to property {P}.
+
+              <c
+                  id="__gsn__15d3bf95f66"
+                  name="Importance">
+                The role that {F} plays in {P} can be highlighted here, although at this level it will often be evident to engineers. This node supports the narrative belief ("sanity checks" the reader).
+              </c>
+
+              <s
+                  id="__gsn__15d3bf14dec"
+                  name="Architectural Argument">
+                By Components or Groups of Components
+
+                <j
+                    id="__gsn__15d3bfa6082"
+                    name="Justification">
+                  Why these are the components groups (or just single components) that bring about the design property {F}, and other components need not be considered. This could also be made as a branch of the argument below this strategy, depending on the scale and need to explicate the associated justification.
+                </j>
+
+                <g
+                    id="__gsn__15d3bf14dfc"
+                    repeat="true"
+                    name="Component(s) {C}">
+                  {Contribution of component C to design feature F}
+
+                  <s
+                      id="__gsn__15d3bf14dee"
+                      name="Properties">
+                    Argue by the design properties of {C} that contribute to the system characteristic.
+
+                    <g
+                        id="__gsn__15d3bf14dfa"
+                        repeat="true"
+                        name="{Positive Property}">
+                      Here you would describe design invariants that are the key take-aways for why the design provides the desired property.
+
+                      <s
+                          id="__gsn__15d3bf1c99a"
+                          name="Argue over Design">
+                      </s>
+                    </g>
+
+                    <g
+                        id="__gsn__15d3bf14dfb"
+                        repeat="true"
+                        name="{Avoided Pitfall}">
+                      You could talk here about pitfalls avoided in the design that would otherwise undermine bounded search. Such a ‘negative argument’ would be optional and is sometimes valuable for the design story the engineers want to tell.
+
+                      <s
+                          id="__gsn__15d3bf687c8"
+                          name="Argue over Design">
+                      </s>
+                    </g>
+                  </s>
+                </g>
+              </s>
+            </g>
+          </s>
+
+          <comment
+              id="__gsn__15d3bf487e7"
+              name="Comment">
+            This is a template form of the reasoning path used to bind the typical architecture-story domain argument to the larger pattern.
+          </comment>
+        </g>
+      </s>
+
+      <comment
+          id="__gsn__15d3c0555d6"
+          name="Comment">
+        This argument is a combination of Sean’s design-rationale argument structure, coupled to one example of a domain argument extracted directly from the text of the Core Services Description on the UxAS wiki where the domain argument is a story supporting one of the highlighted properties Sean pointed out.
+      </comment>
+    </g>
+  </gsn>
+</argument>

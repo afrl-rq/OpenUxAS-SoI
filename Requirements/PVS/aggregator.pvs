@@ -1,0 +1,177 @@
+aggregator[defined_vehicle_id_set: {s: set[nat] | member(0, s)}] : THEORY
+BEGIN
+
+  defined_vehicle_id?(v: nat): bool = member(v, defined_vehicle_id_set);
+
+  % Rebuild the member predicate so that we can curry the element being checked
+  % for membership
+  member?[T: TYPE](s: set[T]): pred[T] =
+    LAMBDA(x: T):
+      member(x, s);
+
+  % A vehicle ID that is drawn from the set of defined vehicle IDs.
+  valid_vehicle_id: TYPE = ( defined_vehicle_id? );
+
+  % A set of valid vehicle IDs.
+  valid_vehicle_id_set: TYPE = set[valid_vehicle_id];
+
+  
+  % Represent a Route Request message.
+  route_request_message: NONEMPTY_TYPE = 
+    [# id: nat,
+       vehicle_ids: valid_vehicle_id_set #]
+  CONTAINING
+    (# id := 0,
+       vehicle_ids := emptyset #);
+
+  default_route_request: route_request_message =
+    (# id := 0,
+       vehicle_ids := emptyset #);
+
+  % To be a valid route_request_message_set, no elements in the set can have the same id
+  route_request_message_set?(route_requests: set[route_request_message]): bool =
+    FORALL(rr1: (member?(route_requests)),
+           rr2: {r: (member?(route_requests)) | r /= rr1}):
+      rr1`id /= rr2`id;
+
+  % A set of Route Request messages
+  route_request_message_set: TYPE = (route_request_message_set?);
+
+  % For use in constructing a new valid route request message set
+  route_request_message_id_in_set?(id: nat, s: route_request_message_set): bool =
+    EXISTS(rr: (member?(s))):
+      rr`id = id;
+
+  route_request_message_in_set?(rr: route_request_message, s: route_request_message_set): bool =
+    EXISTS(rr2: (member?(s))):
+      rr2 = rr;
+
+  % Represent a Route Plan Request message.
+  route_plan_request_message: NONEMPTY_TYPE =
+    [# id: nat,
+       vehicle_id: valid_vehicle_id #]
+  CONTAINING
+    (# id := 0,
+       vehicle_id := 0 #);
+
+  default_route_plan_request: route_plan_request_message = 
+    (# id := 0,
+       vehicle_id := 0 #);
+
+  % To be a valid route_plan_request_message_set, no elements in the set can have the same id
+  route_plan_request_message_set?(route_plan_requests: set[route_plan_request_message]): bool =
+    FORALL(rpr1: (member?(route_plan_requests)),
+	   rpr2: {r: (member?(route_plan_requests)) | r /= rpr1}):
+      rpr1`id /= rpr2`id;
+
+  % As set of Route Plan Requests
+  route_plan_request_message_set: TYPE = (route_plan_request_message_set?);
+
+
+  % Represent a Route Plan Response message.
+  route_plan_response_message: NONEMPTY_TYPE =
+    [# id: nat,
+       addressing: nat #]
+  CONTAINING
+    (# id := 0,
+       addressing := 0 #);
+
+  default_route_plan_response: route_plan_response_message =
+    (# id := 0,
+       addressing := 0 #);
+
+
+  % This function relates sets of Route Plan Requests to Route Requests. Using
+  % this function, given a Route Request, the set of associated Route Plan 
+  % Requests can be 
+  route_request_to_set_of_route_plan_requests(route_requests: route_request_message_set): TYPE =
+    [ ( member?(route_requests) ) -> route_plan_request_message_set ];
+
+  % Route plan request messages have unique ids within their sets (by definition)
+  % Check if two different route plan request sets share ids
+  sets_share_ids?(rprs1, rprs2: route_plan_request_message_set): bool =
+    EXISTS(rpr1: (member?(rprs1)), rpr2: (member?(rprs2))):
+      rpr1`id = rpr2`id;
+
+  % Verify that no two elements in route_requests have sets that share route plan response ids
+  unique_id_amongst_sets?( route_requests: route_request_message_set,
+			   map: route_request_to_set_of_route_plan_requests(route_requests) ) : bool = 
+    FORALL(rr1: ( member?(route_requests) ),
+           rr2: {r : (member?(route_requests)) | r /= rr1 }):
+      NOT(sets_share_ids?(map(rr1), map(rr2)));
+
+  % Route plan request sets are already defined to not allow duplicate ids, but we also need to verify that no two sets have any ids in common
+  unique_route_request_to_set_of_route_plan_requests?( rrs: route_request_message_set ) : pred[route_request_to_set_of_route_plan_requests(rrs)] =
+    LAMBDA( m: route_request_to_set_of_route_plan_requests(rrs) ):
+      unique_id_amongst_sets?(rrs, m);
+
+  route_request_to_set_of_unique_route_plan_requests(route_requests: route_request_message_set): TYPE = ( unique_route_request_to_set_of_route_plan_requests?(route_requests) )
+
+  % Specification for creating a new set of unique route plan requests
+  create(vehicle_ids: valid_vehicle_id_set,
+         route_requests: route_request_message_set,
+	 route_plan_requests: route_request_to_set_of_unique_route_plan_requests(route_requests) ):
+    {rp: route_plan_request_message_set |
+      FORALL(rr: (member?(route_requests))):
+        NOT(sets_share_ids?(rp, route_plan_requests(rr)))};
+
+  % RA1: The configuration shall create a unique RoutePlanRequest message for each 
+  % vehicle ID in each RouteRequest message received  
+  generate(route_requests: route_request_message_set,
+  	   route_plan_requests: route_request_to_set_of_unique_route_plan_requests(route_requests),
+	   route_request: {rr: route_request_message |
+             (route_request_message_in_set?(rr, route_requests) OR
+               NOT route_request_message_id_in_set?(rr`id, route_requests))}) :
+      [rs: route_request_message_set, route_request_to_set_of_unique_route_plan_requests(rs)] =
+    LET new_route_requests: route_request_message_set = LAMBDA ( rr: route_request_message ):
+                                                          member(rr, route_requests) OR rr = route_request
+    IN						  
+    (
+      new_route_requests,
+
+      LAMBDA ( rr: ( member?(new_route_requests) ) ):
+        IF member(rr, route_requests) THEN
+	  route_plan_requests(rr)
+        ELSE
+	  create( rr`vehicle_ids, route_requests, route_plan_requests )
+	ENDIF
+    );
+  
+  % Verify that every vehicle has a corresponding route plan request
+  all_vehicle_ids?(vehicle_ids: valid_vehicle_id_set,
+  		   route_plan_requests: route_plan_request_message_set): bool = 
+    FORALL(v : (member?(vehicle_ids))):
+      EXISTS(rpr: (member?(route_plan_requests))):
+        v = rpr`vehicle_id;
+
+  % Verify that every route plan request corresponds to a valid vehicle
+  only_vehicle_ids?( vehicle_ids: valid_vehicle_id_set,
+  		     route_plan_requests: route_plan_request_message_set ): bool =
+    FORALL(rpr: (member?(route_plan_requests))):
+      EXISTS (v: (member?(vehicle_ids))):
+        v = rpr`vehicle_id;
+
+  % Verify that there is a bijective map between the set of valid vehicle ids
+  % and the set of route plan requests
+  all_and_only_vehicle_ids?(vehicle_ids: valid_vehicle_id_set): pred[route_plan_request_message_set] = 
+    LAMBDA(s: route_plan_request_message_set):
+      all_vehicle_ids?(vehicle_ids, s) AND only_vehicle_ids?(vehicle_ids, s);
+
+
+  % RA4: The configuration shall correlate RoutePlanReponses with RoutePlanRequests
+  correlate( route_requests : route_request_message_set,
+  	     route_plan_requests : [(member?(route_requests)) -> route_plan_request_message_set],
+	     route_plan_responses : [rr: (member?(route_requests)),
+                                     (member?(route_plan_requests(rr))) -> route_plan_response_message],
+	     route_plan_response : route_plan_response_message ): 
+	       [rr: (member?(route_requests)),
+                 (member?(route_plan_requests(rr))) -> route_plan_response_message] =
+    LAMBDA(rr: (member?(route_requests)),
+           rpr: (member?(route_plan_requests(rr)))):
+      IF (rpr`id = route_plan_response`id) THEN
+      	route_plan_response
+      ELSE
+	route_plan_responses(rr, rpr)
+      ENDIF;
+
+END aggregator
