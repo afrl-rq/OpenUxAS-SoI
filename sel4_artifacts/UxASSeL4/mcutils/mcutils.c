@@ -12,11 +12,6 @@
 #include <string.h>
 
 
-#define BSWAP(E) (sizeof(E) == 8 ? E = __builtin_bswap64(E) :\
-                  (sizeof(E) == 4 ? E = __builtin_bswap32(E) :\
-                   (sizeof(E) == 2 ? E = __builtin_bswap16(E) :\
-                    assert(false))))
-
 /* Checksum: Calculate the UxAS checksum. */
 uint32_t Checksum(const uint8_t * p, const size_t len)
 {

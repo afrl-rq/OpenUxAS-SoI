@@ -8,6 +8,11 @@
 
 #define MC_SZ(waypoints) (sizeof(mc_t)-(MAX_WAYPOINTS*sizeof(wp_t))+(waypoints*sizeof(wp_t)))
 
+#define BSWAP(E) (sizeof(E) == 8 ? E = __builtin_bswap64(E) :\
+                  (sizeof(E) == 4 ? E = __builtin_bswap32(E) :\
+                   (sizeof(E) == 2 ? E = __builtin_bswap16(E) :\
+                    assert(false))))
+
 struct  __attribute__((packed)) wp_struct {
   char header[WP_HDR_LEN];
   uint64_t /*double*/ latitude;
@@ -76,5 +81,6 @@ bool MCPrefix(const mc_t * orig_mc_ptr,
               mc_t * mc_new_ptr);
 
 void UnFixCopiedMC(mc_t * mc_ptr);
+bool FixCopiedMC(mc_t * mc_ptr);
 
 #endif /* __MCUTILS_H__ */
