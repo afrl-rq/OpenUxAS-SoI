@@ -168,6 +168,7 @@ private:
     };
 private:
     std::shared_ptr<afrl::impact::PatternSearchTask> m_patternSearchTask;
+    std::shared_ptr<afrl::impact::PointOfInterest> m_pointOfInterest;
     double m_waypointSpacing_m = {100.0};
     bool m_isUseDpss = {false};
     std::unordered_multimap<int64_t, std::shared_ptr<Dpss> > m_optionIdVsDpss;

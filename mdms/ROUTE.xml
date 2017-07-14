@@ -20,7 +20,7 @@
             <!-- Lat/Lon coordinates of node -->
             <Field Name="Coordinates" Type="CMASI/Location3D" />
             <!-- IDs of edges that have this node as an endpoint -->
-            <Field Name="AssociatedEdges" Type="int64[]" />
+            <Field Name="AssociatedEdges" Type="int64[]" MaxArrayLength="8" />
         </Struct>
         
         <!-- Defines an edge for a geo-spatial graph. An edge must connect two nodes defined by
@@ -34,17 +34,17 @@
             <!-- GraphNode ID which defines the end point of the edge -->
             <Field Name="EndNode" Type="int64" Units="None" />
             <!-- Optional waypoints describing physical edge in lat/lon coordinates -->
-            <Field Name="Waypoints" Type="CMASI/Location3D[]" />
+            <Field Name="Waypoints" Type="CMASI/Location3D[]" MaxArrayLength="1024" />
         </Struct>
         
         <!-- Defines a complete geo-spatial graph -->
         <Struct Name="GraphRegion">
             <!-- ID for full region data structure -->
             <Field Name="ID" Type="int64" Units="None" />
-            <!-- List of all nodes that represent the network -->
-            <Field Name="NodeList" Type="GraphNode[]" LargeArray="true" />
-            <!-- List of all edges that represent the network -->
-            <Field Name="EdgeList" Type="GraphEdge[]" LargeArray="true" />
+            <!-- List of all nodes that represent the network (note 2^24 max) -->
+            <Field Name="NodeList" Type="GraphNode[]" MaxArrayLength="16777216" LargeArray="true" />
+            <!-- List of all edges that represent the network (note 2^24 max) -->
+            <Field Name="EdgeList" Type="GraphEdge[]" MaxArrayLength="16777216" LargeArray="true" />
         </Struct>
 
 
@@ -80,11 +80,11 @@
             <Field Name="AssociatedTaskID" Type="int64" Default="0" />
             <!-- Vehicles to consider when planning. If list is empty, route planner
             plans for all known vehicles. -->
-            <Field Name="VehicleID" Type="int64[]" />
+            <Field Name="VehicleID" Type="int64[]" MaxArrayLength="16" />
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- List of all requests for this vehicle set + operating region situation -->
-            <Field Name="RouteRequests" Type="RouteConstraints[]" />
+            <Field Name="RouteRequests" Type="RouteConstraints[]" MaxArrayLength="256" />
             <!-- Request that planner only return costs of routes rather than complete waypoint plans -->
             <Field Name="IsCostOnlyRequest" Type="bool" Default="true" />
             
@@ -101,7 +101,7 @@
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- List of all requests for this vehicle + operating region situation -->
-            <Field Name="RouteRequests" Type="RouteConstraints[]" />
+            <Field Name="RouteRequests" Type="RouteConstraints[]" MaxArrayLength="256" />
             <!-- Request that planner only return costs of routes rather than complete waypoint plans -->
             <Field Name="IsCostOnlyRequest" Type="bool" Default="true" />
             
@@ -112,11 +112,11 @@
             <!-- ID denoting this plan corresponding with requested route constraint pair -->
             <Field Name="RouteID" Type="int64" />
             <!-- Waypoints that connect the start location with the end location. Empty if only costs were requested -->
-            <Field Name="Waypoints" Type="CMASI/Waypoint[]" />
+            <Field Name="Waypoints" Type="CMASI/Waypoint[]" MaxArrayLength="1024" />
             <!-- Time cost of route. If less than zero, a planning error has occurred -->
             <Field Name="RouteCost" Type="int64" Units="milliseconds" Default="-1"/>
             <!-- Error messages, if applicable -->
-            <Field Name="RouteError" Type="CMASI/KeyValuePair[]" />
+            <Field Name="RouteError" Type="CMASI/KeyValuePair[]" MaxArrayLength="8" />
         </Struct>
         
         <!-- Route plan response: list of all fulfilled route requests -->
@@ -130,7 +130,7 @@
             <!-- Operating region that was considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- List of all responses for this vehicle + operating region situation -->
-            <Field Name="RouteResponses" Type="RoutePlan[]" />
+            <Field Name="RouteResponses" Type="RoutePlan[]" MaxArrayLength="256" />
         </Struct>
         
         <!-- Route response: list of all fulfilled route requests for a complete
@@ -139,7 +139,7 @@
             <!-- Response ID matching ID from request ({@link RouteRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- Corresponding route responses for all requested vehicles -->
-            <Field Name="Routes" Type="RoutePlanResponse[]" />
+            <Field Name="Routes" Type="RoutePlanResponse[]" MaxArrayLength="4096" />
         </Struct>
 		
         <!-- Egress route request: find all egress routes (nearby intersections) from a point -->
@@ -157,9 +157,9 @@
             <!-- Response ID matching ID from request ({@link EgressRouteRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- The route locations -->
-            <Field Name="NodeLocations" Type="CMASI/Location3D[]" />
+            <Field Name="NodeLocations" Type="CMASI/Location3D[]" MaxArrayLength="32" />
             <!-- The orientations -->
-            <Field Name="Headings" Type="real32[]" Units="degrees" />
+            <Field Name="Headings" Type="real32[]" MaxArrayLength="32" Units="degrees" />
         </Struct>
         
     </StructList>

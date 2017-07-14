@@ -17,40 +17,32 @@
 #ifndef UXAS_SERVICE_PLAN_BUILDER_SERVICE_H
 #define UXAS_SERVICE_PLAN_BUILDER_SERVICE_H
 
-
-
 #include "ServiceBase.h"
 
 #include "uxas/messages/task/UniqueAutomationRequest.h"
+#include "uxas/messages/task/UniqueAutomationResponse.h"
 #include "uxas/messages/task/TaskAssignmentSummary.h"
+#include "uxas/messages/task/TaskAssignment.h"
 #include "uxas/messages/task/TaskImplementationRequest.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
-#include "uxas/messages/route/RouteRequest.h"
-#include "uxas/messages/route/RouteResponse.h"
+#include "uxas/messages/task/PlanningState.h"
 #include "afrl/cmasi/EntityState.h"
 
 #include <cstdint> // int64_t
 #include <deque>
+#include <unordered_map>
 
 namespace uxas
 {
 namespace service
 {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 /*! \class PlanBuilderService
     \brief A component that constructs plans from assignments.
 
 
- * 1) For each assigned task option,calculate final task plan. 
- * 2) Based on assigned order of task options, calculate final route plans, for
- * each entity, to execute assigned tasks. 
- * 3) Construct waypoint plans and send automation response.
+ * 1) For each assigned task option, in order, request calculation of final waypoint plan 
+ * 2) Construct resulting waypoint plans and send automation response.
  * 
  * MESSAGES:
  * ==> TaskAssignmentSummary
@@ -58,8 +50,6 @@ namespace service
  * FOR EVERY TASK
  * <== TaskImplementationRequest
  * ==> TaskImplementationResponse
- * <== RouteRequest
- * ==> RouteResponse
  * 
  * <== AutomationResponse
  * 
@@ -133,94 +123,67 @@ private:
     configure(const pugi::xml_node& serviceXmlNode) override;
 
     bool
-    initialize() override;
-
-    //bool
-    //start() override;
-
-    //bool
-    //terminate() override;
-
-    bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
-
-
-public:
-    int64_t m_startingWaypointID{100000000};
-
-public:
-
-
-
-
-public: //virtual
-
-
-
-
-
-public:
-private:
+    
     void processTaskAssignmentSummary(const std::shared_ptr<uxas::messages::task::TaskAssignmentSummary>& taskAssignmentSummary);
     void processTaskImplementationResponse(const std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse);
-    void buildAndSendThePlan();
-
-    int64_t getNextImplementationId() {
-        m_taskImplementationId++;
-        return (m_taskImplementationId);
+    void sendError(std::string& errMsg);
+    
+    bool sendNextTaskImplementationRequest(int64_t uniqueRequestID);
+    void checkNextTaskImplementationRequest(int64_t uniqueRequestID);
+    
+    /*! \brief  nested class for tracking projected state of an entity during the plan building process */
+    class ProjectedState {
+    public:
+        ProjectedState() {};
+        ~ProjectedState() { if(state) delete state; };
+        void setState(uxas::messages::task::PlanningState* newState) {
+            if(state) delete state;
+            state = newState;
+        };
+        uxas::messages::task::PlanningState* state{nullptr};
+        int64_t finalWaypointID{0};
+        int64_t time{0}; // ms since 1 Jan 1970
     };
 
-    int64_t getStartingWaypointId() {
-        return (m_startingWaypointID * m_taskImplementationId);
-    };
+    /*! \brief  unique automation requests with key of corresponding unique automation request ID */
+    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_uniqueAutomationRequests;
+    
+    /*! \brief  in progress build of unique automation response with key of corresponding unique automation request ID */
+    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::UniqueAutomationResponse> > m_inProgressResponse;
+    
+    /*! \brief  task assignment summaries with key of corresponding unique automation request ID */
+    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> > m_assignmentSummaries;
+    
+    /*! \brief  projected entity states with key of corresponding unique automation request ID */
+    std::unordered_map< int64_t, std::vector< std::shared_ptr<ProjectedState> > > m_projectedEntityStates;
+    
+    /*! \brief  Track which task assignments have yet to be completed with key of corresponding unique automation request ID */
+    std::unordered_map< int64_t, std::deque< std::shared_ptr<uxas::messages::task::TaskAssignment> > > m_remainingAssignments;
+    
+    /*! \brief  When in the 'busy' state, the key of the currently pending task implementation request ID
+     *          mapped to the unique automation request ID (backwards from normal for easy look-up) */
+    std::unordered_map< int64_t, int64_t > m_expectedResponseID;
+    
+    /*! \brief  latest entity states (used to get starting heading, position, and time) with key of entity ID */
+    std::unordered_map< int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_currentEntityStates;
 
-    int64_t getNextCommandId() {
-        m_commandId++;
-        return (m_commandId);
-    };
 
+    /*! \brief  this stores the next unique ID to be used when requesting task
+     *          implementations. Incremented by one after use. */
+    int64_t m_taskImplementationId{1};
 
-private:
-
-    /*! \brief  this is the current automation request*/
-    std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> m_uniqueAutomationRequest;
-
-    /*! \brief  container to store entity states. (used to get starting heading, position, and time)*/
-    std::unordered_map< int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_entityIdVsEntityState;
-
-    /*! \brief  when a TaskAssignmentSummary messages is received, TaskImplementationRequest
-     *  are constructed and stored in this container until they are ready to be sent out */
-    std::unordered_map< int64_t, std::shared_ptr<std::deque<std::shared_ptr<uxas::messages::task::TaskImplementationRequest> > > > m_entityIdVsTaskImplementationRequests;
-
-    /*! \brief  as they are received the TaskImplementationResponse messages
-     * are used determine if new TaskImplementationRequest should be sent. The
-     * TaskImplementationResponse messages are then stored in this container
-     * until it is time to construct the automationresponse. */
-    std::unordered_map< int64_t, std::shared_ptr<std::deque<std::shared_ptr<uxas::messages::task::TaskImplementationResponse> > > > m_entityIdVsTaskImplementationResponses;
-
-    /*! \brief  this stores the last TaskImplementationId (and StartingWaypointId)
-     sent out. It is incremented by 1 for each new ID. It is reset to zero each
-     time a new TaskAssignmentSummary is received. */
-    int64_t m_taskImplementationId{0};
-
-    /*! \brief  CommandId used in the last mission command. Incremented by one
-    * for each new mission command. Assume this id will be unique during the
-     * lifetime run of the PlanBuilder*/
-    int64_t m_commandId{0};
+    /*! \brief  this stores the next unique ID to be used when building a 
+     *          waypoint list. Incremented by one after use. */
+    int64_t m_commandId{1};
 
     /*! \brief  this is the distance to add to the position of the vehicle, in the
      * direction that the vehicle is headed, to calculate the starting point for 
-     * new plans. */
+     * new plans. Can be changed in XML configuration. */
     double m_assignmentStartPointLead_m{50.0};
 
     /*! \brief  the state of the Rust implementation of PlanBuilder */
     void* m_PlanBuilder;
-
-private:
-
-
-
-
 };
 
 

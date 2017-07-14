@@ -84,6 +84,7 @@
 #include "MultiVehicleWatchTaskService.h"
 #include "OverwatchTaskService.h"
 #include "PatternSearchTaskService.h"
+#include "RendezvousTask.h"
 #include "TaskManagerService.h"
 #include "TaskTrackerService.h"
 
@@ -150,6 +151,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::MultiVehicleWatchTaskService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::OverwatchTaskService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::PatternSearchTaskService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::RendezvousTask>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskTrackerService>();}
 
