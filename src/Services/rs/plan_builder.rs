@@ -136,6 +136,7 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(raw_pb: *mut PlanBu
         let pb: &mut PlanBuilder = pb_box.borrow_mut();
         match msg {
             LmcpType::TaskAssignmentSummary(tas) => pb.process_task_assignment_summary(tas),
+            LmcpType::TaskImplementationResponse(tir) => pb.process_task_implementation_response(tir),
             LmcpType::AirVehicleState(vs) => { pb.entity_states.insert(vs.id, Box::new(vs)); },
             LmcpType::GroundVehicleState(vs) => { pb.entity_states.insert(vs.id, Box::new(vs)); },
             LmcpType::SurfaceVehicleState(vs) => { pb.entity_states.insert(vs.id, Box::new(vs)); },
@@ -220,6 +221,44 @@ impl PlanBuilder {
         let (lat_deg, long_deg) = convert_northeast_m_to_latlong_deg(north_m, east_m);
         tir.start_position.latitude = lat_deg;
         tir.start_position.longitude = long_deg;
+    }
+}
+
+impl PlanBuilder {
+    fn process_task_implementation_response(&mut self, tiresp: TaskImplementationResponse) {
+
+        if let Some(tireqs) = self.task_implementation_requests.get_mut(&tiresp.vehicle_id) {
+            if let Some(tireq0) = tireqs.front() {
+                tireqs.pop_front();
+                println!("found it!");
+            } else {
+                let kv = KeyValuePair {
+                    key: String::from("No UniqueAutomationResponse\0").into_bytes(),
+                    value: format!("ERROR::processTaskImplementationResponse: TaskImplementationId[{}] was not found for Entity Id[{}]!\0", tiresp.response_id, tiresp.vehicle_id).into_bytes(),
+                };
+                let ss = ServiceStatus {
+                    status_type: ServiceStatusType::Error,
+                    info: vec![kv],
+                    percent_complete: 0.0
+                };
+                println!("sending ServiceStatus {:?}", ss);
+                self.send_shared_lmcp_object_broadcast_message(&LmcpType::ServiceStatus(ss));
+                return;
+            }
+        } else {
+            let kv = KeyValuePair {
+                key: String::from("No UniqueAutomationResponse\0").into_bytes(),
+                value: format!("ERROR::processTaskImplementationResponse: TaskImplementationId[{}] was not found for Entity Id[{}]!\0", tiresp.response_id, tiresp.vehicle_id).into_bytes(),
+            };
+            let ss = ServiceStatus {
+                status_type: ServiceStatusType::Error,
+                info: vec![kv],
+                percent_complete: 0.0
+            };
+            println!("sending ServiceStatus {:?}", ss);
+            self.send_shared_lmcp_object_broadcast_message(&LmcpType::ServiceStatus(ss));
+            return;
+        }
     }
 }
 
