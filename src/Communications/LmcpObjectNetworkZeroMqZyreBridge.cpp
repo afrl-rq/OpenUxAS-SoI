@@ -40,9 +40,10 @@
 #include <termio.h>
 #endif
 
-#include <sstream>
 #include <cstdint>
+#include <functional>
 #include <map>
+#include <sstream>
 
 namespace uxas
 {
