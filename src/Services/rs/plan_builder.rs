@@ -56,14 +56,13 @@ use std::slice;
 
 pub enum CppPlanBuilder {}
 
-#[derive(Debug)]
 #[repr(C)]
 pub struct PlanBuilder {
     /// The current automation request
     current_automation_request: UniqueAutomationRequest,
 
     /// Stored entity states, used to get starting heading, position, and time
-    entity_states: HashMap<i64, EntityState>,
+    entity_states: HashMap<i64, Box<EntityStateT>>,
 
     /// After receiving a TaskAssignmentSummary,
     /// TaskImplementationRequests are kept here until ready to send
@@ -112,7 +111,7 @@ const STARTING_WAYPOINT_ID: i64 = 100000000;
 pub extern "C" fn plan_builder_new(instance: *mut CppPlanBuilder) -> *mut PlanBuilder {
     let mut pb = PlanBuilder::default();
     pb.instance = instance;
-    println!("made one! {:?}", pb);
+    println!("Made a Rust PlanBuilder");
     // relinquish ownership
     Box::into_raw(Box::new(pb))
 }
@@ -137,7 +136,11 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(raw_pb: *mut PlanBu
         let pb: &mut PlanBuilder = pb_box.borrow_mut();
         match msg {
             LmcpType::TaskAssignmentSummary(tas) => pb.process_task_assignment_summary(tas),
-            _ => ()//println!("Unhandled LMCP message {:?}", msg)
+            LmcpType::AirVehicleState(vs) => { pb.entity_states.insert(vs.id, Box::new(vs)); },
+            LmcpType::GroundVehicleState(vs) => { pb.entity_states.insert(vs.id, Box::new(vs)); },
+            LmcpType::SurfaceVehicleState(vs) => { pb.entity_states.insert(vs.id, Box::new(vs)); },
+            LmcpType::UniqueAutomationRequest(uar) => pb.current_automation_request = uar,
+            _ => println!("Unhandled LMCP message {:?}", msg)
         }
     } else {
         println!("LMCP deserialization error!");
@@ -194,9 +197,9 @@ impl PlanBuilder {
             tir.start_position = planning_state.planning_position.clone();
             tir.start_time = unsafe { get_utc_time_since_epoch_ms() };
         } else if let Some(entity_state) = self.entity_states.get(&ta.assigned_vehicle) {
-            tir.start_heading = entity_state.heading;
-            tir.start_position = entity_state.location.clone();
-            tir.start_time = entity_state.time;
+            tir.start_heading = *entity_state.get_heading();
+            tir.start_position = entity_state.get_location().clone();
+            tir.start_time = *entity_state.get_time();
         } else {
             let kv = KeyValuePair {
                 key: String::from("No UniqueAutomationResponse\0").into_bytes(),

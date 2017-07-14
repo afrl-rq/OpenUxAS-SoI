@@ -334,7 +334,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Error);
         auto keyValuePair = new afrl::cmasi::KeyValuePair;
         keyValuePair->setKey(std::string("No UniqueAutomationResponse"));
-        std::string message = "ERROR::processTaskAssignmentSummary: A TaskImplementationRequest was not found for Entity Id[" + std::to_string(taskImplementationResponse->getVehicleID()) + "]!";
+        std::string message = "ERROR::processTaskImplementationResponse: A TaskImplementationRequest was not found for Entity Id[" + std::to_string(taskImplementationResponse->getVehicleID()) + "]!";
         keyValuePair->setValue(message);
         serviceStatus->getInfo().push_back(keyValuePair);
         keyValuePair = nullptr;
