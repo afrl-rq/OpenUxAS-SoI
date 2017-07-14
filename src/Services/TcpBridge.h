@@ -152,9 +152,9 @@ private:
     std::shared_ptr<zmq::context_t> m_ptr_zmqContextReceive;
     /*! \brief this is the stream socket used to connect to the axis device */
     std::shared_ptr<zmq::socket_t> m_ptr_ZsckTcpConnection;
-    /*! \brief  this is the tcp/ip address, including port, of the PUB
-     * socket, e.g.  "tcp://xxx.xxx.xxx.xxx:5555" or "tcp://*:5555". Used to
-     * relay messages to the external entity. */
+    /// \brief  this is the tcp/ip address, including port, of the PUB
+    /// socket, e.g.  "tcp://xxx.xxx.xxx.xxx:5555" or "tcp://*:5555". Used to
+    /// relay messages to the external entity.
 	std::string m_strTcpAddress = std::string("tcp://*:5555");
     /*! \brief  If this is set to true the the TcpBridge connects (binds) as a server. 
      If it is false the TcpBridge connects as a client. Defaults to false */

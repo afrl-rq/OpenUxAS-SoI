@@ -41,7 +41,7 @@ public:
    
     ZeroMqZyreBridge();
     
-    ~ZeroMqZyreBridge();
+    virtual ~ZeroMqZyreBridge();
 
 private:
 

@@ -290,13 +290,13 @@ namespace n_FrameworkLib
     public:
 
         rasCPositionID(CPosition posPosition, enType typPositionType = typNone)
-        : m_iID(-1),
-        CPosition(posPosition),
+        : CPosition(posPosition),
+		m_iID(-1),
         m_typPositionType(typNone) { };
 
         rasCPositionID(int iID, CPosition posPosition, enType typPositionType = typNone)
-        : m_iID(iID),
-        CPosition(posPosition),
+        : CPosition(posPosition),
+		m_iID(iID),
         m_typPositionType(typPositionType) { };
 
         rasCPositionID(int iID = -1, enType typPositionType = typNone)

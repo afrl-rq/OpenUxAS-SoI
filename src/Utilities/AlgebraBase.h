@@ -50,7 +50,8 @@ typedef enum _operatorType_t {
 // CLASS DEFINITIONS
 class parseTreeNode
 {
-public: 
+public:
+	virtual ~parseTreeNode() { }
     parseTreeNode *parent;
     virtual v_action_t nextActions ( const v_action_t &executedActions, bool &encounterExecutedOut );
     virtual nodeType_t getNodeType ( void );

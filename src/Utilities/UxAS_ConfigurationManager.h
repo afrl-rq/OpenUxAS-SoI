@@ -267,79 +267,76 @@ private:
     bool
     setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode);
 
-    /**
-//cfg_RoadMonitor2_V400.xml
-//TcpBridge    
-//ICET_CCA
-//RoadMonitor    
-//WaypointPlanManager
-//VicsInterface
-//VicsLogger
-//SendTestMessages
-//SendIsolationStatus
-//SendMessages
-//MessageLogger
-        
-     * 
-     * cfgext.xml (extension XML listing entity services at boot-up with override values if/when required)
-     * 
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<UxAS FormatVersion="1.0" EntityID="33" EntityType="Aircraft">
-    <!-- DBK, RJT 20150825 notional configuration XML design notes (also see cfgbase.xml) -->
-    <!-- CONCEPT: first read cfgbase.xml file, then read cfgext.xml file (if conflicting values, then value from cfgext.xml is retained) -->
-
-    <!-- entity bridges to instantiate at start-up -->
-    <Bridge Type="LmcpObjectNetworkSerialBridge"/>
-    <!-- TCP bridge using all default values -->
-    <Bridge Type="LmcpObjectNetworkTcpBridge"/>
-    <!-- TCP bridge using all default values - but overriding TcpAddress and IsServer -->/>
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5557" IsServer="TRUE">
-    <Bridge Type="LmcpObjectNetworkSubscribePushBridge"/>
-
-    <!-- entity services to instantiate at start-up -->
-    <Service Type="MessageLogger">
-        <LogMessage MessageType="lmcp:CMASI:" NumberMessagesToSkip="0"/> <!-- REVIEW: this overrides list of LogMessages in cfgbase.xml -->
-    </Service>
-    <Service Type="VicsInterface"/>
-    <Service Type="VicsLogger"/>
-
-</UxAS>
-     * 
-     * 
-     * cfgbase.xml (base XML containing all default values)
-     * 
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<UxAS FormatVersion="1.0">
-    <!-- DBK, RJT 20150825 notional configuration XML design notes (also see cfgext.xml)  -->
-    <!-- default configurations for bridges and services (which are all components) -->
-    <Bridge Type="LmcpObjectNetworkSerialBridge" BaudRate="57600" SerialPortAddress="/dev/ttyO2"/>
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5556" Server="FALSE">
-        <SubscribeToMessage MessageType="lmcp:CMASI:"/>
-        <SubscribeToMessage MessageType="lmcp:VICS:"/>
-        <SubscribeToMessage MessageType="lmcp:ISOLATE:"/>
-    </Bridge>
-    <Bridge Type="LmcpObjectNetworkSubscribePushBridge"/>
-        <ExternalZeroMqSubscribeAddress value="tcp://*:5555"/>
-        <ExternalZeroMqPushAddress value="tcp://*:5556"/>
-    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge">
-        <SubscribeToMessage MessageType="lmcp:UXNATIVE:"/>
-    </Bridge>
-    <Service Type="MessageLogger" FilesPerSubDirectory="1000">
-        <LogMessage MessageType="lmcp:UXNATIVE" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:CreateNewComponent" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:KillComponent" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:ISOLATE:" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:UXCOMM:" NumberMessagesToSkip="0"/>
-        <LogMessage MessageType="lmcp:CMASI:MissionCommand" NumberMessagesToSkip="0" />
-        <LogMessage MessageType="lmcp:CCA_Plan" NumberMessagesToSkip="0" />
-        <LogMessage MessageType="lmcp:SUBTASK" NumberMessagesToSkip="0" />
-    </Service>
-    <Service Type="VicsInterface" SendGreenOnEmptyQueryResponse="TRUE" AmaseMode="TRUE"/>
-    <!-- Saves received vics messages in a structure for retrival by a vics interface component -->
-    <Service Type="VicsLogger" FilesPerSubDirectory="500"/>
-</UxAS>
-     * 
-     */
+////cfg_RoadMonitor2_V400.xml
+////TcpBridge
+////ICET_CCA
+////RoadMonitor
+////WaypointPlanManager
+////VicsInterface
+////VicsLogger
+////SendTestMessages
+////SendIsolationStatus
+////SendMessages
+////MessageLogger
+//
+//     //
+//     // cfgext.xml (extension XML listing entity services at boot-up with override values if/when required)
+//     //
+//<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+//<UxAS FormatVersion="1.0" EntityID="33" EntityType="Aircraft">
+//    <!-- DBK, RJT 20150825 notional configuration XML design notes (also see cfgbase.xml) -->
+//    <!-- CONCEPT: first read cfgbase.xml file, then read cfgext.xml file (if conflicting values, then value from cfgext.xml is retained) -->
+//
+//    <!-- entity bridges to instantiate at start-up -->
+//    <Bridge Type="LmcpObjectNetworkSerialBridge"/>
+//    <!-- TCP bridge using all default values -->
+//    <Bridge Type="LmcpObjectNetworkTcpBridge"/>
+//    <!-- TCP bridge using all default values - but overriding TcpAddress and IsServer -->/>
+//    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5557" IsServer="TRUE">
+//    <Bridge Type="LmcpObjectNetworkSubscribePushBridge"/>
+//
+//    <!-- entity services to instantiate at start-up -->
+//    <Service Type="MessageLogger">
+//        <LogMessage MessageType="lmcp:CMASI:" NumberMessagesToSkip="0"/> <!-- REVIEW: this overrides list of LogMessages in cfgbase.xml -->
+//    </Service>
+//    <Service Type="VicsInterface"/>
+//    <Service Type="VicsLogger"/>
+//
+//</UxAS>
+//
+//     //
+//     // cfgbase.xml (base XML containing all default values)
+//     //
+//<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+//<UxAS FormatVersion="1.0">
+//    <!-- DBK, RJT 20150825 notional configuration XML design notes (also see cfgext.xml)  -->
+//    <!-- default configurations for bridges and services (which are all components) -->
+//    <Bridge Type="LmcpObjectNetworkSerialBridge" BaudRate="57600" SerialPortAddress="/dev/ttyO2"/>
+//    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5556" Server="FALSE">
+//        <SubscribeToMessage MessageType="lmcp:CMASI:"/>
+//        <SubscribeToMessage MessageType="lmcp:VICS:"/>
+//        <SubscribeToMessage MessageType="lmcp:ISOLATE:"/>
+//    </Bridge>
+//    <Bridge Type="LmcpObjectNetworkSubscribePushBridge"/>
+//        <ExternalZeroMqSubscribeAddress value="tcp://*:5555"/>
+//        <ExternalZeroMqPushAddress value="tcp://*:5556"/>
+//    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge">
+//        <SubscribeToMessage MessageType="lmcp:UXNATIVE:"/>
+//    </Bridge>
+//    <Service Type="MessageLogger" FilesPerSubDirectory="1000">
+//        <LogMessage MessageType="lmcp:UXNATIVE" NumberMessagesToSkip="0"/>
+//        <LogMessage MessageType="lmcp:CreateNewComponent" NumberMessagesToSkip="0"/>
+//        <LogMessage MessageType="lmcp:KillComponent" NumberMessagesToSkip="0"/>
+//        <LogMessage MessageType="lmcp:ISOLATE:" NumberMessagesToSkip="0"/>
+//        <LogMessage MessageType="lmcp:UXCOMM:" NumberMessagesToSkip="0"/>
+//        <LogMessage MessageType="lmcp:CMASI:MissionCommand" NumberMessagesToSkip="0" />
+//        <LogMessage MessageType="lmcp:CCA_Plan" NumberMessagesToSkip="0" />
+//        <LogMessage MessageType="lmcp:SUBTASK" NumberMessagesToSkip="0" />
+//    </Service>
+//    <Service Type="VicsInterface" SendGreenOnEmptyQueryResponse="TRUE" AmaseMode="TRUE"/>
+//    <!-- Saves received vics messages in a structure for retrival by a vics interface component -->
+//    <Service Type="VicsLogger" FilesPerSubDirectory="500"/>
+//</UxAS>
 
 public:
     static std::string s_rootDataWorkDirectory;

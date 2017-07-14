@@ -46,8 +46,9 @@ public:
     static Time&
     getInstance();
 
-    // \brief do not call constructor directly using singleton pattern
+    virtual ~Time() { }
 
+protected:
     Time() { };
 
 private:
@@ -354,7 +355,7 @@ private:
 protected:
 
     std::mutex m_calibrationMutex;
-    uint64_t m_minimumCalibrationYear{2016};
+    int m_minimumCalibrationYear{2016};
     bool m_isSetSwHdwDateTime{false};
     std::atomic<bool> m_isSetSwHdwDateTimeLogged{false};
     std::string m_setSwHdwDateTime = "";

@@ -1,0 +1,52 @@
+    <LineSearchTask Series="CMASI">
+      <PointList>
+        <Location3D Series="CMASI">
+          <Latitude>25.446938297599885</Latitude>
+          <Longitude>-80.85149810101102</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.456366629511372</Latitude>
+          <Longitude>-80.79078556037676</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.512079499897446</Latitude>
+          <Longitude>-80.76327519040186</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.548078585377677</Latitude>
+          <Longitude>-80.70540855010984</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.551507069709128</Latitude>
+          <Longitude>-80.64849054326521</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.551507069709128</Latitude>
+          <Longitude>-80.64849054326521</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </PointList>
+      <ViewAngleList/>
+      <UseInertialViewAngles>false</UseInertialViewAngles>
+      <DesiredWavelengthBands/>
+      <DwellTime>0</DwellTime>
+      <GroundSampleDistance>0.0</GroundSampleDistance>
+      <TaskID>3</TaskID>
+      <Label/>
+      <EligibleEntities/>
+      <RevisitRate>0.0</RevisitRate>
+      <Parameters/>
+      <Priority>0</Priority>
+      <Required>true</Required>
+    </LineSearchTask>

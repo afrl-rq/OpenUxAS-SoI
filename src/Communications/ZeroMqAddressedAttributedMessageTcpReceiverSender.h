@@ -74,6 +74,10 @@ private:
 
     uxas::common::SentinelSerialBuffer m_receiveTcpDataBuffer;
     std::string m_sourceGroup;
+    
+    // for return sending for zeromq tcp sockets
+    size_t m_idSize{0};
+    uint8_t m_id[256];
 
 };
 

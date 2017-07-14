@@ -400,6 +400,15 @@ public:
     void
     sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject);
     
+    /** \brief The <B><i>sendLmcpObjectLimitedCastMessage</i></B> method can be 
+     * invoked to send a uni-cast or multi-cast <b>LMCP</b> object message to the <b>LMCP</b> network. 
+     * 
+     * @param castAddress message publish address
+     * @param lmcpObject <b>LMCP</b> object to be uni-casted/multi-casted.
+     */
+    void
+    sendLmcpObjectLimitedCastMessage(const std::string& castAddress, std::unique_ptr<avtas::lmcp::Object> lmcpObject);
+    
 protected:
     /** \brief The <B><i>sendLmcpObjectBroadcastMessage</i></B> method can be 
      * invoked to broadcast a <b>LMCP</b> object message on the <b>LMCP</b> network. 
@@ -409,15 +418,6 @@ protected:
      */
     void
     sendLmcpObjectBroadcastMessage(std::unique_ptr<avtas::lmcp::Object> lmcpObject);
-
-    /** \brief The <B><i>sendLmcpObjectLimitedCastMessage</i></B> method can be 
-     * invoked to send a uni-cast or multi-cast <b>LMCP</b> object message to the <b>LMCP</b> network. 
-     * 
-     * @param castAddress message publish address
-     * @param lmcpObject <b>LMCP</b> object to be uni-casted/multi-casted.
-     */
-    void
-    sendLmcpObjectLimitedCastMessage(const std::string& castAddress, std::unique_ptr<avtas::lmcp::Object> lmcpObject);
 
     /** \brief The <B><i>sendSerializedLmcpObjectMessage</i></B> method can be 
      * invoked to send a <B><i>AddressedAttributedMessage</i></B> to the <b>LMCP</b> network. The 

@@ -8,6 +8,7 @@
 // ===============================================================================
 
 #include "LmcpObjectNetworkBridgeManager.h"
+#include "ServiceManager.h"
 
 #include "LmcpObjectNetworkSerialBridge.h"
 #include "LmcpObjectNetworkTcpBridge.h"
@@ -18,6 +19,7 @@
 #include "UxAS_ConfigurationManager.h"
 #include "Constants/UxAS_String.h"
 #include "UxAS_Log.h"
+#include "uxas/messages/uxnative/KillService.h"
 
 #include "stdUniquePtr.h"
 
@@ -45,6 +47,47 @@ LmcpObjectNetworkBridgeManager::getInstance()
 
     return *s_instance;
 };
+
+void
+LmcpObjectNetworkBridgeManager::terminateAllBridges()
+{
+    for (auto svcIt = m_bridgesByNetworkId.cbegin(), serviceItEnd = m_bridgesByNetworkId.cend(); svcIt != serviceItEnd; svcIt++)
+    {
+        if (svcIt->second && !svcIt->second->getIsTerminationFinished())
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::terminateAllBridges sending [", uxas::messages::uxnative::KillService::TypeName, "] message to ", svcIt->second->m_networkClientTypeName, " having entity ID [", svcIt->second->m_entityId, "] and network ID [", svcIt->second->m_networkId, "]");
+
+            std::cout << std::endl << s_typeName() << "::terminateAllBridges sending [" << uxas::messages::uxnative::KillService::TypeName << "] message to " << svcIt->second->m_networkClientTypeName << " having entity ID [" << svcIt->second->m_entityId << "] and network ID [" << svcIt->second->m_networkId << "]" << std::endl;
+            auto killService = uxas::stduxas::make_unique<uxas::messages::uxnative::KillService>();
+            killService->setServiceID(svcIt->second->m_networkId);
+            uxas::service::ServiceManager::getInstance().sendLmcpObjectLimitedCastMessage(LmcpObjectNetworkClientBase::getNetworkClientUnicastAddress(svcIt->second->m_entityId, svcIt->second->m_networkId), std::move(killService));
+        }
+        else
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::terminateAllBridges unexpectedly found empty pointer (hosting a bridge object)");
+        }
+    }
+}
+
+void
+LmcpObjectNetworkBridgeManager::removeTerminatedBridges(uint32_t &runningSvcCnt, uint32_t &terminatedSvcCnt)
+{
+    for (auto svcIt = m_bridgesByNetworkId.begin(); svcIt != m_bridgesByNetworkId.end();)
+    {
+        if (svcIt->second->getIsTerminationFinished())
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::removeTerminatedServices removing reference to terminated ", svcIt->second->m_networkClientTypeName, " ID ", svcIt->second->m_networkId);
+            terminatedSvcCnt++;
+            svcIt = m_bridgesByNetworkId.erase(svcIt); // remove finished service (enables destruction)
+        }
+        else
+        {
+            UXAS_LOG_DEBUGGING(s_typeName(), "::removeTerminatedServices retaining reference to non-terminated ", svcIt->second->m_networkClientTypeName, " ID ", svcIt->second->m_networkId);
+            runningSvcCnt++;
+            svcIt++;
+        }
+    }
+}
 
 bool
 LmcpObjectNetworkBridgeManager::initialize()
