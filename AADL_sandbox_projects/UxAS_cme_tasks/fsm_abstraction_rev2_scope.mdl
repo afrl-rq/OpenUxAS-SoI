@@ -1,5 +1,5 @@
 Model {
-  Name			  "fsm_abstraction_rev2"
+  Name			  "fsm_abstraction_rev2_scope"
   Version		  8.6
   MdlSubVersion		  0
   SavedCharacterEncoding  "windows-1252"
@@ -17,7 +17,7 @@ Model {
       BusOutputAsStruct	      "off"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.87"
+    ComputedModelVersion    "1.86"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -28,7 +28,7 @@ Model {
       Type		      "Cell"
       Dimension		      2
       Cell		      "HDLSubsystem"
-      Cell		      "fsm_abstraction_rev2"
+      Cell		      "fsm_abstraction_rev2_scope"
       PropName		      "mdlProps"
     }
   }
@@ -72,11 +72,11 @@ Model {
 	$ObjectID		6
 	$ClassName		"Simulink.EditorInfo"
 	IsActive		[1]
-	ViewObjType		"SimulinkSubsys"
-	LoadSaveID		"857"
+	ViewObjType		"SimulinkTopLevel"
+	LoadSaveID		"0"
 	Extents			[1821.0, 953.0]
-	ZoomFactor		[1.77]
-	Offset			[0.0, 0.0]
+	ZoomFactor		[3.790983606557377]
+	Offset			[60.82486486486485, 78.307027027027019]
       }
     }
   }
@@ -86,9 +86,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "elliocm"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Jul 14 11:56:57 2017"
-  RTWModifiedTimeStamp	  421934206
-  ModelVersionFormat	  "1.%<AutoIncrement:87>"
+  LastModifiedDate	  "Fri Jul 14 11:48:42 2017"
+  RTWModifiedTimeStamp	  421927745
+  ModelVersionFormat	  "1.%<AutoIncrement:86>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -132,12 +132,12 @@ Model {
     $PropName		    "DataLoggingOverride"
     $ObjectID		    7
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
-    model_		    "fsm_abstraction_rev2"
+    model_		    "fsm_abstraction_rev2_scope"
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
       Dimension		      1
-      Cell		      "fsm_abstraction_rev2"
+      Cell		      "fsm_abstraction_rev2_scope"
       PropName		      "logAsSpecifiedByModels_"
     }
     Array {
@@ -898,6 +898,12 @@ Model {
       InitialOutput	      "[]"
     }
     Block {
+      BlockType		      Scope
+      DefaultConfigurationName "Simulink.scopes.TimeScopeBlockCfg"
+      NumInputPorts	      "1"
+      Floating		      off
+    }
+    Block {
       BlockType		      SignalConversion
       ConversionOutput	      "Signal copy"
       OutDataTypeStr	      "Inherit: auto"
@@ -960,9 +966,9 @@ Model {
     }
   }
   System {
-    Name		    "fsm_abstraction_rev2"
+    Name		    "fsm_abstraction_rev2_scope"
     Location		    [1592, 0, 3656, 1128]
-    Open		    off
+    Open		    on
     ModelBrowserVisibility  on
     ModelBrowserWidth	    200
     ScreenColor		    "white"
@@ -997,7 +1003,7 @@ Model {
       System {
 	Name			"FiniteStateMachine"
 	Location		[1592, 0, 3656, 1128]
-	Open			on
+	Open			off
 	ModelBrowserVisibility	on
 	ModelBrowserWidth	200
 	ScreenColor		"white"
@@ -3785,6 +3791,37 @@ Model {
       Position		      [420, 213, 450, 227]
       ZOrder		      121
       IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Scope
+      Name		      "Scope"
+      SID		      "1143"
+      Ports		      []
+      Position		      [185, 14, 215, 46]
+      ZOrder		      122
+      IOType		      "viewer"
+      List {
+	ListType		IOSignalStrings
+	set0ParseKeys		"37"
+	set0Sigs		"FiniteStateMachine/TaskServiceBase:o1"
+      }
+      ScopeSpecificationString "Simulink.scopes.TimeScopeBlockCfg('CurrentConfiguration', extmgr.ConfigurationSet(extm"
+      "gr.Configuration('Core','General UI',true),extmgr.Configuration('Core','Source UI',true),extmgr.Configuration('S"
+      "ources','WiredSimulink',true),extmgr.Configuration('Visuals','Time Domain',true,'SerializedDisplays',{struct('Mi"
+      "nYLimReal','-0.875','MaxYLimReal','7.875','YLabelReal','','MinYLimMag','0.00000','MaxYLimMag','7.875','LegendVis"
+      "ibility','off','XGrid',true,'YGrid',true,'PlotMagPhase',false,'AxesColor',[0 0 0],'AxesTickColor',[0.68627450980"
+      "3922 0.686274509803922 0.686274509803922],'ColorOrder',[1 1 0.0666666666666667;0.0745098039215686 0.623529411764"
+      "706 1;1 0.411764705882353 0.16078431372549;0.392156862745098 0.831372549019608 0.0745098039215686;0.717647058823"
+      "529 0.274509803921569 1;0.0588235294117647 1 1;1 0.0745098039215686 0.650980392156863],'Title','%<SignalLabel>',"
+      "'LinePropertiesCache',{{struct('Color',[1 1 0.0666666666666667],'LineStyle','-','LineWidth',0.5,'Marker','o','Vi"
+      "sible','on')}},'UserDefinedChannelNames',{{}},'NumLines',1,'LineNames',{{'TaskServiceBase'}},'ShowContent',true,"
+      "'Placement',1)},'DisplayPropertyDefaults',struct('MinYLimReal','-0.875','MaxYLimReal','7.875','YLabelReal','','M"
+      "inYLimMag','0.00000','MaxYLimMag','7.875','LegendVisibility','off','XGrid',true,'YGrid',true,'PlotMagPhase',fals"
+      "e,'AxesColor',[0 0 0],'AxesTickColor',[0.686274509803922 0.686274509803922 0.686274509803922],'ColorOrder',[0.07"
+      "45098039215686 0.623529411764706 1;1 0.411764705882353 0.16078431372549;1 1 0.0666666666666667;0.717647058823529"
+      " 0.274509803921569 1;0.392156862745098 0.831372549019608 0.0745098039215686;0.0588235294117647 1 1;1 0.074509803"
+      "9215686 0.650980392156863])),extmgr.Configuration('Tools','Plot Navigation',true),extmgr.Configuration('Tools','"
+      "Measurements',true,'Version','2015b')),'Version','2015b','VisibleAtModelOpen','on')"
     }
     Line {
       ZOrder		      1
