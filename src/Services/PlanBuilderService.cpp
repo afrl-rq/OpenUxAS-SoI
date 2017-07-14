@@ -47,6 +47,14 @@
 #define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "PLNB-PLNB-PLNB-PLNB:: PlanBuilder:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
 #define CERR_FILE_LINE_MSG(MESSAGE) std::cerr << "PLNB-PLNB-PLNB-PLNB:: PlanBuilder:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cerr.flush();
 
+// Rust prototypes
+extern "C" {
+void* plan_builder_new(uxas::service::PlanBuilderService *pbs);
+void plan_builder_delete(void* raw_pb);
+void* plan_builder_configure(void* raw_pb, double assignment_start_point_lead_m);
+void plan_builder_process_received_lmcp_message(void* raw_pb, uint8_t *msg_buf, uint32_t msg_len);
+}
+
 namespace uxas
 {
 namespace service
@@ -58,7 +66,7 @@ PlanBuilderService::s_registrar(PlanBuilderService::s_registryServiceTypeNames()
 
 PlanBuilderService::PlanBuilderService()
 : ServiceBase(PlanBuilderService::s_typeName(), PlanBuilderService::s_directoryName()) {
-  m_PlanBuilder = plan_builder_new();
+  m_PlanBuilder = plan_builder_new(this);
 }
 
 PlanBuilderService::~PlanBuilderService() {
@@ -409,3 +417,15 @@ void PlanBuilderService::buildAndSendThePlan()
 
 }; //namespace service
 }; //namespace uxas
+
+extern "C" {
+// TODO: rewrite all the unit conversions in Rust. This is gross.
+void convert_latlong_deg_to_northeast_m_raw(const double *lat_deg, const double *long_deg, double *north_m, double *east_m) {
+  uxas::common::utilities::CUnitConversions unitConversions;
+  unitConversions.ConvertLatLong_degToNorthEast_m(*lat_deg, *long_deg, *north_m, *east_m);
+}
+void convert_northeast_m_to_latlong_deg_raw(const double *north_m, const double *east_m, double *lat_deg, double *long_deg) {
+  uxas::common::utilities::CUnitConversions unitConversions;
+  unitConversions.ConvertLatLong_degToNorthEast_m(*north_m, *east_m, *lat_deg, *long_deg);
+}
+}

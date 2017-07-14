@@ -591,4 +591,8 @@ public:
 }; //namespace common
 }; //namespace uxas
 
+extern "C" {
+int64_t get_utc_time_since_epoch_ms();
+}
+
 #endif /* UXAS_COMMON_TIME_H */

@@ -32,14 +32,6 @@
 #include <cstdint> // int64_t
 #include <deque>
 
-// Rust prototypes
-extern "C" {
-void* plan_builder_new();
-void plan_builder_delete(void* raw_pb);
-void* plan_builder_configure(void* raw_pb, double assignment_start_point_lead_m);
-void plan_builder_process_received_lmcp_message(void* raw_pb, uint8_t *msg_buf, uint32_t msg_len);
-}
-
 namespace uxas
 {
 namespace service

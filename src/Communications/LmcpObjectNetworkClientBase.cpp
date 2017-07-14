@@ -499,3 +499,17 @@ LmcpObjectNetworkClientBase::sendSharedLmcpObjectLimitedCastMessage(const std::s
 
 }; //namespace communications
 }; //namespace uxas
+
+extern "C" {
+// Eventually we'll have a Rustier way of doing this
+void send_shared_lmcp_object_broadcast_message_raw(void* client, const uint8_t *buf, uint32_t size) {
+  avtas::lmcp::ByteBuffer lmcpByteBuffer;
+  lmcpByteBuffer.allocate(size);
+  for (int32_t i; i < size; i++) {
+    lmcpByteBuffer.putByte(buf[i]);
+  }
+  lmcpByteBuffer.rewind();
+  auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::Factory::getObject(lmcpByteBuffer));
+  ((uxas::communications::LmcpObjectNetworkClientBase*)client)->sendSharedLmcpObjectBroadcastMessage(obj);
+}
+}
