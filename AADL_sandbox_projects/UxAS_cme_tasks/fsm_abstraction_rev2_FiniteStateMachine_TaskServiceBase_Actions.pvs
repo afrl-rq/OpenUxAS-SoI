@@ -1,0 +1,235 @@
+fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions: THEORY
+BEGIN
+
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected;
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished;
+
+  %|- *_TCC* : PROOF
+  %|-   (skeep 1 t)(model-check)
+  %|- QED
+
+  %|- *int*_TCC* : PROOF
+  %|-   (skeep 1 t)(grind)
+  %|- QED
+% For If_i1
+
+If_i1_type: TYPE = [#
+                     f_Init_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.sys_type,
+                     f_Idle_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.sys_type,
+                     f_SensorRequest_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.sys_type,
+                     f_OptionRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.sys_type,
+                     f_OptionsPublished_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.sys_type,
+                     f_FinalRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.sys_type,
+                     f_OptionSelected_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.sys_type,
+                     f_Active_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.sys_type,
+                     f_Merge: real
+                    #];
+
+
+
+Demux_bustype: TYPE = [#
+                        f_A1: bool,
+                        f_A2: bool,
+                        f_A3: bool,
+                        f_A4: bool,
+                        f_A5: bool,
+                        f_A6: bool,
+                        f_A7: bool,
+                        f_A8: bool
+                       #];
+
+% Type of state
+
+state_type: TYPE = [#
+                     f_Active_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.sys_type,
+                     f_FinalRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.sys_type,
+                     f_Idle_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.sys_type,
+                     f_OptionRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.sys_type,
+                     f_SensorRequest_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.sys_type,
+                     f_Init_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.sys_type,
+                     f_OptionSelected_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.sys_type,
+                     f_OptionsPublished_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.sys_type
+                    #];
+
+% Type of output
+
+out_type: TYPE = [#
+                   f_STATE: real
+                  #];
+
+% Type of system state
+
+sys_type: TYPE = [#
+                   f_state: state_type,
+                   f_output: out_type
+                  #];
+
+Demux(p_fails: Demux_bustype): Demux_bustype =
+  (#
+    f_A1 := p_fails`f_A1,
+    f_A2 := p_fails`f_A2,
+    f_A3 := p_fails`f_A3,
+    f_A4 := p_fails`f_A4,
+    f_A5 := p_fails`f_A5,
+    f_A6 := p_fails`f_A6,
+    f_A7 := p_fails`f_A7,
+    f_A8 := p_fails`f_A8
+   #);
+
+STATE(p_Merge: real): real =
+  p_Merge;
+
+% Prepare If_i1 state
+prepare_If_i1(p_Init_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.sys_type, p_Idle_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.sys_type, p_SensorRequest_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.sys_type, p_OptionRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.sys_type, p_OptionsPublished_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.sys_type, p_FinalRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.sys_type, p_OptionSelected_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.sys_type, p_Active_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.sys_type, p_Merge: real): If_i1_type =
+  (#
+    f_Init_sys := p_Init_sys,
+    f_Idle_sys := p_Idle_sys,
+    f_SensorRequest_sys := p_SensorRequest_sys,
+    f_OptionRoutes_sys := p_OptionRoutes_sys,
+    f_OptionsPublished_sys := p_OptionsPublished_sys,
+    f_FinalRoutes_sys := p_FinalRoutes_sys,
+    f_OptionSelected_sys := p_OptionSelected_sys,
+    f_Active_sys := p_Active_sys,
+    f_Merge := p_Merge
+   #);
+
+% Initialize state
+prepare_state(p_Active_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.sys_type, p_FinalRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.sys_type, p_Idle_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.sys_type, p_OptionRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.sys_type, p_SensorRequest_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.sys_type, p_Init_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.sys_type, p_OptionSelected_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.sys_type, p_OptionsPublished_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.sys_type): state_type =
+  (#
+    f_Active_sys := p_Active_sys,
+    f_FinalRoutes_sys := p_FinalRoutes_sys,
+    f_Idle_sys := p_Idle_sys,
+    f_OptionRoutes_sys := p_OptionRoutes_sys,
+    f_SensorRequest_sys := p_SensorRequest_sys,
+    f_Init_sys := p_Init_sys,
+    f_OptionSelected_sys := p_OptionSelected_sys,
+    f_OptionsPublished_sys := p_OptionsPublished_sys
+   #);
+
+% Initialize output
+prepare_output(p_STATE: real): out_type =
+  (#
+    f_STATE := p_STATE
+   #);
+
+% Initialize system state
+init: sys_type =
+  (#
+    f_state := prepare_state(fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.init, fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.init),
+    f_output := prepare_output(0)
+   #);
+
+% Whole system run, this can only be called after INIT and inputs setting
+run(p_sys: sys_type, p_fails: Demux_bustype, p_state: real, p_uxv: real): sys_type =
+  LET v_Demux: Demux_bustype = Demux(p_fails) IN
+  LET v_If_i1: If_i1_type =
+    IF p_state=0.0 THEN
+      LET v_Init_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Init.run(p_sys`f_state`f_Init_sys, p_state, v_Demux`f_A1) IN
+          prepare_If_i1(v_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_Init_sys`f_output`f_NextState)
+    ELSIF p_state=1.0 THEN
+      LET v_Idle_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Idle.run(p_sys`f_state`f_Idle_sys, p_state, v_Demux`f_A2) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        v_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_Idle_sys`f_output`f_NextState)
+    ELSIF  p_state=2.0 THEN
+      LET v_SensorRequest_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_SensorRequest.run(p_sys`f_state`f_SensorRequest_sys, p_state, v_Demux`f_A3) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        v_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_SensorRequest_sys`f_output`f_NextState)
+    ELSIF  p_state=3.0 THEN
+      LET v_OptionRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionRoutes.run(p_sys`f_state`f_OptionRoutes_sys, p_state, v_Demux`f_A4) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        v_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_OptionRoutes_sys`f_output`f_NextState)
+    ELSIF  p_state=4.0 THEN
+      LET v_OptionsPublished_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionsPublished.run(p_sys`f_state`f_OptionsPublished_sys, p_state, v_Demux`f_A5) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        v_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_OptionsPublished_sys`f_output`f_NextState)
+    ELSIF  p_state=5.0 THEN
+      LET v_FinalRoutes_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_FinalRoutes.run(p_sys`f_state`f_FinalRoutes_sys, p_state, v_Demux`f_A6) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        v_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_FinalRoutes_sys`f_output`f_NextState)
+    ELSIF  p_state=6.0 THEN
+      LET v_OptionSelected_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_OptionSelected.run(p_sys`f_state`f_OptionSelected_sys, p_state, v_Demux`f_A7, p_uxv) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        v_OptionSelected_sys,
+                        p_sys`f_state`f_Active_sys,
+                        v_OptionSelected_sys`f_output`f_NextState)
+    ELSE
+      LET v_Active_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.sys_type = 
+        fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions_Active.run(p_sys`f_state`f_Active_sys, p_state, v_Demux`f_A8, p_uxv) IN
+          prepare_If_i1(p_sys`f_state`f_Init_sys,
+                        p_sys`f_state`f_Idle_sys,
+                        p_sys`f_state`f_SensorRequest_sys,
+                        p_sys`f_state`f_OptionRoutes_sys,
+                        p_sys`f_state`f_OptionsPublished_sys,
+                        p_sys`f_state`f_FinalRoutes_sys,
+                        p_sys`f_state`f_OptionSelected_sys,
+                        v_Active_sys,
+                        v_Active_sys`f_output`f_NextState)
+    ENDIF IN
+  LET v_STATE: real = STATE(v_If_i1`f_Merge) IN
+  (#
+    f_state := prepare_state(v_If_i1`f_Active_sys, v_If_i1`f_FinalRoutes_sys, v_If_i1`f_Idle_sys, v_If_i1`f_OptionRoutes_sys, v_If_i1`f_SensorRequest_sys, v_If_i1`f_Init_sys, v_If_i1`f_OptionSelected_sys, v_If_i1`f_OptionsPublished_sys),
+    f_output := prepare_output(v_STATE)
+   #);
+
+END fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions

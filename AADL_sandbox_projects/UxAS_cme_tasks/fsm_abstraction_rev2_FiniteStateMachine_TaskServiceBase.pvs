@@ -1,0 +1,69 @@
+fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase: THEORY
+BEGIN
+
+IMPORTING fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions;
+
+  %|- *_TCC* : PROOF
+  %|-   (skeep 1 t)(model-check)
+  %|- QED
+
+  %|- *int*_TCC* : PROOF
+  %|-   (skeep 1 t)(grind)
+  %|- QED
+
+nnreal_to_1?(n: real): bool = (0 <= n) AND (n <= 1);
+nnreal_to_1: NONEMPTY_TYPE = (nnreal_to_1?)
+  CONTAINING 0;
+
+% Type of state
+
+state_type: TYPE = [#
+                     f_Actions_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions.sys_type
+                    #];
+
+% Type of output
+
+out_type: TYPE = [#
+                   f_STATE: real
+                  #];
+
+% Type of system state
+
+sys_type: TYPE = [#
+                   f_state: state_type,
+                   f_output: out_type
+                  #];
+
+STATE(p_Actions: real): real =
+  p_Actions;
+
+% Initialize state
+prepare_state(p_Actions_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions.sys_type): state_type =
+  (#
+    f_Actions_sys := p_Actions_sys
+   #);
+
+% Initialize output
+prepare_output(p_STATE: real): out_type =
+  (#
+    f_STATE := p_STATE
+   #);
+
+% Initialize system state
+init: sys_type =
+  (#
+    f_state := prepare_state(fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions.init),
+    f_output := prepare_output(0)
+   #);
+
+% Whole system run, this can only be called after INIT and inputs setting
+run(p_sys: sys_type, p_fails: Demux_bustype, p_uxv: nnreal_to_1, p_state: real): sys_type =
+  LET v_Actions_sys: fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions.sys_type = 
+    fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase_Actions.run(p_sys`f_state`f_Actions_sys, p_fails, p_state, p_uxv) IN
+  LET v_STATE: real = STATE(v_Actions_sys`f_output`f_STATE) IN
+  (#
+    f_state := prepare_state(v_Actions_sys),
+    f_output := prepare_output(v_STATE)
+   #);
+
+END fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase
