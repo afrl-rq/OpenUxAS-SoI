@@ -87,7 +87,7 @@
             <j
                 id="__gsn__15d37188f68"
                 name="Justification">
-              X = X2 * (1 - C1 - C2) + X3 * C1&nbsp;+&nbsp;X4 * C2
+              X = X2 * (1 - C1 - C2) + X3 * C1 + X4 * C2
             </j>
 
             <g
