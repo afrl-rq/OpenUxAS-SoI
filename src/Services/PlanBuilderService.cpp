@@ -39,10 +39,10 @@
 
 // Rust prototypes
 extern "C" {
-void* plan_builder_new(uxas::service::PlanBuilderService *pbs);
+void* plan_builder_new();
 void plan_builder_delete(void* raw_pb);
 void* plan_builder_configure(void* raw_pb, double assignment_start_point_lead_m);
-void plan_builder_process_received_lmcp_message(void* raw_pb, uint8_t *msg_buf, uint32_t msg_len);
+void plan_builder_process_received_lmcp_message(uxas::service::PlanBuilderService *pbs, void* raw_pb, uint8_t *msg_buf, uint32_t msg_len);
 }
 
 namespace uxas
@@ -55,7 +55,7 @@ PlanBuilderService::s_registrar(PlanBuilderService::s_registryServiceTypeNames()
 
 PlanBuilderService::PlanBuilderService()
 : ServiceBase(PlanBuilderService::s_typeName(), PlanBuilderService::s_directoryName()) {
-  m_PlanBuilder = plan_builder_new(this);
+  m_PlanBuilder = plan_builder_new();
 }
 
 PlanBuilderService::~PlanBuilderService() {
@@ -86,7 +86,7 @@ bool
 PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
   avtas::lmcp::ByteBuffer * lmcpByteBuffer = avtas::lmcp::Factory::packMessage(receivedLmcpMessage->m_object.get(), true);
-  plan_builder_process_received_lmcp_message(m_PlanBuilder, lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
+  plan_builder_process_received_lmcp_message(this, m_PlanBuilder, lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
   delete lmcpByteBuffer;
 
 
