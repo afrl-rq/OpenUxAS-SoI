@@ -6,6 +6,7 @@
 //static uint32_t LMCP_CTRL_STR = 0x4c4d4350;
 static uint32_t LMCP_CTRL_STR_NTWK_ORD = 0x50434d4c;
 static mc_t mc;
+static bool vm_got_mission_command = true;
 
 void component_entry(const int64_t * periodic_dispatcher){
 
@@ -16,7 +17,8 @@ void component_init(const int64_t *arg){
 }
 
 void mission_read_vm(const bool * _UNUSED) {
-	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
+        printf("Asset Manager confirmed read\n");
+        vm_got_mission_command = true;
 }
 
 
@@ -83,8 +85,11 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
                 ((uint8_t *)&mc)[message_index] = tb_in_uart_packet->buf[i];
             }
             if(message_index == message_size){
-                *(mc_t *)waypoint = mc;
-                waypoint_write(&_UNUSED);
+                if(vm_got_mission_command){
+                    *(mc_t *)waypoint = mc;
+                    waypoint_write(&_UNUSED);
+                    vm_got_mission_command = false;
+                }
                 gotCtrlStr = gotSize = false;
                 message_index = 0;
             }

@@ -50,19 +50,6 @@ extern seL4_CPtr _fault_endpoint;
 //BEGIN SOI SPECIFIC STUFF
 
 bool wm_read = false;
-void handle_mission_read(uint32_t * var){
-    //printf("VM saw mission read from WM\n");
-    uint32_t numBytes;
-    tb_mission_read_dequeue(&numBytes);
-    wm_read_post();
-    tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
-}
-
-pre_init(void){
-    tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
-}
-
-
 bool mission_write
 (const bool * tb_mission_write) {
     bool tb_result = true ; 
@@ -71,6 +58,41 @@ bool mission_write
 
     return tb_result;
 }
+
+bool waypoint_read
+(const bool * tb_waypoint_read) {
+    bool tb_result = true ; 
+
+    tb_result &= tb_waypoint_read0_enqueue((bool *)tb_waypoint_read);
+
+    return tb_result;
+}
+
+void handle_mission_read(uint32_t * var){
+    //printf("VM saw mission read from WM\n");
+    bool _UNUSED;
+    tb_mission_read_dequeue(&_UNUSED);
+    wm_read_post();
+    tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
+}
+
+
+void handle_waypoint_write(uint32_t * var){
+    //printf("VM saw mission read from WM\n");
+    bool _UNUSED;
+    tb_waypoint_write_dequeue(&_UNUSED);
+    printf("VM saw waypoint write\n");
+    waypoint_read(&_UNUSED);
+
+    tb_waypoint_write_notification_reg_callback(handle_waypoint_write, NULL);
+}
+
+pre_init(void){
+    tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
+    tb_waypoint_write_notification_reg_callback(handle_waypoint_write, NULL);
+}
+
+
 
 static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
 //    vusb_device_t* vusb;
@@ -109,6 +131,7 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
     int addr;
     uint8_t data;
     static uint32_t bufIndex;
+    bool _UNUSED = false;
     //MissionSoftware__mission_command_impl buf;
 
     addr = fault_get_address(fault);
@@ -119,7 +142,7 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
         bufIndex = 0;
     }else if(addr == 0xe0000002){
         //this indicates the end of a write
-        mission_write(&bufIndex);
+        mission_write(&_UNUSED);
         //this is kind of bad because the VM will halt
         //execution until everything is has been sent to the AP
         wm_read_wait();
