@@ -255,7 +255,7 @@ assembly {
         Asset_Waypoint_Manager_inst.tb_timer_global_endpoint = "Asset_Waypoint_Manager_tb_timer";
         Waypoint_Manager_inst.tb_timer_attributes = 12;
         Waypoint_Manager_inst.tb_timer_global_endpoint = "Waypoint_Manager_tb_timer";
-
+        
         Virtual_Machine_inst.base_prio = 100;
         Virtual_Machine_inst.priority = 101;
 

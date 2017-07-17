@@ -231,8 +231,8 @@ void tb_entrypoint_tb_Waypoint_Manager_mission_write(const bool * in_arg) {
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Waypoint_Manager_waypoint_write(const bool * in_arg) {
-    waypoint_write((bool *) in_arg);
+void tb_entrypoint_tb_Waypoint_Manager_waypoint_write(const uint32_t * in_arg) {
+    waypoint_write((uint32_t *) in_arg);
 
 }
 
@@ -263,7 +263,7 @@ int run(void) {
     // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
     bool tb_mission_write;
-    bool tb_waypoint_write;
+    uint32_t tb_waypoint_write;
     bool tb_in_send_success;
 
 
@@ -284,7 +284,7 @@ int run(void) {
         while (tb_mission_write_dequeue((bool*)&tb_mission_write)) {
             tb_entrypoint_tb_Waypoint_Manager_mission_write(&tb_mission_write);
         }
-        while (tb_waypoint_write_dequeue((bool*)&tb_waypoint_write)) {
+        while (tb_waypoint_write_dequeue((uint32_t*)&tb_waypoint_write)) {
             tb_entrypoint_tb_Waypoint_Manager_waypoint_write(&tb_waypoint_write);
         }
         while (tb_in_send_success_dequeue((bool*)&tb_in_send_success)) {

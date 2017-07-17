@@ -102,12 +102,12 @@ void tb_timer_complete_callback(void *_ UNUSED) {
  ************************************************************************/
  
 bool waypoint_write
-(const bool * tb_waypoint_write) {
+(const uint32_t * tb_waypoint_write) {
     bool tb_result = true ; 
 
-    tb_result &= tb_waypoint_write0_enqueue((bool *)tb_waypoint_write);
+    tb_result &= tb_waypoint_write0_enqueue((uint32_t *)tb_waypoint_write);
 
-    tb_result &= tb_waypoint_write1_enqueue((bool *)tb_waypoint_write);
+    tb_result &= tb_waypoint_write1_enqueue((uint32_t *)tb_waypoint_write);
 
     return tb_result;
 }

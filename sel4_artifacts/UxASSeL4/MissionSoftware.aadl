@@ -140,7 +140,7 @@ public
 			mission_read : in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read");
 			};
-			waypoint_write: in event data port Base_Types::Boolean {
+			waypoint_write: in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");
 			};
 			waypoint_read : out event data port Base_Types::Boolean {
@@ -174,7 +174,7 @@ public
 			waypoint_read : out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "waypoint_read";
 			};
-			waypoint_write : in event data port Base_Types::Boolean {
+			waypoint_write : in event data port Base_Types::Unsigned_32 {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("waypoint_write");				
 			};
 			mission: requires data access mission_command.impl {
@@ -205,7 +205,7 @@ public
 	
 	thread Asset_Waypoint_Manager
 		features
-			waypoint_write: out event data port Base_Types::Boolean {
+			waypoint_write: out event data port Base_Types::Unsigned_32 {
 				TB_SYS::CommPrim_Source_Text => "waypoint_write";
 			};
 			waypoint_read_vm: in event data port Base_Types::Boolean {
