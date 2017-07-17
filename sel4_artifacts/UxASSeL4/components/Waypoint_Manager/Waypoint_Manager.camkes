@@ -43,7 +43,7 @@ import <tb_Monitor_bool_1.idl4>;
 
 import <tb_Monitor_bool_1.idl4>;
 
-import <tb_Monitor_bool_1.idl4>;
+import <tb_Monitor_uint32_t_1.idl4>;
 
 import <tb_Monitor_bool_1.idl4>;
 
@@ -57,6 +57,8 @@ import <MissionSoftware__mission_command_impl_writer.idl4>;
 
 
 import <bool_writer.idl4>;
+
+import <uint32_t_writer.idl4>;
 
 import <SMACCM_DATA__UART_Packet_i_writer.idl4>;
 
@@ -75,7 +77,7 @@ component Waypoint_Manager {
     consumes QueuedData tb_mission_write_notification;
     uses tb_Monitor_bool_1 tb_waypoint_read0;
 
-    uses tb_Monitor_bool_1 tb_waypoint_write;
+    uses tb_Monitor_uint32_t_1 tb_waypoint_write;
     consumes QueuedData tb_waypoint_write_notification;
     uses tb_Monitor_bool_1 tb_in_send_success;
     consumes QueuedData tb_in_send_success_notification;

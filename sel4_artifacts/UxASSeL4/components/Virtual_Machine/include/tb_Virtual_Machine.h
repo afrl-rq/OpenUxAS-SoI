@@ -52,10 +52,10 @@ void mission_read(const bool * tb_mission_read);
 
 
  // reader prototype for tb_waypoint_write
-bool tb_waypoint_write_dequeue(bool * tb_waypoint_write);
+bool tb_waypoint_write_dequeue(uint32_t * tb_waypoint_write);
 // user dispatch entrypoints for port tb_waypoint_write
 
-void waypoint_write(const bool * tb_waypoint_write);
+void waypoint_write(const uint32_t * tb_waypoint_write);
 
 
  bool tb_waypoint_read_enqueue(const bool * tb_waypoint_read);
