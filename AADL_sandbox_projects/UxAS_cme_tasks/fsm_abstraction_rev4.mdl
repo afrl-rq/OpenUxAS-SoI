@@ -1,5 +1,5 @@
 Model {
-  Name			  "fsm_abstraction_rev2"
+  Name			  "fsm_abstraction_rev4"
   Version		  8.6
   MdlSubVersion		  0
   SavedCharacterEncoding  "windows-1252"
@@ -17,7 +17,7 @@ Model {
       BusOutputAsStruct	      "off"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.87"
+    ComputedModelVersion    "1.92"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -28,7 +28,7 @@ Model {
       Type		      "Cell"
       Dimension		      2
       Cell		      "HDLSubsystem"
-      Cell		      "fsm_abstraction_rev2"
+      Cell		      "fsm_abstraction_rev4"
       PropName		      "mdlProps"
     }
   }
@@ -75,8 +75,8 @@ Model {
 	ViewObjType		"SimulinkSubsys"
 	LoadSaveID		"857"
 	Extents			[1821.0, 953.0]
-	ZoomFactor		[1.77]
-	Offset			[0.0, 0.0]
+	ZoomFactor		[1.7686424474187379]
+	Offset			[-235.61412162162151, 18.084324324324314]
       }
     }
   }
@@ -86,9 +86,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "elliocm"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Jul 14 11:56:57 2017"
-  RTWModifiedTimeStamp	  421934206
-  ModelVersionFormat	  "1.%<AutoIncrement:87>"
+  LastModifiedDate	  "Fri Jul 14 09:42:21 2017"
+  RTWModifiedTimeStamp	  421926137
+  ModelVersionFormat	  "1.%<AutoIncrement:92>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -132,12 +132,12 @@ Model {
     $PropName		    "DataLoggingOverride"
     $ObjectID		    7
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
-    model_		    "fsm_abstraction_rev2"
+    model_		    "fsm_abstraction_rev4"
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
       Dimension		      1
-      Cell		      "fsm_abstraction_rev2"
+      Cell		      "fsm_abstraction_rev4"
       PropName		      "logAsSpecifiedByModels_"
     }
     Array {
@@ -960,7 +960,7 @@ Model {
     }
   }
   System {
-    Name		    "fsm_abstraction_rev2"
+    Name		    "fsm_abstraction_rev4"
     Location		    [1592, 0, 3656, 1128]
     Open		    off
     ModelBrowserVisibility  on
@@ -973,9 +973,9 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "379"
+    ZoomFactor		    "390"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "1143"
+    SIDHighWatermark	    "1148"
     Block {
       BlockType		      Inport
       Name		      "fails"
@@ -987,7 +987,7 @@ Model {
     }
     Block {
       BlockType		      SubSystem
-      Name		      "FiniteStateMachine"
+      Name		      "TaskServiceBase_FSM"
       SID		      "857"
       Ports		      [1, 1]
       Position		      [250, 131, 350, 309]
@@ -995,7 +995,7 @@ Model {
       RequestExecContextInheritance off
       Variant		      off
       System {
-	Name			"FiniteStateMachine"
+	Name			"TaskServiceBase_FSM"
 	Location		[1592, 0, 3656, 1128]
 	Open			on
 	ModelBrowserVisibility	on
@@ -1138,7 +1138,7 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "Active"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [1592, 0, 3656, 1128]
 		    Open		    off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
@@ -1183,6 +1183,7 @@ Model {
 		    SID			    "1084"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "else"
 		    }
 		    Block {
@@ -1191,7 +1192,7 @@ Model {
 		    SID			    "1085"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "7.0"
+		    Value		    "8.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -1199,15 +1200,15 @@ Model {
 		    SID			    "1086"
 		    Position		    [775, 40, 805, 70]
 		    ZOrder		    283
-		    Value		    "1.0"
+		    Value		    "2.0"
 		    }
 		    Block {
 		    BlockType		    Constant
 		    Name		    "Constant7"
 		    SID			    "1087"
-		    Position		    [385, 160, 415, 190]
+		    Position		    [295, 160, 325, 190]
 		    ZOrder		    267
-		    Value		    "1.0"
+		    Value		    "2.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -1280,8 +1281,39 @@ Model {
 		    BlockType		    UnitDelay
 		    Name		    "Unit Delay"
 		    SID			    "1141"
-		    Position		    [495, 158, 530, 192]
+		    Position		    [550, 158, 585, 192]
 		    ZOrder		    286
+		    InitialCondition	    "8.0"
+		    InputProcessing	    "Elements as channels (sample based)"
+		    SampleTime		    "-1"
+		    }
+		    Block {
+		    BlockType		    UnitDelay
+		    Name		    "Unit Delay1"
+		    SID			    "1146"
+		    Position		    [485, 158, 520, 192]
+		    ZOrder		    287
+		    InitialCondition	    "8.0"
+		    InputProcessing	    "Elements as channels (sample based)"
+		    SampleTime		    "-1"
+		    }
+		    Block {
+		    BlockType		    UnitDelay
+		    Name		    "Unit Delay2"
+		    SID			    "1147"
+		    Position		    [430, 158, 465, 192]
+		    ZOrder		    288
+		    InitialCondition	    "8.0"
+		    InputProcessing	    "Elements as channels (sample based)"
+		    SampleTime		    "-1"
+		    }
+		    Block {
+		    BlockType		    UnitDelay
+		    Name		    "Unit Delay3"
+		    SID			    "1148"
+		    Position		    [370, 158, 405, 192]
+		    ZOrder		    289
+		    InitialCondition	    "8.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -1311,7 +1343,7 @@ Model {
 		    ZOrder		    13
 		    SrcBlock		    "Constant7"
 		    SrcPort		    1
-		    DstBlock		    "Unit Delay"
+		    DstBlock		    "Unit Delay3"
 		    DstPort		    1
 		    }
 		    Line {
@@ -1333,7 +1365,7 @@ Model {
 		    ZOrder		    14
 		    SrcBlock		    "Unit Delay"
 		    SrcPort		    1
-		    Points		    [171, 0; 0, -20]
+		    Points		    [116, 0; 0, -20]
 		    DstBlock		    "Switch2"
 		    DstPort		    3
 		    }
@@ -1381,10 +1413,31 @@ Model {
 		    DstBlock		    "Goto1"
 		    DstPort		    1
 		    }
+		    Line {
+		    ZOrder		    23
+		    SrcBlock		    "Unit Delay1"
+		    SrcPort		    1
+		    DstBlock		    "Unit Delay"
+		    DstPort		    1
+		    }
+		    Line {
+		    ZOrder		    24
+		    SrcBlock		    "Unit Delay2"
+		    SrcPort		    1
+		    DstBlock		    "Unit Delay1"
+		    DstPort		    1
+		    }
+		    Line {
+		    ZOrder		    25
+		    SrcBlock		    "Unit Delay3"
+		    SrcPort		    1
+		    DstBlock		    "Unit Delay2"
+		    DstPort		    1
+		    }
 		    Annotation {
 		    SID			    "1098"
-		    Name		    "// ACTIVE"
-		    Position		    [464, 79, 515, 96]
+		    Name		    "// 8 - ACTIVE"
+		    Position		    [464, 79, 532, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -1434,7 +1487,7 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "FinalRoutes"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [1592, 0, 3656, 1128]
 		    Open		    off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
@@ -1470,6 +1523,7 @@ Model {
 		    SID			    "1045"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "elseif"
 		    }
 		    Block {
@@ -1535,6 +1589,7 @@ Model {
 		    SID			    "1139"
 		    Position		    [495, 158, 530, 192]
 		    ZOrder		    281
+		    InitialCondition	    "6.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -1617,8 +1672,8 @@ Model {
 		    }
 		    Annotation {
 		    SID			    "1055"
-		    Name		    "// FINALROUTES"
-		    Position		    [466, 79, 560, 96]
+		    Name		    "// 6 - FINALROUTES"
+		    Position		    [466, 79, 577, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -1902,7 +1957,7 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "Idle"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [1592, 0, 3656, 1128]
 		    Open		    off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
@@ -1938,6 +1993,7 @@ Model {
 		    SID			    "960"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "elseif"
 		    }
 		    Block {
@@ -1946,7 +2002,7 @@ Model {
 		    SID			    "961"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "1.0"
+		    Value		    "2.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -1954,7 +2010,7 @@ Model {
 		    SID			    "962"
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
-		    Value		    "2.0"
+		    Value		    "3.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -2003,6 +2059,7 @@ Model {
 		    SID			    "1135"
 		    Position		    [495, 158, 530, 192]
 		    ZOrder		    279
+		    InitialCondition	    "2.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -2085,8 +2142,8 @@ Model {
 		    }
 		    Annotation {
 		    SID			    "970"
-		    Name		    "// IDLE"
-		    Position		    [466, 79, 504, 96]
+		    Name		    "// 2 - IDLE"
+		    Position		    [466, 79, 521, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2104,8 +2161,8 @@ Model {
 		  Position		  [400, 27, 525, 1978]
 		  ZOrder		  260
 		  BackgroundColor	  "green"
-		  IfExpression		  "u1==0.0"
-		  ElseIfExpressions	  "u1==1.0, u1==2.0, u1==3.0, u1==4.0, u1==5.0, u1==6.0"
+		  IfExpression		  "u1==1.0"
+		  ElseIfExpressions	  "u1==2.0, u1==3.0, u1==4.0, u1==5.0, u1==6.0, u1==7.0"
 		}
 		Block {
 		  BlockType		  SubSystem
@@ -2119,7 +2176,7 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "Init"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [1592, 0, 3656, 1128]
 		    Open		    off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
@@ -2131,7 +2188,7 @@ Model {
 		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
 		    TiledPageScale	    1
 		    ShowPageBoundaries	    off
-		    ZoomFactor		    "200"
+		    ZoomFactor		    "195"
 		    Block {
 		    BlockType		    Inport
 		    Name		    "state"
@@ -2155,6 +2212,8 @@ Model {
 		    SID			    "424"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    BackgroundColor	    "red"
+		    InitializeStates	    "reset"
 		    ActionType		    "then"
 		    }
 		    Block {
@@ -2163,7 +2222,7 @@ Model {
 		    SID			    "459"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "0.0"
+		    Value		    "1.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -2171,7 +2230,7 @@ Model {
 		    SID			    "454"
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
-		    Value		    "1.0"
+		    Value		    "2.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -2220,6 +2279,8 @@ Model {
 		    SID			    "1134"
 		    Position		    [495, 158, 530, 192]
 		    ZOrder		    278
+		    BackgroundColor	    "red"
+		    InitialCondition	    "1.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -2302,8 +2363,8 @@ Model {
 		    }
 		    Annotation {
 		    SID			    "433"
-		    Name		    "// INIT"
-		    Position		    [466, 79, 499, 96]
+		    Name		    "// 1 - INIT"
+		    Position		    [466, 79, 516, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2371,6 +2432,7 @@ Model {
 		    SID			    "1011"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "elseif"
 		    }
 		    Block {
@@ -2379,7 +2441,7 @@ Model {
 		    SID			    "1012"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "3.0"
+		    Value		    "4.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -2387,7 +2449,7 @@ Model {
 		    SID			    "1013"
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
-		    Value		    "4.0"
+		    Value		    "5.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -2436,6 +2498,7 @@ Model {
 		    SID			    "1137"
 		    Position		    [495, 158, 530, 192]
 		    ZOrder		    279
+		    InitialCondition	    "4.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -2518,8 +2581,8 @@ Model {
 		    }
 		    Annotation {
 		    SID			    "1021"
-		    Name		    "// OPTIONROUTES"
-		    Position		    [466, 79, 572, 96]
+		    Name		    "// 4 - OPTIONROUTES"
+		    Position		    [466, 79, 589, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2586,6 +2649,7 @@ Model {
 		    SID			    "1060"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "elseif"
 		    }
 		    Block {
@@ -2594,7 +2658,7 @@ Model {
 		    SID			    "1061"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "6.0"
+		    Value		    "7.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -2602,7 +2666,7 @@ Model {
 		    SID			    "1078"
 		    Position		    [775, 40, 805, 70]
 		    ZOrder		    283
-		    Value		    "2.0"
+		    Value		    "3.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -2610,7 +2674,7 @@ Model {
 		    SID			    "1062"
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
-		    Value		    "7.0"
+		    Value		    "8.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -2685,6 +2749,7 @@ Model {
 		    SID			    "1140"
 		    Position		    [495, 158, 530, 192]
 		    ZOrder		    288
+		    InitialCondition	    "7.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -2786,8 +2851,8 @@ Model {
 		    }
 		    Annotation {
 		    SID			    "1071"
-		    Name		    "// OPTIONSELECTED"
-		    Position		    [466, 79, 586, 96]
+		    Name		    "// 7 - OPTIONSELECTED"
+		    Position		    [466, 79, 603, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -2868,6 +2933,7 @@ Model {
 		    SID			    "1028"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "elseif"
 		    }
 		    Block {
@@ -2876,7 +2942,7 @@ Model {
 		    SID			    "1029"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "4.0"
+		    Value		    "5.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -2884,7 +2950,7 @@ Model {
 		    SID			    "1030"
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
-		    Value		    "5.0"
+		    Value		    "6.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -2933,6 +2999,7 @@ Model {
 		    SID			    "1138"
 		    Position		    [500, 158, 535, 192]
 		    ZOrder		    279
+		    InitialCondition	    "5.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -3004,8 +3071,8 @@ Model {
 		    }
 		    Annotation {
 		    SID			    "1039"
-		    Name		    "// OPTIONSPUBLISHED"
-		    Position		    [466, 79, 599, 96]
+		    Name		    "// 5 - OPTIONSPUBLISHED"
+		    Position		    [466, 79, 616, 96]
 		    InternalMargins	    [0, 0, 0, 0]
 		    FixedHeight		    off
 		    FixedWidth		    off
@@ -3038,7 +3105,7 @@ Model {
 		  Variant		  off
 		  System {
 		    Name		    "SensorRequest"
-		    Location		    [1592, -8, 3656, 1120]
+		    Location		    [1592, 0, 3656, 1128]
 		    Open		    off
 		    ModelBrowserVisibility  on
 		    ModelBrowserWidth	    200
@@ -3074,6 +3141,7 @@ Model {
 		    SID			    "992"
 		    Position		    [435, 25, 494, 53]
 		    ZOrder		    223
+		    InitializeStates	    "reset"
 		    ActionType		    "elseif"
 		    }
 		    Block {
@@ -3082,7 +3150,7 @@ Model {
 		    SID			    "993"
 		    Position		    [670, 80, 700, 110]
 		    ZOrder		    272
-		    Value		    "2.0"
+		    Value		    "3.0"
 		    }
 		    Block {
 		    BlockType		    Constant
@@ -3090,7 +3158,7 @@ Model {
 		    SID			    "994"
 		    Position		    [385, 160, 415, 190]
 		    ZOrder		    267
-		    Value		    "3.0"
+		    Value		    "4.0"
 		    }
 		    Block {
 		    BlockType		    From
@@ -3139,6 +3207,7 @@ Model {
 		    SID			    "1136"
 		    Position		    [495, 158, 530, 192]
 		    ZOrder		    279
+		    InitialCondition	    "3.0"
 		    InputProcessing	    "Elements as channels (sample based)"
 		    SampleTime		    "-1"
 		    }
@@ -3585,6 +3654,27 @@ Model {
 		  DstBlock		  "Goto10"
 		  DstPort		  1
 		}
+		Annotation {
+		  SID			  "1143"
+		  Name			  "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<htm"
+		  "l><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</st"
+		  "yle></head><body style=\" font-family:'Arial'; font-size:10px; font-weight:400; font-style:normal;\">\n<p style=\""
+		  " margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px; -qt-us"
+		  "er-state:12;\">HOCKING FINDS</p>\n<ol style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right:"
+		  " 0px; -qt-list-indent: 1; -qt-list-number-suffix: ')';\"><li style=\" margin-top:0px; margin-bottom:0px; margin-le"
+		  "ft:12px; margin-right:0px; -qt-block-indent:1; text-indent:0px; -qt-user-state:31;\">from/goto flag</li>\n<li styl"
+		  "e=\" margin-top:0px; margin-bottom:0px; margin-left:12px; margin-right:0px; -qt-block-indent:1; text-indent:0px;\""
+		  ">lack of else (otherwise)</li>\n<li style=\" margin-top:0px; margin-bottom:0px; margin-left:12px; margin-right:0px"
+		  "; -qt-block-indent:1; text-indent:0px;\">double precision state values? and == operation</li></ol></body></html>"
+		  Position		  [-230, 72, 90, 126]
+		  InternalMargins	  [0, 0, 0, 0]
+		  FixedHeight		  off
+		  FixedWidth		  off
+		  HorizontalAlignment	  "left"
+		  VerticalAlignment	  "top"
+		  Interpreter		  "rich"
+		  ZOrder		  -1
+		}
 	      }
 	    }
 	    Block {
@@ -3707,6 +3797,7 @@ Model {
 	  Position		  [235, 398, 270, 432]
 	  ZOrder		  98
 	  BlockMirror		  on
+	  InitialCondition	  "1.0"
 	  InputProcessing	  "Elements as channels (sample based)"
 	  SampleTime		  "-1"
 	}
@@ -3717,7 +3808,7 @@ Model {
 	  Position		  [375, 498, 410, 532]
 	  ZOrder		  102
 	  BlockMirror		  on
-	  InitialCondition	  "1"
+	  InitialCondition	  "0.0"
 	  InputProcessing	  "Elements as channels (sample based)"
 	  SampleTime		  "-1"
 	}
@@ -3790,25 +3881,32 @@ Model {
       ZOrder		      1
       SrcBlock		      "fails"
       SrcPort		      1
-      DstBlock		      "FiniteStateMachine"
+      DstBlock		      "TaskServiceBase_FSM"
       DstPort		      1
     }
     Line {
       ZOrder		      6
-      SrcBlock		      "FiniteStateMachine"
+      SrcBlock		      "TaskServiceBase_FSM"
       SrcPort		      1
       DstBlock		      "STATE"
       DstPort		      1
     }
     Annotation {
-      SID		      "863"
-      Name		      "Task-Services Team\nAFRL Summer of Innovation 2017"
-      Position		      [300, 95, 463, 123]
+      SID		      "1145"
+      Name		      "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+      "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }"
+      "\n</style></head><body style=\" font-family:'Helvetica'; font-size:10px; font-weight:400; font-style:normal;\">\n"
+      "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inden"
+      "t:0px;\"><span style=\" font-size:14px; color:#002060;\">Task-Services Team</span></p>\n<p style=\" margin-top:0"
+      "px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" "
+      "font-size:14px; color:#002060;\">AFRL Summer of Innovation 2017</span></p></body></html>"
+      Position		      [300, 105, 515, 139]
       InternalMargins	      [0, 0, 0, 0]
       FixedHeight	      off
       FixedWidth	      off
       DropShadow	      on
-      ZOrder		      -1
+      Interpreter	      "rich"
+      ZOrder		      -2
     }
   }
 }
