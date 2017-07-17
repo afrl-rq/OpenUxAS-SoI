@@ -50,8 +50,8 @@ component Clock_Driver {
     has semaphore tb_dispatch_sem;
 
 
-    provides clkcar_inf clkcar;
     provides gen_fwd_inf clkcarfwd;
+    provides clkcar_inf clkcar;
 
 
 }

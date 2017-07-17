@@ -71,10 +71,10 @@ interface and so contention may occur.
  ************************************************************************/
  
 bool mission_write
-(const uint32_t * tb_mission_write) {
+(const bool * tb_mission_write) {
     bool tb_result = true ; 
 
-    tb_result &= tb_mission_write0_enqueue((uint32_t *)tb_mission_write);
+    tb_result &= tb_mission_write0_enqueue((bool *)tb_mission_write);
 
     return tb_result;
 }
@@ -103,10 +103,10 @@ static void tb_waypoint_write_notification_handler(void * unused) {
  ************************************************************************/
  
 bool waypoint_read
-(const uint32_t * tb_waypoint_read) {
+(const bool * tb_waypoint_read) {
     bool tb_result = true ; 
 
-    tb_result &= tb_waypoint_read0_enqueue((uint32_t *)tb_waypoint_read);
+    tb_result &= tb_waypoint_read0_enqueue((bool *)tb_waypoint_read);
 
     return tb_result;
 }
@@ -130,8 +130,8 @@ void pre_init(void) {
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Virtual_Machine_mission_read(const uint32_t * in_arg) {
-    mission_read((uint32_t *) in_arg);
+void tb_entrypoint_tb_Virtual_Machine_mission_read(const bool * in_arg) {
+    mission_read((bool *) in_arg);
 
 }
 
@@ -143,8 +143,8 @@ void tb_entrypoint_tb_Virtual_Machine_mission_read(const uint32_t * in_arg) {
  * context for the user-defined entrypoint, then calls it.
  *
  ************************************************************************/
-void tb_entrypoint_tb_Virtual_Machine_waypoint_write(const uint32_t * in_arg) {
-    waypoint_write((uint32_t *) in_arg);
+void tb_entrypoint_tb_Virtual_Machine_waypoint_write(const bool * in_arg) {
+    waypoint_write((bool *) in_arg);
 
 }
 

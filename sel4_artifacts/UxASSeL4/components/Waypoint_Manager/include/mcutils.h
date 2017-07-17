@@ -81,5 +81,6 @@ bool MCPrefix(const mc_t * orig_mc_ptr,
               mc_t * mc_new_ptr);
 
 void UnFixCopiedMC(mc_t * mc_ptr);
+bool FixCopiedMC(mc_t * mc_ptr);
 
 #endif /* __MCUTILS_H__ */
