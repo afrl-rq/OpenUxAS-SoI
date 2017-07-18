@@ -26,7 +26,9 @@ public
 	with AutomationRequestValidatorService_Pkg;	
 	with AutomationDiagramDataService_Pkg;
 	with PlanBuilderService_Pkg;
-	with RouteAggregatorService_Pkg;
+    with RouteAggregatorService_AggregatorRole_Pkg;
+    with RouteAggregatorService_CollectorRole_Pkg;
+--	with RouteAggregatorService_Pkg;
 	with RoutePlannerVisibilityService_Pkg;
 	with TaskManagerService_Pkg;
 	with TaskTrackerService_Pkg;
@@ -34,7 +36,7 @@ public
 	
 	-- Included Logging and Data Services
 	with MessageLoggerDataService_Pkg;
-	with SendMessagesService_Pkg;
+	with SendMessagesService_Pkg;	
     
 
     process waterways
@@ -80,7 +82,10 @@ public
             PatternSearchTask: thread PatternSearchTask_Package::PatternSearchTask;
             TaskTracker: thread TaskTrackerService_Pkg::TaskTrackerService;
             
-            RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
+--            RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
+            RouteAggregatorService_Collector: thread RouteAggregatorService_CollectorRole_Pkg::RouteAggregatorService_CollectorRole;
+            RouteAggregatorService_Aggregatore : thread RouteAggregatorService_AggregatorRole_Pkg::RouteAggregatorService_AggregatorRole;
+            
     	connections
     		
     		-- Connections that notify the AutomationRequestValidatorService that a task is initialized
@@ -422,5 +427,7 @@ public
         **};
             
     end waterways.i;
+
+
 
 end Waterways;
