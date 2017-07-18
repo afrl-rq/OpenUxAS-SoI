@@ -89,7 +89,7 @@ void mission_write(const bool * _UNUSED) {
   return;
 }
 
-void waypoint_write(const bool * _UNUSED) {
+void waypoint_write(const uint32_t * _UNUSED) {
   DEBUG(" Entry.");
   if(DeserializeMCFromBuffer((uint8_t *)mission, &nw) != true) {
     DEBUG(" Failed to deserialize buffer.");

@@ -38,7 +38,7 @@ AADL thread implementation Virtual_Machine.
 
 import <Timer.idl4>;
 import <tb_Monitor_bool_1.idl4>;
-
+import <tb_Monitor_uint32_t_1.idl4>;
 
 
 // Idl files for shared data accessors
@@ -65,7 +65,7 @@ component Virtual_Machine {
 
     uses tb_Monitor_bool_1 tb_mission_read;
     consumes QueuedData tb_mission_read_notification;
-    uses tb_Monitor_bool_1 tb_waypoint_write;
+    uses tb_Monitor_uint32_t_1 tb_waypoint_write;
     consumes QueuedData tb_waypoint_write_notification;
     uses tb_Monitor_bool_1 tb_waypoint_read0;
 

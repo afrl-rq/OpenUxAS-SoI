@@ -63,7 +63,6 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
     static size_t message_size;
     static bool gotCtrlStr = false;
     static bool gotSize = false;
-    bool _UNUSED = false;
     uint32_t i = 0;
     uint8_t sizeIndex;
 
@@ -87,7 +86,7 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
             if(message_index == message_size){
                 if(vm_got_mission_command){
                     *(mc_t *)waypoint = mc;
-                    waypoint_write(&_UNUSED);
+                    waypoint_write(&message_size);
                     vm_got_mission_command = false;
                 }
                 gotCtrlStr = gotSize = false;

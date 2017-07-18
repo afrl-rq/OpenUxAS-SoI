@@ -50,6 +50,9 @@ extern seL4_CPtr _fault_endpoint;
 //BEGIN SOI SPECIFIC STUFF
 
 bool wm_read = false;
+bool vm_reading_waypoing = false;
+size_t waypoint_bytes_to_read = 0;
+
 bool mission_write
 (const bool * tb_mission_write) {
     bool tb_result = true ; 
@@ -79,10 +82,10 @@ void handle_mission_read(uint32_t * var){
 
 void handle_waypoint_write(uint32_t * var){
     //printf("VM saw mission read from WM\n");
-    bool _UNUSED;
-    tb_waypoint_write_dequeue(&_UNUSED);
+    uint32_t bytes;
+    assert(waypoint_bytes_to_read == 0);
+    tb_waypoint_write_dequeue(&waypoint_bytes_to_read);
     printf("VM saw waypoint write\n");
-    waypoint_read(&_UNUSED);
 
     tb_waypoint_write_notification_reg_callback(handle_waypoint_write, NULL);
 }
@@ -91,8 +94,6 @@ pre_init(void){
     tb_mission_read_notification_reg_callback(handle_mission_read, NULL);
     tb_waypoint_write_notification_reg_callback(handle_waypoint_write, NULL);
 }
-
-
 
 static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
 //    vusb_device_t* vusb;
@@ -131,6 +132,8 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
     int addr;
     uint8_t data;
     static uint32_t bufIndex;
+    static size_t readIndex;
+    static bool reading = false;
     bool _UNUSED = false;
     //MissionSoftware__mission_command_impl buf;
 
@@ -151,6 +154,30 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
         if(fault_is_write(fault)){
             data = (uint8_t)fault_get_data(fault);
             (*mission)[bufIndex++] = data;
+        }
+    }else if(addr == 0xe0000004){
+        //this should return the number of bytes
+        //ready to be read if a LMCP message is available
+        if(fault_is_read(fault)){
+            assert(!reading);
+            if(waypoint_bytes_to_read > 0){
+                reading = true;
+                readIndex = 0;
+                fault_set_data(fault, waypoint_bytes_to_read);
+            }else{
+                fault_set_data(fault, 0);
+            }
+            return advance_fault(fault);
+        }
+    }else if(addr == 0xe0000008){
+        if(fault_is_read(fault)){
+            fault_set_data(fault, (*waypoint)[readIndex++]);
+            if(readIndex == waypoint_bytes_to_read){
+                reading = false;
+                waypoint_bytes_to_read = 0;
+                waypoint_read(&_UNUSED);
+            }
+            return advance_fault(fault);
         }
     }else{
         assert(0);
