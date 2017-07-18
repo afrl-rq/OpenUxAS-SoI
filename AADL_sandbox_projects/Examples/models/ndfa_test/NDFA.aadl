@@ -1,0 +1,33 @@
+package NDFA
+public
+	with ComponentA;
+	with ComponentB;
+	
+	process Composite
+		annex agree{**
+			assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+			eq event_ComponentA_out : bool;
+			eq ComponentB_State_3 : bool;
+			
+        	guarantee "Bounded Reachability of ComponentB State3" : 
+        		whenever event_ComponentA_out occurs ComponentB_State_3 occurs during [0.0,100.0];
+		**};
+	end Composite;
+	
+	process implementation Composite.impl
+		subcomponents
+			componentA : thread ComponentA::Component;
+			componentB : thread ComponentB::Component;
+		connections
+			conn1 : port ComponentA.output -> ComponentB.input;
+		
+		annex agree {**
+			assign event_ComponentA_out = event(componentA.output);
+			assign ComponentB_State_3 = (componentB.state = componentB.STATE3);
+		
+			lemma "Observer of ComponentB State3 (unbounded) Reachability" : componentB.state != componentB.STATE3;
+		**}	;
+		
+	end Composite.impl;
+	
+end NDFA;
