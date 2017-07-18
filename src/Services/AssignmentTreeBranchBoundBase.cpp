@@ -583,6 +583,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
             auto taskAssignmentSummary = std::make_shared<uxas::messages::task::TaskAssignmentSummary>();
 
             taskAssignmentSummary->setOperatingRegion(assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getOperatingRegion());
+            taskAssignmentSummary->setCorrespondingAutomationRequestID(assigmentPrerequisites->m_uniqueAutomationRequest->getRequestID());
 
             for (auto itVehicleAssignments = nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.begin();
                     itVehicleAssignments != nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.end();
