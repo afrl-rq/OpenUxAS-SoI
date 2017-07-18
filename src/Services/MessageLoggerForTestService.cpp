@@ -15,6 +15,8 @@
 
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/SessionStatus.h"
+#include "afrl/cmasi/AirVehicleConfiguration.h"
+#include "afrl/cmasi/CameraConfiguration.h"
 
 
 #include <chrono>
@@ -46,6 +48,7 @@ MessageLoggerForTestService::configure(const pugi::xml_node& serviceXmlNode)
 {
     staliroInterface = testgeneration::staliro::c_CommunicationInterface::getInstance();
     
+    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(afrl::cmasi::SessionStatus::Subscription);
 
@@ -68,6 +71,27 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::AirVehicleState::TypeName)
         {
             staliroTrajectoryPopulator->populateTrajectory((void *) receivedLmcpMessage->m_object.get(), &trajectory);
+        }
+        else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::AirVehicleConfiguration::TypeName)
+        {
+            afrl::cmasi::AirVehicleConfiguration* airVehicleConfig = 
+                    (afrl::cmasi::AirVehicleConfiguration*) receivedLmcpMessage->m_object.get();
+            
+            std::vector< afrl::cmasi::PayloadConfiguration* > payloadConfigList = 
+                    airVehicleConfig->getPayloadConfigurationList();
+            
+            for (std::vector< afrl::cmasi::PayloadConfiguration* >::iterator plIter = payloadConfigList.begin(); 
+                    plIter < payloadConfigList.end(); 
+                    plIter++)
+            {
+                if ((*plIter)->getLmcpTypeName() == "CameraConfiguration")
+                {
+                    uint32_t horRes = static_cast<afrl::cmasi::CameraConfiguration*>(*plIter)->getVideoStreamHorizontalResolution();
+                    uint32_t verRes = static_cast<afrl::cmasi::CameraConfiguration*>(*plIter)->getVideoStreamVerticalResolution();
+                    
+                    staliroTrajectoryPopulator->setCameraPixelCount(airVehicleConfig->getID(), horRes, verRes);
+                }
+            }           
         }
         else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::SessionStatus::TypeName)
         {

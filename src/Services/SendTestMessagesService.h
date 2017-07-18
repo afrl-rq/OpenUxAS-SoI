@@ -50,7 +50,7 @@ namespace test
 class SendTestMessagesService : public SendMessagesService
 {
 public:
-    using ServiceBase::ServiceBase;
+    using SendMessagesService::SendMessagesService;
     static const std::string&
     s_typeName() { static std::string s_string("SendTestMessagesService"); return (s_string); };
 
