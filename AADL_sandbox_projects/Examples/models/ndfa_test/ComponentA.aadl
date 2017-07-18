@@ -57,7 +57,7 @@ public
 		-------------------------------------------------------------
 		
 		guarantee "Send output when output is ready in STATE2":
-			(state = STATE2 and output_ready) =>
+			(state = STATE2 and output_ready) <=>
 				event(output);
 		
 			
