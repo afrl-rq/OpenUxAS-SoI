@@ -5,11 +5,12 @@ public
 	
 	process Composite
 		annex agree{**
-			assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+			--assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+			
 			eq event_ComponentA_out : bool;
 			eq ComponentB_State_3 : bool;
 			
-        	guarantee "Bounded Reachability of ComponentB State3" : 
+        	guarantee "Bounded Reachability of ComponentB State3: Reached within 100 time units" : 
         		whenever event_ComponentA_out occurs ComponentB_State_3 occurs during [0.0,100.0];
 		**};
 	end Composite;
@@ -25,7 +26,11 @@ public
 			assign event_ComponentA_out = event(componentA.output);
 			assign ComponentB_State_3 = (componentB.state = componentB.STATE3);
 		
-			lemma "Observer of ComponentB State3 (unbounded) Reachability" : componentB.state != componentB.STATE3;
+			lemma "Observer: ComponentB State3 (unbounded) Reachability" : componentB.state != componentB.STATE3;
+			
+			eq true_var : bool = true;
+			eq compA_state2_check : bool = componentA.state = componentA.STATE2;
+			lemma "componentA state2 is reached by time step 3" : whenever true_var occurs compA_state2_check occurs during [0.0,3.0];
 		**}	;
 		
 	end Composite.impl;

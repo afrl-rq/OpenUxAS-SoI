@@ -6,6 +6,9 @@ public
 			input: in event data port Base_Types::Integer;
 			
 		annex agree {**
+				
+		--assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+		
 		-------------------------------------------------------------
   		-- BEGIN STATE MACHINE LOGIC
 		-------------------------------------------------------------
@@ -35,10 +38,10 @@ public
 		-------------------------------------------------------------	
 		--State transition macros
 		eq T_ONE_TO_TWO : bool = 
-			false -> ((previous_state = STATE1) and system_ready);
+			false -> ((previous_state = STATE1) and pre(system_ready));
 			
 		eq T_TWO_TO_ONE : bool = 
-			false -> ((previous_state = STATE2) and (system_timeout));
+			false -> ((previous_state = STATE2) and pre(system_timeout));
 		
 		eq T_TWO_TO_THREE : bool = 
 			false -> ((previous_state = STATE2) and (pre(event(input))));
@@ -63,7 +66,20 @@ public
 		-- END STATE MACHINE LOGIC
 		-------------------------------------------------------------
 		
+		eq state1_entry : bool = true -> (T_TWO_TO_ONE);
+		eq state2_entry : bool = false -> (T_ONE_TO_TWO);
+		
+		--Timing guarantees
+		guarantee "The system is ready within 2 time units after entry of STATE1"	:
+			whenever state1_entry occurs system_ready occurs during [0.0,2.0];
 			
+--		guarantee "The system transitions to STATE2 within 3 time units after entry of STATE1"	:
+--			whenever state1_entry occurs state2_entry occurs during [0.0,3.0];
+--			
+		guarantee "The system timeouts at exactly 20 time units after entry into STATE2" :
+			whenever state2_entry occurs system_timeout exclusively occurs during [20.0,20.0];
+			
+		--TODO: what does this say about system_timeout in all other states and time steps?
 		**};
 	end Component;
 end ComponentB;

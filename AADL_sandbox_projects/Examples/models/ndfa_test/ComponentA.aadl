@@ -6,6 +6,9 @@ public
 			output: out event data port Base_Types::Integer;
 			
 		annex agree {**
+				
+		--assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+				
 		-------------------------------------------------------------
   		-- BEGIN STATE MACHINE LOGIC
 		-------------------------------------------------------------
@@ -33,7 +36,7 @@ public
 		-------------------------------------------------------------	
 		--State transition macros
 		eq T_ONE_TO_TWO : bool = 
-			false -> ((previous_state = STATE1) and system_ready);
+			false -> ((previous_state = STATE1) and pre(system_ready));
 		
 		eq T_TWO_TO_ONE : bool = 
 			false -> ((previous_state = STATE2) and (pre(event(output))));
@@ -59,8 +62,30 @@ public
 		guarantee "Send output when output is ready in STATE2":
 			(state = STATE2 and output_ready) <=>
 				event(output);
+				
+		guarantee "Output is not ready in STATE1" :
+			state = STATE1 => not output_ready;
 		
+		eq state1_entry : bool = true -> (T_TWO_TO_ONE);
+		eq state2_entry : bool = false -> (T_ONE_TO_TWO);
+		eq output_event : bool = false -> (event(output));
+		eq not_output_event : bool = true -> (not event(output));
+		eq not_output_ready : bool = false -> (not output_ready);
+		
+		--Timing Gurantees
+		guarantee "The system is ready within 2 time units after entry of STATE1"	:
+			whenever state1_entry occurs system_ready occurs during [0.0,2.0];
 			
+		--TODO: I do not know why this guarantee is necessary to prove system-level properties
+		guarantee "The system transitions to STATE2 within 3 time units after entry of STATE1"	:
+			whenever state1_entry occurs state2_entry occurs during [0.0,3.0];
+			
+		guarantee "The system prepares an output at exactly 4 time units after entry of STATE2" :
+			whenever state2_entry occurs output_ready exclusively occurs during [4.0,4.0];
+			
+--		guarantee "The system sends an output at exactly 4 time units after entry of STATE2" :
+--			whenever state2_entry occurs output_event exclusively occurs during [4.0,4.0];
+--			
 		**};
 	end Component;
 end ComponentA;
