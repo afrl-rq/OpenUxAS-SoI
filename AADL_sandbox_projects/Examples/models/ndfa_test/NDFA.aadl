@@ -1,0 +1,20 @@
+package NDFA
+public
+	with ComponentA;
+	with ComponentB;
+	
+	process Composite
+		annex agree{**
+			guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+		**};
+	end Composite;
+	
+	process implementation Composite.impl
+		subcomponents
+			componentA : thread ComponentA::Component;
+			componentB : thread ComponentB::Component;
+		connections
+			conn1 : port ComponentA.output -> ComponentB.input;
+	end Composite.impl;
+	
+end NDFA;
