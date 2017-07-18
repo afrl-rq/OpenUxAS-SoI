@@ -336,6 +336,7 @@ impl PlanBuilder {
                 }
             }).collect();
             TaskImplementationRequest {
+                corresponding_automation_request_id: id,
                 request_id: self.task_implementation_id,
                 starting_waypoint_id: ps.final_waypoint_id + 1,
                 vehicle_id: ta.assigned_vehicle,
@@ -347,7 +348,6 @@ impl PlanBuilder {
                 start_position: ps.state.planning_position.clone(),
                 start_time: ps.time,
                 neighbor_locations: neighbors,
-                ..Default::default()
             }
         };
 
