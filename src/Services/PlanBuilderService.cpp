@@ -230,7 +230,7 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
         return false;
 
     auto taskImplementationRequest = std::make_shared<uxas::messages::task::TaskImplementationRequest>();
-    //taskImplementationRequest->setCorrespondingAutomationRequestID(uniqueRequestID);
+    taskImplementationRequest->setCorrespondingAutomationRequestID(uniqueRequestID);
     m_expectedResponseID[m_taskImplementationId] = uniqueRequestID;
     taskImplementationRequest->setRequestID(m_taskImplementationId++);
     taskImplementationRequest->setStartingWaypointID( (*planState)->finalWaypointID + 1 );

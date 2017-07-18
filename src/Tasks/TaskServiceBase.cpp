@@ -631,6 +631,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 // build a TaskImplementationResponse
                                 auto taskImplementationResponse = std::make_shared<uxas::messages::task::TaskImplementationResponse>();
                                 taskImplementationResponse->setResponseID(itTaskImplementationRequest->second->getRequestID());
+                                taskImplementationResponse->setCorrespondingAutomationRequestID(itTaskImplementationRequest->second->getCorrespondingAutomationRequestID());
                                 taskImplementationResponse->setTaskID(m_task->getTaskID());
                                 taskImplementationResponse->setOptionID(optionId);
                                 taskImplementationResponse->setVehicleID(vehicleId);
@@ -721,6 +722,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 // send out the blank response
                                 auto taskImplementationResponse = std::make_shared<uxas::messages::task::TaskImplementationResponse>();
                                 taskImplementationResponse->setResponseID(itTaskImplementationRequest->second->getRequestID());
+                                taskImplementationResponse->setCorrespondingAutomationRequestID(itTaskImplementationRequest->second->getCorrespondingAutomationRequestID());
                                 taskImplementationResponse->setTaskID(m_task->getTaskID());
                                 taskImplementationResponse->setOptionID(optionId);
                                 taskImplementationResponse->setVehicleID(vehicleId);
