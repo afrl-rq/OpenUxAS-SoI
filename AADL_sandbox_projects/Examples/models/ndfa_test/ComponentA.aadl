@@ -1,0 +1,66 @@
+package ComponentA
+public
+	with Base_Types;
+	thread Component
+		features 
+			output: out event data port Base_Types::Integer;
+			
+		annex agree {**
+		-------------------------------------------------------------
+  		-- BEGIN STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		--State constants
+ 		const STATE1 : int = 0;
+        const STATE2 : int = 1;
+
+		-------------------------------------------------------------
+		--State variable
+		eq state: int;
+
+		-------------------------------------------------------------
+		--State machine support macros		
+
+		eq previous_state: int = prev(state, STATE1);
+
+		eq some_transition: bool = T_ONE_TO_TWO 
+									or T_TWO_TO_ONE;
+									
+		-------------------------------------------------------------
+		--Helper Macro: current system state
+		eq system_ready: bool;
+		eq output_ready: bool;
+								
+		-------------------------------------------------------------	
+		--State transition macros
+		eq T_ONE_TO_TWO : bool = 
+			false -> ((previous_state = STATE1) and system_ready);
+		
+		eq T_TWO_TO_ONE : bool = 
+			false -> ((previous_state = STATE2) and (pre(event(output))));
+			
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (state = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_ONE_TO_TWO_effect" : T_ONE_TO_TWO => (state = STATE2);
+        
+        guarantee "T_TWO_TO_ONE_effect" : T_TWO_TO_ONE => (state = STATE1);							
+		-------------------------------------------------------------
+		-- END STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		
+		guarantee "Send output when output is ready in STATE2":
+			(state = STATE2 and output_ready) <=>
+				event(output);
+		
+			
+		**};
+	end Component;
+end ComponentA;
