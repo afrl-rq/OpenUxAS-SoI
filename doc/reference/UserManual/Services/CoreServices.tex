@@ -73,6 +73,17 @@ vehicles in a particular airspace configuration (described by an
 \emph{OperatingRegion}).
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(2 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Determines validity of \emph{AutomationRequest}. \textbf{idle}
+-\textgreater{} \textbf{busy}, emit \emph{UniqueAutomationRequest}
+\textbf{busy} -\textgreater{} \textbf{busy}, add
+\emph{UniqueAutomationRequest} to queue
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityConfiguration}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -80,6 +91,16 @@ Vehicle capabilities (e.g.~allowable speeds) are described by entity
 configuration messages. Any vehicle requested in an
 \emph{AutomationRequest} must previously be described by an associated
 \emph{EntityConfiguration}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step. \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityState}
@@ -90,11 +111,31 @@ position, speed, and fuel status. Each vehicle in an
 \emph{AutomationRequest} must have reported its state.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step. \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{Task}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Details a particular task that will be referenced (by ID) in an
 \emph{AutomationRequest}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step. \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{TaskInitialized}
@@ -106,12 +147,32 @@ must be initialized before a \emph{UniqueAutomationRequest} is
 published.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{KeepOutZone}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Polygon description of a region in which vehicles must not travel. If
 referenced by the \emph{OperatingRegion} in the
 \emph{AutomationRequest}, zone must exist for request to be valid.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step. \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{KeepInZone}
@@ -122,6 +183,16 @@ travel. If referenced by the \emph{OperatingRegion} in the
 \emph{AutomationRequest}, zone must exist for request to be valid.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step. \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{OperatingRegion}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -130,12 +201,36 @@ allowable space for vehicular travel. Must be defined for
 \emph{AutomationRequest} to be valid.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in validation step. \textbf{idle}
+-\textgreater{} \textbf{idle}, add to storage \textbf{busy}
+-\textgreater{} \textbf{busy}, add to storage
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{UniqueAutomationResponse}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Completed response from the rest of the task assignment process.
 Indicates that the next \emph{AutomationRequest} is ready to be
 processed.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+If response ID does not match request ID at top of queue, ignore and
+remain in current state. Otherwise: \textbf{idle} -\textgreater{}
+\textbf{idle}, normal operation should preclude receiving this message
+in the \textbf{idle} state \textbf{busy}, emit corresponding
+\emph{AutomationResponse} If queue is empty, \textbf{busy}
+-\textgreater{} \textbf{idle}, else \textbf{busy} -\textgreater{}
+\textbf{busy}, emit request message at top of queue
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -232,6 +327,14 @@ make the appropriate service creation message to build a service that
 directly handles this requested Task.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Emit \emph{CreateNewService} message
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{RemoveTasks}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -239,6 +342,14 @@ Indicates that Task is no longer needed and will not be included in
 future \emph{AutomationRequest} messages. Task manager will send the
 proper \emph{KillService} message to remove the service that was
 constructed to handle the requested Task.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Emit \emph{KillService} message corresponding to \emph{Task}
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityConfiguration}
@@ -249,12 +360,28 @@ configuration messages. New Tasks are informed of all known entities
 upon creation.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store to report during \emph{Task} creation
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityState}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Describes the actual state of a vehicle in the system including
 position, speed, and fuel status. New Tasks are informed of all known
 entity states upon creation.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store to report during \emph{Task} creation
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{AreaOfInterest} \emph{LineOfInterest} \emph{PointOfInterest}
@@ -264,11 +391,27 @@ Describes known geometries of areas, lines, and points. New Tasks are
 informed of all such named areas upon creation.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store to report during \emph{Task} creation
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{MissionCommand}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Describes current set of waypoints that a vehicle is following. New
 Tasks are informed of all known current waypoint routes upon creation.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store to report during \emph{Task} creation
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -455,6 +598,18 @@ of this message, if a \emph{Task} ID is included, it will publish
 \emph{TaskPlanOptions}.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(2 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+If included in the request, begin process of calculating task options
+and costs by emitting \emph{SensorFootprintRequests} \textbf{Idle}
+-\textgreater{} \textbf{SensorRequest} in normal operation
+\textbf{OptionSelected} -\textgreater{} \textbf{SensorRequest}, when
+interrupted
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{TaskImplementationRequest}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -464,6 +619,16 @@ requested to build the final set of waypoints that complete the
 the route \textbf{to} the \emph{Task} as well as waypoints that
 implement the \emph{Task}. For each on-task waypoint, the
 \emph{AssociatedTaskList} must include the \emph{Task} ID.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(2 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{OptionsPublished} -\textgreater{} \textbf{FinalRoutes}, emit
+\emph{RouteRequest} to determine final waypoint routes needed for
+implementation
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityConfiguration}
@@ -478,6 +643,14 @@ include that vehicle ID in the list of eligible entities reported as
 part of an option.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Add to internal storage for use in calculating options No state change
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityState}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -489,6 +662,17 @@ When a \emph{Task} ID is listed in the \emph{AssociatedTaskList} of an
 waypoints and sensor commands at will.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{OptionSelected}: if \emph{Task} ID is listed in
+\emph{AssociatedTaskList}, then -\textgreater{} \textbf{Active}
+\textbf{Active}: if \emph{Task} ID is NOT listed in
+\emph{AssociatedTaskList}, then -\textgreater{} \textbf{Completed}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{RouteResponse}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -497,6 +681,34 @@ through an \emph{OperatingRegion}. A \emph{Task} must request the
 waypoints to route a vehicle from its last to the start of the
 \emph{Task}. Additionally, this message can be used to obtain on-task
 waypoints.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{OptionRoutes} -\textgreater{} \textbf{OptionsPublished}, emit
+\emph{TaskPlanOptions} \textbf{FinalRoutes} -\textgreater{}
+\textbf{OptionSelected}, emit \emph{TaskImplementationResponse}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{SensorFootprintResponse}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Collection of sensor information at different conditions corresponding
+to a \emph{SensorFootprintRequests} message. Used to determine if a
+particular entity with known sensor payloads can meet the sensor
+resolution constraints required to fulfill this \emph{Task}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{SensorRequest} -\textgreater{} \textbf{OptionRoutes}, emit
+\emph{RouteRequest} to determine on-\emph{Task} waypoints
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -548,6 +760,15 @@ Collection of route plan requests to leverage the route planner
 capability of constructing waypoints that adhere to the designated
 \emph{OperatingRegion}. This request is made for waypoints en-route to
 the \emph{Task} as well as on-task waypoints.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\emph{SensorFootprintRequests}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Collection of requests to the \emph{SensorManagerService} to determine
+ground-sample distances possible for each potential entity. Uses camera
+and gimbal information from the cached \emph{EntityConfiguration}
+messages.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{VehicleActionCommand}
@@ -626,12 +847,29 @@ Description
 \midrule
 \endhead
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
-\emph{RoutePlanRequest}
+\emph{RoutePlanRequest} ``AircraftPathPlanner''
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Primary message that describes a route plan request. A request considers
 only a single vehicle in a single \emph{OperatingRegion} although it can
 request multiple pairs of start and end locations with a single message.
+In addition to subscribing to \emph{RoutePlanRequest}, this service also
+subscribes to the group mailbox ``AircraftPathPlanner''. Upon reception
+of a message on this channel, the service will process it as if it came
+over the broadcast channel. The return message always uses
+return-to-sender addressing.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(10 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+For each start/end pair, this service will compute a path that respects
+the geometric constraints imposed by the corresponding
+\emph{OperatingRegion}. For each start/end pair, the route planner could
+reasonably work for 10ms to complete the calculation. Once all have been
+calculated, emits \emph{RoutePlanResponse}.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{KeepOutZone}
@@ -642,12 +880,28 @@ service will track all \emph{KeepOutZones} to compose them upon
 reception of an \emph{OperatingRegion}.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store for use during calculation of operating region map
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{KeepInZone}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Polygon description of a region in which vehicles must remain during
 travel. This service will track all \emph{KeepInZones} to compose them
 upon reception of an \emph{OperatingRegion}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store for use during calculation of operating region map
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{OperatingRegion}
@@ -662,6 +916,17 @@ manipulated to add start/end locations and perform the shortest path
 search.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(20 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+To respond quickly to \emph{RoutePlanRequest} messages, the
+\emph{RoutePlannerVisibilityService} will create a pre-processed map
+using the geometric constraints from the \emph{OperatingRegion}. The
+result is stored for later requests.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityConfiguration}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -672,15 +937,13 @@ routes are then returned at the nominal speed and with turns
 approximating the minimum turn radius.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
-``AircraftPathPlanner''
+\begin{verbatim}
+(20 ms work)
+\end{verbatim}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
-In addition to subscribing to the above broadcasted messages, this
-service also subscribes to the group mailbox for path planners that
-service aircraft requests. Upon reception of a message on this channel,
-the service will check for one of the above messages and process it as
-if it came from over the broadcast channel. In either case, the return
-message always uses return-to-sender addressing.
+Stored for use during \emph{RoutePlanRequest}s. Also used to update
+operating region maps based on the capability of the entity.
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -787,6 +1050,18 @@ heterogeneous vehicles. The \emph{Aggregator} will make a series of
 request.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{idle} -\textgreater{} \textbf{pending}, indexed by
+\emph{RouteRequest} request ID, create a checklist of expected
+responses. Emit a number of \emph{RoutePlanRequest} messages equal to
+the number of vehicles in the \texttt{VehicleID} field of the original
+\emph{RouteRequest}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityConfiguration}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -797,12 +1072,32 @@ ground planners are used for ground vehicles and air planners are used
 for aircraft.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+No state change. Store to identify appropriate route planner by vehicle
+ID.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{RoutePlanResponse}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 This message is the fulfillment of a single vehicle route plan request
 which the \emph{Aggregator} catalogues until the complete set of
 expected responses is received.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store response and check to see if this message completes any checklist.
+If a checklist is complete, use the corresponding request ID to create a
+complete \emph{RouteResponse} message. Emit \emph{RouteResponse} and
+\textbf{pending} -\textgreater{} \textbf{idle}.
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -915,14 +1210,37 @@ reception of this message and later used to ensure that all included
 \emph{Tasks} have responded.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{Idle} -\textgreater{} \textbf{OptionsWait}, create checklist of
+expected task options.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{TaskPlanOptions}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Primary message from \emph{Tasks} that prescribe available start and end
-locations for each option as well as cost to complete the option. In the
-\textbf{RoutePending} state, the \emph{Collector} will use the current
-location of the vehicle to create paths from each vehicle to each task
-option and from each task option to every other task option.
+locations for each option as well as cost to complete the option. Once
+all expected \emph{TaskPlanOptions} have been received, the
+\emph{Collector} will use the current locations of the vehicles to
+request paths from each vehicle to each task option and from each task
+option to every other task option.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store task options and check to see if this message completes the
+checklist. If the checklist is complete, create a series of
+\emph{RoutePlanRequest} messages to find routes from the current
+locations of vehicles to each task and from each task to every other
+task. Emit this series of \emph{RoutePlanRequest} messages,
+\textbf{OptionsWait} -\textgreater{} \textbf{RoutePending}.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityState}
@@ -934,12 +1252,31 @@ and cost estimates from the associated vehicle position and heading to
 the task option start locations.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+No state change. Store for use in requesting routes from vehicle
+positions to task start locations.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{RoutePlanResponse}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 This message is the fulfillment of a single vehicle route plan request
 which the \emph{Collector} catalogues until the complete set of expected
 responses is received.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Store response and check to see if this message completes the cost
+matrix. If so, emit \emph{AssignmentCostMatrix} and
+\textbf{RoutePending} -\textgreater{} \textbf{Idle}.
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -1085,6 +1422,16 @@ reception of this message and later used to ensure that all included
 \emph{Tasks} have responded.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{idle} -\textgreater{} \textbf{wait}, store request ID for
+identification of corresponding \emph{TaskPlanOptions} and
+\emph{AssignmentCostMatrix}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{TaskPlanOptions}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -1093,6 +1440,15 @@ locations for each option as well as cost to complete the option. In the
 \textbf{wait} state, this service will store all reported options for
 use in calculating mission cost for vehicles when considering possible
 assignments.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+No state change. Store cost of each task option for look-up during
+optimization.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{AssignmentCostMatrix}
@@ -1105,6 +1461,19 @@ factor in determining which vehicle could most efficiently reach a
 \emph{TaskPlanOptions}, a complete reasoning over both traveling to and
 completing a \emph{Task} can be looked up during the search over
 possible \emph{Task} orderings.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(1500 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Using the cost of each task option (from the stored
+\emph{TaskPlanOptions} messages) and the cost for each vehicle to reach
+each option (from \emph{AssignmentCostMatrix}), perform an optimization
+attempting to find the minimal cost mission that adheres to the Process
+Algebra contraints. Upon completion, emit \emph{TaskAssignmentSummary}
+and \textbf{wait} -\textgreater{} \textbf{idle}.
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -1213,6 +1582,16 @@ messsage, the \emph{PlanBuilderService} queries each \emph{Task} in
 order for the final waypoint paths.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(2 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+\textbf{idle} -\textgreater{} \textbf{busy}, create a queue of ordered
+\emph{TaskImplementationRequest} messages in the order prescribed by the
+\emph{TaskAssignmentSummary}. Emit request at top of queue.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{EntityState}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
@@ -1221,6 +1600,15 @@ position, speed, and fuel status. This message is used to inform the
 first \emph{Task} of the location of the vehicles. Subsequent
 \emph{Tasks} use the predicted positions and headings of vehicles after
 previous \emph{Tasks} have reported waypoints earlier in the mission.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+No state change. Store for use in creating
+\emph{TaskImplementationRequest} messages.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{TaskImplementationResponse}
@@ -1232,12 +1620,35 @@ and carry it out correctly. The ordered collection of these messages are
 used to build the final \emph{UniqueAutomationResponse}.
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(2 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+Remove top of task request queue and update predicted locations of
+vehicles. If task request queue is not empty, configure request at top
+of queue with predicted vehicle positions and emit the corresponding
+\emph{TaskImplementationRequest} message. If queue is empty,
+\textbf{busy} -\textgreater{} \textbf{idle}.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
 \emph{UniqueAutomationRequest}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
 Informs this service of a new mission request in the system. Contains
 the desired starting locations and headings of the vehicles that are to
 be considered as part of the solution.
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.29\columnwidth}\raggedright\strut
+\begin{verbatim}
+(0 ms work)
+\end{verbatim}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.65\columnwidth}\raggedright\strut
+No state change. Store for use in creating
+\emph{TaskImplementationRequest} messages. Note, positions in
+\emph{UniqueAutomationRequest} override reported state positions stored
+when \emph{EntityState} messages are received.
 \strut\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
