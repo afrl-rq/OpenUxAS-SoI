@@ -230,6 +230,19 @@
                       {Assumption A} is satisfied in the implementation
 
                       <s
+                          id="__gsn__15d51fc7ba1"
+                          optional="true"
+                          name="Composition Scheme">
+                        {scheme}
+
+                        <contract
+                            id="__gsn__15d51fcc7be"
+                            name="Design Demand Satisfied by {X}">
+                          Component {X} satisfies {Assumption A}
+                        </contract>
+                      </s>
+
+                      <s
                           id="__gsn__15d32ebd078"
                           optional="true"
                           name="Evidence Scheme">
@@ -278,6 +291,19 @@
                         id="__gsn__15d32f0157b"
                         name="{Guarantee G}">
                       {Guarantee G} is satisfied in the implementation
+
+                      <s
+                          id="__gsn__15d51fe2d34"
+                          optional="true"
+                          name="Composition Scheme">
+                        {scheme}
+
+                        <contract
+                            id="__gsn__15d51fe2d35"
+                            name="Design Demand Satisfied by {Y}">
+                          Component {Y} satisfies {Guarantee G}
+                        </contract>
+                      </s>
 
                       <s
                           id="__gsn__15d32f0f597"
