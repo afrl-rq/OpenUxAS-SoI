@@ -80,6 +80,7 @@ public
 		guarantee "The system transitions to STATE2 within 3 time units after entry of STATE1"	:
 			whenever state1_entry occurs state2_entry occurs during [0.0,3.0];
 			
+		--TODO: add a descriptive comment about the use of exclusively
 		guarantee "The system prepares an output at exactly 4 time units after entry of STATE2" :
 			whenever state2_entry occurs output_ready exclusively occurs during [4.0,4.0];
 			
