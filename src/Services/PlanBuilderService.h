@@ -123,64 +123,7 @@ private:
     configure(const pugi::xml_node& serviceXmlNode) override;
 
     bool
-    processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
-    
-    void processTaskAssignmentSummary(const std::shared_ptr<uxas::messages::task::TaskAssignmentSummary>& taskAssignmentSummary);
-    void processTaskImplementationResponse(const std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse);
-    void sendError(std::string& errMsg);
-    
-    bool sendNextTaskImplementationRequest(int64_t uniqueRequestID);
-    void checkNextTaskImplementationRequest(int64_t uniqueRequestID);
-    
-    /*! \brief  nested class for tracking projected state of an entity during the plan building process */
-    class ProjectedState {
-    public:
-        ProjectedState() {};
-        ~ProjectedState() { if(state) delete state; };
-        void setState(uxas::messages::task::PlanningState* newState) {
-            if(state) delete state;
-            state = newState;
-        };
-        uxas::messages::task::PlanningState* state{nullptr};
-        int64_t finalWaypointID{0};
-        int64_t time{0}; // ms since 1 Jan 1970
-    };
-
-    /*! \brief  unique automation requests with key of corresponding unique automation request ID */
-    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_uniqueAutomationRequests;
-    
-    /*! \brief  in progress build of unique automation response with key of corresponding unique automation request ID */
-    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::UniqueAutomationResponse> > m_inProgressResponse;
-    
-    /*! \brief  task assignment summaries with key of corresponding unique automation request ID */
-    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> > m_assignmentSummaries;
-    
-    /*! \brief  projected entity states with key of corresponding unique automation request ID */
-    std::unordered_map< int64_t, std::vector< std::shared_ptr<ProjectedState> > > m_projectedEntityStates;
-    
-    /*! \brief  Track which task assignments have yet to be completed with key of corresponding unique automation request ID */
-    std::unordered_map< int64_t, std::deque< std::shared_ptr<uxas::messages::task::TaskAssignment> > > m_remainingAssignments;
-    
-    /*! \brief  When in the 'busy' state, the key of the currently pending task implementation request ID
-     *          mapped to the unique automation request ID (backwards from normal for easy look-up) */
-    std::unordered_map< int64_t, int64_t > m_expectedResponseID;
-    
-    /*! \brief  latest entity states (used to get starting heading, position, and time) with key of entity ID */
-    std::unordered_map< int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_currentEntityStates;
-
-
-    /*! \brief  this stores the next unique ID to be used when requesting task
-     *          implementations. Incremented by one after use. */
-    int64_t m_taskImplementationId{1};
-
-    /*! \brief  this stores the next unique ID to be used when building a 
-     *          waypoint list. Incremented by one after use. */
-    int64_t m_commandId{1};
-
-    /*! \brief  this is the distance to add to the position of the vehicle, in the
-     * direction that the vehicle is headed, to calculate the starting point for 
-     * new plans. Can be changed in XML configuration. */
-    double m_assignmentStartPointLead_m{50.0};
+    processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;    
 
     /*! \brief  the state of the Rust implementation of PlanBuilder */
     void* m_PlanBuilder;

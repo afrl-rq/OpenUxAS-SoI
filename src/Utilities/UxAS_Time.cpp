@@ -303,7 +303,3 @@ Time::calibrateWithReferenceUtcTimeImpl(int year, int month, int day, int weeks,
 
 }; //namespace common
 }; //namespace uxas
-
-int64_t get_utc_time_since_epoch_ms() {
-  return uxas::common::Time::getInstance().getUtcTimeSinceEpoch_ms();
-}
