@@ -71,7 +71,8 @@ public
             ImpactAutomationRequest_in: in event data port impact::ImpactAutomationRequest.i;
             LineOfInterest_in: in event data port impact::LineOfInterest.i;
                     --note that the code does not actually subscribe to "ServiceStatus" currently
-            ServiceStatus_in: in event data port cmasi::ServiceStatus.i;
+            --TODO: derek suggests ServiceStatus_in is how error messages are indicated to the service, but we currently do not use it
+            ServiceStatus_in: in event data port cmasi::ServiceStatus.i; 
                     --the source code subscribes to all descendants of task:
             SearchTask_in: in event data port cmasi::SearchTask.i;
             AreaSearchTask_in: in event data port cmasi::AreaSearchTask.i;
@@ -120,29 +121,39 @@ public
                                     or busy_to_idle;
         -------------------------------------------------------------
         
-        --****ISSUE: what is a received automation request: what type?****
         ---------------- state transitions ----------------
             eq idle_to_busy : bool = false -> 
-                previous_state = IDLE and 
-                event(AutomationRequest_in) and  
-                taskVehicleOrRegionIsDefined;
+                (previous_state = IDLE and 
+                pre(event(AutomationRequest_in)) and  
+                pre(taskVehicleOrRegionIsDefined));
             
             eq busy_to_idle : bool = false -> 
                 (previous_state = BUSY and 
-                dequeue_trigger and
-                numTasksInQ = 0);
+                pre(dequeue_trigger) and 
+                --When all queued requests are serviced (the queue is 0)
+                -- and the initial un-queued request is also serviced
+                --Using this variable to avoid modeling a queue with a -1 size
+                --and to simplify the state change condition
+                pre(all_requests_serviced)); 
         ---------------- end state transitions ----------------
+
+			eq all_requests_serviced : bool;
+
+            eq expected_UniqueAutomationResponse_received : bool = 
+            	event(UniqueAutomationResponse_in) and 
+                	UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id and 
+                	not uniqueAutomationRequestErrorMessageRecieved;
                 
-            eq dequeue_trigger : bool = false -> 
-                (event(UniqueAutomationResponse_in) and UniqueAutomationResponse_in.ResponseID = cached_unique_automation_request_id and not uniqueAutomationRequestErrorMessageRecieved) or
+            eq dequeue_trigger : bool = 
+                expected_UniqueAutomationResponse_received or
                 timer_threshold_reached or 
                 received_error_message;
                 
-            eq timer_threshold_reached : bool = false -> 
+            eq timer_threshold_reached : bool = 
                 timeout_option and 
                 timer>=timeout_threshold;
                 
-            eq received_error_message : bool = false ->
+            eq received_error_message : bool = 
                 --TODO: Derek is going to update the spec to have a unique automation error response in
                 --check the error response to match the cached ID, if matched there is an error. 
                 event(UniqueAutomationResponse_in) and 
@@ -157,11 +168,11 @@ public
             
             const SERVICE_TYPE_ERROR_SIGNAL : int = 2;
             
-            eq timer_reset: bool = true-> 
-                event(UniqueAutomationRequest_out) or --Timer starts once we ask for a response (make a request)
-                state=IDLE or 
+            eq timer_reset: bool =
+                (event(UniqueAutomationRequest_out) or --Timer starts once we ask for a response (make a request)
+                state=IDLE or 						  -- Timer is always 0 in the IDLE state
                 (event(UniqueAutomationResponse_in) and 
-                UniqueAutomationResponse_in.ResponseID  = cached_unique_automation_request_id); 
+                	UniqueAutomationResponse_in.ResponseID  = cached_unique_automation_request_id));  --The expected response is received
             
             -- a non-deterministic variable used to model whether or not 
             -- the requested task, vehicle, or operating region has been defined.
@@ -180,21 +191,25 @@ public
             guarantee "Implied Spec: Initially, the service is idle" :
                 (state = IDLE) -> true;
                 
-            guarantee "[Implied: is this necessary? in IDLE the numTasksInQ is 0]" :
+            guarantee "[in IDLE the numTasksInQ is 0]" :
                 state = IDLE =>
                     numTasksInQ = 0;
             
             --TODO make error message a new variable. 
             
             --TODO: check request resource definition instead of non deterministic boolean? 
-            --TODO: is it worth modeling the local state of what the service maintains? 
-            guarantee "if automation request is received and the requested resource has not been defined then we produce an error" : true ->
-                event(TaskAutomationRequest_in) and not taskVehicleOrRegionIsDefined => 
+            --TODO: Derek has suggested how error messages are modeled here may not be correct. We may need to receive ServiceStatus_in
+             --but the current code does not address this. There is apparently ongoing work on how to handle error messages.
+             --This guarantee is probably wrong, and will need to be reassessed as error handling is concretized. 
+            guarantee "[Modified this guarantee to address the only cases in which an error message is to be sent out].
+            	if automation request is received and the requested resource has not been defined then produce an error
+                [In the busy state, if an error message is received, send an error message as a ServiceStatus_out]" : 
+                (event(AutomationRequest_in) and not taskVehicleOrRegionIsDefined) or
+                	(state = BUSY and received_error_message) <=>
                     --TODO: derek will add automation request
                     event(ServiceStatus_out) and 
-                    ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL; --and 
-                    --numTasksInQ = pre(numTasksInQ);
-                    --TODO: what about the timer? 
+                    ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL; 
+                    --event(AutomationResponse_out); Addressed by another guarantee now
                     --TODO: apparently the code sets the status type to "information" rather than "error"
                 
             --Note: the original wording of this guarantee implies the unique automation request is only sent
@@ -204,26 +219,49 @@ public
             --"eventually" idiom. 
             guarantee "if automation request is received and resource is defined produce unique automation request.
             If in the idle state, this service will immediately publish the UniqueAutomationRequest message and transition to the busy state.": true ->
-                 idle_to_busy => 
-                --QUESTION: what is a automation request? above it is listed as a task automation request
-                    event(UniqueAutomationRequest_out) and state = BUSY and
+                 idle_to_busy =>
+                 	state = BUSY and 
+                    event(UniqueAutomationRequest_out) and 
                     cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID; --Used for subsequent specs
            
            guarantee "[ADDED SPEC] cached_unique_automation_request_id does not change if the two conditions under which it can change are both not currently triggered. 
            These conditions are implied in other guarantees.":
-           		not idle_to_busy and  not(state = BUSY and dequeue_trigger and pre(numTasksInQ) >0) =>
-           			cached_unique_automation_request_id = pre(cached_unique_automation_request_id);
+           		(not idle_to_busy and  
+           		 not(state = BUSY and 
+           			dequeue_trigger and 
+           			pre(numTasksInQ) >0)) =>
+           				cached_unique_automation_request_id = pre(cached_unique_automation_request_id);
             		
-            guarantee "[NOTE: extension of the above spec] If already in the busy state, the UniqueAutomationRequest will be added to the end of a queue.":
+            --NOTE: the original (first) request made when the service is IDLE is not queued
+            guarantee "[NOTE: a spec to fully specify how the queue changes. Putting it all in one place
+            	to be able to easily and clearly specify when the numTasksInQ remains constant between time stemps.]":
                   state = BUSY =>
-                  --Note: the definition of the idle state suggests numTasksInQ should already be 0 on transition
-                  --the first guarantee in the above if statement is therefore likely redundant, but helpful for reviewers
-                  	if previous_state != BUSY and not (event(AutomationRequest_in) and taskVehicleOrRegionIsDefined) then
-                  		numTasksInQ = 0
-                    else if event(AutomationRequest_in) and taskVehicleOrRegionIsDefined then
+                    (if event(AutomationRequest_in) and taskVehicleOrRegionIsDefined then
                         numTasksInQ = pre(numTasksInQ) + 1
-                    else
-                        numTasksInQ = pre(numTasksInQ);
+                    --[Implied Requirement: in the busy state, process next task in the queue, if one exists, when a dequeue_trigger occurs]
+                    else if dequeue_trigger and pre(numTasksInQ) >0 then
+                    	numTasksInQ = pre(numTasksInQ) - 1 and
+                    	event(UniqueAutomationRequest_out) and  --Send out next request in the queue
+                        cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID
+                    --[when all requests have been serviced including all queued, decrement the queue again to indicate
+                    --	a transition to IDLE is warranted.]
+                    else if dequeue_trigger and pre(numTasksInQ) = 0 then
+                    	all_requests_serviced = true
+                   	else
+                        numTasksInQ = pre(numTasksInQ));
+          
+          	guarantee "[Explicitly save state on all requests serviced in all time steps, redundant with the above gaurantee]":
+          		if state= BUSY and dequeue_trigger and pre(numTasksInQ) = 0 then
+                    all_requests_serviced = true
+                else
+                	all_requests_serviced = false; 
+                	
+          	--NOTE: added to make sure the model checker will not send out UniqueAutomationRequest_out unless
+          	--within the specified conditions. 
+         	guarantee "[Explicitly specifying the only conditions where UniqueAutomationRequest_out. This makes
+         		some other guarantees redundant.]" : 
+         			((state = BUSY and dequeue_trigger and pre(numTasksInQ) >0) or idle_to_busy) <=>
+         				event(UniqueAutomationRequest_out);
                    
 --              pre(event(TaskAutomationRequest_in) and taskVehicleOrRegionIsDefined) =>
 --                  state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
@@ -233,13 +271,14 @@ public
 --                  else --state = BUSY
 --                     state = BUSY and numTasksInQ = pre(numTasksInQ) + 1;
                        
-            --Note: forcing an incrementing timer (unspecified increment) for now
+            
+            --Note: unless timeout_option is fixed, the model checker can switch it on and off arbitrarily, allowing this behavior for now
             guarantee "Service includes an optional timeout. When a UniqueAutomationRequest is published, a timer begins" : true ->
                 timeout_option => 
                     if timer_reset then
                         timer = 0
                     else 
-                        timer > pre(0->timer);
+                        timer > pre(0->timer); --Note: forcing an incrementing timer (unspecified increment) for now
                         
             --TODO: is this service validating "requests" while queued or only when requests are being actively serviced.
             
@@ -247,23 +286,16 @@ public
             [Implied, that the transition occurs also based on a response, timeout, or error message, i.e., a dequeue trigger]" :
                 busy_to_idle => 
                     state = IDLE;
-                    
-            guarantee "[Implied Requirement: process next message only if IDLE or a response has been received]":
-                 state = BUSY and dequeue_trigger and pre(numTasksInQ) >0 =>
-                    --NOTE: no checking that the event is for the next item in the queue.
-                    --TODO: can mimic queue if the ID's are incremented by one, I can force what the message refers to (1 minus current)
-                        event(UniqueAutomationRequest_out) and 
-                        numTasksInQ = pre(numTasksInQ) - 1 and
-                        cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID;
-
-            --TODO: unclear if ths is the error message behavior specified
-            guarantee "When this service receives either an error message 
-            (indicating that the UniqueAutomationRequest cannot be fulfilled or 
-                a corresponding UniqueAutomationResponse), it will publish the same message. " : true ->
-                received_error_message => 
-                    event(AutomationResponse_out) and --TODO: will become an automation response error out at some point
-                    (event(ServiceStatus_out) and ServiceStatus_out.StatusType = SERVICE_TYPE_ERROR_SIGNAL) ;
-                    
+                
+             --TODO: the guarantee overly simplifies the AutomationResponse_out, the content of the message will need to 
+             --be adjusted depending on the type of message (error or ordinary response) in correspondence to the original request (TBD)      
+            guarantee "[In the busy state] When this service receives either an error message 
+            (indicating that the UniqueAutomationRequest cannot be fulfilled) or 
+                a corresponding UniqueAutomationResponse, it will publish the same message [As an AutomationResponse_out]. 
+            [ADDENDUM: AutomationReponse_out should only be sent out in the event of an erroneous request or 
+            		 when a dequeue_trigger is raised in the BUSY, which also includes the possibility of a timeout]" : 
+                ((state = BUSY and dequeue_trigger) or (event(AutomationRequest_in) and not taskVehicleOrRegionIsDefined)) <=> 
+                    event(AutomationResponse_out); --TODO: correspond this response with the request in terms of message contents
                     
 --          --Cannot formalize in AGREE (unlesse I create a counter)
 --          guarantee "The request ID of unique automation responses are unique" :
@@ -272,6 +304,23 @@ public
 --          --Not sure if there is a way to model this property in agree
 --          guarantee "tasks are fed into 'the system' one at a time" : 
 --              true; --What was meant was to mean "the queue", might not be necessary
+
+--
+--			--Timing properties
+--			
+--			--TODO: may need an assumption about the frequency of AutomationRequest_in
+--			eq event_AutomationRequest_in : bool = event(AutomationRequest_in);
+--			eq event_UniqueAutomationRequest_out_or_queued : bool = event(UniqueAutomationRequest_out) or numTasksInQ = pre(numTasksInQ)+1;
+--			guarantee "Validity of AutomationRequests is determined within 2ms at which time the a UniqueAutomationRequest is emited, or the request is queued":
+--				whenever event_AutomationRequest_in occurs event_UniqueAutomationRequest_out_or_queued occurs during [0.0,0.002];
+--				
+--			--TODO: when does an AutomationResponse go out? Currently only in an error scenario. 
+--			eq event_UniqueAutomationResponse_in : bool = event(UniqueAutomationResponse_in);
+--			--send a AutomationResponse_out, or emit request message at top of queue, or ignore 
+--			eq TBD : bool = (event(UniqueAutomationRequest_out) and numTasksInQ = 0) or (event(UniqueAutomationRequest_out) and numTasksInQ = pre(numTasksInQ) - 1);
+--	
+--			guarantee "TBD" :
+--				whenever event_UniqueAutomationResponse_in occurs TBD occurs during [0.0,0.001];
                     
         **};
     end AutomationRequestValidatorService;
