@@ -245,13 +245,13 @@ public
                         cached_unique_automation_request_id = UniqueAutomationRequest_out.RequestID
                     --[when all requests have been serviced including all queued, decrement the queue again to indicate
                     --	a transition to IDLE is warranted.]
-                    else if dequeue_trigger and pre(numTasksInQ) = 0 then
+                    else if dequeue_trigger and numTasksInQ = 0 then
                     	all_requests_serviced = true
                    	else
                         numTasksInQ = pre(numTasksInQ));
           
           	guarantee "[Explicitly save state on all requests serviced in all time steps, redundant with the above gaurantee]":
-          		if state= BUSY and dequeue_trigger and pre(numTasksInQ) = 0 then
+          		if state= BUSY and dequeue_trigger and numTasksInQ = 0 then
                     all_requests_serviced = true
                 else
                 	all_requests_serviced = false; 
@@ -279,6 +279,7 @@ public
                         timer = 0
                     else 
                         timer > pre(0->timer); --Note: forcing an incrementing timer (unspecified increment) for now
+                        
                         
             --TODO: is this service validating "requests" while queued or only when requests are being actively serviced.
             
