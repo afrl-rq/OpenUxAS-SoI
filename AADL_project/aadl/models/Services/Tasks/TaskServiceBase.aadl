@@ -252,6 +252,10 @@ public
 				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
        			and pre(event(SensorFootprintRequests_out)); 
        			
+       		--Note: the transition pattern differs here
+       		--No events are sent out that trigger this transition
+       		--The transition occurs immediately when the expected EntityState_in is received.
+       		--Also note, that changing this transition to use "pre" yielded realizability issues.
        		eq option_selected_to_active : bool = false ->
        			previous_state = OPTION_SELECTED and 
        			event(EntityState_in) and 
@@ -474,8 +478,8 @@ public
        		guarantee "If the Task is in the OptionSelected state and an EntityState message is received which includes the Task ID 
        		in the AssociatedTaskList, then the Task switches to the Activestate. 
        		A Task will remain in this [OptionSelected] state until an EntityState message includes this Task ID in its AssociatedTaskList.":
-					option_selected_to_active =>
-						state = ACTIVE;
+				option_selected_to_active =>
+					state = ACTIVE;
 						--TODO?: in active the task can send payload action messages and vehicle action commands
        				
        		guarantee "[Not originally specified: If in the ACTIVE state and either (1) an new expected EntityState_in is recieved or 
@@ -550,6 +554,21 @@ public
 --				
 --			guarantee "The task transitions to FINAL_ROUTES within 2ms of receiving TaskImplementationRequest_in in the OPTIONS_PUBLISHED state":
 --				whenever event_tir_in_options_published_state occurs options_published_to_final_routes occurs during [0.0,2.0];
+--			
+----			"Response" to EntityState_in
+----			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
+----			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
+--
+--			eq event_EntityState_in : bool = event(EntityState_in);
+--			eq event_expected_es_in_option_selected_state : bool = event_EntityState_in and state = OPTION_SELECTED and entity_state_task_id_present;
+--			eq event_unexpected_es_in_active_state : bool = event_EntityState_in and state = ACTIVE and not entity_state_task_id_present;
+--			
+--			guarantee "The task transitions to ACTIVE within 0ms of receiving an expected EntityState_in in the OPTION_SELECTED state":
+--				whenever event_expected_es_in_option_selected_state occurs option_selected_to_active occurs during [0.0,0.0];
+--				
+--			guarantee "The task transitions to IDLE within 0ms of receiving an unexpected EntityState_in in the ACTIVE state":
+--				whenever event_unexpected_es_in_active_state occurs active_to_idle occurs during [0.0,0.0];
+--				
 --				
 ----			"Response" to RouteResponse_in
 ----			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
@@ -583,6 +602,8 @@ public
 --				
 --			guarantee "The task transitions to OPTION_ROUTES within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
 --				whenever event_sfr_in_sensor_request_state occurs sensor_request_to_option_routes occurs during [0.0,0.001];
+
+
 
        	**};
        	
