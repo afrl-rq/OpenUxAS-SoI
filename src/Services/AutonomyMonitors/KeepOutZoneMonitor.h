@@ -12,7 +12,7 @@
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "afrl/cmasi/KeepOutZone.h"
-
+#include "../../Utilities/UnitConversions.h"
 namespace uxas {
 namespace service {
 namespace monitoring {
@@ -29,6 +29,7 @@ public:
 
 protected:
 	std::shared_ptr<afrl::cmasi::KeepOutZone> _zone;
+    std::shared_ptr<uxas::common::utilities::CUnitConversions> flatEarth;
 
 };
 

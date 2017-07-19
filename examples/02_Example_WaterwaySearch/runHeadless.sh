@@ -5,7 +5,7 @@ here=$PWD;
 RM_DATAWORK="rm -R ./datawork"
 RM_LOG="rm -R ./log"
 
-BIN="../../../build/uxas"
+BIN="../../../build_debug/uxas"
 
 echo "Cleaning RUNDIR ..."
 mkdir -p RUNDIR_WaterwaySearch

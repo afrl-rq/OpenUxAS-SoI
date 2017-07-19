@@ -41,6 +41,8 @@ bool VehicleStateListenerService::configure(const pugi::xml_node & ndComponent){
 
 bool VehicleStateListenerService::initialize()
 {
+
+
 	return true;
 }
 
@@ -52,22 +54,6 @@ bool VehicleStateListenerService::start(){
 bool VehicleStateListenerService::terminate(){
 	std::cout << "VehicleStateListenerService: TERMINATED." << std::endl;
 	/* -- Dump the data into a CSV file, how? --*/
-	std::string fileStem;
-	std::string basePath(SAVE_PATH);
-	std::stringstream baseName;
-	baseName << "ID_"<< m_entityId << "_";
-	bool isAddExtension=false;
-	bool isSuccess = uxas::common::utilities::c_FileSystemUtilities::bFindUniqueFileName(baseName.str(), basePath, fileStem, isAddExtension);
-
-
-	for (auto it = _m.begin(); it != _m.end(); ++it){
-		EntityStateInfo const & eInfo = it -> second;
-		std::string fileName = fileStem + "Vehicle_"+std::to_string(eInfo.getVehicleID())+".csv";
-		std::ofstream fHandle(fileName);
-		eInfo.dumpToFile(fHandle);
-		fHandle.close();
-		std::cout << "VehicleStateListenerService: Dumped Information to file " << fileName << std::endl;
-	}
 
 	return true;
 }
@@ -133,18 +119,32 @@ void VehicleStateListenerService::EntityStateInfo::addState(int64_t tStamp, afrl
 		UXAS_LOG_WARN(s_typeName(), "::VehicleStateListenerService::EntityStateInfo.addstate(..) - ASL altitude measurement obtained " , alt, "at time ", tStamp );
 		v_alts.push_back(alt);
 	}
+	this -> dumpToFile(tStamp, loc, energy);
 };
 
-void VehicleStateListenerService::EntityStateInfo::dumpToFile(std::ostream & where) const{
-	int n = v_times.size();
-	where << "TIME, LAT, LONG, ALT, ENERGY" << std::endl;
-	for (int i=0; i < n; ++i){
-		where << v_times[i] << ","
-				<< std::setprecision(12) << v_lats[i] << ","
-				<< std::setprecision(12) << v_longs[i] << ","
-				<< std::setprecision(3) << v_alts[i] << ","
-				<< std::setprecision(3) << v_energies[i] << std::endl;
-	}
+VehicleStateListenerService::EntityStateInfo::EntityStateInfo(int64_t whoAmI): vID(whoAmI){
+	// Make up a file name that is unique
+	std::string fileStem;
+	std::string basePath(SAVE_PATH);
+	std::stringstream baseName;
+	bool isAddExtension=false;
+	bool isSuccess = uxas::common::utilities::c_FileSystemUtilities::bFindUniqueFileName(baseName.str(), basePath, fileStem, isAddExtension);
+	std::string fileName = fileStem + "_V_"+std::to_string(getVehicleID())+".csv";
+	std::cout << "VehicleStateListenerService: Will dump Information to file " << fileName << std::endl;
+	std::ofstream fHandle (fileName);
+	fHandle << "TIME, LAT, LONG, ALT, ENERGY" << std::endl;
+	fHandle.close();
+	this -> fName = fileName;
+};
+
+
+void VehicleStateListenerService::EntityStateInfo::dumpToFile(int64_t timeStamp, afrl::cmasi::Location3D* loc, float energyRemaining) const{
+	std::ofstream wh (this -> fName, std::ofstream::out | std::ofstream::app);
+	wh << timeStamp << "," << std::setprecision(12) << loc -> getLatitude() << ","
+				<< std::setprecision(12) << loc -> getLongitude() << ","
+				<< std::setprecision(3) << loc -> getAltitude() << ","
+				<< std::setprecision(3) << energyRemaining << std::endl;
+	wh.close();
 	return;
 };
 
