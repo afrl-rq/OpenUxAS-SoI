@@ -85,7 +85,7 @@ void handle_waypoint_write(uint32_t * var){
     uint32_t bytes;
     assert(waypoint_bytes_to_read == 0);
     tb_waypoint_write_dequeue(&waypoint_bytes_to_read);
-    printf("VM saw waypoint write\n");
+    //printf("VM saw waypoint write\n");
 
     tb_waypoint_write_notification_reg_callback(handle_waypoint_write, NULL);
 }

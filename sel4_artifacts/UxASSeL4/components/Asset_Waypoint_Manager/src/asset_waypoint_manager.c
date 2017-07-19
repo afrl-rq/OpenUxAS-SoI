@@ -17,7 +17,7 @@ void component_init(const int64_t *arg){
 }
 
 void mission_read_vm(const bool * _UNUSED) {
-        printf("Asset Manager confirmed read\n");
+        //printf("Asset Manager confirmed read\n");
         vm_got_mission_command = true;
 }
 
@@ -75,7 +75,7 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
             gotSize = get_message_size(tb_in_uart_packet, &message_size, &i);
             if(gotSize){
                 message_index = 0;
-                printf("got message of size: %d\n", message_size);
+                //printf("got message of size: %d\n", message_size);
             }
         }
 
