@@ -80,10 +80,11 @@ public
 		guarantee "The system transitions to STATE2 within 3 time units after entry of STATE1"	:
 			whenever state1_entry occurs state2_entry occurs during [0.0,3.0];
 			
-		--TODO: add a descriptive comment about the use of exclusively
+		--The use of "exclusively" indicates and "iff", that is the output_ready is only true at the given time
 		guarantee "The system prepares an output at exactly 4 time units after entry of STATE2" :
 			whenever state2_entry occurs output_ready exclusively occurs during [4.0,4.0];
-			
+		
+		--This guarantee was used for debugging purposes, is not necessary to prove the system-level property	
 --		guarantee "The system sends an output at exactly 4 time units after entry of STATE2" :
 --			whenever state2_entry occurs output_event exclusively occurs during [4.0,4.0];
 --			
