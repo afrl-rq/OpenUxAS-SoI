@@ -104,6 +104,9 @@
 #include "SensorManagerService.h"
 #include "WaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
+#include "OffRoadAttack.h"
+#include "BackToBeginAttack.h"
+#include "DosAttack.h"
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -168,7 +171,9 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
-
+{auto svc = uxas::stduxas::make_unique<uxas::service::BackToBeginAttack>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::OffRoadAttack>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::DosAttack>();}
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////
 /// END -- SERVICE REGISTRATION SECTION                ///
