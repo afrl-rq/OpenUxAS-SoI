@@ -213,7 +213,7 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
    - `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
 1. Auto-create the UxAS messaging library
-   - Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.3.0/LmcpGen.jar)
+   - Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.4.0/LmcpGen.jar)
    - Place `LmcpGen.jar` in `LmcpGen/dist` folder
    - From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
 1. Prepare build
@@ -298,7 +298,7 @@ Expected file system layout:
    
    OR Download *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.3.0/LmcpGen.jar)
+   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.4.0/LmcpGen.jar)
    2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
    - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
