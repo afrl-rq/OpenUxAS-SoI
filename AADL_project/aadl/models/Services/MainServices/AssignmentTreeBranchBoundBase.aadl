@@ -7,7 +7,7 @@ public
     -- Includes
 	with ServiceBase_Pkg;
     
-    	-- This is a "dummy" top-level system. We use it so that we can check 
+    -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
 		annex agree {**
@@ -75,7 +75,7 @@ public
       		--Upon reception of a UniqueAutomationRequest, this service enters the wait state 
       		eq idle_to_wait : bool =  false ->
       			previous_state = IDLE and 
-      			event(UniqueAutomationRequest_in);
+      			pre(event(UniqueAutomationRequest_in));
       		--The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       		--at which point this service returns to the idle state.
       		eq wait_to_idle : bool = false ->
@@ -102,12 +102,23 @@ public
       		
       		guarantee "Self loops": not some_transition => (state = previous_state);
       	
-      		guarantee "Upon reception of a UniqueAutomationRequest, this service enters the wait state ": 
-      			if idle_to_wait then
-      				state = WAIT and
+      		--NOTE: the transition occurs on the time step after receiving the UniqueAutomationRequest
+      		guarantee "[In the idle state] Upon [changed to 'after'] reception of a UniqueAutomationRequest, this service enters the wait state ": 
+      			idle_to_wait =>
+      				state = WAIT;
+      		
+--      			if idle_to_wait then
+--      				state = WAIT and
+--      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID
+--      			else
+--      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
+      			
+      		guarantee "[Upon receiving a UniqueAutomationRequest_in in the IDLE state, the ID is cached]":
+      			if state = IDLE and event(UniqueAutomationRequest_in) then
       				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID
       			else
       				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
+
       		
       		guarantee "[ADDED GURANTEE]: In IDLE, there are no expected task options (clear the flag, i.e., set to false) ":
       		 	state = IDLE  =>
@@ -129,6 +140,37 @@ public
       			wait_to_idle =>
       				state = IDLE and
       				allExpectedTaskOptionsReceived = false; --redundant, but explicit
+      				
+      				
+      		--Timing properties
+      		
+----      		"Response" to UniqueAutomationRequest_in
+----      		idle -> wait, store request ID for identification of corresponding TaskPlanOptions and AssignmentCostMatrix.
+--      		
+--      		eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+--      		eq event_uar_in_idle_state : bool = event_UniqueAutomationRequest_in and state = IDLE;
+--      		guarantee "The service transitions to WAIT within 0ms of receiving UniqueAutomationRequest_in from the IDLE state":
+--      			whenever event_uar_in_idle_state occurs idle_to_wait occurs during [0.0,0.0];
+--      			
+--      		eq uar_id_cached : bool = curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID;
+--      		guarantee "The service caches the ID of a received UniqueAutomationRequest_in within 0ms in the IDLE state":
+--      			whenever event_uar_in_idle_state occurs uar_id_cached occurs during [0.0,0.0];
+--      		
+----      		"Response" to AssignmentCostMatrix_in
+----      		Using the cost of each task option (from the stored TaskPlanOptions messages) 
+----      		and the cost for each vehicle to reach each option (from AssignmentCostMatrix), 
+----      		perform an optimization attempting to find the minimal cost mission that adheres to the 
+----      		Process Algebra contraints. Upon completion, emit TaskAssignmentSummary and wait -> idle.
+--
+--			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+--			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
+--			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
+--			
+--			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state":
+--				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
+--				
+--			guarantee "The service transitions to IDLE within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state ":
+--				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
       	**};
     end AssignmentTreeBranchBoundBase;
 
