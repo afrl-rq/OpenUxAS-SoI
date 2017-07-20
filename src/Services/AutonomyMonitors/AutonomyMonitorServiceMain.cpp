@@ -7,6 +7,7 @@
 
 #include "ServiceBase.h"
 #include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
+
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
@@ -20,7 +21,7 @@
 #include "afrl/impact/PointOfInterest.h"
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/AreaOfInterest.h"
-
+#include "MonitorDB.h"
 
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
@@ -28,6 +29,7 @@
 #include <cstdint>
 #include <memory>      //int64_t
 #include <iomanip>      //setfill
+#include <map>
 
 
 #define STRING_COMPONENT_NAME "AutomationMonitorService"
@@ -45,14 +47,15 @@ namespace uxas {
 
       // Constructor.
       AutonomyMonitorServiceMain::AutonomyMonitorServiceMain()
-      :ServiceBase (AutonomyMonitorServiceMain::s_typeName(), AutonomyMonitorServiceMain::s_directoryName())
-      {
-        monitorDB = new MonitorDB();
+	: ServiceBase (AutonomyMonitorServiceMain::s_typeName(),
+		    AutonomyMonitorServiceMain::s_directoryName()),
+	  monitorDB(new MonitorDB(this))
+      {        
       };
 
       // Destructor.
       AutonomyMonitorServiceMain::~AutonomyMonitorServiceMain() {
-        delete(monitorDB);
+	delete(monitorDB);
       };
 
       //Configuration
@@ -100,6 +103,10 @@ namespace uxas {
         return (isSuccess);
       }
 
+      void AutonomyMonitorServiceMain::broadcastMessage(const std::shared_ptr<avtas::lmcp::Object>  & msgToBroadcast) {
+	sendSharedLmcpObjectBroadcastMessage(msgToBroadcast);
+      }
+      
       #define PTR_CAST_TYP(t, o) (std::dynamic_pointer_cast<t>(o -> m_object))
 
       bool

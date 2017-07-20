@@ -9,7 +9,9 @@
 #ifndef KeepInZoneMonitor_h
 #define KeepInZoneMonitor_h
 
+#include "ServiceBase.h"
 #include "AutonomyMonitors/MonitorBase.h"
+#include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/Location3D.h"
@@ -21,12 +23,12 @@ namespace uxas {
         namespace monitoring {
             class KeepInZoneMonitor: public MonitorBase {
             public:
-                KeepInZoneMonitor(std::shared_ptr<afrl::cmasi::KeepInZone> zone);
-                ~KeepInZoneMonitor();
-                void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-                bool isPropertySatisfied();
-                double propertyRobustness();
-                
+	      KeepInZoneMonitor(AutonomyMonitorServiceMain  *service_ptr,std::shared_ptr<afrl::cmasi::KeepInZone> zone);
+	      ~KeepInZoneMonitor();
+	      void addVehicleStateMessage(VehicleStateMessage const & vMessage);
+	      bool isPropertySatisfied();
+	      double propertyRobustness();
+	      
             protected:
                 std::shared_ptr<afrl::cmasi::KeepInZone> _zone;
 

@@ -8,7 +8,9 @@
 #ifndef SRC_SERVICES_AUTONOMYMONITORS_KEEPOUTZONEMONITOR_H_
 #define SRC_SERVICES_AUTONOMYMONITORS_KEEPOUTZONEMONITOR_H_
 
+#include "ServiceBase.h"
 #include "afrl/cmasi/Polygon.h"
+#include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -21,16 +23,17 @@ namespace monitoring {
  */
 class KeepOutZoneMonitor: public MonitorBase {
 public:
-	KeepOutZoneMonitor(std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone);
-	virtual ~KeepOutZoneMonitor();
-	void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-	bool isPropertySatisfied();
-	double propertyRobustness();
+  KeepOutZoneMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone);
+  virtual ~KeepOutZoneMonitor();
+  void addVehicleStateMessage(VehicleStateMessage const & vMessage);
+  bool isPropertySatisfied();
+  double propertyRobustness();
 
 protected:
 	std::shared_ptr<afrl::cmasi::KeepOutZone> _zone;
-    std::shared_ptr<uxas::common::utilities::CUnitConversions> flatEarth;
-
+	std::shared_ptr<uxas::common::utilities::CUnitConversions> flatEarth;
+	bool _failed;
+	void sendFailureMessage(VehicleStateMessage const & vMessage);
 };
 
 } /* namespace monitoring */

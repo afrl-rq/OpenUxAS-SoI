@@ -11,15 +11,14 @@ namespace uxas {
 namespace service {
 namespace monitoring {
 
-MonitorBase::MonitorBase() {
+  MonitorBase::MonitorBase(AutonomyMonitorServiceMain *service_ptr): service_(service_ptr) {
 	// TODO Auto-generated constructor stub
+  }
 
-}
-
-MonitorBase::~MonitorBase() {
-	// TODO Auto-generated destructor stub
-}
-
+  MonitorBase::~MonitorBase() {
+    // TODO Auto-generated destructor stub
+  }
+  
 } /* namespace monitoring */
 } /* namespace service */
 } /* namespace uxas */

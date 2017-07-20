@@ -18,7 +18,8 @@ namespace uxas {
   namespace service {
     namespace monitoring {
             
-      KeepInZoneMonitor::KeepInZoneMonitor(std::shared_ptr<afrl::cmasi::KeepInZone> keepInZone): _zone(keepInZone){
+      KeepInZoneMonitor::KeepInZoneMonitor(AutonomyMonitorServiceMain * service_ptr,std::shared_ptr<afrl::cmasi::KeepInZone> keepInZone): MonitorBase(service_ptr),
+																	       _zone(keepInZone){
 
         //TODO: Remove the print statements if necessary -- they are used for diagnostics
         std::cout << "[KeepInZoneMonitor] Started a Keepin zone monitor" << std::endl;

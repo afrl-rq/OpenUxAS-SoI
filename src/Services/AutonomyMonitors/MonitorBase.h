@@ -8,6 +8,7 @@
 #ifndef SRC_SERVICES_AUTONOMYMONITORS_MONITORBASE_H_
 #define SRC_SERVICES_AUTONOMYMONITORS_MONITORBASE_H_
 
+#include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 #include "VehicleStateMessage.h"
 
 namespace uxas {
@@ -26,13 +27,15 @@ namespace monitoring {
  */
 class MonitorBase {
 public:
-	MonitorBase();
-	virtual ~MonitorBase();
+  MonitorBase(AutonomyMonitorServiceMain * service_ptr);
+  virtual ~MonitorBase();
 
-	virtual void addVehicleStateMessage(VehicleStateMessage const & vMessage) =0;
-	virtual bool isPropertySatisfied() =0;
-	virtual double propertyRobustness() = 0;
+  virtual void addVehicleStateMessage(VehicleStateMessage const & vMessage) =0;
+  virtual bool isPropertySatisfied() =0;
+  virtual double propertyRobustness() = 0;
 
+ protected:
+  AutonomyMonitorServiceMain  * service_;
 
 };
 

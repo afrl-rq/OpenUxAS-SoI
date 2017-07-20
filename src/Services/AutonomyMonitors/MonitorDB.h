@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 #include <memory>
-
+#include "ServiceBase.h"
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "afrl/cmasi/OperatingRegion.h"
@@ -22,6 +22,7 @@
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/AreaOfInterest.h"
 
+#include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "AutonomyMonitors/MonitorBase.h"
 
@@ -36,13 +37,18 @@ namespace uxas {
       *  requests/responses and the vehicle states to judge success or failure of the mission requirements
       *  and the overall plan.
       **/
+      
       class MonitorDB {
       private:
         std::vector<MonitorBase*> allMonitors;
         std::vector<VehicleStateMessage> allVehicleStateMessages;
+	AutonomyMonitorServiceMain * service_;
+	std::map<int64_t, std::shared_ptr<afrl::cmasi::KeepOutZone> > keepOutZones;
+	std::map<int64_t, std::shared_ptr<afrl::cmasi::KeepInZone> > keepInZones;
+	
       public:
         /* Default Constructor */
-        MonitorDB();
+        MonitorDB(AutonomyMonitorServiceMain * service_ptr);
         /* Destructor */
         virtual ~MonitorDB();
 

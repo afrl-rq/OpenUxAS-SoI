@@ -8,7 +8,6 @@
 #include <iostream>
 #include <memory>
 #include <math.h>
-
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/KeepOutZoneMonitor.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
@@ -17,11 +16,12 @@
 #include "afrl/cmasi/AbstractGeometry.h"
 #include "afrl/cmasi/AbstractGeometryDescendants.h"
 #include "../../Utilities/UnitConversions.h"
-
+#include "afrl/cmasi/autonomymonitor/OperatingZoneFailure.h"
+#include "afrl/cmasi/autonomymonitor/OperatingZoneFailureType.h"
 namespace uxas {
   namespace service {
     namespace monitoring {
-      KeepOutZoneMonitor::KeepOutZoneMonitor(std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone): _zone(keepOutZone) {
+      KeepOutZoneMonitor::KeepOutZoneMonitor(AutonomyMonitorServiceMain  * service_ptr, std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone): MonitorBase(service_ptr), _zone(keepOutZone), _failed(false) {
         // TODO: Remove these print statements if needed -- they are just for diagnostics
         std::cout << "[KeepOutZoneMonitor] Started a Keepout zone monitor" << std::endl;
         std::cout << "\t [ID]: " << keepOutZone -> getZoneID() << std::endl;
@@ -70,6 +70,19 @@ namespace uxas {
         // TODO Auto-generated destructor stub
       }
 
+      void KeepOutZoneMonitor::sendFailureMessage(VehicleStateMessage const & vMessage){
+	auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::OperatingZoneFailure>();
+	fObj -> setZoneID(this -> _zone -> getZoneID());
+	fObj -> setResponsibleVehicleID(vMessage.getVehicleID());
+	fObj -> setFailureType(afrl::cmasi::autonomymonitor::OperatingZoneFailureType::KeepOutZoneFail);
+	fObj -> setFailureTime(vMessage.getTimeStamp());
+	fObj -> setFailureLatitude(vMessage.getLatitude());
+	fObj -> setFailureLongitude(vMessage.getLongitude());
+	fObj -> setFailureAltitude(vMessage.getAltitude());
+	this -> _failed = true;
+	service_ -> broadcastMessage(fObj);
+      }
+      
       void KeepOutZoneMonitor::addVehicleStateMessage(VehicleStateMessage const & vMessage){
         // TODO: Take this message away and implement the actual logic
         std::cout << "[Vehicle: " << vMessage.getVehicleID() << "]"
@@ -125,25 +138,34 @@ namespace uxas {
         if(rect) {
           const double centerLatitude_deg = rect->getCenterPoint()->getLatitude();
           const double centerLongitude_deg = rect->getCenterPoint()->getLongitude();
-          double centerNorth_m, centerEast_m; 
+          double centerNorth_m=0.0, centerEast_m=0.0; 
           this->flatEarth->ConvertLatLong_degToNorthEast_m(centerLatitude_deg, centerLongitude_deg, centerNorth_m, centerEast_m);
           // using upper left point and lower right point to characterize rectangle
-          double upperleft_East = centerEast_m - rect->getWidth()/2;
-          double upperleft_North = centerNorth_m + rect->getHeight()/2;
-          double lowerright_East = centerEast_m + rect->getWidth()/2;
-          double lowerright_North = centerNorth_m - rect->getHeight()/2;
+          double left_East = centerEast_m - rect->getWidth()/2;
+          double upper_North = centerNorth_m + rect->getHeight()/2;
+          double right_East = centerEast_m + rect->getWidth()/2;
+          double lower_North = centerNorth_m - rect->getHeight()/2;
+	  assert( left_East <= right_East);
+	  assert( lower_North <= upper_North);
           // check whether they belong to the rectangle
-          if((currentNorth_m <= upperleft_North && currentNorth_m >= lowerright_North) && (currentEast_m <= lowerright_East && currentEast_m >= upperleft_East)) { // If so, warning
+          if((currentNorth_m <= upper_North && currentNorth_m >= lower_North) && (currentEast_m <= right_East && currentEast_m >= left_East)) { // If so, warning
             std::cout << "***************************************" << std::endl;
             std::cout << "WARNING!!! YOU (vehicleID:" << vMessage.getVehicleID()
                       << ") ARE IN THE DANGER ZONE: " <<this->_zone->getZoneID() << "(Rectangle)"<< std::endl;
             std::cout << "***************************************" << std::endl;
+	    std::cout << " Zone: Rectangle->" << this->_zone->getZoneID() << std::endl;
+	    std::cout << "   Position: " << currentNorth_m << " , " << currentEast_m << std::endl;
+            std::cout << "   Center: " << centerNorth_m << ", " << centerEast_m << std::endl;
+            std::cout << "   North range: " << lower_North << ", " << upper_North<< std::endl;
+            std::cout << "   East range: " << left_East << ", " << right_East << std::endl;
+	    sendFailureMessage(vMessage);
+	    
           }
           else { // otherwise, show info
-            std::cout << " Zone: Rectangle->" << this->_zone->getZoneID() << std::endl;
-            std::cout << "   Center: " << centerNorth_m << ", " << centerEast_m << std::endl;
-            std::cout << "   upperleft: " << upperleft_North << ", " << upperleft_East<< std::endl;
-            std::cout << "   lowerright: " << lowerright_North << ", " << lowerright_East << std::endl;
+            // std::cout << " Zone: Rectangle->" << this->_zone->getZoneID() << std::endl;
+            // std::cout << "   Center: " << centerNorth_m << ", " << centerEast_m << std::endl;
+            // std::cout << "   upperleft: " << upperleft_North << ", " << upperleft_East<< std::endl;
+            // std::cout << "   lowerright: " << lowerright_North << ", " << lowerright_East << std::endl;
             //std::cout << "    Width: " << rect->getWidth() << " Height: " << rect->getHeight() << std::endl;
           }
         }
@@ -175,8 +197,8 @@ namespace uxas {
             std::cout << "WARNING!!! YOU(vehicleID:" << vMessage.getVehicleID()
                       << ") ARE IN THE DANGER ZONE: " <<this->_zone->getZoneID() << "(Polygon)" << std::endl;
             std::cout << "***************************************" << std::endl;
-          }
-          else {
+	    sendFailureMessage(vMessage);
+          } else {
             std::cout << " Zone: Polygon->" << this->_zone->getZoneID() << std::endl;
             std::cout << " Boundaries: " << std::endl;
             for(auto loc: polyBoundary) {
@@ -195,6 +217,7 @@ namespace uxas {
             std::cout << "***************************************" << std::endl;
             std::cout << "WARNING!!! YOU(vehicleID:" << vMessage.getVehicleID() << ") ARE IN THE DANGER ZONE: " <<this->_zone->getZoneID() << "(Circle)" << std::endl;
             std::cout << "***************************************" << std::endl;
+	    sendFailureMessage(vMessage);
           } else {
             std::cout << " Zone: Cicle-> " << this->_zone->getZoneID() << std::endl;
             std::cout << "  CenterPosition: " << circle->getCenterPoint()->getLatitude() << ", " << circle->getCenterPoint()->getLongitude() << std::endl;
@@ -208,7 +231,7 @@ namespace uxas {
       bool KeepOutZoneMonitor::isPropertySatisfied(){
         // don't touch it yet. Just put all things in the addvehiclestatemessage()
         std::cout << "testFor: ispropertysatisfied()" << std::endl;
-        return true;
+        return this -> _failed;
       }
       double KeepOutZoneMonitor::propertyRobustness(){
         std::cout << "testFor: propertyrobustness()" <<std::endl;

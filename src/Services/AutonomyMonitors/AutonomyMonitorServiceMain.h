@@ -9,18 +9,21 @@
 #define SRC_SERVICES_AUTONOMYMONITORS_AUTONOMYMONITORSERVICEMAIN_H_
 
 #include "ServiceBase.h"
-#include "MonitorDB.h"
+
 namespace uxas {
   namespace service {
     namespace monitoring {
 
+      class MonitorDB;
+      
       /** \class AutonomyMonitorServiceMain
       *  \brief Provides the main class for the Autonomy monitoring service.
       *  This class will register for the appropriate messages and build the monitoring problem.
       *  It's eventual goal is to judge mission succes/failure, provide robustness estimate and
       *  finally provide diagnosis of failure cases
       */
-      class AutonomyMonitorServiceMain : public ServiceBase {
+      
+      class AutonomyMonitorServiceMain : public uxas::service::ServiceBase {
       public:
         /* Mimicked this code snippet below from 01_HelloWorld.cpp under src/Services/ */
         static const std::string &
@@ -53,9 +56,14 @@ namespace uxas {
         AutonomyMonitorServiceMain();
         virtual ~AutonomyMonitorServiceMain();
 
+	
+	void broadcastMessage(const std::shared_ptr<avtas::lmcp::Object> & msgToBroadcast) ;
+	
+
       private:
         
-        MonitorDB * monitorDB;
+	MonitorDB * monitorDB;
+
 
       private:
 
@@ -86,6 +94,7 @@ namespace uxas {
         /* call back method: processReceivedLmcpMessage */
         bool processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedMsg) override;
 
+	
       };
 
     } /* namespace monitoring */

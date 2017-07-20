@@ -29,7 +29,7 @@ namespace uxas {
   namespace service {
     namespace monitoring {
 
-      MonitorDB::MonitorDB() {};
+      MonitorDB::MonitorDB(AutonomyMonitorServiceMain  * service_ptr): service_(service_ptr) {};
       MonitorDB::~MonitorDB() {};
       void MonitorDB::addMonitor(MonitorBase* what)
         {
@@ -63,16 +63,38 @@ namespace uxas {
       }
 
       bool MonitorDB::processOperatingRegion(std::shared_ptr<afrl::cmasi::OperatingRegion> ptr){
+	// Start a monitor for all keep in zones
+	for (auto id: ptr -> getKeepInAreas()){
+	  auto it = keepInZones.find(id);
+	  assert(it != keepInZones.end());
+	  std::shared_ptr<afrl::cmasi::KeepInZone> ptr = it -> second;
+	  KeepInZoneMonitor * kizm  = new KeepInZoneMonitor(service_, ptr);
+	  this->addMonitor(kizm);
+	}
+	
+	// Start a monitor for allkeep out zones
+	for (auto id: ptr -> getKeepOutAreas()){
+	  auto it = keepOutZones.find(id);
+	  assert(it != keepOutZones.end());
+	  std::shared_ptr<afrl::cmasi::KeepOutZone> ptr = it -> second;
+	  KeepOutZoneMonitor * kizm  = new KeepOutZoneMonitor(service_, ptr);
+	  this->addMonitor(kizm);
+	}
         return true;
       }
       bool MonitorDB::processKeepInZone(std::shared_ptr<afrl::cmasi::KeepInZone> ptr){
-        KeepInZoneMonitor * kizm  = new KeepInZoneMonitor(ptr);
-        this->addMonitor(kizm);
+        
+	int64_t zoneID = ptr -> getZoneID();
+	assert( keepInZones.find(zoneID) == keepInZones.end()); // Duplicate zoneids are not handled.
+	keepInZones.insert(std::pair<int64_t, std::shared_ptr<afrl::cmasi::KeepInZone> >(zoneID, ptr));
         return true;
       }
       bool MonitorDB::processKeepOutZone(std::shared_ptr<afrl::cmasi::KeepOutZone> ptr){
-        KeepOutZoneMonitor * kozm = new KeepOutZoneMonitor(ptr);
-        this -> addMonitor(kozm);
+        //KeepOutZoneMonitor * kozm = new KeepOutZoneMonitor(service_, ptr);
+        //this -> addMonitor(kozm);
+	int64_t zoneID = ptr -> getZoneID();
+	assert( keepOutZones.find(zoneID) == keepOutZones.end()); // Duplicate zoneids are not handled.
+	keepOutZones.insert(std::pair<int64_t, std::shared_ptr<afrl::cmasi::KeepOutZone> >(zoneID, ptr));
         return true;
       }
       bool MonitorDB::processAreaOfInterest(std::shared_ptr<afrl::impact::AreaOfInterest> ptr){
