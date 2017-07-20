@@ -69,23 +69,28 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
     while(i < tb_in_uart_packet->buf_len){
         if(!gotCtrlStr){
             gotCtrlStr = check_ctrl_str(tb_in_uart_packet, &i);
+            if(gotCtrlStr){
+                memcpy(waypoint, &LMCP_CTRL_STR_NTWK_ORD, sizeof(uint32_t));
+            }
         }
 
         if(gotCtrlStr && !gotSize){
             gotSize = get_message_size(tb_in_uart_packet, &message_size, &i);
             if(gotSize){
                 message_index = 0;
-                //printf("got message of size: %d\n", message_size);
+                memcpy(((uint8_t *)waypoint + 4), &message_size, sizeof(uint32_t));
+            //    printf("got message of size: %d\n", message_size);
             }
         }
 
         if(gotSize){
             for(; i < tb_in_uart_packet->buf_len && message_index < message_size; i++, message_index++){
-                ((uint8_t *)&mc)[message_index] = tb_in_uart_packet->buf[i];
+                ((uint8_t *)&mc + 8)[message_index] = tb_in_uart_packet->buf[i];
             }
             if(message_index == message_size){
                 if(vm_got_mission_command){
                     *(mc_t *)waypoint = mc;
+                    message_size += 8;
                     waypoint_write(&message_size);
                     vm_got_mission_command = false;
                 }
