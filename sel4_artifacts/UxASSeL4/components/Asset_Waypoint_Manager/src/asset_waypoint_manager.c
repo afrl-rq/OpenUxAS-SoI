@@ -77,6 +77,11 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
         if(gotCtrlStr && !gotSize){
             gotSize = get_message_size(tb_in_uart_packet, &message_size, &i);
             if(gotSize){
+                if(&message_size > sizeof(mc_t) - 8){
+                    printf("Received LMCP message of size %u is too big to decode\n", &message_size);
+                    gotCtrlStr = gotSize = false;
+                    continue;
+                }
                 message_index = 0;
                 memcpy(((uint8_t *)waypoint + 4), &message_size, sizeof(uint32_t));
             //    printf("got message of size: %d\n", message_size);
