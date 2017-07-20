@@ -41,7 +41,7 @@
             <Field Name="NumberOfParticipants" Type="byte" />
             <!-- Rendezvous location. All vehicles will be at this location
                  simultaneously unless 'MultiLocationRendezvous' is set to 'true'. -->
-            <Field Name="Location" Type="CMASI/Location3D" Default="NULL" />
+            <Field Name="Location" Type="CMASI/Location3D" />
             <!-- Rendezvous location. All vehicles will arrive with this heading
                  simultaneously unless 'MultiLocationRendezvous' is set to 'true'. -->
             <Field Name="Heading" Type="real32" />
@@ -404,7 +404,7 @@
             <!-- Instead of resuming from paused task state, re-start the complete task -->
             <Field Name="RestartCompletely" Type="bool" Default="false" />
             <!-- Instead of resuming from paused task state with the previously assigned entities, resume task with new assignment options -->
-            <Field Name="ReAssign" Type="TaskAssignment" Default="NULL" />
+            <Field Name="ReAssign" Type="TaskAssignment" Optional="true" />
         </Struct>
         
         <!-- Reports the progress of the task -->

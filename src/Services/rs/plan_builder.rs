@@ -79,7 +79,7 @@ pub struct PlanBuilder {
     projected_entity_states: HashMap<i64, Vec<ProjectedState>>,
 
     /// Assignments yet to be completed, keyed by corresponding unique automation request ID
-    remaining_assignments: HashMap<i64, VecDeque<TaskAssignment>>,
+    remaining_assignments: HashMap<i64, VecDeque<Box<TaskAssignmentT>>>,
 
     /// Unique automation request IDs keyed by pending task implementation request ID
     expected_response_ids: HashMap<i64, i64>,
@@ -208,6 +208,8 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
         }
     } else {
         debug_println!("LMCP deserialization error!");
+        debug_println!("Expected length: {}", msg_len);
+        debug_println!("{:?}", msg_buf_slice);
     }
 }
 
@@ -228,7 +230,7 @@ impl PlanBuilder {
             let car = self.unique_automation_requests.get(&car_id).ok_or(err_msg)?;
 
             // ensure that a valid state for each vehicle in the request has been received
-            for v in &car.original_request.entity_list {
+            for v in car.original_request.entity_list() {
                 if let None = self.entity_states.get(&v) {
                     return Err(format!(
                         "{} Corresponding Unique Automation Request included vehicle ID [{}] \
@@ -260,10 +262,10 @@ impl PlanBuilder {
 
     fn project_entity_states(&self, car: &UniqueAutomationRequest) -> Vec<ProjectedState> {
         // list all participating vehicles in the assignment
-        let participating_vehicles: Vec<i64> = if car.original_request.entity_list.is_empty() {
+        let participating_vehicles: Vec<i64> = if car.original_request.entity_list().is_empty() {
             self.entity_states.keys().map(|&x| x).collect()
         } else {
-            car.original_request.entity_list.clone()
+            car.original_request.entity_list().clone()
         };
 
         // project states
@@ -276,14 +278,14 @@ impl PlanBuilder {
             .map(|(v, oes)| {
                 let entity_state = oes.expect("ensured to exist by above validation");
                 let ps_state =
-                    if let Some(ps) = car.planning_states.iter().find(|&ps| v == &ps.entity_id) {
-                        ps.clone()
+                    if let Some(ps) = car.planning_states.iter().find(|&ps| v == &ps.entity_id()) {
+                        ps.as_planning_state().expect("no subtypes of PlanningState").clone()
                     } else {
                         // add in the assignment start point lead distance
-                        let pos0 = entity_state.get_location();
-                        let hdg = *entity_state.get_heading();
+                        let pos0 = entity_state.location();
+                        let hdg = entity_state.heading();
                         let (north_m0, east_m0) =
-                            convert_latlong_deg_to_northeast_m(pos0.latitude, pos0.longitude);
+                            convert_latlong_deg_to_northeast_m(pos0.latitude(), pos0.longitude());
                         let north_m = north_m0 +
                             self.assignment_start_point_lead_m * (hdg as f64).to_radians().cos();
                         let east_m = east_m0 +
@@ -293,17 +295,18 @@ impl PlanBuilder {
                         let position = Location3D {
                             latitude: lat_deg,
                             longitude: long_deg,
-                            ..*pos0
+                            altitude: pos0.altitude(),
+                            altitude_type: pos0.altitude_type(),
                         };
                         PlanningState {
                             entity_id: *v,
                             planning_heading: hdg,
-                            planning_position: position,
+                            planning_position: Box::new(position),
                         }
                     };
                 ProjectedState {
                     final_waypoint_id: 0,
-                    time: *entity_state.get_time(),
+                    time: entity_state.time(),
                     state: ps_state,
                 }
             })
@@ -323,14 +326,14 @@ impl PlanBuilder {
             let ta = ra.pop_front().ok_or(())?;
 
             let ps = pes.iter().find(|&ps| {
-                ps.state.entity_id == ta.assigned_vehicle
+                ps.state.entity_id() == ta.assigned_vehicle()
             }).ok_or(())?;
 
             self.expected_response_ids.insert(self.task_implementation_id, id);
 
-            let neighbors =  pes.iter().filter_map(|ref neighbor| {
-                if neighbor.state.entity_id != ps.state.entity_id {
-                    Some(neighbor.state)
+            let neighbors = pes.iter().filter_map(|ref neighbor| {
+                if neighbor.state.entity_id() != ps.state.entity_id() {
+                    Some(Box::new(neighbor.state.clone()) as Box<PlanningStateT>)
                 } else {
                     None
                 }
@@ -339,11 +342,11 @@ impl PlanBuilder {
                 corresponding_automation_request_id: id,
                 request_id: self.task_implementation_id,
                 starting_waypoint_id: ps.final_waypoint_id + 1,
-                vehicle_id: ta.assigned_vehicle,
-                task_id: ta.task_id,
-                option_id: ta.option_id,
-                region_id: uar.original_request.operating_region,
-                time_threshold: ta.time_threshold,
+                vehicle_id: ta.assigned_vehicle(),
+                task_id: ta.task_id(),
+                option_id: ta.option_id(),
+                region_id: uar.original_request.operating_region(),
+                time_threshold: ta.time_threshold(),
                 start_heading: ps.state.planning_heading,
                 start_position: ps.state.planning_position.clone(),
                 start_time: ps.time,
@@ -386,16 +389,16 @@ impl PlanBuilder {
         let mut ipr = self.in_progress_response.remove(&unique_request_id).ok_or(())?;
         let mut found_mish = false;
 
-        let next_wp = tiresp.task_waypoints.first().ok_or(())?.number;
+        let next_wp = tiresp.task_waypoints.first().ok_or(())?.number();
 
-        for mut mish in &mut ipr.original_response.mission_command_list {
-            if mish.vehicle_id == tiresp.vehicle_id {
+        for mut mish in ipr.original_response.mission_command_list_mut() {
+            if mish.vehicle_id() == tiresp.vehicle_id {
                 found_mish = true;
-                if let Some(back) = mish.waypoint_list.last_mut() {
-                    back.next_waypoint = next_wp;
+                if let Some(back) = mish.waypoint_list_mut().last_mut() {
+                    *back.next_waypoint_mut() = next_wp;
                 }
                 for wp in &tiresp.task_waypoints {
-                    mish.waypoint_list.push(wp.clone());
+                    mish.waypoint_list_mut().push(wp.clone());
                 }
                 break;
             }
@@ -409,7 +412,7 @@ impl PlanBuilder {
                 waypoint_list: tiresp.task_waypoints.clone(),
                 ..Default::default()
             };
-            ipr.original_response.mission_command_list.push(mish);
+            ipr.original_response.mission_command_list_mut().push(Box::new(mish));
         }
 
         self.in_progress_response.insert(unique_request_id, ipr);
@@ -418,7 +421,7 @@ impl PlanBuilder {
         if let Some(mut pes) = self.projected_entity_states.remove(&unique_request_id) {
             for st in &mut pes {
                 if st.state.entity_id == tiresp.vehicle_id {
-                    st.final_waypoint_id = tiresp.task_waypoints.last().ok_or(())?.number;
+                    st.final_waypoint_id = tiresp.task_waypoints.last().ok_or(())?.number();
                     st.time = tiresp.final_time;
                     st.state.planning_position = tiresp.final_location.clone();
                     st.state.planning_heading = tiresp.final_heading;
@@ -443,7 +446,7 @@ impl PlanBuilder {
                 if let Some(pes) = self.projected_entity_states.get(&unique_request_id) {
                     if let Some(mut ipr) = self.in_progress_response.remove(&unique_request_id) {
                         for e in pes {
-                            ipr.final_states.push(e.state.clone());
+                            ipr.final_states.push(Box::new(e.state.clone()));
                         }
                         msgs.push(LmcpType::UniqueAutomationResponse(ipr));
 
@@ -455,7 +458,7 @@ impl PlanBuilder {
                         };
                         let ss = ServiceStatus {
                             status_type: ServiceStatusType::Information,
-                            info: vec![kv],
+                            info: vec![Box::new(kv)],
                             ..Default::default()
                         };
                         msgs.push(LmcpType::ServiceStatus(ss));
@@ -522,7 +525,7 @@ fn mk_error(mut msg: String) -> LmcpType {
     };
     let ss = ServiceStatus {
         status_type: ServiceStatusType::Error,
-        info: vec![kv],
+        info: vec![Box::new(kv)],
         percent_complete: 0.0,
     };
     LmcpType::ServiceStatus(ss)
