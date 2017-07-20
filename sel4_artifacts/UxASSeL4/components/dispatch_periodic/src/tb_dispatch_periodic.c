@@ -55,9 +55,9 @@ uint32_t aadl_calendar_ticks = 0;
 
 
 void tb_thread_calendar() {
-    if ((aadl_calendar_counter % (100 / aadl_tick_interval)) == 0) {
+    if ((aadl_calendar_counter % (25 / aadl_tick_interval)) == 0) {
         Asset_Waypoint_Manager_periodic_dispatcher_emit();
-    }if ((aadl_calendar_counter % (100 / aadl_tick_interval)) == 0) {
+    }if ((aadl_calendar_counter % (25 / aadl_tick_interval)) == 0) {
         Waypoint_Manager_periodic_dispatcher_emit();
     }
 
