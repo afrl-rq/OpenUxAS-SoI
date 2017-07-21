@@ -87,6 +87,7 @@ else # update the local repo
     git checkout $BRANCH
     cd ..
 fi
+echo " "
 
 if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     cd $WORKSPACEDIR
@@ -114,16 +115,19 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
     if [ "$(uname)" == "Darwin" ]; then
     #if [ "$($(uname -s) | cut -c 1-6)" == "Darwin" ]; then
-        /Applications/Safari.app/Contents/MacOS/Safari & sleep 1 && osascript -e 'tell application "Safari" to open location "https://github.com/$REPO_SOURCE_OA/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar"'
+        /Applications/Safari.app/Contents/MacOS/Safari & sleep 1 && osascript -e 'tell application "Safari" to open location "https://github.com/$REPO_SOURCE_OA/OpenAMASE/releases/download/v1.2.0/OpenAMASE.jar"'
     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-        firefox https://github.com/$REPO_SOURCE_OA/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar &
+        firefox https://github.com/$REPO_SOURCE_OA/OpenAMASE/releases/download/v1.2.0/OpenAMASE.jar &
     fi
     read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
 elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
     cd $WORKSPACEDIR
     echo "Checkout + compile OpenAMASE:"
-    if [ ! -d "OpenAMASE" ]; then # pull down the repo for the first time
+    if [ ! -d "OpenAMASE/.git" ]; then # pull down the repo for the first time
+        if [ -d "OpenAMASE" ]; then # can't git pull into existing dir, so remove dir first
+            rm -rf OpenAMASE
+        fi
         git clone https://github.com/$REPO_SOURCE_OA/OpenAMASE.git
         FIRST_TIME=1
     else # update the local repo
@@ -131,9 +135,11 @@ elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
         git pull
         cd ..
     fi
+    mkdir -p OpenAMASE/OpenAMASE/dist
     echo "Loading provided Netbeans project for compile..."
     #echo "If you didn't download the OpenAMASE.jar file, then:"
-    echo "Please click 'Build' inside the project."
+    echo "Please double-click on the 'project.xml' file in the project to open the file."
+    echo "Then click 'Build' inside the project, and 'Build Anyway' in the 'Build Project' dialogue box (it's fine)."
     echo "Once you're done..."
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
     cd $WORKSPACEDIR/OpenAMASE/OpenAMASE
@@ -166,16 +172,19 @@ if [ "$DOWNLOAD_VS_COMPILE" == "-d" ]; then
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
     if [ "$(uname)" == "Darwin" ]; then
     #if [ "$($(uname -s) | cut -c 1-6)" == "Darwin" ]; then
-        /Applications/Safari.app/Contents/MacOS/Safari & sleep 1 && osascript -e 'tell application "Safari" to open location "https://github.com/$REPO_SOURCE_LG/LmcpGen/releases/download/v1.1.0/LmcpGen.jar"'
+        /Applications/Safari.app/Contents/MacOS/Safari & sleep 1 && osascript -e 'tell application "Safari" to open location "https://github.com/$REPO_SOURCE_LG/LmcpGen/releases/download/v1.4.0/LmcpGen.jar"'
     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-        firefox https://github.com/$REPO_SOURCE_LG/LmcpGen/releases/download/v1.1.0/LmcpGen.jar &
+        firefox https://github.com/$REPO_SOURCE_LG/LmcpGen/releases/download/v1.4.0/LmcpGen.jar &
     fi
     read -rs -p " " -n 1 # reference: https://ss64.com/bash/read.html
     echo " "
 elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
     cd $WORKSPACEDIR
     echo "Checkout + compile LmcpGen:"
-    if [ ! -d "LmcpGen" ]; then # pull down the repo for the first time
+    if [ ! -d "LmcpGen/.git" ]; then # pull down the repo for the first time
+        if [ -d "LmcpGen" ]; then # can't git pull into existing dir, so remove dir first
+            rm -rf LmcpGen
+        fi
         git clone https://github.com/$REPO_SOURCE_LG/LmcpGen.git
         FIRST_TIME=1
     else # update the local repo
@@ -183,9 +192,11 @@ elif [ "$DOWNLOAD_VS_COMPILE" == "-c" ]; then
         git pull
         cd ..
     fi
+    mkdir -p LmcpGen/dist
     echo "Loading provided Netbeans project for compile..."
-    echo "If you didn't download the LmcpGen.jar file, then:"
-    echo "Please click 'Build' inside the project."
+    #echo "If you didn't download the LmcpGen.jar file, then:"
+    echo "Please double-click on the 'project.xml' file in the project (open the file)."
+    echo "Then click 'Build' inside the project, and 'Build Anyway' in the 'Build Project' dialogue box (it's fine)."
     echo "Once you're done..."
     echo "Press any key to continue..." # reference: https://ss64.com/bash/read.html
     cd $WORKSPACEDIR/LmcpGen

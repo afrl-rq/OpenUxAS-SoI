@@ -276,6 +276,10 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
                 auto taskResponse = std::make_shared<uxas::messages::task::TaskAutomationResponse>();
                 taskResponse->setOriginalResponse(resp->getOriginalResponse()->clone());
                 taskResponse->setResponseID(m_playId[resp->getResponseID()]);
+                
+                // add FinalStates to task responses
+                for(auto st : resp->getFinalStates())
+                    taskResponse->getFinalStates().push_back(st->clone());
                 sendSharedLmcpObjectBroadcastMessage(taskResponse);
             }
             else if (m_sandboxMap[resp->getResponseID()] == AUTOMATION_REQUEST)
