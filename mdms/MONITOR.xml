@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+     <h2> Monitoring Messages </h2>
+     We now define messages that can be sent to indicate success or failure of individual tasks.
+     Author: Sriram Sankaranarayanan (srirams@colorado.edu)
+     Guohui Ding (guohui.ding@colorado.edu)
+ -->
+
+
+<MDM>
+  <SeriesName>MONITOR</SeriesName>
+  <Namespace>afrl/cmasi/autonomymonitor</Namespace>
+  <Version>1</Version>
+
+  <EnumList>
+    <Enum Name="OperatingZoneFailureType">
+      <Entry Name="KeepOutZoneFail" Value="0"/>
+      <Entry Name="KeepInZoneFail" Value="1"/>
+    </Enum>
+  </EnumList>
+  <StructList>
+    
+    <Struct Name="OperatingZoneFailure">
+      <Field Name="ZoneID" Type="int64" Units="None" />
+      <Field Name="FailureType" Type="OperatingZoneFailureType"/>
+      <Field Name="ResponsibleVehicleID" Type="int64" />
+      <Field Name="FailureTime" Type="int64" Units="milliseconds"/>
+      <Field Name="FailureLatitude" Type="real64" Units="degree"/>
+      <Field Name="FailureLongitude" Type="real64" Units="degree"/>
+      <Field Name="FailureAltitude" Type="real64" Units="meters"/>
+      <Field Name="FailureAltitudeType" Type="AltitudeType" Series="CMASI" Default="MSL" />
+    </Struct>
+    
+  </StructList>
+</MDM>
