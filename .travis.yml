@@ -51,3 +51,4 @@ script:
   # build with -j2; Travis has 2 "cores"
   - ninja -C build test -j2
   
+cache: ccache
