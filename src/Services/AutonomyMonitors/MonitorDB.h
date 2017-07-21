@@ -44,15 +44,20 @@ namespace uxas {
       
       class MonitorDB {
       private:
-        std::vector<MonitorBase*> allMonitors;
+        
         std::vector<VehicleStateMessage> allVehicleStateMessages;
 	AutonomyMonitorServiceMain * service_;
 	
 	std::map<int64_t, std::shared_ptr<afrl::cmasi::KeepOutZone> > keepOutZones;
 	std::map<int64_t, std::shared_ptr<afrl::cmasi::KeepInZone> > keepInZones;
-	std::vector<std::shared_ptr<afrl::cmasi::PointSearchTask> > pointSearchTasks;
-	std::vector<std::shared_ptr<afrl::cmasi::LineSearchTask> > lineSearchTasks;
-	std::vector<std::shared_ptr<afrl::cmasi::AreaSearchTask> > areaSearchTasks;
+	std::map<int64_t, std::shared_ptr<afrl::cmasi::PointSearchTask> > pointSearchTasks;
+	std::map<int64_t, std::shared_ptr<afrl::cmasi::LineSearchTask> > lineSearchTasks;
+	std::map<int64_t, std::shared_ptr<afrl::cmasi::AreaSearchTask> > areaSearchTasks;
+	std::map<int64_t, std::shared_ptr<afrl::cmasi::OperatingRegion> > allOperatingRegions;
+
+	std::vector<MonitorBase*> allMonitors;
+	std::map<int64_t, MonitorBase*> taskMonitorsByTaskID;
+	std::map<int64_t, std::vector<MonitorBase*> > taskMonitorsByVehicleID;
 	
       public:
         /* Default Constructor */
@@ -85,6 +90,9 @@ namespace uxas {
       protected:
         void registerVehicleState(VehicleStateMessage  vMessage);
         void addMonitor(MonitorBase * what) ;
+	void createMonitorsForOperatingRegion(int64_t regionID);
+	void createMonitorForTask(messages::task::TaskAssignment * ta);
+	void addTaskMonitorForVehicle(int64_t vehicleID, int64_t taskID, MonitorBase * mon);
 
 
       };
