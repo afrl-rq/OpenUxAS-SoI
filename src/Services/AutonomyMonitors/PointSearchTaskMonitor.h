@@ -4,6 +4,7 @@
 
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
+#include "afrl/cmasi/PointSearchTask.h"
 
 namespace uxas {
 namespace service {
@@ -12,8 +13,9 @@ namespace monitoring {
   class PointSearchTaskMonitor: public MonitorBase {
   public:
 
-    PointSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::PointSearchTask> pointSearchTask):MonitorBase(service_ptr), _task(pointSearchTask){}
-    // GUOHUI: call parent constructor with service_ptr  See KeepOutZoneMonitor.cpp
+    PointSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::PointSearchTask> pointSearchTask);
+    ~PointSearchTaskMonitor();
+    
     void addVehicleStateMessage(VehicleStateMessage const & vMessage);
     bool isPropertySatisfied();
     double propertyRobustness();

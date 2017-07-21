@@ -43,8 +43,12 @@ namespace uxas {
         std::vector<MonitorBase*> allMonitors;
         std::vector<VehicleStateMessage> allVehicleStateMessages;
 	AutonomyMonitorServiceMain * service_;
+	
 	std::map<int64_t, std::shared_ptr<afrl::cmasi::KeepOutZone> > keepOutZones;
 	std::map<int64_t, std::shared_ptr<afrl::cmasi::KeepInZone> > keepInZones;
+	std::vector<std::shared_ptr<afrl::cmasi::PointSearchTask> > pointSearchTasks;
+	std::vector<std::shared_ptr<afrl::cmasi::LineSearchTask> > lineSearchTasks;
+	std::vector<std::shared_ptr<afrl::cmasi::AreaSearchTask> > areaSearchTasks;
 	
       public:
         /* Default Constructor */

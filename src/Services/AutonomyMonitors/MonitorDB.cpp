@@ -24,13 +24,22 @@
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "AutonomyMonitors/KeepOutZoneMonitor.h"
 #include "AutonomyMonitors/KeepInZoneMonitor.h"
+#include "AutonomyMonitors/PointSearchTaskMonitor.h"
+#include "AutonomyMonitors/LineSearchTaskMonitor.h"
+#include "AutonomyMonitors/AreaSearchTaskMonitor.h"
+
 
 namespace uxas {
   namespace service {
     namespace monitoring {
 
       MonitorDB::MonitorDB(AutonomyMonitorServiceMain  * service_ptr): service_(service_ptr) {};
-      MonitorDB::~MonitorDB() {};
+      MonitorDB::~MonitorDB() {
+	for (auto m: allMonitors){
+	  delete(m);
+	}
+      }
+      
       void MonitorDB::addMonitor(MonitorBase* what)
         {
           allMonitors.push_back(what);
@@ -107,6 +116,28 @@ namespace uxas {
         return true;
       }
       bool MonitorDB::processTask(std::shared_ptr<afrl::cmasi::Task> ptr){
+	// Check what kind of task it is
+
+	auto ptSearchTask = std::dynamic_pointer_cast<afrl::cmasi::PointSearchTask>(ptr);
+	if (ptSearchTask){
+	  this -> pointSearchTasks.push_back(ptSearchTask);
+	  PointSearchTaskMonitor* pstm = new PointSearchTaskMonitor(this-> service_, ptSearchTask);
+	  addMonitor(pstm);
+	} else {
+	  auto lineSearchTask = std::dynamic_pointer_cast<afrl::cmasi::LineSearchTask>(ptr);
+	  if (lineSearchTask){
+	    this -> lineSearchTasks.push_back(lineSearchTask);
+	    LineSearchTaskMonitor * lstm = new LineSearchTaskMonitor(this -> service_, lineSearchTask);
+	    addMonitor(lstm);
+	  } else {
+	    auto areaSearchTask = std::dynamic_pointer_cast<afrl::cmasi::AreaSearchTask>(ptr);
+	    if (areaSearchTask){
+	      this -> areaSearchTasks.push_back(areaSearchTask);
+	      AreaSearchTaskMonitor * astm = new AreaSearchTaskMonitor(this -> service_, areaSearchTask);
+	      addMonitor(astm);
+	    }
+	  }
+	}
         return true;
       }
 
