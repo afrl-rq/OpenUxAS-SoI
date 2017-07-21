@@ -873,9 +873,9 @@
             <Field Name="Footprint" Type="Location3D[]" MaxArrayLength="8" Units="None" />
 
             <!-- the current location according to the intersection of a ray along the center axis of the current
-                camera field of view with the ground.  If this field is null, then the location was not computed.
+                camera field of view with the ground.  If this field is not present, then the location was not computed.
             -->
-            <Field Name="Centerpoint" Type="Location3D" Default="null"/>
+            <Field Name="Centerpoint" Type="Location3D" Optional="true"/>
         </Struct>
 
         <!-- Defines a circular shape based on a center point and radius -->
@@ -1501,9 +1501,9 @@
         -->
         <Struct Name="WeatherReport">
 
-            <!-- The area for which this report pertains.  If this is null, then the report
+            <!-- The area for which this report pertains.  If this is not present, then the report
                  pertains to the entire area. -->
-            <Field Name="Area" Type="AbstractZone" Default="null"/>
+            <Field Name="Area" Type="AbstractZone" Optional="true"/>
 
             <!-- Windspeed value for this area -->
             <Field Name="WindSpeed" Type="real32" Units="meter/sec"/>
@@ -1552,11 +1552,11 @@
             <Field Name="PauseTime" Type="int64" Units="milliseconds" Default="0"/>
         </Struct>
         
-        <!-- Tells the Entity to stop at the given location.  If the location is null, then the 
+        <!-- Tells the Entity to stop at the given location.  If no location is given, then the 
         entity will stop immediately. -->
         <Struct Name="StopMovementAction" Extends="VehicleAction" >
-            <!-- A location at which the entity should stop.  If this is null, the entity will stop immediately. -->
-            <Field Name="Location" Type="Location3D" Series="CMASI" Default="null"/>
+            <!-- A location at which the entity should stop.  If not given, the entity will stop immediately. -->
+            <Field Name="Location" Type="Location3D" Series="CMASI" Optional="true"/>
         </Struct>
         
         <!-- Handles the transfer of waypoints.  This does not affect the current navigation of the 

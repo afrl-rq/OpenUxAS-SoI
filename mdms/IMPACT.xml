@@ -388,8 +388,8 @@
             <!-- A list of acceptable look-angles for this task.  Each wedge is defined relative to true North. To be a valid look angle, a sensor must be looking from a direction within the bounds of the wedge. -->
             <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" Series="CMASI" />
 			
-            <!-- Loiter action to complete to fulfill task. If null, then simply points camera but main trajectory does not change. Otherwise, completes the specified loiter action. -->
-            <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Default="null"/>
+            <!-- Loiter action to complete to fulfill task. If not given, simply points camera but main trajectory does not change. Otherwise, completes the specified loiter action. -->
+            <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Optional="true" />
         </Struct>
         
         <!-- Search task with specified search pattern -->
@@ -486,7 +486,7 @@
             <!-- Biases the blockade so that more vehicles are between enemy and protected
             location. If no location is given, then blockade attempts to block in direction
             of enemy travel -->
-            <Field Name="ProtectedLocation" Type="CMASI/Location3D" Default="NULL" />
+            <Field Name="ProtectedLocation" Type="CMASI/Location3D" Optional="true" />
         </Struct>
         
 		<!-- Task for targeting surveillance at an offset of a moving entity, for example to

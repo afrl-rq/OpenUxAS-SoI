@@ -8,17 +8,16 @@
 // ===============================================================================
 
 /*
- * File:   HelloRust.rs
+ * File:   hello_rust.rs
  * Author: acfoltzer
  */
 
-extern crate lmcp_rs;
 use lmcp_rs::*;
 
 use std::slice;
 
 #[no_mangle]
-pub extern "C" fn processReceivedLmcpMessage_rs(buf: *const u8, len: usize) {
+pub extern "C" fn hello_rust_process_received_lmcp_message(buf: *const u8, len: usize) {
     let buf_slice = unsafe {
         slice::from_raw_parts(buf, len)
     };

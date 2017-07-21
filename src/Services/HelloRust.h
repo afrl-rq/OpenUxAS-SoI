@@ -20,10 +20,6 @@
 #include "CallbackTimer.h"
 #include "TypeDefs/UxAS_TypeDefs_Timer.h"
 
-extern "C" {
-void processReceivedLmcpMessage_rs(uint8_t *buf, uint32_t capacity);
-}
-
 namespace uxas
 {
 namespace service

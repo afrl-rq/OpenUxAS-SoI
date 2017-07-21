@@ -387,6 +387,18 @@ public:
      */
     bool
     removeAllSubscriptionAddresses();
+
+    
+    /** \brief The <B><i>sendSharedLmcpObjectBroadcastMessage</i></B> method can be 
+     * invoked to broadcast a <b>LMCP</b> object message on the <b>LMCP</b> network.
+     *
+     * <b>Temporarily made public to support Rust interop</b>
+     * 
+     * @param lmcpObject <b>LMCP</b> object to be broadcasted. The message publish 
+     * address is derived from the full <b>LMCP</b> object name.
+     */
+    void
+    sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject);
     
     /** \brief The <B><i>sendLmcpObjectLimitedCastMessage</i></B> method can be 
      * invoked to send a uni-cast or multi-cast <b>LMCP</b> object message to the <b>LMCP</b> network. 
@@ -415,15 +427,6 @@ protected:
      */
     void
     sendSerializedLmcpObjectMessage(std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> serializedLmcpObject);
-    
-    /** \brief The <B><i>sendSharedLmcpObjectBroadcastMessage</i></B> method can be 
-     * invoked to broadcast a <b>LMCP</b> object message on the <b>LMCP</b> network. 
-     * 
-     * @param lmcpObject <b>LMCP</b> object to be broadcasted. The message publish 
-     * address is derived from the full <b>LMCP</b> object name.
-     */
-    void
-    sendSharedLmcpObjectBroadcastMessage(const std::shared_ptr<avtas::lmcp::Object>& lmcpObject);
 
     /** \brief The <B><i>sendSharedLmcpObjectLimitedCastMessage</i></B> method can be 
      * invoked to send a uni-cast or multi-cast <b>LMCP</b> object message to the <b>LMCP</b> network. 

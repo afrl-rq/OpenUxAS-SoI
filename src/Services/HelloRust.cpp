@@ -35,6 +35,10 @@
 #define STRING_XML_STRING_TO_SEND "StringToSend"
 #define STRING_XML_SEND_PERIOD_MS "SendPeriod_ms"
 
+extern "C" {
+void hello_rust_process_received_lmcp_message(uint8_t *buf, uint32_t capacity);
+}
+
 // namespace definitions
 namespace uxas  // uxas::
 {
@@ -107,10 +111,10 @@ bool HelloRust::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
         auto keyValuePairIn = std::static_pointer_cast<afrl::cmasi::KeyValuePair> (receivedLmcpMessage->m_object);
         std::cout << "*** RECEIVED:: Received Id[" << m_serviceId << "] Sent Id[" << keyValuePairIn->getKey() << "] Message[" << keyValuePairIn->getValue() << "] *** " << std::endl;
 
-	//serialize message and pass to Rust
-	avtas::lmcp::ByteBuffer * lmcpByteBuffer = avtas::lmcp::Factory::packMessage(keyValuePairIn.get(), true);
-	processReceivedLmcpMessage_rs(lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
-	delete lmcpByteBuffer;
+        //serialize message and pass to Rust
+        avtas::lmcp::ByteBuffer * lmcpByteBuffer = avtas::lmcp::Factory::packMessage(keyValuePairIn.get(), true);
+        hello_rust_process_received_lmcp_message(lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
+        delete lmcpByteBuffer;
     }
     return false;
 }
