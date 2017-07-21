@@ -210,6 +210,13 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
 
         if (airVehicleState->getID() == m_vehicleID)
         {
+            m_lastSafeReportedToWaypoint5 = m_lastSafeReportedToWaypoint4; 
+            m_lastSafeReportedToWaypoint4 = m_lastSafeReportedToWaypoint3; 
+            m_lastSafeReportedToWaypoint3 = m_lastSafeReportedToWaypoint2; 
+            m_lastSafeReportedToWaypoint2 = m_lastSafeReportedToWaypoint1; 
+            m_lastSafeReportedToWaypoint1 = m_lastSafeReportedToWaypoint; 
+            m_lastSafeReportedToWaypoint = m_lastPrevReportedToWaypoint;
+            m_lastPrevReportedToWaypoint = m_lastReportedToWaypoint;
             m_lastReportedToWaypoint = airVehicleState->getCurrentWaypoint();
             afrl::cmasi::Waypoint* wp= this->getWaypointFromID(m_lastReportedToWaypoint);            
             
@@ -253,10 +260,21 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         long bufsize=10;
                         long idx=0;
                         
-                        busy_timestamped(15, tsbuffer, bufsize, &idx);
+                        if (!_temporalEnforcementActionActive){
+                            // test with bad overrun -- disable enforcement signal -- was 15
+                            busy_timestamped(1000, tsbuffer, bufsize, &idx);
+                        } else {
+                            // changed from 15
+                            busy_timestamped(1000, tsbuffer, bufsize, &idx);                            
+                        }
                                                 
                         // clear the next command in order not to do anything
-                        _nextMissionCommandToSend.reset();                                                
+                        _nextMissionCommandToSend.reset();    
+                        
+                        if (!_temporalEnforcementActionActive){
+                            // for testing we simulate a "stop" here
+                            _stopped = true;
+                        }
                     }
                 }
             } else  // _stopped
@@ -392,11 +410,11 @@ WaypointPlanManagerService::safeStop()
     
     if (m_lastReportedToWaypoint >=0)
     {
-        wp = this->getWaypointFromID(m_lastReportedToWaypoint);
+        wp = this->getWaypointFromID(m_lastReportedToWaypoint-2);
         if (wp != NULL)
         {            
             afrl::cmasi::LoiterAction * pLoiterAction(new afrl::cmasi::LoiterAction());
-            pLoiterAction->setRadius(m_loiterRadiusDefault_m);
+            pLoiterAction->setRadius(100);//m_loiterRadiusDefault_m);
             pLoiterAction->setDuration(-1);
             pLoiterAction->setAirspeed(wp->getSpeed());
             afrl::cmasi::Location3D* pLocation3D = new afrl::cmasi::Location3D();
@@ -509,34 +527,39 @@ WaypointPlanManagerService::projectWayPoint(const afrl::cmasi::Waypoint &startBo
 
 void WaypointPlanManagerService::zs_budget_enforcement_handler(int rid)
 {  
-    afrl::cmasi::Waypoint beginBorder;
-    beginBorder.setLatitude(45.2898);
-    beginBorder.setLongitude(-121.01294);
-    afrl::cmasi::Waypoint endBorder;
-    endBorder.setLatitude(45.32789);
-    endBorder.setLongitude(-120.91681);
-    
+//    afrl::cmasi::Waypoint beginBorder;
+//    beginBorder.setLatitude(45.2898);
+//    beginBorder.setLongitude(-121.01294);
+//    afrl::cmasi::Waypoint endBorder;
+//    endBorder.setLatitude(45.32789);
+//    endBorder.setLongitude(-120.91681);
 
-    std::cout << "Budget enforcement("<<rid<<"): ";
-    if (isRuntimeAssuranceOn())
+    std::cout << "Budget enforcement rid("<<rid<<"): tid("<<gettid()<<")";
+    if (isRuntimeAssuranceOn() && _temporalEnforcementActionActive)
     {
         std::cout<< "Runtime Assurance ACTIVE: ";
-        if (m_lastReportedToWaypoint >=0)
-        {
-            afrl::cmasi::Waypoint* wp= getWaypointFromID(m_lastReportedToWaypoint);            
-            if (wp != NULL) 
-            {
-                if (!allowedWaypoint(beginBorder,endBorder,*wp))
-                {
-                    //_nextMissionCommandToSend.reset();
-                    if (!_stopped){
-                        std::cout << "stopping!";
-                        _stopped = true;
-                        safeStop();
-                    }
-                }
-            }
+        if (!_stopped){
+            std::cout << "stopping!";
+            _stopped = true;
+            safeStop();
         }
+
+//        if (m_lastReportedToWaypoint >=0)
+//        {
+//            afrl::cmasi::Waypoint* wp= getWaypointFromID(m_lastReportedToWaypoint);            
+//            if (wp != NULL) 
+//            {
+//                if (!allowedWaypoint(beginBorder,endBorder,*wp))
+//                {
+//                    //_nextMissionCommandToSend.reset();
+//                    if (!_stopped){
+//                        std::cout << "stopping!";
+//                        _stopped = true;
+//                        safeStop();
+//                    }
+//                }
+//            }
+//        }
     }
     else
     {

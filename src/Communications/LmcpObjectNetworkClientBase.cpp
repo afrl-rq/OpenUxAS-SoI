@@ -315,7 +315,6 @@ LmcpObjectNetworkClientBase::initializeNetworkClient()
             std::cout << "Error opening the scheduler\n";
         }
 
-    
         if ((zs_rid = zsv_create_reserve(zs_schedfd,
 				zs_period_secs, // period_secs
 				zs_period_nsecs, // period_nsecs
@@ -328,9 +327,9 @@ LmcpObjectNetworkClientBase::initializeNetworkClient()
 				1, // priority -- will be changed internally so setting it to 1 is enough
 				zs_criticality  // criticality
 				))<0){
-            std::cout << "error calling create reserve\n";
-        }
-
+            std::cout << "error creating reserve\n";
+        } 
+        
         if (zsv_fork_enforcement_handler(zs_schedfd,zs_rid,zs_budget_enforcement_helper,this)<0){
             std::cout << "::initializesendAddressedAttributedMessageNetworkClient method COULD NOT REGISTER budget enforcement handler helper\n" ;
         }

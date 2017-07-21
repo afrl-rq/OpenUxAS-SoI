@@ -199,6 +199,13 @@ protected:
     /*! \brief  this is the last "to" (destination) waypoint reported by the
      *  vehicle*/
     int64_t m_lastReportedToWaypoint = {-1};
+    int64_t m_lastPrevReportedToWaypoint = {-1};
+    int64_t m_lastSafeReportedToWaypoint = {-1};
+    int64_t m_lastSafeReportedToWaypoint1 = {-1};
+    int64_t m_lastSafeReportedToWaypoint2 = {-1};
+    int64_t m_lastSafeReportedToWaypoint3 = {-1};
+    int64_t m_lastSafeReportedToWaypoint4 = {-1};
+    int64_t m_lastSafeReportedToWaypoint5 = {-1};
     /*! \brief  the turn type to send out in mission commands*/
     afrl::cmasi::TurnType::TurnType _turnType = {afrl::cmasi::TurnType::TurnShort};
     /*! \brief  storage for the next mission command to send out*/
@@ -213,6 +220,7 @@ protected:
 
     // RTA fields
     std::shared_ptr<avtas::lmcp::Object> _stopMissionCommandToSend;
+    bool _temporalEnforcementActionActive=true;
     bool _stopped = false;
     int64_t m_idMissionSegmentPrev = {0};
     
