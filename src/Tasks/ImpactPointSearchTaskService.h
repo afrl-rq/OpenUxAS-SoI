@@ -174,6 +174,7 @@ private:
     bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const double& wedgeHeading_rad);
 private:
     std::shared_ptr<afrl::impact::ImpactPointSearchTask> m_pointSearchTask;
+    std::shared_ptr<afrl::impact::PointOfInterest> m_pointOfInterest;
 
 };
 

@@ -186,9 +186,9 @@ namespace task
 
     protected:
 
-        /** \brief used to assign values to the different type of routes. These
-         * values are mangled into the <B><i>RoutePlanRequest</i></B> ID to 
-         * differentiate the RoutePlanResponses */
+        /** \brief Used to assign values to the different type of routes. A
+         * mapping is maintained from <B><i>RoutePlanRequest</i></B> ID to 
+         * differentiate type of request made (see m_routeType) */
         enum class RouteTypeEnum
         {
             UNKNOWN = 0,
@@ -242,12 +242,8 @@ namespace task
         int64_t getOptionRouteId(const int64_t& OptionId);
         /*! \brief builds a RouteId, from the taskId and m_implementationRouteCount, for use with routes requested for task implementation */
         int64_t getImplementationRouteId(const int64_t& OptionId);
-        /*! \brief builds a RouteId, from the RouteType (enum), taskId, and OptionId */
-        int64_t getRouteId(const RouteTypeEnum& routeTypeEnum, const int64_t& OptionId);
         /*! \brief parses a RouteId, response to find the OptionId */
         int64_t getOptionIdFromRouteId(const int64_t& routeId);
-        /*! \brief parses a RouteId, response to find the TaskId */
-        int64_t getTaskFromRouteId(const int64_t& routeId);
         /*! \brief parses a RouteId, response to find the RouteType (enum) */
         RouteTypeEnum getRouteTypeFromRouteId(const int64_t& routeId);
 
@@ -304,13 +300,15 @@ namespace task
         int64_t m_latestUniqueAutomationRequestId{0};
         
         /*! \brief  copy of all known  <B><i>EntityConfiguration</i></B>s*/
-        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_idVsEntityConfiguration;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_entityConfigurations;
+        /*! \brief  copy of all known  <B><i>EntityConfiguration</i></B>s*/
+        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_entityStates;
 
         //ROUTING
-        /*! \brief used as an offset to "mangle" the taskId into route Ids (using multiplier instead of shift to make Id human readable) */
-        const int64_t m_taskMangleMultiplier{100000};
-        /*! \brief used as an offset to "mangle" the taskId into route Ids (using multiplier instead of shift to make Id human readable) */
-        const int64_t m_implementationMangleMultiplier{100000000000};
+        /*! \brief map from route IDs to (task, option) IDs */
+        std::unordered_map<int64_t, int64_t > m_routeOption;
+        /*! \brief map from route IDs to route type */
+        std::unordered_map<int64_t, RouteTypeEnum > m_routeType;
         /*! \brief storage for route implementation requests, used to build 
          * <B><i>TaskImplementationResonse</i></B>s  */
         std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::TaskImplementationRequest>> m_routeIdVsTaskImplementationRequest;
@@ -326,38 +324,31 @@ namespace task
         int64_t m_transitionRouteRequestId{0};
         
         //ACTIVE TASK
-        /*! \brief should the waypoints from the last task to this one be added 
-         * to the active waypoints list (m_taskActiveWaypoints) */
+        /*! \brief indicates whether the waypoints from the last task to this one 
+         * should be added to the active waypoints list (m_taskActiveWaypoints) */
         bool m_isMakeTransitionWaypointsActive{false};
         /*! \brief all entities assigned to this task, that are currently actively
          * performing this task */
         std::unordered_set<int64_t> m_activeEntities;
         
-        ///// TASK SPECIFIC 
-        /*! \brief  the <B><i>AreaOfInterest</i></B> required by this task. 
+        /*! \brief  all <B><i>AreaOfInterest</i></B> objects. 
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
-        std::shared_ptr<afrl::impact::AreaOfInterest> m_areaOfInterest;
-        /*! \brief  the <B><i>LineOfInterest</i></B> required by this task. 
-         * NOTE: Object received before task creation are only available when 
-         * configured in the @ref c_Component_TaskManager*/
-        std::shared_ptr<afrl::impact::LineOfInterest> m_lineOfInterest;
-        /*! \brief  the <B><i>PointOfInterest</i></B> required by this task. 
-         * NOTE: Object received before task creation are only available when 
-         * configured in the @ref c_Component_TaskManager*/
-        std::shared_ptr<afrl::impact::PointOfInterest> m_pointOfInterest;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::AreaOfInterest> > m_areasOfInterest;
         /*! \brief  all <B><i>LineOfInterest</i></B> objects. 
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
-        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::LineOfInterest> > m_idVsLineOfInterest;
+        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::LineOfInterest> > m_linesOfInterest;
+        /*! \brief  all <B><i>PointOfInterest</i></B> objects. 
+         * NOTE: Object received before task creation are only available when 
+         * configured in the @ref c_Component_TaskManager*/
+        std::unordered_map<int64_t, std::shared_ptr<afrl::impact::PointOfInterest> > m_pointsOfInterest;
         /*! \brief  the current <B><i>MissionCommand</i></B> for all entities. 
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
-        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_vehicleIdVsCurrentMission;
-
+        std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_currentMissions;
         
-        
-
+        int64_t m_uniqueRouteRequestId{1};
     };
 
 }; //namespace task

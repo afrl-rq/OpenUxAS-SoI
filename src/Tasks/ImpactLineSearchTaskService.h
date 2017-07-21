@@ -174,6 +174,7 @@ private:
 
 private:
     std::shared_ptr<afrl::cmasi::LineSearchTask> m_lineSearchTask;
+    std::shared_ptr<afrl::impact::LineOfInterest> m_lineOfInterest;
     std::unordered_multimap<int64_t, std::shared_ptr<Dpss> > m_optionIdVsDpss;
     std::shared_ptr<Dpss> m_activeDpss;
     bool m_isPlanBothDirections = true;

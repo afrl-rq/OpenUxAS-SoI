@@ -76,57 +76,51 @@ ImpactLineSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
         if (afrl::impact::isImpactLineSearchTask(m_task.get()))
         {
             auto impactLineSearchTask = std::static_pointer_cast<afrl::impact::ImpactLineSearchTask>(m_task);
-            if (impactLineSearchTask)
+            auto foundLine = m_linesOfInterest.find(impactLineSearchTask->getLineID());
+            if (foundLine != m_linesOfInterest.end())
             {
-                if ((m_lineOfInterest) && (m_lineOfInterest->getLineID() == impactLineSearchTask->getLineID()))
+                m_lineOfInterest = foundLine->second;
+                
+                //COPY PARAMETERS FROM IMPACT LINE SEARCH TO CMASI LINE SEARCH
+                m_lineSearchTask = std::shared_ptr<afrl::cmasi::LineSearchTask>(new afrl::cmasi::LineSearchTask());
+                // copy the search task parameters
+                m_lineSearchTask->getEligibleEntities() = impactLineSearchTask->getEligibleEntities();
+                m_lineSearchTask->setDwellTime(impactLineSearchTask->getDwellTime());
+                m_lineSearchTask->setGroundSampleDistance(impactLineSearchTask->getGroundSampleDistance());
+                m_lineSearchTask->setLabel(impactLineSearchTask->getLabel());
+                m_lineSearchTask->setPriority(impactLineSearchTask->getPriority());
+                m_lineSearchTask->setRequired(impactLineSearchTask->getRequired());
+                m_lineSearchTask->setTaskID(impactLineSearchTask->getTaskID());
+                for (auto& wedge : impactLineSearchTask->getViewAngleList())
                 {
-                    //COPY PARAMETERS FROM IMPACT LINE SEARCH TO CMASI LINE SEARCH
-                    m_lineSearchTask = std::shared_ptr<afrl::cmasi::LineSearchTask>(new afrl::cmasi::LineSearchTask());
-                    // copy the search task parameters
-                    m_lineSearchTask->getEligibleEntities() = impactLineSearchTask->getEligibleEntities();
-                    m_lineSearchTask->setDwellTime(impactLineSearchTask->getDwellTime());
-                    m_lineSearchTask->setGroundSampleDistance(impactLineSearchTask->getGroundSampleDistance());
-                    m_lineSearchTask->setLabel(impactLineSearchTask->getLabel());
-                    m_lineSearchTask->setPriority(impactLineSearchTask->getPriority());
-                    m_lineSearchTask->setRequired(impactLineSearchTask->getRequired());
-                    m_lineSearchTask->setTaskID(impactLineSearchTask->getTaskID());
-                    for (auto& wedge : impactLineSearchTask->getViewAngleList())
-                    {
-                        m_lineSearchTask->getViewAngleList().push_back(wedge->clone());
-                    }
-                    m_lineSearchTask->setUseInertialViewAngles(impactLineSearchTask->getUseInertialViewAngles());
-                    // copy the line points
-                    for (auto& point : m_lineOfInterest->getLine())
-                    {
-                        m_lineSearchTask->getPointList().push_back(point->clone());
-                    }
+                    m_lineSearchTask->getViewAngleList().push_back(wedge->clone());
+                }
+                m_lineSearchTask->setUseInertialViewAngles(impactLineSearchTask->getUseInertialViewAngles());
+                // copy the line points
+                for (auto& point : m_lineOfInterest->getLine())
+                {
+                    m_lineSearchTask->getPointList().push_back(point->clone());
+                }
 
-                    //////////////////////////////////////////////
-                    //////////// PROCESS OPTIONS /////////////////
-                    pugi::xml_node ndTaskOptions = ndComponent.child(m_taskOptions_XmlTag.c_str());
-                    if (ndTaskOptions)
+                //////////////////////////////////////////////
+                //////////// PROCESS OPTIONS /////////////////
+                pugi::xml_node ndTaskOptions = ndComponent.child(m_taskOptions_XmlTag.c_str());
+                if (ndTaskOptions)
+                {
+                    for (pugi::xml_node ndTaskOption = ndTaskOptions.first_child(); ndTaskOption; ndTaskOption = ndTaskOption.next_sibling())
                     {
-                        for (pugi::xml_node ndTaskOption = ndTaskOptions.first_child(); ndTaskOption; ndTaskOption = ndTaskOption.next_sibling())
+                        if (std::string(STRING_XML_LINE_SEARCH_ONE_DIRECTION) == ndTaskOption.name())
                         {
-                            if (std::string(STRING_XML_LINE_SEARCH_ONE_DIRECTION) == ndTaskOption.name())
-                            {
-                                m_isPlanBothDirections = false;
-                            }
+                            m_isPlanBothDirections = false;
                         }
                     }
                 }
-                else //if (std:string(STRING_XML_CFG_MESSAGE) == xmldocNode.name())
-                {
-                    sstrErrors << "ERROR:: **ImpactLineSearchTaskService::bConfigure failed: could not parse ndComponent.name()[" << ndComponent.name() << "]" << std::endl;
-                    CERR_FILE_LINE_MSG(sstrErrors.str())
-
-                    isSuccessful = false;
-                }
             }
-            else
+            else //if (foundLine != m_linesOfInterest.end())
             {
-                sstrErrors << "ERROR:: **ImpactLineSearchTaskService::bConfigure LineOfInterest [" << impactLineSearchTask->getLineID() << "] was not found." << std::endl;
+                sstrErrors << "ERROR:: **ImpactLineSearchTaskService::bConfigure failed: could not parse find line ID [" << impactLineSearchTask->getLineID() << "]" << std::endl;
                 CERR_FILE_LINE_MSG(sstrErrors.str())
+
                 isSuccessful = false;
             }
         }
@@ -558,8 +552,8 @@ void ImpactLineSearchTaskService::activeEntityState(const std::shared_ptr<afrl::
         // find the gimbal payload id to use to point the camera 
         //ASSUME: use first gimbal
         int64_t gimbalPayloadId = 0;
-        auto itEntityConfiguration = m_idVsEntityConfiguration.find(entityState->getID());
-        if (itEntityConfiguration != m_idVsEntityConfiguration.end())
+        auto itEntityConfiguration = m_entityConfigurations.find(entityState->getID());
+        if (itEntityConfiguration != m_entityConfigurations.end())
         {
             for (auto& payload : itEntityConfiguration->second->getPayloadConfigurationList())
             {

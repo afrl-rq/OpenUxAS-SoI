@@ -180,7 +180,7 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeepOutZone")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.LineSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.OperatingRegion")));
-    EXPECT_EQ(4,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
+    EXPECT_EQ(5,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AngledAreaSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AreaOfInterest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.ImpactLineSearchTask")));
