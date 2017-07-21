@@ -13,14 +13,14 @@ namespace monitoring {
    class LineSearchTaskMonitor: public MonitorBase {
   public:
 
-     LineSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::LineSearchTask> pointSearchTask);
-      ~LineSearchTaskMonitor();
-    void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-    bool isPropertySatisfied();
-    double propertyRobustness();
-  protected:
-    std::shared_ptr<afrl::cmasi::LineSearchTask> _task;
-  };
+     LineSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::LineSearchTask> lineSearchTask);
+     ~LineSearchTaskMonitor();
+     void addVehicleStateMessage(VehicleStateMessage const & vMessage);
+     bool isPropertySatisfied();
+     double propertyRobustness();
+   protected:
+     std::shared_ptr<afrl::cmasi::LineSearchTask> _task;
+   };
 
 
 }
