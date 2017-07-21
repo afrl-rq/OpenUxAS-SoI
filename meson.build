@@ -9,7 +9,7 @@ if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
-  link_args += ['-ldl']
+  link_args += ['-lresolv', '-ldl']
 elif os == 'windows'
   link_args += []
 endif
