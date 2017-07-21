@@ -26,7 +26,7 @@ before_install:
   - curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path
   - rustc --version
   # install newer Meson than is packaged in repos
-  - pip3 install --user https://github.com/acfoltzer/meson/tarball/rustc-args-fix
+  - pip3 install --user https://github.com/acfoltzer/meson/tarball/OpenUxAS
   - meson --version
   # download newer Ninja than is packaged in repos
   - curl -L -s https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip -o ninja-linux.zip

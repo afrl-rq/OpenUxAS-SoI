@@ -136,7 +136,7 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
 1. Install ninja build system: in terminal
    - `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   - `sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/rustc-args-fix`
+   - `sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/OpenUxAS`
 1. Ensure dependency search for meson is supported: in terminal
    - `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
@@ -184,7 +184,7 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - `sudo -H pip3 install scikit-build`
    - `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   - `sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/rustc-args-fix`
+   - `sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/OpenUxAS`
 1. Install python plotting capabilities (**optional**): in terminal
    - `sudo -H pip3 install matplotlib`
    - `sudo -H pip3 install pandas`

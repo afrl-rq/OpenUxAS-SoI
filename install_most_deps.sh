@@ -63,7 +63,7 @@ if [ "$(uname)" == "Darwin" ]; then
     sudo -H pip3 install scikit-build
     sudo -H pip3 install ninja
     # Install meson build configuration: in terminal
-    sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/rustc-args-fix
+    sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/OpenUxAS
     # Install python plotting capabilities (optional): in terminal
     sudo -H pip2 install matplotlib
     sudo -H pip2 install pandas
