@@ -10,12 +10,15 @@
 #include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/Location3D.h"
 #include "afrl/cmasi/CameraState.h"
+#include "afrl/cmasi/Wedge.h"
+
 #include <memory>      //int64_t
 #include <vector>
 namespace uxas {
     namespace service {
       namespace monitoring {
           std::vector<afrl::cmasi::Location3D*> getCameraFootprintFromEntityState(std::shared_ptr<afrl::cmasi::EntityState> ptr );
+	  bool checkCameraAngleInWedge_Util(std::vector<afrl::cmasi::Wedge*> const & all_wedges, afrl::cmasi::CameraState const * cState);
       }
     }
 }
