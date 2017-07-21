@@ -75,34 +75,27 @@ PatternSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
         if (afrl::impact::isPatternSearchTask(m_task.get()))
         {
             m_patternSearchTask = std::static_pointer_cast<afrl::impact::PatternSearchTask>(m_task);
-            if (m_patternSearchTask)
+            if (m_patternSearchTask->getSearchLocationID() == 0)
             {
-				if (m_patternSearchTask->getSearchLocationID() == 0)
-				{
-					if (m_patternSearchTask->getSearchLocation() != nullptr)
-					{
-						m_patternSearchTask->setSearchLocation(m_patternSearchTask->getSearchLocation()->clone());
-					}
-				}
-				else 
+                if (m_patternSearchTask->getSearchLocation() != nullptr)
                 {
-                    if ((m_pointOfInterest) && (m_patternSearchTask->getSearchLocationID() == m_pointOfInterest->getPointID()))
-                    {
-                        m_patternSearchTask->setSearchLocation(m_pointOfInterest->getLocation()->clone());
-                    }
-                    else
-                    {
-                        sstrErrors << "ERROR:: **PatternSearchTaskService::bConfigure PointOfInterest [" << m_patternSearchTask->getSearchLocationID() << "] was not found." << std::endl;
-                        CERR_FILE_LINE_MSG(sstrErrors.str())
-                        isSuccessful = false;
-                    }
+                    m_patternSearchTask->setSearchLocation(m_patternSearchTask->getSearchLocation()->clone());
                 }
             }
-            else
+            else 
             {
-                sstrErrors << "ERROR:: **PatternSearchTaskService::bConfigure failed to cast a AreaSearchTask from the task pointer." << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
+                auto foundPoint = m_pointsOfInterest.find(m_patternSearchTask->getSearchLocationID());
+                if (foundPoint != m_pointsOfInterest.end())
+                {
+                    m_pointOfInterest = foundPoint->second;
+                    m_patternSearchTask->setSearchLocation(m_pointOfInterest->getLocation()->clone());
+                }
+                else
+                {
+                    sstrErrors << "ERROR:: **PatternSearchTaskService::bConfigure PointOfInterest [" << m_patternSearchTask->getSearchLocationID() << "] was not found." << std::endl;
+                    CERR_FILE_LINE_MSG(sstrErrors.str())
+                    isSuccessful = false;
+                }
             }
         }
         else
@@ -785,8 +778,8 @@ void PatternSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cma
             // find the gimbal payload id to use to point the camera 
             //ASSUME: use first gimbal
             int64_t gimbalPayloadId = 0;
-            auto itEntityConfiguration = m_idVsEntityConfiguration.find(entityState->getID());
-            if (itEntityConfiguration != m_idVsEntityConfiguration.end())
+            auto itEntityConfiguration = m_entityConfigurations.find(entityState->getID());
+            if (itEntityConfiguration != m_entityConfigurations.end())
             {
                 for (auto& payload : itEntityConfiguration->second->getPayloadConfigurationList())
                 {

@@ -15,7 +15,7 @@ In addition to surveillance pattern automation, UxAS contains services that auto
 
 A core functionality provided by UxAS is the mechanism to calculate near-optimal task allocation across teams of unmanned vehicles. With a collection of tasks that require servicing and a pool of vehicles available to service those tasks, UxAS is able to determine which vehicle should do which task in the proper order. This task assignment pipeline is carried out by a series of services working together in a complex sequence.
 
-# Quick Start (only if you already have Ubuntu 16.04 LTS installed!!):
+# Quick Start with Ubuntu 16.04 LTS:
 
 Try:
 
@@ -28,7 +28,7 @@ Try:
     ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls BRANCH
     ./build_documentation
 
-replacing ***BRANCH*** with the branch of OpenUxAS that you want (e.g., develop, architecture, rta ...). (It's recommended that you use `/home/$USER/UxAS_arch` for the directory if you're using the `archtiecture` branch, rather than `/home/$USER/UxAS_pulls` for the `develop` branch.)
+replacing ***BRANCH*** with the branch of OpenUxAS that you want (e.g., develop, architecture, rta ...). (It's recommended that you use `/home/$USER/UxAS_arch` for the directory if you're using the `architecture` branch, rather than `/home/$USER/UxAS_pulls` for the `develop` branch.)
 
 Make sure you follow the instructions in the terminal window, and press a key once you're ready to move to the next set of instructions.
 
@@ -103,7 +103,7 @@ For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite tools instal
 
 The following is a bash script that helps to partially-automate the "installing prerequisite tools" processes that are documented in this README.md file below.
 
-This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
+This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (install_most_deps.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./install_most_deps.sh`
@@ -213,9 +213,9 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
    - `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
 1. Auto-create the UxAS messaging library
-   - Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.1.0/LmcpGen.jar)
+   - Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
    - Place `LmcpGen.jar` in `LmcpGen/dist` folder
-   - In the root UxAS directory, run `RunLmcpGen.bat`
+   - From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
 1. Prepare build
    - Open VS command prompt (Tools -> Visual Studio Command Prompt)
    - `python prepare`
@@ -235,7 +235,7 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
 
 The following is a bash script that helps to partially-automate the "configure UxAS and related projects" and "building at the command line" processes that are documented in this README.md file below.
 
-This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
+This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
 1. Download these two scripts from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) OR `cd` to your `git clone`d *OpenUxAS* directory
     - `checkout_plus_config.sh`
@@ -289,7 +289,7 @@ Expected file system layout:
    
    OR Download *OpenAMASE* (**optional**)
    - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.0.0/OpenAMASE.jar)
+   1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.3.0/OpenAMASE.jar)
    2. Place `OpenAMASE.jar` in `OpenAMASE/OpenAMASE/dist` folder
 2. EITHER Checkout + compile *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
@@ -298,7 +298,7 @@ Expected file system layout:
    
    OR Download *LmcpGen*
    - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.1.0/LmcpGen.jar)
+   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
    2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
    - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
@@ -440,7 +440,7 @@ unexpected trouble may arise on other platforms.
 
 The following is a bash script that helps to partially-automate the "building the documentation" processes that are documented in this README.md file below.
 
-This has been tested-working on Ubuntu 16.04, as of 2016-05-23.
+This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
 1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./build_documentation.sh`

@@ -74,8 +74,10 @@ ImpactPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
             }
             if (m_pointSearchTask->getSearchLocationID() > 0)
             {
-                if ((m_pointOfInterest) && (m_pointSearchTask->getSearchLocationID() == m_pointOfInterest->getPointID()))
+                auto foundPoint = m_pointsOfInterest.find(m_pointSearchTask->getSearchLocationID());
+                if (foundPoint != m_pointsOfInterest.end())
                 {
+                    m_pointOfInterest = foundPoint->second;
                     m_pointSearchTask->setSearchLocation(m_pointOfInterest->getLocation()->clone());
                 }
                 else
