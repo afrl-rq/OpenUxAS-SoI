@@ -1,2 +1,3 @@
 subdir('AutomationRequestTests')
+subdir('EligibleEntitiesTests')
 

@@ -1,0 +1,58 @@
+    <LineSearchTask Series="CMASI">
+      <PointList>
+        <Location3D Series="CMASI">
+          <Latitude>25.176945156498146</Latitude>
+          <Longitude>-80.77371015832335</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.192373335989675</Latitude>
+          <Longitude>-80.69781948253053</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.22065833172414</Latitude>
+          <Longitude>-80.66177141152893</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.265228628033</Latitude>
+          <Longitude>-80.67220637945044</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.28837089727029</Latitude>
+          <Longitude>-80.73481618697953</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.327798467081973</Latitude>
+          <Longitude>-80.72627848595286</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>25.334655435744875</Latitude>
+          <Longitude>-80.64849054326518</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </PointList>
+      <ViewAngleList/>
+      <UseInertialViewAngles>false</UseInertialViewAngles>
+      <DesiredWavelengthBands/>
+      <DwellTime>0</DwellTime>
+      <GroundSampleDistance>0.0</GroundSampleDistance>
+      <TaskID>4</TaskID>
+      <Label/>
+      <EligibleEntities/>
+      <RevisitRate>0.0</RevisitRate>
+      <Parameters/>
+      <Priority>0</Priority>
+      <Required>true</Required>
+    </LineSearchTask>

@@ -37,9 +37,8 @@ namespace communications
  * 
  * <li> Configuration -
  * Configuration is accomplished by a call to the function bConfigure(...)
- * before component execution begins or by using a ZeroMQ SUB socket to rem_entityId(entityId)
-ceive, 
- * requested, XML configuration nodes after component execution has started.
+ * before component execution begins or by using a ZeroMQ SUB socket to
+ * receive the requested XML configuration nodes after component execution has started.
  * 
  * <li> Thread Management -
  * The component executes in its own thread which is controlled using a
@@ -49,9 +48,8 @@ ceive,
  * <li> LMCP messaging -
  * The component subscribes to desired messages from the CommunicationHub's
  * ZeroMQ PUB socket and sends messages to the hub using a ZeroMQ PUSH socket.
- * Each component generates unique message IDs by mangling the unique component
- * ID with a component message count. The message ID is unique to the entity,
- * e.g. the process.
+ * Each message a component publishes also includes sending service
+ * ID and entity ID.
  * </ul>
  * 
  * 

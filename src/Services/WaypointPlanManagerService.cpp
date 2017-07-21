@@ -601,11 +601,11 @@ bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::M
             auto itWaypoint = ptr_MissionCommand->getWaypointList().begin();
             for (; itWaypoint != ptr_MissionCommand->getWaypointList().end(); itWaypoint++)
             {
-                if (missionSegment_01->getWaypointList().size() < m_numberWaypointsToServe)
+                if (missionSegment_01->getWaypointList().size() < static_cast<size_t>(m_numberWaypointsToServe))
                 {
                     missionSegment_01->getWaypointList().push_back((*itWaypoint)->clone());
                     // check for overlap
-                    if ((m_numberWaypointsToServe - missionSegment_01->getWaypointList().size()) < m_numberWaypointOverlap)
+                    if ((m_numberWaypointsToServe - missionSegment_01->getWaypointList().size()) < static_cast<size_t>(m_numberWaypointOverlap))
                     {
                         missionSegment_02->getWaypointList().push_back((*itWaypoint)->clone());
                     }

@@ -78,6 +78,19 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
             UXAS_LOG_INFORM(s_typeName(), "::configure did not find server boolean in XML configuration; server boolean is ", m_isServer);
         }
     }
+
+    if (isSuccess)
+    {
+        if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
+        {
+            m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
+            UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
+        }
+        else
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::configure did not find 'ConsiderSelfGenerated' boolean in XML configuration; 'ConsiderSelfGenerated' boolean is ", m_isConsideredSelfGenerated);
+        }
+    }
     
     if (isSuccess)
     {
@@ -272,14 +285,27 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
             {
                 if (m_nonImportForwardAddresses.find(receivedTcpMessage->getAddress()) == m_nonImportForwardAddresses.end())
                 {
-                    //sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
-                    avtas::lmcp::ByteBuffer buf;
-                    buf.allocate(receivedTcpMessage->getPayload().size());
-                    uint8_t* msgbytes = (uint8_t*) (receivedTcpMessage->getPayload().c_str());
-                    buf.put(msgbytes, receivedTcpMessage->getPayload().size(), 0);
-                    buf.rewind();
-                    auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::Factory::getObject(buf));
-                    sendSharedLmcpObjectBroadcastMessage(obj);
+                    if(m_isConsideredSelfGenerated)
+                    {
+                        // remove `envelope` and replace with a `broadcast` as if this message
+                        // originated with this bridge service
+                        
+                        // decode message so that `envelope` is auto-created
+                        avtas::lmcp::ByteBuffer buf;
+                        buf.allocate(receivedTcpMessage->getPayload().size());
+                        buf.put((uint8_t*) receivedTcpMessage->getPayload().c_str(), receivedTcpMessage->getPayload().size(), 0);
+                        buf.rewind();
+                        auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::Factory::getObject(buf));
+                        if(obj)
+                        {
+                            sendSharedLmcpObjectBroadcastMessage(obj);
+                        }
+                    }
+                    else
+                    {
+                        // send along message with the exact `envelope` as was received
+                        sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
+                    }
                 }
                 else
                 {

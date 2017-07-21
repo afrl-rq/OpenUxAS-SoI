@@ -149,6 +149,7 @@ private:
 
 private:
     std::shared_ptr<afrl::impact::AngledAreaSearchTask> m_angledAreaSearchTask;
+    std::shared_ptr<afrl::impact::AreaOfInterest> m_areaOfInterest;
 
 public:
 

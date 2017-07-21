@@ -18,6 +18,7 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+#include <set>
 
 //MIGRATION source
 //n_UxAS_Components::c_Component_TcpBridge
@@ -127,15 +128,19 @@ private:
     std::set<std::string> m_nonImportForwardAddresses;
     std::set<std::string> m_nonExportForwardAddresses;
 
-    /** \brief  this is the tcp/ip address, including port, of the PUB
-     * socket, e.g.  "tcp://xxx.xxx.xxx.xxx:5555" or "tcp://*:5555". Used to
-     * relay messages to the external entity. */
-//    std::string m_tcpReceiveAddress{"tcp://*:5555"};
-//    std::string m_tcpSendAddress{"tcp://*:5556"};
+    /// \brief  this is the tcp/ip address, including port, of the PUB
+    /// socket, e.g.  "tcp://xxx.xxx.xxx.xxx:5555" or "tcp://*:5555". Used to
+    /// relay messages to the external entity.
     std::string m_tcpReceiveSendAddress = std::string("tcp://*:5555");
-    /** \brief  If this is set to true the the TcpBridge connects (binds) as a server. 
+    /** \brief  If this is set to true the TcpBridge connects (binds) as a server. 
      If it is false the TcpBridge connects as a client. Defaults to true */
     bool m_isServer{true};
+    /** \brief  If this is set to `true`, the TcpBridge service will report all received
+     * messages as if they originated from the vehicle hosting the TcpBridge rather
+     * than the external sender. This can be used when connected directly to a vehicle 
+     * simulation where the messages received would be considered self-generated in
+     * normal operation. */
+    bool m_isConsideredSelfGenerated{true};
     
 };
 

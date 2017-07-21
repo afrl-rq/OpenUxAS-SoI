@@ -236,9 +236,7 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
         if (afrl::impact::isImpactAutomationRequest(receivedLmcpMessage->m_object))
         {
             auto sand = std::static_pointer_cast<afrl::impact::ImpactAutomationRequest>(receivedLmcpMessage->m_object);
-#ifndef DOES_THIS_BREAK_ANYTHING
             uniqueAutomationRequest->setRequestID(sand->getRequestID());
-#endif //DOES_THIS_BREAK_ANYTHING
             m_sandboxMap[uniqueAutomationRequest->getRequestID()] = SANDBOX_AUTOMATION_REQUEST;
             uniqueAutomationRequest->setOriginalRequest(sand->getTrialRequest()->clone());
             uniqueAutomationRequest->setSandBoxRequest(true);
@@ -248,9 +246,7 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
         else if (uxas::messages::task::isTaskAutomationRequest(receivedLmcpMessage->m_object))
         {
             auto taskAutomationRequest = std::static_pointer_cast<uxas::messages::task::TaskAutomationRequest>(receivedLmcpMessage->m_object);
-#ifndef DOES_THIS_BREAK_ANYTHING
             uniqueAutomationRequest->setRequestID(taskAutomationRequest->getRequestID());
-#endif //DOES_THIS_BREAK_ANYTHING
 
             uniqueAutomationRequest->setOriginalRequest((afrl::cmasi::AutomationRequest*) taskAutomationRequest->getOriginalRequest()->clone());
             uniqueAutomationRequest->setSandBoxRequest(taskAutomationRequest->getSandBoxRequest());
@@ -280,6 +276,10 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
                 auto taskResponse = std::make_shared<uxas::messages::task::TaskAutomationResponse>();
                 taskResponse->setOriginalResponse(resp->getOriginalResponse()->clone());
                 taskResponse->setResponseID(m_playId[resp->getResponseID()]);
+                
+                // add FinalStates to task responses
+                for(auto st : resp->getFinalStates())
+                    taskResponse->getFinalStates().push_back(st->clone());
                 sendSharedLmcpObjectBroadcastMessage(taskResponse);
             }
             else if (m_sandboxMap[resp->getResponseID()] == AUTOMATION_REQUEST)

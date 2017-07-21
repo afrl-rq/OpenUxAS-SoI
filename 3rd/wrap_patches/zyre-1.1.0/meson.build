@@ -39,6 +39,6 @@ lib = static_library('zyre', [
 	c_args: c_args,
 	include_directories: include_directories(
 		'../czmq-3.0.1/include',
-		'../zeromq-4.1.1/include',
+		'../zeromq-4.1.6/include',
 	),
 )

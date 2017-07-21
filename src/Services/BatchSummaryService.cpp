@@ -54,7 +54,7 @@ public:
 
     explicit f(afrl::impact::TaskSummary* t,
             std::vector<std::shared_ptr<afrl::impact::VehicleSummary> >& v,
-            std::shared_ptr<afrl::impact::BatchSummaryResponse>& r) : tsum(nullptr), orig(t), vehicles(v), response(r)
+            std::shared_ptr<afrl::impact::BatchSummaryResponse>& r) : tsum(nullptr), orig(t), response(r), vehicles(v)
     {
     }
 

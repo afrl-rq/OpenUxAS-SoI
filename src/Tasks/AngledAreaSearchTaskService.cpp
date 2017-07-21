@@ -66,8 +66,6 @@ AngledAreaSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -77,20 +75,16 @@ AngledAreaSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
         if (afrl::impact::isAngledAreaSearchTask(m_task.get()))
         {
             m_angledAreaSearchTask = std::static_pointer_cast<afrl::impact::AngledAreaSearchTask>(m_task);
-            if (m_angledAreaSearchTask)
+            auto foundArea = m_areasOfInterest.find(m_angledAreaSearchTask->getSearchAreaID());
+            if (foundArea == m_areasOfInterest.end())
             {
-                if ((!m_areaOfInterest) || (m_areaOfInterest->getAreaID() != m_angledAreaSearchTask->getSearchAreaID()))
-                {
-                    sstrErrors << "ERROR:: **c_Task_ImpactPointSearch::bConfigure LineOfInterest [" << m_angledAreaSearchTask->getSearchAreaID() << "] was not found." << std::endl;
-                    CERR_FILE_LINE_MSG(sstrErrors.str())
-                    isSuccessful = false;
-                }
+                sstrErrors << "ERROR:: **c_Task_ImpactPointSearch::bConfigure AreaOfInterest [" << m_angledAreaSearchTask->getSearchAreaID() << "] was not found." << std::endl;
+                CERR_FILE_LINE_MSG(sstrErrors.str())
+                isSuccessful = false;
             }
             else
             {
-                sstrErrors << "ERROR:: **AngledAreaSearchTaskService::bConfigure failed to cast a AreaSearchTask from the task pointer." << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
+                m_areaOfInterest = foundArea->second;
             }
         }
         else
@@ -207,8 +201,6 @@ AngledAreaSearchTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avta
 
 void AngledAreaSearchTaskService::buildTaskPlanOptions()
 {
-    bool isSuccessful{true};
-
     // construct a task option for each vehicle
     // note:: use only one vehicle per option
 

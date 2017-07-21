@@ -10,7 +10,7 @@
     </Bridge>
 
     <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9900" Server="FALSE">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9900" Server="FALSE" ConsiderSelfGenerated="TRUE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.impact.ImpactLineSearchTask" />
@@ -39,7 +39,6 @@
 
         <Message MessageFileName="AirVehicleConfiguration_V1000.xml" SendTime_ms="50"/>
         <Message MessageFileName="AirVehicleConfiguration_V2000.xml" SendTime_ms="60"/>
-        <Message MessageFileName="AirVehicleConfiguration_V3000.xml" SendTime_ms="70"/>
 
         <!-- boundaries -->
         <Message MessageFileName="KeepOutZone_10.xml" SendTime_ms="200"/>

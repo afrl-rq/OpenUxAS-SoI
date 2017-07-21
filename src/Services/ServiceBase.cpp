@@ -39,8 +39,12 @@ bool
 ServiceBase::configureService(const std::string& parentOfWorkDirectory, const std::string& serviceXml)
 {
     pugi::xml_document xmlDoc;
-    pugi::xml_parse_result xmlParseSuccess = xmlDoc.load(serviceXml.c_str());
-    return (configureService(parentOfWorkDirectory, xmlDoc.root()));
+    if (xmlDoc.load(serviceXml.c_str()))
+    {
+    	return (configureService(parentOfWorkDirectory, xmlDoc.root()));
+	}
+
+    return false;
 };
 
 bool

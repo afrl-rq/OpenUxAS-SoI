@@ -47,7 +47,7 @@ c00_TaskTemplate::c00_TaskTemplate()
 
 c00_TaskTemplate::~c00_TaskTemplate()
 {
-    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~PisrTaskService()");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~c00_TaskTemplate()");
 };
 
 

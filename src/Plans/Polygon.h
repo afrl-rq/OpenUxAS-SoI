@@ -86,8 +86,8 @@ public:    //constructors/destructors
     CBoundary(const uint32_t& uiLocalID,const bool& bKeepInZone,const V_POSITION_t& vposBoundaryPoints_m,const afrl::cmasi::AbstractZone& cmasiAbstractZone)
         :
         afrl::cmasi::AbstractZone(cmasiAbstractZone),
+		m_uiLocalID(uiLocalID),
         m_bKeepInZone(bKeepInZone),
-        m_uiLocalID(uiLocalID),
         m_vposBoundaryPoints_m(vposBoundaryPoints_m)
     {};
 
@@ -304,15 +304,15 @@ public:    //enumerations
 public:    //constructors/destructors
     CPolygon(const int& iID,const enPolygonType& polytypType=CPolygonType::polytypNoFlyThreat)
         :m_iID(iID),
-        m_bValidCentroid(false),
-        m_plytypPolygonType(polytypType),
-        m_plyclsPolygonClassification(plyclsConvexCW),
-        SelectedTest(GRID),
-        GridPtr(0),
-        GridUpdateNeeded(true),
-        BBUpdateNeeded(true),
-        m_dPolygonExpansionDistance(0.0),
-        m_dynbsLocalID(MAX_NUMBER_POLYGONS)
+	    m_bValidCentroid(false),
+	    m_plytypPolygonType(polytypType),
+	    m_plyclsPolygonClassification(plyclsConvexCW),
+	    m_dPolygonExpansionDistance(0.0),
+	    m_dynbsLocalID(MAX_NUMBER_POLYGONS),
+		SelectedTest(GRID),
+		GridUpdateNeeded(true),
+		BBUpdateNeeded(true),
+		GridPtr(0)
     {
         posminBBoxPoint.m_north_m=(0);
         posminBBoxPoint.m_east_m=(0);
@@ -322,6 +322,7 @@ public:    //constructors/destructors
         posmaxBBoxPoint.m_altitude_m=(0);
 
     };
+
 
 
     ~CPolygon()
@@ -572,16 +573,18 @@ public:    //methods/functions
     /* CheckTriple tests three consecutive points for change of direction
     * and for orientation.
     */
-    //#define CheckTriple                            \
-    //    if ( (thisDir = Compare(second, third)) == -curDir )        \
-    //    ++dirChanges;                        \
-    //    curDir = thisDir;                        \
-    //    if ( thisSign = WhichSide(first, second, third) ) {        \
-    //    if ( angleSign == -thisSign )                \
-    //    return plyclsNotConvex;                    \
-    //    angleSign = thisSign;                    \
-    //    }                                \
-    //    first = second; second = third;
+/*
+    #define CheckTriple                            \
+        if ( (thisDir = Compare(second, third)) == -curDir )        \
+        ++dirChanges;                        \
+        curDir = thisDir;                        \
+        if ( thisSign = WhichSide(first, second, third) ) {        \
+        if ( angleSign == -thisSign )                \
+        return plyclsNotConvex;                    \
+        angleSign = thisSign;                    \
+        }                                \
+        first = second; second = third;
+*/
 
 
 
