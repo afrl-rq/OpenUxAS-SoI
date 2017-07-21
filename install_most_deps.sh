@@ -55,13 +55,15 @@ if [ "$(uname)" == "Darwin" ]; then
     # Install pip2: in terminal
     curl -O https://bootstrap.pypa.io/get-pip.py
     sudo -H python get-pip.py
+    # Install Rust compiler: in terminal
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
     # Install ninja build system: in terminal
     brew install cmake
     brew install pkg-config
     sudo -H pip3 install scikit-build
     sudo -H pip3 install ninja
     # Install meson build configuration: in terminal
-    sudo -H pip3 install meson
+    sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/rustc-args-fix
     # Install python plotting capabilities (optional): in terminal
     sudo -H pip2 install matplotlib
     sudo -H pip2 install pandas

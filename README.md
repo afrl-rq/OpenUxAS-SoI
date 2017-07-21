@@ -73,6 +73,7 @@ The primary tools and dependencies to obtain, build, document, and simulate UxAS
 - UUID library
 - Boost
 - Python 3
+- Rust
 - Meson
 - Ninja
 - [LmcpGen](https://github.com/afrl-rq/LmcpGen)
@@ -130,10 +131,12 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
 1. Install pip3: in terminal
    - `sudo apt install python3-pip`
    - `sudo -H pip3 install --upgrade pip`
+1. Install Rust: in terminal
+   - `curl https://sh.rustup.rs -sSf | sh -s -- -y`
 1. Install ninja build system: in terminal
    - `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   - `sudo -H pip3 install meson`
+   - `sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/rustc-args-fix`
 1. Ensure dependency search for meson is supported: in terminal
    - `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
@@ -173,13 +176,15 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
    - `brew cask install mactex`
 1. Install pip3: in terminal
    - `brew install python3`
+1. Install Rust: in terminal
+   - `curl https://sh.rustup.rs -sSf | sh -s -- -y`
 1. Install ninja build system: in terminal
    - `brew install cmake`
    - `brew install pkg-config`
    - `sudo -H pip3 install scikit-build`
    - `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   - `sudo -H pip3 install meson`
+   - `sudo -H pip3 install https://github.com/acfoltzer/meson/tarball/rustc-args-fix`
 1. Install python plotting capabilities (**optional**): in terminal
    - `sudo -H pip3 install matplotlib`
    - `sudo -H pip3 install pandas`
