@@ -505,7 +505,7 @@ extern "C" {
 void send_shared_lmcp_object_broadcast_message_raw(void* client, const uint8_t *buf, uint32_t size) {
   avtas::lmcp::ByteBuffer lmcpByteBuffer;
   lmcpByteBuffer.allocate(size);
-  for (int32_t i; i < size; i++) {
+  for (uint32_t i = 0; i < size; i++) {
     lmcpByteBuffer.putByte(buf[i]);
   }
   lmcpByteBuffer.rewind();
