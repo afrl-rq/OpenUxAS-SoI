@@ -23,9 +23,10 @@
 
         <h2>Changes</h2>
         
-        <h3>11 July 2017</h3>
+        <h3>19 July 2017</h3>
 		<ul>
-			<li>Added maxmimum length bounds to all arrays. Does not change serialization API, however, it can be used to check properly formatted messages during deserialization. Because 'max array length' is information, wire compatability is preserved (version number is NOT incremented).</li>
+			<li>Added maxmimum length bounds to all arrays. Does not change serialization API, however, it can be used to check properly formatted messages during deserialization. Because 'max array length' is informational, wire compatability is preserved (so version number is NOT incremented).</li>
+			<li>Added 'Optional' indicator on fields of messages that contain references to other messages. For fields that are not indicated as Optional, a viable message must not send 'null' in that field. Does not change serialization API and wire compatability is preserved (so version number is NOT incremented).</li>
 		</ul>
 		
         <h3>7 May 2015</h3>
@@ -522,9 +523,9 @@
 
             <!--
                 Geometry object describing the boundary.  This boundary is 2-dimensional.  The zone boundary is defined as
-                an extrusion of this boundary from MinAltitude to MaxAltitude.
+                an extrusion of this boundary from MinAltitude to MaxAltitude. A valid zone must define a boundary (null not allowed).
             -->
-            <Field Name="Boundary" Type="AbstractGeometry" Units="None" />
+            <Field Name="Boundary" Type="AbstractGeometry" Units="None" Optional="false" />
         </Struct>
 
         <!--
@@ -611,7 +612,7 @@
             or endurance speed profile, or any other operating point chosen by a user.  This field may not
             be null.
             -->
-            <Field Name="NominalFlightProfile" Type="FlightProfile"/>
+            <Field Name="NominalFlightProfile" Type="FlightProfile" Optional="false" />
 
             <!-- A list of all flight configurations described for this vehicle.
                 Each flight configuration specifies a different mode of flight, for instance: climb, cruise,
@@ -690,8 +691,8 @@
             <!-- Current entity ground speed -->
             <Field Name="Groundspeed" Type="real32" Units="m/s" />
 
-            <!-- The perceived entity location -->
-            <Field Name="Location" Type="Location3D" />
+            <!-- The perceived entity location. A valid EntityState must include Location (null not allowed) -->
+            <Field Name="Location" Type="Location3D" Optional="false" />
             
             <!-- The available energy remaining, expressed in terms of the percentage of maximum capacity -->
             <Field Name="EnergyAvailable" Type="real32" Units="%" />
@@ -789,8 +790,8 @@
         <!-- Area search task -->
         <Struct Name="AreaSearchTask" Extends="SearchTask">
 
-            <!-- Area to search -->
-            <Field Name="SearchArea" Type="AbstractGeometry" />
+            <!-- Area to search. A valid area search task must define a SearchArea (null not allowed) -->
+            <Field Name="SearchArea" Type="AbstractGeometry" Optional="false" />
 
             <!-- A list of acceptable look-angles for this task.  Each wedge is defined relative to true North. To be a valid
                  look angle, a sensor must be looking from a direction within the bounds of the wedge.
@@ -805,9 +806,6 @@
         <Struct Name="CameraAction" Extends="PayloadAction">
             <!-- The commanded horizontal (azimuth) field of view. -->
             <Field Name="HorizontalFieldOfView" Type="real32" Units="degree" />
-            <!-- Associated payload actions that should be performed simultaneously with the change in field of view. A frequent use case would be a gimbal pointing action. If payload ID is zero, then the gimbal on which the camera is mounted is selected. Note that this has the side-effect of steering all other payloads associated to that gimbal. -->
-            <Field Name="AssociatedActions" Type="PayloadAction[]" MaxArrayLength="8" />
-
         </Struct>
 
         <!--
@@ -875,13 +873,13 @@
             <!-- the current location according to the intersection of a ray along the center axis of the current
                 camera field of view with the ground.  If this field is null, then the location was not computed.
             -->
-            <Field Name="Centerpoint" Type="Location3D" Default="null"/>
+            <Field Name="Centerpoint" Type="Location3D" Default="null" Optional="true" />
         </Struct>
 
         <!-- Defines a circular shape based on a center point and radius -->
         <Struct Name="Circle" Extends="AbstractGeometry">
-            <!-- Center point of the circle -->
-            <Field Name="CenterPoint" Type="Location3D"/>
+            <!-- Center point of the circle. A valid Circle must define CenterPoint (null not allowed) -->
+            <Field Name="CenterPoint" Type="Location3D" Optional="false" />
             <!-- Radius of the circle -->
             <Field Name="Radius" Type="real32" Units="meter"/>
         </Struct>
@@ -1034,8 +1032,8 @@
         -->
         <Struct Name="GimbalStareAction" Extends="PayloadAction">
 
-            <!-- The commanded stare point. -->
-            <Field Name="Starepoint" Type="Location3D" Units="None"/>
+            <!-- The commanded stare point. A valid GimbalStareAction must define the Starepoint (null not allowed). -->
+            <Field Name="Starepoint" Type="Location3D" Units="None" Optional="false" />
             
             <!-- Duration for the stare operation.  Zero denotes an indefinate stare time -->
             <Field Name="Duration" Type="int64" Units="milliseconds"/>
@@ -1154,8 +1152,8 @@
             <!-- Commanded True Airspeed -->
             <Field Name="Airspeed" Type="real32" Units="meter/sec" />
 
-            <!-- The geometric center point of the loiter. -->
-            <Field Name="Location" Type="Location3D"/>
+            <!-- The geometric center point of the loiter. A valid LoiterAction must define Location (null not allowed). -->
+            <Field Name="Location" Type="Location3D" Optional="false" />
 
         </Struct>
 
@@ -1163,9 +1161,9 @@
         <Struct Name="LoiterTask" Extends="Task">
 
             <!--
-                The desired loiter action to take
+                The desired loiter action to take. Must not be null.
             -->
-            <Field Name="DesiredAction" Type="LoiterAction" Units="none"/>
+            <Field Name="DesiredAction" Type="LoiterAction" Units="none" Optional="false" />
 
         </Struct>
 
@@ -1243,8 +1241,8 @@
         -->
         <Struct Name="MustFlyTask" Extends="Task">
 
-            <!-- point that must vehicle must fly through -->
-            <Field Name="Position" Type="Location3D"/>
+            <!-- Point that vehicle must fly through. Null position not allowed. -->
+            <Field Name="Position" Type="Location3D" Optional="false" />
 
             <!-- Denotes whether altitude should be used in this MustFlyTask. If false, the
             aircraft should maintain altitude according to previous commands.
@@ -1304,8 +1302,8 @@
         <!-- Point search task -->
         <Struct Name="PointSearchTask" Extends="SearchTask">
 
-            <!-- Point to search -->
-            <Field Name="SearchLocation" Type="Location3D" />
+            <!-- Point to search. A valid PointSearchTask must define SearchLocation (null not allowed). -->
+            <Field Name="SearchLocation" Type="Location3D" Optional="false" />
 
             <!--Minimum distance that an aircraft must maintain from the point of interest. -->
             <Field Name="StandoffDistance" Type="real32" Units="meter" Default="0"/>
@@ -1325,8 +1323,8 @@
 
         <!-- Defines a rectangular shape based on a corner point, width, height, and rotation -->
         <Struct Name="Rectangle" Extends="AbstractGeometry">
-            <!-- Center point of the rectangle. Altitude value is ignored -->
-            <Field Name="CenterPoint" Type="Location3D"/>
+            <!-- Center point of the rectangle (note altitude value is ignored). A valid Rectangle must define CenterPoint (null not allowed). -->
+            <Field Name="CenterPoint" Type="Location3D" Optional="false" />
             <!-- Width of the rectangle -->
             <Field Name="Width" Type="real32" Units="meter"/>
             <!-- Height of the rectangle -->
@@ -1502,8 +1500,8 @@
         <Struct Name="WeatherReport">
 
             <!-- The area for which this report pertains.  If this is null, then the report
-                 pertains to the entire area. -->
-            <Field Name="Area" Type="AbstractZone" Default="null"/>
+                 pertains to the entire mission area. -->
+            <Field Name="Area" Type="AbstractZone" Default="null" Optional="true" />
 
             <!-- Windspeed value for this area -->
             <Field Name="WindSpeed" Type="real32" Units="meter/sec"/>
@@ -1556,7 +1554,7 @@
         entity will stop immediately. -->
         <Struct Name="StopMovementAction" Extends="VehicleAction" >
             <!-- A location at which the entity should stop.  If this is null, the entity will stop immediately. -->
-            <Field Name="Location" Type="Location3D" Series="CMASI" Default="null"/>
+            <Field Name="Location" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
         </Struct>
         
         <!-- Handles the transfer of waypoints.  This does not affect the current navigation of the 

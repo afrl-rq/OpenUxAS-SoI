@@ -122,16 +122,16 @@
         <Struct Name="RadioConfiguration" Extends="PayloadConfiguration" Series="CMASI" >
             <!-- The range of the radio -->
             <Field Name="Range" Type="real32" Units="meters" Default="1500.0" />
-            <!-- The vehicle's rally point -->
-            <Field Name="RallyPoint" Type="Location3D" Series="CMASI" />
+            <!-- The vehicle's rally point during loss of comm contingency. When set to null, no defined loss of comm behavior. -->
+            <Field Name="RallyPoint" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
             <!-- Time after loss of communications the vehicle should return to its rally point -->
             <Field Name="Timeout" Type="int64" Units="milliseconds" Default="120000" />
         </Struct>
 		
         <!-- Indicates a radio tower -->
         <Struct Name="RadioTowerConfiguration" Extends="EntityConfiguration" Series="CMASI" >
-            <!-- The position of the tower -->
-            <Field Name="Position" Type="Location3D" Series="CMASI" />
+            <!-- The position of the tower. A valid RadioTowerConfiguration must define Position (null not allowed) -->
+            <Field Name="Position" Type="Location3D" Series="CMASI" Optional="false" />
             <!-- The range of the radio -->
             <Field Name="Range" Type="real32" Units="meters" Default="1500.0" />
             <!-- Whether the radio is enabled -->
@@ -317,8 +317,8 @@
         <Struct Name="ImpactAutomationRequest" >
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
-            <!-- Standard CMASI Automation request -->
-            <Field Name="TrialRequest" Type="AutomationRequest" Series="CMASI" />
+            <!-- Standard CMASI Automation request. A valid ImpactAutomationRequest must define TrialRequest (null not allowed). -->
+            <Field Name="TrialRequest" Type="AutomationRequest" Series="CMASI" Optional="false" />
             <!-- Override nominal speed/alt. If a vehicle is not in list, its nominal speed/alt is used -->
             <Field Name="OverridePlanningConditions" Type="SpeedAltPair[]" MaxArrayLength="16" />
             <!-- Associated play ID -->
@@ -333,8 +333,8 @@
         <Struct Name="ImpactAutomationResponse" >
             <!-- Response ID matching request from ({@link ImpactAutomationRequest}) -->
             <Field Name="ResponseID" Type="int64" />
-            <!-- Automation response from the request -->
-            <Field Name="TrialResponse" Type="AutomationResponse" Series="CMASI" />
+            <!-- Automation response from the request. A valid ImpactAutomationResponse must define TrialResponse (null not allowed). -->
+            <Field Name="TrialResponse" Type="AutomationResponse" Series="CMASI" Optional="false" />
             <!-- Associated play ID -->
             <Field Name="PlayID" Type="int64" />
             <!-- Associated solution ID -->
@@ -350,8 +350,8 @@
             <!-- ID for points of interest -->
             <Field Name="PointID" Type="int64" />
             
-            <!-- Point of interest location -->
-            <Field Name="Location" Type="Location3D" Series="CMASI" />
+            <!-- Point of interest location. A valid PointOfInterest must define Location (null not allowed). -->
+            <Field Name="Location" Type="Location3D" Series="CMASI" Optional="false" />
             
         </Struct>
         
@@ -369,8 +369,8 @@
             <!-- ID for area of interest -->
             <Field Name="AreaID" Type="int64" />
             
-            <!-- Geometry describing the area -->
-            <Field Name="Area" Type="AbstractGeometry" Series="CMASI" />
+            <!-- Geometry describing the area. A valid AreaOfInterest must define Area (null not allowed). -->
+            <Field Name="Area" Type="AbstractGeometry" Series="CMASI" Optional="false" />
             
         </Struct>
         
@@ -379,8 +379,8 @@
             <!-- Point to search (from available points of interest). Only valid if ID is non-zero -->
             <Field Name="SearchLocationID" Type="int64" />
 
-            <!-- If search location ID is zero, then use direct coordinates -->
-            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" />
+            <!-- Defines coordinates directly, only used when SearchLocationID is non-zero -->
+            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
 
             <!--Minimum distance that an aircraft must maintain from the point of interest. -->
             <Field Name="StandoffDistance" Type="real32" Units="meter" Default="0" />
@@ -396,8 +396,8 @@
         <Struct Name="PatternSearchTask" Extends="SearchTask" Series="CMASI" >
             <!-- Point at which to search is centered (from available points of interest) -->
             <Field Name="SearchLocationID" Type="int64" />
-            <!-- If search search location ID is zero, then use direct coordinates -->
-            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" />
+            <!-- Defines coordinates directly, only used when SearchLocationID is non-zero -->
+            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
             <!-- Search pattern to use -->
             <Field Name="Pattern" Type="AreaSearchPattern" Default="Spiral" />
             <!-- Pattern extent -->
@@ -412,8 +412,8 @@
             <!-- Sweep angle defined from true North in clockwise manner -->
             <Field Name="SweepAngle" Type="real32" Units="degrees" />
             
-            <!-- Start point for this search -->
-            <Field Name="StartPoint" Type="Location3D" Series="CMASI" />
+            <!-- Optional start point that must be reached before beginning search -->
+            <Field Name="StartPoint" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
         </Struct>
         
         <!-- Defines a line search task.
@@ -454,8 +454,8 @@
             <!-- ID of entity which requires comm relay support -->
             <Field Name="SupportedEntityID" Type="int64" />
 			
-            <!-- Destination location for supported entity -->
-            <Field Name="DestinationLocation" Type="CMASI/Location3D" />
+            <!-- Destination location for supported entity, if known. -->
+            <Field Name="DestinationLocation" Type="CMASI/Location3D" Default="null" Optional="true" />
 			
             <!-- ID of entity to which communication will be delivered (i.e. Tower ID) -->
             <Field Name="TowerID" Type="int64" />
@@ -467,8 +467,8 @@
         vehicles, then this task will use the maximum number of eligible vehicles in a best
         effort strategy which attempts to maximize radial coverage. -->
         <Struct Name="CordonTask" Extends="Task" Series="CMASI" >
-            <!-- Block road access to this location -->
-            <Field Name="CordonLocation" Type="CMASI/Location3D" />
+            <!-- Block road access to this location. A valid CordonTask must define CordonLocation (null not allowed) -->
+            <Field Name="CordonLocation" Type="CMASI/Location3D" Optional="false" />
 			
             <!-- Distance away from 'CordonLocation' that access should be blocked -->
             <Field Name="StandoffDistance" Type="real32" Units="meters" Default="100" />
@@ -484,9 +484,9 @@
             <!-- Number of vehicles to simultaneously block the target -->
             <Field Name="NumberVehicles" Type="byte" Default="1" />
             <!-- Biases the blockade so that more vehicles are between enemy and protected
-            location. If no location is given, then blockade attempts to block in direction
+            location. If null location is given, then blockade attempts to block in direction
             of enemy travel -->
-            <Field Name="ProtectedLocation" Type="CMASI/Location3D" Default="NULL" />
+            <Field Name="ProtectedLocation" Type="CMASI/Location3D" Default="null" Optional="true" />
         </Struct>
         
 		<!-- Task for targeting surveillance at an offset of a moving entity, for example to
@@ -543,8 +543,8 @@
          
         <!-- Reports on navigability of the water in the "Area".  Based on the WeatherReport CMASI message, designed to allow changes during execution. -->
         <Struct Name="WaterReport">
-            <!-- Area for which this report is valid -->
-            <Field Name="Area" Type="AbstractGeometry" Series="CMASI"/>
+            <!-- Area for which this report is valid. A valid WaterReport must define Area (null not allowed) -->
+            <Field Name="Area" Type="AbstractGeometry" Series="CMASI" Optional="false" />
             <!-- Speed of the current, e.g. due to tides or river flow -->
             <Field Name="CurrentSpeed" Type="real32" Units="meters/sec"/>
             <!-- Direction of the current -->

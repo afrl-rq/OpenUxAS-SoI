@@ -60,8 +60,8 @@
         <Struct Name="EntityLocation" >
             <!-- Entity ID -->
             <Field Name="EntityID" Type="int64" />
-            <!-- Current location of entity -->
-            <Field Name="Position" Type="CMASI/Location3D" />
+            <!-- Current location of entity. A valid EntityLocation must define Position (null not allowed) -->
+            <Field Name="Position" Type="CMASI/Location3D" Optional="false" />
             <!-- Corresponding time in milli-seconds since 1 Jan 1970 -->
             <Field Name="Time" Type="int64" Units="milliseconds" />
         </Struct>
@@ -76,10 +76,10 @@
     
         <!-- Report for a received message containing positions of both entities and the payload size -->
         <Struct Name="BandwidthReceiveReport">
-            <!-- Entity from which the message was sent -->
-            <Field Name="EntitySender" Type="EntityLocation" />
-            <!-- Entity which received the message -->
-            <Field Name="EntityReceiver" Type="EntityLocation" />
+            <!-- Entity from which the message was sent. A valid BandwidthReceiveReport must define EntitySender (null not allowed). -->
+            <Field Name="EntitySender" Type="EntityLocation" Optional="false" />
+            <!-- Entity which received the message. A valid BandwidthReceiveReport must define EntityReceiver (null not allowed). -->
+            <Field Name="EntityReceiver" Type="EntityLocation" Optional="false" />
             <!-- Size of the message that was received -->
             <Field Name="TransferPayloadSize" Type="uint32" />
         </Struct>
