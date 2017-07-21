@@ -36,6 +36,7 @@ public:
 
  protected:
   AutonomyMonitorServiceMain  * service_;
+  bool debug;
 
 };
 

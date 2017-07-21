@@ -141,7 +141,22 @@ namespace uxas {
         return true;
       }
 
+      
+      bool MonitorDB::processTaskCompetionMessage (std::shared_ptr<uxas::messages::task::TaskComplete> ptr){
+	return true;
+      }
+      bool MonitorDB::processTaskCancelMessage(std::shared_ptr<uxas::messages::task::CancelTask> ptr){
+	return true;
+      }
+      bool MonitorDB::processTaskActiveMessage(std::shared_ptr<uxas::messages::task::TaskActive> ptr){
+	return true;
+      }
+      bool MonitorDB::processTaskAssignmentSummary(std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> ptr){
+	return true;
+      }
+	
 
+      
     };
   };
 };

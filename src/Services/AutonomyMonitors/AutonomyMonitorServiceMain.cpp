@@ -17,6 +17,10 @@
 #include "afrl/cmasi/KeepOutZone.h"
 #include "afrl/cmasi/Task.h"
 #include "afrl/cmasi/TaskDescendants.h"
+#include "uxas/messages/task/TaskComplete.h"
+#include "uxas/messages/task/CancelTask.h"
+#include "uxas/messages/task/TaskActive.h"
+#include "uxas/messages/task/TaskAssignmentSummary.h"
 
 #include "afrl/impact/PointOfInterest.h"
 #include "afrl/impact/LineOfInterest.h"
@@ -72,11 +76,12 @@ namespace uxas {
         addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
         addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
         addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
-        //REGION OF INTEREST
-        addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
-        addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
-        addSubscriptionAddress(afrl::impact::PointOfInterest::Subscription);
-
+        // Task Based Messages
+	addSubscriptionAddress(uxas::messages::task::TaskComplete::Subscription);
+	addSubscriptionAddress(uxas::messages::task::CancelTask::Subscription);
+	addSubscriptionAddress(uxas::messages::task::TaskActive::Subscription);
+	addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
+       
 
         // Subscribe to Task and all derivatives of Task (copied from AutomationDiagramDataService.cpp)
         addSubscriptionAddress(afrl::cmasi::Task::Subscription);
@@ -158,23 +163,49 @@ namespace uxas {
           return false;
         }
 
-        auto areaOfInterest = PTR_CAST_TYP(afrl::impact::AreaOfInterest, receivedLmcpMessage);
-        if (areaOfInterest){
-          monitorDB -> processAreaOfInterest(areaOfInterest);
-          return false;
-        }
+	auto tCompleteMsg = PTR_CAST_TYP(uxas::messages::task::TaskComplete, receivedLmcpMessage);
+	if (tCompleteMsg){
+	  monitorDB -> processTaskCompetionMessage(tCompleteMsg);
+	  return false;
+	}
+	auto tActiveMsg = PTR_CAST_TYP(uxas::messages::task::TaskActive, receivedLmcpMessage);
 
-        auto lineOfInterest = PTR_CAST_TYP(afrl::impact::LineOfInterest, receivedLmcpMessage);
-        if (lineOfInterest){
-          monitorDB -> processLineOfInterest(lineOfInterest);
-          return false;
-        }
+	if (tActiveMsg){
+	  monitorDB -> processTaskActiveMessage(tActiveMsg);
+	  return false;
+	}
+	auto tCancelMsg = PTR_CAST_TYP(uxas::messages::task::CancelTask, receivedLmcpMessage);
 
-        auto pointOfInterest = PTR_CAST_TYP(afrl::impact::PointOfInterest, receivedLmcpMessage);
-        if (pointOfInterest){
-          monitorDB -> processPointOfInterest(pointOfInterest);
-          return false;
-        }
+	if (tCancelMsg){
+	  monitorDB -> processTaskCancelMessage(tCancelMsg);
+	  return false;
+	}
+	auto tAssignmentSummary = PTR_CAST_TYP(uxas::messages::task::TaskAssignmentSummary, receivedLmcpMessage);
+	if (tAssignmentSummary){
+	  monitorDB -> processTaskAssignmentSummary(tAssignmentSummary);
+	  return false;
+	}
+	
+
+        // auto areaOfInterest = PTR_CAST_TYP(afrl::impact::AreaOfInterest, receivedLmcpMessage);
+        // if (areaOfInterest){
+        //   monitorDB -> processAreaOfInterest(areaOfInterest);
+        //   return false;
+        // }
+
+        // auto lineOfInterest = PTR_CAST_TYP(afrl::impact::LineOfInterest, receivedLmcpMessage);
+        // if (lineOfInterest){
+        //   monitorDB -> processLineOfInterest(lineOfInterest);
+        //   return false;
+        // }
+
+        // auto pointOfInterest = PTR_CAST_TYP(afrl::impact::PointOfInterest, receivedLmcpMessage);
+        // if (pointOfInterest){
+        //   monitorDB -> processPointOfInterest(pointOfInterest);
+        //   return false;
+        // }
+
+	
 
         auto task = PTR_CAST_TYP(afrl::cmasi::Task, receivedLmcpMessage);
         if (task){

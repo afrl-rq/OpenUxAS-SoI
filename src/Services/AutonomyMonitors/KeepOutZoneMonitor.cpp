@@ -23,46 +23,54 @@ namespace uxas {
     namespace monitoring {
       KeepOutZoneMonitor::KeepOutZoneMonitor(AutonomyMonitorServiceMain  * service_ptr, std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone): MonitorBase(service_ptr), _zone(keepOutZone), _failed(false) {
         // TODO: Remove these print statements if needed -- they are just for diagnostics
-        std::cout << "[KeepOutZoneMonitor] Started a Keepout zone monitor" << std::endl;
-        std::cout << "\t [ID]: " << keepOutZone -> getZoneID() << std::endl;
-        std::cout << "\t [Altitude Range]:" << keepOutZone -> getMinAltitude() << " --> " << keepOutZone -> getMaxAltitude() << std::endl;
-        std::cout << "\t [Vehicles Affected IDs]:";
+	if (debug){
+	  std::cout << "[KeepOutZoneMonitor] Started a Keepout zone monitor" << std::endl;
+	  std::cout << "\t [ID]: " << keepOutZone -> getZoneID() << std::endl;
+	  std::cout << "\t [Altitude Range]:" << keepOutZone -> getMinAltitude() << " --> " << keepOutZone -> getMaxAltitude() << std::endl;
+	  std::cout << "\t [Vehicles Affected IDs]:";
+	}
         std::vector<int64_t> affectedVehicles = keepOutZone -> getAffectedAircraft();
-        if (affectedVehicles.size() == 0){
+	if (debug){
+	  if (affectedVehicles.size() == 0){
             std::cout << "All vehicles are affected" << std::endl;
-        } else {
-          for (auto id: affectedVehicles){
-            std::cout << id << ", ";
-          }
-          std::cout << std::endl;
-        }
-        // We can ignore start and end timeStamp
-        afrl::cmasi::AbstractGeometry* zoneGeometry = keepOutZone -> getBoundary();
-        // Is it a circle?
-        auto circle = dynamic_cast<afrl::cmasi::Circle*>(zoneGeometry);
-        if (circle){
-          std::cout << "\t [Circle:] C (" << circle -> getCenterPoint() -> getLatitude()
-            << "," << circle -> getCenterPoint() -> getLongitude()
-            << ") R: " << circle -> getRadius() << std::endl;
-        }
+	  } else {
+	    for (auto id: affectedVehicles){
+	      std::cout << id << ", ";
+	    }
+	    std::cout << std::endl;
+	  }
+	}
+	if (debug){
+	  // We can ignore start and end timeStamp
+	  afrl::cmasi::AbstractGeometry* zoneGeometry = keepOutZone -> getBoundary();
+	  // Is it a circle?
 
-        // Is it a rectangle?
-        auto rect = dynamic_cast<afrl::cmasi::Rectangle*>(zoneGeometry);
-        if (rect){
-          std::cout << "\t [Rectangle:] Center(" << rect -> getCenterPoint() -> getLatitude() << " , "
-            << rect -> getCenterPoint() -> getLongitude() << "), W:" << rect -> getWidth() << " (meters?) H:" <<
-            rect -> getHeight() << " (meters?) " << std::endl;
-        }
+	  auto circle = dynamic_cast<afrl::cmasi::Circle*>(zoneGeometry);
+	  if (circle){
+	    std::cout << "\t [Circle:] C (" << circle -> getCenterPoint() -> getLatitude()
+		      << "," << circle -> getCenterPoint() -> getLongitude()
+		      << ") R: " << circle -> getRadius() << std::endl;
+	  }
+	
 
-        // Is it a polygon?
-        auto poly = dynamic_cast<afrl::cmasi::Polygon*>(zoneGeometry);
-        if (poly){
-          std::cout << "\t [Polygon] List of points (lat, long)" << std::endl;
-          std::vector<afrl::cmasi::Location3D*> ptList = poly -> getBoundaryPoints();
-          for (const auto loc: ptList){
+	  // Is it a rectangle?
+	  auto rect = dynamic_cast<afrl::cmasi::Rectangle*>(zoneGeometry);
+	  if (rect){
+	    std::cout << "\t [Rectangle:] Center(" << rect -> getCenterPoint() -> getLatitude() << " , "
+		      << rect -> getCenterPoint() -> getLongitude() << "), W:" << rect -> getWidth() << " (meters?) H:" <<
+	      rect -> getHeight() << " (meters?) " << std::endl;
+	  }
+
+	  // Is it a polygon?
+	  auto poly = dynamic_cast<afrl::cmasi::Polygon*>(zoneGeometry);
+	  if (poly){
+	    std::cout << "\t [Polygon] List of points (lat, long)" << std::endl;
+	    std::vector<afrl::cmasi::Location3D*> ptList = poly -> getBoundaryPoints();
+	    for (const auto loc: ptList){
               std::cout << "\t\t" << loc -> getLatitude() << ", " << loc -> getLongitude() << std::endl;
-          }
-        }
+	    }
+	  }
+	} 
         // Done unpacking
       }
 
@@ -85,8 +93,10 @@ namespace uxas {
       
       void KeepOutZoneMonitor::addVehicleStateMessage(VehicleStateMessage const & vMessage){
         // TODO: Take this message away and implement the actual logic
-        std::cout << "[Vehicle: " << vMessage.getVehicleID() << "]"
-                  << " in [KeepOutZone: " << this->_zone->getZoneID() << "]" << std::endl;
+	if (debug){
+	  std::cout << "[Vehicle: " << vMessage.getVehicleID() << "]"
+		    << " in [KeepOutZone: " << this->_zone->getZoneID() << "]" << std::endl;
+	}
         /*
         std::cout << "[KeepOutZoneMonitor] Got vehicle state message:" << std::endl;
         std::cout << "\t [VehicleID] " << vMessage.getVehicleID() << std::endl;
@@ -128,9 +138,10 @@ namespace uxas {
         //std::shared_ptr<uxas::common::utilities::CUnitConversions> flatEarth(new uxas::common::utilities::CUnitConversions());
         //flatEarth->Initialize(Latitude_deg, Longitude_deg);
         this->flatEarth->ConvertLatLong_degToNorthEast_m(Latitude_deg, Longitude_deg, currentNorth_m, currentEast_m);
-        std::cout << "\t [[Current_Position: ]]" << currentNorth_m << ", "
-                  << currentEast_m << std::endl;
-
+	if (debug){
+	  std::cout << "\t [[Current_Position: ]]" << currentNorth_m << ", "
+		    << currentEast_m << std::endl;
+	}
         // Define the possible KeepOutZone types
         afrl::cmasi::AbstractGeometry* zoneGeometry = this->_zone->getBoundary();
         // If the KeepOutzone is a rectangle
@@ -159,14 +170,6 @@ namespace uxas {
             std::cout << "   North range: " << lower_North << ", " << upper_North<< std::endl;
             std::cout << "   East range: " << left_East << ", " << right_East << std::endl;
 	    sendFailureMessage(vMessage);
-	    
-          }
-          else { // otherwise, show info
-            // std::cout << " Zone: Rectangle->" << this->_zone->getZoneID() << std::endl;
-            // std::cout << "   Center: " << centerNorth_m << ", " << centerEast_m << std::endl;
-            // std::cout << "   upperleft: " << upperleft_North << ", " << upperleft_East<< std::endl;
-            // std::cout << "   lowerright: " << lowerright_North << ", " << lowerright_East << std::endl;
-            //std::cout << "    Width: " << rect->getWidth() << " Height: " << rect->getHeight() << std::endl;
           }
         }
         
@@ -198,14 +201,8 @@ namespace uxas {
                       << ") ARE IN THE DANGER ZONE: " <<this->_zone->getZoneID() << "(Polygon)" << std::endl;
             std::cout << "***************************************" << std::endl;
 	    sendFailureMessage(vMessage);
-          } else {
-            std::cout << " Zone: Polygon->" << this->_zone->getZoneID() << std::endl;
-            std::cout << " Boundaries: " << std::endl;
-            for(auto loc: polyBoundary) {
-              std::cout << " " << loc.first << ", " << loc.second << std::endl;
-            }
           }
-        }
+	}
         
         // If the KeepOutzone is a circle
         auto circle = dynamic_cast<afrl::cmasi::Circle*>(zoneGeometry);
@@ -218,11 +215,7 @@ namespace uxas {
             std::cout << "WARNING!!! YOU(vehicleID:" << vMessage.getVehicleID() << ") ARE IN THE DANGER ZONE: " <<this->_zone->getZoneID() << "(Circle)" << std::endl;
             std::cout << "***************************************" << std::endl;
 	    sendFailureMessage(vMessage);
-          } else {
-            std::cout << " Zone: Cicle-> " << this->_zone->getZoneID() << std::endl;
-            std::cout << "  CenterPosition: " << circle->getCenterPoint()->getLatitude() << ", " << circle->getCenterPoint()->getLongitude() << std::endl;
-            std::cout << "  Radius: " << circle_radius << std::endl;
-          }  
+          } 
         }
 
         return;

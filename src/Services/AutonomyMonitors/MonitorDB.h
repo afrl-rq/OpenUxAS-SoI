@@ -17,6 +17,10 @@
 #include "afrl/cmasi/KeepOutZone.h"
 #include "afrl/cmasi/Task.h"
 #include "afrl/cmasi/TaskDescendants.h"
+#include "uxas/messages/task/TaskComplete.h"
+#include "uxas/messages/task/CancelTask.h"
+#include "uxas/messages/task/TaskActive.h"
+#include "uxas/messages/task/TaskAssignmentSummary.h"
 
 #include "afrl/impact/PointOfInterest.h"
 #include "afrl/impact/LineOfInterest.h"
@@ -69,6 +73,11 @@ namespace uxas {
         bool processPointOfInterest(std::shared_ptr<afrl::impact::PointOfInterest> ptr);
         bool processTask(std::shared_ptr<afrl::cmasi::Task> ptr);
 
+	bool processTaskCompetionMessage (std::shared_ptr<uxas::messages::task::TaskComplete> ptr);
+	bool processTaskCancelMessage(std::shared_ptr<uxas::messages::task::CancelTask> ptr);
+	bool processTaskActiveMessage(std::shared_ptr<uxas::messages::task::TaskActive> ptr);
+	bool processTaskAssignmentSummary(std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> ptr);
+	
         /*-- Setup the required monitors --*/
 
         /*-- Monitor/Judge task completion status --*/

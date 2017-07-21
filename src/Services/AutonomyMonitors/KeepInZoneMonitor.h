@@ -17,7 +17,8 @@
 #include "afrl/cmasi/Location3D.h"
 #include "afrl/cmasi/AbstractGeometry.h"
 #include "afrl/cmasi/AbstractGeometryDescendants.h"
-
+#include "afrl/cmasi/autonomymonitor/OperatingZoneFailure.h"
+#include "afrl/cmasi/autonomymonitor/OperatingZoneFailureType.h"
 namespace uxas {
     namespace service {
         namespace monitoring {
@@ -28,10 +29,12 @@ namespace uxas {
 	      void addVehicleStateMessage(VehicleStateMessage const & vMessage);
 	      bool isPropertySatisfied();
 	      double propertyRobustness();
+
+	      void sendFailureMessage(VehicleStateMessage const & vMessage);
 	      
             protected:
-                std::shared_ptr<afrl::cmasi::KeepInZone> _zone;
-
+	      std::shared_ptr<afrl::cmasi::KeepInZone> _zone;
+	      bool _failed;
                 
             };
         };
