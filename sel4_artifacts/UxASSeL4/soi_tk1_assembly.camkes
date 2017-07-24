@@ -180,7 +180,7 @@ assembly {
 
         // Shared memory connections
 
-        connection seL4SharedData conn31 (from Waypoint_Manager_inst.mission, to Virtual_Machine_inst.mission);connection seL4SharedData conn32 (from Virtual_Machine_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);connection seL4SharedData conn33 (from Waypoint_Manager_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);
+        connection seL4SharedData conn31 (from Waypoint_Manager_inst.mission, to Virtual_Machine_inst.mission);connection seL4SharedData conn32 (from Waypoint_Manager_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);connection seL4SharedData conn33 (from Virtual_Machine_inst.waypoint, to Asset_Waypoint_Manager_inst.waypoint);
 
 
         connection seL4TimeServer periodic_dispatch_timer(from dispatch_periodic_inst.timer, to time_server.the_timer);
@@ -257,7 +257,7 @@ assembly {
         Waypoint_Manager_inst.tb_timer_global_endpoint = "Waypoint_Manager_tb_timer";
 
 
-        //ADDITIONAL_CONFIGS
+        
 
         Virtual_Machine_inst.base_prio = 100;
         Virtual_Machine_inst.priority = 101;

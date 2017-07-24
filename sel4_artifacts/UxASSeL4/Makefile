@@ -8,13 +8,29 @@ include ${PWD}/apps/soi_tk1/make_template/Makefile
 ####### VM files
 #VM_LIBS += sel4allocman elf sel4simple sel4simple-default cpio sel4arm-vmm sel4dma usbdrivers
 Virtual_Machine_CFILES := $(patsubst $(SOURCE_DIR)/%,%,$(wildcard $(SOURCE_DIR)/components/Virtual_Machine/src/*.c))
-Virtual_Machine_OFILES   := archive.o
+Virtual_Machine_OFILES := archive.o
 
 Virtual_Machine_HFILES := $(patsubst ${SOURCE_DIR}/%,%,$(wildcard $(SOURCE_DIR)/components/Virtual_Machine/include/*.h)) \
                  $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
 Virtual_Machine_LIBS += sel4allocman elf sel4simple sel4simple-default cpio sel4arm-vmm sel4dma usbdrivers
-                 
+
 ###### End VM files
+
+###### Waypoint Additional files
+
+Waypoint_Manager_CFILES :=  ${Waypoint_Manager_CFILES} \
+	$(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/CMASI/*.c)) \
+	$(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/CMASI/common/*.c))
+
+Waypoint_Manager_HFILES :=  ${Waypoint_Manager_HFILES} \
+	$(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/CMASI/*.h)) \
+	$(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/CMASI/common/*.h))
+
+
+
+###### End Waypoint files
+
+
 
 
 ###### UART files
