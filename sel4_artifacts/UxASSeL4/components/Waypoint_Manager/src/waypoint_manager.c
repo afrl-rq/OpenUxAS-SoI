@@ -3,6 +3,8 @@
 #include <tb_Waypoint_Manager.h>
 #include <camkes.h>
 #include <mcutils.h>
+#include <AirVehicleState.h>
+#include <lmcp.h>
 
 #define MAX_AP_WAYPOINTS 8
 #define DEBUG(fmt,args...)  ;//  printf("%s,%s,%i:"fmt,__FUNCTION__,"waypoint_manager.c",__LINE__,##args)
@@ -89,18 +91,81 @@ void mission_write(const bool * _UNUSED) {
   return;
 }
 
-void waypoint_write(const uint32_t * _UNUSED) {
-  DEBUG(" Entry.");
-  if(DeserializeMCFromBuffer((uint8_t *)mission, &nw) != true) {
-    DEBUG(" Failed to deserialize buffer.");
-  } else {
-    valid_nw = true;
-    DEBUG("\nBegin next waypoint output.\n");
-    //PrintMC(stdout,&nw);
-    DEBUG("\nEnd next waypoint output.\n");
-    //TODO: Get the waypoint the asset is currently heading towards.
+void waypoint_write(const uint32_t * size) {
+  bool _UNUSEDB = false;
+  uint32_t type;
+  bool location, x;
+  unsigned short payloadStateListLen = 0;
+  unsigned short payloadParams = 0;
+  size_t offset = 0;
+  AirVehicleState state;
+  lmcp_object lmcp;
+  uint8_t * waypointNoHeader = (uint8_t *)waypoint + 8*sizeof(uint8_t);
+  size_t sizeMinusHeader = *size - 8;
+  int i;
+  uint8_t ** pWaypointNoHeader = &waypointNoHeader;
+
+  //for(i = 0; i < *size; i++){
+  //  if(i % 20 == 0){
+  //    printf("\n");
+  //  }
+  //  printf("%02x",*((uint8_t *)waypoint + i));
+  //}
+  //printf("\n");
+
+  memcpy(&type, (uint8_t *)waypoint + 17, sizeof(uint32_t));
+  BSWAP(type);
+  printf("type %d\n", type);
+  
+  if(type == 15){
+    printf("unpacking... size: %d\n", sizeMinusHeader);
+    lmcp_unpack(&waypointNoHeader, sizeMinusHeader, &lmcp);
+    printf("unpacked\n");
+    lmcp_pp(&lmcp);
   }
-  DEBUG(" Exit.");
+
+
+
+
+  //get the type, we only care about AirVehicleState messages (15)
+  //memcpy(&type, (uint8_t *)waypoint + 17, sizeof(uint32_t));
+  //BSWAP(type);
+  //if(type == 15){
+  //  //this is an AirVehicleState message, get thewaypoint number
+  //  memcpy(&location, (uint8_t *)waypoint + 83, sizeof(bool));
+  //  if(location){
+  //    printf("has location\n");
+  //    offset += 14;
+  //  }
+  //  memcpy(&payloadStateListLen, (uint8_t *)waypoint + 92 + offset, sizeof(unsigned short));
+  //  while(payloadStateListLen > 0){
+  //    memcpy(&x, (uint8_t *) waypoint + 94 + offset, sizeof(bool));
+  //    if(x){
+  //      offset += 14
+  //      //x.pack at 95 + offset
+  //      memcpy(&payloadParams, (uint8_t *) waypoint + 113 + offset, sizeof(unsigned short));
+  //      while(paloadParams > 0){
+  //        memcpy(&x, (uint8_t *) waypoint + 115 + offset, sizeof(bool));
+  //        if(x){
+  //          //116
+  //          offset += 14
+
+  //        }
+  //        offset += 1
+  //      }
+
+  //    }
+  //    offset += 1;
+
+  //  }
+
+
+  //}
+  //printf("type is %u", type);
+
+
+  waypoint_read(&_UNUSEDB);
+
   return;
 }
 

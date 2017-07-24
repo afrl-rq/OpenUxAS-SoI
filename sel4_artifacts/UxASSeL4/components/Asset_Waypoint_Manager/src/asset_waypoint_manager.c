@@ -7,6 +7,7 @@
 static uint32_t LMCP_CTRL_STR_NTWK_ORD = 0x50434d4c;
 static mc_t mc;
 static bool vm_got_mission_command = true;
+static bool wm_got_mission_command = true;
 
 void component_entry(const int64_t * periodic_dispatcher){
 
@@ -17,13 +18,12 @@ void component_init(const int64_t *arg){
 }
 
 void mission_read_vm(const bool * _UNUSED) {
-        //printf("Asset Manager confirmed read\n");
         vm_got_mission_command = true;
 }
 
 
 void mission_read_wm(const const bool * _UNUSED) {
-	printf("%i:%s:%s",__LINE__,__FILE__,__FUNCTION__);
+        wm_got_mission_command = true;
 }
 
 bool check_ctrl_str(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet, uint32_t * i){
@@ -77,7 +77,7 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
         if(gotCtrlStr && !gotSize){
             gotSize = get_message_size(tb_in_uart_packet, &message_size, &i);
             if(gotSize){
-                if(&message_size > sizeof(mc_t) - 8){
+                if(message_size > sizeof(mc_t) - 8){
                     printf("Received LMCP message of size %u is too big to decode\n", &message_size);
                     gotCtrlStr = gotSize = false;
                     continue;
@@ -98,6 +98,7 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
                     message_size += 8;
                     waypoint_write(&message_size);
                     vm_got_mission_command = false;
+                    wm_got_mission_command = false;
                 }
                 gotCtrlStr = gotSize = false;
                 message_index = 0;

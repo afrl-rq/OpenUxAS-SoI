@@ -69,11 +69,11 @@ tb_UART_Driver_in_uart_packet_Monitor_ASMFILES := \
 Asset_Waypoint_Manager_CFILES :=  \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Asset_Waypoint_Manager/src/*.c)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Asset_Waypoint_Manager/src/plat/${PLAT}/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Asset_Waypoint_Manager/src/arch/${ARCH}/*.c))
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Asset_Waypoint_Manager/src/arch/${ARCH}/*.c)) 
 
 Asset_Waypoint_Manager_HFILES := \
    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Asset_Waypoint_Manager/include/*.h)) \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h)) 
 
 Asset_Waypoint_Manager_ASMFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Asset_Waypoint_Manager/crt/arch-${ARCH}/crt0.S)) \
@@ -127,11 +127,15 @@ tb_Asset_Waypoint_Manager_in_uart_packet_Monitor_ASMFILES := \
 Waypoint_Manager_CFILES :=  \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/*.c)) \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/plat/${PLAT}/*.c)) \
-    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/arch/${ARCH}/*.c))
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/arch/${ARCH}/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/lmcp/*.c)) \
+    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/lmcp/common/*.c))
 
 Waypoint_Manager_HFILES := \
    $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/include/*.h)) \
-   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h))
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/include/*.h)) \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/lmcp/*.h)) \
+   $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/src/lmcp/common/*.h))
 
 Waypoint_Manager_ASMFILES := \
     $(patsubst ${SOURCE_DIR}/%,%,$(wildcard ${SOURCE_DIR}/components/Waypoint_Manager/crt/arch-${ARCH}/crt0.S)) \

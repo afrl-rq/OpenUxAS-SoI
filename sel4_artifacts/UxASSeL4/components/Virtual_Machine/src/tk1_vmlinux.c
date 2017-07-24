@@ -158,7 +158,6 @@ static int handle_waypoint_fault(struct device* d, vm_t* vm, fault_t* fault){
     }else if(addr == 0xe0000004){
         //this should return the number of bytes
         //ready to be read if a LMCP message is available
-        //printf("VMM received waypoint read request\n");
         if(fault_is_read(fault)){
  //           assert(!reading);
             if(waypoint_bytes_to_read > 0){
