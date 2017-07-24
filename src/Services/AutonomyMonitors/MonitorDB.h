@@ -26,6 +26,8 @@
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/AreaOfInterest.h"
 
+#include "afrl/cmasi/autonomymonitor/TaskStatusRequest.h"
+
 #include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "AutonomyMonitors/MonitorBase.h"
@@ -78,11 +80,11 @@ namespace uxas {
         bool processPointOfInterest(std::shared_ptr<afrl::impact::PointOfInterest> ptr);
         bool processTask(std::shared_ptr<afrl::cmasi::Task> ptr);
 
-	bool processTaskCompetionMessage (std::shared_ptr<uxas::messages::task::TaskComplete> ptr);
+	bool processTaskCompletionMessage (std::shared_ptr<uxas::messages::task::TaskComplete> ptr);
 	bool processTaskCancelMessage(std::shared_ptr<uxas::messages::task::CancelTask> ptr);
 	bool processTaskActiveMessage(std::shared_ptr<uxas::messages::task::TaskActive> ptr);
 	bool processTaskAssignmentSummary(std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> ptr);
-	
+	bool processTaskStatusRequest(std::shared_ptr<afrl::cmasi::autonomymonitor::TaskStatusRequest> ptr);
         /*-- Setup the required monitors --*/
 
         /*-- Monitor/Judge task completion status --*/

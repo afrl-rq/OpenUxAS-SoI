@@ -33,7 +33,9 @@ public:
   virtual void addVehicleStateMessage(VehicleStateMessage const & vMessage) =0;
   virtual bool isPropertySatisfied() =0;
   virtual double propertyRobustness() = 0;
-
+  /*-- Do nothing --*/
+  virtual void sendTaskStatus(){}
+  
  protected:
   AutonomyMonitorServiceMain  * service_;
   bool debug;

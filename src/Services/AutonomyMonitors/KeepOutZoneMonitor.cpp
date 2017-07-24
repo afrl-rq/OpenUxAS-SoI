@@ -15,24 +15,27 @@
 #include "afrl/cmasi/KeepOutZone.h"
 #include "afrl/cmasi/AbstractGeometry.h"
 #include "afrl/cmasi/AbstractGeometryDescendants.h"
-#include "../../Utilities/UnitConversions.h"
+#include "UnitConversions.h"
 #include "afrl/cmasi/autonomymonitor/OperatingZoneFailure.h"
 #include "afrl/cmasi/autonomymonitor/OperatingZoneFailureType.h"
 namespace uxas {
   namespace service {
     namespace monitoring {
-      KeepOutZoneMonitor::KeepOutZoneMonitor(AutonomyMonitorServiceMain  * service_ptr, std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone): MonitorBase(service_ptr), _zone(keepOutZone), _failed(false) {
+      
+      KeepOutZoneMonitor::KeepOutZoneMonitor(AutonomyMonitorServiceMain  * service_ptr,
+					     std::shared_ptr<afrl::cmasi::KeepOutZone> keepOutZone): MonitorBase(service_ptr),
+												     _zone(keepOutZone),
+												     _failed(false) {
+	
         // TODO: Remove these print statements if needed -- they are just for diagnostics
 	if (debug){
 	  std::cout << "[KeepOutZoneMonitor] Started a Keepout zone monitor" << std::endl;
 	  std::cout << "\t [ID]: " << keepOutZone -> getZoneID() << std::endl;
 	  std::cout << "\t [Altitude Range]:" << keepOutZone -> getMinAltitude() << " --> " << keepOutZone -> getMaxAltitude() << std::endl;
 	  std::cout << "\t [Vehicles Affected IDs]:";
-	}
-        std::vector<int64_t> affectedVehicles = keepOutZone -> getAffectedAircraft();
-	if (debug){
+	  std::vector<int64_t> affectedVehicles = keepOutZone -> getAffectedAircraft();
 	  if (affectedVehicles.size() == 0){
-            std::cout << "All vehicles are affected" << std::endl;
+	    std::cout << "All vehicles are affected" << std::endl;
 	  } else {
 	    for (auto id: affectedVehicles){
 	      std::cout << id << ", ";
@@ -40,38 +43,7 @@ namespace uxas {
 	    std::cout << std::endl;
 	  }
 	}
-	if (debug){
-	  // We can ignore start and end timeStamp
-	  afrl::cmasi::AbstractGeometry* zoneGeometry = keepOutZone -> getBoundary();
-	  // Is it a circle?
-
-	  auto circle = dynamic_cast<afrl::cmasi::Circle*>(zoneGeometry);
-	  if (circle){
-	    std::cout << "\t [Circle:] C (" << circle -> getCenterPoint() -> getLatitude()
-		      << "," << circle -> getCenterPoint() -> getLongitude()
-		      << ") R: " << circle -> getRadius() << std::endl;
-	  }
-	
-
-	  // Is it a rectangle?
-	  auto rect = dynamic_cast<afrl::cmasi::Rectangle*>(zoneGeometry);
-	  if (rect){
-	    std::cout << "\t [Rectangle:] Center(" << rect -> getCenterPoint() -> getLatitude() << " , "
-		      << rect -> getCenterPoint() -> getLongitude() << "), W:" << rect -> getWidth() << " (meters?) H:" <<
-	      rect -> getHeight() << " (meters?) " << std::endl;
-	  }
-
-	  // Is it a polygon?
-	  auto poly = dynamic_cast<afrl::cmasi::Polygon*>(zoneGeometry);
-	  if (poly){
-	    std::cout << "\t [Polygon] List of points (lat, long)" << std::endl;
-	    std::vector<afrl::cmasi::Location3D*> ptList = poly -> getBoundaryPoints();
-	    for (const auto loc: ptList){
-              std::cout << "\t\t" << loc -> getLatitude() << ", " << loc -> getLongitude() << std::endl;
-	    }
-	  }
-	} 
-        // Done unpacking
+	// Done unpacking
       }
 
       KeepOutZoneMonitor::~KeepOutZoneMonitor() {
@@ -92,24 +64,7 @@ namespace uxas {
       }
       
       void KeepOutZoneMonitor::addVehicleStateMessage(VehicleStateMessage const & vMessage){
-        // TODO: Take this message away and implement the actual logic
-	if (debug){
-	  std::cout << "[Vehicle: " << vMessage.getVehicleID() << "]"
-		    << " in [KeepOutZone: " << this->_zone->getZoneID() << "]" << std::endl;
-	}
-        /*
-        std::cout << "[KeepOutZoneMonitor] Got vehicle state message:" << std::endl;
-        std::cout << "\t [VehicleID] " << vMessage.getVehicleID() << std::endl;
-        std::cout << "\t [TimeStamp] " << vMessage.getTimeStamp() << std::endl;
-        std::cout << "\t [Latitude] " << vMessage.getLatitude() << std::endl;
-        std::cout << "\t [Longitude] " << vMessage.getLongitude() << std::endl;
-        std::cout << "\t [Altitude] " << vMessage.getAltitude() << std::endl;
-        std::cout << "\t [CameraFootprint] " << std::endl;
-        std::vector<afrl::cmasi::Location3D*> const & footprint = vMessage.getCameraFootprint();
-        for(const auto loc: footprint){
-          std::cout << "\t\t" << loc -> getLatitude() << ", " << loc -> getLongitude() << std::endl;
-        }
-        */
+
         /***********************************************************************
          * Implement the checking part
          */
@@ -123,20 +78,25 @@ namespace uxas {
          * to the North/East coordinates and check. I put the flatEarth in the
          * header file.
          *
-         * It's a litte different with the example, because I can't initialize
-         * the origin of the North/East cordinates locally or in the constructor,
-         * but it doesn't affect the calculation. And I find out that the function
-         * ConvertLatLong_degToNorthEast_m() will be initialized by the first
-         * Keepxxxx.xml file called by AssignTasks_cfg.xml. (e.g., now the
-         * KeepOutZone_1 (it is a rectangle) is the first zone message called in AssignTasks_cfg.xml,
-         * the ConvertLatLong_degToNorthEast_m() will be initialized by the center
-         * of rectangle. If we put KeepInZone_3 before KeepOutZone_2, ConvertLatLong_degToNorthEast_m() will be initialized by the first point of polygon
-         * in KeepInZone_3) It's just the difference of the origin choices, I checked
-         * the performance and it doesn't affect the results.
+         * It's a litte different with the example, because I can't
+         * initialize the origin of the North/East cordinates locally
+         * or in the constructor, but it doesn't affect the
+         * calculation. And I find out that the function
+         * ConvertLatLong_degToNorthEast_m() will be initialized by
+         * the first Keepxxxx.xml file called by
+         * AssignTasks_cfg.xml. (e.g., now the KeepOutZone_1 (it is a
+         * rectangle) is the first zone message called in
+         * AssignTasks_cfg.xml, the ConvertLatLong_degToNorthEast_m()
+         * will be initialized by the center of rectangle. If we put
+         * KeepInZone_3 before KeepOutZone_2,
+         * ConvertLatLong_degToNorthEast_m() will be initialized by
+         * the first point of polygon in KeepInZone_3) It's just the
+         * difference of the origin choices, I checked the performance
+         * and it doesn't affect the results.
          *
          */
-        //std::shared_ptr<uxas::common::utilities::CUnitConversions> flatEarth(new uxas::common::utilities::CUnitConversions());
-        //flatEarth->Initialize(Latitude_deg, Longitude_deg);
+
+	
         this->flatEarth->ConvertLatLong_degToNorthEast_m(Latitude_deg, Longitude_deg, currentNorth_m, currentEast_m);
 	if (debug){
 	  std::cout << "\t [[Current_Position: ]]" << currentNorth_m << ", "

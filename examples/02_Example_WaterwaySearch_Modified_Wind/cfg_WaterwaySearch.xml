@@ -39,6 +39,7 @@
 	<Message MessageFileName="wind/weather_006.xml" SendTime_ms="180000" />
 	<Message MessageFileName="wind/weather_007.xml" SendTime_ms="200000" />
 	<Message MessageFileName="wind/weather_008.xml" SendTime_ms="260000" />
+	<Message MessageFileName="TaskStatusRequestMessage.xml" SendTime_ms="750000"/>
     </Service>
     <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>

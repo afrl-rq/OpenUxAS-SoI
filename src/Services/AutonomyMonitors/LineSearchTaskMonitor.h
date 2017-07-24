@@ -3,25 +3,35 @@
 
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
+#include "AutonomyMonitors/GeometryUtilities.h"
 #include "afrl/cmasi/LineSearchTask.h"
-
+#include "afrl/cmasi/Location3D.h"
+#include "UnitConversions.h"
 
 namespace uxas {
 namespace service {
 namespace monitoring {
 
-   class LineSearchTaskMonitor: public MonitorBase {
+  class LineSearchTaskMonitor: public MonitorBase {
+
   public:
+    LineSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr,
+			  std::shared_ptr<afrl::cmasi::LineSearchTask> lineSearchTask);
+    ~LineSearchTaskMonitor();
+    void addVehicleStateMessage(VehicleStateMessage const & vMessage);
+    bool isPropertySatisfied();
+    double propertyRobustness();
+    void sendTaskStatus();
+    
+  protected:
+    std::shared_ptr<afrl::cmasi::LineSearchTask> _task;
+    uxas::common::utilities::CUnitConversions flatEarth;
+    std::vector<LineSegment> segments;
 
-     LineSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::LineSearchTask> lineSearchTask);
-     ~LineSearchTaskMonitor();
-     void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-     bool isPropertySatisfied();
-     double propertyRobustness();
-   protected:
-     std::shared_ptr<afrl::cmasi::LineSearchTask> _task;
-   };
+  };
 
+  
+  
 
 }
 }

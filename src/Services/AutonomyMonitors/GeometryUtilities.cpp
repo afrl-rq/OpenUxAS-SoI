@@ -61,6 +61,9 @@ namespace uxas {
 	if ( val < 0.0){
 	  xc = std::make_tuple(-a, -b, -c);
 	}
+	if (debug){
+	  std::cout<< "Halfspace: " << std::get<0>(xc) << "* x + " << std::get<1>(xc) << " *y + " << std::get<2>(xc) << " >= 0" << std::endl;
+	}
 	p_halfspaces.push_back(xc);
 	return;
       }
@@ -91,7 +94,7 @@ namespace uxas {
           2. Add interval
 	  --*/
 	static_assert(std::numeric_limits<double>::is_iec559, "IEEE 754 required");
-	double lb = 1.0, ub = 0.0;
+	double lb = 0.0, ub = 1.0;
 	double a,b,c;
 	double lam;
 	for (auto tup: mp.p_halfspaces){
@@ -125,6 +128,8 @@ namespace uxas {
 	if (lb <= ub){
 	  assert(0.0 <= lb && lb <= 1.0);
 	  assert(0.0 <= ub && ub <= 1.0);
+	  // if (debug)
+	  // std::cout << "[GeometryUtilities:] Segment # " << this -> s_id << " covered interval: " << lb << " , " << ub << std::endl;
 	  s_covered.addInterval(lb, ub);
 	}
 
@@ -135,8 +140,13 @@ namespace uxas {
       }
 
 
-      IntervalList::IntervalList():covers_unit(false){};
-
+      IntervalList::IntervalList(){};
+      IntervalList::IntervalList(IntervalList const & iList){
+	for (auto p: iList.intervals){
+	  intervals.push_back(p);
+	}
+      }
+      
       bool IntervalList::invariant_check(){
 	double lb = 0.0;
 	/* make sure that the intervals are sorted according to their
@@ -153,8 +163,6 @@ namespace uxas {
       
       void IntervalList::consolidate(){
 	assert(invariant_check());
-	double cur_lb = 0.0;
-	double cur_ub = 0.0;
 	auto it = intervals.begin();
 	auto jt = it +1;
 	while (it < intervals.end() && jt < intervals.end()){
@@ -185,19 +193,27 @@ namespace uxas {
 	    while (it < intervals.end() && it -> first < a)
 	      ++it;
 	    intervals.insert(it, pr);
+	    consolidate();
 	  }
-	  consolidate();
+
 	  return;
 	}
       }
 
       bool IntervalList::coversUnit(){
-	consolidate();
-	if (intervals.size() != 1) return false;
+	if (intervals.size() != 1){
+	  return false;
+	}
 	auto p = *(intervals.begin());
-	return p.first <= EPS && p.second >= 1.0 - EPS;
+	return (p.first <= EPS && p.second >= 1.0 - EPS);
       }
-      
+
+      void IntervalList::printAll(){
+	std::cout << "Interval List: " << std::endl;
+	for (auto iv: intervals){
+	  std::cout << "\t Covered: " << iv.first << " , " << iv.second << std::endl;
+	}
+      }
       
     };
   };

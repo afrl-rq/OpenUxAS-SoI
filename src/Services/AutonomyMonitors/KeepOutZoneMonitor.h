@@ -14,7 +14,7 @@
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/VehicleStateMessage.h"
 #include "afrl/cmasi/KeepOutZone.h"
-#include "../../Utilities/UnitConversions.h"
+#include "UnitConversions.h"
 namespace uxas {
 namespace service {
 namespace monitoring {

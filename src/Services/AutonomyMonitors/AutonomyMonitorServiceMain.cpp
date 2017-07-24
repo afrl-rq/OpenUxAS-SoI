@@ -27,6 +27,7 @@
 #include "afrl/impact/AreaOfInterest.h"
 #include "MonitorDB.h"
 
+#include "afrl/cmasi/autonomymonitor/TaskStatusRequest.h"
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
 #include <fstream>     // std::ifstream
@@ -81,7 +82,8 @@ namespace uxas {
 	addSubscriptionAddress(uxas::messages::task::CancelTask::Subscription);
 	addSubscriptionAddress(uxas::messages::task::TaskActive::Subscription);
 	addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
-       
+	// Task Status Request
+	addSubscriptionAddress(afrl::cmasi::autonomymonitor::TaskStatusRequest::Subscription);
 
         // Subscribe to Task and all derivatives of Task (copied from AutomationDiagramDataService.cpp)
         addSubscriptionAddress(afrl::cmasi::Task::Subscription);
@@ -165,7 +167,7 @@ namespace uxas {
 
 	auto tCompleteMsg = PTR_CAST_TYP(uxas::messages::task::TaskComplete, receivedLmcpMessage);
 	if (tCompleteMsg){
-	  monitorDB -> processTaskCompetionMessage(tCompleteMsg);
+	  monitorDB -> processTaskCompletionMessage(tCompleteMsg);
 	  return false;
 	}
 	auto tActiveMsg = PTR_CAST_TYP(uxas::messages::task::TaskActive, receivedLmcpMessage);
@@ -184,6 +186,11 @@ namespace uxas {
 	if (tAssignmentSummary){
 	  monitorDB -> processTaskAssignmentSummary(tAssignmentSummary);
 	  return false;
+	}
+
+	auto tStatusReq = PTR_CAST_TYP(afrl::cmasi::autonomymonitor::TaskStatusRequest, receivedLmcpMessage);
+	if (tStatusReq){
+	  monitorDB -> processTaskStatusRequest(tStatusReq);
 	}
 	
 

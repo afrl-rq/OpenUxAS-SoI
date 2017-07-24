@@ -11,14 +11,23 @@
 #include "afrl/cmasi/Location3D.h"
 #include "afrl/cmasi/CameraState.h"
 #include "afrl/cmasi/Wedge.h"
+#include "UnitConversions.h"
 
 #include <memory>      //int64_t
 #include <vector>
+
+
 namespace uxas {
     namespace service {
       namespace monitoring {
-          std::vector<afrl::cmasi::Location3D*> getCameraFootprintFromEntityState(std::shared_ptr<afrl::cmasi::EntityState> ptr );
-	  bool checkCameraAngleInWedge_Util(std::vector<afrl::cmasi::Wedge*> const & all_wedges, afrl::cmasi::CameraState const * cState);
+	
+	void getCameraFootprintFromEntityState(std::shared_ptr<afrl::cmasi::EntityState> ptr,
+					       std::vector< std::shared_ptr<afrl::cmasi::Location3D> > &  v,
+					       double & camera_azimuth,
+					       double & camera_elevation  );
+	  bool checkCameraAngleInWedge_Util(std::vector<afrl::cmasi::Wedge*> const & all_wedges, double camera_azimuth, double camera_elevation);
+	  std::pair<double, double> get_east_north_coordinates(uxas::common::utilities::CUnitConversions & flatEarth,
+							       afrl::cmasi::Location3D const * loc);
       }
     }
 }

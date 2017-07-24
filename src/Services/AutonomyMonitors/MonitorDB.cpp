@@ -53,7 +53,7 @@ namespace uxas {
         }
 
       void MonitorDB::registerVehicleState(VehicleStateMessage  vMessage){
-        allVehicleStateMessages.push_back(vMessage);
+        //allVehicleStateMessages.push_back(vMessage);
         for (MonitorBase* mon: allMonitors){
           mon -> addVehicleStateMessage(vMessage);
         }
@@ -65,7 +65,7 @@ namespace uxas {
 	    mon -> addVehicleStateMessage(vMessage);
 	  }
 	} else {
-	  UXAS_LOG_WARN("[AutonomyMonitor]: Vehicle ID: ", vehicle_id, " is not associated with any task at this time.");
+	  //UXAS_LOG_WARN("[AutonomyMonitor]: Vehicle ID: ", vehicle_id, " is not associated with any task at this time.");
 	}
 	
 	
@@ -99,7 +99,10 @@ namespace uxas {
 
       void MonitorDB::createMonitorsForOperatingRegion(int64_t regionID){
 	auto it = allOperatingRegions.find(regionID);
-	assert( it != allOperatingRegions.end());
+	if (it == allOperatingRegions.end()){
+	  UXAS_LOG_WARN("[AutonomyMonitor]: Operating region id: ", regionID, " not previously known. Ignoring.");
+	  return;
+	}
 	std::shared_ptr<afrl::cmasi::OperatingRegion> ptr = it -> second;
 	for (auto id: ptr -> getKeepInAreas()){
 	  auto it = keepInZones.find(id);
@@ -241,8 +244,35 @@ namespace uxas {
 	  }
 	}
       }
+
+      bool MonitorDB::processTaskStatusRequest( std::shared_ptr<afrl::cmasi::autonomymonitor::TaskStatusRequest> ptr){
+	int64_t taskID = ptr -> getTaskID();
+	if (taskID >= 0){
+	  auto it = taskMonitorsByTaskID.find(taskID);
+	  if (it != taskMonitorsByTaskID.end()){
+	    it -> second -> sendTaskStatus();
+	  } else {
+	    UXAS_LOG_WARN("[AutonomyMonitor]: processTaskStatusRequest. Task ID ", taskID, " is not being monitored");
+	  }
+	} else {
+	  for (auto p: taskMonitorsByTaskID){
+	    p.second -> sendTaskStatus();
+	  }
+	}
+	return true;
+      }
       
-      bool MonitorDB::processTaskCompetionMessage (std::shared_ptr<uxas::messages::task::TaskComplete> ptr){
+      bool MonitorDB::processTaskCompletionMessage (std::shared_ptr<uxas::messages::task::TaskComplete> ptr){
+	// 1. Find out which task
+	// 2. Check if it is being monitored
+	// 3. Force the monitor to issue a status message
+	int64_t taskID = ptr -> getTaskID();
+	auto it = taskMonitorsByTaskID.find(taskID);
+	if (it != taskMonitorsByTaskID.end()){
+	  it -> second -> sendTaskStatus();
+	} else {
+	  UXAS_LOG_WARN("[AutonomyMonitor]: processTaskCompletionMessage. Task ID ", taskID, " is not being monitored");
+	}
 	return true;
       }
 
