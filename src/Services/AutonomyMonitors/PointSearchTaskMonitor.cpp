@@ -37,7 +37,8 @@ namespace monitoring {
     flatEarth->ConvertLatLong_degToNorthEast_m(Latitude_deg, Longitude_deg, currentNorth_m, currentEast_m);
     // Get the camerafootprint of the vehicle and transfer them to be North/East coordinates
     // The incoming footprints should be ordered clockwise or counterclockwise.
-    std::vector<afrl::cmasi::Location3D*> const & footprint_latlong = vMessage.getCameraFootprint();
+    //std::vector<afrl::cmasi::Location3D*> footprint_latlong = vMessage.getCameraFootprint();
+    std::vector<std::shared_ptr<afrl::cmasi::Location3D>> footprint_latlong = vMessage.getCameraFootprint();
     std::vector<std::pair<double, double>> footprint_m;
     for(auto loc: footprint_latlong) {
       std::pair<double, double> fp_add;
