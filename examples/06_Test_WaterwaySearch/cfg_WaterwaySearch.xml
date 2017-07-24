@@ -4,6 +4,8 @@
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.KeepOutZone" />
+        <SubscribeToMessage MessageType="afrl.cmasi.OperatingRegion" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
@@ -25,6 +27,8 @@
     <Service Type="SendTestMessagesService" PathToMessageFiles="../MessagesToSend/" TestGeneratorPort="5556">
         <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
         <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>
+	<Message MessageFileName="KeepOutZone_11.xml" SendTime_ms="210"/>
+        <Message MessageFileName="OperatingRegion_100.xml" SendTime_ms="240"/>
         <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
         <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
         <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="300"/>
