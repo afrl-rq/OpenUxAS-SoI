@@ -23,6 +23,8 @@ static void send_swin();
 
 bool missionSendState = false;
 bool uartPacketSent = false;
+//uint8_t bigBuf[6975];
+uint8_t * bigBuf;
 
 void component_entry(const int64_t * periodic_dispatcher) {
     send_swin();
@@ -30,6 +32,7 @@ void component_entry(const int64_t * periodic_dispatcher) {
 
 void component_init(const int64_t *arg) {
   DEBUG("Starting Waypoint_Manager.\n");
+  bigBuf = (uint8_t *)malloc(sizeof(uint8_t)*6975);
 }
 
 static void send_swin() {
@@ -99,11 +102,12 @@ void waypoint_write(const uint32_t * size) {
   unsigned short payloadParams = 0;
   size_t offset = 0;
   AirVehicleState state;
-  lmcp_object lmcp;
   uint8_t * waypointNoHeader = (uint8_t *)waypoint + 8*sizeof(uint8_t);
   size_t sizeMinusHeader = *size - 8;
   int i;
   uint8_t ** pWaypointNoHeader = &waypointNoHeader;
+  size_t realSize, alwaysFour = 4;
+  uint8_t * waypointCopy = waypoint;
 
   //for(i = 0; i < *size; i++){
   //  if(i % 20 == 0){
@@ -113,16 +117,27 @@ void waypoint_write(const uint32_t * size) {
   //}
   //printf("\n");
 
-  memcpy(&type, (uint8_t *)waypoint + 17, sizeof(uint32_t));
-  BSWAP(type);
-  printf("type %d\n", type);
+  //memcpy(&type, (uint8_t *)waypoint + 17, sizeof(uint32_t));
+  //BSWAP(type);
+  //printf("type %d\n", type);
   
-  if(type == 15){
-    printf("unpacking... size: %d\n", sizeMinusHeader);
-    lmcp_unpack(&waypointNoHeader, sizeMinusHeader, &lmcp);
-    printf("unpacked\n");
-    lmcp_pp(&lmcp);
-  }
+  lmcp_unpack_uint32_t(&waypointCopy, &alwaysFour, &realSize); 
+  realSize += 12;
+
+  memset(bigBuf, 0, 6975);
+  waypointCopy = waypoint;
+  printf("about to process!!\n");
+  lmcp_process_msg(&waypointCopy, realSize, &bigBuf);
+  printf("I'm here chump!!!\n");
+  lmcp_pp((lmcp_object *)bigBuf);
+
+
+  //if(type == 15){
+  //  printf("unpacking... size: %d\n", sizeMinusHeader);
+  //  lmcp_unpack(&waypointNoHeader, sizeMinusHeader, &lmcp);
+  //  printf("unpacked\n");
+  //  lmcp_pp(&lmcp);
+  //}
 
 
 
