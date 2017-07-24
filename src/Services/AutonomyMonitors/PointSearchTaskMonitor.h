@@ -21,6 +21,7 @@ namespace monitoring {
     double propertyRobustness();
   protected:
     std::shared_ptr<afrl::cmasi::PointSearchTask> _task;
+    bool _failed;
   };
 
 };
