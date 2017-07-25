@@ -1,0 +1,93 @@
+package ComponentB
+public
+	with Base_Types;
+	thread Component
+		features 
+			input: in event data port Base_Types::Integer;
+			accepting_output : out event data port Base_Types::Integer;
+			
+		annex agree {**
+				
+		--assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+		
+		-------------------------------------------------------------
+  		-- BEGIN STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		--State constants
+ 		const STATE1 : int = 0;
+        const STATE2 : int = 1;
+        const STATE3 : int = 2;
+
+		-------------------------------------------------------------
+		--State variable
+		eq state: int;
+
+		-------------------------------------------------------------
+		--State machine support macros		
+
+		eq previous_state: int = prev(state, STATE1);
+
+		eq some_transition: bool = T_ONE_TO_TWO 
+									or T_TWO_TO_ONE
+									or T_TWO_TO_THREE;
+									
+		-------------------------------------------------------------
+		--Helper Macro: current system state
+		eq system_ready: bool;
+		eq system_timeout: bool;
+								
+		-------------------------------------------------------------	
+		--State transition macros
+		eq T_ONE_TO_TWO : bool = 
+			false -> ((previous_state = STATE1) and pre(system_ready));
+			
+		eq T_TWO_TO_ONE : bool = 
+			false -> ((previous_state = STATE2) and pre(system_timeout));
+		
+		eq T_TWO_TO_THREE : bool = 
+			false -> ((previous_state = STATE2) and (pre(event(input))));
+			
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (state = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_ONE_TO_TWO_effect" : T_ONE_TO_TWO => (state = STATE2);
+        
+        guarantee "T_TWO_TO_ONE_effect" : T_TWO_TO_ONE => ((state = STATE1) and (system_ready = false));	
+        
+        guarantee "T_TWO_TO_THREE_effect" : T_TWO_TO_THREE => (state = STATE3);	
+        
+        guarantee "Accepting outputs are only sent on the transtion from state two to three" :
+        		T_TWO_TO_THREE <=> event(accepting_output);
+		-------------------------------------------------------------
+		-- END STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		
+		eq state1_entry : bool = true -> (T_TWO_TO_ONE);
+		eq state2_entry : bool = false -> (T_ONE_TO_TWO);
+		
+		--Timing guarantees
+		guarantee "The system is ready within 2 time units after entry of STATE1"	:
+			whenever state1_entry occurs system_ready occurs during [0.0,2.0];
+			
+--		guarantee "The system transitions to STATE2 within 3 time units after entry of STATE1"	:
+--			whenever state1_entry occurs state2_entry occurs during [0.0,3.0];
+--			
+		guarantee "The system timeouts at exactly 20 time units after entry into STATE2" :
+			whenever state2_entry occurs system_timeout exclusively occurs during [20.0,20.0];
+			
+		
+		
+		--guarantee "The system sends an accepting state output within "
+			
+		--TODO: what does this say about system_timeout in all other states and time steps?
+		**};
+	end Component;
+end ComponentB;

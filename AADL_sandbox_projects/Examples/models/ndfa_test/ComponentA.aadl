@@ -1,0 +1,93 @@
+package ComponentA
+public
+	with Base_Types;
+	thread Component
+		features 
+			output: out event data port Base_Types::Integer;
+			
+		annex agree {**
+				
+		--assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+				
+		-------------------------------------------------------------
+  		-- BEGIN STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		--State constants
+ 		const STATE1 : int = 0;
+        const STATE2 : int = 1;
+
+		-------------------------------------------------------------
+		--State variable
+		eq state: int;
+
+		-------------------------------------------------------------
+		--State machine support macros		
+
+		eq previous_state: int = prev(state, STATE1);
+
+		eq some_transition: bool = T_ONE_TO_TWO 
+									or T_TWO_TO_ONE;
+									
+		-------------------------------------------------------------
+		--Helper Macro: current system state
+		eq system_ready: bool;
+		eq output_ready: bool;
+								
+		-------------------------------------------------------------	
+		--State transition macros
+		eq T_ONE_TO_TWO : bool = 
+			false -> ((previous_state = STATE1) and pre(system_ready));
+		
+		eq T_TWO_TO_ONE : bool = 
+			false -> ((previous_state = STATE2) and (pre(event(output))));
+			
+		-------------------------------------------------------------	
+		--State machine guarantees
+				
+        --This guarantee captures all the "self loops" in shorthand form. 
+        -- It is important to state what happens when no transition condition is satisfied.
+        -- Otherwise the model checker will allow "spontaneous" transitions.
+        guarantee "Self loops": not some_transition => (state = previous_state);
+        
+        -- Now we write one guarantee for each transition.
+        
+        --If we had other actions to take on this transition, we would include those in the consequent as well. 
+        guarantee "T_ONE_TO_TWO_effect" : T_ONE_TO_TWO => (state = STATE2);
+        
+        guarantee "T_TWO_TO_ONE_effect" : T_TWO_TO_ONE => (state = STATE1);							
+		-------------------------------------------------------------
+		-- END STATE MACHINE LOGIC
+		-------------------------------------------------------------
+		
+		guarantee "Send output when output is ready in STATE2":
+			(state = STATE2 and output_ready) <=>
+				event(output);
+				
+		guarantee "Output is not ready in STATE1" :
+			state = STATE1 => not output_ready;
+		
+		eq state1_entry : bool = true -> (T_TWO_TO_ONE);
+		eq state2_entry : bool = false -> (T_ONE_TO_TWO);
+		eq output_event : bool = false -> (event(output));
+		eq not_output_event : bool = true -> (not event(output));
+		eq not_output_ready : bool = false -> (not output_ready);
+		
+		--Timing Gurantees
+		guarantee "The system is ready within 2 time units after entry of STATE1"	:
+			whenever state1_entry occurs system_ready occurs during [0.0,2.0];
+			
+		--TODO: I do not know why this guarantee is necessary to prove system-level properties
+		guarantee "The system transitions to STATE2 within 3 time units after entry of STATE1"	:
+			whenever state1_entry occurs state2_entry occurs during [0.0,3.0];
+			
+		--The use of "exclusively" indicates and "iff", that is the output_ready is only true at the given time
+		guarantee "The system prepares an output at exactly 4 time units after entry of STATE2" :
+			whenever state2_entry occurs output_ready exclusively occurs during [4.0,4.0];
+		
+		--This guarantee was used for debugging purposes, is not necessary to prove the system-level property	
+--		guarantee "The system sends an output at exactly 4 time units after entry of STATE2" :
+--			whenever state2_entry occurs output_event exclusively occurs during [4.0,4.0];
+--			
+		**};
+	end Component;
+end ComponentA;

@@ -1,0 +1,37 @@
+package NDFA
+public
+	with ComponentA;
+	with ComponentB;
+	with PLTL;
+	
+	process Composite
+		annex agree{**
+			--assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+			
+			eq event_first_ComponentA_out : bool;
+			eq ComponentB_State_3 : bool;
+			eq event_ComponentB_out: bool;
+			
+			--Note:  componentB only sends an output for the first componentA output received.  
+        	guarantee "Bounded Reachability of ComponentB State3: Reached within 100 time units" : 
+        		whenever event_first_ComponentA_out occurs event_ComponentB_out occurs during [0.0,100.0];
+		**};
+	end Composite;
+	
+	process implementation Composite.impl
+		subcomponents
+			componentA : thread ComponentA::Component;
+			componentB : thread ComponentB::Component;
+		connections
+			conn1 : port ComponentA.output -> ComponentB.input;
+		
+		annex agree {**
+			assign event_first_ComponentA_out = event(componentA.output) and not pre(PLTL.Once(event(componentA.output)));
+			assign event_ComponentB_out = event(componentB.accepting_output);
+		
+			lemma "Observer: ComponentB State3 (unbounded) Reachability" : componentB.state != componentB.STATE3;
+	**}	;
+		
+	end Composite.impl;
+	
+end NDFA;
