@@ -8,20 +8,20 @@ import LocalCoords
 #############################################
 
 # the initial latitude and longitude (linearization point) is set during the first call to LocalCoords:
-Latitude_Init_deg = 39.338760
-Longitude_Init_deg = -86.027701
-LinearCoordinates_Init = LocalCoords.LatLong_degToNorthEast_m(Latitude_Init_deg,Longitude_Init_deg)
+Latitude_Init_ = 25.4015
+Longitude_Init_ = -80.5223
+LinearCoordinates_Init = LocalCoords.LatLong_degToNorthEast_m(Latitude_Init_,Longitude_Init_)
 print(LinearCoordinates_Init)
 
 # subsequent calls are linerized using the inital point
-Latitude_deg = 39.345334
-Longitude_deg = -86.039201
+Latitude_deg = 25.1856
+Longitude_deg = -80.861
 LinearCoordinates_01 = LocalCoords.LatLong_degToNorthEast_m(Latitude_deg,Longitude_deg)
 print(LinearCoordinates_01)
 
 # subsequent calls are linerized using the inital point
-Latitude_deg = 39.355334
-Longitude_deg = -86.029201
+Latitude_deg = 25.4215
+Longitude_deg = -80.029201
 LinearCoordinates_02 = LocalCoords.LatLong_degToNorthEast_m(Latitude_deg,Longitude_deg)
 print(LinearCoordinates_02)
 
@@ -29,7 +29,7 @@ print(LinearCoordinates_02)
 Latitude_Init_deg = 39.338760
 Longitude_Init_deg = -86.027701
 LinearCoordinates_Init = LocalCoords.LatLong_degToNorthEast_m(Latitude_Init_deg,Longitude_Init_deg)
-print LinearCoordinates_Init
+print(LinearCoordinates_Init)
 
 #############################################
 #convert from meters to lat long degrees

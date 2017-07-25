@@ -1,0 +1,4 @@
+<WeatherReport Series="CMASI">
+  <WindSpeed>10</WindSpeed>
+  <WindDirection>45</WindDirection>
+</WeatherReport>

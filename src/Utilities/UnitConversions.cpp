@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "UnitConversions.h"
-
+#include <iostream>
 
 namespace uxas
 {
@@ -45,6 +45,7 @@ void CUnitConversions::Initialize(const double& dLatitudeInit_rad, const double&
         m_dRadiusTransverse_m = (dDenominatorTransverse <= 0.0) ? (0.0) : (m_dRadiusEquatorial_m / dDenominatorTransverse);
         m_dRadiusSmallCircleLatitude_m = m_dRadiusTransverse_m * cos(dLatitudeInit_rad);
         m_bInitialized = true;
+	
     }
 };
 

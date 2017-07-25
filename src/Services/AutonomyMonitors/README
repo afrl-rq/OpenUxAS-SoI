@@ -1,0 +1,51 @@
+Plan for implementing a monitoring service:
+Sriram Sankaranarayanan and Guohui Ding
+
+
+1. Objective:
+
+   We will collect information regarding
+      (a) the operating region KeepIn/Out zones
+      (b) the tasks
+      (c) the relationship between tasks as
+          captured by the process algebra string.
+      (d) the vehicles that are going to perform the tasks
+      (e) the states of these vehicles
+      (f) the waypoints that are fed to the vehicles.
+      (g) the TaskActive/TaskComplete messages received
+      (g) any sort of time and energy constraints on the overall mission
+      	  completion.
+
+2. As the plan is being implemented:
+
+      (a) The operating regions are maintained "robustly" even in the presence of disturbances. I.e, vehicles do not enter the KeepOut zones.
+         TODO: Find out what the semantics of the KeepIn zones are.
+
+      (b) Monitor completion for various task types: use
+      	  robustness semantics to capture how "robustly"
+	  the tasks are completed.
+	  TODO: Formulate these semantics and important assumptions
+	        with Guohui
+	  
+      (c) Monitor overall mission status and assign a robustness score
+      	  to the overall mission success/failure status.
+
+
+
+Implementation Details
+
+We will implement a service that captures the important messages related
+to the AutomationRequests, Tasks, VehicleConfiguration and States.
+Once this information is collected and the plan implementation begins, we will
+monitor entity states continuously.
+
+- End-to-End Verification
+
+   Using the reported vehicle states, are the tasks actually being
+   completed as specified.
+
+
+- Implementation Verification
+
+  Is the planner working correctly?
+

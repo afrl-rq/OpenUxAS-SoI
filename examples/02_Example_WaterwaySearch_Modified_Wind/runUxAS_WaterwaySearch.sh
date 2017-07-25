@@ -7,8 +7,9 @@ RM_LOG="rm -R ./log"
 
 BIN="../../../build_debug/uxas"
 
-mkdir -p RUNDIR_AssignTasks
-cd RUNDIR_AssignTasks
+mkdir -p RUNDIR_WaterwaySearch
+cd RUNDIR_WaterwaySearch
 $RM_DATAWORK
 $RM_LOG
-$BIN -cfgPath ../AssignTasks_cfg.xml
+$BIN -cfgPath ../cfg_WaterwaySearch.xml
+

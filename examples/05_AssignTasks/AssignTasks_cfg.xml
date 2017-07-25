@@ -4,6 +4,7 @@
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+	<SubscribeToMessage MessageType="afrl.cmasi.WeatherReport" />
     </Bridge>
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
@@ -13,7 +14,8 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
-    
+    <Service Type="VehicleStateListenerService"/>
+    <Service Type="AutonomyMonitorServiceMain"/>
     <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
     param.turnType="FlyOver" GimbalPayloadId="101"/>
     <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
@@ -29,7 +31,11 @@
 
         <Message MessageFileName="KeepOutZone_1.xml" SendTime_ms="200"/>
         <Message MessageFileName="KeepOutZone_2.xml" SendTime_ms="210"/>
+        <Message MessageFileName="KeepOutZone_3.xml" SendTime_ms="212"/>
+        <Message MessageFileName="KeepOutZone_4.xml" SendTime_ms="214"/>
         <Message MessageFileName="KeepInZone_3.xml" SendTime_ms="220"/>
+        <Message MessageFileName="KeepInZone_1.xml" SendTime_ms="222"/>
+        <Message MessageFileName="KeepInZone_2.xml" SendTime_ms="224"/>
         <Message MessageFileName="OperatingRegion_10.xml" SendTime_ms="230"/>
 
         <Message MessageFileName="PointSearchTask_1.xml" SendTime_ms="300"/>
@@ -38,8 +44,19 @@
         <Message MessageFileName="LineSearchTask_4.xml" SendTime_ms="330"/>
         <Message MessageFileName="AreaSearchTask_5.xml" SendTime_ms="340"/>
         <Message MessageFileName="AreaSearchTask_6.xml" SendTime_ms="350"/>
-
         <Message MessageFileName="AutomationRequest_All.xml" SendTime_ms="5000"/>
+	
+	<!-- <Message MessageFileName="wind/weather_001.xml" SendTime_ms="6000" /> -->
+	<!-- <Message MessageFileName="wind/weather_002.xml" SendTime_ms="30000" />	 -->
+	<!-- <Message MessageFileName="wind/weather_003.xml" SendTime_ms="60000" /> -->
+	<!-- <Message MessageFileName="wind/weather_004.xml" SendTime_ms="90000" /> -->
+	<!-- <Message MessageFileName="wind/weather_005.xml" SendTime_ms="120000" /> -->
+	<!-- <Message MessageFileName="wind/weather_006.xml" SendTime_ms="180000" /> -->
+	<!-- <Message MessageFileName="wind/weather_007.xml" SendTime_ms="200000" /> -->
+	<!-- <Message MessageFileName="wind/weather_008.xml" SendTime_ms="260000" /> -->
+	
+	
+	
     </Service>
     
     <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000">

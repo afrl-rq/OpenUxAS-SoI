@@ -1,13 +1,13 @@
 // ===============================================================================
 // Authors: AFRL/RQQA
 // Organization: Air Force Research Laboratory, Aerospace Systems Directorate, Power and Control Division
-// 
+//
 // Copyright (c) 2017 Government of the United State of America, as represented by
 // the Secretary of the Air Force.  No copyright is claimed in the United States under
 // Title 17, U.S. Code.  All Other Rights Reserved.
 // ===============================================================================
 
-/* 
+/*
  * File:   ServiceList.h
  * Author: steve
  *
@@ -16,12 +16,12 @@
 
 /*! \brief This file is used to register services. First the service header is
  * "included" and the top of the service manager, and then the service is registered
- * in ServiceManager::getInstance(), through the creation of a "dummy" instance. 
- * To add new services: 
- * 1) add a #include statement, for the service, in the SERVICE HEADER FILES SECTION. 
- * 2) add a line to create a "dummy" instance in the SERVICE REGISTRATION SECTION. 
- * 3) add a #include statement, for each task, in the INCLUDE TASK MESSAGES SECTION. 
- * 4) add a subscription, for each task, in the SUBSCRIBE TO TASKS SECTION. 
+ * in ServiceManager::getInstance(), through the creation of a "dummy" instance.
+ * To add new services:
+ * 1) add a #include statement, for the service, in the SERVICE HEADER FILES SECTION.
+ * 2) add a line to create a "dummy" instance in the SERVICE REGISTRATION SECTION.
+ * 3) add a #include statement, for each task, in the INCLUDE TASK MESSAGES SECTION.
+ * 4) add a subscription, for each task, in the SUBSCRIBE TO TASKS SECTION.
 */
 
 
@@ -93,6 +93,8 @@
 #include "SerialAutomationRequestTestService.h"
 #include "TcpBridge.h"
 #include "Test_SimulationTime.h"
+#include "VehicleStateListenerService.h"
+#include "AutonomyMonitors/AutonomyMonitorServiceMain.h"
 
 // general services
 #include "AssignmentTreeBranchBoundService.h"
@@ -159,6 +161,8 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SerialAutomationRequestTestService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::Test_SimulationTime>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::MessageLoggerForTestService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::test::VehicleStateListenerService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::monitoring::AutonomyMonitorServiceMain>();}
 
 // general services
 {auto svc = uxas::stduxas::make_unique<uxas::service::AssignmentTreeBranchBoundService>();}
