@@ -70,7 +70,7 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
         if(!gotCtrlStr){
             gotCtrlStr = check_ctrl_str(tb_in_uart_packet, &i);
             if(gotCtrlStr){
-                memcpy(waypoint, &LMCP_CTRL_STR_NTWK_ORD, sizeof(uint32_t));
+                memcpy(&mc, &LMCP_CTRL_STR_NTWK_ORD, sizeof(uint32_t));
             }
         }
 
@@ -84,7 +84,7 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
                 }
                 message_index = 0;
                 BSWAP(message_size);
-                memcpy(((uint8_t *)waypoint + 4), &message_size, sizeof(uint32_t));
+                memcpy(((uint8_t *)&mc + 4), &message_size, sizeof(uint32_t));
                 BSWAP(message_size);
                 //printf("asset got message of size: %d\n", message_size);
             }
