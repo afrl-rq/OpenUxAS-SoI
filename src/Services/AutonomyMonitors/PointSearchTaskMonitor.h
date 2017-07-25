@@ -19,6 +19,7 @@ namespace monitoring {
     void addVehicleStateMessage(VehicleStateMessage const & vMessage);
     bool isPropertySatisfied();
     double propertyRobustness();
+    void sendTaskStatus();
   protected:
     std::shared_ptr<afrl::cmasi::PointSearchTask> _task;
     bool _failed;

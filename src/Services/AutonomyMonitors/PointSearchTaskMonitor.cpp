@@ -1,14 +1,16 @@
 #include "iostream"
 
 #include "AutonomyMonitors/PointSearchTaskMonitor.h"
-#include "../../Utilities/UnitConversions.h"
+#include "UnitConversions.h"
+#include "afrl/cmasi/autonomymonitor/TaskFailure.h"
+#include "afrl/cmasi/autonomymonitor/TaskSuccess.h"
 
 namespace uxas {
 namespace service {
 namespace monitoring {
   
   PointSearchTaskMonitor::PointSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::PointSearchTask> pointSearchTask):MonitorBase(service_ptr), _task(pointSearchTask), _failed(true) {
-    //debug = true; // Debug 
+    //this->debug = true; // Debug 
     if(debug){
       std::cout << "[PointSearchTask] Start searching" << std::endl;
       std::cout << "\t [ID]: " << _task->getTaskID() << std::endl;
@@ -71,7 +73,7 @@ namespace monitoring {
       std::cout << "*********************************************" << std::endl;
       // Because we don't have sendfailuremessage() to show the fail messages,
       // The mission will not fail when touch the target
-      this->_failed = true;
+      this->_failed = false;
     }
     // Debug information
     if(debug) {
@@ -91,11 +93,25 @@ namespace monitoring {
   }
 
   bool PointSearchTaskMonitor::isPropertySatisfied(){
-    return this->_failed;
+    return !this->_failed;
   }
 
   double PointSearchTaskMonitor::propertyRobustness(){
     return 0.0;
+  }
+
+  void PointSearchTaskMonitor::sendTaskStatus(){
+    if(this->isPropertySatisfied()) {
+      std::cout << "[PointSearchTaskMonitor]: SUCESS!!!" << std::endl;
+      auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::TaskSuccess>();
+      fObj->setTaskID(this->_task->getTaskID());
+      service_->broadcastMessage(fObj);
+    } else {
+      std::cout << "[PointSearchTaskMonitor]: FAILURE!!!" << std::endl;
+      auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::TaskFailure>();
+      fObj->setTaskID(this->_task->getTaskID());
+      service_->broadcastMessage(fObj);
+    }
   }
   
 }
