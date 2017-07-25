@@ -825,11 +825,13 @@ int lmcp_process_msg(uint8_t** inb, size_t size, lmcp_object **o) {
     if ((*inb)[0] != 'L' || (*inb)[1] != 'M' || (*inb)[2] != 'C' || (*inb)[3] != 'P') {
         return -1;
     }
+    printf("processed message seems valid\n");
     *inb += 4;
     size_t s = 4;
     uint32_t msglen;
     CHECK(lmcp_unpack_uint32_t(inb, &s, &msglen))
     if (size < (msglen + 8)) {
+        printf("size of %lu if smaller than %u\n", size, msglen + 8);
         return -1;
     }
     CHECK(lmcp_unpack(inb, msglen, o))
