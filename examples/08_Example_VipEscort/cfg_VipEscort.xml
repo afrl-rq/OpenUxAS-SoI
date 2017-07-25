@@ -2,7 +2,7 @@
 <UxAS FormatVersion="1.0" EntityID="100"  EntityType="Aircraft">
     <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
-        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <!-- <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" /> -->
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
         <SubscribeToMessage MessageType="uxas.UT.VipEscortTask" />
     </Bridge>
@@ -25,9 +25,11 @@
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
         <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
         <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V600.xml" SendTime_ms="200"/>
         <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
         <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
-        <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="800"/>
+        <Message MessageFileName="AirVehicleState_V600.xml" SendTime_ms="250"/>
+        <!-- <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="800"/> -->
         <Message MessageFileName="tasks/1002_VipEscortTask.xml" SendTime_ms="2000"/>
         <Message MessageFileName="tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml" SendTime_ms="2500"/>
     </Service>

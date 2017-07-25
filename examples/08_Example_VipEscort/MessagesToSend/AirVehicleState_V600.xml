@@ -3,7 +3,7 @@
       <VerticalSpeed>0.0</VerticalSpeed>
       <WindSpeed>0.0</WindSpeed>
       <WindDirection>0.0</WindDirection>
-      <ID>500</ID>
+      <ID>600</ID>
       <u>0.0</u>
       <v>0.0</v>
       <w>0.0</w>
@@ -20,8 +20,8 @@
       <Groundspeed>0.0</Groundspeed>
       <Location>
         <Location3D Series="CMASI">
-          <Latitude>45.3289</Latitude>
-          <Longitude>-120.9635</Longitude>
+          <Latitude>45.3465</Latitude>
+          <Longitude>-120.9387</Longitude>
           <Altitude>1000.0</Altitude>
           <AltitudeType>MSL</AltitudeType>
         </Location3D>
