@@ -21,7 +21,7 @@ static bool sendUartPacket = false;
 static lmcp_object * mc = NULL;
 static MissionCommandExt swin;
 
-static AirVehicleState * avs = NULL;
+static lmcp_object * avs = NULL;
 
 
 uint32_t Checksum(const uint8_t * p, const size_t len)
@@ -131,9 +131,9 @@ void waypoint_write(const uint32_t * _UNUSED) {
   size_t s = 4;
   uint8_t * tmp_waypoint = (uint8_t*)waypoint;
 
-  /*if(mc != NULL) {
-    lmcp_free((lmcp_object*)avs);
-    mc = NULL;
+  if(mc != NULL) {
+    lmcp_free(avs);
+    avs = NULL;
   }
   
   assert(lmcp_process_msg((uint8_t **)&tmp_waypoint,sizeof(*waypoint),&avs) != -1);
@@ -141,7 +141,7 @@ void waypoint_write(const uint32_t * _UNUSED) {
 
   if(((lmcp_object *)avs)->type == LMCP_MissionCommand_TYPE ) {
     lmcp_pp(avs);
-    }*/
+  }
     
   // TODO: Process the VehicleActionCommand and get the assets target
   // waypoint. Use that waypoint in a call to
