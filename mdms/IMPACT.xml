@@ -389,7 +389,7 @@
             <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" Series="CMASI" />
 			
             <!-- Loiter action to complete to fulfill task. If null, then simply points camera but main trajectory does not change. Otherwise, completes the specified loiter action. -->
-            <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Default="null"/>
+            <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Default="null" Optional="true" />
         </Struct>
         
         <!-- Search task with specified search pattern -->
