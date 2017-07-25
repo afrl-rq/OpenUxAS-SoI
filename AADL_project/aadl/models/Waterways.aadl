@@ -3,6 +3,7 @@ public
     --Included DataTypes
     with CMASI;
 	with UxAS_Props;
+	with PLTL;
 	
 	-- Included Tasks
 	with AngledAreaSearchTask_Package;
@@ -45,6 +46,9 @@ public
             AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
         annex agree {**
         	guarantee "Dummy guarantee so AGREE will run off the top level." :true;
+        	
+        	assume "Process one automation request at a time" :
+        		pre(PLTL.Once(event(AutomationRequest_in))) => not event(AutomationRequest_in);
         	
         	assume "time_init": time = 0.0 -> time = pre(time)+1.0;
         	
@@ -91,6 +95,8 @@ public
     		
     		-- Connections that notify the AutomationRequestValidatorService that a task is initialized
     		-- > Connection Type: Many to One - Will need AGREE connections to support analysis
+            conn001: port AutomationRequest_in -> AutomationRequestValidatorService.AutomationRequest_in;
+            
             conn0: port AngledAreaSearchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn1: port AssignmentCoordinatorTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn2: port BlockadeTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
@@ -270,7 +276,9 @@ public
             prove isolation(this) 
         **};
         annex agree {**
-        		
+        	
+ --       	lemma "Trace" : pre(PLTL.Once(event(UniqueAutomationRequest_in))) => not event(AutomationRequest_in);
+        	
         	assign event_RoutePlanRequest_in = event(RoutePlannerVisibilityService.RoutePlanRequest_in);
         	assign event_RoutePlanResponse_out = event(RoutePlannerVisibilityService.RoutePlanResponse_out);
         		
@@ -325,7 +333,7 @@ public
 
             -- Many to One connection block
             -- Target Port: PlanBuilderService.UniqueAutomationRequest_in
-            connection conn120: true;
+            --connection conn120: true;
             connection conn137: true;
             
             -- Many to One connection block
