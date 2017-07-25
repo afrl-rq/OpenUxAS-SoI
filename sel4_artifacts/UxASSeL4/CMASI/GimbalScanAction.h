@@ -10,6 +10,8 @@
 
 #define LMCP_GimbalScanAction_TYPENAME "GimbalScanAction"
 
+#define LMCP_GimbalScanAction_TYPE 25
+
 typedef struct {
     PayloadAction super;
 // Units: degree/second

@@ -11,6 +11,8 @@
 
 #define LMCP_GimballedPayloadState_TYPENAME "GimballedPayloadState"
 
+#define LMCP_GimballedPayloadState_TYPE 20
+
 typedef struct {
     PayloadState super;
     GimbalPointingMode PointingMode;

@@ -113,16 +113,16 @@ int lmcp_unpack_uint64_t (uint8_t **buf, size_t *size_remain, uint64_t* out)
 
 
 size_t lmcp_pack_int8_t (uint8_t* buf, int8_t in) {
-    lmcp_pack_uint8_t(buf, *(uint8_t*)&in);
+  lmcp_pack_uint8_t(buf, *((uint8_t*)&in));
     return 1;
 }
 
 size_t lmcp_pack_int32_t (uint8_t* buf, int32_t in) {
-    lmcp_pack_uint32_t(buf, *(uint8_t*)&in);
+  lmcp_pack_uint32_t(buf, *((uint32_t*)&in));
     return 4;
 }
 size_t lmcp_pack_int64_t (uint8_t* buf, int64_t in) {
-    lmcp_pack_uint64_t(buf, *(uint8_t*)&in);
+  lmcp_pack_uint64_t(buf, *((uint64_t*)&in));
     return 8;
 }
 
@@ -294,10 +294,10 @@ int lmcp_unpack_structheader(uint8_t** inb, size_t* size_remain, char* seriesnam
     uint8_t isnull;
     lmcp_unpack_uint8_t(inb, size_remain, &isnull);
     if (inb == NULL || *inb == NULL || isnull == 0) {
-        return 0;
+        return -1;
     }
     CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
     CHECK(lmcp_unpack_uint32_t(inb, size_remain, objtype))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, objseries))
-    return 1;
+    return 0;
 }

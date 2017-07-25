@@ -12,6 +12,8 @@
 
 #define LMCP_EntityConfiguration_TYPENAME "EntityConfiguration"
 
+#define LMCP_EntityConfiguration_TYPE 11
+
 typedef struct {
     lmcp_object super;
 // Units: None

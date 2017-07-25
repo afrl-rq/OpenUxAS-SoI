@@ -13,6 +13,8 @@
 
 #define LMCP_EntityState_TYPENAME "EntityState"
 
+#define LMCP_EntityState_TYPE 14
+
 typedef struct {
     lmcp_object super;
     int64_t ID;

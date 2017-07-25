@@ -11,6 +11,8 @@
 
 #define LMCP_GimbalState_TYPENAME "GimbalState"
 
+#define LMCP_GimbalState_TYPE 27
+
 typedef struct {
     PayloadState super;
 // Units: None

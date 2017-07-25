@@ -11,6 +11,8 @@
 
 #define LMCP_Circle_TYPENAME "Circle"
 
+#define LMCP_Circle_TYPE 22
+
 typedef struct {
     AbstractGeometry super;
     Location3D* CenterPoint;

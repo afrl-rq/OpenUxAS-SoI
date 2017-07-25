@@ -11,6 +11,8 @@
 
 #define LMCP_Polygon_TYPENAME "Polygon"
 
+#define LMCP_Polygon_TYPE 42
+
 typedef struct {
     AbstractGeometry super;
     Location3D** BoundaryPoints;

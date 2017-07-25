@@ -11,6 +11,8 @@
 
 #define LMCP_LoiterTask_TYPENAME "LoiterTask"
 
+#define LMCP_LoiterTask_TYPE 34
+
 typedef struct {
     Task super;
 // Units: none

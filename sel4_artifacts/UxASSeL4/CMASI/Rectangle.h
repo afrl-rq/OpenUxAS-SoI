@@ -11,6 +11,8 @@
 
 #define LMCP_Rectangle_TYPENAME "Rectangle"
 
+#define LMCP_Rectangle_TYPE 43
+
 typedef struct {
     AbstractGeometry super;
     Location3D* CenterPoint;

@@ -11,6 +11,8 @@
 
 #define LMCP_WaypointTransfer_TYPENAME "WaypointTransfer"
 
+#define LMCP_WaypointTransfer_TYPE 59
+
 typedef struct {
     lmcp_object super;
     int64_t EntityID;

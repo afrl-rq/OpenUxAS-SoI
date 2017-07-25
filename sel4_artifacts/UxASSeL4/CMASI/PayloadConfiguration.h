@@ -10,6 +10,8 @@
 
 #define LMCP_PayloadConfiguration_TYPENAME "PayloadConfiguration"
 
+#define LMCP_PayloadConfiguration_TYPE 5
+
 typedef struct {
     lmcp_object super;
 // Units: None

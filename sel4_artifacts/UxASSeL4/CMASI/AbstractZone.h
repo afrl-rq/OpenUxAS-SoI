@@ -11,6 +11,8 @@
 
 #define LMCP_AbstractZone_TYPENAME "AbstractZone"
 
+#define LMCP_AbstractZone_TYPE 10
+
 typedef struct {
     lmcp_object super;
 // Units: None

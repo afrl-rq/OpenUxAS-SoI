@@ -10,6 +10,8 @@
 
 #define LMCP_VideoStreamAction_TYPENAME "VideoStreamAction"
 
+#define LMCP_VideoStreamAction_TYPE 48
+
 typedef struct {
     VehicleAction super;
 // Units: None

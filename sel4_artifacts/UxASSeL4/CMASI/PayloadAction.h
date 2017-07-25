@@ -10,6 +10,8 @@
 
 #define LMCP_PayloadAction_TYPENAME "PayloadAction"
 
+#define LMCP_PayloadAction_TYPE 4
+
 typedef struct {
     VehicleAction super;
 // Units: None

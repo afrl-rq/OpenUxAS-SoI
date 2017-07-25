@@ -12,6 +12,8 @@
 
 #define LMCP_AutomationResponse_TYPENAME "AutomationResponse"
 
+#define LMCP_AutomationResponse_TYPE 51
+
 typedef struct {
     lmcp_object super;
     MissionCommand** MissionCommandList;

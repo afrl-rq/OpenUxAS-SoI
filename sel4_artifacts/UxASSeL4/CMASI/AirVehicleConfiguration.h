@@ -13,6 +13,8 @@
 
 #define LMCP_AirVehicleConfiguration_TYPENAME "AirVehicleConfiguration"
 
+#define LMCP_AirVehicleConfiguration_TYPE 13
+
 typedef struct {
     EntityConfiguration super;
 // Units: meter/sec

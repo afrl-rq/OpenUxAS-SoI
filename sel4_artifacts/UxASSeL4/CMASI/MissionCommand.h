@@ -11,6 +11,8 @@
 
 #define LMCP_MissionCommand_TYPENAME "MissionCommand"
 
+#define LMCP_MissionCommand_TYPE 36
+
 typedef struct {
     VehicleActionCommand super;
 // Units: None

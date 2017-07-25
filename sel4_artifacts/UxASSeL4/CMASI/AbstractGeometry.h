@@ -9,6 +9,8 @@
 
 #define LMCP_AbstractGeometry_TYPENAME "AbstractGeometry"
 
+#define LMCP_AbstractGeometry_TYPE 1
+
 typedef struct {
     lmcp_object super;
 } AbstractGeometry;

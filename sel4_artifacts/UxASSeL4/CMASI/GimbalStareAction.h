@@ -11,6 +11,8 @@
 
 #define LMCP_GimbalStareAction_TYPENAME "GimbalStareAction"
 
+#define LMCP_GimbalStareAction_TYPE 26
+
 typedef struct {
     PayloadAction super;
 // Units: None

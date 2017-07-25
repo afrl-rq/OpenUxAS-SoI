@@ -11,6 +11,8 @@
 
 #define LMCP_KeepOutZone_TYPENAME "KeepOutZone"
 
+#define LMCP_KeepOutZone_TYPE 30
+
 typedef struct {
     AbstractZone super;
 // Units: None

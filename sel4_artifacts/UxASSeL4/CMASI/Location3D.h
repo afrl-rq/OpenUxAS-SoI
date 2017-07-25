@@ -10,6 +10,8 @@
 
 #define LMCP_Location3D_TYPENAME "Location3D"
 
+#define LMCP_Location3D_TYPE 3
+
 typedef struct {
     lmcp_object super;
 // Units: degree

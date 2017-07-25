@@ -12,6 +12,8 @@
 
 #define LMCP_LoiterAction_TYPENAME "LoiterAction"
 
+#define LMCP_LoiterAction_TYPE 33
+
 typedef struct {
     NavigationAction super;
 // Units: none

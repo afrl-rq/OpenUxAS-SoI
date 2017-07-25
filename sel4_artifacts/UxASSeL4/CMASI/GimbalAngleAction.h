@@ -10,6 +10,8 @@
 
 #define LMCP_GimbalAngleAction_TYPENAME "GimbalAngleAction"
 
+#define LMCP_GimbalAngleAction_TYPE 23
+
 typedef struct {
     PayloadAction super;
 // Units: degree

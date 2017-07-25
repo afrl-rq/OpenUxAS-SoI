@@ -10,6 +10,8 @@
 
 #define LMCP_Task_TYPENAME "Task"
 
+#define LMCP_Task_TYPE 8
+
 typedef struct {
     lmcp_object super;
 // Units: None

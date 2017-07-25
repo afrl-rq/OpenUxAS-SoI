@@ -34,8 +34,8 @@ size_t lmcp_pack_LoiterTask_header(uint8_t* buf, LoiterTask* i) {
     outb += lmcp_pack_uint8_t(outb, 1);
     memcpy(outb, "CMASI", 5);
     outb += 5;
-    for (size_t j = 5; j < 8; j++)
-        outb[j] = 0;
+    for (size_t j = 5; j < 8; j++, outb++)
+        *outb = 0;
     outb += lmcp_pack_uint32_t(outb, 34);
     outb += lmcp_pack_uint16_t(outb, 3);
     return 15;
@@ -96,8 +96,8 @@ size_t lmcp_pack_LoiterTask(uint8_t* buf, LoiterTask* i) {
         outb += lmcp_pack_uint8_t(outb, 1);
         memcpy(outb, "CMASI", 5);
         outb += 5;
-        for (size_t j = 5; j < 8; j++)
-            outb[j] = 0;
+        for (size_t j = 5; j < 8; j++, outb++)
+            *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 33);
         outb += lmcp_pack_uint16_t(outb, 3);
         outb += lmcp_pack_LoiterAction(outb, i->DesiredAction);

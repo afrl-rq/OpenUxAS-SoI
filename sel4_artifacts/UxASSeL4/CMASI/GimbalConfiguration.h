@@ -11,6 +11,8 @@
 
 #define LMCP_GimbalConfiguration_TYPENAME "GimbalConfiguration"
 
+#define LMCP_GimbalConfiguration_TYPE 24
+
 typedef struct {
     PayloadConfiguration super;
 // Units: None

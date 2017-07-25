@@ -11,6 +11,8 @@
 
 #define LMCP_ServiceStatus_TYPENAME "ServiceStatus"
 
+#define LMCP_ServiceStatus_TYPE 45
+
 typedef struct {
     lmcp_object super;
     float PercentComplete;

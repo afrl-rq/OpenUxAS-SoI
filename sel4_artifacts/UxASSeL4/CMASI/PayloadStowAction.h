@@ -9,6 +9,8 @@
 
 #define LMCP_PayloadStowAction_TYPENAME "PayloadStowAction"
 
+#define LMCP_PayloadStowAction_TYPE 60
+
 typedef struct {
     lmcp_object super;
     int64_t PayloadID;

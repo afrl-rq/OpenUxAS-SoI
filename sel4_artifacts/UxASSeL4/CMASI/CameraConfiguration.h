@@ -11,6 +11,8 @@
 
 #define LMCP_CameraConfiguration_TYPENAME "CameraConfiguration"
 
+#define LMCP_CameraConfiguration_TYPE 19
+
 typedef struct {
     PayloadConfiguration super;
     WavelengthBand SupportedWavelengthBand;

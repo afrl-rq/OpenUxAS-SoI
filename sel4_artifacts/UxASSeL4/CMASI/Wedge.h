@@ -9,6 +9,8 @@
 
 #define LMCP_Wedge_TYPENAME "Wedge"
 
+#define LMCP_Wedge_TYPE 16
+
 typedef struct {
     lmcp_object super;
 // Units: degree

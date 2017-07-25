@@ -10,6 +10,8 @@
 
 #define LMCP_PayloadState_TYPENAME "PayloadState"
 
+#define LMCP_PayloadState_TYPE 6
+
 typedef struct {
     lmcp_object super;
 // Units: None

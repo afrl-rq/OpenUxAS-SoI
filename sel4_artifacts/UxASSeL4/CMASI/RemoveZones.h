@@ -9,6 +9,8 @@
 
 #define LMCP_RemoveZones_TYPENAME "RemoveZones"
 
+#define LMCP_RemoveZones_TYPE 52
+
 typedef struct {
     lmcp_object super;
     int64_t* ZoneList;

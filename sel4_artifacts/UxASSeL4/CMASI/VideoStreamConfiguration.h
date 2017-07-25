@@ -10,6 +10,8 @@
 
 #define LMCP_VideoStreamConfiguration_TYPENAME "VideoStreamConfiguration"
 
+#define LMCP_VideoStreamConfiguration_TYPE 49
+
 typedef struct {
     PayloadConfiguration super;
 // Units: None

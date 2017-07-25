@@ -9,6 +9,8 @@
 
 #define LMCP_OperatingRegion_TYPENAME "OperatingRegion"
 
+#define LMCP_OperatingRegion_TYPE 39
+
 typedef struct {
     lmcp_object super;
     int64_t ID;

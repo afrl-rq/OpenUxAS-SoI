@@ -10,6 +10,8 @@
 
 #define LMCP_KeepInZone_TYPENAME "KeepInZone"
 
+#define LMCP_KeepInZone_TYPE 29
+
 typedef struct {
     AbstractZone super;
 } KeepInZone;

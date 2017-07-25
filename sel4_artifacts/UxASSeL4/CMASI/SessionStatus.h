@@ -11,6 +11,8 @@
 
 #define LMCP_SessionStatus_TYPENAME "SessionStatus"
 
+#define LMCP_SessionStatus_TYPE 46
+
 typedef struct {
     lmcp_object super;
     SimulationStatusType State;

@@ -11,6 +11,8 @@
 
 #define LMCP_StopMovementAction_TYPENAME "StopMovementAction"
 
+#define LMCP_StopMovementAction_TYPE 58
+
 typedef struct {
     VehicleAction super;
     Location3D* Location;

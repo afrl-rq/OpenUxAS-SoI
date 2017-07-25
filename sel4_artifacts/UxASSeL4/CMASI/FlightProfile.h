@@ -9,6 +9,8 @@
 
 #define LMCP_FlightProfile_TYPENAME "FlightProfile"
 
+#define LMCP_FlightProfile_TYPE 12
+
 typedef struct {
     lmcp_object super;
 // Units: None

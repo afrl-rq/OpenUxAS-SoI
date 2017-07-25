@@ -845,7 +845,7 @@ int lmcp_unpack(uint8_t** inb, size_t size, lmcp_object **o) {
     uint16_t objseries;
     char seriesname[8];
     isnull = lmcp_unpack_structheader(inb, size_remain, seriesname, &objtype, &objseries);
-    if (isnull == 0) {
+    if (isnull == -1) {
         return -1;
     }
     switch (objtype) {

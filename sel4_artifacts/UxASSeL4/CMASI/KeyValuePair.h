@@ -9,6 +9,8 @@
 
 #define LMCP_KeyValuePair_TYPENAME "KeyValuePair"
 
+#define LMCP_KeyValuePair_TYPE 2
+
 typedef struct {
     lmcp_object super;
     char* Key;

@@ -11,6 +11,8 @@
 
 #define LMCP_CameraAction_TYPENAME "CameraAction"
 
+#define LMCP_CameraAction_TYPE 18
+
 typedef struct {
     PayloadAction super;
 // Units: degree

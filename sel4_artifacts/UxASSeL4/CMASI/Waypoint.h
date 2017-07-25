@@ -12,6 +12,8 @@
 
 #define LMCP_Waypoint_TYPENAME "Waypoint"
 
+#define LMCP_Waypoint_TYPE 35
+
 typedef struct {
     Location3D super;
 // Units: None

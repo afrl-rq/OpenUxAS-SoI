@@ -11,6 +11,8 @@
 
 #define LMCP_MustFlyTask_TYPENAME "MustFlyTask"
 
+#define LMCP_MustFlyTask_TYPE 37
+
 typedef struct {
     Task super;
     Location3D* Position;

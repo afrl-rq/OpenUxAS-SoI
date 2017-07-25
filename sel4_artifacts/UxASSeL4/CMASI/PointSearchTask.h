@@ -12,6 +12,8 @@
 
 #define LMCP_PointSearchTask_TYPENAME "PointSearchTask"
 
+#define LMCP_PointSearchTask_TYPE 41
+
 typedef struct {
     SearchTask super;
     Location3D* SearchLocation;

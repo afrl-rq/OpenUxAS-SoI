@@ -10,6 +10,8 @@
 
 #define LMCP_AirVehicleState_TYPENAME "AirVehicleState"
 
+#define LMCP_AirVehicleState_TYPE 15
+
 typedef struct {
     EntityState super;
 // Units: meter/sec

@@ -71,8 +71,8 @@ size_t lmcp_pack_Task_header(uint8_t* buf, Task* i) {
     outb += lmcp_pack_uint8_t(outb, 1);
     memcpy(outb, "CMASI", 5);
     outb += 5;
-    for (size_t j = 5; j < 8; j++)
-        outb[j] = 0;
+    for (size_t j = 5; j < 8; j++, outb++)
+        *outb = 0;
     outb += lmcp_pack_uint32_t(outb, 8);
     outb += lmcp_pack_uint16_t(outb, 3);
     return 15;
@@ -186,8 +186,8 @@ size_t lmcp_pack_Task(uint8_t* buf, Task* i) {
             outb += lmcp_pack_uint8_t(outb, 1);
             memcpy(outb, "CMASI", 5);
             outb += 5;
-            for (size_t j = 5; j < 8; j++)
-                outb[j] = 0;
+            for (size_t j = 5; j < 8; j++, outb++)
+                *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 2);
             outb += lmcp_pack_uint16_t(outb, 3);
             outb += lmcp_pack_KeyValuePair(outb, i->Parameters[index]);

@@ -9,6 +9,8 @@
 
 #define LMCP_AutomationRequest_TYPENAME "AutomationRequest"
 
+#define LMCP_AutomationRequest_TYPE 40
+
 typedef struct {
     lmcp_object super;
     int64_t* EntityList;

@@ -12,6 +12,8 @@
 
 #define LMCP_AreaSearchTask_TYPENAME "AreaSearchTask"
 
+#define LMCP_AreaSearchTask_TYPE 17
+
 typedef struct {
     SearchTask super;
     AbstractGeometry* SearchArea;

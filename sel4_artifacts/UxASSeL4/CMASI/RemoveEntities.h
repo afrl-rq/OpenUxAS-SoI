@@ -9,6 +9,8 @@
 
 #define LMCP_RemoveEntities_TYPENAME "RemoveEntities"
 
+#define LMCP_RemoveEntities_TYPE 53
+
 typedef struct {
     lmcp_object super;
     int64_t* EntityList;

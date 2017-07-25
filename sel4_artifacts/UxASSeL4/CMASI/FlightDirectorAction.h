@@ -11,6 +11,8 @@
 
 #define LMCP_FlightDirectorAction_TYPENAME "FlightDirectorAction"
 
+#define LMCP_FlightDirectorAction_TYPE 54
+
 typedef struct {
     NavigationAction super;
 // Units: meter/sec

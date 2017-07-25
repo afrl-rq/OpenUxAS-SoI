@@ -46,8 +46,8 @@ size_t lmcp_pack_AreaSearchTask_header(uint8_t* buf, AreaSearchTask* i) {
     outb += lmcp_pack_uint8_t(outb, 1);
     memcpy(outb, "CMASI", 5);
     outb += 5;
-    for (size_t j = 5; j < 8; j++)
-        outb[j] = 0;
+    for (size_t j = 5; j < 8; j++, outb++)
+        *outb = 0;
     outb += lmcp_pack_uint32_t(outb, 17);
     outb += lmcp_pack_uint16_t(outb, 3);
     return 15;
@@ -135,8 +135,8 @@ size_t lmcp_pack_AreaSearchTask(uint8_t* buf, AreaSearchTask* i) {
         outb += lmcp_pack_uint8_t(outb, 1);
         memcpy(outb, "CMASI", 5);
         outb += 5;
-        for (size_t j = 5; j < 8; j++)
-            outb[j] = 0;
+        for (size_t j = 5; j < 8; j++, outb++)
+            *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 1);
         outb += lmcp_pack_uint16_t(outb, 3);
         outb += lmcp_pack_AbstractGeometry(outb, i->SearchArea);
@@ -149,8 +149,8 @@ size_t lmcp_pack_AreaSearchTask(uint8_t* buf, AreaSearchTask* i) {
             outb += lmcp_pack_uint8_t(outb, 1);
             memcpy(outb, "CMASI", 5);
             outb += 5;
-            for (size_t j = 5; j < 8; j++)
-                outb[j] = 0;
+            for (size_t j = 5; j < 8; j++, outb++)
+                *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 16);
             outb += lmcp_pack_uint16_t(outb, 3);
             outb += lmcp_pack_Wedge(outb, i->ViewAngleList[index]);

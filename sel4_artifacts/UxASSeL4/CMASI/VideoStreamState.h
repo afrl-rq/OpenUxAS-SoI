@@ -10,6 +10,8 @@
 
 #define LMCP_VideoStreamState_TYPENAME "VideoStreamState"
 
+#define LMCP_VideoStreamState_TYPE 50
+
 typedef struct {
     PayloadState super;
 // Units: None

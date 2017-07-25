@@ -54,8 +54,8 @@ size_t lmcp_pack_CameraState_header(uint8_t* buf, CameraState* i) {
     outb += lmcp_pack_uint8_t(outb, 1);
     memcpy(outb, "CMASI", 5);
     outb += 5;
-    for (size_t j = 5; j < 8; j++)
-        outb[j] = 0;
+    for (size_t j = 5; j < 8; j++, outb++)
+        *outb = 0;
     outb += lmcp_pack_uint32_t(outb, 21);
     outb += lmcp_pack_uint16_t(outb, 3);
     return 15;
@@ -149,8 +149,8 @@ size_t lmcp_pack_CameraState(uint8_t* buf, CameraState* i) {
             outb += lmcp_pack_uint8_t(outb, 1);
             memcpy(outb, "CMASI", 5);
             outb += 5;
-            for (size_t j = 5; j < 8; j++)
-                outb[j] = 0;
+            for (size_t j = 5; j < 8; j++, outb++)
+                *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 3);
             outb += lmcp_pack_uint16_t(outb, 3);
             outb += lmcp_pack_Location3D(outb, i->Footprint[index]);
@@ -162,8 +162,8 @@ size_t lmcp_pack_CameraState(uint8_t* buf, CameraState* i) {
         outb += lmcp_pack_uint8_t(outb, 1);
         memcpy(outb, "CMASI", 5);
         outb += 5;
-        for (size_t j = 5; j < 8; j++)
-            outb[j] = 0;
+        for (size_t j = 5; j < 8; j++, outb++)
+            *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 3);
         outb += lmcp_pack_uint16_t(outb, 3);
         outb += lmcp_pack_Location3D(outb, i->Centerpoint);

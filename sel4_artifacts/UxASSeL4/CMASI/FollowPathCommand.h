@@ -12,6 +12,8 @@
 
 #define LMCP_FollowPathCommand_TYPENAME "FollowPathCommand"
 
+#define LMCP_FollowPathCommand_TYPE 56
+
 typedef struct {
     VehicleActionCommand super;
     int64_t FirstWaypoint;

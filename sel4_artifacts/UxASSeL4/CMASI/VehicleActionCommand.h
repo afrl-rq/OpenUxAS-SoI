@@ -11,6 +11,8 @@
 
 #define LMCP_VehicleActionCommand_TYPENAME "VehicleActionCommand"
 
+#define LMCP_VehicleActionCommand_TYPE 47
+
 typedef struct {
     lmcp_object super;
     int64_t CommandID;

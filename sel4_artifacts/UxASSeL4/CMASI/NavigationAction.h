@@ -10,6 +10,8 @@
 
 #define LMCP_NavigationAction_TYPENAME "NavigationAction"
 
+#define LMCP_NavigationAction_TYPE 32
+
 typedef struct {
     VehicleAction super;
 } NavigationAction;

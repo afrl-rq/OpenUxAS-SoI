@@ -11,6 +11,8 @@
 
 #define LMCP_SearchTask_TYPENAME "SearchTask"
 
+#define LMCP_SearchTask_TYPE 9
+
 typedef struct {
     Task super;
     WavelengthBand* DesiredWavelengthBands;

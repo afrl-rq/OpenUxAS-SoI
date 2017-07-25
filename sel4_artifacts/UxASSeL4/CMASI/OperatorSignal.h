@@ -10,6 +10,8 @@
 
 #define LMCP_OperatorSignal_TYPENAME "OperatorSignal"
 
+#define LMCP_OperatorSignal_TYPE 38
+
 typedef struct {
     lmcp_object super;
     KeyValuePair** Signals;

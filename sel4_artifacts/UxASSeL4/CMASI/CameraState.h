@@ -12,6 +12,8 @@
 
 #define LMCP_CameraState_TYPENAME "CameraState"
 
+#define LMCP_CameraState_TYPE 21
+
 typedef struct {
     GimballedPayloadState super;
 // Units: degree

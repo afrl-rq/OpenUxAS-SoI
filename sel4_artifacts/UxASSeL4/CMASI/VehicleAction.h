@@ -9,6 +9,8 @@
 
 #define LMCP_VehicleAction_TYPENAME "VehicleAction"
 
+#define LMCP_VehicleAction_TYPE 7
+
 typedef struct {
     lmcp_object super;
     int64_t* AssociatedTaskList;

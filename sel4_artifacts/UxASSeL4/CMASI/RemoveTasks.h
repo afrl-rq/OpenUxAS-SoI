@@ -9,6 +9,8 @@
 
 #define LMCP_RemoveTasks_TYPENAME "RemoveTasks"
 
+#define LMCP_RemoveTasks_TYPE 44
+
 typedef struct {
     lmcp_object super;
     int64_t* TaskList;

@@ -10,6 +10,8 @@
 
 #define LMCP_PathWaypoint_TYPENAME "PathWaypoint"
 
+#define LMCP_PathWaypoint_TYPE 57
+
 typedef struct {
     Waypoint super;
 // Units: milliseconds

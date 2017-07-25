@@ -10,6 +10,8 @@
 
 #define LMCP_WeatherReport_TYPENAME "WeatherReport"
 
+#define LMCP_WeatherReport_TYPE 55
+
 typedef struct {
     lmcp_object super;
     AbstractZone* Area;

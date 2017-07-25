@@ -10,6 +10,8 @@
 
 #define LMCP_GoToWaypointAction_TYPENAME "GoToWaypointAction"
 
+#define LMCP_GoToWaypointAction_TYPE 28
+
 typedef struct {
     NavigationAction super;
     int64_t WaypointNumber;
