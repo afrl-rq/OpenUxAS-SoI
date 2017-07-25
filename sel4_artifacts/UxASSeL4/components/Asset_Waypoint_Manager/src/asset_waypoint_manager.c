@@ -83,8 +83,10 @@ void in_uart_packet(const SMACCM_DATA__UART_Packet_i * tb_in_uart_packet){
                     continue;
                 }
                 message_index = 0;
+                BSWAP(message_size);
                 memcpy(((uint8_t *)waypoint + 4), &message_size, sizeof(uint32_t));
-            //    printf("got message of size: %d\n", message_size);
+                BSWAP(message_size);
+                //printf("asset got message of size: %d\n", message_size);
             }
         }
 

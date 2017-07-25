@@ -58,7 +58,7 @@ static void send_swin() {
       tmsgbuf = msgbuf;
       lmcp_process_msg(&tmsgbuf,msgsz,&tmc);
       // There is some problem here causing vehicle id's to be different.
-      lmcp_pp(tmc);
+      //lmcp_pp(tmc);
       DEBUG("SWIN ADDY: %x\n",&swin);
       uint32_t chksum = Checksum(msgbuf,msgsz-4);
       *((uint32_t *)(msgbuf + msgsz)) = chksum;
@@ -125,11 +125,19 @@ void mission_write(const bool * _UNUSED) {
   return;
 }
 
-void waypoint_write(const uint32_t * _UNUSED) {
+void waypoint_write(const uint32_t * size) {
 
   uint32_t msgsz = 0;
   size_t s = 4;
   uint8_t * tmp_waypoint = (uint8_t*)waypoint;
+  bool _UNUSEDB;
+  lmcp_object * lmcp;
+  printf("got waypoint of size %d \n", *size);
+  
+  lmcp_process_msg(&tmp_waypoint, *size, (lmcp_object **)&lmcp); 
+  lmcp_pp((lmcp_object *)lmcp);
+
+  lmcp_free(lmcp);
 
   if(mc != NULL) {
     lmcp_free(avs);
@@ -146,6 +154,7 @@ void waypoint_write(const uint32_t * _UNUSED) {
   // TODO: Process the VehicleActionCommand and get the assets target
   // waypoint. Use that waypoint in a call to
   // GetMCWaypointSubSequence.
+  waypoint_read(&_UNUSEDB);
   return;
 }
 
