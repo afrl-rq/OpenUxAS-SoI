@@ -1,7 +1,11 @@
 package AssignmentTreeBranchBoundBase_Pkg
 public
+    -- Include DataTypes
 	with CMASI;
     with UXTASK;
+
+    -- Includes
+	with ServiceBase_Pkg;
     
     -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
@@ -43,7 +47,7 @@ public
 	end top_level.Impl;	
 	
 	
-	thread AssignmentTreeBranchBoundBase
+	thread AssignmentTreeBranchBoundBase extends ServiceBase_Pkg::ServiceBase
         features
             TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
             AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;

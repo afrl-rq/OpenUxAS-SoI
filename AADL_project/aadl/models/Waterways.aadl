@@ -26,7 +26,9 @@ public
 	with AutomationRequestValidatorService_Pkg;	
 	with AutomationDiagramDataService_Pkg;
 	with PlanBuilderService_Pkg;
-	with RouteAggregatorService_Pkg;
+    with RouteAggregatorService_AggregatorRole_Pkg;
+    with RouteAggregatorService_CollectorRole_Pkg;
+--	with RouteAggregatorService_Pkg;
 	with RoutePlannerVisibilityService_Pkg;
 	with TaskManagerService_Pkg;
 	with TaskTrackerService_Pkg;
@@ -34,12 +36,13 @@ public
 	
 	-- Included Logging and Data Services
 	with MessageLoggerDataService_Pkg;
-	with SendMessagesService_Pkg;
+	with SendMessagesService_Pkg;	
     
 
     process waterways
         features
             AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
         annex agree {**
         	guarantee "Dummy guarantee so AGREE will run off the top level." :true;
         	
@@ -80,7 +83,10 @@ public
             PatternSearchTask: thread PatternSearchTask_Package::PatternSearchTask;
             TaskTracker: thread TaskTrackerService_Pkg::TaskTrackerService;
             
-            RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
+--            RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
+            RouteAggregatorService_Collector: thread RouteAggregatorService_CollectorRole_Pkg::RouteAggregatorService_CollectorRole;
+            RouteAggregatorService_Aggregator : thread RouteAggregatorService_AggregatorRole_Pkg::RouteAggregatorService_AggregatorRole;
+            
     	connections
     		
     		-- Connections that notify the AutomationRequestValidatorService that a task is initialized
@@ -100,22 +106,23 @@ public
             conn12: port OverwatchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn13: port PatternSearchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             
-            conn14: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService.RoutePlanResponse_in;
+            conn14: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
+--            conn140: port Route
             
-            conn15: port RouteAggregatorService.RouteResponse_out -> AngledAreaSearchTask.RouteResponse_in;            
-            conn16: port RouteAggregatorService.RouteResponse_out -> AssignmentCoordinatorTask.RouteResponse_in;
-            conn17: port RouteAggregatorService.RouteResponse_out -> BlockadeTask.RouteResponse_in;
-            conn18: port RouteAggregatorService.RouteResponse_out -> CmasiAreaSearchTask.RouteResponse_in;
-            conn19: port RouteAggregatorService.RouteResponse_out -> CmasiLineSearchTask.RouteResponse_in;
-            conn20: port RouteAggregatorService.RouteResponse_out -> CmasiPointSearchTask.RouteResponse_in;
-            conn21: port RouteAggregatorService.RouteResponse_out -> CommRelayTask.RouteResponse_in;
-            conn22: port RouteAggregatorService.RouteResponse_out -> CordonTask.RouteResponse_in;
-            conn23: port RouteAggregatorService.RouteResponse_out -> EscortTask.RouteResponse_in;
-            conn24: port RouteAggregatorService.RouteResponse_out -> ImpactLineSearchTask.RouteResponse_in;
-            conn25: port RouteAggregatorService.RouteResponse_out -> ImpactPointSearchTask.RouteResponse_in;
-            conn26: port RouteAggregatorService.RouteResponse_out -> MultiVehicleWatchTask.RouteResponse_in;
-            conn27: port RouteAggregatorService.RouteResponse_out -> OverwatchTask.RouteResponse_in;
-            conn28: port RouteAggregatorService.RouteResponse_out -> PatternSearchTask.RouteResponse_in;
+            conn15: port RouteAggregatorService_Aggregator.RouteResponse_out -> AngledAreaSearchTask.RouteResponse_in;            
+            conn16: port RouteAggregatorService_Aggregator.RouteResponse_out -> AssignmentCoordinatorTask.RouteResponse_in;
+            conn17: port RouteAggregatorService_Aggregator.RouteResponse_out -> BlockadeTask.RouteResponse_in;
+            conn18: port RouteAggregatorService_Aggregator.RouteResponse_out -> CmasiAreaSearchTask.RouteResponse_in;
+            conn19: port RouteAggregatorService_Aggregator.RouteResponse_out -> CmasiLineSearchTask.RouteResponse_in;
+            conn20: port RouteAggregatorService_Aggregator.RouteResponse_out -> CmasiPointSearchTask.RouteResponse_in;
+            conn21: port RouteAggregatorService_Aggregator.RouteResponse_out -> CommRelayTask.RouteResponse_in;
+            conn22: port RouteAggregatorService_Aggregator.RouteResponse_out -> CordonTask.RouteResponse_in;
+            conn23: port RouteAggregatorService_Aggregator.RouteResponse_out -> EscortTask.RouteResponse_in;
+            conn24: port RouteAggregatorService_Aggregator.RouteResponse_out -> ImpactLineSearchTask.RouteResponse_in;
+            conn25: port RouteAggregatorService_Aggregator.RouteResponse_out -> ImpactPointSearchTask.RouteResponse_in;
+            conn26: port RouteAggregatorService_Aggregator.RouteResponse_out -> MultiVehicleWatchTask.RouteResponse_in;
+            conn27: port RouteAggregatorService_Aggregator.RouteResponse_out -> OverwatchTask.RouteResponse_in;
+            conn28: port RouteAggregatorService_Aggregator.RouteResponse_out -> PatternSearchTask.RouteResponse_in;
             
             conn30: port AirVehicleState_in -> TaskManagerService.AirVehicleState_in;
             conn31: port AirVehicleState_in -> AutomationRequestValidatorService.AirVehicleState_in;
@@ -207,27 +214,13 @@ public
 --            conn117: port AutomationRequestValidatorService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
             conn118: port PlanBuilderService.ServiceStatus_out -> AutomationRequestValidatorService.ServiceStatus_in;
             
-            
-            conn119: port TaskManagerService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
-            conn120: port TaskManagerService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
-            conn121: port TaskManagerService.UniqueAutomationRequest_out -> AngledAreaSearchTask.UniqueAutomationRequest_in;
-            conn122: port TaskManagerService.UniqueAutomationRequest_out -> AssignmentCoordinatorTask.UniqueAutomationRequest_in;
-            conn123: port TaskManagerService.UniqueAutomationRequest_out -> BlockadeTask.UniqueAutomationRequest_in;
-            conn124: port TaskManagerService.UniqueAutomationRequest_out -> CmasiAreaSearchTask.UniqueAutomationRequest_in;
-            conn125: port TaskManagerService.UniqueAutomationRequest_out -> CmasiLineSearchTask.UniqueAutomationRequest_in;
-            conn126: port TaskManagerService.UniqueAutomationRequest_out -> CmasiPointSearchTask.UniqueAutomationRequest_in;
-            conn127: port TaskManagerService.UniqueAutomationRequest_out -> CommRelayTask.UniqueAutomationRequest_in;
-            conn128: port TaskManagerService.UniqueAutomationRequest_out -> CordonTask.UniqueAutomationRequest_in;
-            conn129: port TaskManagerService.UniqueAutomationRequest_out -> EscortTask.UniqueAutomationRequest_in;
-            conn130: port TaskManagerService.UniqueAutomationRequest_out -> ImpactLineSearchTask.UniqueAutomationRequest_in;
-            conn131: port TaskManagerService.UniqueAutomationRequest_out -> ImpactPointSearchTask.UniqueAutomationRequest_in;
-            conn132: port TaskManagerService.UniqueAutomationRequest_out -> MultiVehicleWatchTask.UniqueAutomationRequest_in;
-            conn133: port TaskManagerService.UniqueAutomationRequest_out -> OverwatchTask.UniqueAutomationRequest_in;
-            conn134: port TaskManagerService.UniqueAutomationRequest_out -> PatternSearchTask.UniqueAutomationRequest_in;
-            
-            
+            -- Services that receive UniqueAutomationRequests
+            conn120: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> RouteAggregatorService_Collector.UniqueAutomationRequest_in;
+            conn121: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentTreeBranchBoundService.UniqueAutomationRequest_in;            
             conn136: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AutomationDiagramDataService.UniqueAutomationRequest_in;
             conn137: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
+            
+            -- Tasks that will receive UniqueAutomationRequests
             conn138: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AngledAreaSearchTask.UniqueAutomationRequest_in;
             conn139: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> AssignmentCoordinatorTask.UniqueAutomationRequest_in;
             conn140: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> BlockadeTask.UniqueAutomationRequest_in;
@@ -422,5 +415,7 @@ public
         **};
             
     end waterways.i;
+
+
 
 end Waterways;
