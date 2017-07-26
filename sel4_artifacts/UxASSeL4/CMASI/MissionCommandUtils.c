@@ -145,10 +145,7 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
   uint16_t i;
   Waypoint * wp;
   int64_t it_id = last_prefix_start_id;
-
-  DEBUG("last id = %li.\n",it_id);
-  DEBUG("pilot id = %li.\n",ap_id);
-
+  int64_t last_visited_id;
   
   /* assumption: omcp is not NULL. */
   assert(omcp != NULL);
@@ -173,6 +170,8 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
 
   /* Check to see if the ap_id is in the first half of the auto-pilot
      length. */
+
+  last_visited_id = it_id;
   for(i = 0; i < len/2 ; i++) {
 
     /* assumption: all ids in the waypoint list can be found. */
@@ -184,10 +183,13 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
       return false;
     }
 
+    last_visited_id = it_id;
     it_id = wp->NextWaypoint;
   }
 
-  for( ; i < len; i++) {
+  // XXX: Assume if we got a waypoint out somewhere in the entire list
+  // we will just pick up from there.
+  for( ; i < omcp->WaypointList_ai.length; i++) {
 
     /* assumption: all ids in the waypoint list can be found. */
     assert(FindWP(omcp, it_id, &wp) == true );
@@ -199,18 +201,12 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
     }
 
     if( wp->Number == ap_id ) {
-      DEBUG("Here.");
-      return MCWaypointSubSequence(omcp, ap_id, len, wmcep);
+      bool flag = MCWaypointSubSequence(omcp, last_visited_id, len, wmcep);
+      wmcep->MissionCommand.FirstWaypoint = ap_id;
+      return flag;
     }
-
+    last_visited_id = it_id;
     it_id = wp->NextWaypoint;
-  }
-
-  /* Handle the special case where the auto-pilot waypoint length is
-     1. */
-  if( len == 1 ) {
-    DEBUG("Here.");
-    return MCWaypointSubSequence(omcp, ap_id, len, wmcep);
   }
 
   /* assumption: Control flow should never get here. */

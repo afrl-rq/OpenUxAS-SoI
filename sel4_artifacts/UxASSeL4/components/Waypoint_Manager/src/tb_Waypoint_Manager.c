@@ -260,7 +260,7 @@ int run(void) {
 
     // Port initialization routines
 
-    // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
+    // tb_timer_periodic(0, ((uint64_t)25)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
     bool tb_mission_write;
     uint32_t tb_waypoint_write;

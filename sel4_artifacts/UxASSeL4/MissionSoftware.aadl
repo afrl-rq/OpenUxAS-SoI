@@ -59,18 +59,24 @@ public
 				--TODO this should be a subcomponent reference
 				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
 			};
+			
+			vm_waypoint : data mission_command.impl{
+				--TODO this should be a subcomponent reference
+				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
+			};
 		connections
 			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;
 			uart2awm: port uart_driver.out_uart_packet -> asset_waypoint_manager.in_uart_packet;
 			uart2wm: port uart_driver.out_send_success -> waypoint_manager.in_send_success;
 			
 			-- TODO: Give ports sensible names.
+			
 			e1: port virtual_machine.mission_write -> waypoint_manager.mission_write;
 			e2: port waypoint_manager.mission_read -> virtual_machine.mission_read;
 			e3: port virtual_machine.waypoint_read -> asset_waypoint_manager.waypoint_read_vm;
 			e4: port waypoint_manager.waypoint_read -> asset_waypoint_manager.waypoint_read_wm;
-			e5: port asset_waypoint_manager.waypoint_write -> waypoint_manager.waypoint_write;
-			e6: port asset_waypoint_manager.waypoint_write -> virtual_machine.waypoint_write;
+			e5: port asset_waypoint_manager.waypoint_write_wm -> waypoint_manager.waypoint_write;
+			e6: port asset_waypoint_manager.waypoint_write_vm -> virtual_machine.waypoint_write;
 			
 			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
 			vm_clk_fwd: subprogram group access virtual_machine.clkcarfwd -> clock_driver.clkcarfwd;
@@ -81,7 +87,8 @@ public
 			d2: data access mission -> waypoint_manager.mission;
 			d3: data access waypoint -> waypoint_manager.waypoint;
 			d5: data access waypoint -> asset_waypoint_manager.waypoint;
-			d6: data access waypoint -> virtual_machine.waypoint;
+			d6: data access vm_waypoint -> virtual_machine.waypoint;
+			d7: data access vm_waypoint -> asset_waypoint_manager.vm_waypoint;
 			
 
 			
@@ -200,13 +207,16 @@ public
 			TB_SYS::Sends_Events_To => "{{}}";
 			TB_SYS::Compute_Entrypoint_Source_Text => ("component_entry");
 			Initialize_Entrypoint_Source_Text => "component_init";
-			Period => 100 ms;
+			Period => 25 ms;
 	end Waypoint_Manager;
 	
 	thread Asset_Waypoint_Manager
 		features
-			waypoint_write: out event data port Base_Types::Unsigned_32 {
-				TB_SYS::CommPrim_Source_Text => "waypoint_write";
+			waypoint_write_wm: out event data port Base_Types::Unsigned_32 {
+				TB_SYS::CommPrim_Source_Text => "waypoint_write_wm";
+			};
+			waypoint_write_vm: out event data port Base_Types::Unsigned_32 {
+				TB_SYS::CommPrim_Source_Text => "waypoint_write_vm";
 			};
 			waypoint_read_vm: in event data port Base_Types::Boolean {
 				TB_SYS::Compute_Entrypoint_Source_Text => ("mission_read_vm");
@@ -217,6 +227,10 @@ public
 			waypoint: requires data access mission_command.impl {
 						Access_Right => READ_WRITE;
 					};
+			vm_waypoint: requires data access mission_command.impl {
+						Access_Right => READ_WRITE;
+					};
+					
 			in_uart_packet: in event data port SMACCM_DATA::UART_Packet.i{
 				TB_SYS::Compute_Entrypoint_Source_Text => ("in_uart_packet");
 				-- Maximum possible size of mission command divided by 255.
@@ -225,7 +239,7 @@ public
 		properties
 			Source_Text => ("mcutils/mcutils.c", "mcutils/mcutils.h");
 	        Dispatch_Protocol => Periodic;
-		    Period => 100 ms;
+		    Period => 25 ms;
 	   		Priority => 151;
 	    	Stack_Size => 256 bytes;
 	    	TB_SYS::Thread_Type => Active ;

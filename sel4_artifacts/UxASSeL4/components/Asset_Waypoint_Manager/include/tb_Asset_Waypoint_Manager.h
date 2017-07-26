@@ -48,8 +48,10 @@ void component_entry(const int64_t * periodic_dispatcher);
 
 
  void component_init(const int64_t *arg);
- bool tb_waypoint_write_enqueue(const uint32_t * tb_waypoint_write);
-bool waypoint_write(const uint32_t * tb_waypoint_write);
+ bool tb_waypoint_write_wm_enqueue(const uint32_t * tb_waypoint_write_wm);
+bool waypoint_write_wm(const uint32_t * tb_waypoint_write_wm);
+ bool tb_waypoint_write_vm_enqueue(const uint32_t * tb_waypoint_write_vm);
+bool waypoint_write_vm(const uint32_t * tb_waypoint_write_vm);
  // reader prototype for tb_waypoint_read_vm
 bool tb_waypoint_read_vm_dequeue(bool * tb_waypoint_read_vm);
 // user dispatch entrypoints for port tb_waypoint_read_vm

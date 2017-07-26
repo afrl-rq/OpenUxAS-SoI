@@ -93,7 +93,6 @@ void mission_write(const bool * _UNUSED) {
   uint8_t * tmp_mission = (uint8_t*)mission;
   MissionCommand * local_mc = NULL;
   
-  DEBUG(" Entry.\n");
   if(mc != NULL) {
     lmcp_free((lmcp_object*)mc);
     mc = NULL;
@@ -104,14 +103,10 @@ void mission_write(const bool * _UNUSED) {
   assert(MCWaypointSubSequence(local_mc,
                                local_mc->FirstWaypoint,
                                MAX_AP_WAYPOINTS,
-                               &swin) == true);
-  DEBUG("New waypoints:\n");
-  lmcp_pp((lmcp_object*)&swin);
-  
+                               &swin) == true);  
   
   missionSendState = true;
   sendUartPacket = true;
-  DEBUG(" Exit.\n");
   return;
 }
 
@@ -179,7 +174,7 @@ void waypoint_write(const uint32_t * size) {
   uint64_t id;
   Waypoint * wp = NULL;
 
-  hexDump("waypoint_write recv",(uint8_t*)waypoint,*size);
+  //hexDump("waypoint_write recv",(uint8_t*)waypoint,*size);
   
   memcpy(&type, ((uint8_t *)waypoint) + 17, sizeof(uint32_t));
   type = __builtin_bswap32(type);
@@ -189,18 +184,13 @@ void waypoint_write(const uint32_t * size) {
     memcpy(&id, ((uint8_t *)waypoint) + 23, sizeof(uint64_t));
     id = __builtin_bswap64(id);
 
-    DEBUG("id: %" PRId64 "\n", id);
-
     memcpy(&waypointNum, ((uint8_t *)waypoint) + 423, sizeof(uint64_t));
     waypointNum = __builtin_bswap64(waypointNum);
-    DEBUG("waypoint: %" PRId64 "\n", waypointNum);
 
     if(id == 400 && mc != NULL) {
       MissionCommand * local_mc = (MissionCommand *)mc;
-      DEBUG("here.\n");
-      if(waypoint<=0 || FindWP(local_mc,waypointNum,&wp) != true || FindWP((MissionCommand*)&swin,waypointNum,&wp) != true) {
-        DEBUG("Got %li waypoint, resend waypoints:\n",waypoint);
-        lmcp_pp((lmcp_object*)&swin);
+      if(waypoint<=0 || FindWP(local_mc,waypointNum,&wp) != true ) {
+        DEBUG("Got %li waypoint, resend waypoints:\n",waypointNum);
         missionSendState = true;
         sendUartPacket = true;        
       }
@@ -210,12 +200,10 @@ void waypoint_write(const uint32_t * size) {
                                   MAX_AP_WAYPOINTS,
                                   &swin)) {
         DEBUG("Update waypoints:\n");
-        lmcp_pp((lmcp_object*)&swin);
         
         missionSendState = true;
         sendUartPacket = true;
       } else {
-        DEBUG("Waypoint update not necessary yet.\n");
       }
     }
   }
@@ -233,7 +221,6 @@ void in_send_success(const bool * tb_in_send_success){
   //if we are done sending the last packet then we need to
   //alert the VMM
   if(!missionSendState){
-    DEBUG("Indicate that the mission can change.\n");
     mission_read(tb_in_send_success);
   }
 }

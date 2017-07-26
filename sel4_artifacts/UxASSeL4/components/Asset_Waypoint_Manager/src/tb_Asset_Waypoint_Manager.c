@@ -88,7 +88,7 @@ void tb_timer_complete_callback(void *_ UNUSED) {
    CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
 }
 /************************************************************************
- *  tb_waypoint_write_enqueue:
+ *  tb_waypoint_write_wm_enqueue:
  * Invoked from user code in the local thread.
  *
  * This is the function invoked by the local thread to make a
@@ -101,13 +101,33 @@ void tb_timer_complete_callback(void *_ UNUSED) {
  *
  ************************************************************************/
  
-bool waypoint_write
-(const uint32_t * tb_waypoint_write) {
+bool waypoint_write_wm
+(const uint32_t * tb_waypoint_write_wm) {
     bool tb_result = true ; 
 
-    tb_result &= tb_waypoint_write0_enqueue((uint32_t *)tb_waypoint_write);
+    tb_result &= tb_waypoint_write_wm0_enqueue((uint32_t *)tb_waypoint_write_wm);
 
-    tb_result &= tb_waypoint_write1_enqueue((uint32_t *)tb_waypoint_write);
+    return tb_result;
+}
+/************************************************************************
+ *  tb_waypoint_write_vm_enqueue:
+ * Invoked from user code in the local thread.
+ *
+ * This is the function invoked by the local thread to make a
+ * call to write to a remote data port.
+ *
+ * XXX: When simulating fan out, the caller of this function will only 
+ * receive a positive response when all enqueues are successful. When a
+ * negative response is received it only indicates that at least one
+ * enqueue attempt failed.
+ *
+ ************************************************************************/
+ 
+bool waypoint_write_vm
+(const uint32_t * tb_waypoint_write_vm) {
+    bool tb_result = true ; 
+
+    tb_result &= tb_waypoint_write_vm0_enqueue((uint32_t *)tb_waypoint_write_vm);
 
     return tb_result;
 }
@@ -218,7 +238,7 @@ int run(void) {
 
     // Port initialization routines
 
-    // tb_timer_periodic(0, ((uint64_t)100)*NS_IN_MS);
+    // tb_timer_periodic(0, ((uint64_t)25)*NS_IN_MS);
     CALLBACKOP(tb_timer_complete_reg_callback(tb_timer_complete_callback, NULL));
     bool tb_waypoint_read_vm;
     bool tb_waypoint_read_wm;

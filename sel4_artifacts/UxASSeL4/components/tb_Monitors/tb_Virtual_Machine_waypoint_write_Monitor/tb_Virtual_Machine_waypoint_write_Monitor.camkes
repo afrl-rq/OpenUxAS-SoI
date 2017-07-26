@@ -34,7 +34,7 @@
   Monitor of type uint32_t with input port tb_Virtual_Machine_waypoint_write
   queue size of 1. The output port set follows:
 
-   tb_Asset_Waypoint_Manager_waypoint_write
+   tb_Asset_Waypoint_Manager_waypoint_write_vm
 
 
  **************************************************************************/
