@@ -62,6 +62,8 @@ namespace uxas{
 	MonitorPolygon(std::vector< coord_t > const & coOrdinates);
 	friend void LineSegment::registerSensorFootprint(MonitorPolygon const & mp);
 	void setDebug(bool d) { debug = d;};
+	std::tuple<bool, double> isMember(double x, double y) const;
+	
       protected:
 	void computeHRepr();
 	void addHalfSpace(coord_t const & ptA, coord_t const & ptB, coord_t const & testPt);

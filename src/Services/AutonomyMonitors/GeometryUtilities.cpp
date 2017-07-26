@@ -3,19 +3,20 @@
 #include <algorithm>
 #include <limits>
 #include <cassert>
+#include <cmath>
 #include "GeometryUtilities.h"
 
 namespace uxas {
   namespace service {
     namespace monitoring {
 
-      #define EPS 1E-06
+    #define EPS 1E-06
 
-      bool approx_equals(double a, double b){
-	return (a >= b - EPS && a <= b + EPS); 
-      }
+    bool approx_equals(double a, double b){
+		return (a >= b - EPS && a <= b + EPS); 
+     }
       
-      void computeSegmentEqFromEndPoints( coord_t const & ptA, coord_t const & ptB, line_eq_t & xc){
+    void computeSegmentEqFromEndPoints( coord_t const & ptA, coord_t const & ptB, line_eq_t & xc){
 	double a, b, c;
 	if (approx_equals(ptA.first, ptB.first)){
 	  // Return the line 1.0 * x  + 0.0 * y - xa.first
@@ -87,6 +88,22 @@ namespace uxas {
 	addHalfSpace(ptY, ptX, ptTest);
       }
 
+      std::tuple<bool, double> MonitorPolygon::isMember(double x, double y) const{
+	double distanceToViolation = 100000.0;
+	bool inside = true;
+	double a, b, c;
+	for (auto const & tup: p_halfspaces){
+	  a = b = c = 0.0;
+	  std::tie(a,b,c) = tup;
+	  assert( a*a+b*b > EPS); // Half-space is illconditioned
+	  double cObj = a * x + b * y + c;
+	  if (cObj < 0.0)
+	    inside = false;
+	  distanceToViolation = std::min(distanceToViolation, cObj/(sqrt(a*a + b*b)));
+	}
+	return std::make_tuple(inside, distanceToViolation);
+      }
+      
       void LineSegment::registerSensorFootprint(MonitorPolygon const & mp){
 	/*--
 	  1. Iterate through all the half-spaces of this polygon.

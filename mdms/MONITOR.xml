@@ -31,6 +31,12 @@
       <Field Name="FailureLongitude" Type="real64" Units="degree"/>
       <Field Name="FailureAltitude" Type="real64" Units="meters"/>
       <Field Name="FailureAltitudeType" Type="AltitudeType" Series="CMASI" Default="MSL" />
+      <Field Name="Robustness" Type="real64" Units="meters"/>
+    </Struct>
+
+    <Struct Name="OperatingZoneSuccess">
+      <Field Name="ZoneID" Type="int64" Units="None" />
+      <Field Name="Robustness" Type="real64" Units="meters"/>
     </Struct>
 
     <Struct Name="TaskFailure">

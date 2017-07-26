@@ -42,16 +42,22 @@ namespace monitoring {
   void LineSearchTaskMonitor::addVehicleStateMessage(VehicleStateMessage const & vMessage){
     auto const & cFoot = vMessage.getCameraFootprint();
     std::vector< std::pair<double, double> > polygonCoordinates;
-    for (auto loc: cFoot){
-      auto xy_loc = get_east_north_coordinates(this-> flatEarth, loc.get());
-      polygonCoordinates.push_back(xy_loc);
-    }
-    
-    MonitorPolygon footPrint (polygonCoordinates);
-    for (auto & ls: segments){
-      if (!ls.isSegmentCovered()){
-	ls.registerSensorFootprint(footPrint);
+    // First check if the camera angle is acceptable
+    if (vMessage.checkCameraAngleInWedge(_task -> getViewAngleList())){
+      for (auto loc: cFoot){
+	auto xy_loc = get_east_north_coordinates(this-> flatEarth, loc.get());
+	polygonCoordinates.push_back(xy_loc);
       }
+    
+      MonitorPolygon footPrint (polygonCoordinates);
+      for (auto & ls: segments){
+	if (!ls.isSegmentCovered()){
+	  ls.registerSensorFootprint(footPrint);
+	}
+      }
+    } else {
+      UXAS_LOG_WARN("[LineSearchTaskMonitor]: Camera angles are not acceptable for task ID:", _task -> getTaskID(), " vehicle ID:", vMessage.getVehicleID(), " state message at time : ", vMessage.getTimeStamp());
+      UXAS_LOG_WARN("[LineSearchTaskMonitor]: camera angles azimuth: ", vMessage.getCameraAzimuth(), " elevation: " , vMessage.getCameraElevation() );
     }
     return;
   }
