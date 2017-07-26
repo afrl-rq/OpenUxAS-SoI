@@ -4,6 +4,7 @@
 #include "UnitConversions.h"
 #include "afrl/cmasi/autonomymonitor/TaskFailure.h"
 #include "afrl/cmasi/autonomymonitor/TaskSuccess.h"
+#include "afrl/cmasi/autonomymonitor/TaskMonitorStarted.h"
 
 namespace uxas {
 namespace service {
@@ -90,6 +91,13 @@ namespace monitoring {
       }
     }
     
+  }
+
+
+  void PointSearchTaskMonitor::sendMonitorStartMessage(){
+    auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::TaskMonitorStarted>();
+    fObj -> setTaskID( this -> _task -> getTaskID());
+    service_ -> broadcastMessage(fObj);
   }
 
   bool PointSearchTaskMonitor::isPropertySatisfied(){

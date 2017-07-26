@@ -20,6 +20,7 @@
 #include "afrl/cmasi/autonomymonitor/OperatingZoneFailureType.h"
 #include "afrl/cmasi/autonomymonitor/OperatingZoneSuccess.h"
 #include "AutonomyMonitors/GeometryUtilities.h"
+#include "afrl/cmasi/autonomymonitor/OperatingZoneMonitorStarted.h"
 
 namespace uxas {
 namespace service {
@@ -54,6 +55,13 @@ KeepOutZoneMonitor::KeepOutZoneMonitor(AutonomyMonitorServiceMain  * service_ptr
 
 KeepOutZoneMonitor::~KeepOutZoneMonitor() {
   // TODO Auto-generated destructor stub
+}
+
+void KeepOutZoneMonitor::sendMonitorStartMessage(){
+  auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::OperatingZoneMonitorStarted>();
+  fObj -> setZoneID(this -> _zone -> getZoneID());
+  fObj -> setZoneType(afrl::cmasi::autonomymonitor::OperatingZoneFailureType::KeepOutZoneFail);
+  service_ -> broadcastMessage(fObj);
 }
 
 

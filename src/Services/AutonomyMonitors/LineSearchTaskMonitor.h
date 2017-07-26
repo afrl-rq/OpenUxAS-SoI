@@ -17,12 +17,12 @@ namespace monitoring {
   public:
     LineSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr,
 			  std::shared_ptr<afrl::cmasi::LineSearchTask> lineSearchTask);
-    ~LineSearchTaskMonitor();
-    void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-    bool isPropertySatisfied();
-    double propertyRobustness();
-    void sendTaskStatus();
-    
+    virtual ~LineSearchTaskMonitor();
+    void addVehicleStateMessage(VehicleStateMessage const & vMessage) override;
+    bool isPropertySatisfied() override;
+    double propertyRobustness() override;
+    void sendTaskStatus() override;
+    void sendMonitorStartMessage() override;
   protected:
     std::shared_ptr<afrl::cmasi::LineSearchTask> _task;
     uxas::common::utilities::CUnitConversions flatEarth;

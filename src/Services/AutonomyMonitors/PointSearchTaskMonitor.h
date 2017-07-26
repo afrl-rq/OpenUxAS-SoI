@@ -14,12 +14,13 @@ namespace monitoring {
   public:
 
     PointSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::PointSearchTask> pointSearchTask);
-    ~PointSearchTaskMonitor();
+    virtual ~PointSearchTaskMonitor();
     
-    void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-    bool isPropertySatisfied();
-    double propertyRobustness();
-    void sendTaskStatus();
+    void addVehicleStateMessage(VehicleStateMessage const & vMessage) override;
+    bool isPropertySatisfied() override;
+    double propertyRobustness() override;
+    void sendTaskStatus() override;
+    void sendMonitorStartMessage() override;
   protected:
     std::shared_ptr<afrl::cmasi::PointSearchTask> _task;
     bool _failed;

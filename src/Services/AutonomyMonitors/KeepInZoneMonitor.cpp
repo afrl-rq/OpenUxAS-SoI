@@ -13,6 +13,8 @@
 #include "AutonomyMonitors/KeepInZoneMonitor.h"
 #include "AutonomyMonitors/MonitorBase.h"
 #include "AutonomyMonitors/GeometryUtilities.h"
+#include "afrl/cmasi/autonomymonitor/OperatingZoneMonitorStarted.h"
+#include "afrl/cmasi/autonomymonitor/OperatingZoneFailureType.h"
 
 
 namespace uxas {
@@ -41,6 +43,13 @@ KeepInZoneMonitor::KeepInZoneMonitor(AutonomyMonitorServiceMain * service_ptr,
     }
     // Done unpacking
   }
+}
+
+void KeepInZoneMonitor::sendMonitorStartMessage(){
+  auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::OperatingZoneMonitorStarted>();
+  fObj -> setZoneID(this -> _zone -> getZoneID());
+  fObj -> setZoneType(afrl::cmasi::autonomymonitor::OperatingZoneFailureType::KeepInZoneFail);
+  service_ -> broadcastMessage(fObj);
 }
 
 

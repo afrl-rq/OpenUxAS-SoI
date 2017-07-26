@@ -29,7 +29,7 @@ class MonitorBase {
 public:
   MonitorBase(AutonomyMonitorServiceMain * service_ptr);
   virtual ~MonitorBase();
-
+  virtual void sendMonitorStartMessage() = 0;
   virtual void addVehicleStateMessage(VehicleStateMessage const & vMessage) =0;
   virtual bool isPropertySatisfied() =0;
   virtual double propertyRobustness() = 0;

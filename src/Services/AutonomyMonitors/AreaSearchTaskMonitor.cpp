@@ -12,6 +12,10 @@ namespace monitoring {
   void AreaSearchTaskMonitor::addVehicleStateMessage(VehicleStateMessage const & vMessage){
   }
 
+  void AreaSearchTaskMonitor::sendMonitorStartMessage(){
+    // Do not send until implemented.
+  }
+
   bool AreaSearchTaskMonitor::isPropertySatisfied(){
     return true;
   }

@@ -7,7 +7,7 @@
 #include "afrl/cmasi/autonomymonitor/TaskSuccess.h"
 #include "afrl/cmasi/autonomymonitor/TaskFailure.h"
 #include "afrl/cmasi/autonomymonitor/LineSearchTaskFailure.h"
-
+#include "afrl/cmasi/autonomymonitor/TaskMonitorStarted.h"
 namespace uxas {
 namespace service {
 namespace monitoring {
@@ -38,6 +38,12 @@ namespace monitoring {
   };
 
   LineSearchTaskMonitor::~LineSearchTaskMonitor(){};
+
+  void LineSearchTaskMonitor::sendMonitorStartMessage(){
+    auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::TaskMonitorStarted>();
+    fObj -> setTaskID( this -> _task -> getTaskID());
+    service_ -> broadcastMessage(fObj);
+  }
 
   void LineSearchTaskMonitor::addVehicleStateMessage(VehicleStateMessage const & vMessage){
     auto const & cFoot = vMessage.getCameraFootprint();

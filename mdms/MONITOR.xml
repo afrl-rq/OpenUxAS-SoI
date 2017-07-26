@@ -48,18 +48,24 @@
       <Field Name="TaskID" Type="int64" Units="None" />
     </Struct>
     
-    <Struct Name="LineSearchTaskFailedSegment">
-      <Field Name="SegmentA" Type="Location3D" Series="CMASI"/>
-      <Field Name="SegmentB" Type="Location3D" Series="CMASI"/>
-    </Struct>
     
     <Struct Name="LineSearchTaskFailure" Extends="TaskFailure">
-      <Field Name="MissedSegments" Type="LineSearchTaskFailedSegment[]" MaxArrayLength="256" />
+      <Field Name="MissedSegments" Type="int64[]" MaxArrayLength="256" />
     </Struct>
 
     <Struct Name="TaskStatusRequest">
       <Field Name="TaskID" Type="int64" Units="None"/>
     </Struct>
+
+    <Struct Name="TaskMonitorStarted">
+      <Field Name="TaskID" Type="int64" Units="None"/>
+    </Struct>
+
+    <Struct Name="OperatingZoneMonitorStarted">
+      <Field Name="ZoneID" Type="int64" Units="None"/>
+      <Field Name="ZoneType" Type="OperatingZoneFailureType" />
+    </Struct>
+
 
     
   </StructList>

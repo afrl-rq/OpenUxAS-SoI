@@ -29,6 +29,7 @@ public:
   bool isPropertySatisfied() override;
   double propertyRobustness() override;
   void sendTaskStatus() override;
+  void sendMonitorStartMessage() override;
 
 protected:
 	std::shared_ptr<afrl::cmasi::KeepOutZone> _zone;
