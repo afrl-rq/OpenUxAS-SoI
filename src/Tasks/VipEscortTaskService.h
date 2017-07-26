@@ -21,7 +21,7 @@
 #include "afrl/cmasi/LoiterAction.h"
 #include "afrl/cmasi/Location3D.h"
 #include "uxas/UT/VipEscortTask.h"
-#include <python2.7/Python.h>
+#include "Vip.h"
 namespace uxas
 {
 namespace service
@@ -129,11 +129,7 @@ private:
     static
     ServiceBase::CreationRegistrar<VipEscortTaskService> s_registrar;
 
-    PyObject* Vip_module;
-
-    PyObject* Vip_class;
-
-    PyObject* controller;
+    Vip ctrl;
 
     afrl::cmasi::Location3D* locations [5];
 

@@ -24,9 +24,9 @@
 #include "afrl/cmasi/KeyValuePair.h"
 #include "afrl/cmasi/Location3D.h"
 #include "avtas/lmcp/LmcpXMLReader.h"
-#include <Python.h>
 #include "uxas/UT/VipEscortTask.h"
 #include <iostream>  
+#include "Vip.cpp"
 
 #define STRING_XML_ENTITY_STATES "EntityStates"
 // namespace definitions
@@ -56,21 +56,24 @@ VipEscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
 
-    setenv("PYTHONPATH", ".", 1);
+    // setenv("PYTHONPATH", ".", 1);
 
-    Py_Initialize();
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("print((sys.path))");
-    Vip_module = PyImport_ImportModule("Vip");
+    // Py_Initialize();
+    // PyRun_SimpleString("import sys");
+    // PyRun_SimpleString("print((sys.path))");
+    // Vip_module = PyImport_ImportModule("Vip");
+    Vip ctrl = Vip();
+       
+    
     // Vip_module = PyImport_ImportModule("Simple");
-    assert(Vip_module != NULL);
+    // assert(Vip_module != NULL);
 
-    Vip_class = PyObject_GetAttrString(Vip_module, "Vip");
+    // Vip_class = PyObject_GetAttrString(Vip_module, "Vip");
     // Vip_class = PyObject_GetAttrString(Vip_module, "Simple");
-    assert(Vip_class != NULL);
+    // assert(Vip_class != NULL);
 
-    controller = PyObject_CallObject(Vip_class, NULL);
-    assert(controller != NULL);
+    // controller = PyObject_CallObject(Vip_class, NULL);
+    // assert(controller != NULL);
 
 
 
@@ -327,7 +330,7 @@ void VipEscortTaskService::gotoLocation(std::shared_ptr<afrl::cmasi::AirVehicleS
 }
 
 bool VipEscortTaskService::in(std::shared_ptr<afrl::cmasi::AirVehicleState> uav, int location){
-    std::cout << "UAV " << uav->getID() << " " << uav->getLocation()->getLatitude() << " " << uav->getLocation()->getLongitude() << std::endl;
+    //std::cout << "UAV " << uav->getID() << " " << uav->getLocation()->getLatitude() << " " << uav->getLocation()->getLongitude() << std::endl;
     if (uav->getLocation()->getLatitude() < locations[location]->clone()->getLatitude() + 0.0072 && uav->getLocation()->clone()->getLatitude() > locations[location]->clone()->getLatitude() - 0.0072 && 
         uav->getLocation()->getLongitude() < locations[location]->clone()->getLongitude() + 0.0072 && uav->getLocation()->clone()->getLongitude() > locations[location]->clone()->getLongitude() - 0.0072)
         return true;
@@ -418,19 +421,26 @@ void VipEscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         std::cout << "UAV1: " << l_1 << std::endl;
         std::cout << "UAV2: " << l_2 << std::endl;
 
-        PyObject* result = PyObject_CallMethod(controller, "move","(iiiiiiii)", splist[0],splist[1],
+        Vip::result result = ctrl.move(splist[0],splist[1],
             splist[2],splist[3],splist[4],l_vip,
             l_1,l_2);
 
-        assert(result != NULL);
-        vloc = std::stoi(PyString_AsString(PyObject_Repr(PyDict_GetItem(result, PyString_FromString("vloc")))));
-        bool vTrack1 = PyObject_IsTrue(PyDict_GetItem(result, PyString_FromString("vTrack1")));
+        // PyObject* result = PyObject_CallMethod(controller, "move","(iiiiiiii)", splist[0],splist[1],
+            // splist[2],splist[3],splist[4],l_vip,
+            // l_1,l_2);
+
+        // assert(result != NULL);
+        // vloc = std::stoi(PyString_AsString(PyObject_Repr(PyDict_GetItem(result, PyString_FromString("vloc")))));
+        vloc = result.vloc;
+        //bool vTrack1 = PyObject_IsTrue(PyDict_GetItem(result, PyString_FromString("vTrack1")));
+        bool vTrack1 = result.vTrack1;
         std::cout << "UAV1 Track: " << vTrack1 << std::endl;
         if (vTrack1)
         {
             escort(m_Uav1AirVehicleState);
         }
-        bool vTrack2 = PyObject_IsTrue(PyDict_GetItem(result, PyString_FromString("vTrack2")));
+        // bool vTrack2 = PyObject_IsTrue(PyDict_GetItem(result, PyString_FromString("vTrack2")));
+        bool vTrack2 = result.vTrack2;
         std::cout << "UAV2 Track: " << vTrack2 << std::endl;
         if (vTrack2)
         {
@@ -439,10 +449,12 @@ void VipEscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         
         std::cout << "VIP next: " << vloc << std::endl;
         gotoLocation(m_VipAirVehicleState,vloc);
-        int uloc1 = std::stoi(PyString_AsString(PyObject_Repr(PyDict_GetItem(result, PyString_FromString("uloc1")))));
+        // int uloc1 = std::stoi(PyString_AsString(PyObject_Repr(PyDict_GetItem(result, PyString_FromString("uloc1")))));
+        int uloc1 = result.uloc1;
         std::cout << "UAV1 next: " << uloc1 << std::endl;
         gotoLocation(m_Uav1AirVehicleState,uloc1);
-        int uloc2 = std::stoi(PyString_AsString(PyObject_Repr(PyDict_GetItem(result, PyString_FromString("uloc2")))));
+        // int uloc2 = std::stoi(PyString_AsString(PyObject_Repr(PyDict_GetItem(result, PyString_FromString("uloc2")))));
+        int uloc2 = result.uloc2;
         std::cout << "UAV2 next: " << uloc2 << std::endl;
         gotoLocation(m_Uav2AirVehicleState,uloc2);
         counter = 0;
