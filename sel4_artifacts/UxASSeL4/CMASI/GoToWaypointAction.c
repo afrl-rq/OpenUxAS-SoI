@@ -45,10 +45,7 @@ void lmcp_free_GoToWaypointAction(GoToWaypointAction* out, int out_malloced) {
 }
 void lmcp_init_GoToWaypointAction (GoToWaypointAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GoToWaypointAction));
-    *(*i) = (const GoToWaypointAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GoToWaypointAction));
     ((lmcp_object*)(*i)) -> type = 28;
 }
 int lmcp_unpack_GoToWaypointAction(uint8_t** inb, size_t *size_remain, GoToWaypointAction* outp) {
@@ -59,12 +56,6 @@ int lmcp_unpack_GoToWaypointAction(uint8_t** inb, size_t *size_remain, GoToWaypo
         return -1;
     }
     GoToWaypointAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_NavigationAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->WaypointNumber)))
     return 0;

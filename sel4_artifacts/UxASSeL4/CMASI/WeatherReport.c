@@ -68,10 +68,7 @@ void lmcp_free_WeatherReport(WeatherReport* out, int out_malloced) {
 }
 void lmcp_init_WeatherReport (WeatherReport** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(WeatherReport));
-    *(*i) = (const WeatherReport) {
-        0
-    };
+    (*i) = calloc(1,sizeof(WeatherReport));
     ((lmcp_object*)(*i)) -> type = 55;
 }
 int lmcp_unpack_WeatherReport(uint8_t** inb, size_t *size_remain, WeatherReport* outp) {
@@ -82,8 +79,6 @@ int lmcp_unpack_WeatherReport(uint8_t** inb, size_t *size_remain, WeatherReport*
         return -1;
     }
     WeatherReport* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;

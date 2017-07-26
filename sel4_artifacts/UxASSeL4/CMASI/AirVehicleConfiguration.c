@@ -126,10 +126,7 @@ void lmcp_free_AirVehicleConfiguration(AirVehicleConfiguration* out, int out_mal
 }
 void lmcp_init_AirVehicleConfiguration (AirVehicleConfiguration** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(AirVehicleConfiguration));
-    *(*i) = (const AirVehicleConfiguration) {
-        0
-    };
+    (*i) = calloc(1,sizeof(AirVehicleConfiguration));
     ((lmcp_object*)(*i)) -> type = 13;
 }
 int lmcp_unpack_AirVehicleConfiguration(uint8_t** inb, size_t *size_remain, AirVehicleConfiguration* outp) {
@@ -142,13 +139,13 @@ int lmcp_unpack_AirVehicleConfiguration(uint8_t** inb, size_t *size_remain, AirV
     AirVehicleConfiguration* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
+    CHECK(lmcp_unpack_EntityConfiguration(inb, size_remain, &(out->super)))
+    CHECK(lmcp_unpack_float(inb, size_remain, &(out->MinimumSpeed)))
+    CHECK(lmcp_unpack_float(inb, size_remain, &(out->MaximumSpeed)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_EntityConfiguration(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->MinimumSpeed)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->MaximumSpeed)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->NominalFlightProfile = NULL;
@@ -167,6 +164,10 @@ int lmcp_unpack_AirVehicleConfiguration(uint8_t** inb, size_t *size_remain, AirV
     }
     out->AlternateFlightProfiles_ai.length = tmp;
     for (uint32_t index = 0; index < out->AlternateFlightProfiles_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->AlternateFlightProfiles[index] = NULL;

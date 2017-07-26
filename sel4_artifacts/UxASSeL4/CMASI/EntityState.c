@@ -187,10 +187,7 @@ void lmcp_free_EntityState(EntityState* out, int out_malloced) {
 }
 void lmcp_init_EntityState (EntityState** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(EntityState));
-    *(*i) = (const EntityState) {
-        0
-    };
+    (*i) = calloc(1,sizeof(EntityState));
     ((lmcp_object*)(*i)) -> type = 14;
 }
 int lmcp_unpack_EntityState(uint8_t** inb, size_t *size_remain, EntityState* outp) {
@@ -203,10 +200,6 @@ int lmcp_unpack_EntityState(uint8_t** inb, size_t *size_remain, EntityState* out
     EntityState* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ID)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->u)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->v)))
@@ -222,6 +215,10 @@ int lmcp_unpack_EntityState(uint8_t** inb, size_t *size_remain, EntityState* out
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->r)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Course)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Groundspeed)))
+    uint8_t isnull;
+    uint32_t objtype;
+    uint16_t objseries;
+    char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Location = NULL;
@@ -242,6 +239,10 @@ int lmcp_unpack_EntityState(uint8_t** inb, size_t *size_remain, EntityState* out
     }
     out->PayloadStateList_ai.length = tmp;
     for (uint32_t index = 0; index < out->PayloadStateList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->PayloadStateList[index] = NULL;
@@ -275,6 +276,10 @@ int lmcp_unpack_EntityState(uint8_t** inb, size_t *size_remain, EntityState* out
     }
     out->Info_ai.length = tmp;
     for (uint32_t index = 0; index < out->Info_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Info[index] = NULL;

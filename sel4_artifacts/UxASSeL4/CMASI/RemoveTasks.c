@@ -50,10 +50,7 @@ void lmcp_free_RemoveTasks(RemoveTasks* out, int out_malloced) {
 }
 void lmcp_init_RemoveTasks (RemoveTasks** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(RemoveTasks));
-    *(*i) = (const RemoveTasks) {
-        0
-    };
+    (*i) = calloc(1,sizeof(RemoveTasks));
     ((lmcp_object*)(*i)) -> type = 44;
 }
 int lmcp_unpack_RemoveTasks(uint8_t** inb, size_t *size_remain, RemoveTasks* outp) {
@@ -66,10 +63,6 @@ int lmcp_unpack_RemoveTasks(uint8_t** inb, size_t *size_remain, RemoveTasks* out
     RemoveTasks* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->TaskList = malloc(sizeof(int64_t*) * tmp);

@@ -135,10 +135,7 @@ void lmcp_free_EntityConfiguration(EntityConfiguration* out, int out_malloced) {
 }
 void lmcp_init_EntityConfiguration (EntityConfiguration** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(EntityConfiguration));
-    *(*i) = (const EntityConfiguration) {
-        0
-    };
+    (*i) = calloc(1,sizeof(EntityConfiguration));
     ((lmcp_object*)(*i)) -> type = 11;
 }
 int lmcp_unpack_EntityConfiguration(uint8_t** inb, size_t *size_remain, EntityConfiguration* outp) {
@@ -151,10 +148,6 @@ int lmcp_unpack_EntityConfiguration(uint8_t** inb, size_t *size_remain, EntityCo
     EntityConfiguration* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ID)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
@@ -197,6 +190,10 @@ int lmcp_unpack_EntityConfiguration(uint8_t** inb, size_t *size_remain, EntityCo
     }
     out->PayloadConfigurationList_ai.length = tmp;
     for (uint32_t index = 0; index < out->PayloadConfigurationList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->PayloadConfigurationList[index] = NULL;
@@ -216,6 +213,10 @@ int lmcp_unpack_EntityConfiguration(uint8_t** inb, size_t *size_remain, EntityCo
     }
     out->Info_ai.length = tmp;
     for (uint32_t index = 0; index < out->Info_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Info[index] = NULL;

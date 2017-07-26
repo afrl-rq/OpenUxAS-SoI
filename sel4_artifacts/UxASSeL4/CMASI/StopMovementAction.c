@@ -53,10 +53,7 @@ void lmcp_free_StopMovementAction(StopMovementAction* out, int out_malloced) {
 }
 void lmcp_init_StopMovementAction (StopMovementAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(StopMovementAction));
-    *(*i) = (const StopMovementAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(StopMovementAction));
     ((lmcp_object*)(*i)) -> type = 58;
 }
 int lmcp_unpack_StopMovementAction(uint8_t** inb, size_t *size_remain, StopMovementAction* outp) {
@@ -67,13 +64,11 @@ int lmcp_unpack_StopMovementAction(uint8_t** inb, size_t *size_remain, StopMovem
         return -1;
     }
     StopMovementAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
+    CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Location = NULL;

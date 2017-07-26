@@ -118,10 +118,7 @@ void lmcp_free_GimbalConfiguration(GimbalConfiguration* out, int out_malloced) {
 }
 void lmcp_init_GimbalConfiguration (GimbalConfiguration** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GimbalConfiguration));
-    *(*i) = (const GimbalConfiguration) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GimbalConfiguration));
     ((lmcp_object*)(*i)) -> type = 24;
 }
 int lmcp_unpack_GimbalConfiguration(uint8_t** inb, size_t *size_remain, GimbalConfiguration* outp) {
@@ -134,10 +131,6 @@ int lmcp_unpack_GimbalConfiguration(uint8_t** inb, size_t *size_remain, GimbalCo
     GimbalConfiguration* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadConfiguration(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;

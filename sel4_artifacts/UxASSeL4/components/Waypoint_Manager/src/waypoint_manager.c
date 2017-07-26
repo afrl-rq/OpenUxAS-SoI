@@ -21,9 +21,6 @@ static bool sendUartPacket = false;
 static lmcp_object * mc = NULL;
 static MissionCommandExt swin;
 
-static lmcp_object * avs = NULL;
-
-
 uint32_t Checksum(const uint8_t * p, const size_t len)
 {
   uint32_t sum = 0;
@@ -44,22 +41,14 @@ static void send_swin() {
   static size_t pkts = 0;
   static size_t remaining = 0;
   static uint8_t * msgbuf = NULL;
-  static uint8_t * tmsgbuf = NULL;
 
   SMACCM_DATA__UART_Packet_i packet;
-  MissionCommand * tmc = NULL;
   if(missionSendState && sendUartPacket){
     if(i == 0){
       size_t msgsz = lmcp_msgsize((lmcp_object*)&swin)+4;
       DEBUG("Initiate waypoint window transimission of %u bytes.\n",msgsz);
       msgbuf = calloc(1,msgsz);
-      DEBUG("Vehicle ID = %lu\n",swin.MissionCommand.super.VehicleID);
-      lmcp_make_msg(msgbuf,&swin);
-      tmsgbuf = msgbuf;
-      lmcp_process_msg(&tmsgbuf,msgsz,&tmc);
-      // There is some problem here causing vehicle id's to be different.
-      //lmcp_pp(tmc);
-      DEBUG("SWIN ADDY: %x\n",&swin);
+      lmcp_make_msg(msgbuf,(lmcp_object*)&swin);
       uint32_t chksum = Checksum(msgbuf,msgsz-4);
       *((uint32_t *)(msgbuf + msgsz)) = chksum;
       pkts = msgsz/UART_PACKET_SZ;
@@ -96,16 +85,13 @@ void component_entry(const int64_t * periodic_dispatcher) {
 
 void component_init(const int64_t *arg) {
   DEBUG("Starting Waypoint_Manager.\n");
-  lmcp_init_MissionCommand(&mc);
   MCEInit(&swin,MAX_AP_WAYPOINTS);
 }
 
 void mission_write(const bool * _UNUSED) {
 
-  uint32_t msgsz = 0;
-  size_t s = 4;
   uint8_t * tmp_mission = (uint8_t*)mission;
-  MissionCommand * local_mc = (lmcp_object *)mc;
+  MissionCommand * local_mc = NULL;
   
   DEBUG(" Entry.\n");
   if(mc != NULL) {
@@ -114,10 +100,14 @@ void mission_write(const bool * _UNUSED) {
   }
 
   assert(lmcp_process_msg((uint8_t **)&tmp_mission,sizeof(*mission),&mc) != -1);
+  local_mc = (MissionCommand *)mc;
   assert(MCWaypointSubSequence(local_mc,
                                local_mc->FirstWaypoint,
                                MAX_AP_WAYPOINTS,
                                &swin) == true);
+  DEBUG("New waypoints:\n");
+  lmcp_pp((lmcp_object*)&swin);
+  
   
   missionSendState = true;
   sendUartPacket = true;
@@ -125,37 +115,116 @@ void mission_write(const bool * _UNUSED) {
   return;
 }
 
+
+void hexDump (char *desc, void *addr, int len) {
+    int i;
+    unsigned char buff[17];
+    unsigned char *pc = (unsigned char*)addr;
+
+    // Output description if given.
+    if (desc != NULL)
+        printf ("%s:\n", desc);
+
+    if (len == 0) {
+        printf("  ZERO LENGTH\n");
+        return;
+    }
+    if (len < 0) {
+        printf("  NEGATIVE LENGTH: %i\n",len);
+        return;
+    }
+
+    // Process every byte in the data.
+    for (i = 0; i < len; i++) {
+        // Multiple of 16 means new line (with line offset).
+
+        if ((i % 16) == 0) {
+            // Just don't print ASCII for the zeroth line.
+            if (i != 0)
+                printf ("  %s\n", buff);
+
+            // Output the offset.
+            printf ("  %04x ", i);
+        }
+
+        // Now the hex code for the specific character.
+        printf (" %02x", pc[i]);
+
+        // And store a printable ASCII character for later.
+        if ((pc[i] < 0x20) || (pc[i] > 0x7e))
+            buff[i % 16] = '.';
+        else
+            buff[i % 16] = pc[i];
+        buff[(i % 16) + 1] = '\0';
+    }
+
+    // Pad out last line if not exactly 16 characters.
+    while ((i % 16) != 0) {
+        printf ("   ");
+        i++;
+    }
+
+    // And print the final ASCII bit.
+    printf ("  %s\n", buff);
+}
+
 void waypoint_write(const uint32_t * size) {
 
-  uint32_t msgsz = 0;
-  size_t s = 4;
   uint8_t * tmp_waypoint = (uint8_t*)waypoint;
   bool _UNUSEDB;
   lmcp_object * lmcp;
-  printf("got waypoint of size %d \n", *size);
+  int i;
+  uint64_t waypointNum;
+  uint32_t type;
+  uint64_t id;
+  Waypoint * wp = NULL;
+
+  hexDump("waypoint_write recv",(uint8_t*)waypoint,*size);
   
-  lmcp_process_msg(&tmp_waypoint, *size, (lmcp_object **)&lmcp); 
-  lmcp_pp((lmcp_object *)lmcp);
+  memcpy(&type, ((uint8_t *)waypoint) + 17, sizeof(uint32_t));
+  type = __builtin_bswap32(type);
 
-  lmcp_free(lmcp);
+  if(type == 15){
 
-  if(mc != NULL) {
-    lmcp_free(avs);
-    avs = NULL;
+    memcpy(&id, ((uint8_t *)waypoint) + 23, sizeof(uint64_t));
+    id = __builtin_bswap64(id);
+
+    DEBUG("id: %" PRId64 "\n", id);
+
+    memcpy(&waypointNum, ((uint8_t *)waypoint) + 423, sizeof(uint64_t));
+    waypointNum = __builtin_bswap64(waypointNum);
+    DEBUG("waypoint: %" PRId64 "\n", waypointNum);
+
+    if(id == 400 && mc != NULL) {
+      MissionCommand * local_mc = (MissionCommand *)mc;
+      DEBUG("here.\n");
+      if(waypoint<=0 || FindWP(local_mc,waypointNum,&wp) != true || FindWP((MissionCommand*)&swin,waypointNum,&wp) != true) {
+        DEBUG("Got %li waypoint, resend waypoints:\n",waypoint);
+        lmcp_pp((lmcp_object*)&swin);
+        missionSendState = true;
+        sendUartPacket = true;        
+      }
+      else if(GetMCWaypointSubSequence(local_mc,
+                                  swin.MissionCommand.FirstWaypoint,
+                                  waypointNum,
+                                  MAX_AP_WAYPOINTS,
+                                  &swin)) {
+        DEBUG("Update waypoints:\n");
+        lmcp_pp((lmcp_object*)&swin);
+        
+        missionSendState = true;
+        sendUartPacket = true;
+      } else {
+        DEBUG("Waypoint update not necessary yet.\n");
+      }
+    }
   }
-  
-  assert(lmcp_process_msg((uint8_t **)&tmp_waypoint,sizeof(*waypoint),&avs) != -1);
 
-
-  if(((lmcp_object *)avs)->type == LMCP_MissionCommand_TYPE ) {
-    lmcp_pp(avs);
-  }
-    
-  // TODO: Process the VehicleActionCommand and get the assets target
-  // waypoint. Use that waypoint in a call to
-  // GetMCWaypointSubSequence.
   waypoint_read(&_UNUSEDB);
   return;
+    
+
+
 }
 
 

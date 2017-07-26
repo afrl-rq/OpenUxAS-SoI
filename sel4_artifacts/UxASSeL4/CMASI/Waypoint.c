@@ -108,10 +108,7 @@ void lmcp_free_Waypoint(Waypoint* out, int out_malloced) {
 }
 void lmcp_init_Waypoint (Waypoint** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(Waypoint));
-    *(*i) = (const Waypoint) {
-        0
-    };
+    (*i) = calloc(1,sizeof(Waypoint));
     ((lmcp_object*)(*i)) -> type = 35;
 }
 int lmcp_unpack_Waypoint(uint8_t** inb, size_t *size_remain, Waypoint* outp) {
@@ -124,10 +121,6 @@ int lmcp_unpack_Waypoint(uint8_t** inb, size_t *size_remain, Waypoint* outp) {
     Waypoint* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_Location3D(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->Number)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->NextWaypoint)))
@@ -143,6 +136,10 @@ int lmcp_unpack_Waypoint(uint8_t** inb, size_t *size_remain, Waypoint* outp) {
     }
     out->VehicleActionList_ai.length = tmp;
     for (uint32_t index = 0; index < out->VehicleActionList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->VehicleActionList[index] = NULL;

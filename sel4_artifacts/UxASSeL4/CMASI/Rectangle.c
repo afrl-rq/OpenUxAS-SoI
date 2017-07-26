@@ -65,10 +65,7 @@ void lmcp_free_Rectangle(Rectangle* out, int out_malloced) {
 }
 void lmcp_init_Rectangle (Rectangle** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(Rectangle));
-    *(*i) = (const Rectangle) {
-        0
-    };
+    (*i) = calloc(1,sizeof(Rectangle));
     ((lmcp_object*)(*i)) -> type = 43;
 }
 int lmcp_unpack_Rectangle(uint8_t** inb, size_t *size_remain, Rectangle* outp) {
@@ -79,13 +76,11 @@ int lmcp_unpack_Rectangle(uint8_t** inb, size_t *size_remain, Rectangle* outp) {
         return -1;
     }
     Rectangle* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
+    CHECK(lmcp_unpack_AbstractGeometry(inb, size_remain, &(out->super)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_AbstractGeometry(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->CenterPoint = NULL;

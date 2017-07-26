@@ -64,10 +64,7 @@ void lmcp_free_KeyValuePair(KeyValuePair* out, int out_malloced) {
 }
 void lmcp_init_KeyValuePair (KeyValuePair** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(KeyValuePair));
-    *(*i) = (const KeyValuePair) {
-        0
-    };
+    (*i) = calloc(1,sizeof(KeyValuePair));
     ((lmcp_object*)(*i)) -> type = 2;
 }
 int lmcp_unpack_KeyValuePair(uint8_t** inb, size_t *size_remain, KeyValuePair* outp) {
@@ -80,10 +77,6 @@ int lmcp_unpack_KeyValuePair(uint8_t** inb, size_t *size_remain, KeyValuePair* o
     KeyValuePair* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->Key = malloc(sizeof(char*) * tmp);

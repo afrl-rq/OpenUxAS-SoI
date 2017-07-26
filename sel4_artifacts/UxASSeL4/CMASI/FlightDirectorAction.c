@@ -66,10 +66,7 @@ void lmcp_free_FlightDirectorAction(FlightDirectorAction* out, int out_malloced)
 }
 void lmcp_init_FlightDirectorAction (FlightDirectorAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(FlightDirectorAction));
-    *(*i) = (const FlightDirectorAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(FlightDirectorAction));
     ((lmcp_object*)(*i)) -> type = 54;
 }
 int lmcp_unpack_FlightDirectorAction(uint8_t** inb, size_t *size_remain, FlightDirectorAction* outp) {
@@ -80,12 +77,6 @@ int lmcp_unpack_FlightDirectorAction(uint8_t** inb, size_t *size_remain, FlightD
         return -1;
     }
     FlightDirectorAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_NavigationAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Speed)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->SpeedType)))

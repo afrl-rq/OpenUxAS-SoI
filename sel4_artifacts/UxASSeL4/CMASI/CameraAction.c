@@ -65,10 +65,7 @@ void lmcp_free_CameraAction(CameraAction* out, int out_malloced) {
 }
 void lmcp_init_CameraAction (CameraAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(CameraAction));
-    *(*i) = (const CameraAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(CameraAction));
     ((lmcp_object*)(*i)) -> type = 18;
 }
 int lmcp_unpack_CameraAction(uint8_t** inb, size_t *size_remain, CameraAction* outp) {
@@ -81,10 +78,6 @@ int lmcp_unpack_CameraAction(uint8_t** inb, size_t *size_remain, CameraAction* o
     CameraAction* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->HorizontalFieldOfView)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
@@ -95,6 +88,10 @@ int lmcp_unpack_CameraAction(uint8_t** inb, size_t *size_remain, CameraAction* o
     }
     out->AssociatedActions_ai.length = tmp;
     for (uint32_t index = 0; index < out->AssociatedActions_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->AssociatedActions[index] = NULL;

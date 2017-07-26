@@ -41,10 +41,7 @@ void lmcp_free_KeepInZone(KeepInZone* out, int out_malloced) {
 }
 void lmcp_init_KeepInZone (KeepInZone** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(KeepInZone));
-    *(*i) = (const KeepInZone) {
-        0
-    };
+    (*i) = calloc(1,sizeof(KeepInZone));
     ((lmcp_object*)(*i)) -> type = 29;
 }
 int lmcp_unpack_KeepInZone(uint8_t** inb, size_t *size_remain, KeepInZone* outp) {
@@ -55,12 +52,6 @@ int lmcp_unpack_KeepInZone(uint8_t** inb, size_t *size_remain, KeepInZone* outp)
         return -1;
     }
     KeepInZone* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_AbstractZone(inb, size_remain, &(out->super)))
     return 0;
 }

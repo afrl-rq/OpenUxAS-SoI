@@ -68,10 +68,7 @@ void lmcp_free_OperatingRegion(OperatingRegion* out, int out_malloced) {
 }
 void lmcp_init_OperatingRegion (OperatingRegion** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(OperatingRegion));
-    *(*i) = (const OperatingRegion) {
-        0
-    };
+    (*i) = calloc(1,sizeof(OperatingRegion));
     ((lmcp_object*)(*i)) -> type = 39;
 }
 int lmcp_unpack_OperatingRegion(uint8_t** inb, size_t *size_remain, OperatingRegion* outp) {
@@ -84,10 +81,6 @@ int lmcp_unpack_OperatingRegion(uint8_t** inb, size_t *size_remain, OperatingReg
     OperatingRegion* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ID)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;

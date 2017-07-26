@@ -57,10 +57,7 @@ void lmcp_free_MustFlyTask(MustFlyTask* out, int out_malloced) {
 }
 void lmcp_init_MustFlyTask (MustFlyTask** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(MustFlyTask));
-    *(*i) = (const MustFlyTask) {
-        0
-    };
+    (*i) = calloc(1,sizeof(MustFlyTask));
     ((lmcp_object*)(*i)) -> type = 37;
 }
 int lmcp_unpack_MustFlyTask(uint8_t** inb, size_t *size_remain, MustFlyTask* outp) {
@@ -71,13 +68,11 @@ int lmcp_unpack_MustFlyTask(uint8_t** inb, size_t *size_remain, MustFlyTask* out
         return -1;
     }
     MustFlyTask* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
+    CHECK(lmcp_unpack_Task(inb, size_remain, &(out->super)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_Task(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Position = NULL;

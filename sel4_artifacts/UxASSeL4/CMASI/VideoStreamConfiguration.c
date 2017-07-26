@@ -55,10 +55,7 @@ void lmcp_free_VideoStreamConfiguration(VideoStreamConfiguration* out, int out_m
 }
 void lmcp_init_VideoStreamConfiguration (VideoStreamConfiguration** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(VideoStreamConfiguration));
-    *(*i) = (const VideoStreamConfiguration) {
-        0
-    };
+    (*i) = calloc(1,sizeof(VideoStreamConfiguration));
     ((lmcp_object*)(*i)) -> type = 49;
 }
 int lmcp_unpack_VideoStreamConfiguration(uint8_t** inb, size_t *size_remain, VideoStreamConfiguration* outp) {
@@ -71,10 +68,6 @@ int lmcp_unpack_VideoStreamConfiguration(uint8_t** inb, size_t *size_remain, Vid
     VideoStreamConfiguration* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadConfiguration(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;

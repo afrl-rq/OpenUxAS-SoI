@@ -65,10 +65,7 @@ void lmcp_free_WaypointTransfer(WaypointTransfer* out, int out_malloced) {
 }
 void lmcp_init_WaypointTransfer (WaypointTransfer** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(WaypointTransfer));
-    *(*i) = (const WaypointTransfer) {
-        0
-    };
+    (*i) = calloc(1,sizeof(WaypointTransfer));
     ((lmcp_object*)(*i)) -> type = 59;
 }
 int lmcp_unpack_WaypointTransfer(uint8_t** inb, size_t *size_remain, WaypointTransfer* outp) {
@@ -81,10 +78,6 @@ int lmcp_unpack_WaypointTransfer(uint8_t** inb, size_t *size_remain, WaypointTra
     WaypointTransfer* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->EntityID)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
@@ -94,6 +87,10 @@ int lmcp_unpack_WaypointTransfer(uint8_t** inb, size_t *size_remain, WaypointTra
     }
     out->Waypoints_ai.length = tmp;
     for (uint32_t index = 0; index < out->Waypoints_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Waypoints[index] = NULL;

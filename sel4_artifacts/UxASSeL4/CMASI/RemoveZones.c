@@ -50,10 +50,7 @@ void lmcp_free_RemoveZones(RemoveZones* out, int out_malloced) {
 }
 void lmcp_init_RemoveZones (RemoveZones** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(RemoveZones));
-    *(*i) = (const RemoveZones) {
-        0
-    };
+    (*i) = calloc(1,sizeof(RemoveZones));
     ((lmcp_object*)(*i)) -> type = 52;
 }
 int lmcp_unpack_RemoveZones(uint8_t** inb, size_t *size_remain, RemoveZones* outp) {
@@ -66,10 +63,6 @@ int lmcp_unpack_RemoveZones(uint8_t** inb, size_t *size_remain, RemoveZones* out
     RemoveZones* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->ZoneList = malloc(sizeof(int64_t*) * tmp);

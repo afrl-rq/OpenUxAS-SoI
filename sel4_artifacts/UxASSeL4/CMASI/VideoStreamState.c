@@ -45,10 +45,7 @@ void lmcp_free_VideoStreamState(VideoStreamState* out, int out_malloced) {
 }
 void lmcp_init_VideoStreamState (VideoStreamState** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(VideoStreamState));
-    *(*i) = (const VideoStreamState) {
-        0
-    };
+    (*i) = calloc(1,sizeof(VideoStreamState));
     ((lmcp_object*)(*i)) -> type = 50;
 }
 int lmcp_unpack_VideoStreamState(uint8_t** inb, size_t *size_remain, VideoStreamState* outp) {
@@ -59,12 +56,6 @@ int lmcp_unpack_VideoStreamState(uint8_t** inb, size_t *size_remain, VideoStream
         return -1;
     }
     VideoStreamState* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadState(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ActiveSensor)))
     return 0;

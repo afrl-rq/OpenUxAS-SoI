@@ -74,10 +74,7 @@ void lmcp_free_PayloadConfiguration(PayloadConfiguration* out, int out_malloced)
 }
 void lmcp_init_PayloadConfiguration (PayloadConfiguration** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(PayloadConfiguration));
-    *(*i) = (const PayloadConfiguration) {
-        0
-    };
+    (*i) = calloc(1,sizeof(PayloadConfiguration));
     ((lmcp_object*)(*i)) -> type = 5;
 }
 int lmcp_unpack_PayloadConfiguration(uint8_t** inb, size_t *size_remain, PayloadConfiguration* outp) {
@@ -90,10 +87,6 @@ int lmcp_unpack_PayloadConfiguration(uint8_t** inb, size_t *size_remain, Payload
     PayloadConfiguration* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->PayloadID)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
@@ -113,6 +106,10 @@ int lmcp_unpack_PayloadConfiguration(uint8_t** inb, size_t *size_remain, Payload
     }
     out->Parameters_ai.length = tmp;
     for (uint32_t index = 0; index < out->Parameters_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Parameters[index] = NULL;

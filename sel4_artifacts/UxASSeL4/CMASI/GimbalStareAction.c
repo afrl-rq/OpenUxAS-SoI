@@ -57,10 +57,7 @@ void lmcp_free_GimbalStareAction(GimbalStareAction* out, int out_malloced) {
 }
 void lmcp_init_GimbalStareAction (GimbalStareAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GimbalStareAction));
-    *(*i) = (const GimbalStareAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GimbalStareAction));
     ((lmcp_object*)(*i)) -> type = 26;
 }
 int lmcp_unpack_GimbalStareAction(uint8_t** inb, size_t *size_remain, GimbalStareAction* outp) {
@@ -71,13 +68,11 @@ int lmcp_unpack_GimbalStareAction(uint8_t** inb, size_t *size_remain, GimbalStar
         return -1;
     }
     GimbalStareAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
+    CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Starepoint = NULL;

@@ -86,10 +86,7 @@ void lmcp_free_AutomationRequest(AutomationRequest* out, int out_malloced) {
 }
 void lmcp_init_AutomationRequest (AutomationRequest** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(AutomationRequest));
-    *(*i) = (const AutomationRequest) {
-        0
-    };
+    (*i) = calloc(1,sizeof(AutomationRequest));
     ((lmcp_object*)(*i)) -> type = 40;
 }
 int lmcp_unpack_AutomationRequest(uint8_t** inb, size_t *size_remain, AutomationRequest* outp) {
@@ -102,10 +99,6 @@ int lmcp_unpack_AutomationRequest(uint8_t** inb, size_t *size_remain, Automation
     AutomationRequest* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->EntityList = malloc(sizeof(int64_t*) * tmp);

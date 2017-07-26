@@ -58,10 +58,7 @@ void lmcp_free_GimballedPayloadState(GimballedPayloadState* out, int out_malloce
 }
 void lmcp_init_GimballedPayloadState (GimballedPayloadState** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GimballedPayloadState));
-    *(*i) = (const GimballedPayloadState) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GimballedPayloadState));
     ((lmcp_object*)(*i)) -> type = 20;
 }
 int lmcp_unpack_GimballedPayloadState(uint8_t** inb, size_t *size_remain, GimballedPayloadState* outp) {
@@ -72,12 +69,6 @@ int lmcp_unpack_GimballedPayloadState(uint8_t** inb, size_t *size_remain, Gimbal
         return -1;
     }
     GimballedPayloadState* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadState(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->PointingMode)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Azimuth)))

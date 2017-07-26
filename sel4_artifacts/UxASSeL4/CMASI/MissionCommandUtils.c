@@ -84,7 +84,7 @@ bool MCWaypointSubSequence(const MissionCommand * omcp,
   assert(wmcp != NULL);
 
   /* Ensure that a bad id was not provided. */
-  if(FindWP(omcp, id, &wp) != true) {
+  if(FindWP(omcp, idit, &wp) != true) {
     DEBUG("Waypoint %ld not found.\n",id);
     return false;
   }
@@ -146,6 +146,10 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
   Waypoint * wp;
   int64_t it_id = last_prefix_start_id;
 
+  DEBUG("last id = %li.\n",it_id);
+  DEBUG("pilot id = %li.\n",ap_id);
+
+  
   /* assumption: omcp is not NULL. */
   assert(omcp != NULL);
 
@@ -153,7 +157,7 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
   assert(wmcep != NULL);
 
   /* Ensure that a bad last_prefix_start_id was not provided. */
-  if(FindWP(omcp, last_prefix_start_id, &wp) != true) {
+  if(FindWP(omcp, it_id, &wp) != true) {
     return false;
   }
 
@@ -194,8 +198,8 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
       return false;
     }
 
-    
     if( wp->Number == ap_id ) {
+      DEBUG("Here.");
       return MCWaypointSubSequence(omcp, ap_id, len, wmcep);
     }
 
@@ -205,6 +209,7 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
   /* Handle the special case where the auto-pilot waypoint length is
      1. */
   if( len == 1 ) {
+    DEBUG("Here.");
     return MCWaypointSubSequence(omcp, ap_id, len, wmcep);
   }
 
@@ -240,6 +245,8 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
 void MissionCommandFromFile(FILE * f, MissionCommand ** mcpp) {
 
     uint8_t * source = NULL;
+    uint8_t * orig_source = NULL;
+
     size_t size = 0;
 
     /* assumption: mcpp is not NULL. */
@@ -256,7 +263,7 @@ void MissionCommandFromFile(FILE * f, MissionCommand ** mcpp) {
 
         /* Allocate our buffer to that size. */
         source = malloc(sizeof(char) * (size + 1));
-
+        orig_source = source;
         /* Go back to the start of the file. */
         if (fseek(f, 0L, SEEK_SET) != 0) {
             /* Error */
@@ -271,8 +278,10 @@ void MissionCommandFromFile(FILE * f, MissionCommand ** mcpp) {
         }
 
         assert(lmcp_process_msg(&source,size,(lmcp_object**)mcpp) != -1);
-        free(source);
+        lmcp_pp(*mcpp);
+        free(orig_source);
         source = NULL;
+        orig_source = NULL;
     }
 
 

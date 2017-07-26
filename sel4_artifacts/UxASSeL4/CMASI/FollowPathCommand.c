@@ -78,10 +78,7 @@ void lmcp_free_FollowPathCommand(FollowPathCommand* out, int out_malloced) {
 }
 void lmcp_init_FollowPathCommand (FollowPathCommand** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(FollowPathCommand));
-    *(*i) = (const FollowPathCommand) {
-        0
-    };
+    (*i) = calloc(1,sizeof(FollowPathCommand));
     ((lmcp_object*)(*i)) -> type = 56;
 }
 int lmcp_unpack_FollowPathCommand(uint8_t** inb, size_t *size_remain, FollowPathCommand* outp) {
@@ -94,10 +91,6 @@ int lmcp_unpack_FollowPathCommand(uint8_t** inb, size_t *size_remain, FollowPath
     FollowPathCommand* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_VehicleActionCommand(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->FirstWaypoint)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
@@ -108,6 +101,10 @@ int lmcp_unpack_FollowPathCommand(uint8_t** inb, size_t *size_remain, FollowPath
     }
     out->WaypointList_ai.length = tmp;
     for (uint32_t index = 0; index < out->WaypointList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->WaypointList[index] = NULL;

@@ -64,10 +64,7 @@ void lmcp_free_SearchTask(SearchTask* out, int out_malloced) {
 }
 void lmcp_init_SearchTask (SearchTask** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(SearchTask));
-    *(*i) = (const SearchTask) {
-        0
-    };
+    (*i) = calloc(1,sizeof(SearchTask));
     ((lmcp_object*)(*i)) -> type = 9;
 }
 int lmcp_unpack_SearchTask(uint8_t** inb, size_t *size_remain, SearchTask* outp) {
@@ -80,10 +77,6 @@ int lmcp_unpack_SearchTask(uint8_t** inb, size_t *size_remain, SearchTask* outp)
     SearchTask* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_Task(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;

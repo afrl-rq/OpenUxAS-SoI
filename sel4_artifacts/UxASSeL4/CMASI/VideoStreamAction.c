@@ -49,10 +49,7 @@ void lmcp_free_VideoStreamAction(VideoStreamAction* out, int out_malloced) {
 }
 void lmcp_init_VideoStreamAction (VideoStreamAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(VideoStreamAction));
-    *(*i) = (const VideoStreamAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(VideoStreamAction));
     ((lmcp_object*)(*i)) -> type = 48;
 }
 int lmcp_unpack_VideoStreamAction(uint8_t** inb, size_t *size_remain, VideoStreamAction* outp) {
@@ -63,12 +60,6 @@ int lmcp_unpack_VideoStreamAction(uint8_t** inb, size_t *size_remain, VideoStrea
         return -1;
     }
     VideoStreamAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, &(out->VideoStreamID)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, &(out->ActiveSensor)))

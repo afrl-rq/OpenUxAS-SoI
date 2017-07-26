@@ -36,10 +36,7 @@ void lmcp_free_AbstractGeometry(AbstractGeometry* out, int out_malloced) {
 }
 void lmcp_init_AbstractGeometry (AbstractGeometry** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(AbstractGeometry));
-    *(*i) = (const AbstractGeometry) {
-        0
-    };
+    (*i) = calloc(1,sizeof(AbstractGeometry));
     ((lmcp_object*)(*i)) -> type = 1;
 }
 int lmcp_unpack_AbstractGeometry(uint8_t** inb, size_t *size_remain, AbstractGeometry* outp) {
@@ -50,12 +47,6 @@ int lmcp_unpack_AbstractGeometry(uint8_t** inb, size_t *size_remain, AbstractGeo
         return -1;
     }
     AbstractGeometry* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     return 0;
 }
 size_t lmcp_pack_AbstractGeometry(uint8_t* buf, AbstractGeometry* i) {

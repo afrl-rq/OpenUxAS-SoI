@@ -57,10 +57,7 @@ void lmcp_free_Circle(Circle* out, int out_malloced) {
 }
 void lmcp_init_Circle (Circle** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(Circle));
-    *(*i) = (const Circle) {
-        0
-    };
+    (*i) = calloc(1,sizeof(Circle));
     ((lmcp_object*)(*i)) -> type = 22;
 }
 int lmcp_unpack_Circle(uint8_t** inb, size_t *size_remain, Circle* outp) {
@@ -71,13 +68,11 @@ int lmcp_unpack_Circle(uint8_t** inb, size_t *size_remain, Circle* outp) {
         return -1;
     }
     Circle* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
+    CHECK(lmcp_unpack_AbstractGeometry(inb, size_remain, &(out->super)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_AbstractGeometry(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->CenterPoint = NULL;

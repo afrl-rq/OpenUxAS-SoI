@@ -53,10 +53,7 @@ void lmcp_free_LoiterTask(LoiterTask* out, int out_malloced) {
 }
 void lmcp_init_LoiterTask (LoiterTask** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(LoiterTask));
-    *(*i) = (const LoiterTask) {
-        0
-    };
+    (*i) = calloc(1,sizeof(LoiterTask));
     ((lmcp_object*)(*i)) -> type = 34;
 }
 int lmcp_unpack_LoiterTask(uint8_t** inb, size_t *size_remain, LoiterTask* outp) {
@@ -67,13 +64,11 @@ int lmcp_unpack_LoiterTask(uint8_t** inb, size_t *size_remain, LoiterTask* outp)
         return -1;
     }
     LoiterTask* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
+    CHECK(lmcp_unpack_Task(inb, size_remain, &(out->super)))
     uint8_t isnull;
     uint32_t objtype;
     uint16_t objseries;
     char seriesname[8];
-    CHECK(lmcp_unpack_Task(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->DesiredAction = NULL;

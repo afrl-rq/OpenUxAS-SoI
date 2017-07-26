@@ -73,10 +73,7 @@ void lmcp_free_SessionStatus(SessionStatus* out, int out_malloced) {
 }
 void lmcp_init_SessionStatus (SessionStatus** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(SessionStatus));
-    *(*i) = (const SessionStatus) {
-        0
-    };
+    (*i) = calloc(1,sizeof(SessionStatus));
     ((lmcp_object*)(*i)) -> type = 46;
 }
 int lmcp_unpack_SessionStatus(uint8_t** inb, size_t *size_remain, SessionStatus* outp) {
@@ -89,10 +86,6 @@ int lmcp_unpack_SessionStatus(uint8_t** inb, size_t *size_remain, SessionStatus*
     SessionStatus* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->State)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->StartTime)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ScenarioTime)))
@@ -105,6 +98,10 @@ int lmcp_unpack_SessionStatus(uint8_t** inb, size_t *size_remain, SessionStatus*
     }
     out->Parameters_ai.length = tmp;
     for (uint32_t index = 0; index < out->Parameters_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Parameters[index] = NULL;

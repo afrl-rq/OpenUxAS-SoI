@@ -65,10 +65,7 @@ void lmcp_free_ServiceStatus(ServiceStatus* out, int out_malloced) {
 }
 void lmcp_init_ServiceStatus (ServiceStatus** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(ServiceStatus));
-    *(*i) = (const ServiceStatus) {
-        0
-    };
+    (*i) = calloc(1,sizeof(ServiceStatus));
     ((lmcp_object*)(*i)) -> type = 45;
 }
 int lmcp_unpack_ServiceStatus(uint8_t** inb, size_t *size_remain, ServiceStatus* outp) {
@@ -81,10 +78,6 @@ int lmcp_unpack_ServiceStatus(uint8_t** inb, size_t *size_remain, ServiceStatus*
     ServiceStatus* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->PercentComplete)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
@@ -94,6 +87,10 @@ int lmcp_unpack_ServiceStatus(uint8_t** inb, size_t *size_remain, ServiceStatus*
     }
     out->Info_ai.length = tmp;
     for (uint32_t index = 0; index < out->Info_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Info[index] = NULL;

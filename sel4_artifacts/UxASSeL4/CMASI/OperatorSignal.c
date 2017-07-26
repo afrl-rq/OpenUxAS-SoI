@@ -56,10 +56,7 @@ void lmcp_free_OperatorSignal(OperatorSignal* out, int out_malloced) {
 }
 void lmcp_init_OperatorSignal (OperatorSignal** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(OperatorSignal));
-    *(*i) = (const OperatorSignal) {
-        0
-    };
+    (*i) = calloc(1,sizeof(OperatorSignal));
     ((lmcp_object*)(*i)) -> type = 38;
 }
 int lmcp_unpack_OperatorSignal(uint8_t** inb, size_t *size_remain, OperatorSignal* outp) {
@@ -72,10 +69,6 @@ int lmcp_unpack_OperatorSignal(uint8_t** inb, size_t *size_remain, OperatorSigna
     OperatorSignal* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->Signals = malloc(sizeof(KeyValuePair*) * tmp);
@@ -84,6 +77,10 @@ int lmcp_unpack_OperatorSignal(uint8_t** inb, size_t *size_remain, OperatorSigna
     }
     out->Signals_ai.length = tmp;
     for (uint32_t index = 0; index < out->Signals_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Signals[index] = NULL;

@@ -5,7 +5,12 @@
 #include "conv.h"
 // from beej
 
-#define CHECK(i) { if(i == -1) { return -1; } }
+#define LMCP_DEBUG(fmt,args...) \
+  printf("%s,%s,%i:"fmt,__FUNCTION__,__FILE__,__LINE__,##args)
+
+#define CHECK(i) { if(i == -1) { LMCP_DEBUG("Check failed!\n"); return -1; } }
+
+
 
 size_t lmcp_pack_uint16_t (uint8_t* buf, uint16_t in) ;
 

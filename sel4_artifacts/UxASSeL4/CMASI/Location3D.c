@@ -53,10 +53,7 @@ void lmcp_free_Location3D(Location3D* out, int out_malloced) {
 }
 void lmcp_init_Location3D (Location3D** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(Location3D));
-    *(*i) = (const Location3D) {
-        0
-    };
+    (*i) = calloc(1,sizeof(Location3D));
     ((lmcp_object*)(*i)) -> type = 3;
 }
 int lmcp_unpack_Location3D(uint8_t** inb, size_t *size_remain, Location3D* outp) {
@@ -67,12 +64,6 @@ int lmcp_unpack_Location3D(uint8_t** inb, size_t *size_remain, Location3D* outp)
         return -1;
     }
     Location3D* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_double(inb, size_remain, &(out->Latitude)))
     CHECK(lmcp_unpack_double(inb, size_remain, &(out->Longitude)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Altitude)))

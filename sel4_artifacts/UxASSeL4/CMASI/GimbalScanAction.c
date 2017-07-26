@@ -69,10 +69,7 @@ void lmcp_free_GimbalScanAction(GimbalScanAction* out, int out_malloced) {
 }
 void lmcp_init_GimbalScanAction (GimbalScanAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GimbalScanAction));
-    *(*i) = (const GimbalScanAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GimbalScanAction));
     ((lmcp_object*)(*i)) -> type = 25;
 }
 int lmcp_unpack_GimbalScanAction(uint8_t** inb, size_t *size_remain, GimbalScanAction* outp) {
@@ -83,12 +80,6 @@ int lmcp_unpack_GimbalScanAction(uint8_t** inb, size_t *size_remain, GimbalScanA
         return -1;
     }
     GimbalScanAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->AzimuthSlewRate)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->ElevationSlewRate)))

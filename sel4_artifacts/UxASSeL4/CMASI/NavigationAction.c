@@ -41,10 +41,7 @@ void lmcp_free_NavigationAction(NavigationAction* out, int out_malloced) {
 }
 void lmcp_init_NavigationAction (NavigationAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(NavigationAction));
-    *(*i) = (const NavigationAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(NavigationAction));
     ((lmcp_object*)(*i)) -> type = 32;
 }
 int lmcp_unpack_NavigationAction(uint8_t** inb, size_t *size_remain, NavigationAction* outp) {
@@ -55,12 +52,6 @@ int lmcp_unpack_NavigationAction(uint8_t** inb, size_t *size_remain, NavigationA
         return -1;
     }
     NavigationAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
     return 0;
 }

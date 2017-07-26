@@ -82,10 +82,7 @@ void lmcp_free_LoiterAction(LoiterAction* out, int out_malloced) {
 }
 void lmcp_init_LoiterAction (LoiterAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(LoiterAction));
-    *(*i) = (const LoiterAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(LoiterAction));
     ((lmcp_object*)(*i)) -> type = 33;
 }
 int lmcp_unpack_LoiterAction(uint8_t** inb, size_t *size_remain, LoiterAction* outp) {
@@ -96,12 +93,6 @@ int lmcp_unpack_LoiterAction(uint8_t** inb, size_t *size_remain, LoiterAction* o
         return -1;
     }
     LoiterAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_NavigationAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->LoiterType)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Radius)))
@@ -110,6 +101,10 @@ int lmcp_unpack_LoiterAction(uint8_t** inb, size_t *size_remain, LoiterAction* o
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->Direction)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->Duration)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Airspeed)))
+    uint8_t isnull;
+    uint32_t objtype;
+    uint16_t objseries;
+    char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Location = NULL;

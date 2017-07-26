@@ -81,10 +81,7 @@ void lmcp_free_CameraState(CameraState* out, int out_malloced) {
 }
 void lmcp_init_CameraState (CameraState** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(CameraState));
-    *(*i) = (const CameraState) {
-        0
-    };
+    (*i) = calloc(1,sizeof(CameraState));
     ((lmcp_object*)(*i)) -> type = 21;
 }
 int lmcp_unpack_CameraState(uint8_t** inb, size_t *size_remain, CameraState* outp) {
@@ -97,10 +94,6 @@ int lmcp_unpack_CameraState(uint8_t** inb, size_t *size_remain, CameraState* out
     CameraState* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_GimballedPayloadState(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->HorizontalFieldOfView)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->VerticalFieldOfView)))
@@ -112,6 +105,10 @@ int lmcp_unpack_CameraState(uint8_t** inb, size_t *size_remain, CameraState* out
     }
     out->Footprint_ai.length = tmp;
     for (uint32_t index = 0; index < out->Footprint_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->Footprint[index] = NULL;
@@ -123,6 +120,10 @@ int lmcp_unpack_CameraState(uint8_t** inb, size_t *size_remain, CameraState* out
             CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->Footprint[index])))
         }
     }
+    uint8_t isnull;
+    uint32_t objtype;
+    uint16_t objseries;
+    char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Centerpoint = NULL;

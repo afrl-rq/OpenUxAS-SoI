@@ -80,10 +80,7 @@ void lmcp_free_CameraConfiguration(CameraConfiguration* out, int out_malloced) {
 }
 void lmcp_init_CameraConfiguration (CameraConfiguration** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(CameraConfiguration));
-    *(*i) = (const CameraConfiguration) {
-        0
-    };
+    (*i) = calloc(1,sizeof(CameraConfiguration));
     ((lmcp_object*)(*i)) -> type = 19;
 }
 int lmcp_unpack_CameraConfiguration(uint8_t** inb, size_t *size_remain, CameraConfiguration* outp) {
@@ -96,10 +93,6 @@ int lmcp_unpack_CameraConfiguration(uint8_t** inb, size_t *size_remain, CameraCo
     CameraConfiguration* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadConfiguration(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->SupportedWavelengthBand)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->FieldOfViewMode)))

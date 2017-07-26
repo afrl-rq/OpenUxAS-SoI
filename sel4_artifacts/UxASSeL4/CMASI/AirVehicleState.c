@@ -57,10 +57,7 @@ void lmcp_free_AirVehicleState(AirVehicleState* out, int out_malloced) {
 }
 void lmcp_init_AirVehicleState (AirVehicleState** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(AirVehicleState));
-    *(*i) = (const AirVehicleState) {
-        0
-    };
+    (*i) = calloc(1,sizeof(AirVehicleState));
     ((lmcp_object*)(*i)) -> type = 15;
 }
 int lmcp_unpack_AirVehicleState(uint8_t** inb, size_t *size_remain, AirVehicleState* outp) {
@@ -71,12 +68,6 @@ int lmcp_unpack_AirVehicleState(uint8_t** inb, size_t *size_remain, AirVehicleSt
         return -1;
     }
     AirVehicleState* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_EntityState(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Airspeed)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->VerticalSpeed)))

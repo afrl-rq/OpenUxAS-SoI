@@ -52,10 +52,7 @@ void lmcp_free_Wedge(Wedge* out, int out_malloced) {
 }
 void lmcp_init_Wedge (Wedge** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(Wedge));
-    *(*i) = (const Wedge) {
-        0
-    };
+    (*i) = calloc(1,sizeof(Wedge));
     ((lmcp_object*)(*i)) -> type = 16;
 }
 int lmcp_unpack_Wedge(uint8_t** inb, size_t *size_remain, Wedge* outp) {
@@ -66,12 +63,6 @@ int lmcp_unpack_Wedge(uint8_t** inb, size_t *size_remain, Wedge* outp) {
         return -1;
     }
     Wedge* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->AzimuthCenterline)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->VerticalCenterline)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->AzimuthExtent)))

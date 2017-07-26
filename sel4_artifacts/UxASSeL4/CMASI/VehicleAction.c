@@ -50,10 +50,7 @@ void lmcp_free_VehicleAction(VehicleAction* out, int out_malloced) {
 }
 void lmcp_init_VehicleAction (VehicleAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(VehicleAction));
-    *(*i) = (const VehicleAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(VehicleAction));
     ((lmcp_object*)(*i)) -> type = 7;
 }
 int lmcp_unpack_VehicleAction(uint8_t** inb, size_t *size_remain, VehicleAction* outp) {
@@ -66,10 +63,6 @@ int lmcp_unpack_VehicleAction(uint8_t** inb, size_t *size_remain, VehicleAction*
     VehicleAction* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->AssociatedTaskList = malloc(sizeof(int64_t*) * tmp);

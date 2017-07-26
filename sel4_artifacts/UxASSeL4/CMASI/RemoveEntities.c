@@ -50,10 +50,7 @@ void lmcp_free_RemoveEntities(RemoveEntities* out, int out_malloced) {
 }
 void lmcp_init_RemoveEntities (RemoveEntities** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(RemoveEntities));
-    *(*i) = (const RemoveEntities) {
-        0
-    };
+    (*i) = calloc(1,sizeof(RemoveEntities));
     ((lmcp_object*)(*i)) -> type = 53;
 }
 int lmcp_unpack_RemoveEntities(uint8_t** inb, size_t *size_remain, RemoveEntities* outp) {
@@ -66,10 +63,6 @@ int lmcp_unpack_RemoveEntities(uint8_t** inb, size_t *size_remain, RemoveEntitie
     RemoveEntities* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
     (out)->EntityList = malloc(sizeof(int64_t*) * tmp);

@@ -109,10 +109,7 @@ void lmcp_free_AbstractZone(AbstractZone* out, int out_malloced) {
 }
 void lmcp_init_AbstractZone (AbstractZone** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(AbstractZone));
-    *(*i) = (const AbstractZone) {
-        0
-    };
+    (*i) = calloc(1,sizeof(AbstractZone));
     ((lmcp_object*)(*i)) -> type = 10;
 }
 int lmcp_unpack_AbstractZone(uint8_t** inb, size_t *size_remain, AbstractZone* outp) {
@@ -125,10 +122,6 @@ int lmcp_unpack_AbstractZone(uint8_t** inb, size_t *size_remain, AbstractZone* o
     AbstractZone* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ZoneID)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->MinAltitude)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->MinAltitudeType)))
@@ -157,6 +150,10 @@ int lmcp_unpack_AbstractZone(uint8_t** inb, size_t *size_remain, AbstractZone* o
     for (uint32_t index = 0; index < out->Label_ai.length; index++) {
         CHECK(lmcp_unpack_char(inb, size_remain, &out->Label[index]))
     }
+    uint8_t isnull;
+    uint32_t objtype;
+    uint16_t objseries;
+    char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
         out->Boundary = NULL;

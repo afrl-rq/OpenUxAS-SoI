@@ -45,10 +45,7 @@ void lmcp_free_PathWaypoint(PathWaypoint* out, int out_malloced) {
 }
 void lmcp_init_PathWaypoint (PathWaypoint** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(PathWaypoint));
-    *(*i) = (const PathWaypoint) {
-        0
-    };
+    (*i) = calloc(1,sizeof(PathWaypoint));
     ((lmcp_object*)(*i)) -> type = 57;
 }
 int lmcp_unpack_PathWaypoint(uint8_t** inb, size_t *size_remain, PathWaypoint* outp) {
@@ -59,12 +56,6 @@ int lmcp_unpack_PathWaypoint(uint8_t** inb, size_t *size_remain, PathWaypoint* o
         return -1;
     }
     PathWaypoint* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_Waypoint(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->PauseTime)))
     return 0;

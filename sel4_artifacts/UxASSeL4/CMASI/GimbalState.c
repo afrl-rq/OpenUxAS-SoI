@@ -58,10 +58,7 @@ void lmcp_free_GimbalState(GimbalState* out, int out_malloced) {
 }
 void lmcp_init_GimbalState (GimbalState** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GimbalState));
-    *(*i) = (const GimbalState) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GimbalState));
     ((lmcp_object*)(*i)) -> type = 27;
 }
 int lmcp_unpack_GimbalState(uint8_t** inb, size_t *size_remain, GimbalState* outp) {
@@ -72,12 +69,6 @@ int lmcp_unpack_GimbalState(uint8_t** inb, size_t *size_remain, GimbalState* out
         return -1;
     }
     GimbalState* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadState(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->PointingMode)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Azimuth)))

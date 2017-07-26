@@ -65,10 +65,7 @@ void lmcp_free_MissionCommand(MissionCommand* out, int out_malloced) {
 }
 void lmcp_init_MissionCommand (MissionCommand** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(MissionCommand));
-    *(*i) = (const MissionCommand) {
-        0
-    };
+    (*i) = calloc(1,sizeof(MissionCommand));
     ((lmcp_object*)(*i)) -> type = 36;
 }
 int lmcp_unpack_MissionCommand(uint8_t** inb, size_t *size_remain, MissionCommand* outp) {
@@ -81,10 +78,6 @@ int lmcp_unpack_MissionCommand(uint8_t** inb, size_t *size_remain, MissionComman
     MissionCommand* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_VehicleActionCommand(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
@@ -94,6 +87,10 @@ int lmcp_unpack_MissionCommand(uint8_t** inb, size_t *size_remain, MissionComman
     }
     out->WaypointList_ai.length = tmp;
     for (uint32_t index = 0; index < out->WaypointList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->WaypointList[index] = NULL;

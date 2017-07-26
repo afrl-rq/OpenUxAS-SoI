@@ -85,10 +85,7 @@ void lmcp_free_LineSearchTask(LineSearchTask* out, int out_malloced) {
 }
 void lmcp_init_LineSearchTask (LineSearchTask** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(LineSearchTask));
-    *(*i) = (const LineSearchTask) {
-        0
-    };
+    (*i) = calloc(1,sizeof(LineSearchTask));
     ((lmcp_object*)(*i)) -> type = 31;
 }
 int lmcp_unpack_LineSearchTask(uint8_t** inb, size_t *size_remain, LineSearchTask* outp) {
@@ -101,10 +98,6 @@ int lmcp_unpack_LineSearchTask(uint8_t** inb, size_t *size_remain, LineSearchTas
     LineSearchTask* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_SearchTask(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
@@ -114,6 +107,10 @@ int lmcp_unpack_LineSearchTask(uint8_t** inb, size_t *size_remain, LineSearchTas
     }
     out->PointList_ai.length = tmp;
     for (uint32_t index = 0; index < out->PointList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->PointList[index] = NULL;
@@ -133,6 +130,10 @@ int lmcp_unpack_LineSearchTask(uint8_t** inb, size_t *size_remain, LineSearchTas
     }
     out->ViewAngleList_ai.length = tmp;
     for (uint32_t index = 0; index < out->ViewAngleList_ai.length; index++) {
+        uint8_t isnull;
+        uint32_t objtype;
+        uint16_t objseries;
+        char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
             out->ViewAngleList[index] = NULL;

@@ -45,10 +45,7 @@ void lmcp_free_PayloadAction(PayloadAction* out, int out_malloced) {
 }
 void lmcp_init_PayloadAction (PayloadAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(PayloadAction));
-    *(*i) = (const PayloadAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(PayloadAction));
     ((lmcp_object*)(*i)) -> type = 4;
 }
 int lmcp_unpack_PayloadAction(uint8_t** inb, size_t *size_remain, PayloadAction* outp) {
@@ -59,12 +56,6 @@ int lmcp_unpack_PayloadAction(uint8_t** inb, size_t *size_remain, PayloadAction*
         return -1;
     }
     PayloadAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->PayloadID)))
     return 0;

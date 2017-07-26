@@ -53,10 +53,7 @@ void lmcp_free_GimbalAngleAction(GimbalAngleAction* out, int out_malloced) {
 }
 void lmcp_init_GimbalAngleAction (GimbalAngleAction** i) {
     if (i == NULL) return;
-    (*i) = malloc(sizeof(GimbalAngleAction));
-    *(*i) = (const GimbalAngleAction) {
-        0
-    };
+    (*i) = calloc(1,sizeof(GimbalAngleAction));
     ((lmcp_object*)(*i)) -> type = 23;
 }
 int lmcp_unpack_GimbalAngleAction(uint8_t** inb, size_t *size_remain, GimbalAngleAction* outp) {
@@ -67,12 +64,6 @@ int lmcp_unpack_GimbalAngleAction(uint8_t** inb, size_t *size_remain, GimbalAngl
         return -1;
     }
     GimbalAngleAction* out = outp;
-    uint32_t tmp;
-    uint16_t tmp16;
-    uint8_t isnull;
-    uint32_t objtype;
-    uint16_t objseries;
-    char seriesname[8];
     CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Azimuth)))
     CHECK(lmcp_unpack_float(inb, size_remain, &(out->Elevation)))
