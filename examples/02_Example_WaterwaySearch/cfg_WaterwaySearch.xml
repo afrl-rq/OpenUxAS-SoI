@@ -13,6 +13,7 @@
     <Service Type="RouteAggregatorService" />
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="AutomationDiagramDataService"/>
+    <Service Type="AutonomyMonitoringServiceMain"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="400" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
@@ -29,6 +30,7 @@
         <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
         <Message MessageFileName="tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml" SendTime_ms="300"/>
         <Message MessageFileName="tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml" SendTime_ms="5000"/>
+	<Message MessageFileName="TaskStatusRequestMessage.xml" SendTime_ms="750000"/>
     </Service>
     <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>

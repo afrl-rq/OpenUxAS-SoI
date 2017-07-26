@@ -19,25 +19,35 @@
 #include "afrl/cmasi/AbstractGeometryDescendants.h"
 #include "afrl/cmasi/autonomymonitor/OperatingZoneFailure.h"
 #include "afrl/cmasi/autonomymonitor/OperatingZoneFailureType.h"
-namespace uxas {
-    namespace service {
-        namespace monitoring {
-            class KeepInZoneMonitor: public MonitorBase {
-            public:
-	      KeepInZoneMonitor(AutonomyMonitorServiceMain  *service_ptr,std::shared_ptr<afrl::cmasi::KeepInZone> zone);
-	      ~KeepInZoneMonitor();
-	      void addVehicleStateMessage(VehicleStateMessage const & vMessage);
-	      bool isPropertySatisfied();
-	      double propertyRobustness();
+#include "afrl/cmasi/autonomymonitor/OperatingZoneSuccess.h"
+#include "UnitConversions.h"
 
-	      void sendFailureMessage(VehicleStateMessage const & vMessage);
-	      
-            protected:
-	      std::shared_ptr<afrl::cmasi::KeepInZone> _zone;
-	      bool _failed;
-                
-            };
-        };
-    };
+namespace uxas {
+namespace service {
+namespace monitoring {
+class KeepInZoneMonitor: public MonitorBase {
+public:
+      KeepInZoneMonitor(AutonomyMonitorServiceMain  *service_ptr, std::shared_ptr<afrl::cmasi::KeepInZone> zone);
+      ~KeepInZoneMonitor();
+      void sendMonitorStartMessage();
+      void addVehicleStateMessage(VehicleStateMessage const & vMessage) override;
+      bool isPropertySatisfied() override;
+      double propertyRobustness() override;
+      void sendTaskStatus() override;
+      void sendFailureMessage(VehicleStateMessage const & vMessage);
+
+protected:
+      std::shared_ptr<afrl::cmasi::KeepInZone> _zone;
+      bool _failed;
+      uxas::common::utilities::CUnitConversions flatEarth;
+      double fail_latitude;
+      double fail_longitude;
+      int64_t fail_responsible_vehicle_id;
+      int64_t fail_timestamp;
+      double fail_altitude;
+      double _robustness;
+};
+};
+};
 };
 #endif /* KeepInZoneMonitor_h */

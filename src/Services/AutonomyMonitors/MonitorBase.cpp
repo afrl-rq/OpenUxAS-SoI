@@ -12,7 +12,7 @@ namespace service {
 namespace monitoring {
 
   MonitorBase::MonitorBase(AutonomyMonitorServiceMain *service_ptr): service_(service_ptr), debug(false) {
-	// TODO Auto-generated constructor stub
+	//sendMonitorStartMessage();
   }
 
   MonitorBase::~MonitorBase() {

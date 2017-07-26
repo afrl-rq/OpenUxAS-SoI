@@ -22,7 +22,8 @@ namespace uxas{
 	/*-- Check if for a given vehicle state, the camera angle lies within the wedges required by a search task --*/
 	bool checkCameraAngleInWedge(std::vector<afrl::cmasi::Wedge*> const & all_wedges) const;
 
-	
+	double getCameraAzimuth() const { return camera_azimuth; }
+	double getCameraElevation() const { return camera_elevation; }
 
       protected:
 	int64_t vehicleID;
@@ -32,6 +33,8 @@ namespace uxas{
 	std::shared_ptr<afrl::cmasi::EntityState> msg;
 	double camera_azimuth;
 	double camera_elevation;
+
+	
       };
 
     };
