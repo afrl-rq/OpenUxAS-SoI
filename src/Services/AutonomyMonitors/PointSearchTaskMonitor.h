@@ -20,7 +20,7 @@ namespace monitoring {
     bool isPropertySatisfied() override;
     double propertyRobustness() override;
     void sendTaskStatus() override;
-    void sendMonitorStartMessage() override;
+    void sendMonitorStartMessage();
   protected:
     std::shared_ptr<afrl::cmasi::PointSearchTask> _task;
     bool _failed;

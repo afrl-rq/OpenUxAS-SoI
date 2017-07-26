@@ -5,7 +5,11 @@ namespace uxas {
 namespace service {
 namespace monitoring {
   
-  AreaSearchTaskMonitor::AreaSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::AreaSearchTask> pointSearchTask):MonitorBase(service_ptr), _task(pointSearchTask){};
+  AreaSearchTaskMonitor::AreaSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, 
+    std::shared_ptr<afrl::cmasi::AreaSearchTask> pointSearchTask):MonitorBase(service_ptr), _task(pointSearchTask){
+
+    sendMonitorStartMessage();
+  };
 
   AreaSearchTaskMonitor::~AreaSearchTaskMonitor(){};
 

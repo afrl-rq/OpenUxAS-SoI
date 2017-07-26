@@ -29,19 +29,19 @@ public:
   bool isPropertySatisfied() override;
   double propertyRobustness() override;
   void sendTaskStatus() override;
-  void sendMonitorStartMessage() override;
+  void sendMonitorStartMessage();
 
 protected:
-	std::shared_ptr<afrl::cmasi::KeepOutZone> _zone;
-	uxas::common::utilities::CUnitConversions flatEarth;
-	bool _failed;
-	double _robustness;
-	void sendFailureMessage(VehicleStateMessage const & vMessage);
-      double fail_latitude;
-      double fail_longitude;
-      double fail_altitude;
-      int64_t fail_responsible_vehicle_id;
-      int64_t fail_timestamp;
+  std::shared_ptr<afrl::cmasi::KeepOutZone> _zone;
+  uxas::common::utilities::CUnitConversions flatEarth;
+  bool _failed;
+  double _robustness;
+  void sendFailureMessage(VehicleStateMessage const & vMessage);
+  double fail_latitude;
+  double fail_longitude;
+  double fail_altitude;
+  int64_t fail_responsible_vehicle_id;
+  int64_t fail_timestamp;
 };
 
 } /* namespace monitoring */

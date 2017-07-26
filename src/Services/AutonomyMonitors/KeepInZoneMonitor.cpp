@@ -21,11 +21,12 @@ namespace uxas {
 namespace service {
 namespace monitoring {
 
-KeepInZoneMonitor::KeepInZoneMonitor(AutonomyMonitorServiceMain * service_ptr, 
-  std::shared_ptr<afrl::cmasi::KeepInZone> keepInZone): MonitorBase(service_ptr),
+KeepInZoneMonitor::KeepInZoneMonitor(AutonomyMonitorServiceMain * service_ptr,
+                                     std::shared_ptr<afrl::cmasi::KeepInZone> keepInZone): MonitorBase(service_ptr),
   _zone(keepInZone),
   _failed(false),
-  _robustness(0.0){
+  _robustness(0.0) {
+  sendMonitorStartMessage();
   if (debug) {
     //TODO: Remove the print statements if necessary -- they are used for diagnostics
     std::cout << "[KeepInZoneMonitor] Started a Keepin zone monitor" << std::endl;
@@ -45,7 +46,7 @@ KeepInZoneMonitor::KeepInZoneMonitor(AutonomyMonitorServiceMain * service_ptr,
   }
 }
 
-void KeepInZoneMonitor::sendMonitorStartMessage(){
+void KeepInZoneMonitor::sendMonitorStartMessage() {
   auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::OperatingZoneMonitorStarted>();
   fObj -> setZoneID(this -> _zone -> getZoneID());
   fObj -> setZoneType(afrl::cmasi::autonomymonitor::OperatingZoneFailureType::KeepInZoneFail);
@@ -55,8 +56,8 @@ void KeepInZoneMonitor::sendMonitorStartMessage(){
 
 KeepInZoneMonitor::~KeepInZoneMonitor() {}
 
-void KeepInZoneMonitor::sendTaskStatus(){
-  if (this -> _failed){
+void KeepInZoneMonitor::sendTaskStatus() {
+  if (this -> _failed) {
     auto fObj = std::make_shared<afrl::cmasi::autonomymonitor::OperatingZoneFailure>();
     fObj -> setZoneID(this -> _zone -> getZoneID());
     fObj -> setResponsibleVehicleID(fail_responsible_vehicle_id);
@@ -117,10 +118,10 @@ void KeepInZoneMonitor::addVehicleStateMessage(VehicleStateMessage const & vMess
     double lowerright_East = centerEast_m + rect->getWidth() / 2.0;
     double lowerright_North = centerNorth_m - rect->getHeight() / 2.0;
     distToViolation = std::min({ currentNorth_m - lowerright_North,   \
-                                  upperleft_North - currentNorth_m,   \
-                                  currentEast_m - upperleft_East,      \
-                                  lowerright_East - currentEast_m      \
-                                      });
+                                 upperleft_North - currentNorth_m,   \
+                                 currentEast_m - upperleft_East,      \
+                                 lowerright_East - currentEast_m      \
+                               });
     _robustness = std::min(_robustness, distToViolation);
     // KeepInZone conditions
     if ((currentNorth_m <= upperleft_North && currentNorth_m >= lowerright_North) && \
@@ -143,42 +144,42 @@ void KeepInZoneMonitor::addVehicleStateMessage(VehicleStateMessage const & vMess
   // If the KeepInZone is a polygon
   auto poly = dynamic_cast<afrl::cmasi::Polygon*>(zoneGeometry);
   if (poly) {
-/**
-    std::vector<afrl::cmasi::Location3D*> ptList = poly->getBoundaryPoints();
-    std::vector<std::pair<double, double>> polyBoundary;
-    for (const auto loc : ptList) {
-      std::pair<double, double> add_temp;
-      flatEarth.ConvertLatLong_degToNorthEast_m(loc->getLatitude(), loc->getLongitude(), add_temp.first, add_temp.second);
-      polyBoundary.push_back(add_temp);
-    }
-    polyBoundary.push_back(polyBoundary[0]);
-    int nCross = 0;
-    for (int i = 0; i < polyBoundary.size() - 1; i++) { // count the number of one-side intersections
-      std::pair<double, double> p1 = polyBoundary[i];
-      std::pair<double, double> p2 = polyBoundary[i + 1];
-      if (p1.first == p2.first) continue; // p1 and p2 are parallel
-      if (currentNorth_m < p1.first && currentNorth_m < p2.first) continue; // in extension line
-      if (currentNorth_m >= p1.first && currentNorth_m >= p2.first) continue; // in extension line
-      double verticalCurrentEast = (currentNorth_m - p1.first) * (p2.second - p1.second) / (p2.first - p1.first) + p1.second;
-      if (verticalCurrentEast > currentEast_m) nCross++;
-    }
-    if (nCross % 2) { // vehicle is in the KeepInZone
-      if (debug) {
-        std::cout << " Zone: Polygon->" << this->_zone->getZoneID() << std::endl;
-        std::cout << " Boundaries: " << std::endl;
-        for (auto loc : polyBoundary) {
-          std::cout << " " << loc.first << ", " << loc.second << " ->";
+    /**
+        std::vector<afrl::cmasi::Location3D*> ptList = poly->getBoundaryPoints();
+        std::vector<std::pair<double, double>> polyBoundary;
+        for (const auto loc : ptList) {
+          std::pair<double, double> add_temp;
+          flatEarth.ConvertLatLong_degToNorthEast_m(loc->getLatitude(), loc->getLongitude(), add_temp.first, add_temp.second);
+          polyBoundary.push_back(add_temp);
         }
-        std::cout << std::endl;
-      }
-    } else {
-      std::cout << "***************************************" << std::endl;
-      std::cout << "WARNING!!! YOU (vehicleID:" << vMessage.getVehicleID()
-                << ") ARE OUT OF THE ZONE: " << this->_zone->getZoneID() << "(Polygon)" << std::endl;
-      std::cout << "***************************************" << std::endl;
-      sendFailureMessage(vMessage);
-    }
-**/
+        polyBoundary.push_back(polyBoundary[0]);
+        int nCross = 0;
+        for (int i = 0; i < polyBoundary.size() - 1; i++) { // count the number of one-side intersections
+          std::pair<double, double> p1 = polyBoundary[i];
+          std::pair<double, double> p2 = polyBoundary[i + 1];
+          if (p1.first == p2.first) continue; // p1 and p2 are parallel
+          if (currentNorth_m < p1.first && currentNorth_m < p2.first) continue; // in extension line
+          if (currentNorth_m >= p1.first && currentNorth_m >= p2.first) continue; // in extension line
+          double verticalCurrentEast = (currentNorth_m - p1.first) * (p2.second - p1.second) / (p2.first - p1.first) + p1.second;
+          if (verticalCurrentEast > currentEast_m) nCross++;
+        }
+        if (nCross % 2) { // vehicle is in the KeepInZone
+          if (debug) {
+            std::cout << " Zone: Polygon->" << this->_zone->getZoneID() << std::endl;
+            std::cout << " Boundaries: " << std::endl;
+            for (auto loc : polyBoundary) {
+              std::cout << " " << loc.first << ", " << loc.second << " ->";
+            }
+            std::cout << std::endl;
+          }
+        } else {
+          std::cout << "***************************************" << std::endl;
+          std::cout << "WARNING!!! YOU (vehicleID:" << vMessage.getVehicleID()
+                    << ") ARE OUT OF THE ZONE: " << this->_zone->getZoneID() << "(Polygon)" << std::endl;
+          std::cout << "***************************************" << std::endl;
+          sendFailureMessage(vMessage);
+        }
+    **/
     // Copy and paste from KeepInZoneMonitor
     auto const & cFoot = vMessage.getCameraFootprint();
     std::vector< std::pair<double, double> > polygonCoordinates;
@@ -206,12 +207,12 @@ void KeepInZoneMonitor::addVehicleStateMessage(VehicleStateMessage const & vMess
   if (circle) {
     double circle_radius = circle->getRadius();
     double circle_center_North_m, circle_center_East_m;
-    flatEarth.ConvertLatLong_degToNorthEast_m(circle->getCenterPoint()->getLatitude(), 
-      circle->getCenterPoint()->getLongitude(), 
-      circle_center_North_m, 
-      circle_center_East_m);
-    double distance_from_center = sqrt((currentEast_m - circle_center_East_m) * (currentEast_m - circle_center_East_m) + 
-      (currentNorth_m - circle_center_North_m) * (currentNorth_m - circle_center_North_m));
+    flatEarth.ConvertLatLong_degToNorthEast_m(circle->getCenterPoint()->getLatitude(),
+        circle->getCenterPoint()->getLongitude(),
+        circle_center_North_m,
+        circle_center_East_m);
+    double distance_from_center = sqrt((currentEast_m - circle_center_East_m) * (currentEast_m - circle_center_East_m) +
+                                       (currentNorth_m - circle_center_North_m) * (currentNorth_m - circle_center_North_m));
     _robustness = std::min(_robustness, circle_radius - distance_from_center);
 
     if (distance_from_center < circle_radius) {

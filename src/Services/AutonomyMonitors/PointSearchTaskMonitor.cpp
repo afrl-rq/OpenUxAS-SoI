@@ -12,6 +12,7 @@ namespace monitoring {
   
   PointSearchTaskMonitor::PointSearchTaskMonitor(AutonomyMonitorServiceMain * service_ptr, std::shared_ptr<afrl::cmasi::PointSearchTask> pointSearchTask):MonitorBase(service_ptr), _task(pointSearchTask), _failed(true) {
     //this->debug = true; // Debug 
+    sendMonitorStartMessage();
     if(debug){
       std::cout << "[PointSearchTask] Start searching" << std::endl;
       std::cout << "\t [ID]: " << _task->getTaskID() << std::endl;

@@ -29,7 +29,7 @@ class KeepInZoneMonitor: public MonitorBase {
 public:
       KeepInZoneMonitor(AutonomyMonitorServiceMain  *service_ptr, std::shared_ptr<afrl::cmasi::KeepInZone> zone);
       ~KeepInZoneMonitor();
-      void sendMonitorStartMessage() override;
+      void sendMonitorStartMessage();
       void addVehicleStateMessage(VehicleStateMessage const & vMessage) override;
       bool isPropertySatisfied() override;
       double propertyRobustness() override;

@@ -33,6 +33,7 @@ KeepOutZoneMonitor::KeepOutZoneMonitor(AutonomyMonitorServiceMain  * service_ptr
   _failed(false),
   _robustness(10000.0)
 {
+  sendMonitorStartMessage();
 
   // TODO: Remove these print statements if needed -- they are just for diagnostics
   if (debug) {

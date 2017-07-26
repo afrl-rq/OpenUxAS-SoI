@@ -22,11 +22,12 @@ namespace monitoring {
     bool isPropertySatisfied() override;
     double propertyRobustness() override;
     void sendTaskStatus() override;
-    void sendMonitorStartMessage() override;
+    void sendMonitorStartMessage();
   protected:
     std::shared_ptr<afrl::cmasi::LineSearchTask> _task;
     uxas::common::utilities::CUnitConversions flatEarth;
     std::vector<LineSegment> segments;
+    double _robustness;
 
   };
 
