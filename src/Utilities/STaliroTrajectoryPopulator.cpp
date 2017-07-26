@@ -16,21 +16,21 @@ namespace testgeneration
             // which messages will be added to the trajectory.
         }
         
-        void c_TrajectoryPopulator::setCameraPixelCount(int64_t vehicleId, 
+        void c_TrajectoryPopulator::setCameraPixelCount(int vehicleId, 
                 int32_t horizontalPixelCount, 
                 int32_t longitudinalPixelCount)
         {
-            double_t pixelCount = std::sqrt(std::pow((double_t) horizontalPixelCount, 2.0) 
+            double pixelCount = std::sqrt(std::pow((double_t) horizontalPixelCount, 2.0) 
                     + std::pow((double_t) longitudinalPixelCount, 2.0));
             if (pixelCount < 1.0)
             {
                 pixelCount = 1.0;
             }
-            cameraDiagonalPixelCount[vehicleId] = pixelCount;
+            cameraDiagonalPixelCount.insert(std::pair<int, double>(vehicleId, pixelCount));
         }
         
-        double_t c_TrajectoryPopulator::computeGroundSampleDistance(int64_t vehicleId, 
-                double_t (&cameraFootprintCoordinates)[4][2])
+        double_t c_TrajectoryPopulator::computeGroundSampleDistance(int vehicleId, 
+                double (&cameraFootprintCoordinates)[4][2])
         {
             double_t gsd = 0.0;
             uxas::common::utilities::CUnitConversions cUnitConversions;
@@ -107,8 +107,7 @@ namespace testgeneration
                     }
                 }
             }
-            double_t gsd = computeGroundSampleDistance(airVehicleState->getID(), 
-                    cameraFootprintCoords);
+            double_t gsd = 6.0; //computeGroundSampleDistance(airVehicleState->getID(), cameraFootprintCoords);
             
             uint32_t indexStart = 0;
 

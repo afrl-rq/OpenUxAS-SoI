@@ -91,8 +91,11 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
     
     void sendOutTrajectory();
+    void sendMonitorResults();
     
-    std::map<int64_t, std::vector<double>> trajectory;
+    std::map<int64_t, std::vector<double_t>> trajectory;
+    std::map<int64_t, int32_t> taskStatusResults;
+    std::map<int64_t, double_t> taskRobustnessResults;
     testgeneration::staliro::c_TrajectoryPopulator *staliroTrajectoryPopulator;
 };
 

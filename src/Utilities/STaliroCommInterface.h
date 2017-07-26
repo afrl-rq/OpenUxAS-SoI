@@ -50,6 +50,7 @@ namespace testgeneration
             void readInitCond();
             void readTask();
             bool sendHeartBeat(int64_t curTime);
+            bool sendEndOfSimulation();
             void setFileFieldMapPtr(std::map<std::string, 
                     std::map<std::string,
                     std::string> >* mapPtr);
@@ -61,8 +62,10 @@ namespace testgeneration
                     uint32_t numElementsInRow, 
                     double time,
                     double * row);
-            bool isTrajectoryRequested();
+            int getSimulationStatus();
+            void setSimulationStatus(int simStatus);
             int64_t getMaxSimulationDuration();
+            bool sendTaskStatus(int32_t task_id, int32_t status, double_t robustness);
 
         protected:
             int serverSocket;
@@ -82,7 +85,7 @@ namespace testgeneration
             size_t sendBufferSize;
             double trajectoryBuffer[(STALIRO_SEND_BUFFER_SIZE-8)/8];
             void *trajectoryBufferPtr;
-            bool trajectoryRequested;
+            int simulationStatus;
             int64_t m_maxSimulationDuration_ms;
             int64_t m_lastHeartBeatTime_ms;
             
@@ -109,7 +112,9 @@ namespace testgeneration
             STALIRO_TRAJ_INFO = 10,
             STALIRO_TRAJ_DATA = 11,
             STALIRO_REQUEST_TRAJECTORY = 12,
-            STALIRO_HEART_BEAT = 20
+            STALIRO_HEART_BEAT = 20,
+            STALIRO_END_OF_SIMULATION = 21,
+            STALIRO_TASK_STATUS = 22
         };
         struct s_StaliroMessage
         {

@@ -23,7 +23,7 @@ namespace testgeneration
             sendBufferFillPtr = (void *)sendBuffer;
             sendBufferSize = 0;
             isConnected = false;
-            trajectoryRequested = false;
+            simulationStatus = 0;
             m_lastHeartBeatTime_ms = 0;
         }
         
@@ -219,7 +219,7 @@ namespace testgeneration
                     allReceived = true;
                     m_maxSimulationDuration_ms = readMaxSimulationDuration();
                     sendAck(testgeneration::staliro::STALIRO_ACK);
-                    trajectoryRequested = true;
+                    simulationStatus = 1;
                 }
             }
             return retCode;
@@ -391,6 +391,11 @@ namespace testgeneration
             return retVector;
         }
         
+        void c_CommunicationInterface::setSimulationStatus(int simStatus)
+        {
+            simulationStatus = simStatus;
+        }
+        
         bool c_CommunicationInterface::sendTrajInfo(uint32_t numColumns, 
                 uint32_t numRows)
         {
@@ -450,7 +455,7 @@ namespace testgeneration
             }
             if (curRowNumber >= totalNumOfRows)
             {
-                trajectoryRequested = false;
+                simulationStatus = 2;
             }
         }
         
@@ -476,6 +481,24 @@ namespace testgeneration
             return retCode;
         }
         
+        bool c_CommunicationInterface::sendTaskStatus(int32_t task_id, int32_t status, double_t robustness)
+        {
+            bool retCode = true;
+            uint32_t cmd = testgeneration::staliro::STALIRO_TASK_STATUS;
+            
+            resetSendBuffer();
+            addToSendBuffer((void *) &cmd, sizeof(cmd));
+            addToSendBuffer((void *) &task_id, sizeof(task_id));
+            addToSendBuffer((void *) &status, sizeof(status));
+            addToSendBuffer((void *) &robustness, sizeof(robustness));
+            if (sendData())
+            {
+                retCode = receiveAck();
+            }
+
+            return retCode;
+        }
+        
         bool c_CommunicationInterface::sendHeartBeat(int64_t curTime)
         {
             double totalTimeInSec = (double) m_maxSimulationDuration_ms / 1000.0;
@@ -483,7 +506,7 @@ namespace testgeneration
             bool retCode = true;
             uint32_t cmd = testgeneration::staliro::STALIRO_HEART_BEAT;
             
-            if (curTime > m_lastHeartBeatTime_ms + STALIRO_HEART_BEAT_PERIOD_MS)
+            if (curTime > m_lastHeartBeatTime_ms + STALIRO_HEART_BEAT_PERIOD_MS || curTime > m_maxSimulationDuration_ms)
             {
                 resetSendBuffer();
                 addToSendBuffer((void *) &cmd, sizeof(cmd));
@@ -499,9 +522,24 @@ namespace testgeneration
             return retCode;
         }
         
-        bool c_CommunicationInterface::isTrajectoryRequested()
+        bool c_CommunicationInterface::sendEndOfSimulation()
         {
-            return trajectoryRequested;
+            bool retCode = true;
+            uint32_t cmd = testgeneration::staliro::STALIRO_END_OF_SIMULATION;
+            
+            resetSendBuffer();
+            addToSendBuffer((void *) &cmd, sizeof(cmd));
+            if (!sendData())
+            {
+                retCode = false;
+            }
+            
+            return retCode;
+        }
+        
+        int c_CommunicationInterface::getSimulationStatus()
+        {
+            return simulationStatus;
         }
         
         int64_t c_CommunicationInterface::getMaxSimulationDuration()
