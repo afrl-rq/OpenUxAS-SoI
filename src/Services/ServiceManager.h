@@ -12,8 +12,6 @@
 
 #include "ServiceBase.h"
 
-#include "AddressStringMessageReceiverPipe.h"
-#include "AddressStringMessageSenderPipe.h"
 #include "LmcpObjectMessageReceiverPipe.h"
 
 #include <memory>
