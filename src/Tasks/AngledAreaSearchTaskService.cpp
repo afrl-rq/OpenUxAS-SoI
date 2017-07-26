@@ -177,10 +177,18 @@ AngledAreaSearchTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avta
 
                             if (!routePlanRequest->getRouteRequests().empty())
                             {
-                                itTaskOptionClass->second->m_taskOption->setStartHeading(routePlanRequest->getRouteRequests().front()->getEndHeading() + 180.0);
-                                itTaskOptionClass->second->m_taskOption->setStartLocation(m_angledAreaSearchTask->getStartPoint()->clone());
-                                itTaskOptionClass->second->m_taskOption->setEndHeading(routePlanRequest->getRouteRequests().back()->getEndHeading());
+                                if(m_angledAreaSearchTask->getStartPoint() != nullptr)
+                                {
+                                    itTaskOptionClass->second->m_taskOption->setStartLocation(m_angledAreaSearchTask->getStartPoint()->clone());
+                                }
+                                else
+                                {
+                                    itTaskOptionClass->second->m_taskOption->setStartLocation(routePlanRequest->getRouteRequests().front()->getStartLocation()->clone());
+                                }
+                                itTaskOptionClass->second->m_taskOption->setStartHeading(routePlanRequest->getRouteRequests().front()->getStartHeading());
+                                
                                 itTaskOptionClass->second->m_taskOption->setEndLocation(routePlanRequest->getRouteRequests().back()->getEndLocation()->clone());
+                                itTaskOptionClass->second->m_taskOption->setEndHeading(routePlanRequest->getRouteRequests().back()->getEndHeading());
                             }
                         }
                         else
@@ -517,7 +525,7 @@ bool AngledAreaSearchTaskService::isCalculateRasterScanRoute(std::shared_ptr<Tas
                     endLocation->setLongitude(endLongitude_deg);
                     endLocation->setAltitude(taskOptionClass->m_altitude_m);
 
-                    if (isFirstLeg)
+                    if (isFirstLeg && m_angledAreaSearchTask->getStartPoint() != nullptr)
                     {
                         double dummySignalLatLon = 0;
                         n_FrameworkLib::CPosition startPoint(m_angledAreaSearchTask->getStartPoint()->getLatitude(),
