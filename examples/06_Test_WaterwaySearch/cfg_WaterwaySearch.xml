@@ -10,8 +10,6 @@
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
-    <Service Type="VehicleStateListenerService"/>
-    <Service Type="AutonomyMonitorServiceMain"/>
     <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/>
     <Service Type="RouteAggregatorService" />
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
@@ -47,8 +45,9 @@
     <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
-        
     </Service>
+    <Service Type="VehicleStateListenerService"/>
+    <Service Type="AutonomyMonitorServiceMain"/>
 </UxAS>
 
 

@@ -20,6 +20,7 @@
 #include "afrl/cmasi/autonomymonitor/TaskStatusRequest.h"
 #include "afrl/cmasi/autonomymonitor/TaskFailure.h"
 #include "afrl/cmasi/autonomymonitor/TaskSuccess.h"
+#include "afrl/cmasi/autonomymonitor/TaskMonitorStarted.h"
 
 
 #include <chrono>
@@ -39,8 +40,6 @@ MessageLoggerForTestService::ServiceBase::CreationRegistrar<MessageLoggerForTest
 MessageLoggerForTestService::MessageLoggerForTestService()
 : ServiceBase(MessageLoggerForTestService::s_typeName(), MessageLoggerForTestService::s_directoryName())
 {
-    // taskStatusResults[1000] = 0;
-    // taskRobustnessResults[1000] = 1.0;
 };
 
 MessageLoggerForTestService::~MessageLoggerForTestService()
@@ -57,6 +56,7 @@ MessageLoggerForTestService::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(afrl::cmasi::SessionStatus::Subscription);
     addSubscriptionAddress(afrl::cmasi::autonomymonitor::TaskSuccess::Subscription);
     addSubscriptionAddress(afrl::cmasi::autonomymonitor::TaskFailure::Subscription);
+    addSubscriptionAddress(afrl::cmasi::autonomymonitor::TaskMonitorStarted::Subscription);
 
     return (true);
 };
@@ -71,6 +71,12 @@ bool
 MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
     UXAS_LOG_DEBUG_VERBOSE(s_typeName(), "::processReceivedLmcpMessage BEFORE logging received message");
+    
+    if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskMonitorStarted::TypeName)
+    {
+        taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = 0;
+        taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = 1.0;
+    }
     
     if (staliroInterface->getSimulationStatus() == 1)
     {
@@ -125,7 +131,8 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             std::cout << "Task Failure" << std::endl;
             std::cout << std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID() << std::endl;
             taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = -1;
-            taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = 1.0;
+            taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] 
+                    = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getRobustness();
             // fill in a data structure for task monitoring
         }
         else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskSuccess::TypeName)
@@ -133,7 +140,8 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             std::cout << "TaskSuccess" << std::endl;
             std::cout << std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID() << std::endl;
             taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] = 1;
-            taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] = 1.0;
+            taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] 
+                    = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getRobustness();
             // fill in a data structure for task monitoring
         }
         if (staliroInterface->getSimulationStatus() == 2)
