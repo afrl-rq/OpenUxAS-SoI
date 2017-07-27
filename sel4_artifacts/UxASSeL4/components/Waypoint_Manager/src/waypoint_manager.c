@@ -37,11 +37,11 @@
      while true:
        waypoint = recv_target_waypoint_from_autopilot()
        if(waypoint is not valid):
-         send_waypoints(mission[first_waypoint:N])
+         send_waypoints(mission[first_waypoint:first_waypoint + N])
        else:
          if(waypoint > N/2):
            first_waypoint = waypoint - 1
-           send_waypoints(mission[first_waypoint:N])
+           send_waypoints(mission[first_waypoint:first_waypoint + N])
 
  */
 
