@@ -34,6 +34,8 @@ scaling tool to be able to prevent the processor from switching frequencies on d
 
    	sudo update-grub
 
+   Reboot.
+
    Now try the indicator by selecting of the frequencies shown in the applet. This should fix the frequency.
 
 2. Compile and Install the ZSRMV scheduler
