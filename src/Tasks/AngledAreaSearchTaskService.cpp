@@ -75,20 +75,16 @@ AngledAreaSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
         if (afrl::impact::isAngledAreaSearchTask(m_task.get()))
         {
             m_angledAreaSearchTask = std::static_pointer_cast<afrl::impact::AngledAreaSearchTask>(m_task);
-            if (m_angledAreaSearchTask)
+            auto foundArea = m_areasOfInterest.find(m_angledAreaSearchTask->getSearchAreaID());
+            if (foundArea == m_areasOfInterest.end())
             {
-                if ((!m_areaOfInterest) || (m_areaOfInterest->getAreaID() != m_angledAreaSearchTask->getSearchAreaID()))
-                {
-                    sstrErrors << "ERROR:: **c_Task_ImpactPointSearch::bConfigure LineOfInterest [" << m_angledAreaSearchTask->getSearchAreaID() << "] was not found." << std::endl;
-                    CERR_FILE_LINE_MSG(sstrErrors.str())
-                    isSuccessful = false;
-                }
+                sstrErrors << "ERROR:: **c_Task_ImpactPointSearch::bConfigure AreaOfInterest [" << m_angledAreaSearchTask->getSearchAreaID() << "] was not found." << std::endl;
+                CERR_FILE_LINE_MSG(sstrErrors.str())
+                isSuccessful = false;
             }
             else
             {
-                sstrErrors << "ERROR:: **AngledAreaSearchTaskService::bConfigure failed to cast a AreaSearchTask from the task pointer." << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
+                m_areaOfInterest = foundArea->second;
             }
         }
         else
@@ -181,10 +177,18 @@ AngledAreaSearchTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avta
 
                             if (!routePlanRequest->getRouteRequests().empty())
                             {
-                                itTaskOptionClass->second->m_taskOption->setStartHeading(routePlanRequest->getRouteRequests().front()->getEndHeading() + 180.0);
-                                itTaskOptionClass->second->m_taskOption->setStartLocation(m_angledAreaSearchTask->getStartPoint()->clone());
-                                itTaskOptionClass->second->m_taskOption->setEndHeading(routePlanRequest->getRouteRequests().back()->getEndHeading());
+                                if(m_angledAreaSearchTask->getStartPoint() != nullptr)
+                                {
+                                    itTaskOptionClass->second->m_taskOption->setStartLocation(m_angledAreaSearchTask->getStartPoint()->clone());
+                                }
+                                else
+                                {
+                                    itTaskOptionClass->second->m_taskOption->setStartLocation(routePlanRequest->getRouteRequests().front()->getStartLocation()->clone());
+                                }
+                                itTaskOptionClass->second->m_taskOption->setStartHeading(routePlanRequest->getRouteRequests().front()->getStartHeading());
+                                
                                 itTaskOptionClass->second->m_taskOption->setEndLocation(routePlanRequest->getRouteRequests().back()->getEndLocation()->clone());
+                                itTaskOptionClass->second->m_taskOption->setEndHeading(routePlanRequest->getRouteRequests().back()->getEndHeading());
                             }
                         }
                         else
@@ -521,7 +525,7 @@ bool AngledAreaSearchTaskService::isCalculateRasterScanRoute(std::shared_ptr<Tas
                     endLocation->setLongitude(endLongitude_deg);
                     endLocation->setAltitude(taskOptionClass->m_altitude_m);
 
-                    if (isFirstLeg)
+                    if (isFirstLeg && m_angledAreaSearchTask->getStartPoint() != nullptr)
                     {
                         double dummySignalLatLon = 0;
                         n_FrameworkLib::CPosition startPoint(m_angledAreaSearchTask->getStartPoint()->getLatitude(),

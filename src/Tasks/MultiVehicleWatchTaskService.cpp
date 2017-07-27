@@ -252,13 +252,13 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> MultiVehicleWatchTaskService:
     auto surveyType = afrl::cmasi::LoiterType::Circular;
     std::vector<int64_t> gimbalId;
 
-    if (m_idVsEntityConfiguration.find(entityState->getID()) != m_idVsEntityConfiguration.end())
+    if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
     {
-        surveySpeed = m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed();
+        surveySpeed = m_entityConfigurations[entityState->getID()]->getNominalSpeed();
         // find all gimbals to steer
-        for (size_t a = 0; a < m_idVsEntityConfiguration[entityState->getID()]->getPayloadConfigurationList().size(); a++)
+        for (size_t a = 0; a < m_entityConfigurations[entityState->getID()]->getPayloadConfigurationList().size(); a++)
         {
-            auto payload = m_idVsEntityConfiguration[entityState->getID()]->getPayloadConfigurationList().at(a);
+            auto payload = m_entityConfigurations[entityState->getID()]->getPayloadConfigurationList().at(a);
             if (afrl::cmasi::isGimbalConfiguration(payload))
             {
                 gimbalId.push_back(payload->getPayloadID());
@@ -266,15 +266,15 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> MultiVehicleWatchTaskService:
         }
 
         // calculate proper radius
-        if (afrl::impact::isGroundVehicleConfiguration(m_idVsEntityConfiguration[entityState->getID()].get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(m_idVsEntityConfiguration[entityState->getID()].get()))
+        if (afrl::impact::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
+                afrl::impact::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
             surveyRadius = 0.0;
             surveyType = afrl::cmasi::LoiterType::Hover;
         }
-        else if (afrl::cmasi::isAirVehicleConfiguration(m_idVsEntityConfiguration[entityState->getID()].get()))
+        else if (afrl::cmasi::isAirVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
-            double speed = m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed();
+            double speed = m_entityConfigurations[entityState->getID()]->getNominalSpeed();
             double bank = 25.0 * n_Const::c_Convert::dDegreesToRadians();
             // Note: R = V/omega for coordinated turn omega = g*tan(phi)/V
             // Therefore: R = V^2/(g*tan(phi))
