@@ -39,7 +39,7 @@
        if(waypoint is not valid):
          send_waypoints(mission[first_waypoint:N])
        else:
-         if(waypoint/2 > N):
+         if(waypoint > N/2):
            first_waypoint = waypoint - 1
            send_waypoints(mission[first_waypoint:N])
 
