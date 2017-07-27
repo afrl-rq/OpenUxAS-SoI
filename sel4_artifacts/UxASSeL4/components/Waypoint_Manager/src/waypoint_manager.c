@@ -4,6 +4,49 @@
 #include <camkes.h>
 #include <lmcp.h>
 #include <MissionCommandUtils.h>
+/* Basic Notional Waypoint Manager Operation.
+
+   Summary:
+
+     Given a mission composed of a large set of waypoints received
+     from UxAS, send a sliding window, moving from first waypoint to
+     last waypoint, of size N to the auto-pilot. The sliding window is
+     moved N/2 waypoints forward when the auto-pilot is beyond the
+     last sent sliding windows middle waypoint.
+
+   Assumption: 
+
+     send_waypoint, mission, and first_waypoint are protected from
+     race-conditions in some way.
+
+   Thread 1 talking to UxAS:
+
+     send_waypoints = 0
+
+     while true: 
+       mission = recv_mission_command_from_UxAS()
+       first_waypoint = 1
+       send_waypoints = 1
+       send_waypoints(mission[first_waypoint:N])
+
+
+   Thread 2 talking to Auto-Pilot:
+
+     wait_until_equal_one(send_waypoints)
+
+     while true:
+       waypoint = recv_target_waypoint_from_autopilot()
+       if(waypoint is not valid):
+         send_waypoints(mission[first_waypoint:N])
+       else:
+         if(waypoint/2 > N):
+           first_waypoint = waypoint - 1
+           send_waypoints(mission[first_waypoint:N])
+
+ */
+
+
+
 
 // Maximum number of waypoints that will be sent to the autopilot at
 // one time.
