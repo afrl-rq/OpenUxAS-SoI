@@ -19,15 +19,26 @@ function run_uxas {
 }
 
 run_uxas 400 &> /tmp/out.400 &
+sleep 1
 run_uxas 500 &> /tmp/out.500 &
+sleep 1
 run_uxas 600 &> /tmp/out.600 &
+sleep 1
 run_uxas 700 &> /tmp/out.700 &
+sleep 1
 run_uxas 900 &> /tmp/out.900 &
+sleep 1
 run_uxas 1000 &> /tmp/out.1000 &
+sleep 1
 run_uxas 1100 &> /tmp/out.1100 &
+sleep 1
 run_uxas 1200 &> /tmp/out.1200 &
+sleep 1
 run_uxas 1300 &> /tmp/out.1300 &
+sleep 1
 run_uxas 1400 &> /tmp/out.1400 &
+sleep 1
 run_uxas 1500 &> /tmp/out.1500 &
+sleep 1
 run_uxas 800 2>&1 | tee /tmp/out.800
 wait
