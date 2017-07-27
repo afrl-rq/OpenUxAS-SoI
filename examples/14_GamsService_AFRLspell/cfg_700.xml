@@ -4,12 +4,12 @@
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
     <!-- on Linux, type 'ifconfig' to find interface name -->
     <!-- on Windows, type 'netsh interface show interface' to find interface name -->
-    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="wlan0">
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="eth0">
         <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
         <SubscribeToExternalMessage MessageType="uxas.madara.MadaraState" />
     </Bridge>
 
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:7700" Server="FALSE">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:7700" Server="FALSE" ConsiderSelfGenerated="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
