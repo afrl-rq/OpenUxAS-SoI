@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS FormatVersion="1.0" EntityID="1200"  EntityType="Aircraft">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.AirVehicleState" />
+        <SubscribeToMessage MessageType="uxas.madara.MadaraState" />
+    </Bridge>
+    <Service Type="Test_SimulationTime"/>
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/>
+    <Service Type="RouteAggregatorService" />
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="AutomationDiagramDataService"/>
+    <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
+    
+    <Service Type="GamsService" >
+        <Logging>
+            <Madara File="GamsService.log" />
+            <Gams File="GamsService.log" />
+        </Logging>
+        <GamsController AgentPrefix="agent.8"
+            CheckpointPrefix="checkpoints/checkpoint" CheckpointStrategy="1"
+            LoopHertz="1.0" SendHertz="-1" RunTime="10" />
+        <!-- load the groups karl file and then the asset file -->
+        <Knowledge KarlFile="../karl/groups.karl" BinaryFile="" />
+        <Knowledge KarlFile="../karl/speller.karl" BinaryFile="" />
+        <Agents>
+          <Agent Prefix="agent.0" EntityId="400"/>
+          <Agent Prefix="agent.1" EntityId="500"/>
+          <Agent Prefix="agent.2" EntityId="600"/>
+          <Agent Prefix="agent.3" EntityId="700"/>
+          <Agent Prefix="agent.4" EntityId="800"/>
+          <Agent Prefix="agent.5" EntityId="900"/>
+          <Agent Prefix="agent.6" EntityId="1000"/>
+          <Agent Prefix="agent.7" EntityId="1100"/>
+          <Agent Prefix="agent.8" EntityId="1200"/>
+          <Agent Prefix="agent.9" EntityId="1300"/>
+          <Agent Prefix="agent.10" EntityId="1400"/>
+          <Agent Prefix="agent.11" EntityId="1500"/>
+        </Agents>
+    </Service>
+   
+    <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+        <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V600.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V700.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V800.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V900.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V1000.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V1100.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V1200.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V1300.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V1400.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_V1500.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V600.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V700.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V800.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V900.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V1000.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V1100.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V1200.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V1300.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V1400.xml" SendTime_ms="250"/>
+        <Message MessageFileName="AirVehicleState_V1500.xml" SendTime_ms="250"/>
+    </Service>
+    <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        
+    </Service>
+</UxAS>
+
+

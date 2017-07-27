@@ -186,7 +186,7 @@ namespace service
             if (it == sensors->end ()) // create coverage sensor
             {
               // get origin
-              gams::utility::GPSPosition origin;
+              gams::pose::Position origin (get_frame ());
               knowledge::containers::NativeDoubleArray origin_container;
               origin_container.set_name (
                 "sensor.coverage.origin", *knowledge, 3);
