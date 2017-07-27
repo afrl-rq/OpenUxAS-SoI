@@ -4,6 +4,9 @@ public
     with CMASI;
     with UXTASK;
     with IMPACT;
+
+    -- Includes
+	with ServiceBase_Pkg;
     
     	-- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
@@ -49,7 +52,7 @@ public
 	end top_level.Impl;	
 	
     
-    thread AutomationRequestValidatorService
+    thread AutomationRequestValidatorService extends ServiceBase_Pkg::ServiceBase
         features
             TaskInitialized_in: in event data port uxtask::TaskInitialized.i;
             KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
@@ -348,5 +351,6 @@ public
                
         **};
     end AutomationRequestValidatorService;
+
     
 end AutomationRequestValidatorService_Pkg;

@@ -1,10 +1,14 @@
 package AutomationDiagramDataService_Pkg
 public
+    -- Included DataTypes
     with CMASI;
     with UXTASK;
     with IMPACT;
+
+    -- Includes
+	with ServiceBase_Pkg;
     
-    thread AutomationDiagramDataService
+    thread AutomationDiagramDataService extends ServiceBase_Pkg::ServiceBase
         features
             KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
             UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
@@ -21,5 +25,6 @@ public
         properties
             Dispatch_Protocol => Sporadic;
     end AutomationDiagramDataService;
+
     
 end AutomationDiagramDataService_Pkg;

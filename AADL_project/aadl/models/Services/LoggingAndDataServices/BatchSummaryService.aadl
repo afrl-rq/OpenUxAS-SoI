@@ -3,9 +3,12 @@ public
     -- Data_types Packages
     with CMASI;
     with ROUTE;
-    with IMPACT;    
+    with IMPACT;
+
+    -- Includes
+	with ServiceBase_Pkg;    
     
-    thread BatchSummaryService
+    thread BatchSummaryService extends ServiceBase_Pkg::ServiceBase
         features
             RadioTowerState_in: in event data port impact::RadioTowerState.i;
             GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
@@ -28,5 +31,6 @@ public
             RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
             BatchSummaryResponse_out: out event data port impact::BatchSummaryResponse.i;
     end BatchSummaryService;
+
     
 end BatchSummaryService_Pkg;
