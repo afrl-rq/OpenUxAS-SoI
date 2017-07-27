@@ -12,6 +12,13 @@ public
 	process top_level
 		annex agree {**
 			guarantee "Placeholder guarantee to force agree to run" : true;
+			
+			eq event_UniqueAutomationRequest_in : bool;
+			eq event_TaskPlanOptions_out : bool; 
+			
+			guarantee "Timing Test: A UniqueAutomationRequest_in always results in TaskPlanOptions_out" :
+				whenever event_UniqueAutomationRequest_in occurs event_TaskPlanOptions_out occurs during [0.0,200.0];
+			
 		**};
 	end top_level;
 	
@@ -19,6 +26,9 @@ public
 		subcomponents
 			sub : thread TaskServiceBase; 
 		annex agree {**
+				
+			assign event_UniqueAutomationRequest_in = event(sub.UniqueAutomationRequest_in);
+			assign event_TaskPlanOptions_out = event(sub.TaskPlanOptions_out); 
 			-- These lemmas could be captured in SpeAR as properties
 			
 			--States to check for reachability:
@@ -103,6 +113,7 @@ public
 				
 			lemma "False if the internal variable cached_task_id is not constant (no inadvertent constraints)"	:
 				true -> sub.cached_task_id = pre(sub.cached_task_id);
+			
 				
 		**};
 	end top_level.Impl;	
@@ -521,87 +532,87 @@ public
 
 				--Timing properties
 				
-----				"Response" to UniqueAutomationRequest_in:
-----				If included in the request, begin process of calculating task options and costs by emitting SensorFootprintRequests
-----				Idle -> SensorRequest in normal operation
-----				OptionSelected -> SensorRequest, when interrupted
---
---				eq event_expected_UniqueAutomationRequest_in: bool =
---					(event(UniqueAutomationRequest_in)  and unique_automation_request_task_id_present);
---				eq event_uar_request_in_idle_state : bool = state = IDLE and event_expected_UniqueAutomationRequest_in;
---				eq event_SensorFootprintRequests_out: bool = event(SensorFootprintRequests_out);
---				guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the IDLE state":
---					whenever event_uar_request_in_idle_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
---					
---				guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the IDLE state":
---					whenever event_uar_request_in_idle_state occurs idle_to_sensor_request occurs during [0.0,0.002];
---					
---				eq event_uar_request_in_option_selected_state : bool = state = OPTION_SELECTED and event_expected_UniqueAutomationRequest_in;
---				guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the OPTION_SPELETECTED state" :
---					whenever event_uar_request_in_option_selected_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
---					
---				guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the OPTION_SELECTED state":
---					whenever event_uar_request_in_option_selected_state occurs option_selected_to_sensor_request occurs during [0.0,0.002];
---					
-----			"Response" to TaskImplementationRequest_in
-----			OptionsPublished -> FinalRoutes, emit RouteRequest to determine final waypoint routes needed for implementation
---
---			eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
---			eq event_tir_in_options_published_state : bool = state = OPTIONS_PUBLISHED and event_TaskImplementationRequest;
---			eq event_RouteRequest_out : bool = event(RouteRequest_out);
---			guarantee "RouteRequest_out is emitted within 2ms of receiving TaskImplementationRequest_in in the OPTION_PUBLISHED state":
---				whenever event_tir_in_options_published_state occurs event_RouteRequest_out occurs during [0.0,0.002];
---				
---			guarantee "The task transitions to FINAL_ROUTES within 2ms of receiving TaskImplementationRequest_in in the OPTIONS_PUBLISHED state":
---				whenever event_tir_in_options_published_state occurs options_published_to_final_routes occurs during [0.0,2.0];
---			
-----			"Response" to EntityState_in
-----			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
-----			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
---
---			eq event_EntityState_in : bool = event(EntityState_in);
---			eq event_expected_es_in_option_selected_state : bool = event_EntityState_in and state = OPTION_SELECTED and entity_state_task_id_present;
---			eq event_unexpected_es_in_active_state : bool = event_EntityState_in and state = ACTIVE and not entity_state_task_id_present;
---			
---			guarantee "The task transitions to ACTIVE within 0ms of receiving an expected EntityState_in in the OPTION_SELECTED state":
---				whenever event_expected_es_in_option_selected_state occurs option_selected_to_active occurs during [0.0,0.0];
---				
---			guarantee "The task transitions to IDLE within 0ms of receiving an unexpected EntityState_in in the ACTIVE state":
---				whenever event_unexpected_es_in_active_state occurs active_to_idle occurs during [0.0,0.0];
---				
---				
-----			"Response" to RouteResponse_in
-----			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
-----			FinalRoutes -> OptionSelected, emit TaskImplementationResponse
---
---			eq event_RouteResponse_in : bool = event(RouteResponse_in);
---			eq event_rr_in_option_routes_state : bool = event_RouteResponse_in and state = OPTION_ROUTES;
---			eq event_TaskPlanOptions_out : bool = event(TaskPlanOptions_out);
---			guarantee "TaskPlanOptions_out is emitted within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
---				whenever event_rr_in_option_routes_state occurs event_TaskPlanOptions_out occurs during [0.0,0.001];
---				
---			eq event_rr_in_final_routes_state : bool = event_RouteResponse_in and state = FINAL_ROUTES;
---			eq event_TaskImplementationResponse_out: bool = event(TaskImplementationResponse_out);
---			guarantee "TaskImplementationResponse_out is emitted within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
---				whenever event_rr_in_final_routes_state occurs event_TaskImplementationResponse_out occurs during [0.0,0.001];
---				
---			guarantee "The task transitions to OPTIONS_PUBLISHED within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
---				whenever event_rr_in_option_routes_state occurs option_routes_to_options_published occurs during [0.0,0.001];
---				
---			guarantee "The task transitions to OPTION_SELECTED within 1ms of receiving RouteResponse_in in the FINAL_ROUTES state":
---				whenever event_rr_in_option_routes_state occurs final_routes_to_option_selected occurs during [0.0,0.001];
---				
---				
-----			"Response" to SensorFootprintResponse_in
-----			SensorRequest -> OptionRoutes, emit RouteRequest to determine on-Task waypoints
---
---			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
---			eq event_sfr_in_sensor_request_state : bool = event_SensorFootprintResponse_in and state = SENSOR_REQUEST;
---			guarantee "RouteRequest_out is emitted within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
---				whenever event_sfr_in_sensor_request_state occurs event_RouteRequest_out occurs during [0.0,0.001];
---				
---			guarantee "The task transitions to OPTION_ROUTES within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
---				whenever event_sfr_in_sensor_request_state occurs sensor_request_to_option_routes occurs during [0.0,0.001];
+--				"Response" to UniqueAutomationRequest_in:
+--				If included in the request, begin process of calculating task options and costs by emitting SensorFootprintRequests
+--				Idle -> SensorRequest in normal operation
+--				OptionSelected -> SensorRequest, when interrupted
+
+				eq event_expected_UniqueAutomationRequest_in: bool =
+					(event(UniqueAutomationRequest_in)  and unique_automation_request_task_id_present);
+				eq event_uar_request_in_idle_state : bool = state = IDLE and event_expected_UniqueAutomationRequest_in;
+				eq event_SensorFootprintRequests_out: bool = event(SensorFootprintRequests_out);
+				guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the IDLE state":
+					whenever event_uar_request_in_idle_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
+					
+				guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the IDLE state":
+					whenever event_uar_request_in_idle_state occurs idle_to_sensor_request occurs during [0.0,0.002];
+					
+				eq event_uar_request_in_option_selected_state : bool = state = OPTION_SELECTED and event_expected_UniqueAutomationRequest_in;
+				guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the OPTION_SPELETECTED state" :
+					whenever event_uar_request_in_option_selected_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
+					
+				guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the OPTION_SELECTED state":
+					whenever event_uar_request_in_option_selected_state occurs option_selected_to_sensor_request occurs during [0.0,0.002];
+					
+--			"Response" to TaskImplementationRequest_in
+--			OptionsPublished -> FinalRoutes, emit RouteRequest to determine final waypoint routes needed for implementation
+
+			eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
+			eq event_tir_in_options_published_state : bool = state = OPTIONS_PUBLISHED and event_TaskImplementationRequest;
+			eq event_RouteRequest_out : bool = event(RouteRequest_out);
+			guarantee "RouteRequest_out is emitted within 2ms of receiving TaskImplementationRequest_in in the OPTION_PUBLISHED state":
+				whenever event_tir_in_options_published_state occurs event_RouteRequest_out occurs during [0.0,0.002];
+				
+			guarantee "The task transitions to FINAL_ROUTES within 2ms of receiving TaskImplementationRequest_in in the OPTIONS_PUBLISHED state":
+				whenever event_tir_in_options_published_state occurs options_published_to_final_routes occurs during [0.0,2.0];
+			
+--			"Response" to EntityState_in
+--			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
+--			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
+
+			eq event_EntityState_in : bool = event(EntityState_in);
+			eq event_expected_es_in_option_selected_state : bool = event_EntityState_in and state = OPTION_SELECTED and entity_state_task_id_present;
+			eq event_unexpected_es_in_active_state : bool = event_EntityState_in and state = ACTIVE and not entity_state_task_id_present;
+			
+			guarantee "The task transitions to ACTIVE within 0ms of receiving an expected EntityState_in in the OPTION_SELECTED state":
+				whenever event_expected_es_in_option_selected_state occurs option_selected_to_active occurs during [0.0,0.0];
+				
+			guarantee "The task transitions to IDLE within 0ms of receiving an unexpected EntityState_in in the ACTIVE state":
+				whenever event_unexpected_es_in_active_state occurs active_to_idle occurs during [0.0,0.0];
+				
+				
+--			"Response" to RouteResponse_in
+--			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
+--			FinalRoutes -> OptionSelected, emit TaskImplementationResponse
+
+			eq event_RouteResponse_in : bool = event(RouteResponse_in);
+			eq event_rr_in_option_routes_state : bool = event_RouteResponse_in and state = OPTION_ROUTES;
+			eq event_TaskPlanOptions_out : bool = event(TaskPlanOptions_out);
+			guarantee "TaskPlanOptions_out is emitted within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
+				whenever event_rr_in_option_routes_state occurs event_TaskPlanOptions_out occurs during [0.0,0.001];
+				
+			eq event_rr_in_final_routes_state : bool = event_RouteResponse_in and state = FINAL_ROUTES;
+			eq event_TaskImplementationResponse_out: bool = event(TaskImplementationResponse_out);
+			guarantee "TaskImplementationResponse_out is emitted within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
+				whenever event_rr_in_final_routes_state occurs event_TaskImplementationResponse_out occurs during [0.0,0.001];
+				
+			guarantee "The task transitions to OPTIONS_PUBLISHED within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
+				whenever event_rr_in_option_routes_state occurs option_routes_to_options_published occurs during [0.0,0.001];
+				
+			guarantee "The task transitions to OPTION_SELECTED within 1ms of receiving RouteResponse_in in the FINAL_ROUTES state":
+				whenever event_rr_in_option_routes_state occurs final_routes_to_option_selected occurs during [0.0,0.001];
+				
+				
+--			"Response" to SensorFootprintResponse_in
+--			SensorRequest -> OptionRoutes, emit RouteRequest to determine on-Task waypoints
+
+			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
+			eq event_sfr_in_sensor_request_state : bool = event_SensorFootprintResponse_in and state = SENSOR_REQUEST;
+			guarantee "RouteRequest_out is emitted within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
+				whenever event_sfr_in_sensor_request_state occurs event_RouteRequest_out occurs during [0.0,0.001];
+				
+			guarantee "The task transitions to OPTION_ROUTES within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
+				whenever event_sfr_in_sensor_request_state occurs sensor_request_to_option_routes occurs during [0.0,0.001];
 
 
 
