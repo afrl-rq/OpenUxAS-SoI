@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <UxAS FormatVersion="1.0" EntityID="1400"  EntityType="Aircraft">
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+
+    <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
+    <!-- on Linux, type 'ifconfig' to find interface name -->
+    <!-- on Windows, type 'netsh interface show interface' to find interface name -->
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="wlan0">
+        <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
+        <SubscribeToExternalMessage MessageType="uxas.madara.MadaraState" />
+    </Bridge>
+
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:8400" Server="FALSE">
         <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
-        <SubscribeToMessage MessageType="afrl.cmasi.AirVehicleState" />
-        <SubscribeToMessage MessageType="uxas.madara.MadaraState" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
