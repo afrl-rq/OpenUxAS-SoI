@@ -44,7 +44,7 @@ namespace testgeneration
             void closeConnection();
             bool receiveCommands();
             bool receiveTrajectoryRequest();
-            bool sendTrajInfo(uint32_t numColumns, uint32_t numRows);
+            bool sendTrajInfo(uint32_t numColumns, uint32_t numRows, std::map<int64_t, uint32_t> *vehicleTrajectoryStartIndex);
             bool sendTrajData(size_t length, void* data);
             bool receiveAck();
             void readInitCond();
@@ -61,7 +61,8 @@ namespace testgeneration
                     uint32_t totalNumOfRows, 
                     uint32_t numElementsInRow, 
                     double time,
-                    double * row);
+                    double * row,
+                    std::map<int64_t, uint32_t> *vehicleTrajectoryStartIndex);
             int getSimulationStatus();
             void setSimulationStatus(int simStatus);
             int64_t getMaxSimulationDuration();

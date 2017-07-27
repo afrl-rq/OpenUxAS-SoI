@@ -36,11 +36,14 @@ namespace testgeneration
             void setCameraPixelCount(int64_t vehicleId, 
                     int32_t horizontalPixelCount, 
                     int32_t longitudinalPixelCount);
+            std::map<int64_t, uint32_t> vehicleTrajectoryStartIndex;
         protected:
             std::map<int64_t, double_t> cameraDiagonalPixelCount;
             uxas::common::utilities::CUnitConversions* flatEarth;
             double_t computeGroundSampleDistance(int vehicleId, 
                     double (&cameraFootprintCoordinates)[4][2]);
+            uint32_t nextAvailableStartIndex;
+            uint32_t sizeOfVehicleTrajectory;
         };
     }
 }

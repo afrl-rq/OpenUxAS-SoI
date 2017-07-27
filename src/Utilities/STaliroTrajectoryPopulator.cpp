@@ -11,6 +11,8 @@ namespace testgeneration
         c_TrajectoryPopulator::c_TrajectoryPopulator()
         {
             uxas::common::utilities::CUnitConversions* flatEarth = new uxas::common::utilities::CUnitConversions();
+            nextAvailableStartIndex = 0;
+            sizeOfVehicleTrajectory = 4;
             // Optionally a more generalizable configuration can be read here.
             // For the scope of this project, we will hard code which fields of 
             // which messages will be added to the trajectory.
@@ -64,6 +66,28 @@ namespace testgeneration
         {
             afrl::cmasi::AirVehicleState* airVehicleState = (afrl::cmasi::AirVehicleState*) receivedLmcpMessage;
             int64_t curTime = airVehicleState->getTime();
+            int64_t vhc_id = airVehicleState->getID();
+            
+            if (vehicleTrajectoryStartIndex.find(vhc_id) == vehicleTrajectoryStartIndex.end())
+            {
+                vehicleTrajectoryStartIndex[vhc_id] = nextAvailableStartIndex;
+                nextAvailableStartIndex += sizeOfVehicleTrajectory;
+                for (auto iter = (*trajectory).begin(); iter != (*trajectory).end(); iter++)
+                {
+                    for (uint32_t i = iter->second.size(); i < nextAvailableStartIndex; i++)
+                    {
+                        iter->second.push_back(0.0); // Fix the older results.
+                    }
+                }
+                
+                if ( (*trajectory).find(curTime) == (*trajectory).end() )
+                {
+                    for (uint32_t i = 0; i < nextAvailableStartIndex; i++)
+                    {
+                        (*trajectory)[curTime].push_back(0.0);
+                    }
+                }
+            }
             
             std::map<int64_t, std::vector<double_t>>::iterator curIter = (*trajectory).find(curTime);
             
@@ -72,13 +96,6 @@ namespace testgeneration
                 if (!trajectory->empty() && (trajectory->rbegin()->first < curTime))
                 {
                     (*trajectory)[curTime] = (*trajectory).rbegin()->second;
-                }
-                else
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        (*trajectory)[curTime].push_back(0.0);
-                    }
                 }
             }
             
@@ -108,18 +125,10 @@ namespace testgeneration
                     }
                 }
             }
-            double_t gsd = 6.0; //computeGroundSampleDistance(airVehicleState->getID(), cameraFootprintCoords);
+            double_t gsd = computeGroundSampleDistance(airVehicleState->getID(), cameraFootprintCoords);
             
-            uint32_t indexStart = 0;
+            uint32_t indexStart = vehicleTrajectoryStartIndex[vhc_id];
 
-            if (airVehicleState->getID() == 400)
-            {
-                indexStart = 0;
-            }
-            else if (airVehicleState->getID() == 500)
-            {
-                indexStart = 4;
-            }
             (*trajectory)[curTime][indexStart] = curLatitude;
             (*trajectory)[curTime][indexStart+1] = curLongitude;
             (*trajectory)[curTime][indexStart+2] = curAltitude;

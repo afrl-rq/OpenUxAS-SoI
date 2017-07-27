@@ -397,15 +397,24 @@ namespace testgeneration
         }
         
         bool c_CommunicationInterface::sendTrajInfo(uint32_t numColumns, 
-                uint32_t numRows)
+                uint32_t numRows, std::map<int64_t, uint32_t> *vehicleTrajectoryStartIndex)
         {
             bool retCode = true;
             uint32_t cmd = testgeneration::staliro::STALIRO_TRAJ_INFO;
+            uint32_t num_vhc = (uint32_t) vehicleTrajectoryStartIndex->size();
             
             resetSendBuffer();
             addToSendBuffer((void *) &cmd, sizeof(cmd));
             addToSendBuffer((void *) &numColumns, sizeof(numColumns));
             addToSendBuffer((void *) &numRows, sizeof(numRows));
+            addToSendBuffer((void *) &num_vhc, sizeof(num_vhc));
+            for (auto iter = vehicleTrajectoryStartIndex->begin(); iter != vehicleTrajectoryStartIndex->end(); iter++)
+            {
+                int32_t vhc_id = iter->first;
+                int32_t index = iter->second;
+                addToSendBuffer((void *) &vhc_id, sizeof(vhc_id));
+                addToSendBuffer((void *) &index, sizeof(index));
+            }
             if (sendData())
             {
                 retCode = receiveAck();
@@ -422,12 +431,13 @@ namespace testgeneration
                     uint32_t totalNumOfRows, 
                     uint32_t numElementsInRow, 
                     double time,
-                    double * row)
+                    double * row,
+                    std::map<int64_t, uint32_t> *vehicleTrajectoryStartIndex)
         {
             if (curRowNumber == 1)
             {
                 trajectoryBufferPtr = (void *) trajectoryBuffer;
-                sendTrajInfo((numElementsInRow+1), totalNumOfRows);
+                sendTrajInfo((numElementsInRow+1), totalNumOfRows, vehicleTrajectoryStartIndex);
             }
             if (sizeof(double)*(numElementsInRow+1) + (uint8_t *) trajectoryBufferPtr - 
                     (uint8_t *) trajectoryBuffer > (STALIRO_SEND_BUFFER_SIZE-8))

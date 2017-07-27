@@ -168,6 +168,12 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 staliroInterface->setSimulationStatus(4);
                 std::cout << "sim status 4" << std::endl;
             }
+            else
+            {
+                auto taskStatusRequestMsg = std::make_shared<afrl::cmasi::autonomymonitor::TaskStatusRequest>();
+                taskStatusRequestMsg->setTaskID(-1); //-1 for all tasks!
+                sendSharedLmcpObjectBroadcastMessage(taskStatusRequestMsg);
+            }
         }
         else if (staliroInterface->getSimulationStatus() == 4) // Will send monitoring results
         {
@@ -195,7 +201,8 @@ MessageLoggerForTestService::sendOutTrajectory()
                 totalNumOfRows, 
                 trajIter.second.size(), 
                 (double) ((double) trajIter.first)/1000.0,
-                (double *) &trajIter.second[0]);
+                (double *) &trajIter.second[0],
+                & staliroTrajectoryPopulator->vehicleTrajectoryStartIndex);
     }
 }
 
