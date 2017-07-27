@@ -168,7 +168,7 @@ public
             
             const SERVICE_TYPE_ERROR_SIGNAL : int = 2;
             
-            eq timer_reset: bool =
+            eq timer_reset: bool = 
                 (event(UniqueAutomationRequest_out) or --Timer starts once we ask for a response (make a request)
                 state=IDLE or 						  -- Timer is always 0 in the IDLE state
                 (event(UniqueAutomationResponse_in) and 
@@ -273,12 +273,14 @@ public
                        
             
             --Note: unless timeout_option is fixed, the model checker can switch it on and off arbitrarily, allowing this behavior for now
-            guarantee "Service includes an optional timeout. When a UniqueAutomationRequest is published, a timer begins" : true ->
+            guarantee "Service includes an optional timeout. When a UniqueAutomationRequest is published, a timer begins. 
+            	[When the timeout option is 'on' increment the timer (currently unspecified how per time step) unless a timer
+            		reset is received, in which case the timer is reset to 0 on the next time step]" : true ->
                 timeout_option => 
-                    if timer_reset then
+                    (if pre(timer_reset) then
                         timer = 0
                     else 
-                        timer > pre(0->timer); --Note: forcing an incrementing timer (unspecified increment) for now
+                        timer > prev(0,timer)); --Note: forcing an incrementing timer (unspecified increment) for now
                         
                         
             --TODO: is this service validating "requests" while queued or only when requests are being actively serviced.
