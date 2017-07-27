@@ -20,13 +20,14 @@ namespace testgeneration
                 int32_t horizontalPixelCount, 
                 int32_t longitudinalPixelCount)
         {
-            double pixelCount = std::sqrt(std::pow((double_t) horizontalPixelCount, 2.0) 
-                    + std::pow((double_t) longitudinalPixelCount, 2.0));
-            if (pixelCount < 1.0)
+            double pixelCount = 1.0;
+            double tempPixelCount = (double) (std::sqrt(std::pow((double_t) horizontalPixelCount, 2.0) 
+                    + std::pow((double_t) longitudinalPixelCount, 2.0)));
+            if (tempPixelCount > 1.0)
             {
-                pixelCount = 1.0;
+                pixelCount = tempPixelCount;
             }
-            cameraDiagonalPixelCount.insert(std::pair<int, double>(vehicleId, pixelCount));
+            cameraDiagonalPixelCount[vehicleId] = pixelCount;
         }
         
         double_t c_TrajectoryPopulator::computeGroundSampleDistance(int vehicleId, 

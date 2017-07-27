@@ -37,8 +37,8 @@ namespace testgeneration
                     int32_t horizontalPixelCount, 
                     int32_t longitudinalPixelCount);
         protected:
-            uxas::common::utilities::CUnitConversions* flatEarth;
             std::map<int, double> cameraDiagonalPixelCount;
+            uxas::common::utilities::CUnitConversions* flatEarth;
             double_t computeGroundSampleDistance(int vehicleId, 
                     double (&cameraFootprintCoordinates)[4][2]);
         };
