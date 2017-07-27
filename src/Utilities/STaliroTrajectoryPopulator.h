@@ -33,11 +33,11 @@ namespace testgeneration
             
             void populateTrajectory(void* receivedLmcpMessage, 
                     std::map<int64_t, std::vector<double_t>>* trajectory);
-            void setCameraPixelCount(int vehicleId, 
+            void setCameraPixelCount(int64_t vehicleId, 
                     int32_t horizontalPixelCount, 
                     int32_t longitudinalPixelCount);
         protected:
-            std::map<int, double> cameraDiagonalPixelCount;
+            std::map<int64_t, double_t> cameraDiagonalPixelCount;
             uxas::common::utilities::CUnitConversions* flatEarth;
             double_t computeGroundSampleDistance(int vehicleId, 
                     double (&cameraFootprintCoordinates)[4][2]);

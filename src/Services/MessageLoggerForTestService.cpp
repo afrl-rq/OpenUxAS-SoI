@@ -40,6 +40,7 @@ MessageLoggerForTestService::ServiceBase::CreationRegistrar<MessageLoggerForTest
 MessageLoggerForTestService::MessageLoggerForTestService()
 : ServiceBase(MessageLoggerForTestService::s_typeName(), MessageLoggerForTestService::s_directoryName())
 {
+    staliroTrajectoryPopulator = new testgeneration::staliro::c_TrajectoryPopulator;
 };
 
 MessageLoggerForTestService::~MessageLoggerForTestService()
@@ -100,8 +101,7 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 {
                     uint32_t horRes = static_cast<afrl::cmasi::CameraConfiguration*>(*plIter)->getVideoStreamHorizontalResolution();
                     uint32_t verRes = static_cast<afrl::cmasi::CameraConfiguration*>(*plIter)->getVideoStreamVerticalResolution();
-                    
-                    //staliroTrajectoryPopulator->setCameraPixelCount(airVehicleConfig->getID(), horRes, verRes);
+                    staliroTrajectoryPopulator->setCameraPixelCount(airVehicleConfig->getID(), horRes, verRes);
                 }
             }           
         }

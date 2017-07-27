@@ -16,12 +16,12 @@ namespace testgeneration
             // which messages will be added to the trajectory.
         }
         
-        void c_TrajectoryPopulator::setCameraPixelCount(int vehicleId, 
+        void c_TrajectoryPopulator::setCameraPixelCount(int64_t vehicleId, 
                 int32_t horizontalPixelCount, 
                 int32_t longitudinalPixelCount)
         {
-            double pixelCount = 1.0;
-            double tempPixelCount = (double) (std::sqrt(std::pow((double_t) horizontalPixelCount, 2.0) 
+            double_t pixelCount = 1.0;
+            double_t tempPixelCount = (double) (std::sqrt(std::pow((double_t) horizontalPixelCount, 2.0) 
                     + std::pow((double_t) longitudinalPixelCount, 2.0)));
             if (tempPixelCount > 1.0)
             {
