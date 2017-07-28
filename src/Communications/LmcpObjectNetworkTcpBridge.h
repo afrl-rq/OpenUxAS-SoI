@@ -140,7 +140,7 @@ private:
      * than the external sender. This can be used when connected directly to a vehicle 
      * simulation where the messages received would be considered self-generated in
      * normal operation. */
-    bool m_isConsideredSelfGenerated{false};
+    bool m_isConsideredSelfGenerated{true};
     
 };
 
