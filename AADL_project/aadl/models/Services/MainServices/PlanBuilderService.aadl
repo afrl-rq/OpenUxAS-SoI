@@ -8,7 +8,13 @@ public
 	--  "properties" of our component contract.
 	process top_level
 		annex agree {**
-			guarantee "Placeholder guarantee to force agree to run" : true;
+			eq event_TaskAssignmentSummary_in : bool;
+			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
+				
+			eq event_TaskImplementationResponse_in : bool;
+			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskImplementationResponse_in occurs sporadic with IAT 0.003;
 		**};
 	end top_level;
 	
@@ -16,6 +22,9 @@ public
 		subcomponents
 			sub : thread PlanBuilderService; 
 		annex agree {**
+			assign event_TaskAssignmentSummary_in = event(sub.TaskAssignmentSummary_in);
+			assign event_TaskImplementationResponse_in = event(sub.TaskImplementationResponse_in);
+			
 			-- These lemmas could be captured in SpeAR as properties
 			
 			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
@@ -191,45 +200,55 @@ public
         		
         	--Timing Properties
         	
-----        	"Response" to TaskAssignmentSummary_in
-----        	idle -> busy, create a queue of ordered TaskImplementationRequest messages in the order --NOTE: now corresponds to idle_waiting_to_busy_requesting
-----        	prescribed by the TaskAssignmentSummary. Emit request at top of queue.	
---
---			eq event_TaskAssignmentSummary_in : bool = event(TaskAssignmentSummary_in);
---			
---			--NOTE: in this spec, the event occurs and the state transitions at the same time, i.e., must check the previous state is IDLE_WAITING
---			eq event_tas_in_idle_waiting : bool = event_TaskAssignmentSummary_in and pre(state = IDLE_WAITING);
---			guarantee "The service transitions to BUSY_REQUESTING within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state " :
---				whenever event_tas_in_idle_waiting occurs idle_waiting_to_busy_requesting occurs during [0.0,0.002];
---				
---			--NOTE: Likely redundant with the above guarantee given the semantics of the state change
---			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
---			guarantee "A TaskImplementationRequest_out is emitted within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state
---				i.e., the queued TaskImplementationRequest_out requests begin emitted before 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state" :
---				whenever event_tas_in_idle_waiting occurs event_TaskImplementationRequest_out occurs during [0.0,0.002];	
---				
---		
-----			"Response" to TaskImplementationResponse_in
-----			Remove top of task request queue and update predicted locations of vehicles. 
-----			If task request queue is not empty, configure request at top of queue with predicted 
-----			vehicle positions and emit the corresponding TaskImplementationRequest message. If queue is empty, busy -> idle.
---
---			--Pick up point: I believe this property refers to BUSY_WAITING
---			
---			eq event_TaskImplementationResponse_in : bool = event(TaskImplementationResponse_in);
---			eq event_tir_in_busy_waiting_state : bool = event_TaskImplementationResponse_in and state = BUSY_WAITING;
---			eq request_out_or_busy_waiting_to_idle : bool = event_TaskImplementationRequest_out or busy_waiting_to_idle;
---			
---			guarantee "The service conifgures the request at the top of the 'queue' with predicted vehicle positions and emits a TaskImplementationRequest_out message or
---				transitions to IDLE within 2ms of receiving TaskImplementationResponse_in in the BUSY_WAITING state." :
---				whenever event_tir_in_busy_waiting_state occurs request_out_or_busy_waiting_to_idle occurs during [0.0,0.002];
---				
---			--NOTE: IMPLIED GUARANTEE FROM ABOVE
---			eq event_tir_in_busy_waiting_state_and_all_requests_made : bool = event_tir_in_busy_waiting_state and all_task_requests_sent_in_order;
---			guarantee "The service transitions to IDLE within 2ms of receiving TaskImplementationResponse_in in the BUSY_WAITING state when
---				all task implementation requests have been serviced":
---				whenever event_tir_in_busy_waiting_state_and_all_requests_made occurs busy_waiting_to_idle occurs during [0.0,0.002];
---				
+--        	"Response" to TaskAssignmentSummary_in
+--        	idle -> busy, create a queue of ordered TaskImplementationRequest messages in the order --NOTE: now corresponds to idle_waiting_to_busy_requesting
+--        	prescribed by the TaskAssignmentSummary. Emit request at top of queue.	
+
+			eq event_TaskAssignmentSummary_in : bool = event(TaskAssignmentSummary_in);
+			eq event_tas_in_idle_waiting : bool = event_TaskAssignmentSummary_in and pre(state = IDLE_WAITING);
+			
+			--NOTE: needed to address bound conccern. 
+			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
+			
+			--NOTE: in this spec, the event occurs and the state transitions at the same time, i.e., must check the previous state is IDLE_WAITING
+			guarantee "The service transitions to BUSY_REQUESTING within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state " :
+				whenever event_tas_in_idle_waiting occurs idle_waiting_to_busy_requesting occurs during [0.0,0.002];
+				
+			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
+			--NOTE: Likely redundant with the above guarantee given the semantics of the state change
+			guarantee "A TaskImplementationRequest_out is emitted within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state
+				i.e., the queued TaskImplementationRequest_out requests begin emitted before 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state" :
+				whenever event_tas_in_idle_waiting occurs event_TaskImplementationRequest_out occurs during [0.0,0.002];	
+				
+		
+--			"Response" to TaskImplementationResponse_in
+--			Remove top of task request queue and update predicted locations of vehicles. 
+--			If task request queue is not empty, configure request at top of queue with predicted 
+--			vehicle positions and emit the corresponding TaskImplementationRequest message. If queue is empty, busy -> idle.
+
+			--Pick up point: I believe this property refers to BUSY_WAITING
+			
+			eq event_TaskImplementationResponse_in : bool = event(TaskImplementationResponse_in);
+			eq event_tir_in_busy_waiting_state : bool = event_TaskImplementationResponse_in and state = BUSY_WAITING;
+			eq request_out_or_busy_waiting_to_idle : bool = event_TaskImplementationRequest_out or busy_waiting_to_idle;
+			
+			--NOTE: needed to address bound conccern. 
+			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskImplementationResponse_in occurs sporadic with IAT 0.003;
+			
+			guarantee "The service conifgures the request at the top of the 'queue' with predicted vehicle positions and emits a TaskImplementationRequest_out message or
+				transitions to IDLE within 2ms of receiving TaskImplementationResponse_in in the BUSY_WAITING state." :
+				whenever event_tir_in_busy_waiting_state occurs request_out_or_busy_waiting_to_idle occurs during [0.0,0.002];
+				
+			--NOTE: IMPLIED GUARANTEE FROM ABOVE: Added as a result of considering how long it takes to transition out of BUSY_WAITING total
+				--Cannot specify the total time, but we can specify the specific condition under which a transition occurs. This is likely 
+				--redundant with the above guarantee but added to completeness. 
+			eq event_tir_in_busy_waiting_state_and_all_requests_made : bool = event_tir_in_busy_waiting_state and all_task_requests_sent_in_order;
+			guarantee "The service transitions to IDLE within 2ms of receiving TaskImplementationResponse_in in the BUSY_WAITING state when
+				all task implementation requests have been serviced":
+				whenever event_tir_in_busy_waiting_state_and_all_requests_made occurs busy_waiting_to_idle occurs during [0.0,0.002];
+				
 			
 			
         **};
