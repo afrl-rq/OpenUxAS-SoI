@@ -355,10 +355,6 @@ namespace service
         gams::pose::Position current (gps_frame);
         current.from_container(self_->agent.location);
 
-        // @Derek, I need to recreate the code for creating a afrl::cmasi::Waypoint
-        // from the gams::pose::Position location that is passed in.
-        std::shared_ptr<afrl::cmasi::Waypoint> uxasWP;
-        
         if (m_last != location)
         {
             gams::platforms::BasePlatform::move(location, epsilon);
@@ -384,8 +380,10 @@ namespace service
               location.lat(), location.lng(), location.alt(), 
               current.lat(), current.lng(), current.alt(), epsilon);
 
-            // @Derek as a reminder, this is where we use the uxasWP
-            m_service->sendWaypoint(location, uxasWP);
+            // note, sending a 'null' uxasWP which will get
+            // overwritten with the geographic position indicated
+            // in 'location'
+            m_service->sendWaypoint(location, std::shared_ptr<afrl::cmasi::Waypoint>(nullptr));
             return platforms::PLATFORM_MOVING;
         }
     }
