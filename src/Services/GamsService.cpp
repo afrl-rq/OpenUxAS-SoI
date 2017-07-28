@@ -30,7 +30,9 @@
 #include "gams/loggers/GlobalLogger.h"
 
 #include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityConfiguration.h"
 #include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
 #include "afrl/cmasi/LoiterAction.h"
@@ -38,6 +40,9 @@
 #include "afrl/cmasi/Waypoint.h"
 
 #include "afrl/impact/GroundVehicleState.h"
+#include "afrl/impact/GroundVehicleConfiguration.h"
+#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/impact/SurfaceVehicleConfiguration.h"
 
 #include "uxas/messages/uxnative/IncrementWaypoint.h"
 
@@ -709,7 +714,9 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
         {
             if (!currentXmlNode.attribute("Speed").empty())
             {
+                // specifying speed in the config file will override nominal entity speed
                 m_vehicleSpeed = currentXmlNode.attribute("Speed").as_double();
+                m_overrideSpeed = true;
             }
         }
         // if we need to load initial knowledge
@@ -955,9 +962,16 @@ GamsService::configure(const pugi::xml_node& serviceXmlNode)
     s_knowledgeBase.save_context(
         m_controllerSettings.checkpoint_prefix + "_config_knowledgeBase.kb");
 
+    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    
     addSubscriptionAddress(uxas::madara::MadaraState::Subscription);
     
     return true;
@@ -1057,7 +1071,23 @@ GamsService::sendWaypoint (const gams::pose::Position & location,
         nextPoint = new afrl::cmasi::Waypoint ();
         nextPoint->setNumber(1);
         nextPoint->setNextWaypoint(1);
-        nextPoint->setSpeed(m_vehicleSpeed);  // TODO: get from AirVehicleConfiguration
+        if(m_overrideSpeed)
+        {
+            nextPoint->setSpeed(m_vehicleSpeed);
+        }
+        else
+        {
+            if(m_entityConfigurations.find(this->m_entityId) != m_entityConfigurations.end())
+            {
+                nextPoint->setSpeed(m_entityConfigurations[this->m_entityId]->getNominalSpeed());
+            }
+            else
+            {
+                // not overridden and not found in entity configuration list
+                // so set to reasonable default value
+                nextPoint->setSpeed(m_vehicleSpeed);
+            }
+        }
     }
     
     nextPoint->setLatitude(location.lat());
@@ -1096,6 +1126,7 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
 {
     if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()) ||
         afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()) ||
+        afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()) ||
         afrl::cmasi::isEntityState(receivedLmcpMessage->m_object.get()))
     {
         // retrieve a EntityState pointer for querying
@@ -1152,6 +1183,17 @@ GamsService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::da
         currentPosition.to_container(agent.location);
         
         agent.battery_remaining = message->getEnergyAvailable();
+    }
+    else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object) ||
+        afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object) ||
+        afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object) ||
+        afrl::cmasi::isEntityConfiguration(receivedLmcpMessage->m_object))
+    {
+        auto entityConfig = std::dynamic_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
+        if(entityConfig)
+        {
+            m_entityConfigurations[entityConfig->getID()] = entityConfig;
+        }
     }
     else if (uxas::madara::isMadaraState (receivedLmcpMessage->m_object.get()))
     {

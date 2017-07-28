@@ -32,11 +32,13 @@
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/TurnType.h"
 #include "afrl/cmasi/MissionCommand.h"
+#include "afrl/cmasi/EntityConfiguration.h"
 
 #include <cstdint> // uint32_t
 #include <atomic>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 namespace uxas
 {
@@ -245,6 +247,8 @@ private:
 
     /// the vehicle speed
     double m_vehicleSpeed = 22.0;
+    bool m_overrideSpeed{false};
+    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration>> m_entityConfigurations;
 };
 
 }; //namespace service
