@@ -11,7 +11,10 @@ public
 	--  "properties" of our component contract.
 	process top_level
 		annex agree {**
-			guarantee "Placeholder guarantee to force agree to run" : true;
+				
+			eq event_AssignmentCostMatrix_in : bool;
+			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
+				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
 		**};
 	end top_level;
 	
@@ -19,6 +22,8 @@ public
 		subcomponents
 			sub : thread AssignmentTreeBranchBoundBase; 
 		annex agree {**
+				assign event_AssignmentCostMatrix_in = event(sub.AssignmentCostMatrix_in);
+				
 			-- These lemmas could be captured in SpeAR as properties
 			
 			--States to check for reachability:
@@ -144,33 +149,41 @@ public
       				
       		--Timing properties
       		
-----      		"Response" to UniqueAutomationRequest_in
-----      		idle -> wait, store request ID for identification of corresponding TaskPlanOptions and AssignmentCostMatrix.
---      		
---      		eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
---      		eq event_uar_in_idle_state : bool = event_UniqueAutomationRequest_in and state = IDLE;
---      		guarantee "The service transitions to WAIT within 0ms of receiving UniqueAutomationRequest_in from the IDLE state":
---      			whenever event_uar_in_idle_state occurs idle_to_wait occurs during [0.0,0.0];
---      			
---      		eq uar_id_cached : bool = curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID;
---      		guarantee "The service caches the ID of a received UniqueAutomationRequest_in within 0ms in the IDLE state":
---      			whenever event_uar_in_idle_state occurs uar_id_cached occurs during [0.0,0.0];
---      		
-----      		"Response" to AssignmentCostMatrix_in
-----      		Using the cost of each task option (from the stored TaskPlanOptions messages) 
-----      		and the cost for each vehicle to reach each option (from AssignmentCostMatrix), 
-----      		perform an optimization attempting to find the minimal cost mission that adheres to the 
-----      		Process Algebra contraints. Upon completion, emit TaskAssignmentSummary and wait -> idle.
---
---			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
---			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
---			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
---			
---			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state":
---				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
---				
---			guarantee "The service transitions to IDLE within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state ":
---				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
+--      		"Response" to UniqueAutomationRequest_in
+--      		idle -> wait, store request ID for identification of corresponding TaskPlanOptions and AssignmentCostMatrix.
+      		
+      		eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+      		eq event_uar_in_idle_state : bool = event_UniqueAutomationRequest_in and state = IDLE;
+      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
+      		--small amount of time instead of 0 for this guarantee. 
+      		guarantee "The service transitions to WAIT within 0ms of receiving UniqueAutomationRequest_in from the IDLE state":
+      			whenever event_uar_in_idle_state occurs idle_to_wait occurs during [0.0,0.0000001];
+      			
+      		eq uar_id_cached : bool = curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID;
+      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
+      		--small amount of time instead of 0 for this guarantee. 
+      		guarantee "The service caches the ID of a received UniqueAutomationRequest_in within 0ms in the IDLE state":
+      			whenever event_uar_in_idle_state occurs uar_id_cached occurs during [0.0,0.0000001];
+      		
+--      		"Response" to AssignmentCostMatrix_in
+--      		Using the cost of each task option (from the stored TaskPlanOptions messages) 
+--      		and the cost for each vehicle to reach each option (from AssignmentCostMatrix), 
+--      		perform an optimization attempting to find the minimal cost mission that adheres to the 
+--      		Process Algebra contraints. Upon completion, emit TaskAssignmentSummary and wait -> idle.
+
+			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
+			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
+			
+			--NOTE: needed to address bound conccern. 
+			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
+				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
+			
+			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state":
+				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
+				
+			guarantee "The service transitions to IDLE within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state ":
+				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
       	**};
     end AssignmentTreeBranchBoundBase;
 

@@ -6,6 +6,21 @@ public
     with IMPACT;
     with UXNATIVE;
   
+  process top_level
+		annex agree {**
+			eq event_RemoveTasks_in : bool;
+			assume "RemoveTasks_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+				condition event_RemoveTasks_in occurs sporadic with IAT 0.002;
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread TaskManagerService; 
+		annex agree {**
+			assign event_RemoveTasks_in = event(sub.RemoveTasks_in);
+		**};
+	end top_level.Impl;
     
     thread TaskManagerService
         features
@@ -43,15 +58,20 @@ public
                     true; --TBD
                     
              --Timing properties
---             eq event_Task_in : bool = event(Task_in);
---             eq event_CreateNewService_out : bool = event(CreateNewService_out);
---             guarantee "CreateNewService_out is emited within 1ms of receiving Task_in":
---              	whenever event_Task_in occurs event_CreateNewService_out occurs during [0.0,0.001];
---              	
---            eq event_RemoveTasks_in : bool = event(RemoveTasks_in);
---            eq event_KillService_out: bool = event(KillService_out);
---            guarantee "KillService_out is emited within 1ms of receiving RemoveTasks_in" :
---            	whenever event_RemoveTasks_in occurs event_KillService_out occurs during [0.0,0.001];
+             eq event_Task_in : bool = event(Task_in);
+             eq event_CreateNewService_out : bool = event(CreateNewService_out);
+             guarantee "CreateNewService_out is emited within 1ms of receiving Task_in":
+              	whenever event_Task_in occurs event_CreateNewService_out occurs during [0.0,0.001];
+              	
+            eq event_RemoveTasks_in : bool = event(RemoveTasks_in);
+            eq event_KillService_out: bool = event(KillService_out);
+            
+            --NOTE: needed to address bounds conccern. 
+			assume "RemoveTasks_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+				condition event_RemoveTasks_in occurs sporadic with IAT 0.002;
+            
+            guarantee "KillService_out is emited within 1ms of receiving RemoveTasks_in" :
+            	whenever event_RemoveTasks_in occurs event_KillService_out occurs during [0.0,0.001];
              
         **};
         

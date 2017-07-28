@@ -8,11 +8,18 @@ public
     -- Includes
 	with ServiceBase_Pkg;
     
-    	-- This is a "dummy" top-level system. We use it so that we can check 
+    -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
 		annex agree {**
-			guarantee "Placeholder guarantee to force agree to run" : true;
+			eq event_AutomationRequest_in : bool;
+			assume "AutomationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms.": 
+				condition event_AutomationRequest_in occurs sporadic with IAT 0.003;
+				
+			eq event_UniqueAutomationResponse_in : bool;
+			assume "UniqueAutomationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+				condition event_UniqueAutomationResponse_in occurs sporadic with IAT 0.002;
+			
 		**};
 	end top_level;
 	
@@ -20,6 +27,9 @@ public
 		subcomponents
 			sub : thread AutomationRequestValidatorService; 
 		annex agree {**
+				assign event_AutomationRequest_in = event(sub.AutomationRequest_in);
+				assign event_UniqueAutomationResponse_in = event(sub.UniqueAutomationResponse_in);
+				
 			-- These lemmas could be captured in SpeAR as properties
 			
 			--States to check for reachability:
@@ -313,41 +323,52 @@ public
 
 
 			--Timing properties
-----			"Response" to AutomationRequest_in
-----			Determines validity of AutomationRequest.
-----			idle -> busy, emit UniqueAutomationRequest
-----			busy -> busy, add UniqueAutomationRequest to queue
---			
---			--TODO: may need an assumption about the frequency of AutomationRequest_in
---			eq event_AutomationRequest_in : bool = event(AutomationRequest_in);
---			eq event_UniqueAutomationRequest_out_or_queued : bool = event(UniqueAutomationRequest_out) or numTasksInQ = pre(numTasksInQ)+1;
---			guarantee "Validity of AutomationRequest_in is determined within 2ms at which time the a UniqueAutomationRequest is emited, or the request is queued":
---				whenever event_AutomationRequest_in occurs event_UniqueAutomationRequest_out_or_queued occurs during [0.0,0.002];
---			
---			--TODO: uncertain if the BUSY to BUSY transition is appropriately modeled
---			eq idle_to_busy_or_busy_to_busy : bool = false -> (idle_to_busy or (state = BUSY and pre(state) = BUSY));
---			guarantee "The service transitions from IDLE to BUSY or transitions back to BUSY (transitions from BUSY to BUSY) within
---				2ms of receiving AutomationRequest_in": 
---					whenever event_AutomationRequest_in occurs idle_to_busy_or_busy_to_busy occurs during [0.0,0.002];
---				
-----			"Response" to UniqueAutomationResponse_in
-----			If response ID does not match request ID at top of queue, ignore and remain in current state. Otherwise:
-----			idle -> idle, normal operation should preclude receiving this message in the idle state
-----			busy, emit corresponding AutomationResponse
-----			If queue is empty, busy -> idle, else
-----			busy -> busy, emit request message at top of queue	
---				
---			--TODO: Check assumption: I am assuming that ignoring a message takes undefined time (0?)
---			eq event_busy_and_UniqueAutomationResponse_in : bool = state=BUSY and event(UniqueAutomationResponse_in);
---			eq event_AutomationResponse_out : bool = event(AutomationResponse_out);
---			guarantee "Sending a AutomationResponse_out in response to a UniqueAutomationResponse_in in the BUSY state occurs within 1ms" :
---				whenever event_busy_and_UniqueAutomationResponse_in occurs event_AutomationResponse_out occurs during [0.0,0.001];
---				
---			--TODO: uncertain if the BUSY to BUSY transition is appropriately modeled	
---			eq busy_to_idle_or_busy_to_busy : bool = false->(busy_to_idle or (state=BUSY and pre(state) = BUSY));
---			guarantee "The service transitions from BUSY to IDLE or remains BUSY (transitions from BUSY to BUSY) within 1ms of 
---				receiving UniqueAutomationResponse_in in the busy state" : 
---				whenever event_busy_and_UniqueAutomationResponse_in occurs busy_to_idle_or_busy_to_busy occurs during [0.0,0.001];
+--			"Response" to AutomationRequest_in
+--			Determines validity of AutomationRequest.
+--			idle -> busy, emit UniqueAutomationRequest
+--			busy -> busy, add UniqueAutomationRequest to queue
+			
+			eq event_AutomationRequest_in : bool = event(AutomationRequest_in);
+			eq event_UniqueAutomationRequest_out_or_queued : bool = event(UniqueAutomationRequest_out) or numTasksInQ = pre(numTasksInQ)+1;
+			
+			--NOTE: needed to address bound conccern. 
+			assume "AutomationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms.": 
+				condition event_AutomationRequest_in occurs sporadic with IAT 0.003;
+			
+			guarantee "Validity of AutomationRequest_in is determined within 2ms at which time the a UniqueAutomationRequest is emited, or the request is queued":
+				whenever event_AutomationRequest_in occurs event_UniqueAutomationRequest_out_or_queued occurs during [0.0,0.002];
+			
+			--TODO: uncertain if the BUSY to BUSY transition is appropriately modeled
+			eq idle_to_busy_or_busy_to_busy : bool = false -> (idle_to_busy or (state = BUSY and pre(state) = BUSY));
+			guarantee "The service transitions from IDLE to BUSY or transitions back to BUSY (transitions from BUSY to BUSY) within
+				2ms of receiving AutomationRequest_in": 
+					whenever event_AutomationRequest_in occurs idle_to_busy_or_busy_to_busy occurs during [0.0,0.002];
+				
+--			"Response" to UniqueAutomationResponse_in
+--			If response ID does not match request ID at top of queue, ignore and remain in current state. Otherwise:
+--			idle -> idle, normal operation should preclude receiving this message in the idle state
+--			busy, emit corresponding AutomationResponse
+--			If queue is empty, busy -> idle, else
+--			busy -> busy, emit request message at top of queue	
+				
+			
+			eq event_UniqueAutomationResponse_in : bool = event(UniqueAutomationResponse_in);
+			eq event_busy_and_UniqueAutomationResponse_in : bool = state=BUSY and event_UniqueAutomationResponse_in;
+			eq event_AutomationResponse_out : bool = event(AutomationResponse_out);
+			
+			--NOTE: needed to address bound conccern. 
+			assume "UniqueAutomationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+				condition event_UniqueAutomationResponse_in occurs sporadic with IAT 0.002;
+			
+			--TODO: Check assumption: I am assuming that ignoring a message takes undefined time (0?)
+			guarantee "Sending a AutomationResponse_out in response to a UniqueAutomationResponse_in in the BUSY state occurs within 1ms" :
+				whenever event_busy_and_UniqueAutomationResponse_in occurs event_AutomationResponse_out occurs during [0.0,0.001];
+				
+			--TODO: uncertain if the BUSY to BUSY transition is appropriately modeled	
+			eq busy_to_idle_or_busy_to_busy : bool = false->(busy_to_idle or (state=BUSY and pre(state) = BUSY));
+			guarantee "The service transitions from BUSY to IDLE or remains BUSY (transitions from BUSY to BUSY) within 1ms of 
+				receiving UniqueAutomationResponse_in in the busy state" : 
+				whenever event_busy_and_UniqueAutomationResponse_in occurs busy_to_idle_or_busy_to_busy occurs during [0.0,0.001];
                
         **};
     end AutomationRequestValidatorService;
