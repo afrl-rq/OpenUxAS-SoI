@@ -154,10 +154,14 @@ public
       		
       		eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
       		eq event_uar_in_idle_state : bool = event_UniqueAutomationRequest_in and state = IDLE;
+      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
+      		--small amount of time instead of 0 for this guarantee. 
       		guarantee "The service transitions to WAIT within 0ms of receiving UniqueAutomationRequest_in from the IDLE state":
       			whenever event_uar_in_idle_state occurs idle_to_wait occurs during [0.0,0.0000001];
       			
       		eq uar_id_cached : bool = curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID;
+      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
+      		--small amount of time instead of 0 for this guarantee. 
       		guarantee "The service caches the ID of a received UniqueAutomationRequest_in within 0ms in the IDLE state":
       			whenever event_uar_in_idle_state occurs uar_id_cached occurs during [0.0,0.0000001];
       		
