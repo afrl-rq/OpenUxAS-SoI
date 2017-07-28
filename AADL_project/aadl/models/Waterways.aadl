@@ -50,12 +50,18 @@ public
         	assume "Process one automation request at a time" :
         		pre(PLTL.Once(event(AutomationRequest_in))) => not event(AutomationRequest_in);
         	
-        	assume "time_init": time = 0.0 -> time = pre(time)+1.0;
+--        	assume "time_init": time = 0.0 -> time = pre(time)+1.0;
         	
-        	eq event_RoutePlanRequest_in : bool;
-        	eq event_RoutePlanResponse_out : bool;
-        	guarantee "RoutePlannerVisibilityService responsiveness" : 
-        		whenever event_RoutePlanRequest_in occurs event_RoutePlanResponse_out occurs during [0.0,5.0];
+--        	eq event_RoutePlanRequest_in : bool;
+--        	eq event_RoutePlanResponse_out : bool;
+--        	guarantee "RoutePlannerVisibilityService responsiveness" : 
+--        		whenever event_RoutePlanRequest_in occurs event_RoutePlanResponse_out occurs during [0.0,5.0];
+
+			eq event_rasc_AssignmentCostMatrix_out : bool;
+			eq event_pbs_TaskImplementationRequest_out: bool;
+			guarantee "An AssignmentCostMatrix_out produced from the RouteAggregatorService_Collector a TaskImplementation_Request_out is emited from the
+				PlanBuilderService within 200 seconds":
+				whenever event_rasc_AssignmentCostMatrix_out occurs event_pbs_TaskImplementationRequest_out occurs during [0.0,200.0];
         **};
     end waterways;
 
@@ -112,8 +118,7 @@ public
             conn12: port OverwatchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn13: port PatternSearchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             
-            conn14: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
---            conn140: port Route
+--            conn14: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
             
             conn15: port RouteAggregatorService_Aggregator.RouteResponse_out -> AngledAreaSearchTask.RouteResponse_in;            
             conn16: port RouteAggregatorService_Aggregator.RouteResponse_out -> AssignmentCoordinatorTask.RouteResponse_in;
@@ -268,6 +273,31 @@ public
             conn173: port PlanBuilderService.TaskImplementationRequest_out -> OverwatchTask.TaskImplementationRequest_in;
             conn174: port PlanBuilderService.TaskImplementationRequest_out -> PatternSearchTask.TaskImplementationRequest_in;
             
+            -- Connections added that were discovered missing in the automated connection passes
+            -- RouteRequest from Tasks to RA_Aggregator
+            -- Note: Many to 1 fan in
+            conn200: port AngledAreaSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn201: port AssignmentCoordinatorTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn202: port BlockadeTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn203: port CmasiPointSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn204: port CommRelayTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn205: port CordonTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn206: port EscortTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn207: port ImpactLineSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn208: port ImpactPointSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn209: port MultiVehicleWatchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn210: port OverwatchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn211: port PatternSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            
+            -- RoutePlanRequest from RA_Aggregator to RoutePlannerVisibilityService
+            conn220: port RouteAggregatorService_Aggregator.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            
+            -- RoutePlanResponse from RoutePlannerVisibilityService to RA_Aggregator
+            conn225: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
+            
+            -- AssignmentTreeCostMatrix from RA_Aggregator to AssignmentTreeBranchBoundService
+            conn230: port RouteAggregatorService_Collector.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundService.AssignmentCostMatrix_in;
+            
     	properties
     		UxAS_Props::OS => Linux;
         annex resolute {**
@@ -276,12 +306,15 @@ public
             prove isolation(this) 
         **};
         annex agree {**
+        		
+        	assign event_rasc_AssignmentCostMatrix_out = event(RouteAggregatorService_Collector.AssignmentCostMatrix_out);
+			assign event_pbs_TaskImplementationRequest_out = event(PlanBuilderService.TaskImplementationRequest_out);
         	
  --       	lemma "Trace" : pre(PLTL.Once(event(UniqueAutomationRequest_in))) => not event(AutomationRequest_in);
         	
-        	assign event_RoutePlanRequest_in = event(RoutePlannerVisibilityService.RoutePlanRequest_in);
-        	assign event_RoutePlanResponse_out = event(RoutePlannerVisibilityService.RoutePlanResponse_out);
-        		
+--        	assign event_RoutePlanRequest_in = event(RoutePlannerVisibilityService.RoutePlanRequest_in);
+--        	assign event_RoutePlanResponse_out = event(RoutePlannerVisibilityService.RoutePlanResponse_out);
+--        		
         	-- We use AGREE connections to assert true for the cases where an 
         	--  input port is fed by multiple sources.
         	-- Note: AGREE will assume arbitrary values for the input ports on 
