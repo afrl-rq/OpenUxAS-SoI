@@ -112,8 +112,7 @@ public
             conn12: port OverwatchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             conn13: port PatternSearchTask.TaskInitialized_out -> AutomationRequestValidatorService.TaskInitialized_in;
             
-            conn14: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
---            conn140: port Route
+--            conn14: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
             
             conn15: port RouteAggregatorService_Aggregator.RouteResponse_out -> AngledAreaSearchTask.RouteResponse_in;            
             conn16: port RouteAggregatorService_Aggregator.RouteResponse_out -> AssignmentCoordinatorTask.RouteResponse_in;
@@ -267,6 +266,31 @@ public
             conn172: port PlanBuilderService.TaskImplementationRequest_out -> MultiVehicleWatchTask.TaskImplementationRequest_in;
             conn173: port PlanBuilderService.TaskImplementationRequest_out -> OverwatchTask.TaskImplementationRequest_in;
             conn174: port PlanBuilderService.TaskImplementationRequest_out -> PatternSearchTask.TaskImplementationRequest_in;
+            
+            -- Connections added that were discovered missing in the automated connection passes
+            -- RouteRequest from Tasks to RA_Aggregator
+            -- Note: Many to 1 fan in
+            conn200: port AngledAreaSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn201: port AssignmentCoordinatorTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn202: port BlockadeTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn203: port CmasiPointSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn204: port CommRelayTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn205: port CordonTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn206: port EscortTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn207: port ImpactLineSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn208: port ImpactPointSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn209: port MultiVehicleWatchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn210: port OverwatchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            conn211: port PatternSearchTask.RouteRequest_out -> RouteAggregatorService_Aggregator.RouteRequest_in;
+            
+            -- RoutePlanRequest from RA_Aggregator to RoutePlannerVisibilityService
+            conn220: port RouteAggregatorService_Aggregator.RoutePlanRequest_out -> RoutePlannerVisibilityService.RoutePlanRequest_in;
+            
+            -- RoutePlanResponse from RoutePlannerVisibilityService to RA_Aggregator
+            conn225: port RoutePlannerVisibilityService.RoutePlanResponse_out -> RouteAggregatorService_Aggregator.RoutePlanResponse_in;
+            
+            -- AssignmentTreeCostMatrix from RA_Aggregator to AssignmentTreeBranchBoundService
+            conn230: port RouteAggregatorService_Collector.AssignmentCostMatrix_out -> AssignmentTreeBranchBoundService.AssignmentCostMatrix_in;
             
     	properties
     		UxAS_Props::OS => Linux;
