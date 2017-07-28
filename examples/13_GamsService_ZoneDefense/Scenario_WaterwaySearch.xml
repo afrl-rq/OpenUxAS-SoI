@@ -394,8 +394,8 @@
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
-          <Latitude>45.3171</Latitude>
-          <Longitude>-120.9923</Longitude>
+          <Latitude>45.2956</Latitude>
+          <Longitude>-120.9668</Longitude>
          </Location3D>
         </Location>
         <u>0</u>
@@ -445,8 +445,8 @@
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
-          <Latitude>45.3133</Latitude>
-          <Longitude>-120.9402</Longitude>
+          <Latitude>45.3392</Latitude>
+          <Longitude>-120.9603</Longitude>
          </Location3D>
         </Location>
         <u>0</u>
@@ -496,8 +496,8 @@
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
-          <Latitude>45.3133</Latitude>
-          <Longitude>-120.9402</Longitude>
+          <Latitude>45.3232</Latitude>
+          <Longitude>-120.9959</Longitude>
          </Location3D>
         </Location>
         <u>0</u>
@@ -547,8 +547,8 @@
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
-          <Latitude>45.3133</Latitude>
-          <Longitude>-120.9402</Longitude>
+          <Latitude>45.3232</Latitude>
+          <Longitude>-120.9655</Longitude>
          </Location3D>
         </Location>
         <u>0</u>
@@ -598,8 +598,8 @@
          <Location>
          <Location3D Series="CMASI">
           <Altitude>700</Altitude><AltitudeType>MSL</AltitudeType>           
-          <Latitude>45.3133</Latitude>
-          <Longitude>-120.9402</Longitude>
+          <Latitude>45.3232</Latitude>
+          <Longitude>-120.9285</Longitude>
          </Location3D>
         </Location>
         <u>0</u>
@@ -730,7 +730,7 @@
         <FirstWaypoint>1</FirstWaypoint>
         <Status>Pending</Status>
       </MissionCommand>
-
+<!--
       <MissionCommand Series="CMASI" Time="1.9">
         <CommandID>100</CommandID>
         <VehicleID>600</VehicleID>
@@ -859,7 +859,7 @@
         <FirstWaypoint>1</FirstWaypoint>
         <Status>Pending</Status>
       </MissionCommand>
-
+-->
 
 
 

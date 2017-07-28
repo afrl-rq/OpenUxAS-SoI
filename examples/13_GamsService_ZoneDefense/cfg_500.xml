@@ -26,7 +26,7 @@
             LoopHertz="1.0" SendHertz="-1" RunTime="10" />
         <!-- load the groups karl file and then the asset file -->
         <Knowledge KarlFile="../karl/groups.karl" BinaryFile="" />
-        <Knowledge KarlFile="../karl/agent.karl" BinaryFile="" />
+        <Knowledge KarlFile="../karl/attacker.karl" BinaryFile="" />
         <Agents>
           <Agent Prefix="agent.0" EntityId="400"/>
           <Agent Prefix="agent.1" EntityId="500"/>

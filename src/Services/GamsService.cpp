@@ -344,7 +344,59 @@ namespace service
     }
 
     /**
-     * Moves the platform to a location. Optional.
+     * Moves the platform to a location. Used by almost all GAMS algorithms.
+     * @param   location  the coordinates to move to
+     * @param   epsilon   approximation value
+     * @return the status of the move operation, @see PlatformReturnValues
+     **/
+    virtual int move (const gams::pose::Position & location,
+                      double epsilon)
+    {
+        gams::pose::Position current (gps_frame);
+        current.from_container(self_->agent.location);
+
+        // @Derek, I need to recreate the code for creating a afrl::cmasi::Waypoint
+        // from the gams::pose::Position location that is passed in.
+        std::shared_ptr<afrl::cmasi::Waypoint> uxasWP;
+        
+        if (m_last != location)
+        {
+            gams::platforms::BasePlatform::move(location, epsilon);
+        }
+        
+        if (location.approximately_equal(current, epsilon))
+        {
+            madara_logger_ptr_log (loggers::global_logger.get (),
+              loggers::LOG_MAJOR,
+              "UxASGamsPlatform::move: [%.4f, %.4f, %.4f] ~= [%.4f, %.4f, %.4f]"
+              " with %.2f m accuracy. Arrived at location.\n",
+              location.lat(), location.lng(), location.alt(), 
+              current.lat(), current.lng(), current.alt(), epsilon);
+
+            return platforms::PLATFORM_ARRIVED;
+        }
+        else
+        {
+            madara_logger_ptr_log (loggers::global_logger.get (),
+              loggers::LOG_MAJOR,
+              "UxASGamsPlatform::move: [%.4f, %.4f, %.4f] != [%.4f, %.4f, %.4f]"
+              " with %.2f m accuracy. Still moving to location.\n",
+              location.lat(), location.lng(), location.alt(), 
+              current.lat(), current.lng(), current.alt(), epsilon);
+
+            // @Derek as a reminder, this is where we use the uxasWP
+            m_service->sendWaypoint(location, uxasWP);
+            return platforms::PLATFORM_MOVING;
+        }
+    }
+
+    /**
+     * Moves the platform to a location. This is a custom function, and I cannot
+     * for the life of me understand why someone added the afrl::cmasi::Waypoint
+     * parameter without also leaving the original intact. Without the original,
+     * all algorithms that call move(Position) go absolutely nowhere. You literally
+     * broke all GAMS algorithm compatibility with UxAS except for the Move
+     * algorithm because I used pose(Pose) wherever possible in that single algorithm
      * @param   location  the coordinates to move to
      * @param   uxasWP    the waypoint that UxAS is moving to
      * @param   epsilon   approximation value

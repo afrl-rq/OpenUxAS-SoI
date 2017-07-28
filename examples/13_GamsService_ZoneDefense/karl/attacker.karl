@@ -20,14 +20,13 @@
  * do altitude differences.
  **/
 {.prefix}.algorithm="waypoints";
-{.prefix}.algorithm.args.locations.size=4;
-{.prefix}.algorithm.args.locations.0=[45.342664,-120.973900,700.0];
-{.prefix}.algorithm.args.locations.1=[45.319694,-120.994200,700.0];
-{.prefix}.algorithm.args.locations.2=[45.336664,-120.980900,700.0];
-{.prefix}.algorithm.args.locations.3=[45.313684,-120.998100,700.0];
-{.prefix}.algorithm.args.repeat=3;
+{.prefix}.algorithm.args.locations.size=3;
+{.prefix}.algorithm.args.locations.0=[45.3509,-121.0126,700.0];
+{.prefix}.algorithm.args.locations.1=[45.3509,-120.9156,700.0];
+{.prefix}.algorithm.args.locations.2=[45.3392,-120.9603,700.0];
+{.prefix}.algorithm.args.repeat=10;
 {.prefix}.madara_debug_level=1;
-{.prefix}.gams_debug_level=4;
+{.prefix}.gams_debug_level=1;
 
 
 

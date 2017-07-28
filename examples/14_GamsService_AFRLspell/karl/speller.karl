@@ -21,15 +21,15 @@
  **/
 
 {.prefix}.madara_debug_level=1;
-{.prefix}.gams_debug_level=1;
+{.prefix}.gams_debug_level=3;
 
-swarm.algorithm = "spell";
-swarm.algorithm.args.text = "afrl";
-swarm.algorithm.args.group = "group.spellers";
-swarm.algorithm.args.origin = [45.3365,-121.0169,700];
-swarm.algorithm.args.buffer = 500.0;
-swarm.algorithm.args.width = 1000.0;
-swarm.algorithm.args.height = 1000.0;
+{.prefix}.algorithm = "spell";
+{.prefix}.algorithm.args.text = "afrl";
+{.prefix}.algorithm.args.group = "group.spellers";
+{.prefix}.algorithm.args.origin = [45.3365,-121.0169,700];
+{.prefix}.algorithm.args.buffer = 500.0;
+{.prefix}.algorithm.args.width = 1000.0;
+{.prefix}.algorithm.args.height = 1000.0;
 
 
 

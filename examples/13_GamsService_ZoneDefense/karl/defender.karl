@@ -25,13 +25,16 @@
 
 {.prefix}.algorithm="zone coverage";
 
-{.prefix}.algorithm.args.formation=.zone_coverage_formation;
-{.prefix}.algorithm.args.assets="assets";
-{.prefix}.algorithm.args.protectors="protectors";
-{.prefix}.algorithm.args.enemies="enemies";
-{.prefix}.algorithm.args.buffer=.zone_coverage_buffer;
-{.prefix}.algorithm.args.distance=.zone_coverage_distance;
-{.prefix}.algorithm.args.frame="gps";
+{.prefix}.algorithm.args.formation="arc";
+{.prefix}.algorithm.args.assets="agent.0";
+{.prefix}.algorithm.args.protectors="group.protectors";
+{.prefix}.algorithm.args.enemies="agent.1";
+{.prefix}.algorithm.args.buffer=300.0;
+{.prefix}.algorithm.args.distance=0.5;
+
+// prepopulate the agent locations for asset and attacker
+agent.0.location=[45.2956, -120.9668, 700];
+agent.1.location=[45.3392, -120.9603, 700];
 
 
 
