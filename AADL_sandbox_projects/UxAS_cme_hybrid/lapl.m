@@ -3,8 +3,12 @@ function [L, D] = lapl(A)
 % given Adjacency Matrix A
 % compute the Laplacian Matrix L
 % and the Diagonal In-Degree Matrix D
-% EE 5329, Dr. Lewis
-% Chris Elliott 1/27/2013
+%
+% Summer of Innovation, Hybrid Systems Group
+%  Wright Brothers Institute
+%  Air Force Research Laboratory
+%  Lockheed Martin Aeronautics
+%  Chris Elliott, July 2017
 
 n = length(A);
 L = zeros(n);
