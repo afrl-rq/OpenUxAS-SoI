@@ -105,6 +105,7 @@
 #include "SensorManagerService.h"
 #include "WaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
+#include "TemporalService.h"
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -170,6 +171,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::TemporalService>();}
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////
