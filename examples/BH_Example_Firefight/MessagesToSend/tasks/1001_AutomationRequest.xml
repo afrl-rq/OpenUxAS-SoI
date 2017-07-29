@@ -1,0 +1,25 @@
+<!-- <AutomationRequest Series="CMASI"> -->
+<TemporalAutomationRequest Series="TEMPORAL">
+	<Label>PISR_FromGoogleEarth</Label>
+	<EntityList>
+		<int64>400</int64>
+		<int64>500</int64>
+		<int64>600</int64>
+		<int64>700</int64>
+	</EntityList>
+	<TaskList><int64>1005</int64></TaskList>
+	<TaskList><int64>1006</int64></TaskList>
+	<TaskList><int64>1007</int64></TaskList>
+	<TaskList><int64>1008</int64></TaskList>
+	<TaskList><int64>1009</int64></TaskList>
+	<TaskList><int64>1010</int64></TaskList>
+	<TaskList><int64>1011</int64></TaskList>
+	<TaskList><int64>1012</int64></TaskList>
+	<TaskList><int64>1013</int64></TaskList>
+	<TaskList><int64>1014</int64></TaskList>
+	<TaskList><int64>1015</int64></TaskList>
+	<TaskList><int64>1016</int64></TaskList>
+	<!-- <TaskRelationships>.(p1009 p1010 p1011 p1012 p1013 p1014 p1015 p1016 p1005 p1006 p1007 p1008)</TaskRelationships> -->
+	<TaskRelationships>.(p1009 p1010 p1011 p1012 p1013 p1014 p1015 p1016)S.(p1005 p1006 p1007 p1008)</TaskRelationships>
+<!-- </AutomationRequest> -->
+</TemporalAutomationRequest>

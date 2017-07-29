@@ -1,0 +1,39 @@
+<UxAS EntityID="10000" EntityType="Aircraft" FormatVersion="1.0">
+  <Bridge Server="FALSE" TcpAddress="tcp://127.0.0.1:5555" Type="LmcpObjectNetworkTcpBridge">
+    <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+    <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+    <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+    <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
+    <SubscribeToMessage MessageType="afrl.cmasi.KeepOutZone" />
+  </Bridge>
+  <Service Type="Test_SimulationTime" />
+  <Service Type="TaskManagerService" />
+  <Service MinimumWaypointSeparation_m="50.0" TurnRadiusOffset_m="0.0" Type="RoutePlannerVisibilityService" />
+  <Service Type="RouteAggregatorService" />
+  <Service CostFunction="MINMAX" NumberNodesMaximum="10000" Type="AssignmentTreeBranchBoundService" />
+  <Service Type="AutomationDiagramDataService" />
+  <Service Type="TemporalService" />
+  <Service AddLoiterToEndOfMission="FALSE" AddLoiterToEndOfSegments="FALSE" DefaultLoiterRadius_m="250" GimbalPayloadId="1" LoopBackToFirstTask="FALSE" NumberWaypointsOverlap="5" NumberWaypointsToServe="1500" Type="WaypointPlanManagerService" VehicleID="400" param.turnType="FlyOver" />
+  <Service AddLoiterToEndOfMission="FALSE" AddLoiterToEndOfSegments="FALSE" DefaultLoiterRadius_m="250" GimbalPayloadId="1" LoopBackToFirstTask="FALSE" NumberWaypointsOverlap="5" NumberWaypointsToServe="1500" Type="WaypointPlanManagerService" VehicleID="500" param.turnType="FlyOver" />
+  <Service AssignmentStartPointLead_m="0.0" Type="PlanBuilderService" />
+  <Service PathToMessageFiles="../MessagesToSend/" Type="SendMessagesService">
+    <Message MessageFileName="AirVehicleConfiguration_V400.xml" SendTime_ms="100" />
+    <Message MessageFileName="AirVehicleConfiguration_V500.xml" SendTime_ms="100" />
+    <Message MessageFileName="AirVehicleState_V400.xml" SendTime_ms="150" />
+    <Message MessageFileName="AirVehicleState_V500.xml" SendTime_ms="150" />
+    <Message MessageFileName="tasks/1000_LineSearch.xml" SendTime_ms="250" />
+    <Message MessageFileName="tasks/1001_LineSearch.xml" SendTime_ms="350" />
+    <Message MessageFileName="tasks/5010_LineSearch.xml" SendTime_ms="460" />
+    <Message MessageFileName="tasks/1003_LineSearch.xml" SendTime_ms="500" />
+    <Message MessageFileName="tasks/1001_AutomationRequest.xml" SendTime_ms="4000" />
+    <Message MessageFileName="KeepOutZone_AutoGen_1.xml" sendTime_ms="50" />
+    <Message MessageFileName="KeepOutZone_AutoGen_2.xml" sendTime_ms="50" />
+    <Message MessageFileName="KeepOutZone_AutoGen_3.xml" sendTime_ms="50" />
+    <Message MessageFileName="KeepOutZone_AutoGen_4.xml" sendTime_ms="50" />
+    <Message MessageFileName="OperatingRegion_Autogen.xml" SendTime_ms="50" />
+  </Service>
+  <Service FilesPerSubDirectory="1000" LogFileMessageCountLimit="1000" Type="MessageLoggerDataService">
+    <LogMessage MessageType="uxas" NumberMessagesToSkip="0" />
+    <LogMessage MessageType="afrl" NumberMessagesToSkip="0" />
+  </Service>
+</UxAS>

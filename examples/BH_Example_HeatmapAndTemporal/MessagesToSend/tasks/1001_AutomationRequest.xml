@@ -1,0 +1,17 @@
+<TemporalAutomationRequest Series="TEMPORAL">
+	<Label>PISR_FromGoogleEarth</Label>
+	<EntityList>
+		<int64>400</int64>
+		<int64>500</int64>
+	</EntityList>
+	<TaskList>
+	<int64>1000</int64>
+	<int64>1003</int64>
+	<int64>1001</int64>
+	<int64>5010</int64>
+	</TaskList>
+	<Temporal>true</Temporal>
+	<TaskRelationships>.(p1000 p5010)S.(p1001 p1003)</TaskRelationships>
+	<OperatingRegion>314</OperatingRegion>
+	<!-- <TaskRelationships>.(p1000)S.(p1003)</TaskRelationships> -->
+</TemporalAutomationRequest>

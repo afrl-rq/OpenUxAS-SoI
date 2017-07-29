@@ -1,0 +1,49 @@
+<KeepOutZone Series="CMASI">
+  <ZoneType>Physical</ZoneType>
+  <ZoneID>5</ZoneID>
+  <MinAltitude>-3.40282346638529e+38</MinAltitude>
+  <MaxAltitude>3.40282346638529e+38</MaxAltitude>
+  <AffectedAircraft />
+  <StartTime>0</StartTime>
+  <EndTime>0</EndTime>
+  <Padding>60.9599990844727</Padding>
+  <Label>KeepOut_AutoGen_5</Label>
+  <Boundary>
+    <Polygon Series="CMASI">
+      <BoundaryPoints>
+        <Location3D Series="CMASI">
+          <Latitude>45.38358107022195</Latitude>
+          <Longitude>-121.14879340427166</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.38022440073478</Latitude>
+          <Longitude>-121.14879340427166</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.379553066837346</Latitude>
+          <Longitude>-121.1463837944855</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.37821039904248</Latitude>
+          <Longitude>-121.13915496512706</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.376867731247614</Latitude>
+          <Longitude>-121.12831172108942</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.37888173293992</Latitude>
+          <Longitude>-121.11023964769332</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.38358107022195</Latitude>
+          <Longitude>-121.09337237919031</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.38358107022195</Latitude>
+          <Longitude>-121.14879340427166</Longitude>
+        </Location3D>
+      </BoundaryPoints>
+    </Polygon>
+  </Boundary>
+</KeepOutZone>
