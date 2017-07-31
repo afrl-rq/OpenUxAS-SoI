@@ -1,0 +1,97 @@
+<KeepOutZone Series="CMASI">
+  <ZoneType>Physical</ZoneType>
+  <ZoneID>12</ZoneID>
+  <MinAltitude>-3.40282346638529e+38</MinAltitude>
+  <MaxAltitude>3.40282346638529e+38</MaxAltitude>
+  <AffectedAircraft />
+  <StartTime>0</StartTime>
+  <EndTime>0</EndTime>
+  <Padding>60.9599990844727</Padding>
+  <Label>KeepOut_AutoGen_12</Label>
+  <Boundary>
+    <Polygon Series="CMASI">
+      <BoundaryPoints>
+        <Location3D Series="CMASI">
+          <Latitude>45.29563632965813</Latitude>
+          <Longitude>-120.96686786541764</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.303021002529896</Latitude>
+          <Longitude>-120.95241020670079</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.311748343196534</Latitude>
+          <Longitude>-120.92831410883933</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32114701776061</Latitude>
+          <Longitude>-120.91385645012245</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32316101945291</Latitude>
+          <Longitude>-120.9030132060848</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32316101945291</Latitude>
+          <Longitude>-120.88976035226099</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32114701776061</Latitude>
+          <Longitude>-120.88012191311641</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.3070490059145</Latitude>
+          <Longitude>-120.8620498397203</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.303021002529896</Latitude>
+          <Longitude>-120.85361620546881</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.3050350042222</Latitude>
+          <Longitude>-120.85361620546881</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.311077009299105</Latitude>
+          <Longitude>-120.86445944950646</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.322489685555475</Latitude>
+          <Longitude>-120.87409788865102</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32584635504264</Latitude>
+          <Longitude>-120.87891710822333</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32853169063238</Latitude>
+          <Longitude>-120.89216996204715</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32853169063238</Latitude>
+          <Longitude>-120.90783242565708</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.32584635504264</Latitude>
+          <Longitude>-120.91747086480166</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.3151050126837</Latitude>
+          <Longitude>-120.93192852351854</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.30436367032477</Latitude>
+          <Longitude>-120.95602462138</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.297650331350425</Latitude>
+          <Longitude>-120.96686786541764</Longitude>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>45.29563632965813</Latitude>
+          <Longitude>-120.96686786541764</Longitude>
+        </Location3D>
+      </BoundaryPoints>
+    </Polygon>
+  </Boundary>
+</KeepOutZone>

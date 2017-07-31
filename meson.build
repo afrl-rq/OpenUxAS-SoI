@@ -7,7 +7,7 @@ link_args = []
 os = target_machine.system()
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-  link_args += ['-lrt', '-ldl']
+  link_args += ['-lrt', '-ldl', ]
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
@@ -136,9 +136,9 @@ endif
 
 cpp_args = []
 if cpp.get_id() == 'msvc'
-  cpp_args += ['/std:c++14']
+  cpp_args += ['/std:c++14', ]
 else
-  cpp_args += ['-std=c++11']
+  cpp_args += ['-std=c++11', ]
 endif
 
 executable(

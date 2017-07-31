@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <AMASE>
   <ScenarioData>
-    <SimulationView LongExtent="0.11" Latitude="45.323" Longitude="-120.9645"/>
+    <SimulationView LongExtent="0.3" Latitude="45.3" Longitude="-121"/>
     <ScenarioName>Waterway Search Example</ScenarioName>
     <Date>1/1/2020:16:50:18</Date>
     <ScenarioDuration>7200.0</ScenarioDuration>
     <TrackAgeOut/>
   </ScenarioData>
     <ScenarioEventList>
-
       <AirVehicleConfiguration Series="CMASI" Time="1.0">
         <ID>400</ID>
         <Label>UAV 400</Label>

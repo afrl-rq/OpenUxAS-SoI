@@ -1,0 +1,24 @@
+<LineSearchTask Series="CMASI">
+	<PointList>
+		<Location3D Series="CMASI"><Altitude>0</Altitude><Longitude>-121.0677622731235</Longitude><Latitude>45.27120895091226</Latitude></Location3D>
+		<Location3D Series="CMASI"><Altitude>0</Altitude><Longitude>-121.0677622731235</Longitude><Latitude>45.31010191362929</Latitude></Location3D>
+	</PointList>
+	<ViewAngleList></ViewAngleList>
+	<UseInertialViewAngles>false</UseInertialViewAngles>
+	<TaskID>5010</TaskID>
+	<Label>LINE_Waterway_DeschutesTEN</Label>
+	<EligibleEntities></EligibleEntities>
+	<ViewAngleList>
+		<Wedge Series="CMASI">
+			<AzimuthCenterline>35.0</AzimuthCenterline>
+			<VerticalCenterline>60.0</VerticalCenterline>
+		</Wedge>
+	</ViewAngleList>
+	<RevisitRate>0</RevisitRate>
+	<Parameters></Parameters>
+	<Priority>0</Priority>
+	<Required>true</Required>
+	<DesiredWavelengthBands><WavelengthBand>AllAny</WavelengthBand></DesiredWavelengthBands>
+	<DwellTime>0</DwellTime>
+	<GroundSampleDistance>1000</GroundSampleDistance>
+</LineSearchTask>

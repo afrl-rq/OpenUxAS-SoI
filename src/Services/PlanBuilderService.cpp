@@ -27,6 +27,8 @@
 #include "afrl/impact/SurfaceVehicleState.h"
 #include "afrl/cmasi/ServiceStatus.h"
 
+#include "uxas/temporal/TemporalAutomationRequest.h"
+#include "uxas/temporal/TemporalUniqueAutomationResponse.h"
 
 
 #include "pugixml.hpp"
@@ -323,7 +325,68 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
 
 void PlanBuilderService::buildAndSendThePlan()
 {
-    if (m_uniqueAutomationRequest)
+    
+    bool temporal = false;
+    if(uxas::temporal::isTemporalAutomationRequest(m_uniqueAutomationRequest->getOriginalRequest()))
+    {
+        auto temporalRequest = (uxas::temporal::TemporalAutomationRequest*) m_uniqueAutomationRequest->getOriginalRequest();
+        temporal = temporalRequest->getTemporal();
+    }
+    if (temporal)
+    {
+        COUT_FILE_LINE_MSG('hi')
+        COUT_FILE_LINE_MSG(temporal);
+
+        auto uniqueAutomationResponse = std::make_shared<uxas::temporal::TemporalUniqueAutomationResponse>();
+        uniqueAutomationResponse->setResponseID(m_uniqueAutomationRequest->getRequestID());
+        for (auto taskImplementationResponses = m_entityIdVsTaskImplementationResponses.begin();
+                taskImplementationResponses != m_entityIdVsTaskImplementationResponses.end();
+                taskImplementationResponses++)
+        {
+            if (!taskImplementationResponses->second->empty())
+            {
+                auto missionCommand = new afrl::cmasi::MissionCommand;
+                afrl::cmasi::Waypoint * lastWaypoint(nullptr); // store pointer to last waypoint do not delete, we do not own this pointer
+                for (auto taskImplementationResponse = taskImplementationResponses->second->begin();
+                        taskImplementationResponse != taskImplementationResponses->second->end();
+                        taskImplementationResponse++)
+                {
+                    for (auto taskWaypoint = (*taskImplementationResponse)->getTaskWaypoints().begin();
+                            taskWaypoint != (*taskImplementationResponse)->getTaskWaypoints().end();
+                            taskWaypoint++)
+                    {
+                        if (lastWaypoint != nullptr)
+                        {
+                            lastWaypoint->setNextWaypoint((*taskWaypoint)->getNumber());
+                        }
+                        lastWaypoint = (*taskWaypoint)->clone();
+                        missionCommand->getWaypointList().push_back(lastWaypoint);
+                    }
+
+                }
+                lastWaypoint = nullptr; // we do not own this
+                missionCommand->setVehicleID((*taskImplementationResponses).first);
+                missionCommand->setCommandID(getNextCommandId());
+                if (!missionCommand->getWaypointList().empty()) //sanity check
+                {
+                    missionCommand->setFirstWaypoint(missionCommand->getWaypointList().front()->getNumber());
+                }
+                uniqueAutomationResponse->getOriginalResponse()->getMissionCommandList().push_back(missionCommand);
+                missionCommand = nullptr;
+            }
+        }
+        sendSharedLmcpObjectBroadcastMessage(uniqueAutomationResponse);
+
+        auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
+        serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Information);
+        auto keyValuePair = new afrl::cmasi::KeyValuePair;
+        std::string message = "UniqueAutomationResponse[" + std::to_string(uniqueAutomationResponse->getResponseID()) + "] - sent";
+        keyValuePair->setKey(message);
+        serviceStatus->getInfo().push_back(keyValuePair);
+        keyValuePair = nullptr;
+        sendSharedLmcpObjectBroadcastMessage(serviceStatus);
+    }
+    else if (m_uniqueAutomationRequest && !temporal)
     {
         auto uniqueAutomationResponse = std::make_shared<uxas::messages::task::UniqueAutomationResponse>();
         uniqueAutomationResponse->setResponseID(m_uniqueAutomationRequest->getRequestID());

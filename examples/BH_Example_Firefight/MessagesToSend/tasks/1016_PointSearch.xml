@@ -1,0 +1,28 @@
+<PointSearchTask Series="CMASI">
+  <SearchLocation>
+   <Location3D Series="CMASI">
+     <Latitude>45.297</Latitude>
+     <Longitude>-120.928</Longitude>
+   </Location3D>
+  </SearchLocation>
+  <StandoffDistance>0</StandoffDistance>
+  <ViewAngleList>
+    <Wedge Series="CMASI">
+      <AzimuthCenterline>100.0</AzimuthCenterline>
+    </Wedge>
+  </ViewAngleList>
+  <DesiredWavelengthBands>
+  <WavelengthBand>AllAny</WavelengthBand>
+  </DesiredWavelengthBands>
+  <DwellTime>5</DwellTime>
+  <GroundSampleDistance>152.399993896484</GroundSampleDistance>
+  <TaskID>1016</TaskID>
+   <EligibleEntities>
+    <int64>700</int64>
+  </EligibleEntities>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</PointSearchTask>

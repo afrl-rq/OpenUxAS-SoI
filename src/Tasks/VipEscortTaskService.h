@@ -16,10 +16,12 @@
 
 #ifndef UXAS_VipEscort_TASK_SERVICE_H
 #define UXAS_VipEscort_TASK_SERVICE_H
-
 #include "TaskServiceBase.h"
 #include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/LoiterAction.h"
+#include "afrl/cmasi/Location3D.h"
 #include "uxas/UT/VipEscortTask.h"
+#include "Vip.h"
 namespace uxas
 {
 namespace service
@@ -127,6 +129,18 @@ private:
     static
     ServiceBase::CreationRegistrar<VipEscortTaskService> s_registrar;
 
+    Vip ctrl;
+
+    afrl::cmasi::Location3D* locations [5];
+
+    int uav1_previous_loc;
+
+    int uav2_previous_loc;
+
+    int uavVIP_previous_loc;
+
+    bool splist [5];
+
     /** brief Copy construction not permitted */
     VipEscortTaskService(VipEscortTaskService const&) = delete;
 
@@ -143,13 +157,31 @@ private:
     
     bool processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
 
+    void escort(const std::shared_ptr<afrl::cmasi::AirVehicleState> escort);
+    
+    afrl::cmasi::LoiterAction* setupLoiter(afrl::cmasi::Location3D* location);
+
+    void gotoLocation(const std::shared_ptr<afrl::cmasi::AirVehicleState> uav, const int64_t destinationID);
+
+    bool is_sp(const int location);
+
+    bool in(std::shared_ptr<afrl::cmasi::AirVehicleState> uav, int location);
+
+    int get_loc(const std::shared_ptr<afrl::cmasi::AirVehicleState> uav);
+
     void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)override;
 
     void buildTaskPlanOptions()override;
 
     bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const std::vector<int64_t>& eligibleEntities);
 
+
+
 private:
+    double m_loiterRadius_m = {200.0};
+    int counter = 951;
+    int vloc = 1;
+    bool initial = true;
     // storage for the option entries
     std::shared_ptr<uxas::UT::VipEscortTask> m_VipEscortTask;
     std::shared_ptr<afrl::cmasi::AirVehicleState> m_VipAirVehicleState;
