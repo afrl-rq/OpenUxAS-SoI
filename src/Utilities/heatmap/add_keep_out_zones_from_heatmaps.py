@@ -31,7 +31,8 @@ import argparse
 import os
 
 
-def add_keep_out_zones_from_heatmaps(ar_config_file, heatmap_files, loc_per_file, map_center_lat_long_deg, m_width_m, m_height_m):
+def add_keep_out_zones_from_heatmaps(ar_config_file, heatmap_files, loc_per_file, map_center_lat_long_deg, m_width_m,
+                                     m_height_m):
     print(' ')
     print('---------------------')
     print('KeepOutZone Generator')

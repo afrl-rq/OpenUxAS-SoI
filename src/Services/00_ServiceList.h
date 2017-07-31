@@ -104,8 +104,9 @@
 #include "RoutePlannerService.h"
 #include "SensorManagerService.h"
 #include "WaypointPlanManagerService.h"
-#include "RoutePlannerVisibilityService.h"
 #include "TemporalService.h"
+#include "RoutePlannerVisibilityService.h"
+
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
@@ -114,7 +115,7 @@
 /// END -- SERVICE HEADER FILES SECTION            ///
 //////////////////////////////////////////////////////
 
-
+	
 
 
 //////////////////////////////////////////////////////////
