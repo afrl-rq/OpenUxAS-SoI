@@ -42,7 +42,7 @@ def main():
 	zoneArrayPd = pd.read_pickle(zonesPickle)
 
 	print('')	# add a line return
-	print('*** PLOTING ***')
+	print('*** PLOTTING ***')
 	print('')	# add a line return
 
 	fig = plt.figure(10000)

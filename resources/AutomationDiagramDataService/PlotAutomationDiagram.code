@@ -42,7 +42,7 @@ file << "\t\tProcessZones.main()" << std::endl;
 file << "\tzoneArrayPd = pd.read_pickle(zonesPickle)" << std::endl;
 file << "" << std::endl;
 file << "\tprint('')\t# add a line return" << std::endl;
-file << "\tprint('*** PLOTING ***')" << std::endl;
+file << "\tprint('*** PLOTTING ***')" << std::endl;
 file << "\tprint('')\t# add a line return" << std::endl;
 file << "" << std::endl;
 file << "\tfig = plt.figure(10000)" << std::endl;

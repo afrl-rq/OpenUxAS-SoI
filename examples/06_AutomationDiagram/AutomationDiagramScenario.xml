@@ -941,11 +941,11 @@
         <!-- 2 have a SweepAngle > 0, the last has SweepAngle = 0 -->
         <!-- 2 have StartPoint, 1st does not -->
         <!-- -->
-        <!-- For each AngledAreaSearchTask with ID 2<x>, the original AMASE Setup Tool file contained 
+        <!-- For each AngledAreaSearchTask with TaskID 2<x>, the original AMASE Setup Tool file contained
              * An AreaOfInterest with AreaID 12<x> with a blank Area,
              * A nearly complete AngledAreaSearchTask referencing the AreaOfInterest,
              * An AreaSearchTask with TaskID 22<x> that only included the SearchArea, and
-             * For the tasks with a StartPoint, a PointSearch task with TaskID 325 that only included the Location.
+             * For the tasks with a StartPoint, a PointSearch task with TaskID 32<x> that only included the Location.
              The AreaOfInterest's Area was copied from the AreaSearchTask's SearchArea, and the AreaSearchTask was 
              deleted. Likewise, the Location for the StartPoint was copied from the PointSearchTask, and the 
              PointSearchTask was deleted.
@@ -1190,10 +1190,10 @@
         <!-- 1st has ViewAngleList, 2nd does not -->
         <!-- ViewAngleList/../VerticalExtent currently uses flipped sign -->
         <!-- -->
-        <!-- For each ImpactLineSearchTask with ID 2<x>, the original AMASE Setup Tool file contained
+        <!-- For each ImpactLineSearchTask with TaskID 2<x>, the original AMASE Setup Tool file contained
              * A LineOfInterest with LineID 12<x> with a blank Line,
              * A nearly complete ImpactLineSearchTask referencing the LineOfInterest, and 
-             * A LineSearchTask with TaskID 2y<x> that only included a PointList.
+             * A LineSearchTask with TaskID 22<x> that only included a PointList.
              The LineOfInterest's Line was copied from the LineSearchTask's PointList, and the
             LineSearchTask was deleted.
          -->
@@ -1362,11 +1362,11 @@
         <!-- 2nd has LoiterAction, the others do not -->
         <!-- -->
         <!-- For each ImpactPointSearchTask with ID 3<x>, the original AMASE Setup Tool file contained
-             * A PointOfInterest with PointID 13<x> with a blank Location,
-             * A nearly complete ImpactPiontSearchTask referencing the PointOfInterest, and 
+             * A PointOfInterest with PointID 13<x> with a blank Location (if using SearchLocationID),
+             * A nearly complete ImpactPointSearchTask referencing the PointOfInterest (if needed), and
              * A PointSearchTask with TaskID 23<x> that only included a SearchLocation.
-             The PointOfInterest's Location was copied from the PointSearchTask's SearchLocation,
-             and the PointSearchTask was deleted.
+             The PointOfInterest's Location or the ImpactPointSearchTask's SearchLocation was copied from 
+             the PointSearchTask's SearchLocation, and the PointSearchTask was deleted.
          -->
         <PointOfInterest Series="IMPACT">
             <PointID>133</PointID>
