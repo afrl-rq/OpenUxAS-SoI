@@ -47,7 +47,7 @@
         <g
             id="__gsn__15c8389c4c4"
             optional="true"
-            name="Optimal Plan Calculation">
+            name="Optimal Mission Plan Calculation">
           A plan can be calculated that minimizes the total cost function of the plan, if such a plan exists
 
           <c
@@ -88,7 +88,7 @@
         <g
             id="__gsn__15c838d7921"
             optional="true"
-            name="Near-Optimal Path Calculation">
+            name="Near-Optimal Mission Plan Calculation">
           A plan can be calculated that meets the mission specifications and that is better than most other plans, if such a plan exists
 
           <j
@@ -103,21 +103,27 @@
             Argue over heuristics for calculationg near-optimal paths
 
             <g
+                id="__gsn__15d89ced181"
+                name="Reactive Synthesis">
+              Reactive synthesis heuristic will calculate near optimal path with a reliability as high as reasonably practicable
+            </g>
+
+            <g
                 id="__gsn__15c84031773"
                 name="Simulated Annealing">
-              Non-existent magic heuristic will calculate near optimal path with a reliability as high as reasonably practicable
+              Simulated annealing heuristic will calculate near optimal path with a reliability as high as reasonably practicable
 
-              <c
-                  id="__gsn__15c840454c2"
-                  name="Context">
+              <comment
+                  id="__gsn__15d89cea15a"
+                  name="Comment">
                 Quantum Simulated Annealing would be even better!
-              </c>
+              </comment>
             </g>
 
             <g
                 id="__gsn__15c840322b4"
                 name="Neural Network Planning">
-              Non-existent magic heuristic will calculate near optimal path with a reliability as high as reasonably practicable
+              neural network heuristic will calculate near optimal path with a reliability as high as reasonably practicable
             </g>
           </s>
         </g>
