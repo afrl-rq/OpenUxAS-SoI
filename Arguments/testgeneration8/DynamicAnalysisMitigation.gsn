@@ -134,6 +134,12 @@
             </g>
           </s>
         </g>
+
+        <g
+            id="__gsn__15d7ba08fb7"
+            name="ROS/Gazebo">
+          Tests using rosbridge_suite interface provide confidence in acceptable levels of performance of connectivity functionality
+        </g>
       </s>
 
       <comment
