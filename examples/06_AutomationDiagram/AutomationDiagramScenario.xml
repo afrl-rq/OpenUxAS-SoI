@@ -1085,7 +1085,7 @@
         <!-- 2 LineSearchTasks TaskID 27,28 -->
         <!-- 1st has Label text, 2nd has </Label> -->
         <!-- 2nd has ViewAngleList, 1st does not -->
-        <!-- ViewAngleList/../VerticalExtent currently uses flipped sign -->
+        <!-- ViewAngleList/../VerticalCenterline currently uses flipped sign -->
         <LineSearchTask Series="CMASI">
             <PointList>
                 <Location3D Series="CMASI">
@@ -1188,7 +1188,7 @@
         <!-- 2 ImpactLineSearchTasks TaskID 29,30 -->
         <!-- 1st has Label text, 2nd has </Label> -->
         <!-- 1st has ViewAngleList, 2nd does not -->
-        <!-- ViewAngleList/../VerticalExtent currently uses flipped sign -->
+        <!-- ViewAngleList/../VerticalCenterline currently uses flipped sign -->
         <!-- -->
         <!-- For each ImpactLineSearchTask with TaskID 2<x>, the original AMASE Setup Tool file contained
              * A LineOfInterest with LineID 12<x> with a blank Line,
