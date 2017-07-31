@@ -64,7 +64,7 @@
         <c
             id="__gsn__15d374b784e"
             name="Context">
-          Red team type testing —&nbsp;tried DoS attack, finding errors (e.g., from 0mq), suggests verification scheme is required for preventing malicious attacks
+          Red team type testing — tried DoS attack, finding errors (e.g., from 0mq), suggests verification scheme is required for preventing malicious attacks
         </c>
       </g>
 
