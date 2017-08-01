@@ -279,7 +279,7 @@ void AutomationDiagramDataService::ProcessUniqueAutomationResponse(std::shared_p
                         entityState->setLocation(planningState->getPlanningPosition()->clone());
                         entityState->setHeading(planningState->getPlanningHeading());
 
-                        std::string fileName = savePath + "EnityState_Id_" + std::to_string(entityId) + ".xml";
+                        std::string fileName = savePath + "EntityState_Id_" + std::to_string(entityId) + ".xml";
                         std::ofstream file(fileName);
                         file << entityState->toXML();
                         file.close();
@@ -294,7 +294,7 @@ void AutomationDiagramDataService::ProcessUniqueAutomationResponse(std::shared_p
                     if (itEntity != m_idVsLastEntityState.end())
                     {
                         isFoundEntityState = true;
-                        std::string fileName = savePath + "EnityState_Id_" + std::to_string(itEntity->second->getID()) + ".xml";
+                        std::string fileName = savePath + "EntityState_Id_" + std::to_string(itEntity->second->getID()) + ".xml";
                         std::ofstream file(fileName);
                         file << itEntity->second->toXML();
                         file.close();
