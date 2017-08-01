@@ -103,7 +103,7 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     uint32_t verRes = static_cast<afrl::cmasi::CameraConfiguration*>(*plIter)->getVideoStreamVerticalResolution();
                     staliroTrajectoryPopulator->setCameraPixelCount(airVehicleConfig->getID(), horRes, verRes);
                 }
-            }           
+            }
         }
         else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::SessionStatus::TypeName)
         {
@@ -116,7 +116,6 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 taskStatusRequestMsg->setTaskID(-1); //-1 for all tasks!
                 sendSharedLmcpObjectBroadcastMessage(taskStatusRequestMsg);
                 staliroInterface->setSimulationStatus(2); //Stop collecting trajectory 
-                std::cout << "Simulation status :2" << std::endl;
             }
             else
             {
@@ -124,12 +123,10 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             }
         }
     }
-    else 
+    else
     {
         if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskFailure::TypeName)
         {
-            std::cout << "Task Failure" << std::endl;
-            std::cout << std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID() << std::endl;
             taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = -1;
             taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] 
                     = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getRobustness();
@@ -137,8 +134,6 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         }
         else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskSuccess::TypeName)
         {
-            std::cout << "TaskSuccess" << std::endl;
-            std::cout << std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID() << std::endl;
             taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] = 1;
             taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] 
                     = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getRobustness();
@@ -146,14 +141,11 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         }
         if (staliroInterface->getSimulationStatus() == 2)
         {
-            std::cout << "send trajectory" << std::endl;
             sendOutTrajectory();
             staliroInterface->setSimulationStatus(3); // Will read monitoring results
-            std::cout << "Sim status 3" << std::endl;
         }
         else if (staliroInterface->getSimulationStatus() == 3)
         {
-            std::cout << "checking all done" << std::endl;
             bool allDone = true;
             for (auto it = taskStatusResults.begin(); it != taskStatusResults.end(); it++)
             {
@@ -166,7 +158,6 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             if (allDone)
             {
                 staliroInterface->setSimulationStatus(4);
-                std::cout << "sim status 4" << std::endl;
             }
             else
             {
@@ -177,11 +168,8 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         }
         else if (staliroInterface->getSimulationStatus() == 4) // Will send monitoring results
         {
-            std::cout << "sendMonitorResults" << std::endl;
             sendMonitorResults();
-            std::cout << "sendEndOfSimulation" << std::endl;
             staliroInterface->sendEndOfSimulation();
-            std::cout << "DONE" << std::endl;
         }
     }
 

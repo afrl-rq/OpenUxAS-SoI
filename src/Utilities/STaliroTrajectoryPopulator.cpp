@@ -93,9 +93,9 @@ namespace testgeneration
             
             if (curIter == (*trajectory).end())
             {
-                if (!trajectory->empty() && (trajectory->rbegin()->first < curTime))
+                for (uint32_t i = 0; i < nextAvailableStartIndex; i++)
                 {
-                    (*trajectory)[curTime] = (*trajectory).rbegin()->second;
+                    (*trajectory)[curTime].push_back(0.0);
                 }
             }
             

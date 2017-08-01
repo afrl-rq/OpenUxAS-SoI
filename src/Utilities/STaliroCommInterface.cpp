@@ -1,4 +1,6 @@
 #include "STaliroCommInterface.h"
+#include <errno.h>
+#include <string.h>
 
 namespace testgeneration
 {
@@ -34,7 +36,7 @@ namespace testgeneration
                 if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) > 0)
                 {
                     int opt = 1;
-                    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+                    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEPORT, 
                             &opt, 
                             sizeof(opt)) == 0)
                     {
@@ -48,23 +50,23 @@ namespace testgeneration
                             if (listen(serverSocket, 3) < 0)
                             {
                                 UXAS_LOG_ERROR(
-                                        "staliro::CommunicationInterface::Could not listen socket!");
+                                        "staliro::CommunicationInterface::Could not listen socket! Error: ", strerror(errno));
                             }
                         }
                         else
                         {
-                            UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not bind socket!");
+                            UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not bind socket! Error: ", strerror(errno));
                         }
                     }
                     else
                     {
                         UXAS_LOG_ERROR(
-                                "staliro::CommunicationInterface::Could not set socket options!");
+                                "staliro::CommunicationInterface::Could not set socket options! Error: ", strerror(errno));
                     }
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not create socket!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not create socket! Error: ", strerror(errno));
                 }
             }
         }
@@ -82,7 +84,7 @@ namespace testgeneration
             }
             else
             {
-                UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not accept connection!");
+                UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not accept connection! Error: ", strerror(errno));
                 isConnected = false;
             }
             
@@ -167,7 +169,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read Ack!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read Ack! Error: ", strerror(errno));
                     ackMsg = 0;
                     break;
                 }
@@ -203,7 +205,7 @@ namespace testgeneration
                     }
                     else
                     {
-                        UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read CMD!");
+                        UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read CMD! Error: ", strerror(errno));
                         retCode = false;
                     }
                 }
@@ -243,7 +245,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read Sim duration!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read Sim duration! Error: ", strerror(errno));
                 }
             }
             
@@ -267,7 +269,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read CMD!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read CMD! Error: ", strerror(errno));
                     retCode = false;
                 }
             }
@@ -315,7 +317,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg length!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg length! Error: ", strerror(errno));
                     msgLen = 0;
                 }
             }
@@ -336,7 +338,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg! Error: ", strerror(errno));
                     msgLen = 0;
                 }
             }
@@ -362,7 +364,7 @@ namespace testgeneration
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg length!");
+                    UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read msg length! Error: ", strerror(errno));
                     msgLen = 0;
                 }
             }
@@ -382,7 +384,7 @@ namespace testgeneration
                     }
                     else
                     {
-                        UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read double!");
+                        UXAS_LOG_ERROR("staliro::CommunicationInterface::Could not read double! Error: ", strerror(errno));
                     }
                 }
                 retVector.push_back(tempDbl);
