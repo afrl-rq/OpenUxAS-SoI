@@ -527,7 +527,7 @@ void TaskServiceBase::processOptionsRoutePlanResponseBase(const std::shared_ptr<
                 // we are waiting for this one
                 auto route = std::shared_ptr<uxas::messages::route::RoutePlan>(routePlan->clone());
                 // call virtual function
-                if (!isHandleOptionsRouteResponse(vehicleId, optionId, operatingRegion, route));
+                if (!isHandleOptionsRouteResponse(vehicleId, optionId, operatingRegion, route))
                 {
                     if (itTaskOptionClass->second->m_pendingRouteIds.find(route->getRouteID()) != itTaskOptionClass->second->m_pendingRouteIds.end())
                     {
