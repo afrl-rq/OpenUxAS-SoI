@@ -5,6 +5,7 @@ conf = configuration_data()
 link_args = []
 
 os = target_machine.system()
+
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
@@ -138,6 +139,12 @@ elif os.startswith('linux')
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
+glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
+foreach fn : glu_functions
+  if not cpp.has_function(fn, dependencies: deps)
+    error('GLU library functions not found')
+  endif
+endforeach
 
 cpp_args = []
 if cpp.get_id() == 'msvc'
