@@ -32,6 +32,7 @@ srcs_services = [
   './AutonomyMonitors/LineSearchTaskMonitor.cpp',
   './AutonomyMonitors/AreaSearchTaskMonitor.cpp',
   './AutonomyMonitors/GeometryUtilities.cpp',
+  './AutonomyMonitors/VoronoiDiagramGenerator.cpp',
   'WaypointPlanManagerService.cpp',
 ]
 
