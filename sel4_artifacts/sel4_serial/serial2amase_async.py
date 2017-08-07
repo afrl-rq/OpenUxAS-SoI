@@ -6,7 +6,7 @@ import signal
 import sys
 import asyncore
 
-sock_buf_size = 1000000
+sock_buf_size = 100000000
 uart_buf_size = 1000
 
 class Looper(asyncore.dispatcher):
