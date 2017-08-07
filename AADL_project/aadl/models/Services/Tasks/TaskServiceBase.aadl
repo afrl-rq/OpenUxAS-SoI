@@ -14,28 +14,32 @@ public
 			TaskImplementationRequest_in: in event data port uxtask::TaskImplementationRequest.i;
 			RouteResponse_in: in event data port route::RouteResponse.i;
 			SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
-			
+			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+			TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
 			
 		annex agree {**
-				
-				
-			eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
-			assume "bound on frequency of task implementation requests" :
-				  condition event_TaskImplementationRequest occurs sporadic with IAT 1.0;
-				  
-			eq event_RouteResponse_in : bool = event(RouteResponse_in);
-			assume "bound on frequency of task implementation requests" :
-				  condition event_RouteResponse_in occurs sporadic with IAT 1.0;
-				  
-			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
-			assume "bound on frequency of task implementation requests" :
-				  condition event_SensorFootprintResponse_in occurs sporadic with IAT 1.0;
+			guarantee "Placeholder guarantee to force agree to run" : true;
 			
-			eq event_UniqueAutomationRequest_in : bool;
-			eq event_TaskPlanOptions_out : bool; 
+			eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+			eq event_TaskPlanOptions_out : bool = event(TaskPlanOptions_out);
+			eq event_TaskImplementationRequest_in : bool = event(TaskImplementationRequest_in);
+			eq event_RouteResponse_in : bool = event(RouteResponse_in);
+			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
 			
 			guarantee "Timing Test: A UniqueAutomationRequest_in always results in TaskPlanOptions_out" :
 				whenever event_UniqueAutomationRequest_in occurs event_TaskPlanOptions_out occurs during [0.0,200.0];
+				
+			assume "UniqueAutomationRequest_in occurs every 10ms":
+				condition event_UniqueAutomationRequest_in occurs each 0.01;
+				
+			assume "TaskImplementationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskImplementationRequest_in occurs sporadic with IAT 0.003;
+				
+			assume "event_RouteResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_RouteResponse_in occurs sporadic with IAT 0.003;
+			
+			assume "SensorFootprintResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+				condition event_SensorFootprintResponse_in occurs sporadic with IAT 0.002;
 			
 		**};
 	end top_level;
@@ -43,98 +47,99 @@ public
 	process implementation top_level.Impl
 		subcomponents
 			sub : thread TaskServiceBase; 
+			
 		connections
 			conn0 : port TaskImplementationRequest_in -> sub.TaskImplementationRequest_in;
 			conn1 : port RouteResponse_in -> sub.RouteResponse_in;
-			conn2: port SensorFootprintResponse_in-> sub.SensorFootprintResponse_in;
+			conn2 : port SensorFootprintResponse_in-> sub.SensorFootprintResponse_in;
+			conn3 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
+			conn4 : port sub.TaskPlanOptions_out -> TaskPlanOptions_out;
+			
 		annex agree {**
-				
-			assign event_UniqueAutomationRequest_in = event(sub.UniqueAutomationRequest_in);
-			assign event_TaskPlanOptions_out = event(sub.TaskPlanOptions_out); 
 			-- These lemmas could be captured in SpeAR as properties
 			
-			--States to check for reachability:
-			    -- INIT 
-	       		-- IDLE 
-	       		-- SENSOR_REQUEST 
-	       		-- OPTION_ROUTES 
-	       		-- OPTIONS_PUBLISHED 
-	       		-- FINAL_ROUTES 
-	       		-- OPTION_SELECTED 
-	       		-- ACTIVE 
-	       		-- COMPLETED 
-			
-			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
-			lemma "False indicates the INIT state is reachable" : sub.state != sub.INIT; 
-			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
-			lemma "False indicates the SENSOR_REQUEST state is reachable" : sub.state != sub.SENSOR_REQUEST; 
-			lemma "False indicates the OPTION_ROUTES state is reachable" : sub.state != sub.OPTION_ROUTES; 
-			lemma "False indicates the OPTIONS_PUBLISHED state is reachable" : sub.state != sub.OPTIONS_PUBLISHED; 
-			lemma "False indicates the FINAL_ROUTES state is reachable" : sub.state != sub.FINAL_ROUTES; 
-			lemma "False indicates the OPTION_SELECTED state is reachable" : sub.state != sub.OPTION_SELECTED; 
-			lemma "False indicates the ACTIVE state is reachable" : sub.state != sub.ACTIVE; 
---			lemma "False indicates the COMPLETED state is reachable" : sub.state != sub.COMPLETED; 
-			
-			lemma "True indicates we have enumerated all states in the reachability observers" :
-				sub.state = sub.INIT or
-				sub.state = sub.IDLE or
-				sub.state = sub.SENSOR_REQUEST or
-				sub.state = sub.OPTION_ROUTES or
-				sub.state = sub.OPTIONS_PUBLISHED or
-				sub.state = sub.FINAL_ROUTES or
-				sub.state = sub.OPTION_SELECTED or
-				sub.state = sub.ACTIVE;-- or
---				sub.state = sub.COMPLETED;
-				
-			lemma "False indicates init_to_idle transition is reachable" : 
-           		 not sub.init_to_idle;
-           		 
-           	lemma "False indicates idle_to_sensor_request transition is reachable" : 
-           		 not sub.idle_to_sensor_request;	
-           		 
-           	lemma "False indicates sensor_request_to_option_routes transition is reachable" : 
-           		 not sub.sensor_request_to_option_routes;	
-           		 
-      		lemma "False indicates option_routes_to_options_published transition is reachable" : 
-           		 not sub.option_routes_to_options_published;	
-           		 
-           	lemma "False indicates options_published_to_final_routes transition is reachable" : 
-           		 not sub.options_published_to_final_routes;	
-           		 
-           	lemma "False indicates final_routes_to_option_selected transition is reachable" : 
-           		 not sub.final_routes_to_option_selected;	
-           		 
-           	lemma "False indicates option_selected_to_sensor_request transition is reachable" : 
-           		 not sub.option_selected_to_sensor_request;	
-           		 
-           	lemma "False indicates option_selected_to_active transition is reachable" : 
-           		 not sub.option_selected_to_active;	
-           		 
-           	lemma "False indicates active_to_idle transition is reachable" :
-           		not sub.active_to_idle;
-           		
---           	lemma "False indicates active_to_completed transition is reachable" : 
---           		 not sub.active_to_completed;	
+--			--States to check for reachability:
+--			    -- INIT 
+--	       		-- IDLE 
+--	       		-- SENSOR_REQUEST 
+--	       		-- OPTION_ROUTES 
+--	       		-- OPTIONS_PUBLISHED 
+--	       		-- FINAL_ROUTES 
+--	       		-- OPTION_SELECTED 
+--	       		-- ACTIVE 
+--	       		-- COMPLETED 
+--			
+--			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+--			lemma "False indicates the INIT state is reachable" : sub.state != sub.INIT; 
+--			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+--			lemma "False indicates the SENSOR_REQUEST state is reachable" : sub.state != sub.SENSOR_REQUEST; 
+--			lemma "False indicates the OPTION_ROUTES state is reachable" : sub.state != sub.OPTION_ROUTES; 
+--			lemma "False indicates the OPTIONS_PUBLISHED state is reachable" : sub.state != sub.OPTIONS_PUBLISHED; 
+--			lemma "False indicates the FINAL_ROUTES state is reachable" : sub.state != sub.FINAL_ROUTES; 
+--			lemma "False indicates the OPTION_SELECTED state is reachable" : sub.state != sub.OPTION_SELECTED; 
+--			lemma "False indicates the ACTIVE state is reachable" : sub.state != sub.ACTIVE; 
+----			lemma "False indicates the COMPLETED state is reachable" : sub.state != sub.COMPLETED; 
+--			
+--			lemma "True indicates we have enumerated all states in the reachability observers" :
+--				sub.state = sub.INIT or
+--				sub.state = sub.IDLE or
+--				sub.state = sub.SENSOR_REQUEST or
+--				sub.state = sub.OPTION_ROUTES or
+--				sub.state = sub.OPTIONS_PUBLISHED or
+--				sub.state = sub.FINAL_ROUTES or
+--				sub.state = sub.OPTION_SELECTED or
+--				sub.state = sub.ACTIVE;-- or
+----				sub.state = sub.COMPLETED;
+--				
+--			lemma "False indicates init_to_idle transition is reachable" : 
+--           		 not sub.init_to_idle;
 --           		 
---           	lemma "False indicates completed_to_idle transition is reachable" : 
---           		  not sub.completed_to_idle;	
-           		 
-           	lemma "True if only stated transitions are executed (no missing transitions)." :
-                sub.some_transition or sub.state = sub.previous_state;	
-				
-			-- Inadvertent internal variable constraint checks	
-				
-			lemma "False if the internal variable cached_task_plan_options is not constant (no inadvertent constraints)":
-				true -> sub.cached_task_plan_options = pre(sub.cached_task_plan_options);	
-				
-			lemma "False if the internal variable cached_route_request_id is not constant (no inadvertent constraints)"	:
-				true -> sub.cached_route_request_id = pre(sub.cached_route_request_id);
-				
-			lemma "False if the internal variable cached_sensor_request_id is not constant (no inadvertent constraints)":
-				true -> sub.cached_sensor_request_id = pre(sub.cached_sensor_request_id);
-				
-			lemma "False if the internal variable cached_task_id is not constant (no inadvertent constraints)"	:
-				true -> sub.cached_task_id = pre(sub.cached_task_id);
+--           	lemma "False indicates idle_to_sensor_request transition is reachable" : 
+--           		 not sub.idle_to_sensor_request;	
+--           		 
+--           	lemma "False indicates sensor_request_to_option_routes transition is reachable" : 
+--           		 not sub.sensor_request_to_option_routes;	
+--           		 
+--      		lemma "False indicates option_routes_to_options_published transition is reachable" : 
+--           		 not sub.option_routes_to_options_published;	
+--           		 
+--           	lemma "False indicates options_published_to_final_routes transition is reachable" : 
+--           		 not sub.options_published_to_final_routes;	
+--           		 
+--           	lemma "False indicates final_routes_to_option_selected transition is reachable" : 
+--           		 not sub.final_routes_to_option_selected;	
+--           		 
+--           	lemma "False indicates option_selected_to_sensor_request transition is reachable" : 
+--           		 not sub.option_selected_to_sensor_request;	
+--           		 
+--           	lemma "False indicates option_selected_to_active transition is reachable" : 
+--           		 not sub.option_selected_to_active;	
+--           		 
+--           	lemma "False indicates active_to_idle transition is reachable" :
+--           		not sub.active_to_idle;
+--           		
+----           	lemma "False indicates active_to_completed transition is reachable" : 
+----           		 not sub.active_to_completed;	
+----           		 
+----           	lemma "False indicates completed_to_idle transition is reachable" : 
+----           		  not sub.completed_to_idle;	
+--           		 
+--           	lemma "True if only stated transitions are executed (no missing transitions)." :
+--                sub.some_transition or sub.state = sub.previous_state;	
+--				
+--			-- Inadvertent internal variable constraint checks	
+--				
+--			lemma "False if the internal variable cached_task_plan_options is not constant (no inadvertent constraints)":
+--				true -> sub.cached_task_plan_options = pre(sub.cached_task_plan_options);	
+--				
+--			lemma "False if the internal variable cached_route_request_id is not constant (no inadvertent constraints)"	:
+--				true -> sub.cached_route_request_id = pre(sub.cached_route_request_id);
+--				
+--			lemma "False if the internal variable cached_sensor_request_id is not constant (no inadvertent constraints)":
+--				true -> sub.cached_sensor_request_id = pre(sub.cached_sensor_request_id);
+--				
+--			lemma "False if the internal variable cached_task_id is not constant (no inadvertent constraints)"	:
+--				true -> sub.cached_task_id = pre(sub.cached_task_id);
 			
 				
 		**};
@@ -554,39 +559,39 @@ public
 
 				--Timing properties
 				
-				eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
-				
-				assume "bound on frequency of task implementation requests" :
-				  condition event_TaskImplementationRequest occurs sporadic with IAT 1.0;
-				
-				
 --				"Response" to UniqueAutomationRequest_in:
 --				If included in the request, begin process of calculating task options and costs by emitting SensorFootprintRequests
 --				Idle -> SensorRequest in normal operation
 --				OptionSelected -> SensorRequest, when interrupted
 
-				eq event_expected_UniqueAutomationRequest_in: bool =
-					(event(UniqueAutomationRequest_in)  and unique_automation_request_task_id_present);
-				eq event_uar_request_in_idle_state : bool = state = IDLE and event_expected_UniqueAutomationRequest_in;
-				eq event_SensorFootprintRequests_out: bool = event(SensorFootprintRequests_out);
-				guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the IDLE state":
-					whenever event_uar_request_in_idle_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
+			eq event_expected_UniqueAutomationRequest_in: bool =
+				(event(UniqueAutomationRequest_in)  and unique_automation_request_task_id_present);
+			eq event_uar_request_in_idle_state : bool = state = IDLE and event_expected_UniqueAutomationRequest_in;
+			eq event_SensorFootprintRequests_out: bool = event(SensorFootprintRequests_out);
+			guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the IDLE state":
+				whenever event_uar_request_in_idle_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
 					
-				guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the IDLE state":
-					whenever event_uar_request_in_idle_state occurs idle_to_sensor_request occurs during [0.0,0.002];
+			guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the IDLE state":
+				whenever event_uar_request_in_idle_state occurs idle_to_sensor_request occurs during [0.0,0.002];
 					
-				eq event_uar_request_in_option_selected_state : bool = state = OPTION_SELECTED and event_expected_UniqueAutomationRequest_in;
-				guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the OPTION_SPELETECTED state" :
-					whenever event_uar_request_in_option_selected_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
+			eq event_uar_request_in_option_selected_state : bool = state = OPTION_SELECTED and event_expected_UniqueAutomationRequest_in;
+			guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the OPTION_SPELETECTED state" :
+				whenever event_uar_request_in_option_selected_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
 					
-				guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the OPTION_SELECTED state":
-					whenever event_uar_request_in_option_selected_state occurs option_selected_to_sensor_request occurs during [0.0,0.002];
+			guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the OPTION_SELECTED state":
+				whenever event_uar_request_in_option_selected_state occurs option_selected_to_sensor_request occurs during [0.0,0.002];
 					
 --			"Response" to TaskImplementationRequest_in
 --			OptionsPublished -> FinalRoutes, emit RouteRequest to determine final waypoint routes needed for implementation
 
+			eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
 			eq event_tir_in_options_published_state : bool = state = OPTIONS_PUBLISHED and event_TaskImplementationRequest;
 			eq event_RouteRequest_out : bool = event(RouteRequest_out);
+			
+--			--NOTE: needed to address bound conccern. 
+--			assume "TaskImplementationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+--				condition event_TaskImplementationRequest occurs sporadic with IAT 0.003;
+--			
 			guarantee "RouteRequest_out is emitted within 2ms of receiving TaskImplementationRequest_in in the OPTION_PUBLISHED state":
 				whenever event_tir_in_options_published_state occurs event_RouteRequest_out occurs during [0.0,0.002];
 				
@@ -615,6 +620,11 @@ public
 			eq event_RouteResponse_in : bool = event(RouteResponse_in);
 			eq event_rr_in_option_routes_state : bool = event_RouteResponse_in and state = OPTION_ROUTES;
 			eq event_TaskPlanOptions_out : bool = event(TaskPlanOptions_out);
+			
+--			--NOTE: needed to address bound conccern. 
+--			assume "RouteResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+--				condition event_RouteResponse_in occurs sporadic with IAT 0.002;
+--			
 			guarantee "TaskPlanOptions_out is emitted within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
 				whenever event_rr_in_option_routes_state occurs event_TaskPlanOptions_out occurs during [0.0,0.001];
 				
@@ -635,6 +645,11 @@ public
 
 			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
 			eq event_sfr_in_sensor_request_state : bool = event_SensorFootprintResponse_in and state = SENSOR_REQUEST;
+			
+--			--NOTE: needed to address bound conccern. 
+--			assume "SensorFootprintResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+--				condition event_SensorFootprintResponse_in occurs sporadic with IAT 0.002;
+--			
 			guarantee "RouteRequest_out is emitted within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
 				whenever event_sfr_in_sensor_request_state occurs event_RouteRequest_out occurs during [0.0,0.001];
 				
