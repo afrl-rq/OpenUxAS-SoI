@@ -11,12 +11,15 @@ public
     -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
+		features
+			AutomationRequest_in : in event data port cmasi::AutomationRequest.i;
+			UniqueAutomationResponse_in : in event data port uxtask::UniqueAutomationResponse.i;
 		annex agree {**
-			eq event_AutomationRequest_in : bool;
+			eq event_AutomationRequest_in : bool = event(AutomationRequest_in);
 			assume "AutomationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms.": 
 				condition event_AutomationRequest_in occurs sporadic with IAT 0.003;
 				
-			eq event_UniqueAutomationResponse_in : bool;
+			eq event_UniqueAutomationResponse_in : bool = event(UniqueAutomationResponse_in);
 			assume "UniqueAutomationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
 				condition event_UniqueAutomationResponse_in occurs sporadic with IAT 0.002;
 			
@@ -26,10 +29,10 @@ public
 	process implementation top_level.Impl
 		subcomponents
 			sub : thread AutomationRequestValidatorService; 
+		connections
+			conn0 : port UniqueAutomationResponse_in -> sub.UniqueAutomationResponse_in;
+			conn1 : port AutomationRequest_in -> sub.AutomationRequest_in;
 		annex agree {**
-				assign event_AutomationRequest_in = event(sub.AutomationRequest_in);
-				assign event_UniqueAutomationResponse_in = event(sub.UniqueAutomationResponse_in);
-				
 			-- These lemmas could be captured in SpeAR as properties
 			
 			--States to check for reachability:

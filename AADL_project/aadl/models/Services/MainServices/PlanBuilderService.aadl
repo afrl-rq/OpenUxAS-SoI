@@ -7,12 +7,16 @@ public
        -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
+		features
+			TaskAssignmentSummary_in : in event data port uxtask::TaskAssignmentSummary.i;
+			TaskImplementationResponse_in : in event data port uxtask::TaskImplementationResponse.i;
+			
 		annex agree {**
-			eq event_TaskAssignmentSummary_in : bool;
+			eq event_TaskAssignmentSummary_in : bool = event(TaskAssignmentSummary_in);
 			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
 				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
 				
-			eq event_TaskImplementationResponse_in : bool;
+			eq event_TaskImplementationResponse_in : bool = event(TaskImplementationResponse_in);
 			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
 				condition event_TaskImplementationResponse_in occurs sporadic with IAT 0.003;
 		**};
@@ -21,10 +25,11 @@ public
 	process implementation top_level.Impl
 		subcomponents
 			sub : thread PlanBuilderService; 
-		annex agree {**
-			assign event_TaskAssignmentSummary_in = event(sub.TaskAssignmentSummary_in);
-			assign event_TaskImplementationResponse_in = event(sub.TaskImplementationResponse_in);
+		connections
+			conn0 : port TaskAssignmentSummary_in -> sub.TaskAssignmentSummary_in;
+			conn1 : port TaskImplementationResponse_in -> sub.TaskImplementationResponse_in;
 			
+		annex agree {**
 			-- These lemmas could be captured in SpeAR as properties
 			
 			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
@@ -207,9 +212,9 @@ public
 			eq event_TaskAssignmentSummary_in : bool = event(TaskAssignmentSummary_in);
 			eq event_tas_in_idle_waiting : bool = event_TaskAssignmentSummary_in and pre(state = IDLE_WAITING);
 			
-			--NOTE: needed to address bound conccern. 
-			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
-				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
+--			--NOTE: needed to address bound conccern. 
+--			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+--				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
 			
 			--NOTE: in this spec, the event occurs and the state transitions at the same time, i.e., must check the previous state is IDLE_WAITING
 			guarantee "The service transitions to BUSY_REQUESTING within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state " :
@@ -233,9 +238,9 @@ public
 			eq event_tir_in_busy_waiting_state : bool = event_TaskImplementationResponse_in and state = BUSY_WAITING;
 			eq request_out_or_busy_waiting_to_idle : bool = event_TaskImplementationRequest_out or busy_waiting_to_idle;
 			
-			--NOTE: needed to address bound conccern. 
-			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
-				condition event_TaskImplementationResponse_in occurs sporadic with IAT 0.003;
+--			--NOTE: needed to address bound conccern. 
+--			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+--				condition event_TaskImplementationResponse_in occurs sporadic with IAT 0.003;
 			
 			guarantee "The service conifgures the request at the top of the 'queue' with predicted vehicle positions and emits a TaskImplementationRequest_out message or
 				transitions to IDLE within 2ms of receiving TaskImplementationResponse_in in the BUSY_WAITING state." :

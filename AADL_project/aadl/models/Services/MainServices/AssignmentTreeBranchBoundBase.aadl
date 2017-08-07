@@ -10,6 +10,8 @@ public
     -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
+		features
+			AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;
 		annex agree {**
 				
 			eq event_AssignmentCostMatrix_in : bool;
@@ -21,9 +23,9 @@ public
 	process implementation top_level.Impl
 		subcomponents
 			sub : thread AssignmentTreeBranchBoundBase; 
+		connections
+			conn0 : port AssignmentCostMatrix_in -> sub.AssignmentCostMatrix_in;
 		annex agree {**
-				assign event_AssignmentCostMatrix_in = event(sub.AssignmentCostMatrix_in);
-				
 			-- These lemmas could be captured in SpeAR as properties
 			
 			--States to check for reachability:
@@ -175,9 +177,9 @@ public
 			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
 			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
 			
-			--NOTE: needed to address bound conccern. 
-			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
-				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
+--			--NOTE: needed to address bound conccern. 
+--			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
+--				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
 			
 			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state":
 				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];

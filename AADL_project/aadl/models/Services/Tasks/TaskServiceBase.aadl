@@ -56,6 +56,8 @@ public
 			conn4 : port sub.TaskPlanOptions_out -> TaskPlanOptions_out;
 			
 		annex agree {**
+				eq dummy : bool = true;
+				
 			-- These lemmas could be captured in SpeAR as properties
 			
 --			--States to check for reachability:

@@ -7,18 +7,22 @@ public
     with UXNATIVE;
   
   process top_level
-		annex agree {**
-			eq event_RemoveTasks_in : bool;
-			assume "RemoveTasks_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
-				condition event_RemoveTasks_in occurs sporadic with IAT 0.002;
-		**};
+  	features
+  		RemoveTasks_in : in event data port cmasi::RemoveTasks.i;
+	annex agree {**
+		eq event_RemoveTasks_in : bool = event(RemoveTasks_in);
+		assume "RemoveTasks_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+			condition event_RemoveTasks_in occurs sporadic with IAT 0.002;
+	**};
 	end top_level;
 	
 	process implementation top_level.Impl
 		subcomponents
 			sub : thread TaskManagerService; 
+		connections
+			conn0: port RemoveTasks_in -> sub.RemoveTasks_in;
 		annex agree {**
-			assign event_RemoveTasks_in = event(sub.RemoveTasks_in);
+			eq dummy : bool = true;
 		**};
 	end top_level.Impl;
     
@@ -66,9 +70,9 @@ public
             eq event_RemoveTasks_in : bool = event(RemoveTasks_in);
             eq event_KillService_out: bool = event(KillService_out);
             
-            --NOTE: needed to address bounds conccern. 
-			assume "RemoveTasks_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
-				condition event_RemoveTasks_in occurs sporadic with IAT 0.002;
+--            --NOTE: needed to address bounds conccern. 
+--			assume "RemoveTasks_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+--				condition event_RemoveTasks_in occurs sporadic with IAT 0.002;
             
             guarantee "KillService_out is emited within 1ms of receiving RemoveTasks_in" :
             	whenever event_RemoveTasks_in occurs event_KillService_out occurs during [0.0,0.001];
