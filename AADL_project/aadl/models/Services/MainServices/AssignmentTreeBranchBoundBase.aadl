@@ -12,11 +12,24 @@ public
 	process top_level
 		features
 			AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;
+			TaskAssignmentSummary_out: out event data port uxtask::TaskAssignmentSummary.i;
+			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
 		annex agree {**
 				
-			eq event_AssignmentCostMatrix_in : bool;
+			eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+			assume "UniqueAutomationRequest_in occurs every 10ms":
+				condition event_UniqueAutomationRequest_in occurs each 0.01;
+				
+			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
 			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
 				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
+				
+			--NOTE: I expect this guarantee to be false (currently). If a AssignmentCostMatrix is received before an automation
+			--request, I believe the automata will not emit a TaskAssignmentSummary_out. Also, the AssignmentCostMatrix cannot be
+			--arbirary. It must have specific characteristics at a specific point in processing to result in emitting a TaskAssignmentSummary_out;
+			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+			guarantee "Timing Test: AssignmentCostMatrix_in results in a TaskAssignmentSummary_out within 5 seconds" : 
+				whenever event_AssignmentCostMatrix_in occurs event_TaskAssignmentSummary_out occurs during [0.0,5.0];
 		**};
 	end top_level;
 	
@@ -25,6 +38,8 @@ public
 			sub : thread AssignmentTreeBranchBoundBase; 
 		connections
 			conn0 : port AssignmentCostMatrix_in -> sub.AssignmentCostMatrix_in;
+			conn1 : port sub.TaskAssignmentSummary_out -> TaskAssignmentSummary_out;
+			conn2 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
 		annex agree {**
 			-- These lemmas could be captured in SpeAR as properties
 			
