@@ -17,19 +17,25 @@ public
 		annex agree {**
 				
 			eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
-			assume "UniqueAutomationRequest_in occurs every 10ms":
-				condition event_UniqueAutomationRequest_in occurs each 0.01;
+			assume "UniqueAutomationRequest_in occurs every 1s":
+				condition event_UniqueAutomationRequest_in occurs each 1.0;
 				
 			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
 			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
 				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
 				
+			
+			assume "UniqueAutomationRequest_in must provide a TaskList of size greater than 0 and less than or equal to 10":
+        		event(UniqueAutomationRequest_in) => 
+        			UniqueAutomationRequest_in.OriginalRequest.TaskListSize > 0 and UniqueAutomationRequest_in.OriginalRequest.TaskListSize <= 10;
+        	
+        	
 			--NOTE: I expect this guarantee to be false (currently). If a AssignmentCostMatrix is received before an automation
 			--request, I believe the automata will not emit a TaskAssignmentSummary_out. Also, the AssignmentCostMatrix cannot be
 			--arbirary. It must have specific characteristics at a specific point in processing to result in emitting a TaskAssignmentSummary_out;
-			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
-			guarantee "Timing Test: AssignmentCostMatrix_in results in a TaskAssignmentSummary_out within 5 seconds" : 
-				whenever event_AssignmentCostMatrix_in occurs event_TaskAssignmentSummary_out occurs during [0.0,5.0];
+--			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+--			guarantee "Timing Test: AssignmentCostMatrix_in results in a TaskAssignmentSummary_out within 5 seconds" : 
+--				whenever event_AssignmentCostMatrix_in occurs event_TaskAssignmentSummary_out occurs during [0.0,5.0];
 		**};
 	end top_level;
 	
@@ -95,24 +101,23 @@ public
 		--------------------------State Transition Predicates-----------------------------------
       		
       		--Upon reception of a UniqueAutomationRequest, this service enters the wait state 
-      		eq idle_to_wait : bool =  false ->
-      			previous_state = IDLE and 
-      			pre(event(UniqueAutomationRequest_in));
+      		eq idle_to_wait : bool =  (false ->
+      			(previous_state = IDLE and 
+      			pre(event(UniqueAutomationRequest_in))));
       		--The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       		--at which point this service returns to the idle state.
-      		eq wait_to_idle : bool = false ->
-      			previous_state = WAIT and
-      			pre(event(TaskAssignmentSummary_out));
+      		eq wait_to_idle : bool = (false ->
+      			(previous_state = WAIT and
+      			pre(event(TaskAssignmentSummary_out))));
       			
       		-- Other internal transitions --
       		
-      		eq send_task_assignment_summary : bool = false ->
-      			state = WAIT and 
+      		eq send_task_assignment_summary : bool = (false ->
+      			(state = WAIT and 
       			event(AssignmentCostMatrix_in) and 
       			AssignmentCostMatrix_in.CorrespondingAutomationRequestID = curUniqueAutomationRequestID and
-      			allExpectedTaskOptionsReceived;
+      			allExpectedTaskOptionsReceived));
       			
-      		
       		--NOTE: CANNOT FORMALIZE WITHOUT ARRAY SUPPORT (NO WAY TO TIE VARIABLE TO INPUT PORTS)	
       		--True if while in the wait state, all taskoptions are received for all tasks in the request
       		--TaskOptions must match the UniqueAutomationRequest ID to be valid. 
@@ -121,6 +126,23 @@ public
       		eq allExpectedTaskOptionsReceived : bool ;
       		
       		eq curUniqueAutomationRequestID : int;
+      		
+      		 --TODO: ASK DEREK: arbitrary number chosen here
+        	const MAX_TASKS : int = 10;
+        	eq all_tasks_options_recieved : bool; 
+        	eq current_total_task_options_to_recieve : int; 
+        	eq current_task_options_recieved_counter : int;
+        	
+        	--TODO: I might be able to remove this assumption and rely on the system as a whole to ensure the list is constrained
+        	assume "UniqueAutomationRequest_in must provide a TaskList of size greater than 0 and less than or equal to 10":
+        		event(UniqueAutomationRequest_in) => 
+        			UniqueAutomationRequest_in.OriginalRequest.TaskListSize > 0 and UniqueAutomationRequest_in.OriginalRequest.TaskListSize <= MAX_TASKS;
+        	
+        	assume "[INFORMAL ASSUMPTION PLACEHOLDER] Due to limitations in the formal analysis tools, there is no way to verify incoming task plan options
+        		are expected, i.e., for the expected tasks as listed in the unique automation request. We therefore must assume that all task options are 
+        		in fact expected and unique, thus allowing the model to simply count requests. There is no way of formalizing this assumption so it is left
+        		here as a placeholder so this assumption is not forgotten or implicit.":
+        			true;
       		
       		guarantee "Self loops": not some_transition => (state = previous_state);
       	
@@ -135,18 +157,33 @@ public
 --      			else
 --      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
       			
-      		guarantee "[Upon receiving a UniqueAutomationRequest_in in the IDLE state, the ID is cached]":
+      		guarantee "[Upon receiving a UniqueAutomationRequest_in in the IDLE state, the ID is cached, 
+      				the total task options to receive variable is set and the options received counter is reset]":
       			if state = IDLE and event(UniqueAutomationRequest_in) then
-      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID
+      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID and
+      				current_total_task_options_to_recieve = UniqueAutomationRequest_in.OriginalRequest.TaskListSize and
+      				current_task_options_recieved_counter = 0
       			else
-      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
-
-      		
-      		guarantee "[ADDED GURANTEE]: In IDLE, there are no expected task options (clear the flag, i.e., set to false) ":
-      		 	state = IDLE  =>
-      				allExpectedTaskOptionsReceived = false;
-      		
-      		--NOTE: although there is an expectation about the ordering in which the RouteAggregatorService sends out
+      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID) and
+      				current_total_task_options_to_recieve = pre(current_total_task_options_to_recieve);
+      				
+      		guarantee "[ADDED GUARANTEE - made under the assumption we can rely on simple counting of options received, see assumption above]:
+      		 All expected tasks options are received when the total recieved unique task options equals to the total expected.":
+      			current_total_task_options_to_recieve = current_task_options_recieved_counter <=> 
+      				allExpectedTaskOptionsReceived;
+      				
+      		guarantee "[ADDED GUARANTEE - made under the assumption we can rely on simple counting of options received, see assumption above]
+      			When a TaskPlanOptions_in is received in the WAIT state, increment the received task options counter":
+      			(state = WAIT and event(TaskPlanOptions_in)) =>
+      				current_task_options_recieved_counter = pre(current_task_options_recieved_counter)+1;
+      				
+      		guarantee "[ADDED GUARANTEE] If not in WAIT and receiving a TaskPlanOptions_in or in IDLE and receiving UniqueAutomationRequest_in
+      			the received task options counter remains constant" :
+      			(not (state = IDLE and event(UniqueAutomationRequest_in)) and 
+      					not ((state = WAIT and event(TaskPlanOptions_in)))) =>
+      				current_task_options_recieved_counter = pre(current_task_options_recieved_counter);
+      				
+      	     --NOTE: although there is an expectation about the ordering in which the RouteAggregatorService sends out
       		--the AssignmentCostMatrix relative to receiving Taskoptions, there is no intrinsic need to assume this ordering here (verified with Derek).
       		--We instead allow the TaskOptions and Matrix to come in in any order. Upon receiving the requisite task and matrix the summary is sent out. 
       		guarantee "Upon receiving the AssignmentCostMatrix (which should be received strictly after the TaskPlanOptions
@@ -156,12 +193,11 @@ public
       				event(TaskAssignmentSummary_out)
       			else
       				not event(TaskAssignmentSummary_out);
-      				
+      		
       		guarantee "The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       			at which point this service returns to the idle state.":
       			wait_to_idle =>
-      				state = IDLE and
-      				allExpectedTaskOptionsReceived = false; --redundant, but explicit
+      				state = IDLE;
       				
       				
       		--Timing properties

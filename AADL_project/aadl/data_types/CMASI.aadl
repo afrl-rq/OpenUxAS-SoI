@@ -943,6 +943,11 @@ data implementation AutomationRequest.i
         --list of task IDs (defined by {@link Task} messages) to be planned
         --for by the automation service
         TaskList: data int64.i {Data_Model::Data_Representation => Array;};
+        
+        -- ADDED: BDR (20170808)
+		-- Size of the TaskList (not necessary if AGREE can get array size)		
+        TaskListSize : data int64.i;
+        
         --string containing the relationship between requested tasks. If
         --empty, all tasks are to be completed in any order. The format of the
         --string is specific to the automation service. This relationship string
