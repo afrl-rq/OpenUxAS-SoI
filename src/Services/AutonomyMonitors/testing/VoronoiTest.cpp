@@ -1,6 +1,5 @@
-
 /*
- * Author: Guohui and Sriram
+ * Author: Guohui
  */
 #include <stdio.h>
 #include <search.h>
@@ -26,7 +25,7 @@ int main(int argc,char **argv) {
   }
 
   VoronoiDiagramGenerator vdg;
-  //vdg.generateVDrectangle(input, -100, 100, -100, 100, 1);
+  vdg.generateVDrectangle(input, -100, 100, -100, 100, 1);
 
   double radius = 80;
   std::pair<double, double> center = {0, 0};
@@ -42,10 +41,15 @@ int main(int argc,char **argv) {
     polyBoundary.push_back(add);
   }
   polyBoundary.push_back(polyBoundary.front());
-  vdg.generateVDpolygon(input, polyBoundary);
-  
+  //vdg.generateVDpolygon(input, polyBoundary);
   
   vdg.hashTableOfSiteVDvertices();
+  std::vector<std::pair<double, double> > conveshull = vdg.convexHullExpand(vdg.convexHullset(input), 10);
+  for(auto item: conveshull) {
+    std::cout << item.first << " " << item.second << std::endl;
+  }
+
+  
   vdg.resetIterator();
   double x1,y1,x2,y2;
   
@@ -58,6 +62,7 @@ int main(int argc,char **argv) {
   for(auto item: vdg.VDedgeSet) {
     std::cout << item.first.x << " " << item.first.y << " " << item.second.x << " " << item.second.y << std::endl;
   }
+  /*
   std::cout << "-------------------------------" << std::endl;
   //for(auto item: vdg.VDedgeSet) std::cout << item.first.x << " " << item.first.y << " " << item.second.x << " " << item.second.y << std::endl;
   for(auto item: vdg.sites) {
@@ -65,9 +70,8 @@ int main(int argc,char **argv) {
     for(auto each: vdg.VDvertices[item.sitemarker]){
       std::cout << each.x << " " << each.y << std::endl;
     }
-    
   }
-  
+  */
   return 0;
 	
 }

@@ -11,9 +11,8 @@
  * REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
-
 /*
- * Author Guohui and Sriram
+ * Author: Guohui and Sriram
  */
 
 #ifndef VORONOI_DIAGRAM_GENERATOR
@@ -60,25 +59,23 @@ struct GraphEdge {
   struct GraphEdge* next;
 };
 
-struct VoronoiEdge { //
+struct VoronoiEdge {
   struct VoronoiEdge *leftVedge, *rightVedge; // vertex's neightbors
   struct Edge *innerVedge;
-  //int ELrefcnt;
-  char ELpm;
-  struct Site *vertex; //
+  char ELpm; // The position of VoronoiEdge based on vertex
+  struct Site *vertex; // The node caused VoronoiDdge
   double ystar; // Lowest y-coordinate of the hyperbola
-  struct VoronoiEdge *PQnext; //
+  struct VoronoiEdge *PQnext; 
 };
 
 class VoronoiDiagramGenerator {
 public:
+  std::vector<struct Site> sites;
   std::unordered_map<int, std::vector<struct Point> > VDvertices;
-  std::vector<std::pair<int, int> > VDedgeSetHelper;
-  
   std::vector<std::pair<struct Point, struct Point> >VDedgeSet;
+  std::vector<std::pair<int, int> > VDedgeSetHelper;
   int VDverticesNumber; // Number of Voronoi diagram vertices
   int siteNumber; // Number of sites
-  std::vector<struct Site> sites;
   
   VoronoiDiagramGenerator();
   ~VoronoiDiagramGenerator();
@@ -86,10 +83,8 @@ public:
   bool generateVDcircle(std::vector<std::pair<double, double> > viewAngleList, std::pair<double, double> Center, double Radius, double minDist=0);
   bool generateVDpolygon(std::vector<std::pair<double, double> > viewAngleList, std::vector<std::pair<double, double> > polyBoundary, double minDist=0);
   void hashTableOfSiteVDvertices();
-
   std::vector<std::pair<double, double> > convexHullset(std::vector<std::pair<double, double> > viewAngleList);
   std::vector<std::pair<double, double> > convexHullExpand(std::vector<std::pair<double, double> > chBoundary, double moat);
-
   
   void resetIterator() {
     iteratorEdges = allEdges;
@@ -108,7 +103,10 @@ public:
 
 private:
   /* Fundamental components */
-  int searchAreaType; // 0: circle, 1: rectangle, 2: polygon
+  int edgeNumber; // Number of edges
+  int siteIndex; // Index of current site
+  double gapThreshold;
+  struct Site *bottomsite;
   GraphEdge* allEdges;
   GraphEdge* iteratorEdges;
   struct sort_pred {
@@ -116,13 +114,6 @@ private:
       return a.coord.y < b.coord.y || (a.coord.y == b.coord.y && a.coord.x < b.coord.x);
     }
   };
-  
-  int edgeNumber; // Number of edges
-  
-  int siteIndex; // Index of current site
-  double gapThreshold;
-  struct Site *bottomsite;
-  
   
   /* Main operation */
   bool voronoiOperation();
@@ -139,9 +130,8 @@ private:
   void PQdelete(struct VoronoiEdge *VDedge);
   
   
-  /* EdgeList */
-  struct VoronoiEdge *EdgeListLeftBorder, *EdgeListRightBorder; // ELhash's range
-  //int ELhashsize;
+  /* EdgeList for the new created regions, VDedges */
+  struct VoronoiEdge *EdgeListLeftBorder, *EdgeListRightBorder; // EdgeList's range
   bool EdgeListInit();
   void EdgeListInsert(struct VoronoiEdge *current, struct VoronoiEdge *newVDedge);
   void EdgeListDelete(struct VoronoiEdge *VDedge);
@@ -150,35 +140,29 @@ private:
   
   /* Geometry operations */
   struct Edge *generateBisector(struct Site *s1, struct Site *s2);
-  double distance(struct Site *s1, struct Site *s2);
-  double distPoint(struct Point s1, struct Point s2);
-  double distpair(std::pair<double, double> s1, std::pair<double, double> s2);
-  double distPointToLineABC(std::pair<double, double> innerPoint, double a, double b, double c);
-  
-  
   struct Site *generateIntersection(struct VoronoiEdge *VDedge1, struct VoronoiEdge *VDedge2);
   bool segIntersectSeg(std::pair<struct Point, struct Point> &edge, std::pair<struct Point, struct Point> boundary, struct Point &intersect);
   int rightCheck(struct VoronoiEdge *VDedge, struct Point *node);
   struct Site *rightSite(struct VoronoiEdge *VDedge);
   struct Site *leftSite(struct VoronoiEdge *VDedge);
+  
+  double distance(struct Site *s1, struct Site *s2);
+  double distPoint(struct Point s1, struct Point s2);
+  double distPointToLineABC(std::pair<double, double> innerPoint, double a, double b, double c);
   int orientation(std::pair<double, double> p0, std::pair<double, double> a, std::pair<double, double> b);
-  
-  
 
 
   /* Additional operations */
   double xmin, xmax, ymin, ymax;
   double borderMinX, borderMaxX, borderMinY, borderMaxY;
-  //void geominit();
   void usedMark(struct Site *st);
   void unusedMark(struct Site *st);
-  
   void endPoint(struct Edge *edge, int pos,struct Site *st);
   void generateVDvertex(struct Site *st);
-  struct Site *nextone();
   void VDedgeGenerator(struct Edge *VDedge);
+  
   void pushGraphEdge(double x1, double y1, double x2, double y2);
-
+  struct Site *nextone();
   struct VoronoiEdge *HEcreate(struct Edge *edge, int pm);
   
 };
