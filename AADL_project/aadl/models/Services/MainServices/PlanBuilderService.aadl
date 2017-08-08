@@ -164,6 +164,7 @@ public
         	eq current_total_tasks_to_service : int; 
         	eq current_serviced_tasks_counter : int;
         	
+        	--TODO: I might be able to remove this assumption and rely on the system as a whole to ensure the list is constrained
         	assume "TaskAssignmentSummary_in must provide a TaskList of size greater than 0 and less than or equal to 10":
         		event(TaskAssignmentSummary_in) => 
         			TaskAssignmentSummary_in.TaskListSize > 0 and TaskAssignmentSummary_in.TaskListSize <= MAX_TASKS;
@@ -172,8 +173,8 @@ public
         	
         	guarantee "Self loops": not some_transition => (state = previous_state);   
         	
---        	guarantee "The PlanBuilderService begins in the IDLE state" : 
---        		(state =IDLE)->true;  		
+        	guarantee "The PlanBuilderService begins in the IDLE state" : 
+        		(state =IDLE)->true;  		
         	
         	--Similar to both the RouteAggregator and the AssignmentTreeBranchBoundService, 
         	--the PlanBuilderService utilizes a received UniqueAutomationRequest to detect 
