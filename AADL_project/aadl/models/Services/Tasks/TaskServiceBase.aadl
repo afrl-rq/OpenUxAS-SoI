@@ -16,6 +16,7 @@ public
 			SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
 			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
 			TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
+			EntityState_in: in event data port cmasi::EntityState.i;
 			
 		annex agree {**
 			guarantee "Placeholder guarantee to force agree to run" : true;
@@ -25,21 +26,25 @@ public
 			eq event_TaskImplementationRequest_in : bool = event(TaskImplementationRequest_in);
 			eq event_RouteResponse_in : bool = event(RouteResponse_in);
 			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
+			eq event_EntityState_in : bool = event(EntityState_in);
 			
-			guarantee "Timing Test: A UniqueAutomationRequest_in always results in TaskPlanOptions_out" :
-				whenever event_UniqueAutomationRequest_in occurs event_TaskPlanOptions_out occurs during [0.0,200.0];
+--			guarantee "Timing Test: A UniqueAutomationRequest_in always results in TaskPlanOptions_out" :
+--				whenever event_UniqueAutomationRequest_in occurs event_TaskPlanOptions_out occurs during [0.0,200.0];
 				
-			assume "UniqueAutomationRequest_in occurs every 10ms":
-				condition event_UniqueAutomationRequest_in occurs each 0.01;
+			assume "UniqueAutomationRequest_in occurs every 1s":
+				condition event_UniqueAutomationRequest_in occurs each 10.0;
 				
 			assume "TaskImplementationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
-				condition event_TaskImplementationRequest_in occurs sporadic with IAT 0.003;
+				condition event_TaskImplementationRequest_in occurs sporadic with IAT 1.0; --0.003;
 				
 			assume "event_RouteResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
-				condition event_RouteResponse_in occurs sporadic with IAT 0.003;
+				condition event_RouteResponse_in occurs sporadic with IAT 1.0; -- 0.003;
 			
 			assume "SensorFootprintResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
-				condition event_SensorFootprintResponse_in occurs sporadic with IAT 0.002;
+				condition event_SensorFootprintResponse_in occurs sporadic with IAT 1.0; --0.002;
+				
+			assume "EntityState_in is assumed to occur sporadically with an inter arrival time no sooner than ...":
+				condition event_EntityState_in occurs sporadic with IAT 1.0;
 			
 		**};
 	end top_level;
@@ -54,6 +59,7 @@ public
 			conn2 : port SensorFootprintResponse_in-> sub.SensorFootprintResponse_in;
 			conn3 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
 			conn4 : port sub.TaskPlanOptions_out -> TaskPlanOptions_out;
+			conn5 : port EntityState_in -> sub.EntityState_in;
 			
 		annex agree {**
 				eq dummy : bool = true;
@@ -589,44 +595,36 @@ public
 			eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
 			eq event_tir_in_options_published_state : bool = state = OPTIONS_PUBLISHED and event_TaskImplementationRequest;
 			eq event_RouteRequest_out : bool = event(RouteRequest_out);
-			
---			--NOTE: needed to address bound conccern. 
---			assume "TaskImplementationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
---				condition event_TaskImplementationRequest occurs sporadic with IAT 0.003;
---			
+						
 			guarantee "RouteRequest_out is emitted within 2ms of receiving TaskImplementationRequest_in in the OPTION_PUBLISHED state":
 				whenever event_tir_in_options_published_state occurs event_RouteRequest_out occurs during [0.0,0.002];
 				
 			guarantee "The task transitions to FINAL_ROUTES within 2ms of receiving TaskImplementationRequest_in in the OPTIONS_PUBLISHED state":
-				whenever event_tir_in_options_published_state occurs options_published_to_final_routes occurs during [0.0,2.0];
+				whenever event_tir_in_options_published_state occurs options_published_to_final_routes occurs during [0.0,0.002];
 			
---			"Response" to EntityState_in
---			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
---			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
+			"Response" to EntityState_in
+			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
+			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
 
 			eq event_EntityState_in : bool = event(EntityState_in);
 			eq event_expected_es_in_option_selected_state : bool = event_EntityState_in and state = OPTION_SELECTED and entity_state_task_id_present;
 			eq event_unexpected_es_in_active_state : bool = event_EntityState_in and state = ACTIVE and not entity_state_task_id_present;
 			
 			guarantee "The task transitions to ACTIVE within 0ms of receiving an expected EntityState_in in the OPTION_SELECTED state":
-				whenever event_expected_es_in_option_selected_state occurs option_selected_to_active occurs during [0.0,0.0];
+				whenever event_expected_es_in_option_selected_state occurs option_selected_to_active occurs during [0.0,0.000001];
 				
 			guarantee "The task transitions to IDLE within 0ms of receiving an unexpected EntityState_in in the ACTIVE state":
-				whenever event_unexpected_es_in_active_state occurs active_to_idle occurs during [0.0,0.0];
+				whenever event_unexpected_es_in_active_state occurs active_to_idle occurs during [0.0,0.000001];
 				
 				
---			"Response" to RouteResponse_in
---			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
---			FinalRoutes -> OptionSelected, emit TaskImplementationResponse
+			"Response" to RouteResponse_in
+			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
+			FinalRoutes -> OptionSelected, emit TaskImplementationResponse
 
 			eq event_RouteResponse_in : bool = event(RouteResponse_in);
 			eq event_rr_in_option_routes_state : bool = event_RouteResponse_in and state = OPTION_ROUTES;
 			eq event_TaskPlanOptions_out : bool = event(TaskPlanOptions_out);
-			
---			--NOTE: needed to address bound conccern. 
---			assume "RouteResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
---				condition event_RouteResponse_in occurs sporadic with IAT 0.002;
---			
+					
 			guarantee "TaskPlanOptions_out is emitted within 1ms of receiving RouteResponse_in in the OPTION_ROUTES state":
 				whenever event_rr_in_option_routes_state occurs event_TaskPlanOptions_out occurs during [0.0,0.001];
 				
@@ -647,11 +645,7 @@ public
 
 			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
 			eq event_sfr_in_sensor_request_state : bool = event_SensorFootprintResponse_in and state = SENSOR_REQUEST;
-			
---			--NOTE: needed to address bound conccern. 
---			assume "SensorFootprintResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
---				condition event_SensorFootprintResponse_in occurs sporadic with IAT 0.002;
---			
+					
 			guarantee "RouteRequest_out is emitted within 1ms of receiving SensorFootprintResponse_in in the SENSOR_REQUEST state":
 				whenever event_sfr_in_sensor_request_state occurs event_RouteRequest_out occurs during [0.0,0.001];
 				
