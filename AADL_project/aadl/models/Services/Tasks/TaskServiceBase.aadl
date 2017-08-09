@@ -602,9 +602,9 @@ public
 			guarantee "The task transitions to FINAL_ROUTES within 2ms of receiving TaskImplementationRequest_in in the OPTIONS_PUBLISHED state":
 				whenever event_tir_in_options_published_state occurs options_published_to_final_routes occurs during [0.0,0.002];
 			
-			"Response" to EntityState_in
-			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
-			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
+--			"Response" to EntityState_in
+--			OptionSelected: if Task ID is listed in AssociatedTaskList, then -> Active
+--			Active: if Task ID is NOT listed in AssociatedTaskList, then -> Completed --NOTE: completed was removed, transition directly to IDLE
 
 			eq event_EntityState_in : bool = event(EntityState_in);
 			eq event_expected_es_in_option_selected_state : bool = event_EntityState_in and state = OPTION_SELECTED and entity_state_task_id_present;
@@ -617,9 +617,9 @@ public
 				whenever event_unexpected_es_in_active_state occurs active_to_idle occurs during [0.0,0.000001];
 				
 				
-			"Response" to RouteResponse_in
-			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
-			FinalRoutes -> OptionSelected, emit TaskImplementationResponse
+--			"Response" to RouteResponse_in
+--			OptionRoutes -> OptionsPublished, emit TaskPlanOptions
+--			FinalRoutes -> OptionSelected, emit TaskImplementationResponse
 
 			eq event_RouteResponse_in : bool = event(RouteResponse_in);
 			eq event_rr_in_option_routes_state : bool = event_RouteResponse_in and state = OPTION_ROUTES;
