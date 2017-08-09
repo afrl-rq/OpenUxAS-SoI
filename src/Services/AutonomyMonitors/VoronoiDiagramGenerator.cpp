@@ -95,11 +95,25 @@ bool VoronoiDiagramGenerator::generateVDcircle(std::vector<std::pair<double, dou
     double B = 2*((s2->x - s1->x)*(s1->x - Center.first) + (s2->y - s1->y)*(s1->y - Center.second));
     double C = Center.first * Center.first + Center.second * Center.second + s1->x * s1->x + s1->y * s1->y - 2*(Center.first * s1->x + Center.second * s1->y) - Radius*Radius;
     double delta = B*B - 4*A*C;
+    struct Site *site1 = &VDedgeSetHelper[i].first;
+    struct Site *site2 = &VDedgeSetHelper[i].second;
+    if(distPoint(site1->coord, stCenter) <= Radius && distPoint(site2->coord, stCenter) > Radius) {
+      *site2 = *site1;
+    } else if(distPoint(site1->coord, stCenter) > Radius && distPoint(site2->coord, stCenter) <= Radius) {
+      *site1 = *site2;
+    } else if(distPoint(site1->coord, stCenter) > Radius && distPoint(site2->coord, stCenter) > Radius) {
+      site2 = (struct Site *) NULL;
+      site1 = (struct Site *) NULL;
+    }
+    
     
     if(distPoint(*s1, stCenter) <= Radius && distPoint(*s2, stCenter) <= Radius) {
       continue;
     } else if(distPoint(*s1, stCenter) > Radius && distPoint(*s2, stCenter) > Radius) {
-      continue;
+      // Remove the edges outside of the area
+      VDedgeSet.erase(VDedgeSet.begin() + i);
+      VDedgeSetHelper.erase(VDedgeSetHelper.begin() + i);
+      i--;
     } else {
       if(delta > EPS) {
         // Possible ratio
@@ -110,6 +124,7 @@ bool VoronoiDiagramGenerator::generateVDcircle(std::vector<std::pair<double, dou
           if(distPoint(*s1, stCenter) <= Radius) {
             s2->x = s1->x + u1*(s2->x - s1->x);
             s2->y = s1->y + u1*(s2->y - s1->y);
+            
           }
           else{
             s1->x = s1->x + u1*(s2->x - s1->x);
@@ -250,23 +265,32 @@ bool VoronoiDiagramGenerator::segIntersectSeg(std::pair<struct Point, struct Poi
 }
 
 void VoronoiDiagramGenerator::hashTableOfSiteVDvertices() {
-   for(int i = 0; i < VDedgeSetHelper.size(); i++) {
-    VDvertices[VDedgeSetHelper[i].first].push_back(VDedgeSet[i].first);
-    VDvertices[VDedgeSetHelper[i].first].push_back(VDedgeSet[i].second);
-    VDvertices[VDedgeSetHelper[i].second].push_back(VDedgeSet[i].first);
-    VDvertices[VDedgeSetHelper[i].second].push_back(VDedgeSet[i].second);
+  for(int i = 0; i < VDedgeSetHelper.size(); i++) {
+    if(&VDedgeSetHelper[i].first != (struct Site *) NULL) {
+      VDvertices[VDedgeSetHelper[i].first.sitemarker].push_back(VDedgeSet[i].first);
+      VDvertices[VDedgeSetHelper[i].first.sitemarker].push_back(VDedgeSet[i].second);
+    }
+    if(&VDedgeSetHelper[i].second != (struct Site *) NULL) {
+      VDvertices[VDedgeSetHelper[i].second.sitemarker].push_back(VDedgeSet[i].first);
+      VDvertices[VDedgeSetHelper[i].second.sitemarker].push_back(VDedgeSet[i].second);
+    }
   }
-  std::unordered_map<int, std::vector<struct Point> > vdupdate = VDvertices;
+  
+  std::cout << sites.size() << std::endl;
   for(int i = 0; i < sites.size(); i++) {
-    VDvertices[sites[i].sitemarker] = vdupdate[sites[i].sitemarker];
+    if(VDvertices[sites[i].sitemarker].empty()) continue;
     sort(VDvertices[sites[i].sitemarker].begin(), VDvertices[sites[i].sitemarker].end(), [](const Point &a, const Point &b) {
         return a.y < b.y || (a.y == b.y && a.x < b.x);
       });
     for(int j = 0; j < VDvertices[sites[i].sitemarker].size() - 1; j++) {
       double diff = VDvertices[sites[i].sitemarker][j].y - VDvertices[sites[i].sitemarker][j+1].y;
-      if(diff > -EPS && diff < EPS) VDvertices[sites[i].sitemarker].erase(VDvertices[sites[i].sitemarker].begin() + j+1);
+      if(diff > -EPS && diff < EPS) {
+        VDvertices[sites[i].sitemarker].erase(VDvertices[sites[i].sitemarker].begin() + j+1);
+        j--;
+      }
     }
   }
+  
 }
 
 /******************************************************************************
@@ -746,9 +770,9 @@ void VoronoiDiagramGenerator::VDedgeGenerator(struct Edge *VDedge) {
   add.second.y = y2;
   VDedgeSet.push_back(add);
   
-  std::pair<int, int> siteNum;
-  siteNum.first = VDedge->siteSeg[0]->sitemarker;
-  siteNum.second = VDedge->siteSeg[1]->sitemarker;
+  std::pair<struct Site, struct Site> siteNum; 
+  siteNum.first = *VDedge->siteSeg[0];
+  siteNum.second = *VDedge->siteSeg[1];
   VDedgeSetHelper.push_back(siteNum);
   
 }

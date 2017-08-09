@@ -73,7 +73,7 @@ public:
   std::vector<struct Site> sites;
   std::unordered_map<int, std::vector<struct Point> > VDvertices;
   std::vector<std::pair<struct Point, struct Point> >VDedgeSet;
-  std::vector<std::pair<int, int> > VDedgeSetHelper;
+  std::vector<std::pair<struct Site, struct Site> > VDedgeSetHelper;
   int VDverticesNumber; // Number of Voronoi diagram vertices
   int siteNumber; // Number of sites
   
