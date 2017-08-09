@@ -33,50 +33,7 @@
        "LAMBDA(vset: valid_vehicle_id_set, rset: route_request_message_set, map: route_request_to_set_of_unique_route_plan_requests(rset)): emptyset")
       (("" (grind) nil nil)) nil))
     nil)
-   ((finite_emptyset name-judgement "finite_set" finite_sets nil)
-    (/= const-decl "boolean" notequal nil)
-    (number nonempty-type-decl nil numbers nil)
-    (boolean nonempty-type-decl nil booleans nil)
-    (number_field_pred const-decl "[number -> boolean]" number_fields
-     nil)
-    (number_field nonempty-type-from-decl nil number_fields nil)
-    (real_pred const-decl "[number_field -> boolean]" reals nil)
-    (real nonempty-type-from-decl nil reals nil)
-    (rational_pred const-decl "[real -> boolean]" rationals nil)
-    (rational nonempty-type-from-decl nil rationals nil)
-    (integer_pred const-decl "[rational -> boolean]" integers nil)
-    (int nonempty-type-eq-decl nil integers nil)
-    (bool nonempty-type-eq-decl nil booleans nil)
-    (>= const-decl "bool" reals nil)
-    (nat nonempty-type-eq-decl nil naturalnumbers nil)
-    (defined_vehicle_id? const-decl "bool" aggregator nil)
-    (valid_vehicle_id type-eq-decl nil aggregator nil)
-    (valid_vehicle_id_set type-eq-decl nil aggregator nil)
-    (route_request_message_set type-eq-decl nil aggregator nil)
-    (route_request_message nonempty-type-eq-decl nil aggregator nil)
-    (set type-eq-decl nil sets nil)
-    (pred type-eq-decl nil defined_types nil)
-    (member? const-decl "pred[T]" aggregator nil)
-    (route_request_message_set? const-decl "bool" aggregator nil)
-    (route_plan_request_message nonempty-type-eq-decl nil aggregator
-     nil)
-    (route_plan_request_message_set? const-decl "bool" aggregator nil)
-    (route_plan_request_message_set type-eq-decl nil aggregator nil)
-    (route_request_to_set_of_route_plan_requests type-eq-decl nil
-     aggregator nil)
-    (unique_route_request_to_set_of_route_plan_requests? const-decl
-     "pred[route_request_to_set_of_route_plan_requests(rrs)]"
-     aggregator nil)
-    (route_request_to_set_of_unique_route_plan_requests type-eq-decl
-     nil aggregator nil)
-    (NOT const-decl "[bool -> bool]" booleans nil)
-    (sets_share_ids? const-decl "bool" aggregator nil)
-    (emptyset const-decl "set" sets nil)
-    (= const-decl "[T, T -> boolean]" equalities nil)
-    (AND const-decl "[bool, bool -> bool]" booleans nil)
-    (member const-decl "bool" sets nil)
-    (unique_id_amongst_sets? const-decl "bool" aggregator nil))
-   nil))
+   nil nil))
  (generate_TCC1 0
   (generate_TCC1-1 nil 3708946203
    ("" (skeep 1 t)
@@ -113,54 +70,7 @@
         nil))
       nil))
     nil)
-   ((sets_share_ids? const-decl "bool" aggregator nil)
-    (unique_id_amongst_sets? const-decl "bool" aggregator nil)
-    (unique_route_request_to_set_of_route_plan_requests? const-decl
-     "pred[route_request_to_set_of_route_plan_requests(rrs)]"
-     aggregator nil)
-    (/= const-decl "boolean" notequal nil)
-    (rr2 skolem-const-decl "{r:
-   (member?(LAMBDA (rr: route_request_message):
-              member[route_request_message](rr, route_requests) OR
-               rr = route_request)) |
-   r /= rr1}" aggregator nil)
-    (nat nonempty-type-eq-decl nil naturalnumbers nil)
-    (valid_vehicle_id_set type-eq-decl nil aggregator nil)
-    (route_request_message nonempty-type-eq-decl nil aggregator nil)
-    (boolean nonempty-type-decl nil booleans nil)
-    (bool nonempty-type-eq-decl nil booleans nil)
-    (set type-eq-decl nil sets nil)
-    (pred type-eq-decl nil defined_types nil)
-    (member? const-decl "pred[T]" aggregator nil)
-    (route_request_message_set type-eq-decl nil aggregator nil)
-    (route_requests skolem-const-decl "route_request_message_set"
-     aggregator nil)
-    (OR const-decl "[bool, bool -> bool]" booleans nil)
-    (member const-decl "bool" sets nil)
-    (= const-decl "[T, T -> boolean]" equalities nil)
-    (route_request_message_in_set? const-decl "bool" aggregator nil)
-    (NOT const-decl "[bool -> bool]" booleans nil)
-    (number nonempty-type-decl nil numbers nil)
-    (number_field_pred const-decl "[number -> boolean]" number_fields
-     nil)
-    (number_field nonempty-type-from-decl nil number_fields nil)
-    (real_pred const-decl "[number_field -> boolean]" reals nil)
-    (real nonempty-type-from-decl nil reals nil)
-    (rational_pred const-decl "[real -> boolean]" rationals nil)
-    (rational nonempty-type-from-decl nil rationals nil)
-    (integer_pred const-decl "[rational -> boolean]" integers nil)
-    (int nonempty-type-eq-decl nil integers nil)
-    (>= const-decl "bool" reals nil)
-    (route_request_message_id_in_set? const-decl "bool" aggregator nil)
-    (route_request skolem-const-decl "{rr: route_request_message |
-   (route_request_message_in_set?(rr, route_requests) OR
-     NOT route_request_message_id_in_set?(rr`id, route_requests))}"
-     aggregator nil)
-    (rr1 skolem-const-decl "(member?(LAMBDA (rr: route_request_message):
-           member[route_request_message](rr, route_requests) OR
-            rr = route_request))" aggregator nil)
-    (route_request_message_set? const-decl "bool" aggregator nil))
-   nil))
+   nil nil))
  (generate_TCC2 0
   (generate_TCC2-1 nil 3708946203 ("" (subtype-tcc) nil nil)
    ((boolean nonempty-type-decl nil booleans nil)
@@ -178,15 +88,11 @@
      nil)
     (route_plan_request_message_set? const-decl "bool" aggregator nil)
     (route_plan_request_message_set type-eq-decl nil aggregator nil)
-    (route_request_to_set_of_route_plan_requests type-eq-decl nil
+    (rough_route_request_to_set_of_route_plan_requests type-eq-decl nil
      aggregator nil)
-    (unique_route_request_to_set_of_route_plan_requests? const-decl
-     "pred[route_request_to_set_of_route_plan_requests(rrs)]"
+    (route_request_to_unique_set_of_route_plan_requests? const-decl
+     "pred[rough_route_request_to_set_of_route_plan_requests(rrs)]"
      aggregator nil)
-    (route_request_to_set_of_unique_route_plan_requests type-eq-decl
-     nil aggregator nil)
-    (OR const-decl "[bool, bool -> bool]" booleans nil)
-    (route_request_message_in_set? const-decl "bool" aggregator nil)
     (number nonempty-type-decl nil numbers nil)
     (number_field_pred const-decl "[number -> boolean]" number_fields
      nil)
@@ -198,6 +104,13 @@
     (integer_pred const-decl "[rational -> boolean]" integers nil)
     (int nonempty-type-eq-decl nil integers nil)
     (>= const-decl "bool" reals nil)
+    (defined_vehicle_id? const-decl "bool" aggregator nil)
+    (all_and_only_vehicle_ids? const-decl
+     "pred[route_plan_request_message_set]" aggregator nil)
+    (route_request_to_set_of_route_plan_requests type-eq-decl nil
+     aggregator nil)
+    (OR const-decl "[bool, bool -> bool]" booleans nil)
+    (route_request_message_in_set? const-decl "bool" aggregator nil)
     (route_request_message_id_in_set? const-decl "bool" aggregator nil)
     (member const-decl "bool" sets nil)
     (member? const-decl "pred[T]" aggregator nil))
@@ -295,87 +208,5 @@
         nil))
       nil))
     nil)
-   ((route_request_message_id_in_set? const-decl "bool" aggregator nil)
-    (>= const-decl "bool" reals nil)
-    (int nonempty-type-eq-decl nil integers nil)
-    (integer_pred const-decl "[rational -> boolean]" integers nil)
-    (rational nonempty-type-from-decl nil rationals nil)
-    (rational_pred const-decl "[real -> boolean]" rationals nil)
-    (real nonempty-type-from-decl nil reals nil)
-    (real_pred const-decl "[number_field -> boolean]" reals nil)
-    (number_field nonempty-type-from-decl nil number_fields nil)
-    (number_field_pred const-decl "[number -> boolean]" number_fields
-     nil)
-    (number nonempty-type-decl nil numbers nil)
-    (NOT const-decl "[bool -> bool]" booleans nil)
-    (route_request_message_in_set? const-decl "bool" aggregator nil)
-    (route_request_message_set type-eq-decl nil aggregator nil)
-    (route_request_message_set? const-decl "bool" aggregator nil)
-    (OR const-decl "[bool, bool -> bool]" booleans nil)
-    (member const-decl "bool" sets nil) (set type-eq-decl nil sets nil)
-    (bool nonempty-type-eq-decl nil booleans nil)
-    (boolean nonempty-type-decl nil booleans nil)
-    (route_request_message nonempty-type-eq-decl nil aggregator nil)
-    (valid_vehicle_id_set type-eq-decl nil aggregator nil)
-    (nat nonempty-type-eq-decl nil naturalnumbers nil)
-    (unique_route_request_to_set_of_route_plan_requests? const-decl
-     "pred[route_request_to_set_of_route_plan_requests(rrs)]"
-     aggregator nil)
-    (route_plan_requests skolem-const-decl
-     "route_request_to_set_of_unique_route_plan_requests(route_requests)"
-     aggregator nil)
-    (route_requests skolem-const-decl "route_request_message_set"
-     aggregator nil)
-    (new_route_requests skolem-const-decl "route_request_message_set"
-     aggregator nil)
-    (/= const-decl "boolean" notequal nil)
-    (unique_id_amongst_sets? const-decl "bool" aggregator nil)
-    (IMPLIES const-decl "[bool, bool -> bool]" booleans nil)
-    (pred type-eq-decl nil defined_types nil)
-    (member? const-decl "pred[T]" aggregator nil)
-    (valid_vehicle_id type-eq-decl nil aggregator nil)
-    (route_plan_request_message nonempty-type-eq-decl nil aggregator
-     nil)
-    (route_plan_request_message_set? const-decl "bool" aggregator nil)
-    (route_plan_request_message_set type-eq-decl nil aggregator nil)
-    (IF const-decl "[boolean, T, T -> T]" if_def nil)
-    (route_request_to_set_of_route_plan_requests type-eq-decl nil
-     aggregator nil)
-    (route_request_to_set_of_unique_route_plan_requests type-eq-decl
-     nil aggregator nil)
-    (defined_vehicle_id? const-decl "bool" aggregator nil)
-    (sets_share_ids? const-decl "bool" aggregator nil)
-    (create const-decl "{rp: route_plan_request_message_set |
-   FORALL (rr: (member?(route_requests))):
-     NOT (sets_share_ids?(rp, route_plan_requests(rr)))}" aggregator
-     nil)
-    (= const-decl "[T, T -> boolean]" equalities nil)
-    (rr1!1 skolem-const-decl "(member?(new_route_requests))" aggregator
-     nil)
-    (rr2!1 skolem-const-decl
-     "{r: (member?(new_route_requests)) | r /= rr1!1}" aggregator nil)
-    (rpr2!1 skolem-const-decl
-     "(member?(IF route_requests(rr2!1) THEN route_plan_requests(rr2!1)
-         ELSE create(rr2!1`vehicle_ids, route_requests,
-                     route_plan_requests)
-         ENDIF))" aggregator nil)
-    (new_rr skolem-const-decl "{rp: route_plan_request_message_set |
-   FORALL (rr: (member?(route_requests))):
-     NOT (sets_share_ids?(rp, route_plan_requests(rr)))}" aggregator
-     nil)
-    (rpr1!1 skolem-const-decl
-     "(member?(IF route_requests(rr1!1) THEN route_plan_requests(rr1!1)
-         ELSE create(rr1!1`vehicle_ids, route_requests,
-                     route_plan_requests)
-         ENDIF))" aggregator nil)
-    (AND const-decl "[bool, bool -> bool]" booleans nil)
-    (new_rr skolem-const-decl "{rp: route_plan_request_message_set |
-   FORALL (rr: (member?(route_requests))):
-     NOT (sets_share_ids?(rp, route_plan_requests(rr)))}" aggregator
-     nil)
-    (route_request skolem-const-decl "{rr: route_request_message |
-   (route_request_message_in_set?(rr, route_requests) OR
-     NOT route_request_message_id_in_set?(rr`id, route_requests))}"
-     aggregator nil))
-   nil)))
+   nil nil)))
 

@@ -160,8 +160,9 @@ BEGIN
              (route_request_message_in_set?(rr, route_requests) OR
                NOT route_request_message_id_in_set?(rr`id, route_requests))}) :
       [rs: route_request_message_set, route_request_to_set_of_route_plan_requests(rs)] =
-    LET new_route_requests: route_request_message_set = LAMBDA ( rr: route_request_message ):
-                                                          member(rr, route_requests) OR rr = route_request
+    LET new_route_requests: route_request_message_set = 
+      LAMBDA ( rr: route_request_message ): 
+        member(rr, route_requests) OR rr = route_request
     IN						  
     (
       new_route_requests,
@@ -175,28 +176,23 @@ BEGIN
     );
   
 
-  % TODO: BROKEN
-  % 
   % 2D function representing a mapping from Route Request and Route Plan Request
   % messages to Route Plan Response messages.
-  route_request_to_route_plan_requests_to_route_plan_responses(route_requests: route_request_message_set,
-                                                               route_plan_requests: route_request_to_set_of_route_plan_requests(route_requests)): TYPE =
-    [(member?(route_requests)), (member?(route_plan_requests(route_requests))) -> route_plan_response_message_set(route_plan_requests(route_requests))]
+  route_request_and_route_plan_requests_to_route_plan_responses(route_requests: route_request_message_set,
+                                                                route_plan_requests: route_request_to_set_of_route_plan_requests(route_requests)): TYPE =
+    [(member?(route_requests)), (member?(route_plan_requests(route_requests))) -> (member?(route_plan_response_message_set(route_plan_requests(route_requests))))]
 
 
-  % TODO: BROKEN
-  %
-  % RA4: The configuration shall correlate RoutePlanReponses with 
+  % RA3: The configuration shall correlate RoutePlanReponses with 
   %      RoutePlanRequests
   correlate(route_requests: route_request_message_set,
             route_plan_requests: route_request_to_set_of_route_plan_requests(route_requests),
-            route_plan_responses: route_request_to_route_plan_requests_to_route_plan_responses(route_requests, route_plan_requests),
-            route_plan_response: route_plan_response_message ): route_request_to_route_plan_requests_to_route_plan_responses(route_requests, route_plan_requests) =
+            route_plan_responses: route_request_and_route_plan_requests_to_route_plan_responses(route_requests, route_plan_requests),
+            route_plan_response: route_plan_response_message ): route_request_and_route_plan_requests_to_route_plan_responses(route_requests, route_plan_requests) =
     LAMBDA(rr: (member?(route_requests)),
            rpr: (member?(route_plan_requests(rr)))):
       IF (rpr`id = route_plan_response`id) THEN
-        LAMBDA (rpresponse: route_plan_response_message):
-          member(rpresponse, route_plan_responses(rr, rpr)) OR rpresponse = route_plan_response
+        route_plan_response
       ELSE
         route_plan_responses(rr, rpr)
       ENDIF;
