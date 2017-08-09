@@ -44,9 +44,9 @@ SentinelSerialBuffer::createSentinelizedString(const std::string& data)
     {
         UXAS_LOG_INFORM(s_typeName(), "::createSentinelizedString creating payload string containing sentinel substrings.  ", detectedSentinelBaseStrings->c_str());
     }
-    return (std::move(getSerialSentinelBeforePayloadSize() + std::to_string(data.size())
-                      + getSerialSentinelAfterPayloadSize() + data + getSerialSentinelBeforeChecksum()
-                      + std::to_string(calculateChecksum(data)) + getSerialSentinelAfterChecksum()));
+    return (getSerialSentinelBeforePayloadSize() + std::to_string(data.size())
+             + getSerialSentinelAfterPayloadSize() + data + getSerialSentinelBeforeChecksum()
+             + std::to_string(calculateChecksum(data)) + getSerialSentinelAfterChecksum());
 };
 
 std::unique_ptr<std::string>
@@ -113,7 +113,7 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
     if (aftChecksum == std::string::npos)
     {
         UXAS_LOG_INFORM(s_typeName(), "::getNextPayloadString does not contain complete data segment");
-        return (std::move(std::string("")));
+        return std::string("");
     }
     auto inspectLength = aftChecksum + getSerialSentinelAfterChecksumSize();
     bool isValid{true};
@@ -140,7 +140,7 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
         UXAS_LOG_WARN(s_typeName(), "::getNextPayloadString erasing invalid data segment: ", m_data.substr(0, inspectLength));
         m_data.erase(0, inspectLength);
         UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString buffer contents (after erasure): ", m_data);
-        return (std::move(std::string("")));
+        return std::string("");
     }
 
     auto totalLen = aftChecksum + getSerialSentinelAfterChecksumSize() - befPayloadSz;
@@ -197,7 +197,7 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
                 m_validDeserializeCount++;
                 UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_validDeserializeCount=", m_validDeserializeCount);
                 UXAS_LOG_DEBUGGING(s_typeName(), "::getNextPayloadString m_invalidDeserializeCount=", m_invalidDeserializeCount);
-                return (std::move(payload));
+                return payload;
             }
             else
             {
@@ -238,7 +238,7 @@ SentinelSerialBuffer::getNextPayloadString(const std::string& newDataChunk)
         UXAS_LOG_INFORM(s_typeName(), "::getNextPayloadString m_disregardedDataCount=", m_disregardedDataCount);
     }
 
-    return (std::move(std::string("")));
+    return std::string("");
 };
 
 }; //namespace common

@@ -51,6 +51,7 @@ private:
 
 public:
 
+    using TransportBase::initialize;
     void
     initialize(const std::string& sourceGroup, uint32_t entityId, uint32_t serviceId, SocketConfiguration& zeroMqSocketConfiguration);
     
