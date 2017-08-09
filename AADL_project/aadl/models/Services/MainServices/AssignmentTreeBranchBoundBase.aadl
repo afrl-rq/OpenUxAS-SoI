@@ -1,19 +1,51 @@
 package AssignmentTreeBranchBoundBase_Pkg
 public
+    -- Include DataTypes
 	with CMASI;
     with UXTASK;
+
+    -- Includes
+	with ServiceBase_Pkg;
     
-    	-- This is a "dummy" top-level system. We use it so that we can check 
+    -- This is a "dummy" top-level system. We use it so that we can check 
 	--  "properties" of our component contract.
 	process top_level
+		features
+			AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;
+			TaskAssignmentSummary_out: out event data port uxtask::TaskAssignmentSummary.i;
+			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
 		annex agree {**
-			guarantee "Placeholder guarantee to force agree to run" : true;
+				
+			eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+			assume "UniqueAutomationRequest_in occurs every 1s":
+				condition event_UniqueAutomationRequest_in occurs each 1.0;
+				
+			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
+			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
+				condition event_AssignmentCostMatrix_in occurs sporadic with IAT 1.6;
+				
+			
+			assume "UniqueAutomationRequest_in must provide a TaskList of size greater than 0 and less than or equal to 10":
+        		event(UniqueAutomationRequest_in) => 
+        			UniqueAutomationRequest_in.OriginalRequest.TaskListSize > 0 and UniqueAutomationRequest_in.OriginalRequest.TaskListSize <= 10;
+        	
+        	
+			--NOTE: I expect this guarantee to be false (currently). If a AssignmentCostMatrix is received before an automation
+			--request, I believe the automata will not emit a TaskAssignmentSummary_out. Also, the AssignmentCostMatrix cannot be
+			--arbirary. It must have specific characteristics at a specific point in processing to result in emitting a TaskAssignmentSummary_out;
+--			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+--			guarantee "Timing Test: AssignmentCostMatrix_in results in a TaskAssignmentSummary_out within 5 seconds" : 
+--				whenever event_AssignmentCostMatrix_in occurs event_TaskAssignmentSummary_out occurs during [0.0,5.0];
 		**};
 	end top_level;
 	
 	process implementation top_level.Impl
 		subcomponents
 			sub : thread AssignmentTreeBranchBoundBase; 
+		connections
+			conn0 : port AssignmentCostMatrix_in -> sub.AssignmentCostMatrix_in;
+			conn1 : port sub.TaskAssignmentSummary_out -> TaskAssignmentSummary_out;
+			conn2 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
 		annex agree {**
 			-- These lemmas could be captured in SpeAR as properties
 			
@@ -43,7 +75,7 @@ public
 	end top_level.Impl;	
 	
 	
-	thread AssignmentTreeBranchBoundBase
+	thread AssignmentTreeBranchBoundBase extends ServiceBase_Pkg::ServiceBase
         features
             TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
             AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;
@@ -69,24 +101,23 @@ public
 		--------------------------State Transition Predicates-----------------------------------
       		
       		--Upon reception of a UniqueAutomationRequest, this service enters the wait state 
-      		eq idle_to_wait : bool =  false ->
-      			previous_state = IDLE and 
-      			event(UniqueAutomationRequest_in);
+      		eq idle_to_wait : bool =  (false ->
+      			(previous_state = IDLE and 
+      			pre(event(UniqueAutomationRequest_in))));
       		--The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       		--at which point this service returns to the idle state.
-      		eq wait_to_idle : bool = false ->
-      			previous_state = WAIT and
-      			pre(event(TaskAssignmentSummary_out));
+      		eq wait_to_idle : bool = (false ->
+      			(previous_state = WAIT and
+      			pre(event(TaskAssignmentSummary_out))));
       			
       		-- Other internal transitions --
       		
-      		eq send_task_assignment_summary : bool = false ->
-      			state = WAIT and 
+      		eq send_task_assignment_summary : bool = (false ->
+      			(state = WAIT and 
       			event(AssignmentCostMatrix_in) and 
       			AssignmentCostMatrix_in.CorrespondingAutomationRequestID = curUniqueAutomationRequestID and
-      			allExpectedTaskOptionsReceived;
+      			allExpectedTaskOptionsReceived));
       			
-      		
       		--NOTE: CANNOT FORMALIZE WITHOUT ARRAY SUPPORT (NO WAY TO TIE VARIABLE TO INPUT PORTS)	
       		--True if while in the wait state, all taskoptions are received for all tasks in the request
       		--TaskOptions must match the UniqueAutomationRequest ID to be valid. 
@@ -96,20 +127,64 @@ public
       		
       		eq curUniqueAutomationRequestID : int;
       		
+      		 --TODO: ASK DEREK: arbitrary number chosen here
+        	const MAX_TASKS : int = 10;
+        	eq all_tasks_options_recieved : bool; 
+        	eq current_total_task_options_to_recieve : int; 
+        	eq current_task_options_recieved_counter : int;
+        	
+        	--TODO: is there a way to remove this assumption and place it in the parent?
+        	--The purpose of this assumption is to ensure it is OK to use MAX_TASKS as an upper bound. 
+        	assume "UniqueAutomationRequest_in must provide a TaskList of size greater than 0 and less than or equal to 10":
+        		event(UniqueAutomationRequest_in) => 
+        			UniqueAutomationRequest_in.OriginalRequest.TaskListSize > 0 and UniqueAutomationRequest_in.OriginalRequest.TaskListSize <= MAX_TASKS;
+        	
+        	assume "[INFORMAL ASSUMPTION PLACEHOLDER] Due to limitations in the formal analysis tools, there is no way to verify incoming task plan options
+        		are expected, i.e., for the expected tasks as listed in the unique automation request. We therefore must assume that all task options are 
+        		in fact expected and unique, thus allowing the model to simply count requests. There is no way of formalizing this assumption so it is left
+        		here as a placeholder so this assumption is not forgotten or implicit.":
+        			true;
+      		
       		guarantee "Self loops": not some_transition => (state = previous_state);
       	
-      		guarantee "Upon reception of a UniqueAutomationRequest, this service enters the wait state ": 
-      			if idle_to_wait then
-      				state = WAIT and
-      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID
+      		--NOTE: the transition occurs on the time step after receiving the UniqueAutomationRequest
+      		guarantee "[In the idle state] Upon [changed to 'after'] reception of a UniqueAutomationRequest, this service enters the wait state ": 
+      			idle_to_wait =>
+      				state = WAIT;
+      		
+--      			if idle_to_wait then
+--      				state = WAIT and
+--      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID
+--      			else
+--      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
+      			
+      		guarantee "[Upon receiving a UniqueAutomationRequest_in in the IDLE state, the ID is cached, 
+      				the total task options to receive variable is set and the options received counter is reset]":
+      			if state = IDLE and event(UniqueAutomationRequest_in) then
+      				curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID and
+      				current_total_task_options_to_recieve = UniqueAutomationRequest_in.OriginalRequest.TaskListSize and
+      				current_task_options_recieved_counter = 0
       			else
-      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID);
-      		
-      		guarantee "[ADDED GURANTEE]: In IDLE, there are no expected task options (clear the flag, i.e., set to false) ":
-      		 	state = IDLE  =>
-      				allExpectedTaskOptionsReceived = false;
-      		
-      		--NOTE: although there is an expectation about the ordering in which the RouteAggregatorService sends out
+      				curUniqueAutomationRequestID = pre(curUniqueAutomationRequestID) and
+      				current_total_task_options_to_recieve = pre(current_total_task_options_to_recieve);
+      				
+      		guarantee "[ADDED GUARANTEE - made under the assumption we can rely on simple counting of options received, see assumption above]:
+      		 All expected tasks options are received when the total recieved unique task options equals to the total expected.":
+      			current_total_task_options_to_recieve = current_task_options_recieved_counter <=> 
+      				allExpectedTaskOptionsReceived;
+      				
+      		guarantee "[ADDED GUARANTEE - made under the assumption we can rely on simple counting of options received, see assumption above]
+      			When a TaskPlanOptions_in is received in the WAIT state, increment the received task options counter":
+      			(state = WAIT and event(TaskPlanOptions_in)) =>
+      				current_task_options_recieved_counter = pre(current_task_options_recieved_counter)+1;
+      				
+      		guarantee "[ADDED GUARANTEE] If not in WAIT and receiving a TaskPlanOptions_in or in IDLE and receiving UniqueAutomationRequest_in
+      			the received task options counter remains constant" :
+      			(not (state = IDLE and event(UniqueAutomationRequest_in)) and 
+      					not ((state = WAIT and event(TaskPlanOptions_in)))) =>
+      				current_task_options_recieved_counter = pre(current_task_options_recieved_counter);
+      				
+      	     --NOTE: although there is an expectation about the ordering in which the RouteAggregatorService sends out
       		--the AssignmentCostMatrix relative to receiving Taskoptions, there is no intrinsic need to assume this ordering here (verified with Derek).
       		--We instead allow the TaskOptions and Matrix to come in in any order. Upon receiving the requisite task and matrix the summary is sent out. 
       		guarantee "Upon receiving the AssignmentCostMatrix (which should be received strictly after the TaskPlanOptions
@@ -119,13 +194,48 @@ public
       				event(TaskAssignmentSummary_out)
       			else
       				not event(TaskAssignmentSummary_out);
-      				
+      		
       		guarantee "The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       			at which point this service returns to the idle state.":
       			wait_to_idle =>
-      				state = IDLE and
-      				allExpectedTaskOptionsReceived = false; --redundant, but explicit
+      				state = IDLE;
+      				
+      				
+      		--Timing properties
+      		
+--      		"Response" to UniqueAutomationRequest_in
+--      		idle -> wait, store request ID for identification of corresponding TaskPlanOptions and AssignmentCostMatrix.
+      		
+      		eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+      		eq event_uar_in_idle_state : bool = event_UniqueAutomationRequest_in and state = IDLE;
+      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
+      		--small amount of time instead of 0 for this guarantee. 
+      		guarantee "The service transitions to WAIT within 0ms of receiving UniqueAutomationRequest_in from the IDLE state":
+      			whenever event_uar_in_idle_state occurs idle_to_wait occurs during [0.0,0.0000001];
+      			
+      		eq uar_id_cached : bool = curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID;
+      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
+      		--small amount of time instead of 0 for this guarantee. 
+      		guarantee "The service caches the ID of a received UniqueAutomationRequest_in within 0ms in the IDLE state":
+      			whenever event_uar_in_idle_state occurs uar_id_cached occurs during [0.0,0.0000001];
+      		
+--      		"Response" to AssignmentCostMatrix_in
+--      		Using the cost of each task option (from the stored TaskPlanOptions messages) 
+--      		and the cost for each vehicle to reach each option (from AssignmentCostMatrix), 
+--      		perform an optimization attempting to find the minimal cost mission that adheres to the 
+--      		Process Algebra contraints. Upon completion, emit TaskAssignmentSummary and wait -> idle.
+
+			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
+			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
+			
+			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state":
+				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
+				
+			guarantee "The service transitions to IDLE within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state ":
+				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
       	**};
     end AssignmentTreeBranchBoundBase;
+
     
 end AssignmentTreeBranchBoundBase_Pkg;
