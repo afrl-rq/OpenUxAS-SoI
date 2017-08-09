@@ -48,10 +48,13 @@ public
 	end top_level.Impl;	
 	
 thread RouteAggregatorService_AggregatorRole
-    features
-        GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i; 
-        SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i; 
-        AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i; 
+	features
+		-- These features are specific versions of the base entity type, replace with the base type
+--        GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i; 
+--        SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i; 
+--        AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+        EntityConfiguration_in: in event data port CMASI::EntityConfiguration.i; 
+        
         RouteRequest_in: in event data port route::RouteRequest.i; 
         RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
         ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki. Per Derek, it is used for error reporting (or at least can be used for that.)
@@ -187,7 +190,7 @@ thread RouteAggregatorService_AggregatorRole
 				event(RoutePlanRequest_out) =>
 				((RoutePlanRequest_out.AssociatedTaskID = RouteRequest_being_serviced.AssociatedTaskID)
 					and (RoutePlanRequest_out.OperatingRegion = RouteRequest_being_serviced.OperatingRegion)
-					and (RoutePlanRequest_out.RouteRequests = RouteRequest_being_serviced.RouteRequests)
+					and (RoutePlanRequest_out.RouteConstraints = RouteRequest_being_serviced.RouteConstraints)
 					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
 				);
 		
@@ -203,6 +206,20 @@ thread RouteAggregatorService_AggregatorRole
 		
 		guarantee "Response ID in the route response should match the ID in the associated route request." :
 			event(RouteResponse_out) => (RouteResponse_out.ResponseID = RouteRequest_being_responded_to.RequestID);
+			
+		-- Adding a cache capability to ensure that each RoutePlanRequest_out is based off of a unique vehicleID
+		-- Get the number of vehicles from the route request
+		eq numVehicleIDs : int;
+		guarantee "For each vehicle in the RouteRequest, the number of vehicles will govern the number of route plan requests" :
+            event_RouteRequest_Recvd => (numVehicleIDs = RouteRequest_in.NumVehicleIDs) and (state = PENDING);
+        
+        -- Cache the RequestIDs of the RoutePlanRequests dependent 
+        guarantee "":
+            
+
+        
+		 
+			
 		
 		-- Q: Is the ResponseID in the route plan responses enough to ensure the message is the response we're expecting? 
 		-- Do we have any system-level guarantees about uniqueness of these IDs? 
@@ -231,6 +248,81 @@ thread RouteAggregatorService_AggregatorRole
 		--  Currently, my contracts on this component are not nearly sufficient to ensure correctness. The output
 		--  messages could be jibberish. Even if I require the response ID to match the request ID, the
 		--  rest of the information could be garbage.
+		
+		--------------------
+		-- Timing Properties
+		--------------------
+		
+        -- TODO: ASK DEREK: Arbitary number chosen for max number of RoutePlanRequests
+        const MAX_VEH_IDS : int = 2000;
+        
+        -- The system should return a RoutePlanResponse for every sent RoutePlanRequest
+        eq totalRoutePlanRequests: int;
+        eq numRoutePlanResponses_Recvd : int;
+
+        assume "The maximum number of RoutePlanRequests is dependant on the number of VehicleIDSs which must be greater than 0 and less than or equal to MAX_VEH_IDS" :
+            event(RouteRequest_in) => 
+                RouteRequest_in.NumVehicleIDs > 0 and RouteRequest_in.NumVehicleIDs <= MAX_VEH_IDS;
+
+        -- Timing on a received occurance of a route request
+        -- Notes:
+        --  idle -> pending, indexed by RouteRequest request ID, create a checklist of expected responses. 
+        --  Emit a number of RoutePlanRequest messages equal to the number of vehicles in the VehicleID field of the original RouteRequest
+        -- AWF (20170808)
+        --  We can state that at the time a RouteRequest comes in the system will transition and produce RoutePlanRequests.
+        --  I am not sure how we can say anything about how many RoutePlanRequests are generated
+        eq event_RouteRequest_Recvd : bool = (event(RouteRequest_in) and (state = IDLE));
+        eq event_RoutePlanRequest_Sent : bool = (event(RoutePlanRequest_out) and (state = PENDING) and );
+                
+        guarantee "[STUB] (Idle -> Pending) Received a Route Request" :
+            whenever event_RouteRequest_Recvd occurs event_RoutePlanRequest_Sent occurs during [0.0,0.001];
+
+        -- Timing on when an EntityConfiguration is received
+        -- Notes:
+        --  Vehicle capabilities (e.g. allowable speeds) are described by entity configuration messages. 
+        --  This service uses the EntityConfiguration to determine which type of vehicle corresponds to a specific ID 
+        --  so that ground planners are used for ground vehicles and air planners are used for aircraft.
+        --  No state change. Store to identify appropriate route planner by vehicle ID.         
+        eq event_EntityConfig_Recved : bool = (event(EntityConfiguration_in) and (state = PENDING));
+        eq storeData : bool; -- When true the appropriate data has been stored
+        eq dataStore_VehCapabilities : bool = (storeData and (state = PENDING));
+        
+        guarantee "[STUB] (Pending) Received a Entity Configuration":
+            whenever event_EntityConfig_Recved occurs dataStore_VehCapabilities occurs during [0.0,0.000];
+            
+        -- Timing on a reception of a RoutePlanResponse
+        -- Notes:
+        --  This message is the fulfillment of a single vehicle route plan request which the Aggregator 
+        --  catalogues until the complete set of expected responses is received.
+        --  Store response and check to see if this message completes any checklist. 
+        --  If a checklist is complete, use the corresponding request ID to create a complete RouteResponse message. 
+        --  Emit RouteResponse and pending -> idle.
+        eq numPendingPlanResponses : int = MAX_VEH_IDS;
+        eq event_RPR_Recvd : bool = event(RoutePlanResponse_in) and (state = PENDING)
+        
+--        eq event_expected_UniqueAutomationRequest_in: bool =
+--                (event(UniqueAutomationRequest_in)  and unique_automation_request_task_id_present);
+--        eq event_uar_request_in_idle_state : bool = state = IDLE and event_expected_UniqueAutomationRequest_in;
+--        eq event_SensorFootprintRequests_out: bool = event(SensorFootprintRequests_out);
+--        guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the IDLE state":
+--            whenever event_uar_request_in_idle_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
+--                    
+--        guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the IDLE state":
+--            whenever event_uar_request_in_idle_state occurs idle_to_sensor_request occurs during [0.0,0.002];
+--                
+--        eq event_uar_request_in_option_selected_state : bool = state = OPTION_SELECTED and event_expected_UniqueAutomationRequest_in;
+--        guarantee "SensorFootprintRequests_out is emitted within 2ms of receiving UniqueAutomationRequest_in in the OPTION_SPELETECTED state" :
+--            whenever event_uar_request_in_option_selected_state occurs event_SensorFootprintRequests_out occurs during [0.0,0.002];
+--                    
+--        guarantee "The task transitions to SENSOR_REQUEST within 2ms of UniqueAutomationRequest_in in the OPTION_SELECTED state":
+--            whenever event_uar_request_in_option_selected_state occurs option_selected_to_sensor_request occurs during [0.0,0.002];
+--                    
+----        "Response" to TaskImplementationRequest_in
+----        OptionsPublished -> FinalRoutes, emit RouteRequest to determine final waypoint routes needed for implementation
+--
+--        eq event_TaskImplementationRequest : bool = event(TaskImplementationRequest_in);
+--        eq event_tir_in_options_published_state : bool = state = OPTIONS_PUBLISHED and event_TaskImplementationRequest;
+--        eq event_RouteRequest_out : bool = event(RouteRequest_out);
 
 	**};
 end RouteAggregatorService_AggregatorRole;

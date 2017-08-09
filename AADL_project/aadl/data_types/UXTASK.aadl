@@ -403,7 +403,8 @@ data implementation TaskAssignmentSummary.i
         OperatingRegion: data int64.i;
         --Ordered list of tasks to be completed
         TaskList: data TaskAssignment.i {Data_Model::Data_Representation => Array;};
-        
+        -- ADDED: BDR (20170808)
+        -- Size of the TaskList (not necessary if AGREE can get array size)
         TaskListSize : data int64.i;
 end TaskAssignmentSummary.i;
 

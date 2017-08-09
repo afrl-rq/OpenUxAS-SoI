@@ -209,7 +209,7 @@ thread RouteAggregatorService_OneRequestAtATime
 			event(RoutePlanRequest_out) =>
 				((RoutePlanRequest_out.AssociatedTaskID = RouteRequest_being_serviced.AssociatedTaskID)
 					and (RoutePlanRequest_out.OperatingRegion = RouteRequest_being_serviced.OperatingRegion)
-					and (RoutePlanRequest_out.RouteRequests = RouteRequest_being_serviced.RouteRequests)
+					and (RoutePlanRequest_out.RouteConstraints = RouteRequest_being_serviced.RouteConstraints)
 					and (RoutePlanRequest_out.IsCostOnlyRequest = RouteRequest_being_serviced.IsCostOnlyRequest)
 				);
 

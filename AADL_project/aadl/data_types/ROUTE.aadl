@@ -92,11 +92,17 @@ end RouteRequest;
         --Vehicles to consider when planning. If list is empty, route planner
         --plans for all known vehicles.
         VehicleID: data int64.i {Data_Model::Data_Representation => Array;};
+        -- ADDED: AWF (20170808)
+        -- Number of VehicleIDs (not necessary if AGREE can get array size)                
+        NumVehicleIDs: data int64.i; 
         --Operating region to be considered during planning
         OperatingRegion: data int64.i;
         --List of all requests for this vehicle set + operating region
         --situation
-        RouteRequests: data RouteConstraints.i {Data_Model::Data_Representation => Array;};
+        -- AWF (20170808)
+        --  The original name of "RouteRequests" was misleading as this field actually describes the
+        --  route constraints that the vehicle planners must take in account. 
+        RouteConstraints: data RouteConstraints.i {Data_Model::Data_Representation => Array;};       
         --Request that planner only return costs of routes rather than
         --complete waypoint plans
         IsCostOnlyRequest: data bool.i;
@@ -119,7 +125,10 @@ end RoutePlanRequest;
         --Operating region to be considered during planning
         OperatingRegion: data int64.i;
         --List of all requests for this vehicle + operating region situation
-        RouteRequests: data RouteConstraints.i {Data_Model::Data_Representation => Array;};
+        -- AWF (20170808)
+        --  The original name of "RouteRequests" was misleading as this field actually describes the
+        --  route constraints that the vehicle planners must take in account. 
+        RouteConstraints: data RouteConstraints.i {Data_Model::Data_Representation => Array;};
         --Request that planner only return costs of routes rather than
         --complete waypoint plans
         IsCostOnlyRequest: data bool.i;
