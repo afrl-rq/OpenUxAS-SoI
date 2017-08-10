@@ -1,0 +1,3 @@
+# Machine-generated file - use setup menu in minicom to change parameters.
+pu port             /dev/ttyUSB0
+pu rtscts           No 
