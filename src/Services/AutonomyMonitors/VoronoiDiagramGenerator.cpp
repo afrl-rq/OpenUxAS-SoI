@@ -17,7 +17,12 @@
  */
 
 #include "VoronoiDiagramGenerator.h"
+#include "GeometryUtilities.h"
 
+namespace uxas {
+namespace service {
+namespace monitoring {
+  
 VoronoiDiagramGenerator::VoronoiDiagramGenerator() {
   siteIndex = 0;
   allEdges = 0;
@@ -29,6 +34,7 @@ VoronoiDiagramGenerator::~VoronoiDiagramGenerator() {}
 
 bool VoronoiDiagramGenerator::generateVDrectangle(std::vector<std::pair<double, double>> viewAngleList, double lowerBorderX, double upperBorderX, double lowerBorderY, double upperBorderY, double minDist) {
   if(viewAngleList.empty()) return false;
+  if((upperBorderX - lowerBorderX < EPS && upperBorderX - lowerBorderX > -EPS) || (upperBorderY - lowerBorderY < EPS && upperBorderY - lowerBorderY > -EPS)) return false;
   
   gapThreshold = minDist;
   siteNumber = viewAngleList.size();
@@ -74,6 +80,7 @@ bool VoronoiDiagramGenerator::generateVDrectangle(std::vector<std::pair<double, 
 
 bool VoronoiDiagramGenerator::generateVDcircle(std::vector<std::pair<double, double> > viewAngleList, std::pair<double, double> Center, double Radius,  double minDist) {
   if(viewAngleList.empty()) return false;
+  if(Radius < EPS && Radius > -EPS) return false;
   
   double upperBorderX = Center.first + Radius;
   double lowerBorderX = Center.first - Radius;
@@ -155,8 +162,11 @@ bool VoronoiDiagramGenerator::generateVDcircle(std::vector<std::pair<double, dou
 double VoronoiDiagramGenerator::distPoint(struct Point s1, struct Point s2) {
   return sqrt(pow(s1.x - s2.x, 2) + pow(s1.y - s2.y, 2));
 }
-
+  
+// Input polyBoundary should be clockwise or counterclockwise, and it doesn't
+// have the same point.
 bool VoronoiDiagramGenerator::generateVDpolygon(std::vector<std::pair<double, double> > viewAngleList, std::vector<std::pair<double, double> > polyBoundary, double minDist) {
+  
   if(viewAngleList.empty()) return false;
   
   std::pair<double, double> Xpoint=polyBoundary[0], Ypoint=polyBoundary[0];
@@ -170,67 +180,46 @@ bool VoronoiDiagramGenerator::generateVDpolygon(std::vector<std::pair<double, do
   
   generateVDrectangle(viewAngleList, Xpoint.first, Xpoint.second, Ypoint.first, Ypoint.second, minDist);
 
+  MonitorPolygon boundaryArea(polyBoundary);
+  double something;
+  long length = polyBoundary.size();
   for(int i = 0; i < VDedgeSet.size(); i++) {
-    if(VDedgeSet[i].first.x == Xpoint.first || VDedgeSet[i].first.x == Xpoint.second) {
-      for(int j = 0; j < polyBoundary.size()-1; j++) {
+    bool isInArea1 = false, isInArea2 = false;
+    std::tie(isInArea1, something) = boundaryArea.isMember(VDedgeSet[i].first.x, VDedgeSet[i].first.y);
+    std::tie(isInArea2, something) = boundaryArea.isMember(VDedgeSet[i].second.x, VDedgeSet[i].second.y);
+    if(isInArea1 && isInArea2) continue;
+    else if(isInArea1 && !isInArea2) {
+      for(int j = 0; j < length; j++) {
         struct Point intersect;
         std::pair<struct Point, struct Point> boundary;
         boundary.first.x = polyBoundary[j].first;
         boundary.first.y = polyBoundary[j].second;
-        boundary.second.x = polyBoundary[j+1].first;
-        boundary.second.y = polyBoundary[j+1].second;
-        
-        if(segIntersectSeg(VDedgeSet[i], boundary, intersect)) {
-          VDedgeSet[i].first = intersect;
-          //break;
-        }
-      }
-    }
-    if(VDedgeSet[i].first.y == Ypoint.first || VDedgeSet[i].first.y == Ypoint.second) {
-      for(int j = 0; j < polyBoundary.size()-1; j++) {
-        struct Point intersect;
-        std::pair<struct Point, struct Point> boundary;
-        boundary.first.x = polyBoundary[j].first;
-        boundary.first.y = polyBoundary[j].second;
-        boundary.second.x = polyBoundary[j+1].first;
-        boundary.second.y = polyBoundary[j+1].second;
-        
-        if(segIntersectSeg(VDedgeSet[i], boundary, intersect)) {
-          VDedgeSet[i].first = intersect;
-          //break;
-        }
-      }
-    }
-
-    if(VDedgeSet[i].second.x == Xpoint.first || VDedgeSet[i].second.x == Xpoint.second) {
-      for(int j = 0; j < polyBoundary.size()-1; j++) {
-        struct Point intersect;
-        std::pair<struct Point, struct Point> boundary;
-        boundary.first.x = polyBoundary[j].first;
-        boundary.first.y = polyBoundary[j].second;
-        boundary.second.x = polyBoundary[j+1].first;
-        boundary.second.y = polyBoundary[j+1].second;
+        boundary.second.x = polyBoundary[(j+1) % length].first;
+        boundary.second.y = polyBoundary[(j+1) % length].second;
         
         if(segIntersectSeg(VDedgeSet[i], boundary, intersect)) {
           VDedgeSet[i].second = intersect;
           //break;
         }
       }
-    }
-    if(VDedgeSet[i].second.y == Ypoint.first || VDedgeSet[i].second.y == Ypoint.second) {
-      for(int j = 0; j < polyBoundary.size()-1; j++) {
+    } else if(!isInArea1 && isInArea2) {
+      for(int j = 0; j < length; j++) {
         struct Point intersect;
         std::pair<struct Point, struct Point> boundary;
         boundary.first.x = polyBoundary[j].first;
         boundary.first.y = polyBoundary[j].second;
-        boundary.second.x = polyBoundary[j+1].first;
-        boundary.second.y = polyBoundary[j+1].second;
+        boundary.second.x = polyBoundary[(j+1) % length].first;
+        boundary.second.y = polyBoundary[(j+1) % length].second;
         
         if(segIntersectSeg(VDedgeSet[i], boundary, intersect)) {
-          VDedgeSet[i].second = intersect;
+          VDedgeSet[i].first = intersect;
           //break;
         }
       }
+    } else {
+      VDedgeSet.erase(VDedgeSet.begin() + i);
+      VDedgeSetHelper.erase(VDedgeSetHelper.begin() + i);
+      i--;
     }
   }
 
@@ -915,6 +904,9 @@ bool VoronoiDiagramGenerator::voronoiOperation() {
 
 
 
+};
+};
+};
 
 
 

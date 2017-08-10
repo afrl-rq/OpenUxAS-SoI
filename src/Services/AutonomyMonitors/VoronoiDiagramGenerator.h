@@ -28,7 +28,10 @@
 #include <stack>
 #include <algorithm>
 
-
+namespace uxas {
+namespace service {
+namespace monitoring {
+  
 #define DELETED -2
 #define EPS 1.0e-8
 
@@ -165,6 +168,10 @@ private:
   struct Site *nextone();
   struct VoronoiEdge *HEcreate(struct Edge *edge, int pm);
   
+};
+
+};
+};
 };
 
 
