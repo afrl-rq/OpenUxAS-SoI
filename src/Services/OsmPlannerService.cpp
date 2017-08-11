@@ -590,7 +590,7 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
                         // the begin and end nodes for the highway
                         auto itHighwayFirst = nodes.begin();
                         auto itHighwayLast = nodes.end();
-                        if (!nodes.empty());
+                        if (!nodes.empty())
                         {
                             itHighwayLast--; // last node on the highway
                         }

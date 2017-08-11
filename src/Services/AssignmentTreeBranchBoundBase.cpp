@@ -133,7 +133,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
     if (uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object.get()))
     {
         auto uniqueAutomationRequest = std::static_pointer_cast<uxas::messages::task::UniqueAutomationRequest>(receivedLmcpMessage->m_object);
-        if (m_idVsAssigmentPrerequisites.find(uniqueAutomationRequest->getRequestID()) == m_idVsAssigmentPrerequisites.end());
+        if (m_idVsAssigmentPrerequisites.find(uniqueAutomationRequest->getRequestID()) == m_idVsAssigmentPrerequisites.end())
         {
             m_idVsAssigmentPrerequisites.insert(std::make_pair(uniqueAutomationRequest->getRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
@@ -148,7 +148,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
     else if (uxas::messages::task::isTaskPlanOptions(receivedLmcpMessage->m_object.get()))
     {
         auto taskPlanOptions = std::static_pointer_cast<uxas::messages::task::TaskPlanOptions>(receivedLmcpMessage->m_object);
-        if (m_idVsAssigmentPrerequisites.find(taskPlanOptions->getCorrespondingAutomationRequestID()) == m_idVsAssigmentPrerequisites.end());
+        if (m_idVsAssigmentPrerequisites.find(taskPlanOptions->getCorrespondingAutomationRequestID()) == m_idVsAssigmentPrerequisites.end())
         {
             m_idVsAssigmentPrerequisites.insert(std::make_pair(taskPlanOptions->getCorrespondingAutomationRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
@@ -162,7 +162,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
     else if (uxas::messages::task::isAssignmentCostMatrix(receivedLmcpMessage->m_object.get()))
     {
         auto assignmentCostMatrix = std::static_pointer_cast<uxas::messages::task::AssignmentCostMatrix>(receivedLmcpMessage->m_object);
-        if (m_idVsAssigmentPrerequisites.find(assignmentCostMatrix->getCorrespondingAutomationRequestID()) == m_idVsAssigmentPrerequisites.end());
+        if (m_idVsAssigmentPrerequisites.find(assignmentCostMatrix->getCorrespondingAutomationRequestID()) == m_idVsAssigmentPrerequisites.end())
         {
             m_idVsAssigmentPrerequisites.insert(std::make_pair(assignmentCostMatrix->getCorrespondingAutomationRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
