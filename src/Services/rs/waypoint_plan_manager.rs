@@ -11,9 +11,24 @@ mod lmcp {
 
 pub use lmcp_rs::afrl::cmasi::entity_state::EntityStateT;
 
-use std::{ptr, slice};
+use std::slice;
 
-pub enum CppWaypointPlanManager {}
+macro_rules! debug_println {
+    () =>
+        (if cfg!(debug_assertions) {
+            println!("[waypoint_plan_manager]\n")
+        });
+    ($fmt:expr) =>
+        (if cfg!(debug_assertions) {
+            println!(concat!("[waypoint_plan_manager] ", $fmt))
+        });
+    ($fmt:expr, $($arg:tt)*) =>
+        (if cfg!(debug_assertions) {
+            println!(concat!("[waypoint_plan_manager] ", $fmt), $($arg)*)
+        });
+}
+
+pub enum WaypointPlanManagerService {}
 
 #[repr(C)]
 pub struct WaypointPlanManager {
@@ -59,11 +74,9 @@ impl Default for WaypointPlanManager {
 }
 
 #[no_mangle]
-pub extern "C" fn waypoint_plan_manager_new(
-    instance: *mut CppWaypointPlanManager,
-) -> *mut WaypointPlanManager {
-    let mut pb = WaypointPlanManager::default();
-    println!("Made a Rust WaypointPlanManager");
+pub extern "C" fn waypoint_plan_manager_new() -> *mut WaypointPlanManager {
+    let pb = WaypointPlanManager::default();
+    debug_println!("Made a Rust WaypointPlanManager");
     // relinquish ownership
     Box::into_raw(Box::new(pb))
 }
@@ -94,7 +107,7 @@ pub extern "C" fn waypoint_plan_manager_configure(
         manager.number_waypoint_overlap = if number_waypoint_overlap >= 2 {
             number_waypoint_overlap
         } else {
-            println!(
+            debug_println!(
                 "WARNING::WaypointPlanManagerService::bConfigure:: configuration overridden: m_numberWaypointOverlap set = 2"
             );
             2
@@ -111,82 +124,90 @@ pub extern "C" fn waypoint_plan_manager_configure(
 
 #[no_mangle]
 pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
-    raw_wps: *mut CppWaypointPlanManager,
+    raw_wps: *mut WaypointPlanManagerService,
     raw_wp: *mut WaypointPlanManager,
     msg_buf: *const u8,
     msg_len: u32,
 ) {
     // reclaim ownership
-    let wps = unsafe { raw_wps.as_mut().unwrap() };
-    if let Some(manager) = unsafe { raw_wp.as_mut() } {
-        let msg_buf_slice = unsafe { slice::from_raw_parts(msg_buf, msg_len as usize) };
-        if let Ok(Some(msg)) = lmcp::lmcp_msg_deser(msg_buf_slice) {
-            match msg {
+    let wps = unsafe {
+        raw_wps.as_mut().expect("C++ WaypointPlanManager  passed as null pointer")
+    };
+    let manager = unsafe {
+        raw_wp.as_mut().expect("Rust waypoint_plan_manager passed as null pointer")
+    };
+    let msg_buf_slice = unsafe { slice::from_raw_parts(msg_buf, msg_len as usize) };
+    if let Ok(Some(msg)) = lmcp::lmcp_msg_deser(msg_buf_slice) {
+        match msg {
 
-                lmcp::LmcpType::AirVehicleState(ref avs) => {
-                    if avs.id() == manager.vehicle_id {
-                        if manager.is_move_to_next_waypoint {
-                            if let Some(waypoint_id_next) = manager.get_next_waypoint_id(avs.current_waypoint()) {
-                                manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_next);
-                            }
-                            manager.is_move_to_next_waypoint = false;
-                        } else {
-                            manager.next_mission_command_to_send = manager.get_current_segment(avs.current_waypoint);
+            lmcp::LmcpType::AirVehicleState(ref avs) => {
+                if avs.id() == manager.vehicle_id {
+                    if manager.is_move_to_next_waypoint {
+                        if let Some(waypoint_id_next) = manager.get_next_waypoint_id(avs.current_waypoint()) {
+                            manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_next);
                         }
+                        manager.is_move_to_next_waypoint = false;
+                    } else {
+                        manager.next_mission_command_to_send = manager.get_current_segment(avs.current_waypoint);
                     }
-                },
+                }
+            },
 
-                lmcp::LmcpType::AutomationResponse(ref rsp) => {
-                    if let Some(mission) = rsp.mission_command_list.iter().find(|m| m.vehicle_id() == manager.vehicle_id) {
-                        if manager.initialize_plan(mission.as_ref(), wps) {
-                            let waypoint_id_current = mission.waypoint_list()[0].number();
-                            manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_current);
-                        }
+            lmcp::LmcpType::AutomationResponse(ref rsp) => {
+                if let Some(mission) = rsp.mission_command_list.iter()
+                    .find(|m| m.vehicle_id() == manager.vehicle_id)
+                {
+                    if manager.initialize_plan(mission.as_ref(), wps) {
+                        let waypoint_id_current = mission.waypoint_list()[0].number();
+                        manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_current);
                     }
-                },
+                }
+            },
 
-                // If we get a MissionCommand, we want to initialize
-                // our internal state from that message
-                lmcp::LmcpType::MissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
-                    if manager.initialize_plan(cmd, wps) {
-                        let waypoint_id_current = cmd.waypoint_list[0].number();
-                        if let Some(segment) = manager.get_current_segment(waypoint_id_current) {
-                            manager.id_mission_segment_current = segment.command_id;
-                        }
+            // If we get a MissionCommand, we want to initialize
+            // our internal state from that message
+            lmcp::LmcpType::MissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
+                if manager.initialize_plan(cmd, wps) {
+                    let waypoint_id_current = cmd.waypoint_list[0].number();
+                    if let Some(segment) = manager.get_current_segment(waypoint_id_current) {
+                        manager.id_mission_segment_current = segment.command_id;
                     }
-                },
+                }
+            },
 
-                lmcp::LmcpType::MissionCommand(_) => (),
+            lmcp::LmcpType::MissionCommand(_) => (),
 
-                _ => println!("Unhandled LMCP message {:?}", msg),
-            }
-
-        } else {
-            println!("waypoint_plan_manager: LMCP deserialization error!");
+            _ => debug_println!("Unhandled LMCP message {:?}", msg),
         }
+
+    } else {
+        debug_println!("LMCP deserialization error!");
     }
 }
 
 #[no_mangle]
 pub extern "C" fn waypoint_plan_manager_on_send_new_mission_timer(
     raw_wp: *mut WaypointPlanManager,
-    raw_wps: *mut CppWaypointPlanManager,
+    raw_wps: *mut WaypointPlanManagerService,
 ) {
-    if let Some(raw_wps) = unsafe { raw_wps.as_mut() } {
-        if let Some(manager) = unsafe { raw_wp.as_mut() } {
-            manager.on_send_new_mission_timer(raw_wps)
-        }
-    }
+    let wps = unsafe {
+        raw_wps.as_mut().expect("C++ WaypointPlanManager  passed as null pointer")
+    };
+    let manager = unsafe {
+        raw_wp.as_mut().expect("Rust waypoint_plan_manager passed as null pointer")
+    };
+
+    manager.on_send_new_mission_timer(wps);
 }
 
 impl WaypointPlanManager {
     fn initialize_plan(
         &mut self,
         cmd: &lmcp::MissionCommandT,
-        raw_wpm: &mut CppWaypointPlanManager
+        raw_wpm: &mut WaypointPlanManagerService
     ) -> bool {
         if self.vehicle_id <= 0 {
-            println!("vehicle ID not > 0!!!!");
+            debug_println!("vehicle ID not > 0");
             return false;
         }
 
@@ -236,7 +257,7 @@ impl WaypointPlanManager {
                 } else {
                     mission_segment_02.waypoint_list.push(wp.clone());
                     if mission_segment_01.first_waypoint < 0 {
-                        println!("first waypoint of segment was not set!!!");
+                        debug_println!("first waypoint of segment was not set");
                         return false;
                     }
 
@@ -342,7 +363,7 @@ impl WaypointPlanManager {
 
         match segment_tmp {
             Some(segment) if segment.command_id != self.id_mission_segment_current => {
-                println!(
+                debug_println!(
                     "New segment: id_mission_segment_new[{:?}] \
                      id_mission_segment_old[{:?}] \
                      waypoint_id_current[{:?}] \
@@ -367,41 +388,49 @@ impl WaypointPlanManager {
     }
 
     fn get_next_waypoint_id(&self, current: i64) -> Option<i64> {
-        for segment in self.mission_segments.iter() {
-            let mut is_found_current = false;
-            for waypoint in segment.waypoint_list.iter() {
-                if waypoint.number() == current {
-                    is_found_current = true;
-                }
-                if is_found_current {
-                    return Some(waypoint.number());
-                }
-            }
-        }
-        None
+        self.mission_segments.iter().filter_map(
+            |segment| segment.waypoint_list.iter().skip_while(
+                |wp| wp.number() != current).nth(1)
+        ).nth(0).map(|wp| wp.number())
+        // for segment in self.mission_segments.iter() {
+        //     let mut is_found_current = false;
+        //     for waypoint in segment.waypoint_list.iter() {
+        //         if waypoint.number() == current {
+        //             is_found_current = true;
+        //         } else if is_found_current {
+        //             return Some(waypoint.number());
+        //         }
+        //     }
+        // }
+        // None
     }
 
-    fn on_send_new_mission_timer(&mut self, raw_wpm: &mut CppWaypointPlanManager) {
-        if self.next_mission_command_to_send.is_some() {
-            let msg = lmcp::LmcpType::MissionCommand(
-                self.next_mission_command_to_send.clone().unwrap(),
+    fn on_send_new_mission_timer(
+        &mut self,
+        raw_wpm: &mut WaypointPlanManagerService,
+    ) {
+        if let Some(ref payload) = self.next_mission_command_to_send {
+            raw_wpm.send_shared_lmcp_object_broadcast_message(
+                &lmcp::LmcpType::MissionCommand(payload.clone())
             );
-            raw_wpm.send_shared_lmcp_object_broadcast_message(&msg);
         }
         self.next_mission_command_to_send = None;
     }
 
 }
 
-impl CppWaypointPlanManager {
+impl WaypointPlanManagerService {
     pub fn get_unique_entity_send_message_id(&mut self) -> i64 {
         unsafe {
             get_unique_entity_send_message_id_raw(self)
         }
     }
 
-    pub fn send_shared_lmcp_object_broadcast_message(&mut self, obj: &lmcp::LmcpType) {
-        println!("waypoint_plan_builder: sending LMCP message {:#?}", obj);
+    pub fn send_shared_lmcp_object_broadcast_message(
+        &mut self,
+        obj: &lmcp::LmcpType,
+    ) {
+        debug_println!("sending LMCP message {:#?}", obj);
         let size = lmcp::lmcp_msg_size(obj);
         let mut buf: Vec<u8> = vec![0; size];
         let res = lmcp::lmcp_msg_ser(obj, &mut buf);
@@ -421,11 +450,11 @@ impl CppWaypointPlanManager {
 
 extern {
     fn get_unique_entity_send_message_id_raw(
-        instance: *mut CppWaypointPlanManager
+        instance: *mut WaypointPlanManagerService
     ) -> i64;
 
     fn send_shared_lmcp_object_broadcast_message_raw(
-        instance: *mut CppWaypointPlanManager,
+        instance: *mut WaypointPlanManagerService,
         buf: *const u8,
         size: u32,
     );
