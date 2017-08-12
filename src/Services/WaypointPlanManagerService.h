@@ -196,6 +196,9 @@ protected:
      vehicle controlled by this manager*/
     int64_t m_gimbalPayloadId = {-1};
 
+    /*! \brief  the state of the Rust implementation of WaypointPlanManager */
+    void* m_WaypointPlanManager;
+
 private:
 
 

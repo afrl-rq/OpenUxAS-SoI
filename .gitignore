@@ -27,7 +27,7 @@ examples/**/log/**
 examples/**/datawork/**
 
 # Mac OS X file system
-**.DS_Store
+*.DS_Store
 /UxAS-afrl_internal/
 
 # Visual Studio

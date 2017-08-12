@@ -512,4 +512,8 @@ void send_shared_lmcp_object_broadcast_message_raw(void* client, const uint8_t *
   auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::Factory::getObject(lmcpByteBuffer));
   ((uxas::communications::LmcpObjectNetworkClientBase*)client)->sendSharedLmcpObjectBroadcastMessage(obj);
 }
+
+  uint64_t get_unique_entity_send_message_id_raw(void* client) {
+    return ((uxas::communications::LmcpObjectNetworkClientBase*)client)->getUniqueEntitySendMessageId();
+  }
 }

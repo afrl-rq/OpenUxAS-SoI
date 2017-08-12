@@ -58,6 +58,27 @@
 #define CERR_FILE_LINE_MSG(MESSAGE) std::cerr << "<>WaypointPlanManagerService:: " << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
 
 
+// Rust prototypes
+extern "C" {
+void* waypoint_plan_manager_new();
+void waypoint_plan_manager_delete(void* raw_pb);
+void* waypoint_plan_manager_configure(
+    void* raw_wp,
+    uint64_t vehicle_id,
+    uint32_t number_waypoints_to_serve,
+    uint32_t number_waypoint_overlap,
+    float loiter_radius_default,
+    bool is_add_loiter_to_end_of_segments,
+    bool is_add_loiter_to_end_of_mission,
+    bool is_loop_back_to_first_task,
+    bool is_set_last_waypoint_speed_to_0,
+    afrl::cmasi::TurnType::TurnType turn_type,
+    uint64_t gimbal_payload_id);
+void waypoint_plan_manager_process_received_lmcp_message(
+  void *wp, void* raw_wps, uint8_t *msg_buf, uint32_t msg_len);
+  void waypoint_plan_manager_on_send_new_mission_timer(void* wp, void* raw_wps);
+}
+
 namespace uxas
 {
 namespace service
@@ -66,9 +87,13 @@ WaypointPlanManagerService::ServiceBase::CreationRegistrar<WaypointPlanManagerSe
 WaypointPlanManagerService::s_registrar(WaypointPlanManagerService::s_registryServiceTypeNames());
 
 WaypointPlanManagerService::WaypointPlanManagerService()
-: ServiceBase(WaypointPlanManagerService::s_typeName(), WaypointPlanManagerService::s_directoryName()) { };
+: ServiceBase(WaypointPlanManagerService::s_typeName(), WaypointPlanManagerService::s_directoryName()) {
+  m_WaypointPlanManager = waypoint_plan_manager_new();
+};
 
-WaypointPlanManagerService::~WaypointPlanManagerService() { };
+WaypointPlanManagerService::~WaypointPlanManagerService() {
+  waypoint_plan_manager_delete(m_WaypointPlanManager);
+};
 
 bool
 WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
@@ -143,7 +168,33 @@ WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::IncrementWaypoint::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription); // for direct implementation outside of automation response
+
+    waypoint_plan_manager_configure(
+      m_WaypointPlanManager,
+      m_vehicleID,
+      m_numberWaypointsToServe,
+      m_numberWaypointOverlap,
+      m_loiterRadiusDefault_m,
+      m_isAddLoiterToEndOfSegments,
+      m_isAddLoiterToEndOfMission,
+      m_isLoopBackToFirstTask,
+      m_isSetLastWaypointSpeedTo0,
+      _turnType,
+      m_gimbalPayloadId
+      );
     return (bSucceeded);
+}
+
+bool
+WaypointPlanManagerService::processReceivedLmcpMessage(
+  std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
+{
+
+  avtas::lmcp::ByteBuffer * lmcpByteBuffer = avtas::lmcp::Factory::packMessage(receivedLmcpMessage->m_object.get(), true);
+  waypoint_plan_manager_process_received_lmcp_message(this, m_WaypointPlanManager, lmcpByteBuffer->array(), lmcpByteBuffer->capacity());
+  delete lmcpByteBuffer;
+
+  return (false);
 }
 
 bool
@@ -172,6 +223,7 @@ WaypointPlanManagerService::terminate()
     return true;
 }
 
+  /*
 bool
 WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
@@ -269,7 +321,7 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     }
     return (false); // always false implies never terminating service from here
 };
-
+  */
 bool WaypointPlanManagerService::isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand)
 {
     bool isSucceeded(true);
@@ -525,12 +577,13 @@ void WaypointPlanManagerService::setTurnType(const afrl::cmasi::TurnType::TurnTy
 
 void WaypointPlanManagerService::OnSendNewMissionTimer()
 {
-    if (_nextMissionCommandToSend)
-    {
-        sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
+  waypoint_plan_manager_on_send_new_mission_timer(m_WaypointPlanManager, this);
+    // if (_nextMissionCommandToSend)
+    // {
+    //     sendSharedLmcpObjectBroadcastMessage(_nextMissionCommandToSend);
 
-        _nextMissionCommandToSend.reset();
-    }
+    //     _nextMissionCommandToSend.reset();
+    // }
 }
 
 }; //namespace service

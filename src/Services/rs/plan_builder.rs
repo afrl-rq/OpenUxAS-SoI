@@ -204,12 +204,12 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
                 pb.remaining_assignments.insert(id, VecDeque::new());
                 pb.in_progress_response.insert(id, UniqueAutomationResponse::default());
             }
-            _ => debug_println!("Unhandled LMCP message {:?}", msg),
+            _ => debug_println!("Unhandled LMCP message {:#?}", msg),
         }
     } else {
         debug_println!("LMCP deserialization error!");
         debug_println!("Expected length: {}", msg_len);
-        debug_println!("{:?}", msg_buf_slice);
+        debug_println!("{:#?}", msg_buf_slice);
     }
 }
 
@@ -497,7 +497,7 @@ impl PlanBuilder {
 
 impl PlanBuilderService {
     fn send_shared_lmcp_object_broadcast_message(&mut self, obj: &LmcpType) {
-        debug_println!("plan_builder: sending LMCP message {:?}", obj);
+        debug_println!("plan_builder: sending LMCP message {:#?}", obj);
         let size = lmcp_msg_size(obj);
         let mut buf: Vec<u8> = vec![0; size];
         let res = lmcp_msg_ser(obj, &mut buf);
@@ -512,7 +512,7 @@ impl PlanBuilderService {
 
     fn send_error(&mut self, msg: String) {
         let ss = mk_error(msg);
-        debug_println!("sending error {:?}", ss);
+        debug_println!("sending error {:#?}", ss);
         self.send_shared_lmcp_object_broadcast_message(&ss);
     }
 }
