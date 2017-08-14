@@ -134,17 +134,17 @@ if os == 'darwin'
   # newer MacOS splits out GLU into a separate framework, but we can't
   # ask Meson for the version in order to handle things differently
   deps += [dependency('glu', required: false)]
+  glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
+  foreach fn : glu_functions
+    if not cpp.has_function(fn, dependencies: deps)
+      error('GLU library functions not found')
+    endif
+  endforeach
 elif os.startswith('linux')
   deps += [dependency('glu')]
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
-glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
-foreach fn : glu_functions
-  if not cpp.has_function(fn, dependencies: deps)
-    error('GLU library functions not found')
-  endif
-endforeach
 
 cpp_args = []
 if cpp.get_id() == 'msvc'
