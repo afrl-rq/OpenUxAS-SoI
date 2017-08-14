@@ -123,10 +123,7 @@ endif
 # creates src/Includes/config.h
 subdir('src/Includes')
 
-deps = [
-  dep_thread,
-  dep_boost,
-]
+deps = []
 
 # OpenGL, specifically the GLU library
 deps += [dependency('gl')]
@@ -145,6 +142,11 @@ elif os.startswith('linux')
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
+
+deps += [
+  dep_thread,
+  dep_boost,
+]
 
 cpp_args = []
 if cpp.get_id() == 'msvc'
