@@ -502,7 +502,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
                 int64_t taskOptionId = c_TaskAssignmentState::getTaskAndOptionId((*itOption)->getTaskID(), (*itOption)->getOptionID());
                 if (nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation.find(taskOptionId) == nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation.end())
                 {
-                    nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation[taskOptionId] = std::unique_ptr<c_TaskInformationStatic>(new c_TaskInformationStatic(taskOptionId));
+                    nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation[taskOptionId] = std::unique_ptr<c_TaskInformationStatic>(new c_TaskInformationStatic());
                 }
                 for (auto itObjVehicle = (*itOption)->getEligibleEntities().begin(); itObjVehicle != (*itOption)->getEligibleEntities().end(); itObjVehicle++)
                 {
@@ -625,8 +625,7 @@ int64_t c_VehicleInformationStatic::getTravelTime_ms(const int64_t& fromId, cons
     return (returnTravelTime_ms);
 };
 
-c_TaskInformationStatic::c_TaskInformationStatic(const int64_t & taskOptionId)
-: m_taskOptionId(taskOptionId) { };
+c_TaskInformationStatic::c_TaskInformationStatic() { }
 
 int64_t c_TaskInformationStatic::getTravelTime_ms(const int64_t & VehicleId)
 {
