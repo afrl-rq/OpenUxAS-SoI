@@ -207,7 +207,6 @@ TcpBridge::ReceiveTcpMessages()
                     //std::cerr << "TCPBRIDGE: Received ZMQ message of size: " << msgsize << std::endl;
 
                     std::shared_ptr<avtas::lmcp::Object> ptr_Object;
-                    m_ui32MessageCount_Receive_0++;
 
                     std::string strMessageStream(reinterpret_cast<const char*> (msgdata), msgsize);
                     std::stringstream sstrError;
