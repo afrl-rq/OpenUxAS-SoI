@@ -65,7 +65,7 @@ private:
 public:
 
     void
-    initialize(uint32_t entityId, uint32_t serviceId, SocketConfiguration& zeroMqSocketConfiguration) override;
+    initialize(uint32_t entityId, uint32_t serviceId, SocketConfiguration& zeroMqSocketConfiguration);
     
     bool
     addSubscriptionAddressToSocket(const std::string& address) override;
