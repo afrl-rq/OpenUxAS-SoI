@@ -178,7 +178,7 @@ private:
     std::shared_ptr<afrl::impact::BlockadeTask> m_blockadeTask;
     std::shared_ptr<afrl::cmasi::EntityState> m_blockedEntityStateLast;
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_idVsEntityState;
-    double m_loiterRadius_m = {200.0};
+
 public:
 
 

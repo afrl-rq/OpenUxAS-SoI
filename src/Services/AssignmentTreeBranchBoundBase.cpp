@@ -178,7 +178,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
     {
         m_isUsingAssignmentTypes = true;
         auto pisrAssignmentType = std::static_pointer_cast<uxas::project::pisr::PSIR_AssignmentType>(receivedLmcpMessage->m_object);
-        if (m_idVsAssigmentPrerequisites.find(pisrAssignmentType->getAutomationRequestID()) == m_idVsAssigmentPrerequisites.end());
+        if (m_idVsAssigmentPrerequisites.find(pisrAssignmentType->getAutomationRequestID()) == m_idVsAssigmentPrerequisites.end())
         {
             m_idVsAssigmentPrerequisites.insert(std::make_pair(pisrAssignmentType->getAutomationRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
@@ -502,7 +502,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
                 int64_t taskOptionId = c_TaskAssignmentState::getTaskAndOptionId((*itOption)->getTaskID(), (*itOption)->getOptionID());
                 if (nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation.find(taskOptionId) == nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation.end())
                 {
-                    nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation[taskOptionId] = std::unique_ptr<c_TaskInformationStatic>(new c_TaskInformationStatic(taskOptionId));
+                    nodeAssignment->m_staticAssignmentParameters->m_taskOptionIdVsInformation[taskOptionId] = std::unique_ptr<c_TaskInformationStatic>(new c_TaskInformationStatic());
                 }
                 for (auto itObjVehicle = (*itOption)->getEligibleEntities().begin(); itObjVehicle != (*itOption)->getEligibleEntities().end(); itObjVehicle++)
                 {
@@ -625,8 +625,7 @@ int64_t c_VehicleInformationStatic::getTravelTime_ms(const int64_t& fromId, cons
     return (returnTravelTime_ms);
 };
 
-c_TaskInformationStatic::c_TaskInformationStatic(const int64_t & taskOptionId)
-: m_taskOptionId(taskOptionId) { };
+c_TaskInformationStatic::c_TaskInformationStatic() { }
 
 int64_t c_TaskInformationStatic::getTravelTime_ms(const int64_t & VehicleId)
 {
