@@ -178,7 +178,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
     {
         m_isUsingAssignmentTypes = true;
         auto pisrAssignmentType = std::static_pointer_cast<uxas::project::pisr::PSIR_AssignmentType>(receivedLmcpMessage->m_object);
-        if (m_idVsAssigmentPrerequisites.find(pisrAssignmentType->getAutomationRequestID()) == m_idVsAssigmentPrerequisites.end());
+        if (m_idVsAssigmentPrerequisites.find(pisrAssignmentType->getAutomationRequestID()) == m_idVsAssigmentPrerequisites.end())
         {
             m_idVsAssigmentPrerequisites.insert(std::make_pair(pisrAssignmentType->getAutomationRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
