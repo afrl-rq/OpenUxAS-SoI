@@ -8,7 +8,7 @@
 // ===============================================================================
 
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
+#include "afrl/vehicles/GroundVehicleState.h"
 
 #include "LmcpObjectNetworkBridgeManager.h"
 #include "LmcpObjectNetworkServer.h"
@@ -84,7 +84,7 @@ main(int argc, char** argv)
         else if (strcmp((const char *) argv[i], ARG_VERSION) == 0)
         {
             auto o = new afrl::cmasi::AirVehicleState;
-            auto p = new afrl::impact::GroundVehicleState;
+            auto p = new afrl::vehicles::GroundVehicleState;
             std::cout << std::endl << "#######################" << std::endl;
             std::cout << "   VERSION: " << MAJOR_VERSION << "." << MINOR_VERSION << "." << PATCH_VERSION << std::endl;
             std::cout << "     CMASI:  " << o->getSeriesVersion() << std::endl;

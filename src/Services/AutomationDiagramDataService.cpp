@@ -21,8 +21,8 @@
 
 #include "afrl/cmasi/EntityState.h"
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -96,8 +96,8 @@ AutomationDiagramDataService::configure(const pugi::xml_node& ndComponent)
     //assert(strComponentType==STRING_XML_COMPONENT_TYPE)
     //STATES
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
 
     //AUTOMATION
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);

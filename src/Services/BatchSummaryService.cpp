@@ -130,13 +130,13 @@ BatchSummaryService::configure(const pugi::xml_node & ndComponent)
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
     addSubscriptionAddress(afrl::impact::RadioTowerConfiguration::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::impact::RadioTowerState::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
 
     addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
     addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
@@ -211,13 +211,13 @@ BatchSummaryService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_airVehicles.insert(id);
     }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_groundVehicles.insert(id);
     }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);

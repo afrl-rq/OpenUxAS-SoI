@@ -35,10 +35,10 @@
 
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 
 #include "pugixml.hpp"
 
@@ -144,8 +144,8 @@ RoutePlannerVisibilityService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
 
     addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
 
     // service 'global' path planning requests (system assumes aircraft)
     addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
@@ -156,8 +156,8 @@ RoutePlannerVisibilityService::configure(const pugi::xml_node& ndComponent)
     if (m_isRoutAggregator)
     {
         addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-        addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-        addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+        addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+        addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
         addSubscriptionAddress(uxas::messages::route::RouteRequest::Subscription);
     }
 
@@ -190,13 +190,13 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
         m_idVsEntityConfiguration[entityConfiguration->getID()] = entityConfiguration;
         calculatePlannerParameters(entityConfiguration);
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         auto entityConfiguration = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
         m_idVsEntityConfiguration[entityConfiguration->getID()] = entityConfiguration;
         calculatePlannerParameters(entityConfiguration);
     }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         auto entityConfiguration = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
         m_idVsEntityConfiguration[entityConfiguration->getID()] = entityConfiguration;
@@ -207,12 +207,12 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
         auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_idVsEntityState[entityState->getID()] = entityState;
     }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
     {
         auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_idVsEntityState[entityState->getID()] = entityState;
     }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
     {
         auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_idVsEntityState[entityState->getID()] = entityState;
@@ -239,7 +239,7 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
         auto itEntityConfiguration = m_idVsEntityConfiguration.find(request->getVehicleID());
         if (itEntityConfiguration != m_idVsEntityConfiguration.end() &&
                 (afrl::cmasi::isAirVehicleConfiguration(itEntityConfiguration->second.get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(itEntityConfiguration->second.get())))
+                afrl::vehicles::isSurfaceVehicleConfiguration(itEntityConfiguration->second.get())))
         {
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             if (bProcessRoutePlanRequest(request, routePlanResponse))

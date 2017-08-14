@@ -86,7 +86,7 @@ public:
         strGetBaseFileName() = sstrFileName.str();
     };
 
-    c_VehicleBase(afrl::impact::SurfaceVehicleConfiguration* pSurfaceVehicleConfiguration) :
+    c_VehicleBase(afrl::vehicles::SurfaceVehicleConfiguration* pSurfaceVehicleConfiguration) :
     	CBaseObject(pSurfaceVehicleConfiguration->getID()),
 		CVehicleParameters(pSurfaceVehicleConfiguration),
 		m_vehicleType(envehicleSurfaceVehicle),
@@ -99,7 +99,7 @@ public:
         strGetBaseFileName() = sstrFileName.str();
     };
 
-    c_VehicleBase(afrl::impact::GroundVehicleConfiguration* pGroundVehicleConfiguration) :
+    c_VehicleBase(afrl::vehicles::GroundVehicleConfiguration* pGroundVehicleConfiguration) :
     	CBaseObject(pGroundVehicleConfiguration->getID()),
 		CVehicleParameters(pGroundVehicleConfiguration),
 		m_vehicleType(envehicleGroundVehicle),

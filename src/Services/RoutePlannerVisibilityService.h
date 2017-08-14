@@ -64,13 +64,13 @@ namespace service
  *  - afrl::cmasi::KeepInZone
  *  - afrl::cmasi::OperatingRegion
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - uxas::messages::route::RoutePlanRequest
  *  - AircraftPathPlanner
  *  - afrl::cmasi::AirVehicleState
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::SurfaceVehicleState
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::SurfaceVehicleState
  *  - uxas::messages::route::RouteRequest
  * 
  * Sent Messages:

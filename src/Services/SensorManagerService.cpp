@@ -18,8 +18,8 @@
 #include "SensorManagerService.h"
 
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/CameraConfiguration.h"
 #include "afrl/cmasi/RemoveTasks.h"
@@ -81,8 +81,8 @@ SensorManagerService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
 
     addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
 
     addSubscriptionAddress(uxas::messages::task::SensorFootprintRequests::Subscription);
 

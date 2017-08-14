@@ -149,7 +149,7 @@ OsmPlannerService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(uxas::common::MessageGroup::GroundPathPlanner());
 
     // need to keep track of all ground vehicles and their configurations for proper speed setting
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
 
     // only the ground planner can fulfill this request, response (as typical) will be limited-cast back
     addSubscriptionAddress(uxas::messages::route::EgressRouteRequest::Subscription);
@@ -207,9 +207,9 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
                     newResponse);
         }
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
-        auto config = std::static_pointer_cast<afrl::impact::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
+        auto config = std::static_pointer_cast<afrl::vehicles::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
         m_entityConfigurations[config->getID()] = config;
     }
     else

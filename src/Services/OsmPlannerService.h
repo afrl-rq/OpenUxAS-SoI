@@ -63,7 +63,7 @@ namespace service
  * 
  * Subscribed Messages:
  *  - GroundPathPlanner
- *  - afrl::impact::GroundVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleConfiguration
  *  - uxas::messages::route::EgressRouteRequest
  *  - uxas::messages::route::RoutePlanRequest
  * 
@@ -232,7 +232,7 @@ protected:
     int32_t m_northMin_m = 0;
     int32_t m_eastMin_m = 0;
 
-    std::unordered_map<int64_t, std::shared_ptr<afrl::impact::GroundVehicleConfiguration> > m_entityConfigurations;
+    std::unordered_map<int64_t, std::shared_ptr<afrl::vehicles::GroundVehicleConfiguration> > m_entityConfigurations;
 
     /*! \brief  the name of the openstreetmap file. */
     std::string m_osmFileName;

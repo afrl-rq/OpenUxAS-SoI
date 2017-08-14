@@ -23,6 +23,7 @@
 #include "afrl/cmasi/CMASI.h"
 #include "uxas/messages/route/ROUTE.h"
 #include "afrl/impact/IMPACT.h"
+#include "afrl/vehicles/VEHICLES.h"
 #include "visilibity.h"
 
 #include <unordered_map>
