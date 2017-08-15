@@ -235,7 +235,7 @@ public
 
 			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state":
 --				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
-				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
+				whenever send_task_assignment_summary occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
 				
 			guarantee "The service transitions to IDLE within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state ":
 --				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
