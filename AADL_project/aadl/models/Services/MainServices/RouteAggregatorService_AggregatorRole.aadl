@@ -204,10 +204,12 @@ thread RouteAggregatorService_AggregatorRole
 		
 		--Note: this assumption is vital to the correct use of this component, so I am leaving
 		--the assumption within the component (not assuming solely at a higher level)
+		--Note: This assumption allows for 0 RouteRequest_in messages for maximum flexibility
+		--I will let parent systems force at least one Request. 
 		assume "No more than 3 vehicles are specified within a RouteRequest_in and 
 			at least one vehicle is specified." :
 			event(RouteRequest_in) => 
-				(RouteRequest_in.NumVehicleIDs >0 and 
+				(RouteRequest_in.NumVehicleIDs >=0 and 
 					RouteRequest_in.NumVehicleIDs <= MAX_SIZE_OF_VehicleID_ARRAY);
 		
 		eq RouteRequest1Table : RouteAggregatorService_AggregatorRole_Pkg::Int_to_Bool_3_by_3_Table_Type.Impl;
