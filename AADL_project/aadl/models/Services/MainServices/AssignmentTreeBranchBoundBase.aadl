@@ -11,6 +11,7 @@ public
 	--  "properties" of our component contract.
 	process top_level
 		features
+			TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i;
 			AssignmentCostMatrix_in: in event data port uxtask::AssignmentCostMatrix.i;
 			TaskAssignmentSummary_out: out event data port uxtask::TaskAssignmentSummary.i;
 			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
@@ -50,6 +51,7 @@ public
 			conn0 : port AssignmentCostMatrix_in -> sub.AssignmentCostMatrix_in;
 			conn1 : port sub.TaskAssignmentSummary_out -> TaskAssignmentSummary_out;
 			conn2 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
+			conn4 : port TaskPlanOptions_in -> sub.TaskPlanOptions_in;
 		annex agree {**
 			-- These lemmas could be captured in SpeAR as properties
 			
