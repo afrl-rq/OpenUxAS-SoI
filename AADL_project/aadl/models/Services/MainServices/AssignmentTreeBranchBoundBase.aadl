@@ -229,11 +229,17 @@ public
 			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
 			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
 			
-			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state":
-				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
+			--NOTE: originally I had only considered an AssignmentConstMatrix_in message in the wait state
+			--but forgot about the 'send_task_assignment_summary' that more accurately specifies the conditions
+			--under which a TaskAssignmentSummary_out is sent.
+
+			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state":
+--				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
+				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
 				
-			guarantee "The service transitions to IDLE within 1500ms after receiving AssignmentCostMatrix_in in the WAIT state ":
-				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
+			guarantee "The service transitions to IDLE within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state ":
+--				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
+				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
       	**};
     end AssignmentTreeBranchBoundBase;
 
