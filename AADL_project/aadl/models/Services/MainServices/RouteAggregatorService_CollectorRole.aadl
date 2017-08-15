@@ -65,11 +65,12 @@ public
 thread RouteAggregatorService_CollectorRole
     features
         GroundVehicleState_in: in event data port impact::GroundVehicleState.i; 
+        AirVehicleState_in: in event data port cmasi::AirVehicleState.i; 
+        SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+        
         UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i; 
         RoutePlanResponse_in: in event data port route::RoutePlanResponse.i; --keep
-        SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i; 
         TaskPlanOptions_in: in event data port uxtask::TaskPlanOptions.i; 
-        AirVehicleState_in: in event data port cmasi::AirVehicleState.i; 
         ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki. Per Derek, it is used for error reporting (or at least can be used for that.)
         RoutePlanRequest_out: out event data port route::RoutePlanRequest.i; 
         AssignmentCostMatrix_out: out event data port uxtask::AssignmentCostMatrix.i; 

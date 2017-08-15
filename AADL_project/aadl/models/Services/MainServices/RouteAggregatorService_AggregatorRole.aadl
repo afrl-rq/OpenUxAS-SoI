@@ -96,6 +96,7 @@ public
 thread RouteAggregatorService_AggregatorRole
     features
         --TODO: Where are these coming from? 
+        --TODO: Comment out and insert an EntityConfiguration type
         GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i; 
         SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i; 
         AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i; 
