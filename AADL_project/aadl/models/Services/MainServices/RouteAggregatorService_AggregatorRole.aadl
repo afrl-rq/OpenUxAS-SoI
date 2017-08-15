@@ -40,6 +40,10 @@ public
 		annex agree {**
 			guarantee "Placeholder guarantee to force AGREE to run" : true;
 			
+		eq route_requests_received_counter : int;
+		assume "No more than three RouteRequest_in total can ever be received by this service":
+			route_requests_received_counter <=3;
+			
 		assume "No more than 3 vehicles are specified within a RouteRequest_in and 
 			at least one vehicle is specified." :
 			event(RouteRequest_in) => 
@@ -69,6 +73,13 @@ public
 			conn2: port sub.RoutePlanRequest_out -> RoutePlanRequest_out;
 			conn3: port sub.RouteResponse_out -> RouteResponse_out;
 		annex agree {**
+				assign route_requests_received_counter = (0 ->
+					(if event(RouteRequest_in) then
+						pre(route_requests_received_counter)+1
+					else
+						pre(route_requests_received_counter)
+					));
+			
 			------------------------------------------------------
 			-- These lemmas could be captured in SpeAR as properties
 --			lemma "num_route_requests_being_serviced >= 0" : sub.num_route_requests_being_serviced >= 0;
@@ -103,6 +114,8 @@ thread RouteAggregatorService_AggregatorRole
 					
 		const MAX_ROUTE_REQUESTS_SERVICABLE : int = 3;
 		
+		--Note: this assumption is vital to the correct use of this component, so I am leaving
+		--the assumption within the component (not assuming solely at a higher level)
 		assume "No more than three RouteRequest_in total can ever be received by this service":
 			route_requests_received_counter <=3;
 		
