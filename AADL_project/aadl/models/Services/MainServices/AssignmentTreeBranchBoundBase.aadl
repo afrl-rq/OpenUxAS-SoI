@@ -57,7 +57,9 @@ public
 				
 			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
 			--Note: previously proven
-			guarantee "Test2":
+			guarantee "Test2: Sanity check:
+				Once the triggering condition is met for sending a TaskAssignmentSummary_out in the WAIT state is met,
+				the service will send out a TaskAssignmentSummary_out within a reasonble upper bound.":
 				whenever event_expected_acm_in_wait_state_and_expected_task_options_received occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
 			
 			eq event_uar_in_attb_idle_state : bool;
@@ -68,20 +70,29 @@ public
 --			guarantee "Test4: ATBB to Builder test":
 --				whenever event_uar_in_attb_idle_state occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
 --				
-			guarantee "Test5":
+			--Note: counterexample generated for this guarantee on the linquest "supercomputer" when
+			--All component timing guarantees are removed (takes over an hour to produce)
+			guarantee "Test5: Sanity check:
+				A reasonable upper bound after a UniqueAutomationRequest_in is recieved in the IDLE state, the service will reach the triggering
+				condition for sending a TaskAssignmentSummary_out":
 				whenever event_uar_in_attb_idle_state occurs event_expected_acm_in_wait_state_and_expected_task_options_received occurs during [0.0,200.0];
 			
 			eq allExpectedTaskOptionsReceived : bool;
 			--Note: passed with assumptions alone (no timing information in the child component) using the Linquest "supercomputer"
-			guarantee "Test6":
+			guarantee "Test6: Sanity check:
+				all expected task options are always received within a reasonable upper after a 
+				UniqueAutomationRequest_in is received in the IDLE state.":
 				whenever event_uar_in_attb_idle_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
 			
 			eq component_in_wait_state : bool ;
 			--Note: previously proven
-			guarantee "Test7" :
+			guarantee "Test7: Sanity check:
+				the service always enteres the WAIT state within a reasonable upper bound from the IDLE state when
+				a UniqueAutomationRequest_in is recieved." :
 				whenever event_uar_in_attb_idle_state occurs component_in_wait_state occurs during [0.0,200.0];
 				
-			guarantee "Test8" :
+			guarantee "Test8: Sanity check:
+				 all expected task options are always received in the WAIT state within a reasonable upper" :
 				whenever component_in_wait_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
 				
 			------------------------------------------	
@@ -397,9 +408,13 @@ public
 --				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
 				whenever send_task_assignment_summary occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
 				
-			guarantee "The service transitions to IDLE within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state ":
+--			guarantee "The service transitions to IDLE within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state ":
+----				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
+--				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
+
+			guarantee "The service transitions to IDLE within 0ms after a TaskAssignmentSummary_out is emited":
 --				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
-				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
+				whenever event_TaskAssignmentSummary_out occurs wait_to_idle occurs during [0.0,0.0000001];
 
       	**};
     end AssignmentTreeBranchBoundBase;
