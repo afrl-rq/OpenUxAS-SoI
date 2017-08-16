@@ -87,8 +87,10 @@ public
         		condition event_TaskPlanOptions_in occurs each 1.0;
 				
 			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
+			eq event_expected_acm : bool; 
 			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
-				condition event_AssignmentCostMatrix_in occurs each 2.0;--1.6;--sporadic with IAT 1.6;
+				--condition event_AssignmentCostMatrix_in occurs each 2.0;--1.6;--sporadic with IAT 1.6;
+				condition event_expected_acm occurs each 2.0;
 			
 			assume "UniqueAutomationRequest_in must provide a TaskList of size greater than 0 and less than or equal to 10":
         		event(UniqueAutomationRequest_in) => 
@@ -136,7 +138,10 @@ public
 			assign event_expected_acm_in_wait_state_and_expected_task_options_received = sub.send_task_assignment_summary;
 			assign event_uar_in_attb_idle_state = event(UniqueAutomationRequest_in) and sub.state = sub.IDLE;
 			assign allExpectedTaskOptionsReceived = sub.allExpectedTaskOptionsReceived;
---			assign builder_in_idle_waiting = (sub2.state = sub2.IDLE_WAITING) and sub.state = sub.IDLE;
+			assign event_expected_acm = event(AssignmentCostMatrix_in) and 
+				AssignmentCostMatrix_in.CorrespondingAutomationRequestID = sub.curUniqueAutomationRequestID;
+      			
+ --			assign builder_in_idle_waiting = (sub2.state = sub2.IDLE_WAITING) and sub.state = sub.IDLE;
 
 			-- These lemmas could be captured in SpeAR as properties
 			
