@@ -234,6 +234,14 @@ thread RouteAggregatorService_AggregatorRole
 		eq totalRouteRequestsReceivedCounter : int = 
 			0 -> (pre(totalRouteRequestsReceivedCounter) + 
 					UxAS_Node_Lib.bool_to_int(event(RouteRequest_in)));
+					
+		--NOTE and REALIZABILITY ISSUE: 
+		-- I have found the guarantees below make proving realizability difficult (the result is unknown)
+		-- Further experimentation in other models has shown that the complex use of initializing conditions
+		-- is likely the culprit. They are used to avoid having more complex guarantees that further reveal internal state. 
+		-- In other experiments (with AssignmentTreeBranchBoudnBase), I have found the unknown realizability
+		-- can be solved by also including the guarantees that were intended to be obviated. This isn't an
+		-- ideal solution (adding redundancy in this case), but could be used as a counter check of the spec logic. 
 
 		--Note: the totalRouteRequestsReceivedCounter is incremented on the same time step
 		--as a RouteRequest_in. Hence, these checks below must consider that the counter
