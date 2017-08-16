@@ -21,8 +21,8 @@ public
 			TaskAssignmentSummary_out: out event data port uxtask::TaskAssignmentSummary.i;
 			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
 			
-			--PlanBuilder features (outputs)
-			TaskImplementationRequest_out : out event data port uxtask::TaskImplementationRequest.i;
+--			--PlanBuilder features (outputs)
+--			TaskImplementationRequest_out : out event data port uxtask::TaskImplementationRequest.i;
 			
 		annex agree {**
 				
@@ -47,33 +47,43 @@ public
 			--TODO: guarantee that states if an automation request is received, a puilder response is received in bounded time. 
 				
 			--Test guarantee	
-			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
+--			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
 --			guarantee "If an AssignmentCostMatrix_in occurs, a TaskImplementationRequest_out occurs within 200 seconds":
 --				whenever event_AssignmentCostMatrix_in occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
 --				
 			eq event_expected_acm_in_wait_state_and_expected_task_options_received: bool;
---			guarantee "Test":
+--			guarantee "Test1: ATBB to Builder test":
 --				whenever event_expected_acm_in_wait_state_and_expected_task_options_received occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
---				
-			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
-			--Note: previousl proven
---			guarantee "Test2":
---				whenever event_expected_acm_in_wait_state_and_expected_task_options_received occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
---			
-			eq event_uar_in_attb_idle_state : bool;
---			guarantee "Test3":
---				whenever event_uar_in_attb_idle_state occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
---				
---			guarantee "Test4":
---				whenever event_uar_in_attb_idle_state occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
 				
+			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
+			--Note: previously proven
+			guarantee "Test2":
+				whenever event_expected_acm_in_wait_state_and_expected_task_options_received occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
+			
+			eq event_uar_in_attb_idle_state : bool;
+			guarantee "Test3: end-to-end AssignmentTreeBranchBoundBase check: 
+				UniqueAutomationRequest_in in the IDLE state will result in TaskAssignmentSummary_out with a reasonable upper limit (200.0s)":
+				whenever event_uar_in_attb_idle_state occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
+				
+--			guarantee "Test4: ATBB to Builder test":
+--				whenever event_uar_in_attb_idle_state occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
+--				
 			guarantee "Test5":
 				whenever event_uar_in_attb_idle_state occurs event_expected_acm_in_wait_state_and_expected_task_options_received occurs during [0.0,200.0];
 			
 			eq allExpectedTaskOptionsReceived : bool;
+			--Note: passed with assumptions alone (no timing information in the child component) using the Linquest "supercomputer"
 			guarantee "Test6":
 				whenever event_uar_in_attb_idle_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
 			
+			eq component_in_wait_state : bool ;
+			--Note: previously proven
+			guarantee "Test7" :
+				whenever event_uar_in_attb_idle_state occurs component_in_wait_state occurs during [0.0,200.0];
+				
+			guarantee "Test8" :
+				whenever component_in_wait_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
+				
 			------------------------------------------	
 			--Assumptions for AssignmentTreeBranchBound	
 				
@@ -140,7 +150,7 @@ public
 			assign allExpectedTaskOptionsReceived = sub.allExpectedTaskOptionsReceived;
 			assign event_expected_acm = event(AssignmentCostMatrix_in) and 
 				AssignmentCostMatrix_in.CorrespondingAutomationRequestID = sub.curUniqueAutomationRequestID;
-      			
+      		assign component_in_wait_state = sub.state = sub.WAIT;
  --			assign builder_in_idle_waiting = (sub2.state = sub2.IDLE_WAITING) and sub.state = sub.IDLE;
 
 			-- These lemmas could be captured in SpeAR as properties
@@ -256,13 +266,13 @@ public
       		 --TODO: ASK DEREK: arbitrary number chosen here
         	const MAX_TASKS : int = 10;
         			 
-        	eq current_total_task_options_to_recieve : int = 
+        	eq current_total_task_options_to_recieve : int = (
         		(if state = IDLE and event(UniqueAutomationRequest_in) then
         			UniqueAutomationRequest_in.OriginalRequest.TaskListSize
         		else
-        			pre(current_total_task_options_to_recieve));
+        			pre(current_total_task_options_to_recieve)));
         		
-        	eq current_task_options_recieved_counter : int = 
+        	eq current_task_options_recieved_counter : int = (
         		(if state = IDLE and event(UniqueAutomationRequest_in) then
         			0
         		else if state = WAIT and event(TaskPlanOptions_in) then
@@ -271,7 +281,7 @@ public
         			--is "expected";
         			pre(current_task_options_recieved_counter) + 1 
         		else
-        			pre(current_task_options_recieved_counter));
+        			pre(current_task_options_recieved_counter)));
         	
         	--TODO: is there a way to remove this assumption and place it in the parent?
         	--The purpose of this assumption is to ensure it is OK to use MAX_TASKS as an upper bound. 
@@ -340,10 +350,11 @@ public
       		guarantee "Upon receiving the AssignmentCostMatrix (which should be received strictly after the TaskPlanOptions
       			due to the behavior of the RouteAggregatorService), this service conducts the branch-and-bound search to determine 
       			the proper ordering and assignment of Tasks to vehicles. The results of the optimization are packaged into the TaskAssignmentSummary":
-      			if send_task_assignment_summary then
-      				event(TaskAssignmentSummary_out)
-      			else
-      				not event(TaskAssignmentSummary_out);
+      			send_task_assignment_summary <=> event(TaskAssignmentSummary_out);
+--      			if send_task_assignment_summary then
+--      				event(TaskAssignmentSummary_out)
+--      			else
+--      				not event(TaskAssignmentSummary_out);
       		
       		guarantee "The results of the optimization are packaged into the TaskAssignmentSummary and published, 
       			at which point this service returns to the idle state.":
@@ -389,6 +400,7 @@ public
 			guarantee "The service transitions to IDLE within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state ":
 --				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
 				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
+
       	**};
     end AssignmentTreeBranchBoundBase;
 
