@@ -91,9 +91,14 @@ public
 				a UniqueAutomationRequest_in is recieved." :
 				whenever event_uar_in_attb_idle_state occurs component_in_wait_state occurs during [0.0,200.0];
 				
+			--Note: previously proven after 7-8 hours on linquest "supercomputer"
 			guarantee "Test8: Sanity check:
-				 all expected task options are always received in the WAIT state within a reasonable upper" :
+				 all expected task options are always received in the WAIT state within a reasonable upper bound" :
 				whenever component_in_wait_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
+				
+			guarantee "Test 9: Sanity check:
+				In the WAIT state, within a reasonable upper bound, the expected AssignmentCostMatrix_in is recieved." :
+				whenever component_in_wait_state occurs event_expected_acm occurs during [0.0,200.0];
 				
 			------------------------------------------	
 			--Assumptions for AssignmentTreeBranchBound	
@@ -109,7 +114,7 @@ public
 				
 			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
 			eq event_expected_acm : bool; 
-			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 1600ms" :
+			assume "AssignmentCostMatrix_in is assumed to occur sporadically with an inter arrival time no sooner than 2000ms" :
 				--condition event_AssignmentCostMatrix_in occurs each 2.0;--1.6;--sporadic with IAT 1.6;
 				condition event_expected_acm occurs each 2.0;
 			
