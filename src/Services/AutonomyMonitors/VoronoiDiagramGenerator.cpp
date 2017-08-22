@@ -1,8 +1,8 @@
 /*
- * The author of this software is Steven Fortune.  Copyright (c) 1994 by AT&T
+ * The original author of this software is Steven Fortune.  Copyright (c) 1994 by AT&T
  * Bell Laboratories.
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with fee is hereby granted, provided that this entire notice
+ * purpose without fee is hereby granted, provided that this entire notice
  * is included in all copies of any software which is or includes a copy
  * or modification of this software and in all copies of the supporting
  * documentation for such software.
