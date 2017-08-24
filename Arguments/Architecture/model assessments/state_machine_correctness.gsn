@@ -1192,13 +1192,15 @@
 
         <g
             id="__gsn__15d183655c6"
+            color="lightgrey"
             name="TBD">
           Use of the correct infrastructure for all components?
         </g>
 
         <g
             id="__gsn__15d32c11d9b"
-            name="Goal">
+            color="lightgrey"
+            name="TBD">
           composition of states (but does not include full reachability, gets into system level properties)
 
           <comment
@@ -1210,7 +1212,8 @@
 
         <g
             id="__gsn__15d3874c940"
-            name="Goal">
+            color="lightgrey"
+            name="TBD">
           system level reachability?
         </g>
       </s>
@@ -1225,6 +1228,12 @@
           id="__gsn__15d37d3eb6c"
           name="Rodes">
         General note: any use of a lemma to produce a “witness” should require the user to examine and approve the counterexample. Chris has discussed the possibility of visualizing counterexamples in simulink as a possible “tool” for this purpose.
+      </comment>
+
+      <comment
+          id="__gsn__15e15120ba9"
+          name="Color Scheme">
+        Blue comments were developed by Ben Rodes. Gray elements indicate a work in progress. Pink indicates some review is necessary. Green is used to highlight where repeated use of misc. validation techniques are applied. Yellow comments indicate general comments (no defined author).
       </comment>
     </g>
   </gsn>
