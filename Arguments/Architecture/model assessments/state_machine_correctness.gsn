@@ -66,18 +66,12 @@
             id="__gsn__15d15389a52"
             repeat="true"
             name="{Component} State Machine  Correctness">
-          {Component}  AGREE state machine specification is correct.
+          {Component} AGREE state machine specification is correct.
 
           <c
               id="__gsn__15d18a60010"
               name="Context">
             {component AGREE state machine}
-          </c>
-
-          <c
-              id="__gsn__15d3829a03d"
-              name="Definition">
-            [Correct]:
           </c>
 
           <s
@@ -252,6 +246,12 @@
                                   AADL model consistency; Natural language model consistency; consistency/reduction with other models/specifications; traceability to and satisfaction of requirements; simulation of the model (model tests)
                                 </comment>
                               </g>
+
+                              <comment
+                                  id="__gsn__15d55dab5ad"
+                                  name="Rodes">
+                                Should include abstractions about data structures and processes, as well as abstractions about time (e.g., the definition of a time step in the model checker).
+                              </comment>
                             </g>
 
                             <g
@@ -490,7 +490,7 @@
                               <s
                                   id="__gsn__15d387a218a"
                                   name="Strategy">
-                                Argue destination state  correctness by {misc. model validation} and mitigation of design faults
+                                Argue destination state correctness by {misc. model validation} and mitigation of design faults
 
                                 <c
                                     id="__gsn__15d387a218b"
@@ -1188,12 +1188,6 @@
               Note: in general additional lemmas can be used to aid manual inspection: e.g., an inspection that the state machine as correct transition connections can have lemmas to assert start and end states on a transition. Another example: probing behavior of states with lemmas.
             </comment>
           </s>
-
-          <comment
-              id="__gsn__15d17eb2e23"
-              name="Rodes">
-            TODO: include a placeholder or note for the kind of validation that has been done with derek manually.
-          </comment>
         </g>
 
         <g
@@ -1206,6 +1200,12 @@
             id="__gsn__15d32c11d9b"
             name="Goal">
           composition of states (but does not include full reachability, gets into system level properties)
+
+          <comment
+              id="__gsn__15d42a800f0"
+              name="Rodes">
+            Reachability of states at the system level (existential paths, always a path for critical output, critical output only produced under expected input, all with respect to a bounded time)
+          </comment>
         </g>
 
         <g

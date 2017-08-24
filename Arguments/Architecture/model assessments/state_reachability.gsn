@@ -80,6 +80,18 @@
             name="{State} Reachable">
           There exists a trace for which state {State} is reachable.
 
+          <a
+              id="__gsn__15d32be94c0"
+              name="Assumption">
+            Reachability is only considered at this level with respect to the component in isolation. This means we assume all inputs (as constrained by any component assumptions) are possible. In the larger system, states may not be reachable (i.e., an input may not be globally possible under system constraints).
+
+            <comment
+                id="__gsn__15d32c04106"
+                name="Comment">
+              TODO: where does the argument about system-level reachability come in?
+            </comment>
+          </a>
+
           <s
               id="__gsn__15cf99d9cc8"
               name="Evidence Scheme">

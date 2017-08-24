@@ -31,7 +31,7 @@
     <g
         id="__gsn__15cf9c05961"
         name="AGREE Abstraction Correctness">
-      All AGREE abstractions within {component} correctly abstracts the intended component behavior and characteristics.
+      All AGREE abstractions within {component} correctly abstract the intended component behavior and characteristics.
 
       <c
           id="__gsn__15cf9c31dad"
@@ -42,7 +42,7 @@
       <s
           id="__gsn__15cf9c1cc9e"
           name="Strategy">
-        Argue each abstraction is correct and that the complete set is assessed.
+        Argue each individual abstraction is correct and that the complete set is assessed.
 
         <c
             id="__gsn__15cf9c3b4ef"
@@ -143,11 +143,6 @@
           Types of abstractions include: behavior abstraction, data structure abstraction, AADL abstraction, others?
         </comment>
       </s>
-
-      <comment
-          id="__gsn__15cfb339f75"
-          name="Rodes">
-      </comment>
     </g>
   </gsn>
 </argument>
