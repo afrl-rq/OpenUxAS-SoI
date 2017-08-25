@@ -96,6 +96,7 @@ private:
     std::map<int64_t, std::vector<double_t>> trajectory;
     std::map<int64_t, int32_t> taskStatusResults;
     std::map<int64_t, double_t> taskRobustnessResults;
+    std::map<int32_t, std::vector<std::string>> trajectoryMapping;
     testgeneration::staliro::c_TrajectoryPopulator *staliroTrajectoryPopulator;
 };
 

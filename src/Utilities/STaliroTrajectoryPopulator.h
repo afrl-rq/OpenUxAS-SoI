@@ -32,7 +32,8 @@ namespace testgeneration
             virtual ~c_TrajectoryPopulator(){};
             
             void populateTrajectory(void* receivedLmcpMessage, 
-                    std::map<int64_t, std::vector<double_t>>* trajectory);
+                    std::map<int64_t, std::vector<double_t>>* trajectory,
+                    std::map<int32_t, std::vector<std::string>>* trajectoryMapping);
             void setCameraPixelCount(int64_t vehicleId, 
                     int32_t horizontalPixelCount, 
                     int32_t longitudinalPixelCount);

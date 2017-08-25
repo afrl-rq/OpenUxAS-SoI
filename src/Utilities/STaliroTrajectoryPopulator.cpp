@@ -4,6 +4,11 @@
 #include "afrl/cmasi/CameraState.h"
 #include <cmath>
 
+#define LMCP_NAME_INDEX 0
+#define FILTERING_FIELD_NAME_INDEX 1
+#define FILTERING_FIELD_VALUE_INDEX 2
+#define FIELD_NAME_INDEX 3
+
 namespace testgeneration
 {
     namespace staliro
@@ -11,11 +16,6 @@ namespace testgeneration
         c_TrajectoryPopulator::c_TrajectoryPopulator()
         {
             uxas::common::utilities::CUnitConversions* flatEarth = new uxas::common::utilities::CUnitConversions();
-            nextAvailableStartIndex = 0;
-            sizeOfVehicleTrajectory = 4;
-            // Optionally a more generalizable configuration can be read here.
-            // For the scope of this project, we will hard code which fields of 
-            // which messages will be added to the trajectory.
         }
         
         void c_TrajectoryPopulator::setCameraPixelCount(int64_t vehicleId, 
@@ -60,79 +60,89 @@ namespace testgeneration
             gsd = (gsd_1 < gsd_2) ? gsd_2:gsd_1;
             return gsd;
         }
-
+        
         void c_TrajectoryPopulator::populateTrajectory(
-            void* receivedLmcpMessage, std::map<int64_t, std::vector<double_t>>* trajectory)
+            void* receivedLmcpMessage, 
+                std::map<int64_t, std::vector<double_t>>* trajectory,
+                std::map<int32_t, std::vector<std::string>>* trajectoryMapping)
         {
-            afrl::cmasi::AirVehicleState* airVehicleState = (afrl::cmasi::AirVehicleState*) receivedLmcpMessage;
-            int64_t curTime = airVehicleState->getTime();
-            int64_t vhc_id = airVehicleState->getID();
-            
-            if (vehicleTrajectoryStartIndex.find(vhc_id) == vehicleTrajectoryStartIndex.end())
+            for (auto mappingIter = (*trajectoryMapping).begin(); 
+                    mappingIter != (*trajectoryMapping).end(); 
+                    mappingIter++)
             {
-                vehicleTrajectoryStartIndex[vhc_id] = nextAvailableStartIndex;
-                nextAvailableStartIndex += sizeOfVehicleTrajectory;
-                for (auto iter = (*trajectory).begin(); iter != (*trajectory).end(); iter++)
+                if (((avtas::lmcp::Object *) receivedLmcpMessage)->getLmcpTypeName() == mappingIter->second.at(LMCP_NAME_INDEX))
                 {
-                    for (uint32_t i = iter->second.size(); i < nextAvailableStartIndex; i++)
+                    // Would be perfect to make the following automatically reconfigurable instead of the hard coded behavior for different type of messages.
+                    if (mappingIter->second.at(LMCP_NAME_INDEX) == "AirVehicleState")
                     {
-                        iter->second.push_back(0.0); // Fix the older results.
-                    }
-                }
-                
-                if ( (*trajectory).find(curTime) == (*trajectory).end() )
-                {
-                    for (uint32_t i = 0; i < nextAvailableStartIndex; i++)
-                    {
-                        (*trajectory)[curTime].push_back(0.0);
-                    }
-                }
-            }
-            
-            std::map<int64_t, std::vector<double_t>>::iterator curIter = (*trajectory).find(curTime);
-            
-            if (curIter == (*trajectory).end())
-            {
-                for (uint32_t i = 0; i < nextAvailableStartIndex; i++)
-                {
-                    (*trajectory)[curTime].push_back(0.0);
-                }
-            }
-            
-            double_t curLatitude = airVehicleState->getLocation()->getLatitude();
-            double_t curLongitude = airVehicleState->getLocation()->getLongitude();
-            double_t curAltitude = airVehicleState->getLocation()->getAltitude();
-            std::vector< afrl::cmasi::PayloadState* > payloadStateList = 
-                    airVehicleState->getPayloadStateList();
-
-            double_t cameraFootprintCoords[4][2] = {{0,0}, {0,0}, {0,0}, {0,0}};
-            for (std::vector< afrl::cmasi::PayloadState* >::iterator plIter = payloadStateList.begin(); 
-                    plIter < payloadStateList.end(); 
-                    plIter++)
-            {
-                if ((*plIter)->getLmcpTypeName() == "CameraState")
-                {
-                    std::vector<afrl::cmasi::Location3D*> footprintVector = static_cast<afrl::cmasi::CameraState*>(*plIter)->getFootprint();
-                    int curInd = 0;
-                    for (auto fpIter = footprintVector.begin(); fpIter < footprintVector.end(); fpIter++)
-                    {
-                        if (curInd < 4)
+                        afrl::cmasi::AirVehicleState* airVehicleState = (afrl::cmasi::AirVehicleState*) receivedLmcpMessage;
+                        if (mappingIter->second.at(FILTERING_FIELD_NAME_INDEX) == "ID")
                         {
-                            cameraFootprintCoords[curInd][0] = (*fpIter)->getLatitude();
-                            cameraFootprintCoords[curInd][1] = (*fpIter)->getLongitude();
-                            curInd++;
+                            if (airVehicleState->getID() == std::stoi(mappingIter->second.at(FILTERING_FIELD_VALUE_INDEX)))
+                            {
+                                int64_t curTime = airVehicleState->getTime();
+                                if ( (*trajectory).find(curTime) == (*trajectory).end() )
+                                {
+                                    for (uint32_t i = 0; i < trajectoryMapping->size(); i++)
+                                    {
+                                        (*trajectory)[curTime].push_back(0.0);
+                                    }
+                                }
+                                
+                                // This list has to be extended manually to support more variety of data in the trajectory.
+                                if (mappingIter->second.at(FIELD_NAME_INDEX) == "Location.Location3D.Latitude")
+                                {
+                                    (*trajectory)[curTime][mappingIter->first] = airVehicleState->getLocation()->getLatitude();
+                                }
+                                else if (mappingIter->second.at(FIELD_NAME_INDEX) == "Location.Location3D.Longitude")
+                                {
+                                    (*trajectory)[curTime][mappingIter->first] = airVehicleState->getLocation()->getLongitude();
+                                }
+                                else if (mappingIter->second.at(FIELD_NAME_INDEX) == "Location.Location3D.Altitude")
+                                {
+                                    (*trajectory)[curTime][mappingIter->first] = airVehicleState->getLocation()->getAltitude();
+                                }
+                                else if (mappingIter->second.at(FIELD_NAME_INDEX) == "Airspeed")
+                                {
+                                    (*trajectory)[curTime][mappingIter->first] = airVehicleState->getAirspeed();
+                                }
+                                else if (mappingIter->second.at(FIELD_NAME_INDEX) == "VerticalSpeed")
+                                {
+                                    (*trajectory)[curTime][mappingIter->first] = airVehicleState->getVerticalSpeed();
+                                }
+                                else if (mappingIter->second.at(FIELD_NAME_INDEX) == "gsd")
+                                {
+                                    std::vector< afrl::cmasi::PayloadState* > payloadStateList = airVehicleState->getPayloadStateList();
+
+                                    double_t cameraFootprintCoords[4][2] = {{0,0}, {0,0}, {0,0}, {0,0}};
+                                    for (std::vector< afrl::cmasi::PayloadState* >::iterator plIter = payloadStateList.begin(); 
+                                            plIter < payloadStateList.end(); 
+                                            plIter++)
+                                    {
+                                        if ((*plIter)->getLmcpTypeName() == "CameraState")
+                                        {
+                                            std::vector<afrl::cmasi::Location3D*> footprintVector = static_cast<afrl::cmasi::CameraState*>(*plIter)->getFootprint();
+                                            int curInd = 0;
+                                            for (auto fpIter = footprintVector.begin(); fpIter < footprintVector.end(); fpIter++)
+                                            {
+                                                if (curInd < 4)
+                                                {
+                                                    cameraFootprintCoords[curInd][0] = (*fpIter)->getLatitude();
+                                                    cameraFootprintCoords[curInd][1] = (*fpIter)->getLongitude();
+                                                    curInd++;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    double_t gsd = computeGroundSampleDistance(airVehicleState->getID(), cameraFootprintCoords);
+                                    
+                                    (*trajectory)[curTime][mappingIter->first] = gsd;
+                                }
+                            }
                         }
                     }
                 }
             }
-            double_t gsd = computeGroundSampleDistance(airVehicleState->getID(), cameraFootprintCoords);
-            
-            uint32_t indexStart = vehicleTrajectoryStartIndex[vhc_id];
-
-            (*trajectory)[curTime][indexStart] = curLatitude;
-            (*trajectory)[curTime][indexStart+1] = curLongitude;
-            (*trajectory)[curTime][indexStart+2] = curAltitude;
-            (*trajectory)[curTime][indexStart+3] = gsd;
         }
     }
 }
