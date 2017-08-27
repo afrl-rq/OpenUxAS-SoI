@@ -198,7 +198,7 @@
 <MDM>
     <SeriesName>CMASI</SeriesName>
     <Namespace>afrl/cmasi</Namespace>
-    <Version>3</Version>
+    <Version>4</Version>
 
     <EnumList>
         <!-- Describes wavelength bands -->
