@@ -30,6 +30,8 @@
 #include "uxas/messages/route/RoutePlanResponse.h"
 #include "uxas/messages/route/EgressRouteRequest.h"
 #include "uxas/messages/route/EgressRouteResponse.h"
+#include "uxas/messages/route/RoadPointsRequest.h"
+#include "uxas/messages/route/RoadPointsResponse.h"
 
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -156,42 +158,6 @@ public: //virtual
 
 public:
 
-protected:
-    bool bProcessRoutePlanRequest(const std::shared_ptr<uxas::messages::route::RoutePlanRequest>& routePlanRequest,
-            std::shared_ptr<uxas::messages::route::RoutePlanResponse>& routePlanResponse);
-    bool bProcessEgressRequest(const std::shared_ptr<uxas::messages::route::EgressRouteRequest>& egressRequest,
-            std::shared_ptr<uxas::messages::route::EgressRouteResponse>& egressResponse);
-    bool isBuildRoadGraphWithOsm(const string& osmFile);
-
-    bool isFindShortestRoute(const int64_t& startNodeId, const int64_t& endNodeId,
-            int32_t& pathCost, std::deque<int64_t>& pathNodes);
-    bool isProcessHighwayNodes(const std::unordered_map<int64_t, bool>& nodeIdVs_isPlanningNode,
-            const std::vector<int64_t>& highWayIds);
-    bool isBuildGraph(const std::unordered_set<int64_t>& planningNodeIds, const std::vector<int64_t>& highWayIds);
-    bool isFindClosestNodeId(const n_FrameworkLib::CPosition& position, int64_t& nodeId, double& length_m);
-    bool isExamineCellsInSquare(const n_FrameworkLib::CPosition& position,
-            const int32_t& northStart, const int32_t& northEnd,
-            const int32_t& eastStart, const int32_t& eastEnd,
-            double& candidateLength_m, int64_t& candidateNodeId);
-    bool isExamineCell(const n_FrameworkLib::CPosition& position,
-            const int32_t& north, const int32_t& east,
-            double& candidateLength_m, int64_t& candidateNodeId);
-    void savePythonPlotCode();
-    void findRoadIntersectionsOfCircle(const n_FrameworkLib::CPosition& center, const double& radius_m,
-            std::vector<n_FrameworkLib::CPosition>& intersections);
-public:
-
-    struct s_PlannerParameters
-    {
-        double turnRadius_m = {0};
-    };
-
-    struct s_EdgeIds
-    {
-        std::deque<int64_t> m_nodeIds;
-        int64_t m_highwayId = -1;
-    };
-
     struct PairIdHash
     {
         typedef std::pair<int64_t, int64_t> argument_type;
@@ -205,6 +171,53 @@ public:
             //std::cout << "Hash[" << returnValue << "] s.first[" << s.first << "] s.second[" << s.second << "]" << std::endl;
             return returnValue;
         }
+    };
+
+
+protected:
+    bool bProcessRoutePlanRequest(const std::shared_ptr<uxas::messages::route::RoutePlanRequest>& routePlanRequest,
+            std::shared_ptr<uxas::messages::route::RoutePlanResponse>& routePlanResponse);
+    bool bProcessEgressRequest(const std::shared_ptr<uxas::messages::route::EgressRouteRequest>& egressRequest,
+            std::shared_ptr<uxas::messages::route::EgressRouteResponse>& egressResponse);
+    bool isProcessRoadPointsRequest(const std::shared_ptr<uxas::messages::route::RoadPointsRequest>& roadPointsRequest,
+                                    std::shared_ptr<uxas::messages::route::RoadPointsResponse>& roadPointsResponse);
+    bool isBuildRoadGraphWithOsm(const string& osmFile);
+    bool isFindShortestRoute(const int64_t& startNodeId, const int64_t& endNodeId,
+            int32_t& pathCost, std::deque<int64_t>& pathNodes);
+    bool isProcessHighwayNodes(const std::unordered_map<int64_t, bool>& nodeIdVs_isPlanningNode,
+            const std::vector<int64_t>& highWayIds);
+    bool isBuildGraph(const std::unordered_set<int64_t>& planningNodeIds, const std::vector<int64_t>& highWayIds);
+    bool isFindClosestNodeId(const n_FrameworkLib::CPosition& position,
+                             std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash >& cellVsNodeIds,
+                             int64_t& nodeId, double& length_m);
+    bool isExamineCellsInSquare(const n_FrameworkLib::CPosition& position,
+            const int32_t& northStart, const int32_t& northEnd,
+            const int32_t& eastStart, const int32_t& eastEnd,
+                                std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash >& cellVsNodeIds,
+            double& candidateLength_m, int64_t& candidateNodeId);
+    bool isExamineCell(const n_FrameworkLib::CPosition& position,
+            const int32_t& north, const int32_t& east,
+                       std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash >& cellVsNodeIds,
+            double& candidateLength_m, int64_t& candidateNodeId);
+    void savePythonPlotCode();
+    void findRoadIntersectionsOfCircle(const n_FrameworkLib::CPosition& center, const double& radius_m,
+            std::vector<n_FrameworkLib::CPosition>& intersections);
+
+    bool isGetNodesOnSegment(const std::pair<int64_t, int64_t>& segmentNodeIds,
+                             const int64_t& startNodeId, const int64_t& endNodeId,
+                             const bool& isAddExtraNodeIds,
+                             std::vector<int64_t>& nodeIds);
+public:
+
+    struct s_PlannerParameters
+    {
+        double turnRadius_m = {0};
+    };
+
+    struct s_EdgeIds
+    {
+        std::deque<int64_t> m_nodeIds;
+        int64_t m_highwayId = -1;
     };
 
 
@@ -225,14 +238,16 @@ protected:
     /*! \brief  multimap from map cell to the node in the cell node, used to
       find closest NodeId to a given North/East point. The cell is a north/east
       pair, defined by dividing the North/East values by a cell length factor */
-    std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash > m_cellVsNodeIds;
+    std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash > m_cellVsPlanningNodeIds;
+    std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash > m_cellVsAllNodeIds;
     /*! \brief  used to convert Noth/East to cell Id's */
     int32_t m_PositionToCellFactorNorth_m = 100;
     int32_t m_PositionToCellFactorEast_m = 100;
     int32_t m_northMin_m = 0;
     int32_t m_eastMin_m = 0;
 
-    std::unordered_map<int64_t, std::shared_ptr<afrl::impact::GroundVehicleConfiguration> > m_entityConfigurations;
+    //    std::unordered_map<int64_t, std::shared_ptr<afrl::impact::GroundVehicleConfiguration> > m_entityConfigurations;
+    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_entityConfigurations;
 
     /*! \brief  the name of the openstreetmap file. */
     std::string m_osmFileName;
@@ -260,7 +275,7 @@ protected:
     double m_processPlanTime_s = 0.0;
 
 private:
-
+    bool isBuildFullPlot(const std::vector<int64_t>& highWayIds);
 
 
 
@@ -275,9 +290,7 @@ public:
     manhattan_distance_heuristic(std::shared_ptr<std::unordered_map<int64_t, std::unique_ptr<n_FrameworkLib::CPosition> > >& idVsNode,
             std::shared_ptr<std::unordered_map<int32_t, int64_t> >& planningIndexVsNodeId,
             n_FrameworkLib::CPosition& goalPosition)
-    : m_idVsNode(idVsNode), m_planningIndexVsNodeId(planningIndexVsNodeId), m_goalPosition(goalPosition)
-    {
-    }
+    : m_idVsNode(idVsNode), m_planningIndexVsNodeId(planningIndexVsNodeId), m_goalPosition(goalPosition) { }
 
     int64_t operator()(OsmPlannerService::VertexDescriptor_t v)
     {
@@ -311,9 +324,7 @@ public:
     euclidean_distance_heuristic(std::shared_ptr<std::unordered_map<int64_t, std::unique_ptr<n_FrameworkLib::CPosition> > >& idVsNode,
             std::shared_ptr<std::unordered_map<int32_t, int64_t> >& planningIndexVsNodeId,
             n_FrameworkLib::CPosition& goalPosition)
-    : m_idVsNode(idVsNode), m_planningIndexVsNodeId(planningIndexVsNodeId), m_goalPosition(goalPosition)
-    {
-    }
+    : m_idVsNode(idVsNode), m_planningIndexVsNodeId(planningIndexVsNodeId), m_goalPosition(goalPosition) { }
 
     int64_t operator()(OsmPlannerService::VertexDescriptor_t v)
     {
@@ -348,9 +359,7 @@ class astar_goal_visitor : public boost::default_astar_visitor
 {
 public:
 
-    astar_goal_visitor(OsmPlannerService::VertexDescriptor_t goal) : m_goal(goal)
-    {
-    }
+    astar_goal_visitor(OsmPlannerService::VertexDescriptor_t goal) : m_goal(goal) { }
 
     void examine_vertex(OsmPlannerService::VertexDescriptor_t u, const OsmPlannerService::Graph_t& g)
     {
