@@ -148,6 +148,10 @@ deps += [
   dep_boost,
 ]
 
+if get_option('afrl_internal')
+  deps += deps_internal
+endif
+
 cpp_args = []
 if cpp.get_id() == 'msvc'
   cpp_args += ['/std:c++14']
