@@ -205,6 +205,8 @@ namespace task
     protected:
 
         virtual void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) { };
+        
+        virtual void taskComplete() { };
 
         virtual void buildTaskPlanOptions() = 0;
 

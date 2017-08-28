@@ -241,6 +241,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
             {
                 if (m_activeEntities.find(entityState->getID()) != m_activeEntities.end())
                 {
+                    taskComplete(); // allow task to perform functions required at taskcomplete
                     // was active last state update, send taskcomplete message for this vehicle
                     m_activeEntities.erase(entityState->getID());
                     COUT_INFO_MSG("Sending TaskComplete !!!!")
