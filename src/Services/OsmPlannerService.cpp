@@ -79,8 +79,8 @@ OsmPlannerService::configure(const pugi::xml_node& ndComponent)
     std::string strNewPathName;
     std::stringstream sstrNewDirectoryPrefix;
     sstrNewDirectoryPrefix << STRING_COMPONENT_NAME << "_ID" << std::setfill('0') << std::setw(4) << m_entityId;
-    std::string strComponentPath = strBasePath + "/" + m_entityType + "/";
-    isSuccessful = uxas::common::utilities::c_FileSystemUtilities::bCreateUniqueDirectory(strComponentPath, m_entityType, strNewPathName, sstrErrors);
+    std::string strComponentPath = strBasePath;
+    isSuccessful = uxas::common::utilities::c_FileSystemUtilities::bCreateUniqueDirectory(strComponentPath, std::string("OsmPlot"), strNewPathName, sstrErrors);
     m_strSavePath = strNewPathName;
 
 
