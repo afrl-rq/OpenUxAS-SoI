@@ -184,3 +184,8 @@ executable(
 )
 
 subdir('tests')
+
+if get_option('afrl_internal')
+  subdir('UxAS-afrl_internal/tests')
+endif
+
