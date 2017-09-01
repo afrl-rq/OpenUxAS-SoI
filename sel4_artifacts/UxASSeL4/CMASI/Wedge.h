@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_Wedge_SUB "afrl.cmasi.Wedge"
@@ -11,21 +8,22 @@
 
 #define LMCP_Wedge_TYPE 16
 
-typedef struct {
+struct Wedge_struct {
     lmcp_object super;
 // Units: degree
-    float AzimuthCenterline;
+    uint32_t azimuthcenterline;
 
 // Units: degree
-    float VerticalCenterline;
+    uint32_t verticalcenterline;
 
 // Units: degree
-    float AzimuthExtent;
+    uint32_t azimuthextent;
 
 // Units: degree
-    float VerticalExtent;
+    uint32_t verticalextent;
 
-} Wedge;
+};
+typedef struct Wedge_struct Wedge;
 void lmcp_pp_Wedge(Wedge* s);
 size_t lmcp_packsize_Wedge (Wedge* i);
 size_t lmcp_pack_Wedge_header(uint8_t* buf, Wedge* i);

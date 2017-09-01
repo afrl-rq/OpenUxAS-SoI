@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "KeyValuePair.h"
@@ -13,16 +10,17 @@
 
 #define LMCP_ServiceStatus_TYPE 45
 
-typedef struct {
+struct ServiceStatus_struct {
     lmcp_object super;
-    float PercentComplete;
+    uint32_t percentcomplete;
 
-    KeyValuePair** Info;
-    array_info Info_ai;
+    KeyValuePair** info;
+    array_info info_ai;
 
-    ServiceStatusType StatusType;
+    ServiceStatusType statustype;
 
-} ServiceStatus;
+};
+typedef struct ServiceStatus_struct ServiceStatus;
 void lmcp_pp_ServiceStatus(ServiceStatus* s);
 size_t lmcp_packsize_ServiceStatus (ServiceStatus* i);
 size_t lmcp_pack_ServiceStatus_header(uint8_t* buf, ServiceStatus* i);

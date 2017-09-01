@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "EntityConfiguration.h"
@@ -15,37 +12,38 @@
 
 #define LMCP_AirVehicleConfiguration_TYPE 13
 
-typedef struct {
+struct AirVehicleConfiguration_struct {
     EntityConfiguration super;
 // Units: meter/sec
-    float MinimumSpeed;
+    uint32_t minimumspeed;
 
 // Units: meter/sec
-    float MaximumSpeed;
+    uint32_t maximumspeed;
 
-    FlightProfile* NominalFlightProfile;
+    FlightProfile* nominalflightprofile;
 
 // Units: None
-    FlightProfile** AlternateFlightProfiles;
-    array_info AlternateFlightProfiles_ai;
+    FlightProfile** alternateflightprofiles;
+    array_info alternateflightprofiles_ai;
 
-    LoiterType* AvailableLoiterTypes;
-    array_info AvailableLoiterTypes_ai;
+    LoiterType* availableloitertypes;
+    array_info availableloitertypes_ai;
 
-    TurnType* AvailableTurnTypes;
-    array_info AvailableTurnTypes_ai;
-
-// Units: meter
-    float MinimumAltitude;
-
-    AltitudeType MinAltitudeType;
+    TurnType* availableturntypes;
+    array_info availableturntypes_ai;
 
 // Units: meter
-    float MaximumAltitude;
+    uint32_t minimumaltitude;
 
-    AltitudeType MaxAltitudeType;
+    AltitudeType minaltitudetype;
 
-} AirVehicleConfiguration;
+// Units: meter
+    uint32_t maximumaltitude;
+
+    AltitudeType maxaltitudetype;
+
+};
+typedef struct AirVehicleConfiguration_struct AirVehicleConfiguration;
 void lmcp_pp_AirVehicleConfiguration(AirVehicleConfiguration* s);
 size_t lmcp_packsize_AirVehicleConfiguration (AirVehicleConfiguration* i);
 size_t lmcp_pack_AirVehicleConfiguration_header(uint8_t* buf, AirVehicleConfiguration* i);

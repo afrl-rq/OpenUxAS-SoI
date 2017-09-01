@@ -1,13 +1,17 @@
 #ifndef __MISSIONCOMMANDUTILS_H__
 #define __MISSIONCOMMANDUTILS_H__
-#include "lmcp.h"
 #include <stdbool.h>
+#include "MissionCommand.h"
+
+int lmcp_process_msg(uint8_t** inb, size_t size, lmcp_object **o);
+int lmcp_unpack(uint8_t** inb, size_t size, lmcp_object **o);
+
 
 typedef
 struct {
-  MissionCommand MissionCommand;
-  Waypoint * Waypoints;
-  uint16_t WaypointsLen;
+  MissionCommand missioncommand;
+  Waypoint * waypoints;
+  uint16_t waypointslen;
 
 } MissionCommandExt;
 

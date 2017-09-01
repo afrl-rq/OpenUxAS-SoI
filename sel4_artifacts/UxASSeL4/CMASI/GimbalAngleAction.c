@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "GimbalAngleAction.h"
@@ -9,23 +7,23 @@ void lmcp_pp_GimbalAngleAction(GimbalAngleAction* s) {
     printf("GimbalAngleAction{");
     printf("Inherited from PayloadAction:\n");
     lmcp_pp_PayloadAction(&(s->super));
-    printf("Azimuth: ");
-    printf("%f",s->Azimuth);
+    printf("azimuth: ");
+    printf("%u",s->azimuth);
     printf("\n");
-    printf("Elevation: ");
-    printf("%f",s->Elevation);
+    printf("elevation: ");
+    printf("%u",s->elevation);
     printf("\n");
-    printf("Rotation: ");
-    printf("%f",s->Rotation);
+    printf("rotation: ");
+    printf("%u",s->rotation);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_GimbalAngleAction (GimbalAngleAction* i) {
     size_t out = 0;
     out += lmcp_packsize_PayloadAction(&(i->super));
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     return out;
 }
 size_t lmcp_pack_GimbalAngleAction_header(uint8_t* buf, GimbalAngleAction* i) {
@@ -65,17 +63,17 @@ int lmcp_unpack_GimbalAngleAction(uint8_t** inb, size_t *size_remain, GimbalAngl
     }
     GimbalAngleAction* out = outp;
     CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Azimuth)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Elevation)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Rotation)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->azimuth)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->elevation)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->rotation)))
     return 0;
 }
 size_t lmcp_pack_GimbalAngleAction(uint8_t* buf, GimbalAngleAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_PayloadAction(outb, &(i->super));
-    outb += lmcp_pack_float(outb, i->Azimuth);
-    outb += lmcp_pack_float(outb, i->Elevation);
-    outb += lmcp_pack_float(outb, i->Rotation);
+    outb += lmcp_pack_uint32_t(outb, i->azimuth);
+    outb += lmcp_pack_uint32_t(outb, i->elevation);
+    outb += lmcp_pack_uint32_t(outb, i->rotation);
     return (outb - buf);
 }

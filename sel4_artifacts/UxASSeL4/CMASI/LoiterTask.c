@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "LoiterTask.h"
@@ -10,18 +8,18 @@ void lmcp_pp_LoiterTask(LoiterTask* s) {
     printf("LoiterTask{");
     printf("Inherited from Task:\n");
     lmcp_pp_Task(&(s->super));
-    printf("DesiredAction: ");
-    lmcp_pp_LoiterAction((s->DesiredAction));
+    printf("desiredaction: ");
+    lmcp_pp_LoiterAction((s->desiredaction));
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_LoiterTask (LoiterTask* i) {
     size_t out = 0;
     out += lmcp_packsize_Task(&(i->super));
-    if (i->DesiredAction==NULL) {
+    if (i->desiredaction==NULL) {
         out += 1;
     } else {
-        out += 15 + lmcp_packsize_LoiterAction(i->DesiredAction);
+        out += 15 + lmcp_packsize_LoiterAction(i->desiredaction);
     }
     return out;
 }
@@ -44,8 +42,8 @@ void lmcp_free_LoiterTask(LoiterTask* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_Task(&(out->super), 0);
-    if (out->DesiredAction != NULL) {
-        lmcp_free_LoiterAction(out->DesiredAction, 1);
+    if (out->desiredaction != NULL) {
+        lmcp_free_LoiterAction(out->desiredaction, 1);
     }
     if (out_malloced == 1) {
         free(out);
@@ -71,13 +69,13 @@ int lmcp_unpack_LoiterTask(uint8_t** inb, size_t *size_remain, LoiterTask* outp)
     char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
-        out->DesiredAction = NULL;
+        out->desiredaction = NULL;
     } else if (inb != NULL) {
         CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
         CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
         CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-        lmcp_init_LoiterAction(&(out->DesiredAction));
-        CHECK(lmcp_unpack_LoiterAction(inb, size_remain, (out->DesiredAction)))
+        lmcp_init_LoiterAction(&(out->desiredaction));
+        CHECK(lmcp_unpack_LoiterAction(inb, size_remain, (out->desiredaction)))
     }
     return 0;
 }
@@ -85,7 +83,7 @@ size_t lmcp_pack_LoiterTask(uint8_t* buf, LoiterTask* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_Task(outb, &(i->super));
-    if (i->DesiredAction==NULL) {
+    if (i->desiredaction==NULL) {
         outb += lmcp_pack_uint8_t(outb, 0);
     } else {
         outb += lmcp_pack_uint8_t(outb, 1);
@@ -95,7 +93,7 @@ size_t lmcp_pack_LoiterTask(uint8_t* buf, LoiterTask* i) {
             *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 33);
         outb += lmcp_pack_uint16_t(outb, 3);
-        outb += lmcp_pack_LoiterAction(outb, i->DesiredAction);
+        outb += lmcp_pack_LoiterAction(outb, i->desiredaction);
     }
     return (outb - buf);
 }

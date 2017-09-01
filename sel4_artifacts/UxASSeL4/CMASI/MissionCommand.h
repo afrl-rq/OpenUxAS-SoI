@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleActionCommand.h"
@@ -13,15 +10,16 @@
 
 #define LMCP_MissionCommand_TYPE 36
 
-typedef struct {
+struct MissionCommand_struct {
     VehicleActionCommand super;
 // Units: None
-    Waypoint** WaypointList;
-    array_info WaypointList_ai;
+    Waypoint ** waypointlist;
+    array_info waypointlist_ai;
 
-    int64_t FirstWaypoint;
+    int64_t firstwaypoint;
 
-} MissionCommand;
+};
+typedef struct MissionCommand_struct MissionCommand;
 void lmcp_pp_MissionCommand(MissionCommand* s);
 size_t lmcp_packsize_MissionCommand (MissionCommand* i);
 size_t lmcp_pack_MissionCommand_header(uint8_t* buf, MissionCommand* i);

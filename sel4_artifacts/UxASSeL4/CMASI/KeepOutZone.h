@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AbstractZone.h"
@@ -13,12 +10,13 @@
 
 #define LMCP_KeepOutZone_TYPE 30
 
-typedef struct {
+struct KeepOutZone_struct {
     AbstractZone super;
 // Units: None
-    ZoneAvoidanceType ZoneType;
+    ZoneAvoidanceType zonetype;
 
-} KeepOutZone;
+};
+typedef struct KeepOutZone_struct KeepOutZone;
 void lmcp_pp_KeepOutZone(KeepOutZone* s);
 size_t lmcp_packsize_KeepOutZone (KeepOutZone* i);
 size_t lmcp_pack_KeepOutZone_header(uint8_t* buf, KeepOutZone* i);

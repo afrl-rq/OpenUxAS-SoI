@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VideoStreamAction.h"
@@ -9,11 +7,11 @@ void lmcp_pp_VideoStreamAction(VideoStreamAction* s) {
     printf("VideoStreamAction{");
     printf("Inherited from VehicleAction:\n");
     lmcp_pp_VehicleAction(&(s->super));
-    printf("VideoStreamID: ");
-    printf("%i",s->VideoStreamID);
+    printf("videostreamid: ");
+    printf("%i",s->videostreamid);
     printf("\n");
-    printf("ActiveSensor: ");
-    printf("%i",s->ActiveSensor);
+    printf("activesensor: ");
+    printf("%i",s->activesensor);
     printf("\n");
     printf("}");
 }
@@ -61,15 +59,15 @@ int lmcp_unpack_VideoStreamAction(uint8_t** inb, size_t *size_remain, VideoStrea
     }
     VideoStreamAction* out = outp;
     CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, &(out->VideoStreamID)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, &(out->ActiveSensor)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, &(out->videostreamid)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, &(out->activesensor)))
     return 0;
 }
 size_t lmcp_pack_VideoStreamAction(uint8_t* buf, VideoStreamAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_VehicleAction(outb, &(i->super));
-    outb += lmcp_pack_int32_t(outb, i->VideoStreamID);
-    outb += lmcp_pack_int32_t(outb, i->ActiveSensor);
+    outb += lmcp_pack_int32_t(outb, i->videostreamid);
+    outb += lmcp_pack_int32_t(outb, i->activesensor);
     return (outb - buf);
 }

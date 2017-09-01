@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Waypoint.h"
@@ -13,16 +10,17 @@
 
 #define LMCP_WaypointTransfer_TYPE 59
 
-typedef struct {
+struct WaypointTransfer_struct {
     lmcp_object super;
-    int64_t EntityID;
+    int64_t entityid;
 
-    Waypoint** Waypoints;
-    array_info Waypoints_ai;
+    Waypoint** waypoints;
+    array_info waypoints_ai;
 
-    WaypointTransferMode TransferMode;
+    WaypointTransferMode transfermode;
 
-} WaypointTransfer;
+};
+typedef struct WaypointTransfer_struct WaypointTransfer;
 void lmcp_pp_WaypointTransfer(WaypointTransfer* s);
 size_t lmcp_packsize_WaypointTransfer (WaypointTransfer* i);
 size_t lmcp_pack_WaypointTransfer_header(uint8_t* buf, WaypointTransfer* i);

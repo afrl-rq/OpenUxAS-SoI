@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "WaypointTransfer.h"
@@ -8,18 +6,18 @@
 #include "enums.h"
 void lmcp_pp_WaypointTransfer(WaypointTransfer* s) {
     printf("WaypointTransfer{");
-    printf("EntityID: ");
-    printf("%lld",s->EntityID);
+    printf("entityid: ");
+    printf("%lld",s->entityid);
     printf("\n");
-    printf("Waypoints: ");
+    printf("waypoints: ");
     printf("[");
-    for (uint32_t index = 0; index < s->Waypoints_ai.length; index++) {
-        lmcp_pp_Waypoint((s->Waypoints[index]));
+    for (uint32_t index = 0; index < s->waypoints_ai.length; index++) {
+        lmcp_pp_Waypoint((s->waypoints[index]));
         printf(",");
     }
     printf("\n");
-    printf("TransferMode: ");
-    printf("%i", s->TransferMode);
+    printf("transfermode: ");
+    printf("%i", s->transfermode);
     printf("\n");
     printf("}");
 }
@@ -27,8 +25,8 @@ size_t lmcp_packsize_WaypointTransfer (WaypointTransfer* i) {
     size_t out = 0;
     out += sizeof(int64_t);
     out += 2;
-    for (uint32_t index = 0; index < i->Waypoints_ai.length; index++) {
-        out += 15 + lmcp_packsize_Waypoint(i->Waypoints[index]);
+    for (uint32_t index = 0; index < i->waypoints_ai.length; index++) {
+        out += 15 + lmcp_packsize_Waypoint(i->waypoints[index]);
     }
     out += 4;
     return out;
@@ -51,13 +49,13 @@ size_t lmcp_pack_WaypointTransfer_header(uint8_t* buf, WaypointTransfer* i) {
 void lmcp_free_WaypointTransfer(WaypointTransfer* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->Waypoints != NULL) {
-        for (uint32_t index = 0; index < out->Waypoints_ai.length; index++) {
-            if (out->Waypoints[index] != NULL) {
-                lmcp_free_Waypoint(out->Waypoints[index], 1);
+    if (out->waypoints != NULL) {
+        for (uint32_t index = 0; index < out->waypoints_ai.length; index++) {
+            if (out->waypoints[index] != NULL) {
+                lmcp_free_Waypoint(out->waypoints[index], 1);
             }
         }
-        free(out->Waypoints);
+        free(out->waypoints);
     }
     if (out_malloced == 1) {
         free(out);
@@ -78,40 +76,40 @@ int lmcp_unpack_WaypointTransfer(uint8_t** inb, size_t *size_remain, WaypointTra
     WaypointTransfer* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->EntityID)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->entityid)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->Waypoints = malloc(sizeof(Waypoint*) * tmp);
-    if (out->Waypoints==0) {
+    (out)->waypoints = malloc(sizeof(Waypoint*) * tmp);
+    if (out->waypoints==0) {
         return -1;
     }
-    out->Waypoints_ai.length = tmp;
-    for (uint32_t index = 0; index < out->Waypoints_ai.length; index++) {
+    out->waypoints_ai.length = tmp;
+    for (uint32_t index = 0; index < out->waypoints_ai.length; index++) {
         uint8_t isnull;
         uint32_t objtype;
         uint16_t objseries;
         char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
-            out->Waypoints[index] = NULL;
+            out->waypoints[index] = NULL;
         } else if (inb != NULL) {
             CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
             CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
             CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-            lmcp_init_Waypoint(&(out->Waypoints[index]));
-            CHECK(lmcp_unpack_Waypoint(inb, size_remain, (out->Waypoints[index])))
+            lmcp_init_Waypoint(&(out->waypoints[index]));
+            CHECK(lmcp_unpack_Waypoint(inb, size_remain, (out->waypoints[index])))
         }
     }
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->TransferMode)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->transfermode)))
     return 0;
 }
 size_t lmcp_pack_WaypointTransfer(uint8_t* buf, WaypointTransfer* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_int64_t(outb, i->EntityID);
-    outb += lmcp_pack_uint16_t(outb, i->Waypoints_ai.length);
-    for (uint32_t index = 0; index < i->Waypoints_ai.length; index++) {
-        if (i->Waypoints[index]==NULL) {
+    outb += lmcp_pack_int64_t(outb, i->entityid);
+    outb += lmcp_pack_uint16_t(outb, i->waypoints_ai.length);
+    for (uint32_t index = 0; index < i->waypoints_ai.length; index++) {
+        if (i->waypoints[index]==NULL) {
             outb += lmcp_pack_uint8_t(outb, 0);
         } else {
             outb += lmcp_pack_uint8_t(outb, 1);
@@ -121,9 +119,9 @@ size_t lmcp_pack_WaypointTransfer(uint8_t* buf, WaypointTransfer* i) {
                 *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 35);
             outb += lmcp_pack_uint16_t(outb, 3);
-            outb += lmcp_pack_Waypoint(outb, i->Waypoints[index]);
+            outb += lmcp_pack_Waypoint(outb, i->waypoints[index]);
         }
     }
-    outb += lmcp_pack_int32_t(outb, (int) i->TransferMode);
+    outb += lmcp_pack_int32_t(outb, (int) i->transfermode);
     return (outb - buf);
 }

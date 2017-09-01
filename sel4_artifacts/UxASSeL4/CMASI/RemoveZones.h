@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_RemoveZones_SUB "afrl.cmasi.RemoveZones"
@@ -11,12 +8,13 @@
 
 #define LMCP_RemoveZones_TYPE 52
 
-typedef struct {
+struct RemoveZones_struct {
     lmcp_object super;
-    int64_t* ZoneList;
-    array_info ZoneList_ai;
+    int64_t* zonelist;
+    array_info zonelist_ai;
 
-} RemoveZones;
+};
+typedef struct RemoveZones_struct RemoveZones;
 void lmcp_pp_RemoveZones(RemoveZones* s);
 size_t lmcp_packsize_RemoveZones (RemoveZones* i);
 size_t lmcp_pack_RemoveZones_header(uint8_t* buf, RemoveZones* i);

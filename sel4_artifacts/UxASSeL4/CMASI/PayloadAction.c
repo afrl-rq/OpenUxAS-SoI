@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadAction.h"
@@ -9,8 +7,8 @@ void lmcp_pp_PayloadAction(PayloadAction* s) {
     printf("PayloadAction{");
     printf("Inherited from VehicleAction:\n");
     lmcp_pp_VehicleAction(&(s->super));
-    printf("PayloadID: ");
-    printf("%lld",s->PayloadID);
+    printf("payloadid: ");
+    printf("%lld",s->payloadid);
     printf("\n");
     printf("}");
 }
@@ -57,13 +55,13 @@ int lmcp_unpack_PayloadAction(uint8_t** inb, size_t *size_remain, PayloadAction*
     }
     PayloadAction* out = outp;
     CHECK(lmcp_unpack_VehicleAction(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->PayloadID)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->payloadid)))
     return 0;
 }
 size_t lmcp_pack_PayloadAction(uint8_t* buf, PayloadAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_VehicleAction(outb, &(i->super));
-    outb += lmcp_pack_int64_t(outb, i->PayloadID);
+    outb += lmcp_pack_int64_t(outb, i->payloadid);
     return (outb - buf);
 }

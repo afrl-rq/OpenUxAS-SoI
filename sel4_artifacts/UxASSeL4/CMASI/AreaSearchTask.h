@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "SearchTask.h"
@@ -14,14 +11,15 @@
 
 #define LMCP_AreaSearchTask_TYPE 17
 
-typedef struct {
+struct AreaSearchTask_struct {
     SearchTask super;
-    AbstractGeometry* SearchArea;
+    AbstractGeometry* searcharea;
 
-    Wedge** ViewAngleList;
-    array_info ViewAngleList_ai;
+    Wedge** viewanglelist;
+    array_info viewanglelist_ai;
 
-} AreaSearchTask;
+};
+typedef struct AreaSearchTask_struct AreaSearchTask;
 void lmcp_pp_AreaSearchTask(AreaSearchTask* s);
 size_t lmcp_packsize_AreaSearchTask (AreaSearchTask* i);
 size_t lmcp_pack_AreaSearchTask_header(uint8_t* buf, AreaSearchTask* i);

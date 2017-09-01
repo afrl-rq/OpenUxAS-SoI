@@ -4,78 +4,60 @@
 * Purposes: Implements a number of functions useful for mission               *
 * command manipulation.                                                       *
 *                                                                             *
-* Testing build:  $CC -g -D__MISSIONCOMMANDUTILS_TESTS__ *.c                  *
+* Testing build:                                                              *
+*   $CC -g -I./ -I./common/ -D__MISSIONCOMMANDUTILS_TESTS__ *.c common/*.c    *
 ******************************************************************************/
 
-#include "lmcp.h"
+//#include "lmcp.h"
 #include "MissionCommandUtils.h"
-#include <assert.h>
-#include <string.h>
 #include <stdbool.h>
 
+#define AUTOCORRES
+#ifdef AUTOCORRES
+#define printf(args...) 
+#define assert(x)
+void *memset(void *s, int c, size_t n);
+void *calloc(size_t nmemb, size_t size);
+void free(void * p);
+#else
+#include <assert.h>
+#include <stdlib.h>
+#endif
+
 #define DEBUG(fmt,args...) \
-  printf("%s,%s,%i:"fmt,__FUNCTION__,"MissionCommandUtils.c",__LINE__,##args)
+  printf("%s,%s,%i:"fmt,__FUNCTION__,"MissionCommandMtils.c",__LINE__,##args)
 
 
 void MCEInit(MissionCommandExt * mce, uint16_t waypoints) {
-  memset((uint8_t*)&(mce->MissionCommand),0,sizeof(MissionCommand));
-  mce->MissionCommand.WaypointList = calloc(sizeof(Waypoint*),waypoints);
-  mce->Waypoints = calloc(sizeof(Waypoint),waypoints);
+  memset((uint8_t*)&(mce->missioncommand),0,sizeof(MissionCommand));
+  mce->missioncommand.waypointlist = calloc(sizeof(Waypoint*),waypoints);
+  mce->waypoints = calloc(sizeof(Waypoint),waypoints);
   for(uint16_t i = 0; i < waypoints; i++) {
-    mce->MissionCommand.WaypointList[i] = mce->Waypoints + i;
+    mce->missioncommand.waypointlist[i] = mce->waypoints + i;
   }
-  mce->WaypointsLen = waypoints;
+  mce->waypointslen = waypoints;
 }
 
-/* FindWP: Find a waypoint associated with an id.
-
-     mcp - Pointer to a mission command.
-
-     id - Waypoint identifier to be searched for.
-
-     wpp - Pointer to waypoint where found waypoint will be stored.
-
-     returns - True if the waypoint was found, false otherwise.
-*/
-bool FindWP(const MissionCommand * mcp, const int64_t id, Waypoint ** wpp) {
-  uint16_t i;
-
+Waypoint * FindWP(const MissionCommand * mcp, const int64_t id) {
+  uint32_t i;
   /* assumption: p is not NULL. */
   assert(mcp != NULL);
-  /* assumption: f is not NULL. */
-  assert(wpp != NULL);
 
-  for(i = 0 ; i < mcp->WaypointList_ai.length ; i++) {
-    if(mcp->WaypointList[i]->Number == id) {
-      *wpp = mcp->WaypointList[i];
-      return true;
+  for(i = 0 ; i < mcp->waypointlist_ai.length; i++) {
+    if(mcp->waypointlist[i]->number == id) {
+      return mcp->waypointlist[i];
     }
   }
-
-  return false;
+  return NULL;
 }
 
-/* MCWaypointSubSequence: Create a new mission command from a prefix of the
-   waypoints of another mission command.
-
-     omcp - The mission command whose prefix waypoints will be
-     used to build a new mission command.
-
-     id - The waypoint id to start the prefix from.
-
-     len - The length of the prefix.
-
-     new_mc_ptr - The mission command that will stored the prefix
-     version of mc_orig_ptr.
-
-*/
 bool MCWaypointSubSequence(const MissionCommand * omcp,
               const int64_t id,
               const uint16_t len,
               MissionCommandExt * wmcep) {
   MissionCommand * wmcp = (MissionCommand*)wmcep;
   uint16_t i;
-  Waypoint * wp = NULL;
+  Waypoint * wp;
   int64_t idit = id;
 
   /* assumption: omcp is not NULL. */
@@ -84,7 +66,8 @@ bool MCWaypointSubSequence(const MissionCommand * omcp,
   assert(wmcp != NULL);
 
   /* Ensure that a bad id was not provided. */
-  if(FindWP(omcp, idit, &wp) != true) {
+  wp = FindWP(omcp, idit);
+  if(wp == NULL) {
     DEBUG("Waypoint %ld not found.\n",id);
     return false;
   }
@@ -94,49 +77,29 @@ bool MCWaypointSubSequence(const MissionCommand * omcp,
     return false;
   }
 
-  Waypoint ** tmp = wmcp->WaypointList;
+  Waypoint ** tmp = wmcp->waypointlist;
   *wmcp = *omcp;
-  wmcp->WaypointList = tmp;
+  wmcp->waypointlist = tmp;
   
   for(i=0; i<len ; i++) {
 
     /* assumption: all ids in the waypoint list can be found. */
-    assert(FindWP(omcp,idit,&wp) == true);
-
-    wmcep->Waypoints[i] = *wp;
-    if(wp->Number == wp->NextWaypoint) {
+    wp = FindWP(omcp, idit);
+    assert(wp != NULL);
+    wmcep->waypoints[i] = *wp;
+    if(wp->number == wp->nextwaypoint) {
       i++;
       break;
     }
-    idit = wp->NextWaypoint;
+    idit = wp->nextwaypoint;
   }
   
-  wmcp->WaypointList_ai.length = i;
-  wmcp->WaypointList[i - 1]->NextWaypoint = wmcp->WaypointList[i - 1]->Number;
-  wmcp->FirstWaypoint = id;
+  wmcp->waypointlist_ai.length = i;
+  wmcp->waypointlist[i - 1]->nextwaypoint = wmcp->waypointlist[i - 1]->number;
+  wmcp->firstwaypoint = id;
   return true;
 }
 
-/* GetMCWaypointSubSequence: Get a mission command prefix if the waypoint being
-   approached by the platform is half way through the previous mission
-   command prefix which was assumed to be sent.
-
-     omcp - The mission command whose prefix waypoints will be
-     used to build a new mission command.
-
-     last_prefix_start_id - The starting waypoint id of the last
-     prefix sent to the auto-pilot.
-
-     ap_wp - The waypoint the auto-pilot is currently heading towards.
-
-     len - The len of the new prefix.
-
-     wmcp - The storage place of the new prefix mission command.
-
-     returns - True if a new prefix mission command was selected,
-     false otherwise.
-
- */
 bool GetMCWaypointSubSequence(const MissionCommand * omcp,
                  const int64_t last_prefix_start_id,
                  const int64_t ap_id,
@@ -154,12 +117,14 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
   assert(wmcep != NULL);
 
   /* Ensure that a bad last_prefix_start_id was not provided. */
-  if(FindWP(omcp, it_id, &wp) != true) {
+  wp = FindWP(omcp, it_id);
+  if(wp == NULL) {
     return false;
   }
 
   /* Ensure that a bad ap_id was not provided. */
-  if(FindWP(omcp, ap_id, &wp) != true) {
+  wp = FindWP(omcp, ap_id);
+  if(wp == NULL) {
     return false;
   }
 
@@ -174,39 +139,42 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
   last_visited_id = it_id;
   for(i = 0; i < len/2 ; i++) {
 
+
+    wp = FindWP(omcp,it_id);
     /* assumption: all ids in the waypoint list can be found. */
-    assert(FindWP(omcp,it_id,&wp) == true);
+    assert(wp != NULL);
 
     /* If we have found the end or found the nextwp then there is no
        update to be sent to the auto-pilot. */
-    if(wp->Number == wp->NextWaypoint || wp->Number == ap_id) {
+    if(wp->number == wp->nextwaypoint || wp->number == ap_id) {
       return false;
     }
 
     last_visited_id = it_id;
-    it_id = wp->NextWaypoint;
+    it_id = wp->nextwaypoint;
   }
 
   // XXX: Assume if we got a waypoint out somewhere in the entire list
   // we will just pick up from there.
-  for( ; i < omcp->WaypointList_ai.length; i++) {
+  for( ; i < omcp->waypointlist_ai.length; i++) {
 
     /* assumption: all ids in the waypoint list can be found. */
-    assert(FindWP(omcp, it_id, &wp) == true );
+    wp = FindWP(omcp,it_id);
+    assert(wp != NULL );
 
     /* If we have found the end or found the nextwp then there is no
        update to be sent to the auto-pilot. */
-    if(wp->Number == wp->NextWaypoint) {
+    if(wp->number == wp->nextwaypoint) {
       return false;
     }
 
-    if( wp->Number == ap_id ) {
-      bool flag = MCWaypointSubSequence(omcp, last_visited_id, len, wmcep);
-      wmcep->MissionCommand.FirstWaypoint = ap_id;
+    if( wp->number == ap_id ) {
+      bool flag = MCWaypointSubSequence(omcp, it_id, len, wmcep);
+      wmcep->missioncommand.firstwaypoint = ap_id;
       return flag;
     }
     last_visited_id = it_id;
-    it_id = wp->NextWaypoint;
+    it_id = wp->nextwaypoint;
   }
 
   /* assumption: Control flow should never get here. */
@@ -216,21 +184,23 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
 
 #ifdef __MISSIONCOMMANDUTILS_TESTS__
 
-#define RETURNONFAIL(X)                                                 \
-  if((X) != true) {                                                     \
-    fprintf(stderr,"(%s:%u) Test failed.\n",__FILE__,__LINE__);         \
-    return false;                                                       \
+#include <stdio.h>
+
+#define RETURNONFAIL(X)                                 \
+  if((X) != true) {                                     \
+    printf("(%s:%u) Test failed.\n",__FILE__,__LINE__); \
+    return false;                                       \
   }
 
-#define TEST(X) \
-  {                                                                   \
-    bool flag;                                                        \
-    fprintf(stdout,"%s ",#X);                                         \
-    flag = X();                                                       \
-    fprintf(stdout, "%s\n", flag == true ? " Passed." : " Failed.");  \
+#define TEST(X)                                             \
+  {                                                         \
+    bool flag;                                              \
+    printf("%s ",#X);                                       \
+    flag = X();                                             \
+    printf("%s\n", flag == true ? " Passed." : " Failed."); \
   }
 
-/* MissionCommandFromFile: Deserialize a mission command reading from a
+/* missioncommandFromFile: Deserialize a mission command reading from a
    file.
 
      f - The file to read the mission command from.
@@ -238,7 +208,7 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
      mcp - The mission command to be populated from the serialized data.
 
 */
-void MissionCommandFromFile(FILE * f, MissionCommand ** mcpp) {
+void missioncommandFromFile(FILE * f, MissionCommand ** mcpp) {
 
     uint8_t * source = NULL;
     uint8_t * orig_source = NULL;
@@ -266,15 +236,15 @@ void MissionCommandFromFile(FILE * f, MissionCommand ** mcpp) {
         }
 
         /* Read the entire file into memory. */
-        size_t newLen = fread(source, sizeof(char), size, f);
+        size_t newlen = fread(source, sizeof(char), size, f);
         if ( ferror( f ) != 0 ) {
             fputs("Error reading file", stderr);
         } else {
-            source[newLen++] = '\0'; /* Just to be safe. */
+            source[newlen++] = '\0'; /* Just to be safe. */
         }
 
         assert(lmcp_process_msg(&source,size,(lmcp_object**)mcpp) != -1);
-        lmcp_pp(*mcpp);
+        //lmcp_pp(*mcpp);
         free(orig_source);
         source = NULL;
         orig_source = NULL;
@@ -288,78 +258,82 @@ bool CheckMCWaypointSubSequence(const MissionCommand * omcp,
                                 const MissionCommand * smcp,
                                 const int64_t start_waypoint_id,
                                 const uint16_t sslen) {
-  Waypoint * owpp;
-  Waypoint * swpp;
+  Waypoint * owp;
+  Waypoint * swp;
   Waypoint twp;
   int64_t it_id = start_waypoint_id;
 
   /* Certain parts of a mission command subsequence should not change. */
-  RETURNONFAIL(omcp->super.CommandID == smcp->super.CommandID);
-  RETURNONFAIL(omcp->super.VehicleID == smcp->super.VehicleID);
-  RETURNONFAIL(omcp->super.VehicleActionList_ai.length
-               == smcp->super.VehicleActionList_ai.length);
-  for(uint16_t i = 0 ; i < smcp->super.VehicleActionList_ai.length ; i ++) {
-    RETURNONFAIL(omcp->super.VehicleActionList[i] == smcp->super.VehicleActionList[i]);
+  RETURNONFAIL(omcp->super.commandid == smcp->super.commandid);
+  RETURNONFAIL(omcp->super.vehicleid == smcp->super.vehicleid);
+  RETURNONFAIL(omcp->super.vehicleactionlist_ai.length
+               == smcp->super.vehicleactionlist_ai.length);
+  for(uint16_t i = 0 ; i < smcp->super.vehicleactionlist_ai.length ; i ++) {
+    RETURNONFAIL(omcp->super.vehicleactionlist[i] == smcp->super.vehicleactionlist[i]);
   }
   
   /* A subsequence could be shorter. */
-  RETURNONFAIL(smcp->super.VehicleActionList_ai.length <= sslen );
+  RETURNONFAIL(smcp->super.vehicleactionlist_ai.length <= sslen );
 
   /* The starting point we provided to the subsequence should be its
      starting point. */
-  RETURNONFAIL(start_waypoint_id == smcp->FirstWaypoint);
+  RETURNONFAIL(start_waypoint_id == smcp->firstwaypoint);
 
   /* Check that all non-last waypoints are identical up to the
      subsequence size. */
   uint16_t i = 0;
-  for(; i < smcp->WaypointList_ai.length - 1; i++) {
-    RETURNONFAIL(FindWP(omcp, it_id, &owpp));
-    RETURNONFAIL(FindWP(smcp, it_id, &swpp));
-    RETURNONFAIL(owpp->super.Latitude == smcp->WaypointList[i]->super.Latitude);
-    RETURNONFAIL(owpp->super.Longitude == smcp->WaypointList[i]->super.Longitude);
-    RETURNONFAIL(owpp->super.Altitude == smcp->WaypointList[i]->super.Altitude);
-    RETURNONFAIL(owpp->super.AltitudeType == smcp->WaypointList[i]->super.AltitudeType);
-    RETURNONFAIL(owpp->Number == smcp->WaypointList[i]->Number);
-    RETURNONFAIL(owpp->NextWaypoint == smcp->WaypointList[i]->NextWaypoint);
-    RETURNONFAIL(owpp->Speed == smcp->WaypointList[i]->Speed);
-    RETURNONFAIL(owpp->SpeedType == smcp->WaypointList[i]->SpeedType);
-    RETURNONFAIL(owpp->ClimbRate == smcp->WaypointList[i]->ClimbRate);
-    RETURNONFAIL(owpp->TurnType == smcp->WaypointList[i]->TurnType);
-    RETURNONFAIL(owpp->VehicleActionList == smcp->WaypointList[i]->VehicleActionList);
-    RETURNONFAIL(owpp->VehicleActionList_ai.length == smcp->WaypointList[i]->VehicleActionList_ai.length);
-    RETURNONFAIL(owpp->ContingencyWaypointA == smcp->WaypointList[i]->ContingencyWaypointA);
-    RETURNONFAIL(owpp->ContingencyWaypointB == smcp->WaypointList[i]->ContingencyWaypointB);
-    RETURNONFAIL(owpp->AssociatedTasks == smcp->WaypointList[i]->AssociatedTasks);
-    RETURNONFAIL(owpp->AssociatedTasks_ai.length == smcp->WaypointList[i]->AssociatedTasks_ai.length);
-    it_id = swpp->NextWaypoint;
+  for(; i < smcp->waypointlist_ai.length - 1; i++) {
+    owp = FindWP(omcp,it_id);
+    RETURNONFAIL(owp != NULL);
+    swp = FindWP(smcp,it_id);
+    RETURNONFAIL(swp != NULL);
+    RETURNONFAIL(owp->super.latitude == smcp->waypointlist[i]->super.latitude);
+    RETURNONFAIL(owp->super.longitude == smcp->waypointlist[i]->super.longitude);
+    RETURNONFAIL(owp->super.altitude == smcp->waypointlist[i]->super.altitude);
+    RETURNONFAIL(owp->super.altitudetype == smcp->waypointlist[i]->super.altitudetype);
+    RETURNONFAIL(owp->number == smcp->waypointlist[i]->number);
+    RETURNONFAIL(owp->nextwaypoint == smcp->waypointlist[i]->nextwaypoint);
+    RETURNONFAIL(owp->speed == smcp->waypointlist[i]->speed);
+    RETURNONFAIL(owp->speedtype == smcp->waypointlist[i]->speedtype);
+    RETURNONFAIL(owp->climbrate == smcp->waypointlist[i]->climbrate);
+    RETURNONFAIL(owp->turntype == smcp->waypointlist[i]->turntype);
+    RETURNONFAIL(owp->vehicleactionlist == smcp->waypointlist[i]->vehicleactionlist);
+    RETURNONFAIL(owp->vehicleactionlist_ai.length == smcp->waypointlist[i]->vehicleactionlist_ai.length);
+    RETURNONFAIL(owp->contingencywaypointa == smcp->waypointlist[i]->contingencywaypointa);
+    RETURNONFAIL(owp->contingencywaypointb == smcp->waypointlist[i]->contingencywaypointb);
+    RETURNONFAIL(owp->associatedtasks == smcp->waypointlist[i]->associatedtasks);
+    RETURNONFAIL(owp->associatedtasks_ai.length == smcp->waypointlist[i]->associatedtasks_ai.length);
+    it_id = swp->nextwaypoint;
   }
   
   /* Check that the last waypoint is identical and that its nxid
      points to itself. */
-  RETURNONFAIL(FindWP(omcp, it_id, &owpp));
-  RETURNONFAIL(FindWP(smcp, it_id, &swpp));
-  RETURNONFAIL(owpp->super.Latitude == smcp->WaypointList[i]->super.Latitude);
-  RETURNONFAIL(owpp->super.Longitude == smcp->WaypointList[i]->super.Longitude);
-  RETURNONFAIL(owpp->super.Altitude == smcp->WaypointList[i]->super.Altitude);
-  RETURNONFAIL(owpp->super.AltitudeType == smcp->WaypointList[i]->super.AltitudeType);
-  RETURNONFAIL(owpp->Number == smcp->WaypointList[i]->Number);
-  RETURNONFAIL(owpp->Speed == smcp->WaypointList[i]->Speed);
-  RETURNONFAIL(owpp->SpeedType == smcp->WaypointList[i]->SpeedType);
-  RETURNONFAIL(owpp->ClimbRate == smcp->WaypointList[i]->ClimbRate);
-  RETURNONFAIL(owpp->TurnType == smcp->WaypointList[i]->TurnType);
-  RETURNONFAIL(owpp->VehicleActionList == smcp->WaypointList[i]->VehicleActionList);
-  RETURNONFAIL(owpp->VehicleActionList_ai.length == smcp->WaypointList[i]->VehicleActionList_ai.length);
-  RETURNONFAIL(owpp->ContingencyWaypointA == smcp->WaypointList[i]->ContingencyWaypointA);
-  RETURNONFAIL(owpp->ContingencyWaypointB == smcp->WaypointList[i]->ContingencyWaypointB);
-  RETURNONFAIL(owpp->AssociatedTasks == smcp->WaypointList[i]->AssociatedTasks);
-  RETURNONFAIL(owpp->AssociatedTasks_ai.length == smcp->WaypointList[i]->AssociatedTasks_ai.length);
+  owp = FindWP(omcp,it_id);
+  RETURNONFAIL(owp != NULL);
+  swp = FindWP(smcp,it_id);
+  RETURNONFAIL(swp != NULL);
+  RETURNONFAIL(owp->super.latitude == smcp->waypointlist[i]->super.latitude);
+  RETURNONFAIL(owp->super.longitude == smcp->waypointlist[i]->super.longitude);
+  RETURNONFAIL(owp->super.altitude == smcp->waypointlist[i]->super.altitude);
+  RETURNONFAIL(owp->super.altitudetype == smcp->waypointlist[i]->super.altitudetype);
+  RETURNONFAIL(owp->number == smcp->waypointlist[i]->number);
+  RETURNONFAIL(owp->speed == smcp->waypointlist[i]->speed);
+  RETURNONFAIL(owp->speedtype == smcp->waypointlist[i]->speedtype);
+  RETURNONFAIL(owp->climbrate == smcp->waypointlist[i]->climbrate);
+  RETURNONFAIL(owp->turntype == smcp->waypointlist[i]->turntype);
+  RETURNONFAIL(owp->vehicleactionlist == smcp->waypointlist[i]->vehicleactionlist);
+  RETURNONFAIL(owp->vehicleactionlist_ai.length == smcp->waypointlist[i]->vehicleactionlist_ai.length);
+  RETURNONFAIL(owp->contingencywaypointa == smcp->waypointlist[i]->contingencywaypointa);
+  RETURNONFAIL(owp->contingencywaypointb == smcp->waypointlist[i]->contingencywaypointb);
+  RETURNONFAIL(owp->associatedtasks == smcp->waypointlist[i]->associatedtasks);
+  RETURNONFAIL(owp->associatedtasks_ai.length == smcp->waypointlist[i]->associatedtasks_ai.length);
   return true;
 }
 
 
 bool ExhaustiveTest(MissionCommand * omcp) {
   Waypoint * wp = NULL;
-  uint64_t total_tests = (omcp->WaypointList_ai.length*(omcp->WaypointList_ai.length+1))/2;
+  uint64_t total_tests = (omcp->waypointlist_ai.length*(omcp->waypointlist_ai.length+1))/2;
   uint64_t ten_percent = total_tests/10;
   uint64_t tests_completed = 0;
   MissionCommandExt smce = {};
@@ -367,25 +341,26 @@ bool ExhaustiveTest(MissionCommand * omcp) {
 
   /* For each subsequence length less than or equal to the total
      number of waypoints. */
-  for(uint16_t i = 2 ; i <= omcp->WaypointList_ai.length ; i++) {
-    int64_t last_subseq_id = omcp->FirstWaypoint;
+  for(uint16_t i = 2 ; i <= omcp->waypointlist_ai.length ; i++) {
+    int64_t last_subseq_id = omcp->firstwaypoint;
     MCEInit(&smce,i);
 
     for(uint16_t j = 1 ; j < i ; j++) {
       RETURNONFAIL(MCWaypointSubSequence(omcp,
-                                         omcp->FirstWaypoint,
+                                         omcp->firstwaypoint,
                                          i,
                                          & smce));
       RETURNONFAIL(CheckMCWaypointSubSequence(omcp,
                                               smcp,
-                                              omcp->FirstWaypoint,
+                                              omcp->firstwaypoint,
                                               i));
 
-      last_subseq_id = omcp->FirstWaypoint;
-      RETURNONFAIL(FindWP(omcp, last_subseq_id, &wp));
+      last_subseq_id = omcp->firstwaypoint;
+      wp = FindWP(omcp,last_subseq_id);
+      RETURNONFAIL(wp != NULL);
       RETURNONFAIL(GetMCWaypointSubSequence(omcp,
                                             last_subseq_id,
-                                            wp->Number,
+                                            wp->number,
                                             i,
                                             &smce) != true);
 
@@ -394,19 +369,20 @@ bool ExhaustiveTest(MissionCommand * omcp) {
       for(uint16_t k = 0 ; k < j ; k++) {
         n++;
         c++;
-        RETURNONFAIL(FindWP(omcp, wp->NextWaypoint, &wp));
+        wp = FindWP(omcp,wp->nextwaypoint);
+        RETURNONFAIL(wp != NULL);
       }
-      while(wp->Number != wp->NextWaypoint) {
+      while(wp->number != wp->nextwaypoint) {
         bool flag = GetMCWaypointSubSequence(omcp,
                                              last_subseq_id,
-                                             wp->Number,
+                                             wp->number,
                                              i,
                                              &smce);
         if(n < i/2) {
           RETURNONFAIL(flag != true);
         } else  {
           n = 0;
-          last_subseq_id = wp->Number;
+          last_subseq_id = wp->number;
           RETURNONFAIL(flag == true);
           RETURNONFAIL(CheckMCWaypointSubSequence(omcp,
                                                   smcp,
@@ -416,7 +392,8 @@ bool ExhaustiveTest(MissionCommand * omcp) {
         for(uint16_t k = 0 ; k < j ; k++) {
           c++;
           n++;
-          RETURNONFAIL(FindWP(omcp, wp->NextWaypoint, &wp));
+          wp = FindWP(omcp,wp->nextwaypoint);
+          RETURNONFAIL(wp != NULL);
         }
       }
       tests_completed++;
@@ -426,10 +403,10 @@ bool ExhaustiveTest(MissionCommand * omcp) {
         fflush(stdout);
       }
     }
-    free(smce.Waypoints);
-    smce.Waypoints = NULL;
-    free(smce.MissionCommand.WaypointList);
-    smce.MissionCommand.WaypointList = NULL;
+    free(smce.waypoints);
+    smce.waypoints = NULL;
+    free(smce.missioncommand.waypointlist);
+    smce.missioncommand.waypointlist = NULL;
   }  
   return true;
 }
@@ -442,7 +419,7 @@ bool WaterwaysTestFromFile() {
     /* Load waterways data. */
     f = fopen("./testdata/waterways.mc","r");
     RETURNONFAIL(f != NULL);
-    MissionCommandFromFile(f, &omcp);
+    missioncommandFromFile(f, &omcp);
     fclose(f);
 
     ExhaustiveTest(omcp);

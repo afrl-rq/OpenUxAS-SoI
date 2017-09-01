@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AbstractZone.h"
@@ -12,25 +9,26 @@
 
 #define LMCP_WeatherReport_TYPE 55
 
-typedef struct {
+struct WeatherReport_struct {
     lmcp_object super;
-    AbstractZone* Area;
+    AbstractZone* area;
 
 // Units: meter/sec
-    float WindSpeed;
+    uint32_t windspeed;
 
 // Units: degree
-    float WindDirection;
+    uint32_t winddirection;
 
 // Units: meter
-    float Visibility;
+    uint32_t visibility;
 
 // Units: meter
-    float CloudCeiling;
+    uint32_t cloudceiling;
 
-    float CloudCoverage;
+    uint32_t cloudcoverage;
 
-} WeatherReport;
+};
+typedef struct WeatherReport_struct WeatherReport;
 void lmcp_pp_WeatherReport(WeatherReport* s);
 size_t lmcp_packsize_WeatherReport (WeatherReport* i);
 size_t lmcp_pack_WeatherReport_header(uint8_t* buf, WeatherReport* i);

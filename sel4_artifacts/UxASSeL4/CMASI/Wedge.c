@@ -1,31 +1,29 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Wedge.h"
 void lmcp_pp_Wedge(Wedge* s) {
     printf("Wedge{");
-    printf("AzimuthCenterline: ");
-    printf("%f",s->AzimuthCenterline);
+    printf("azimuthcenterline: ");
+    printf("%u",s->azimuthcenterline);
     printf("\n");
-    printf("VerticalCenterline: ");
-    printf("%f",s->VerticalCenterline);
+    printf("verticalcenterline: ");
+    printf("%u",s->verticalcenterline);
     printf("\n");
-    printf("AzimuthExtent: ");
-    printf("%f",s->AzimuthExtent);
+    printf("azimuthextent: ");
+    printf("%u",s->azimuthextent);
     printf("\n");
-    printf("VerticalExtent: ");
-    printf("%f",s->VerticalExtent);
+    printf("verticalextent: ");
+    printf("%u",s->verticalextent);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_Wedge (Wedge* i) {
     size_t out = 0;
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     return out;
 }
 size_t lmcp_pack_Wedge_header(uint8_t* buf, Wedge* i) {
@@ -63,18 +61,18 @@ int lmcp_unpack_Wedge(uint8_t** inb, size_t *size_remain, Wedge* outp) {
         return -1;
     }
     Wedge* out = outp;
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->AzimuthCenterline)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->VerticalCenterline)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->AzimuthExtent)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->VerticalExtent)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->azimuthcenterline)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->verticalcenterline)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->azimuthextent)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->verticalextent)))
     return 0;
 }
 size_t lmcp_pack_Wedge(uint8_t* buf, Wedge* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_float(outb, i->AzimuthCenterline);
-    outb += lmcp_pack_float(outb, i->VerticalCenterline);
-    outb += lmcp_pack_float(outb, i->AzimuthExtent);
-    outb += lmcp_pack_float(outb, i->VerticalExtent);
+    outb += lmcp_pack_uint32_t(outb, i->azimuthcenterline);
+    outb += lmcp_pack_uint32_t(outb, i->verticalcenterline);
+    outb += lmcp_pack_uint32_t(outb, i->azimuthextent);
+    outb += lmcp_pack_uint32_t(outb, i->verticalextent);
     return (outb - buf);
 }

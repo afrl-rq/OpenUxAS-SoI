@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AbstractGeometry.h"
@@ -13,12 +10,13 @@
 
 #define LMCP_Polygon_TYPE 42
 
-typedef struct {
+struct Polygon_struct {
     AbstractGeometry super;
-    Location3D** BoundaryPoints;
-    array_info BoundaryPoints_ai;
+    Location3D** boundarypoints;
+    array_info boundarypoints_ai;
 
-} Polygon;
+};
+typedef struct Polygon_struct Polygon;
 void lmcp_pp_Polygon(Polygon* s);
 size_t lmcp_packsize_Polygon (Polygon* i);
 size_t lmcp_pack_Polygon_header(uint8_t* buf, Polygon* i);

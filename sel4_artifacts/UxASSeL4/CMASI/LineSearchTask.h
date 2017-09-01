@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "SearchTask.h"
@@ -14,17 +11,18 @@
 
 #define LMCP_LineSearchTask_TYPE 31
 
-typedef struct {
+struct LineSearchTask_struct {
     SearchTask super;
-    Location3D** PointList;
-    array_info PointList_ai;
+    Location3D** pointlist;
+    array_info pointlist_ai;
 
-    Wedge** ViewAngleList;
-    array_info ViewAngleList_ai;
+    Wedge** viewanglelist;
+    array_info viewanglelist_ai;
 
-    uint8_t UseInertialViewAngles;
+    uint8_t useinertialviewangles;
 
-} LineSearchTask;
+};
+typedef struct LineSearchTask_struct LineSearchTask;
 void lmcp_pp_LineSearchTask(LineSearchTask* s);
 size_t lmcp_packsize_LineSearchTask (LineSearchTask* i);
 size_t lmcp_pack_LineSearchTask_header(uint8_t* buf, LineSearchTask* i);

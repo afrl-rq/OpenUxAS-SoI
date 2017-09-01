@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "GimbalStareAction.h"
@@ -10,21 +8,21 @@ void lmcp_pp_GimbalStareAction(GimbalStareAction* s) {
     printf("GimbalStareAction{");
     printf("Inherited from PayloadAction:\n");
     lmcp_pp_PayloadAction(&(s->super));
-    printf("Starepoint: ");
-    lmcp_pp_Location3D((s->Starepoint));
+    printf("starepoint: ");
+    lmcp_pp_Location3D((s->starepoint));
     printf("\n");
-    printf("Duration: ");
-    printf("%lld",s->Duration);
+    printf("duration: ");
+    printf("%lld",s->duration);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_GimbalStareAction (GimbalStareAction* i) {
     size_t out = 0;
     out += lmcp_packsize_PayloadAction(&(i->super));
-    if (i->Starepoint==NULL) {
+    if (i->starepoint==NULL) {
         out += 1;
     } else {
-        out += 15 + lmcp_packsize_Location3D(i->Starepoint);
+        out += 15 + lmcp_packsize_Location3D(i->starepoint);
     }
     out += sizeof(int64_t);
     return out;
@@ -48,8 +46,8 @@ void lmcp_free_GimbalStareAction(GimbalStareAction* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_PayloadAction(&(out->super), 0);
-    if (out->Starepoint != NULL) {
-        lmcp_free_Location3D(out->Starepoint, 1);
+    if (out->starepoint != NULL) {
+        lmcp_free_Location3D(out->starepoint, 1);
     }
     if (out_malloced == 1) {
         free(out);
@@ -75,22 +73,22 @@ int lmcp_unpack_GimbalStareAction(uint8_t** inb, size_t *size_remain, GimbalStar
     char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
-        out->Starepoint = NULL;
+        out->starepoint = NULL;
     } else if (inb != NULL) {
         CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
         CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
         CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-        lmcp_init_Location3D(&(out->Starepoint));
-        CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->Starepoint)))
+        lmcp_init_Location3D(&(out->starepoint));
+        CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->starepoint)))
     }
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->Duration)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->duration)))
     return 0;
 }
 size_t lmcp_pack_GimbalStareAction(uint8_t* buf, GimbalStareAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_PayloadAction(outb, &(i->super));
-    if (i->Starepoint==NULL) {
+    if (i->starepoint==NULL) {
         outb += lmcp_pack_uint8_t(outb, 0);
     } else {
         outb += lmcp_pack_uint8_t(outb, 1);
@@ -100,8 +98,8 @@ size_t lmcp_pack_GimbalStareAction(uint8_t* buf, GimbalStareAction* i) {
             *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 3);
         outb += lmcp_pack_uint16_t(outb, 3);
-        outb += lmcp_pack_Location3D(outb, i->Starepoint);
+        outb += lmcp_pack_Location3D(outb, i->starepoint);
     }
-    outb += lmcp_pack_int64_t(outb, i->Duration);
+    outb += lmcp_pack_int64_t(outb, i->duration);
     return (outb - buf);
 }

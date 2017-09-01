@@ -1,15 +1,13 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "RemoveTasks.h"
 void lmcp_pp_RemoveTasks(RemoveTasks* s) {
     printf("RemoveTasks{");
-    printf("TaskList: ");
+    printf("tasklist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->TaskList_ai.length; index++) {
-        printf("%lld",s->TaskList[index]);
+    for (uint32_t index = 0; index < s->tasklist_ai.length; index++) {
+        printf("%lld",s->tasklist[index]);
         printf(",");
     }
     printf("\n");
@@ -18,7 +16,7 @@ void lmcp_pp_RemoveTasks(RemoveTasks* s) {
 size_t lmcp_packsize_RemoveTasks (RemoveTasks* i) {
     size_t out = 0;
     out += 2;
-    for (uint32_t index = 0; index < i->TaskList_ai.length; index++) {
+    for (uint32_t index = 0; index < i->tasklist_ai.length; index++) {
         out += sizeof(int64_t);
     }
     return out;
@@ -41,8 +39,8 @@ size_t lmcp_pack_RemoveTasks_header(uint8_t* buf, RemoveTasks* i) {
 void lmcp_free_RemoveTasks(RemoveTasks* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->TaskList != NULL) {
-        free(out->TaskList);
+    if (out->tasklist != NULL) {
+        free(out->tasklist);
     }
     if (out_malloced == 1) {
         free(out);
@@ -65,22 +63,22 @@ int lmcp_unpack_RemoveTasks(uint8_t** inb, size_t *size_remain, RemoveTasks* out
     uint16_t tmp16;
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->TaskList = malloc(sizeof(int64_t*) * tmp);
-    if (out->TaskList==0) {
+    (out)->tasklist = malloc(sizeof(int64_t*) * tmp);
+    if (out->tasklist==0) {
         return -1;
     }
-    out->TaskList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->TaskList_ai.length; index++) {
-        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->TaskList[index]))
+    out->tasklist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->tasklist_ai.length; index++) {
+        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->tasklist[index]))
     }
     return 0;
 }
 size_t lmcp_pack_RemoveTasks(uint8_t* buf, RemoveTasks* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_uint16_t(outb, i->TaskList_ai.length);
-    for (uint32_t index = 0; index < i->TaskList_ai.length; index++) {
-        outb += lmcp_pack_int64_t(outb, i->TaskList[index]);
+    outb += lmcp_pack_uint16_t(outb, i->tasklist_ai.length);
+    for (uint32_t index = 0; index < i->tasklist_ai.length; index++) {
+        outb += lmcp_pack_int64_t(outb, i->tasklist[index]);
     }
     return (outb - buf);
 }

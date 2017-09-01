@@ -1,13 +1,15 @@
 #pragma once
-#include <stdint.h>
-#include <stdlib.h>
+#include "types.h"
 
-typedef struct {
+struct lmcp_object_struct {
     uint32_t type;
     // series name, version can also go here
-} lmcp_object;
+};
+
+typedef struct lmcp_object_struct lmcp_object;
 
 
-typedef struct {
+struct array_info_struct {
     uint32_t length;
-} array_info;
+};
+typedef struct array_info_struct array_info;

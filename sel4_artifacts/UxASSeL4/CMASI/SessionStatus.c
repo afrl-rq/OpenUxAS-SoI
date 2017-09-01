@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "SessionStatus.h"
@@ -8,22 +6,22 @@
 #include "KeyValuePair.h"
 void lmcp_pp_SessionStatus(SessionStatus* s) {
     printf("SessionStatus{");
-    printf("State: ");
-    printf("%i", s->State);
+    printf("state: ");
+    printf("%i", s->state);
     printf("\n");
-    printf("StartTime: ");
-    printf("%lld",s->StartTime);
+    printf("starttime: ");
+    printf("%lld",s->starttime);
     printf("\n");
-    printf("ScenarioTime: ");
-    printf("%lld",s->ScenarioTime);
+    printf("scenariotime: ");
+    printf("%lld",s->scenariotime);
     printf("\n");
-    printf("RealTimeMultiple: ");
-    printf("%f",s->RealTimeMultiple);
+    printf("realtimemultiple: ");
+    printf("%u",s->realtimemultiple);
     printf("\n");
-    printf("Parameters: ");
+    printf("parameters: ");
     printf("[");
-    for (uint32_t index = 0; index < s->Parameters_ai.length; index++) {
-        lmcp_pp_KeyValuePair((s->Parameters[index]));
+    for (uint32_t index = 0; index < s->parameters_ai.length; index++) {
+        lmcp_pp_KeyValuePair((s->parameters[index]));
         printf(",");
     }
     printf("\n");
@@ -34,10 +32,10 @@ size_t lmcp_packsize_SessionStatus (SessionStatus* i) {
     out += 4;
     out += sizeof(int64_t);
     out += sizeof(int64_t);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
     out += 2;
-    for (uint32_t index = 0; index < i->Parameters_ai.length; index++) {
-        out += 15 + lmcp_packsize_KeyValuePair(i->Parameters[index]);
+    for (uint32_t index = 0; index < i->parameters_ai.length; index++) {
+        out += 15 + lmcp_packsize_KeyValuePair(i->parameters[index]);
     }
     return out;
 }
@@ -59,13 +57,13 @@ size_t lmcp_pack_SessionStatus_header(uint8_t* buf, SessionStatus* i) {
 void lmcp_free_SessionStatus(SessionStatus* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->Parameters != NULL) {
-        for (uint32_t index = 0; index < out->Parameters_ai.length; index++) {
-            if (out->Parameters[index] != NULL) {
-                lmcp_free_KeyValuePair(out->Parameters[index], 1);
+    if (out->parameters != NULL) {
+        for (uint32_t index = 0; index < out->parameters_ai.length; index++) {
+            if (out->parameters[index] != NULL) {
+                lmcp_free_KeyValuePair(out->parameters[index], 1);
             }
         }
-        free(out->Parameters);
+        free(out->parameters);
     }
     if (out_malloced == 1) {
         free(out);
@@ -86,31 +84,31 @@ int lmcp_unpack_SessionStatus(uint8_t** inb, size_t *size_remain, SessionStatus*
     SessionStatus* out = outp;
     uint32_t tmp;
     uint16_t tmp16;
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->State)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->StartTime)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ScenarioTime)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->RealTimeMultiple)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->state)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->starttime)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->scenariotime)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->realtimemultiple)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->Parameters = malloc(sizeof(KeyValuePair*) * tmp);
-    if (out->Parameters==0) {
+    (out)->parameters = malloc(sizeof(KeyValuePair*) * tmp);
+    if (out->parameters==0) {
         return -1;
     }
-    out->Parameters_ai.length = tmp;
-    for (uint32_t index = 0; index < out->Parameters_ai.length; index++) {
+    out->parameters_ai.length = tmp;
+    for (uint32_t index = 0; index < out->parameters_ai.length; index++) {
         uint8_t isnull;
         uint32_t objtype;
         uint16_t objseries;
         char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
-            out->Parameters[index] = NULL;
+            out->parameters[index] = NULL;
         } else if (inb != NULL) {
             CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
             CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
             CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-            lmcp_init_KeyValuePair(&(out->Parameters[index]));
-            CHECK(lmcp_unpack_KeyValuePair(inb, size_remain, (out->Parameters[index])))
+            lmcp_init_KeyValuePair(&(out->parameters[index]));
+            CHECK(lmcp_unpack_KeyValuePair(inb, size_remain, (out->parameters[index])))
         }
     }
     return 0;
@@ -118,13 +116,13 @@ int lmcp_unpack_SessionStatus(uint8_t** inb, size_t *size_remain, SessionStatus*
 size_t lmcp_pack_SessionStatus(uint8_t* buf, SessionStatus* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_int32_t(outb, (int) i->State);
-    outb += lmcp_pack_int64_t(outb, i->StartTime);
-    outb += lmcp_pack_int64_t(outb, i->ScenarioTime);
-    outb += lmcp_pack_float(outb, i->RealTimeMultiple);
-    outb += lmcp_pack_uint16_t(outb, i->Parameters_ai.length);
-    for (uint32_t index = 0; index < i->Parameters_ai.length; index++) {
-        if (i->Parameters[index]==NULL) {
+    outb += lmcp_pack_int32_t(outb, (int) i->state);
+    outb += lmcp_pack_int64_t(outb, i->starttime);
+    outb += lmcp_pack_int64_t(outb, i->scenariotime);
+    outb += lmcp_pack_uint32_t(outb, i->realtimemultiple);
+    outb += lmcp_pack_uint16_t(outb, i->parameters_ai.length);
+    for (uint32_t index = 0; index < i->parameters_ai.length; index++) {
+        if (i->parameters[index]==NULL) {
             outb += lmcp_pack_uint8_t(outb, 0);
         } else {
             outb += lmcp_pack_uint8_t(outb, 1);
@@ -134,7 +132,7 @@ size_t lmcp_pack_SessionStatus(uint8_t* buf, SessionStatus* i) {
                 *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 2);
             outb += lmcp_pack_uint16_t(outb, 3);
-            outb += lmcp_pack_KeyValuePair(outb, i->Parameters[index]);
+            outb += lmcp_pack_KeyValuePair(outb, i->parameters[index]);
         }
     }
     return (outb - buf);

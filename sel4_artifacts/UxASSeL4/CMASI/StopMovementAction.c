@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "StopMovementAction.h"
@@ -10,18 +8,18 @@ void lmcp_pp_StopMovementAction(StopMovementAction* s) {
     printf("StopMovementAction{");
     printf("Inherited from VehicleAction:\n");
     lmcp_pp_VehicleAction(&(s->super));
-    printf("Location: ");
-    lmcp_pp_Location3D((s->Location));
+    printf("location: ");
+    lmcp_pp_Location3D((s->location));
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_StopMovementAction (StopMovementAction* i) {
     size_t out = 0;
     out += lmcp_packsize_VehicleAction(&(i->super));
-    if (i->Location==NULL) {
+    if (i->location==NULL) {
         out += 1;
     } else {
-        out += 15 + lmcp_packsize_Location3D(i->Location);
+        out += 15 + lmcp_packsize_Location3D(i->location);
     }
     return out;
 }
@@ -44,8 +42,8 @@ void lmcp_free_StopMovementAction(StopMovementAction* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_VehicleAction(&(out->super), 0);
-    if (out->Location != NULL) {
-        lmcp_free_Location3D(out->Location, 1);
+    if (out->location != NULL) {
+        lmcp_free_Location3D(out->location, 1);
     }
     if (out_malloced == 1) {
         free(out);
@@ -71,13 +69,13 @@ int lmcp_unpack_StopMovementAction(uint8_t** inb, size_t *size_remain, StopMovem
     char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
-        out->Location = NULL;
+        out->location = NULL;
     } else if (inb != NULL) {
         CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
         CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
         CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-        lmcp_init_Location3D(&(out->Location));
-        CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->Location)))
+        lmcp_init_Location3D(&(out->location));
+        CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->location)))
     }
     return 0;
 }
@@ -85,7 +83,7 @@ size_t lmcp_pack_StopMovementAction(uint8_t* buf, StopMovementAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_VehicleAction(outb, &(i->super));
-    if (i->Location==NULL) {
+    if (i->location==NULL) {
         outb += lmcp_pack_uint8_t(outb, 0);
     } else {
         outb += lmcp_pack_uint8_t(outb, 1);
@@ -95,7 +93,7 @@ size_t lmcp_pack_StopMovementAction(uint8_t* buf, StopMovementAction* i) {
             *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 3);
         outb += lmcp_pack_uint16_t(outb, 3);
-        outb += lmcp_pack_Location3D(outb, i->Location);
+        outb += lmcp_pack_Location3D(outb, i->location);
     }
     return (outb - buf);
 }

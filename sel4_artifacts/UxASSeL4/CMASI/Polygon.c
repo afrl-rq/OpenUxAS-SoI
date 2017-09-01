@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Polygon.h"
@@ -10,10 +8,10 @@ void lmcp_pp_Polygon(Polygon* s) {
     printf("Polygon{");
     printf("Inherited from AbstractGeometry:\n");
     lmcp_pp_AbstractGeometry(&(s->super));
-    printf("BoundaryPoints: ");
+    printf("boundarypoints: ");
     printf("[");
-    for (uint32_t index = 0; index < s->BoundaryPoints_ai.length; index++) {
-        lmcp_pp_Location3D((s->BoundaryPoints[index]));
+    for (uint32_t index = 0; index < s->boundarypoints_ai.length; index++) {
+        lmcp_pp_Location3D((s->boundarypoints[index]));
         printf(",");
     }
     printf("\n");
@@ -23,8 +21,8 @@ size_t lmcp_packsize_Polygon (Polygon* i) {
     size_t out = 0;
     out += lmcp_packsize_AbstractGeometry(&(i->super));
     out += 2;
-    for (uint32_t index = 0; index < i->BoundaryPoints_ai.length; index++) {
-        out += 15 + lmcp_packsize_Location3D(i->BoundaryPoints[index]);
+    for (uint32_t index = 0; index < i->boundarypoints_ai.length; index++) {
+        out += 15 + lmcp_packsize_Location3D(i->boundarypoints[index]);
     }
     return out;
 }
@@ -47,13 +45,13 @@ void lmcp_free_Polygon(Polygon* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_AbstractGeometry(&(out->super), 0);
-    if (out->BoundaryPoints != NULL) {
-        for (uint32_t index = 0; index < out->BoundaryPoints_ai.length; index++) {
-            if (out->BoundaryPoints[index] != NULL) {
-                lmcp_free_Location3D(out->BoundaryPoints[index], 1);
+    if (out->boundarypoints != NULL) {
+        for (uint32_t index = 0; index < out->boundarypoints_ai.length; index++) {
+            if (out->boundarypoints[index] != NULL) {
+                lmcp_free_Location3D(out->boundarypoints[index], 1);
             }
         }
-        free(out->BoundaryPoints);
+        free(out->boundarypoints);
     }
     if (out_malloced == 1) {
         free(out);
@@ -77,25 +75,25 @@ int lmcp_unpack_Polygon(uint8_t** inb, size_t *size_remain, Polygon* outp) {
     CHECK(lmcp_unpack_AbstractGeometry(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->BoundaryPoints = malloc(sizeof(Location3D*) * tmp);
-    if (out->BoundaryPoints==0) {
+    (out)->boundarypoints = malloc(sizeof(Location3D*) * tmp);
+    if (out->boundarypoints==0) {
         return -1;
     }
-    out->BoundaryPoints_ai.length = tmp;
-    for (uint32_t index = 0; index < out->BoundaryPoints_ai.length; index++) {
+    out->boundarypoints_ai.length = tmp;
+    for (uint32_t index = 0; index < out->boundarypoints_ai.length; index++) {
         uint8_t isnull;
         uint32_t objtype;
         uint16_t objseries;
         char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
-            out->BoundaryPoints[index] = NULL;
+            out->boundarypoints[index] = NULL;
         } else if (inb != NULL) {
             CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
             CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
             CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-            lmcp_init_Location3D(&(out->BoundaryPoints[index]));
-            CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->BoundaryPoints[index])))
+            lmcp_init_Location3D(&(out->boundarypoints[index]));
+            CHECK(lmcp_unpack_Location3D(inb, size_remain, (out->boundarypoints[index])))
         }
     }
     return 0;
@@ -104,9 +102,9 @@ size_t lmcp_pack_Polygon(uint8_t* buf, Polygon* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_AbstractGeometry(outb, &(i->super));
-    outb += lmcp_pack_uint16_t(outb, i->BoundaryPoints_ai.length);
-    for (uint32_t index = 0; index < i->BoundaryPoints_ai.length; index++) {
-        if (i->BoundaryPoints[index]==NULL) {
+    outb += lmcp_pack_uint16_t(outb, i->boundarypoints_ai.length);
+    for (uint32_t index = 0; index < i->boundarypoints_ai.length; index++) {
+        if (i->boundarypoints[index]==NULL) {
             outb += lmcp_pack_uint8_t(outb, 0);
         } else {
             outb += lmcp_pack_uint8_t(outb, 1);
@@ -116,7 +114,7 @@ size_t lmcp_pack_Polygon(uint8_t* buf, Polygon* i) {
                 *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 3);
             outb += lmcp_pack_uint16_t(outb, 3);
-            outb += lmcp_pack_Location3D(outb, i->BoundaryPoints[index]);
+            outb += lmcp_pack_Location3D(outb, i->boundarypoints[index]);
         }
     }
     return (outb - buf);

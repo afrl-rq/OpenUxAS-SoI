@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Location3D.h"
@@ -15,82 +12,83 @@
 
 #define LMCP_EntityState_TYPE 14
 
-typedef struct {
+struct EntityState_struct {
     lmcp_object super;
-    int64_t ID;
+    int64_t id;
 
 // Units: meter/sec
-    float u;
+    uint32_t u;
 
 // Units: meter/sec
-    float v;
+    uint32_t v;
 
 // Units: meter/sec
-    float w;
+    uint32_t w;
 
 // Units: meter/sec/sec
-    float udot;
+    uint32_t udot;
 
 // Units: meter/sec/sec
-    float vdot;
+    uint32_t vdot;
 
 // Units: meter/sec/sec
-    float wdot;
+    uint32_t wdot;
 
 // Units: degree
-    float Heading;
+    uint32_t heading;
 
 // Units: degree
-    float Pitch;
+    uint32_t pitch;
 
 // Units: degree
-    float Roll;
+    uint32_t roll;
 
 // Units: degree/sec
-    float p;
+    uint32_t p;
 
 // Units: degree/sec
-    float q;
+    uint32_t q;
 
 // Units: degree/sec
-    float r;
+    uint32_t r;
 
 // Units: degrees
-    float Course;
+    uint32_t course;
 
 // Units: m/s
-    float Groundspeed;
+    uint32_t groundspeed;
 
-    Location3D* Location;
+    Location3D* location;
 
 // Units: %
-    float EnergyAvailable;
+    uint32_t energyavailable;
 
 // Units: %/sec
-    float ActualEnergyRate;
+    uint32_t actualenergyrate;
 
-    PayloadState** PayloadStateList;
-    array_info PayloadStateList_ai;
-
-// Units: None
-    int64_t CurrentWaypoint;
-
-    int64_t CurrentCommand;
+    PayloadState** payloadstatelist;
+    array_info payloadstatelist_ai;
 
 // Units: None
-    NavigationMode Mode;
+    int64_t currentwaypoint;
+
+    int64_t currentcommand;
 
 // Units: None
-    int64_t* AssociatedTasks;
-    array_info AssociatedTasks_ai;
+    NavigationMode mode;
+
+// Units: None
+    int64_t* associatedtasks;
+    array_info associatedtasks_ai;
 
 // Units: millisecond
-    int64_t Time;
+    int64_t time;
 
-    KeyValuePair** Info;
-    array_info Info_ai;
+    KeyValuePair** info;
+    array_info info_ai;
 
-} EntityState;
+};
+typedef struct EntityState_struct EntityState;
 void lmcp_pp_EntityState(EntityState* s);
 size_t lmcp_packsize_EntityState (EntityState* i);
 size_t lmcp_pack_EntityState_header(uint8_t* buf, EntityState* i);

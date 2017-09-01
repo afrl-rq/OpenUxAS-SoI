@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "SearchTask.h"
@@ -14,17 +11,18 @@
 
 #define LMCP_PointSearchTask_TYPE 41
 
-typedef struct {
+struct PointSearchTask_struct {
     SearchTask super;
-    Location3D* SearchLocation;
+    Location3D* searchlocation;
 
 // Units: meter
-    float StandoffDistance;
+    uint32_t standoffdistance;
 
-    Wedge** ViewAngleList;
-    array_info ViewAngleList_ai;
+    Wedge** viewanglelist;
+    array_info viewanglelist_ai;
 
-} PointSearchTask;
+};
+typedef struct PointSearchTask_struct PointSearchTask;
 void lmcp_pp_PointSearchTask(PointSearchTask* s);
 size_t lmcp_packsize_PointSearchTask (PointSearchTask* i);
 size_t lmcp_pack_PointSearchTask_header(uint8_t* buf, PointSearchTask* i);

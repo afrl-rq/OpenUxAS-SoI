@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "enums.h"
@@ -12,20 +9,21 @@
 
 #define LMCP_Location3D_TYPE 3
 
-typedef struct {
+struct Location3D_struct {
     lmcp_object super;
 // Units: degree
-    double Latitude;
+    uint64_t latitude;
 
 // Units: degree
-    double Longitude;
+    uint64_t longitude;
 
 // Units: meter
-    float Altitude;
+    uint32_t altitude;
 
-    AltitudeType AltitudeType;
+    AltitudeType altitudetype;
 
-} Location3D;
+};
+typedef struct Location3D_struct Location3D;
 void lmcp_pp_Location3D(Location3D* s);
 size_t lmcp_packsize_Location3D (Location3D* i);
 size_t lmcp_pack_Location3D_header(uint8_t* buf, Location3D* i);

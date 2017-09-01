@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "enums.h"
@@ -14,36 +11,37 @@
 
 #define LMCP_EntityConfiguration_TYPE 11
 
-typedef struct {
+struct EntityConfiguration_struct {
     lmcp_object super;
 // Units: None
-    int64_t ID;
+    int64_t id;
 
-    char* Affiliation;
-    array_info Affiliation_ai;
+    char* affiliation;
+    array_info affiliation_ai;
 
-    char* EntityType;
-    array_info EntityType_ai;
+    char* entitytype;
+    array_info entitytype_ai;
 
-    char* Label;
-    array_info Label_ai;
+    char* label;
+    array_info label_ai;
 
 // Units: meter/sec
-    float NominalSpeed;
+    uint32_t nominalspeed;
 
 // Units: meter
-    float NominalAltitude;
+    uint32_t nominalaltitude;
 
-    AltitudeType NominalAltitudeType;
+    AltitudeType nominalaltitudetype;
 
 // Units: None
-    PayloadConfiguration** PayloadConfigurationList;
-    array_info PayloadConfigurationList_ai;
+    PayloadConfiguration** payloadconfigurationlist;
+    array_info payloadconfigurationlist_ai;
 
-    KeyValuePair** Info;
-    array_info Info_ai;
+    KeyValuePair** info;
+    array_info info_ai;
 
-} EntityConfiguration;
+};
+typedef struct EntityConfiguration_struct EntityConfiguration;
 void lmcp_pp_EntityConfiguration(EntityConfiguration* s);
 size_t lmcp_packsize_EntityConfiguration (EntityConfiguration* i);
 size_t lmcp_pack_EntityConfiguration_header(uint8_t* buf, EntityConfiguration* i);

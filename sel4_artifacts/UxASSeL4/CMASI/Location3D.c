@@ -1,31 +1,29 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Location3D.h"
 #include "enums.h"
 void lmcp_pp_Location3D(Location3D* s) {
     printf("Location3D{");
-    printf("Latitude: ");
-    printf("%f",s->Latitude);
+    printf("latitude: ");
+    printf("%llu",s->latitude);
     printf("\n");
-    printf("Longitude: ");
-    printf("%f",s->Longitude);
+    printf("longitude: ");
+    printf("%llu",s->longitude);
     printf("\n");
-    printf("Altitude: ");
-    printf("%f",s->Altitude);
+    printf("altitude: ");
+    printf("%u",s->altitude);
     printf("\n");
-    printf("AltitudeType: ");
-    printf("%i", s->AltitudeType);
+    printf("altitudetype: ");
+    printf("%i", s->altitudetype);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_Location3D (Location3D* i) {
     size_t out = 0;
-    out += sizeof(double);
-    out += sizeof(double);
-    out += sizeof(float);
+    out += sizeof(uint64_t);
+    out += sizeof(uint64_t);
+    out += sizeof(uint32_t);
     out += 4;
     return out;
 }
@@ -64,18 +62,18 @@ int lmcp_unpack_Location3D(uint8_t** inb, size_t *size_remain, Location3D* outp)
         return -1;
     }
     Location3D* out = outp;
-    CHECK(lmcp_unpack_double(inb, size_remain, &(out->Latitude)))
-    CHECK(lmcp_unpack_double(inb, size_remain, &(out->Longitude)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Altitude)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->AltitudeType)))
+    CHECK(lmcp_unpack_uint64_t(inb, size_remain, &(out->latitude)))
+    CHECK(lmcp_unpack_uint64_t(inb, size_remain, &(out->longitude)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->altitude)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->altitudetype)))
     return 0;
 }
 size_t lmcp_pack_Location3D(uint8_t* buf, Location3D* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_double(outb, i->Latitude);
-    outb += lmcp_pack_double(outb, i->Longitude);
-    outb += lmcp_pack_float(outb, i->Altitude);
-    outb += lmcp_pack_int32_t(outb, (int) i->AltitudeType);
+    outb += lmcp_pack_uint64_t(outb, i->latitude);
+    outb += lmcp_pack_uint64_t(outb, i->longitude);
+    outb += lmcp_pack_uint32_t(outb, i->altitude);
+    outb += lmcp_pack_int32_t(outb, (int) i->altitudetype);
     return (outb - buf);
 }

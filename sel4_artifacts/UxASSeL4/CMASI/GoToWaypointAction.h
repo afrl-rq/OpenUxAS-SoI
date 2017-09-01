@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "NavigationAction.h"
@@ -12,11 +9,12 @@
 
 #define LMCP_GoToWaypointAction_TYPE 28
 
-typedef struct {
+struct GoToWaypointAction_struct {
     NavigationAction super;
-    int64_t WaypointNumber;
+    int64_t waypointnumber;
 
-} GoToWaypointAction;
+};
+typedef struct GoToWaypointAction_struct GoToWaypointAction;
 void lmcp_pp_GoToWaypointAction(GoToWaypointAction* s);
 size_t lmcp_packsize_GoToWaypointAction (GoToWaypointAction* i);
 size_t lmcp_pack_GoToWaypointAction_header(uint8_t* buf, GoToWaypointAction* i);

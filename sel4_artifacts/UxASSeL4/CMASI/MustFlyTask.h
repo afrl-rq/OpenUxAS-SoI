@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Task.h"
@@ -13,13 +10,14 @@
 
 #define LMCP_MustFlyTask_TYPE 37
 
-typedef struct {
+struct MustFlyTask_struct {
     Task super;
-    Location3D* Position;
+    Location3D* position;
 
-    uint8_t UseAltitude;
+    uint8_t usealtitude;
 
-} MustFlyTask;
+};
+typedef struct MustFlyTask_struct MustFlyTask;
 void lmcp_pp_MustFlyTask(MustFlyTask* s);
 size_t lmcp_packsize_MustFlyTask (MustFlyTask* i);
 size_t lmcp_pack_MustFlyTask_header(uint8_t* buf, MustFlyTask* i);

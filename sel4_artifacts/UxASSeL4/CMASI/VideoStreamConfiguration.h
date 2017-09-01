@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadConfiguration.h"
@@ -12,13 +9,14 @@
 
 #define LMCP_VideoStreamConfiguration_TYPE 49
 
-typedef struct {
+struct VideoStreamConfiguration_struct {
     PayloadConfiguration super;
 // Units: None
-    int64_t* AvailableSensorList;
-    array_info AvailableSensorList_ai;
+    int64_t* availablesensorlist;
+    array_info availablesensorlist_ai;
 
-} VideoStreamConfiguration;
+};
+typedef struct VideoStreamConfiguration_struct VideoStreamConfiguration;
 void lmcp_pp_VideoStreamConfiguration(VideoStreamConfiguration* s);
 size_t lmcp_packsize_VideoStreamConfiguration (VideoStreamConfiguration* i);
 size_t lmcp_pack_VideoStreamConfiguration_header(uint8_t* buf, VideoStreamConfiguration* i);

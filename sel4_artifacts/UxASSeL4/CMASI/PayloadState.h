@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "KeyValuePair.h"
@@ -12,15 +9,16 @@
 
 #define LMCP_PayloadState_TYPE 6
 
-typedef struct {
+struct PayloadState_struct {
     lmcp_object super;
 // Units: None
-    int64_t PayloadID;
+    int64_t payloadid;
 
-    KeyValuePair** Parameters;
-    array_info Parameters_ai;
+    KeyValuePair** parameters;
+    array_info parameters_ai;
 
-} PayloadState;
+};
+typedef struct PayloadState_struct PayloadState;
 void lmcp_pp_PayloadState(PayloadState* s);
 size_t lmcp_packsize_PayloadState (PayloadState* i);
 size_t lmcp_pack_PayloadState_header(uint8_t* buf, PayloadState* i);

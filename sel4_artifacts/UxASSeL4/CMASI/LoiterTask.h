@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Task.h"
@@ -13,12 +10,13 @@
 
 #define LMCP_LoiterTask_TYPE 34
 
-typedef struct {
+struct LoiterTask_struct {
     Task super;
 // Units: none
-    LoiterAction* DesiredAction;
+    LoiterAction* desiredaction;
 
-} LoiterTask;
+};
+typedef struct LoiterTask_struct LoiterTask;
 void lmcp_pp_LoiterTask(LoiterTask* s);
 size_t lmcp_packsize_LoiterTask (LoiterTask* i);
 size_t lmcp_pack_LoiterTask_header(uint8_t* buf, LoiterTask* i);

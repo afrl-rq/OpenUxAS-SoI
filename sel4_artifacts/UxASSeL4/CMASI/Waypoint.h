@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Location3D.h"
@@ -14,36 +11,37 @@
 
 #define LMCP_Waypoint_TYPE 35
 
-typedef struct {
+struct Waypoint_struct {
     Location3D super;
 // Units: None
-    int64_t Number;
+    int64_t number;
 
 // Units: None
-    int64_t NextWaypoint;
+    int64_t nextwaypoint;
 
 // Units: meter/sec
-    float Speed;
+    uint32_t speed;
 
-    SpeedType SpeedType;
+    SpeedType speedtype;
 
 // Units: meter/sec
-    float ClimbRate;
+    uint32_t climbrate;
 
-    TurnType TurnType;
+    TurnType turntype;
 
 // Units: None
-    VehicleAction** VehicleActionList;
-    array_info VehicleActionList_ai;
+    VehicleAction** vehicleactionlist;
+    array_info vehicleactionlist_ai;
 
-    int64_t ContingencyWaypointA;
+    int64_t contingencywaypointa;
 
-    int64_t ContingencyWaypointB;
+    int64_t contingencywaypointb;
 
-    int64_t* AssociatedTasks;
-    array_info AssociatedTasks_ai;
+    int64_t* associatedtasks;
+    array_info associatedtasks_ai;
 
-} Waypoint;
+};
+typedef struct Waypoint_struct Waypoint;
 void lmcp_pp_Waypoint(Waypoint* s);
 size_t lmcp_packsize_Waypoint (Waypoint* i);
 size_t lmcp_pack_Waypoint_header(uint8_t* buf, Waypoint* i);

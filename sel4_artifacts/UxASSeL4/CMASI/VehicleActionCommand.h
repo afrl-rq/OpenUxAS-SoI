@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleAction.h"
@@ -13,19 +10,20 @@
 
 #define LMCP_VehicleActionCommand_TYPE 47
 
-typedef struct {
+struct VehicleActionCommand_struct {
     lmcp_object super;
-    int64_t CommandID;
+    int64_t commandid;
 
 // Units: None
-    int64_t VehicleID;
+    int64_t vehicleid;
 
-    VehicleAction** VehicleActionList;
-    array_info VehicleActionList_ai;
+    VehicleAction** vehicleactionlist;
+    array_info vehicleactionlist_ai;
 
-    CommandStatusType Status;
+    CommandStatusType status;
 
-} VehicleActionCommand;
+};
+typedef struct VehicleActionCommand_struct VehicleActionCommand;
 void lmcp_pp_VehicleActionCommand(VehicleActionCommand* s);
 size_t lmcp_packsize_VehicleActionCommand (VehicleActionCommand* i);
 size_t lmcp_pack_VehicleActionCommand_header(uint8_t* buf, VehicleActionCommand* i);

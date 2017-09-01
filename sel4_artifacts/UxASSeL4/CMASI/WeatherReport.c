@@ -1,44 +1,42 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "WeatherReport.h"
 #include "AbstractZone.h"
 void lmcp_pp_WeatherReport(WeatherReport* s) {
     printf("WeatherReport{");
-    printf("Area: ");
-    lmcp_pp_AbstractZone((s->Area));
+    printf("area: ");
+    lmcp_pp_AbstractZone((s->area));
     printf("\n");
-    printf("WindSpeed: ");
-    printf("%f",s->WindSpeed);
+    printf("windspeed: ");
+    printf("%u",s->windspeed);
     printf("\n");
-    printf("WindDirection: ");
-    printf("%f",s->WindDirection);
+    printf("winddirection: ");
+    printf("%u",s->winddirection);
     printf("\n");
-    printf("Visibility: ");
-    printf("%f",s->Visibility);
+    printf("visibility: ");
+    printf("%u",s->visibility);
     printf("\n");
-    printf("CloudCeiling: ");
-    printf("%f",s->CloudCeiling);
+    printf("cloudceiling: ");
+    printf("%u",s->cloudceiling);
     printf("\n");
-    printf("CloudCoverage: ");
-    printf("%f",s->CloudCoverage);
+    printf("cloudcoverage: ");
+    printf("%u",s->cloudcoverage);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_WeatherReport (WeatherReport* i) {
     size_t out = 0;
-    if (i->Area==NULL) {
+    if (i->area==NULL) {
         out += 1;
     } else {
-        out += 15 + lmcp_packsize_AbstractZone(i->Area);
+        out += 15 + lmcp_packsize_AbstractZone(i->area);
     }
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     return out;
 }
 size_t lmcp_pack_WeatherReport_header(uint8_t* buf, WeatherReport* i) {
@@ -59,8 +57,8 @@ size_t lmcp_pack_WeatherReport_header(uint8_t* buf, WeatherReport* i) {
 void lmcp_free_WeatherReport(WeatherReport* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->Area != NULL) {
-        lmcp_free_AbstractZone(out->Area, 1);
+    if (out->area != NULL) {
+        lmcp_free_AbstractZone(out->area, 1);
     }
     if (out_malloced == 1) {
         free(out);
@@ -85,25 +83,25 @@ int lmcp_unpack_WeatherReport(uint8_t** inb, size_t *size_remain, WeatherReport*
     char seriesname[8];
     CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
     if (isnull == 0 && inb != NULL) {
-        out->Area = NULL;
+        out->area = NULL;
     } else if (inb != NULL) {
         CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
         CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
         CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-        lmcp_init_AbstractZone(&(out->Area));
-        CHECK(lmcp_unpack_AbstractZone(inb, size_remain, (out->Area)))
+        lmcp_init_AbstractZone(&(out->area));
+        CHECK(lmcp_unpack_AbstractZone(inb, size_remain, (out->area)))
     }
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->WindSpeed)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->WindDirection)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Visibility)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->CloudCeiling)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->CloudCoverage)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->windspeed)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->winddirection)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->visibility)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->cloudceiling)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->cloudcoverage)))
     return 0;
 }
 size_t lmcp_pack_WeatherReport(uint8_t* buf, WeatherReport* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    if (i->Area==NULL) {
+    if (i->area==NULL) {
         outb += lmcp_pack_uint8_t(outb, 0);
     } else {
         outb += lmcp_pack_uint8_t(outb, 1);
@@ -113,12 +111,12 @@ size_t lmcp_pack_WeatherReport(uint8_t* buf, WeatherReport* i) {
             *outb = 0;
         outb += lmcp_pack_uint32_t(outb, 10);
         outb += lmcp_pack_uint16_t(outb, 3);
-        outb += lmcp_pack_AbstractZone(outb, i->Area);
+        outb += lmcp_pack_AbstractZone(outb, i->area);
     }
-    outb += lmcp_pack_float(outb, i->WindSpeed);
-    outb += lmcp_pack_float(outb, i->WindDirection);
-    outb += lmcp_pack_float(outb, i->Visibility);
-    outb += lmcp_pack_float(outb, i->CloudCeiling);
-    outb += lmcp_pack_float(outb, i->CloudCoverage);
+    outb += lmcp_pack_uint32_t(outb, i->windspeed);
+    outb += lmcp_pack_uint32_t(outb, i->winddirection);
+    outb += lmcp_pack_uint32_t(outb, i->visibility);
+    outb += lmcp_pack_uint32_t(outb, i->cloudceiling);
+    outb += lmcp_pack_uint32_t(outb, i->cloudcoverage);
     return (outb - buf);
 }

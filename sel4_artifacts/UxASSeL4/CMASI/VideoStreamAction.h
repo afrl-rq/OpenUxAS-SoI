@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleAction.h"
@@ -12,15 +9,16 @@
 
 #define LMCP_VideoStreamAction_TYPE 48
 
-typedef struct {
+struct VideoStreamAction_struct {
     VehicleAction super;
 // Units: None
-    int32_t VideoStreamID;
+    int32_t videostreamid;
 
 // Units: None
-    int32_t ActiveSensor;
+    int32_t activesensor;
 
-} VideoStreamAction;
+};
+typedef struct VideoStreamAction_struct VideoStreamAction;
 void lmcp_pp_VideoStreamAction(VideoStreamAction* s);
 size_t lmcp_packsize_VideoStreamAction (VideoStreamAction* i);
 size_t lmcp_pack_VideoStreamAction_header(uint8_t* buf, VideoStreamAction* i);

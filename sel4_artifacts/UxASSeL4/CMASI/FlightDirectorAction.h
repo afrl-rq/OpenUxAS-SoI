@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "NavigationAction.h"
@@ -13,25 +10,26 @@
 
 #define LMCP_FlightDirectorAction_TYPE 54
 
-typedef struct {
+struct FlightDirectorAction_struct {
     NavigationAction super;
 // Units: meter/sec
-    float Speed;
+    uint32_t speed;
 
-    SpeedType SpeedType;
+    SpeedType speedtype;
 
 // Units: degree
-    float Heading;
+    uint32_t heading;
 
 // Units: meter
-    float Altitude;
+    uint32_t altitude;
 
-    AltitudeType AltitudeType;
+    AltitudeType altitudetype;
 
 // Units: meter/sec
-    float ClimbRate;
+    uint32_t climbrate;
 
-} FlightDirectorAction;
+};
+typedef struct FlightDirectorAction_struct FlightDirectorAction;
 void lmcp_pp_FlightDirectorAction(FlightDirectorAction* s);
 size_t lmcp_packsize_FlightDirectorAction (FlightDirectorAction* i);
 size_t lmcp_pack_FlightDirectorAction_header(uint8_t* buf, FlightDirectorAction* i);

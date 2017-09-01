@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadAction.h"
@@ -13,15 +10,16 @@
 
 #define LMCP_CameraAction_TYPE 18
 
-typedef struct {
+struct CameraAction_struct {
     PayloadAction super;
 // Units: degree
-    float HorizontalFieldOfView;
+    uint32_t horizontalfieldofview;
 
-    PayloadAction** AssociatedActions;
-    array_info AssociatedActions_ai;
+    PayloadAction** associatedactions;
+    array_info associatedactions_ai;
 
-} CameraAction;
+};
+typedef struct CameraAction_struct CameraAction;
 void lmcp_pp_CameraAction(CameraAction* s);
 size_t lmcp_packsize_CameraAction (CameraAction* i);
 size_t lmcp_pack_CameraAction_header(uint8_t* buf, CameraAction* i);

@@ -1,7 +1,4 @@
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include "conv.h"
 // from beej
 //
@@ -225,7 +222,7 @@ long double unpack754(long long i, unsigned bits, unsigned expbits)
 	return result;
 }
 
-size_t lmcp_pack_float(uint8_t* buf, float in) {
+size_t lmcp_pack_float(uint8_t* buf, uint32_t in) {
   uint32_t l = pack754_32(in);
   lmcp_pack_uint32_t(buf, l);
   return 4;
@@ -241,7 +238,7 @@ int lmcp_unpack_float(uint8_t** buf, size_t* size_remain, float* out) {
     return -1;
 }
 
-size_t lmcp_pack_double(uint8_t* buf, double in) {
+size_t lmcp_pack_double(uint8_t* buf, uint64_t in) {
   uint64_t l = pack754_64(in);
   lmcp_pack_uint64_t(buf, l);
   return 8;

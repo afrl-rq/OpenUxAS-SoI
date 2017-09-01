@@ -1,15 +1,13 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "RemoveEntities.h"
 void lmcp_pp_RemoveEntities(RemoveEntities* s) {
     printf("RemoveEntities{");
-    printf("EntityList: ");
+    printf("entitylist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->EntityList_ai.length; index++) {
-        printf("%lld",s->EntityList[index]);
+    for (uint32_t index = 0; index < s->entitylist_ai.length; index++) {
+        printf("%lld",s->entitylist[index]);
         printf(",");
     }
     printf("\n");
@@ -18,7 +16,7 @@ void lmcp_pp_RemoveEntities(RemoveEntities* s) {
 size_t lmcp_packsize_RemoveEntities (RemoveEntities* i) {
     size_t out = 0;
     out += 2;
-    for (uint32_t index = 0; index < i->EntityList_ai.length; index++) {
+    for (uint32_t index = 0; index < i->entitylist_ai.length; index++) {
         out += sizeof(int64_t);
     }
     return out;
@@ -41,8 +39,8 @@ size_t lmcp_pack_RemoveEntities_header(uint8_t* buf, RemoveEntities* i) {
 void lmcp_free_RemoveEntities(RemoveEntities* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->EntityList != NULL) {
-        free(out->EntityList);
+    if (out->entitylist != NULL) {
+        free(out->entitylist);
     }
     if (out_malloced == 1) {
         free(out);
@@ -65,22 +63,22 @@ int lmcp_unpack_RemoveEntities(uint8_t** inb, size_t *size_remain, RemoveEntitie
     uint16_t tmp16;
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->EntityList = malloc(sizeof(int64_t*) * tmp);
-    if (out->EntityList==0) {
+    (out)->entitylist = malloc(sizeof(int64_t*) * tmp);
+    if (out->entitylist==0) {
         return -1;
     }
-    out->EntityList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->EntityList_ai.length; index++) {
-        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->EntityList[index]))
+    out->entitylist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->entitylist_ai.length; index++) {
+        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->entitylist[index]))
     }
     return 0;
 }
 size_t lmcp_pack_RemoveEntities(uint8_t* buf, RemoveEntities* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_uint16_t(outb, i->EntityList_ai.length);
-    for (uint32_t index = 0; index < i->EntityList_ai.length; index++) {
-        outb += lmcp_pack_int64_t(outb, i->EntityList[index]);
+    outb += lmcp_pack_uint16_t(outb, i->entitylist_ai.length);
+    for (uint32_t index = 0; index < i->entitylist_ai.length; index++) {
+        outb += lmcp_pack_int64_t(outb, i->entitylist[index]);
     }
     return (outb - buf);
 }
