@@ -33,6 +33,7 @@
 #define STRING_XML_FILTERING_FIELD_NAME "FilteringFieldName"
 #define STRING_XML_FILTERING_FIELD_VALUE "FilteringFieldValue"
 #define STRING_XML_FIELD_NAME "FieldName"
+#define TASK_STATUS_WAIT_TIMEOUT_MS 20000
 
 namespace uxas
 {
@@ -48,6 +49,7 @@ MessageLoggerForTestService::MessageLoggerForTestService()
 : ServiceBase(MessageLoggerForTestService::s_typeName(), MessageLoggerForTestService::s_directoryName())
 {
     staliroTrajectoryPopulator = new testgeneration::staliro::c_TrajectoryPopulator;
+    lastReceivedSimTime = 0;
 };
 
 MessageLoggerForTestService::~MessageLoggerForTestService()
@@ -102,6 +104,18 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = 0;
         taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = 1.0;
     }
+    else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskFailure::TypeName)
+    {
+        taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = -1;
+        taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] 
+                = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getRobustness();
+    }
+    else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskSuccess::TypeName)
+    {
+        taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] = 1;
+        taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] 
+                = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getRobustness();
+    }
     
     if (staliroInterface->getSimulationStatus() == 1)
     {
@@ -128,6 +142,7 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::SessionStatus::TypeName)
         {
             afrl::cmasi::SessionStatus* sessionStatus = static_cast<afrl::cmasi::SessionStatus*> (receivedLmcpMessage->m_object.get());
+            lastReceivedSimTime = sessionStatus->getScenarioTime();
             if (sessionStatus->getScenarioTime() > staliroInterface->getMaxSimulationDuration())
             {
                 staliroInterface->sendHeartBeat(sessionStatus->getScenarioTime());
@@ -145,42 +160,37 @@ MessageLoggerForTestService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         }
         staliroTrajectoryPopulator->populateTrajectory((void *) receivedLmcpMessage->m_object.get(), &trajectory, &trajectoryMapping);
     }
-    else
+    else if (staliroInterface->getSimulationStatus() == 2)
     {
-        if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskFailure::TypeName)
+        bool allDone = true;
+        for (auto it = taskStatusResults.begin(); it != taskStatusResults.end(); it++)
         {
-            taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] = -1;
-            taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getTaskID()] 
-                    = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskFailure>(receivedLmcpMessage->m_object)->getRobustness();
+            if (it->second == 0)
+            {
+                allDone = false;
+                break;
+            }
         }
-        else if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::autonomymonitor::TaskSuccess::TypeName)
+        if (receivedLmcpMessage->m_object->getLmcpTypeName() == afrl::cmasi::SessionStatus::TypeName)
         {
-            taskStatusResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] = 1;
-            taskRobustnessResults[std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getTaskID()] 
-                    = std::static_pointer_cast<afrl::cmasi::autonomymonitor::TaskSuccess>(receivedLmcpMessage->m_object)->getRobustness();
+            afrl::cmasi::SessionStatus* sessionStatus = static_cast<afrl::cmasi::SessionStatus*> (receivedLmcpMessage->m_object.get());
+            int64_t timePassed = sessionStatus->getScenarioTime() - lastReceivedSimTime;
+            if (timePassed / sessionStatus->getRealTimeMultiple() > TASK_STATUS_WAIT_TIMEOUT_MS)
+            {
+                allDone = true;
+            }
         }
-        if (staliroInterface->getSimulationStatus() == 2)
+        if (allDone)
         {
-            bool allDone = true;
-            for (auto it = taskStatusResults.begin(); it != taskStatusResults.end(); it++)
-            {
-                if (it->second == 0)
-                {
-                    allDone = false;
-                    break;
-                }
-            }
-            if (allDone)
-            {
-                sendMonitorResults();
-                staliroInterface->sendEndOfSimulation();
-            }
-            else
-            {
-                auto taskStatusRequestMsg = std::make_shared<afrl::cmasi::autonomymonitor::TaskStatusRequest>();
-                taskStatusRequestMsg->setTaskID(-1); //-1 for all tasks!
-                sendSharedLmcpObjectBroadcastMessage(taskStatusRequestMsg);
-            }
+            sendMonitorResults();
+            staliroInterface->sendEndOfSimulation();
+            staliroInterface->setSimulationStatus(3);
+        }
+        else
+        {
+            auto taskStatusRequestMsg = std::make_shared<afrl::cmasi::autonomymonitor::TaskStatusRequest>();
+            taskStatusRequestMsg->setTaskID(-1); //-1 for all tasks!
+            sendSharedLmcpObjectBroadcastMessage(taskStatusRequestMsg);
         }
     }
 

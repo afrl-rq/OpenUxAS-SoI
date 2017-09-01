@@ -3,7 +3,10 @@
         <Label>UAV 400</Label>
         <MinimumSpeed>18.0055561065674</MinimumSpeed>
         <MaximumSpeed>33.4388885498047</MaximumSpeed>
-        <NominalSpeed>22.0</NominalSpeed>
+        <NominalSpeed>
+	    <staliro_minimum> 19.0 </staliro_minimum>
+            <staliro_maximum> 22.0 </staliro_maximum>
+	</NominalSpeed>
         <NominalAltitude>1000.0</NominalAltitude>
         <NominalAltitudeType>MSL</NominalAltitudeType>
         <NominalFlightProfile>

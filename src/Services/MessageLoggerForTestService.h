@@ -98,6 +98,7 @@ private:
     std::map<int64_t, double_t> taskRobustnessResults;
     std::map<int32_t, std::vector<std::string>> trajectoryMapping;
     testgeneration::staliro::c_TrajectoryPopulator *staliroTrajectoryPopulator;
+    int64_t lastReceivedSimTime;
 };
 
 }; //namespace test
