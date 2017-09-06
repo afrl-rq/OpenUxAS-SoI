@@ -181,6 +181,7 @@ protected:
             std::shared_ptr<uxas::messages::route::EgressRouteResponse>& egressResponse);
     bool isProcessRoadPointsRequest(const std::shared_ptr<uxas::messages::route::RoadPointsRequest>& roadPointsRequest,
                                     std::shared_ptr<uxas::messages::route::RoadPointsResponse>& roadPointsResponse);
+    bool isGetRoadPoints(const int64_t& startNodeId,const int64_t& endNodeId,int32_t& pathCost,std::deque<int64_t>& pathNodeIds);
     bool isBuildRoadGraphWithOsm(const string& osmFile);
     bool isFindShortestRoute(const int64_t& startNodeId, const int64_t& endNodeId,
             int32_t& pathCost, std::deque<int64_t>& pathNodes);

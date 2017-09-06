@@ -150,8 +150,8 @@ OsmPlannerService::configure(const pugi::xml_node& ndComponent)
     // only the ground planner can fulfill this request, response (as typical) will be limited-cast back
     addSubscriptionAddress(uxas::messages::route::EgressRouteRequest::Subscription);
 
-	// subscribe, but only sends response for ground vehicles
-	addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
+    // subscribe, but only sends response for ground vehicles
+    addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
 
     // returns LineOfInterest, does not depend on entity configuration 
     addSubscriptionAddress(uxas::messages::route::RoadPointsRequest::Subscription);
@@ -173,24 +173,24 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
 {
     if (uxas::messages::route::isRoutePlanRequest(receivedLmcpMessage->m_object))
     {
-		std::shared_ptr<uxas::messages::route::RoutePlanRequest> request = std::static_pointer_cast<uxas::messages::route::RoutePlanRequest>(receivedLmcpMessage->m_object);
-		//assumes only ground vehicles
-		if (m_entityConfigurations.find(request->getVehicleID()) != m_entityConfigurations.end())
-		{
+        std::shared_ptr<uxas::messages::route::RoutePlanRequest> request = std::static_pointer_cast<uxas::messages::route::RoutePlanRequest>(receivedLmcpMessage->m_object);
+        //assumes only ground vehicles
+        if (m_entityConfigurations.find(request->getVehicleID()) != m_entityConfigurations.end())
+        {
 
-			auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
-                        routePlanResponse->setResponseID(request->getRequestID());
-			if (bProcessRoutePlanRequest(request, routePlanResponse))
-			{
-				auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
-				sendSharedLmcpObjectLimitedCastMessage(
-					getNetworkClientUnicastAddress(
-						receivedLmcpMessage->m_attributes->getSourceEntityId(),
-						receivedLmcpMessage->m_attributes->getSourceServiceId()
-					),
-					newResponse);
-			}
-		}
+            auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
+            routePlanResponse->setResponseID(request->getRequestID());
+            if (bProcessRoutePlanRequest(request, routePlanResponse))
+            {
+                auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
+                sendSharedLmcpObjectLimitedCastMessage(
+                                                       getNetworkClientUnicastAddress(
+                                                                                      receivedLmcpMessage->m_attributes->getSourceEntityId(),
+                                                                                      receivedLmcpMessage->m_attributes->getSourceServiceId()
+                                                                                      ),
+                                                       newResponse);
+            }
+        }
     }
     else if (uxas::messages::route::isRoadPointsRequest(receivedLmcpMessage->m_object))
     {
@@ -214,11 +214,11 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
         {
             auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(egressResponse);
             sendSharedLmcpObjectLimitedCastMessage(
-                    getNetworkClientUnicastAddress(
-                        receivedLmcpMessage->m_attributes->getSourceEntityId(),
-                        receivedLmcpMessage->m_attributes->getSourceServiceId()
-                    ),
-                    newResponse);
+                                                   getNetworkClientUnicastAddress(
+                                                                                  receivedLmcpMessage->m_attributes->getSourceEntityId(),
+                                                                                  receivedLmcpMessage->m_attributes->getSourceServiceId()
+                                                                                  ),
+                                                   newResponse);
         }
     }
     else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object))
@@ -239,7 +239,7 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
 };
 
 bool OsmPlannerService::bProcessEgressRequest(const std::shared_ptr<uxas::messages::route::EgressRouteRequest>& egressRequest,
-        std::shared_ptr<uxas::messages::route::EgressRouteResponse>& egressResponse)
+                                              std::shared_ptr<uxas::messages::route::EgressRouteResponse>& egressResponse)
 {
     /*
     // TODO: make this real, send two vehicles to the cordon location
@@ -255,8 +255,8 @@ bool OsmPlannerService::bProcessEgressRequest(const std::shared_ptr<uxas::messag
     double dummy = 0.0;
     std::vector<n_FrameworkLib::CPosition> intersections;
     n_FrameworkLib::CPosition center(egressRequest->getStartLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
-            egressRequest->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-            egressRequest->getStartLocation()->getAltitude(), dummy);
+                                     egressRequest->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
+                                     egressRequest->getStartLocation()->getAltitude(), dummy);
 
     findRoadIntersectionsOfCircle(center, egressRequest->getRadius(), intersections);
 
@@ -278,7 +278,7 @@ bool OsmPlannerService::bProcessEgressRequest(const std::shared_ptr<uxas::messag
 }
 
 bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::messages::route::RoutePlanRequest>& routePlanRequest,
-        std::shared_ptr<uxas::messages::route::RoutePlanResponse>& routePlanResponse)
+                                                 std::shared_ptr<uxas::messages::route::RoutePlanResponse>& routePlanResponse)
 {
     bool isSuccess(true);
 
@@ -308,14 +308,14 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
             std::vector<int64_t> waypointNodeIds;
 
             n_FrameworkLib::CPosition positionStart((*itRequest)->getStartLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
-                    (*itRequest)->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                    0.0, 0.0);
+                                                    (*itRequest)->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
+                                                    0.0, 0.0);
             int64_t nodeIdStart(-1);
             double lengthFromStartToNode(-1.0);
 
             n_FrameworkLib::CPosition positionEnd((*itRequest)->getEndLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
-                    (*itRequest)->getEndLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                    0.0, 0.0);
+                                                  (*itRequest)->getEndLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
+                                                  0.0, 0.0);
             int64_t nodeIdEnd(-1);
             double lengthFromNodeToEnd(-1.0);
 
@@ -572,9 +572,8 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
 
             if (isSuccess)
             {
-                // need these here to be availble for saving metrics
+                // need these here to be available for saving metrics
                 std::vector<int64_t> fullPathNodeIds;
-                int32_t pathCostFinal(INT32_MAX);
 
 
                 // 2) find the edges that these nodes are part of
@@ -592,6 +591,10 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                     {
                         for (auto itEdgeIdEnd = itSegmentsEnd.first; itEdgeIdEnd != itSegmentsEnd.second; itEdgeIdEnd++)
                         {
+//                            COUT_FILE_LINE_MSG("itEdgeIdStart->second.first[" << itEdgeIdStart->second.first
+//                                               << "] itEdgeIdStart->second.second[" << itEdgeIdStart->second.second
+//                                               << "] itEdgeIdEnd->second.first[" << itEdgeIdEnd->second.first
+//                                               << "] itEdgeIdEnd->second.second[" << itEdgeIdEnd->second.second << "]")
                             if ((itEdgeIdStart->second.first == itEdgeIdEnd->second.first) &&
                                     (itEdgeIdStart->second.second == itEdgeIdEnd->second.second))
                             {
@@ -709,95 +712,49 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                         // 5) find four shortest paths from the combination of start/end nodes
                         // 6) choose pair of nodes that implement the shortest path (include start/end distances)
 
-                        int64_t planningNodeStart(startSegmentNodeId_01);
-                        int64_t planningNodeEnd(endSegmentNodeId_01);
+                        int32_t pathCostFinal(INT32_MAX);
                         int32_t pathCost(INT32_MAX);
                         std::deque<int64_t> pathNodeIds;
                         std::deque<int64_t> pathNodeIdsFinal;
-
-                        if (startSegmentNodeId_01 != endSegmentNodeId_01)
+                        if(isGetRoadPoints(startSegmentNodeId_01,endSegmentNodeId_01,pathCost,pathNodeIds))
                         {
-                            pathCost = INT32_MAX;
-                            pathNodeIds.clear();
-                            if (isFindShortestRoute(startSegmentNodeId_01, endSegmentNodeId_01, pathCost, pathNodeIds))
+                            pathCost += static_cast<int32_t> (distanceStartToStart_01 + distanceEndToEnd_01);
+                            if (pathCost < pathCostFinal)
                             {
-                                pathCostFinal = pathCost + static_cast<int32_t> (distanceStartToStart_01 + distanceEndToEnd_01);
+                                pathCostFinal = pathCost;
                                 pathNodeIdsFinal = pathNodeIds;
                             }
-                            else
-                            {
-                                CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << edgeBeginNodeId << "," << edgeEndNodeId << "] start/end IDs [" << nodeIdStart << "," << edgeEndNodeId << "]")
-                                isSuccess = false;
-                            }
                         }
-
-                        if (startSegmentNodeId_01 != endSegmentNodeId_02)
+                        if(isGetRoadPoints(startSegmentNodeId_01,endSegmentNodeId_02,pathCost,pathNodeIds))
                         {
-                            pathCost = INT32_MAX;
-                            pathNodeIds.clear();
-                            if (isFindShortestRoute(startSegmentNodeId_01, endSegmentNodeId_02, pathCost, pathNodeIds))
+                            pathCost += static_cast<int32_t> (distanceStartToStart_01 + distanceEndToEnd_02);
+                            if (pathCost < pathCostFinal)
                             {
-                                pathCost += static_cast<int32_t> (distanceStartToStart_01 + distanceEndToEnd_02);
-                                if (pathCost < pathCostFinal)
-                                {
-                                    planningNodeStart = startSegmentNodeId_01;
-                                    planningNodeEnd = endSegmentNodeId_02;
-                                    pathCostFinal = pathCost;
-                                    pathNodeIdsFinal = pathNodeIds;
-                                }
-                            }
-                            else
-                            {
-                                CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << edgeBeginNodeId << "," << edgeEndNodeId << "] start/end IDs [" << nodeIdStart << "," << edgeEndNodeId << "]")
-                                isSuccess = false;
+                                pathCostFinal = pathCost;
+                                pathNodeIdsFinal = pathNodeIds;
                             }
                         }
-
-                        if (startSegmentNodeId_02 != endSegmentNodeId_01)
+                        if(isGetRoadPoints(startSegmentNodeId_02,endSegmentNodeId_01,pathCost,pathNodeIds))
                         {
-                            pathCost = INT32_MAX;
-                            pathNodeIds.clear();
-                            if (isFindShortestRoute(startSegmentNodeId_02, endSegmentNodeId_01, pathCost, pathNodeIds))
+                            pathCost += static_cast<int32_t> (distanceStartToStart_02 + distanceEndToEnd_01);
+                            if (pathCost < pathCostFinal)
                             {
-                                pathCost += static_cast<int32_t> (distanceStartToStart_02 + distanceEndToEnd_01);
-                                if (pathCost < pathCostFinal)
-                                {
-                                    planningNodeStart = startSegmentNodeId_02;
-                                    planningNodeEnd = endSegmentNodeId_01;
-                                    pathCostFinal = pathCost;
-                                    pathNodeIdsFinal = pathNodeIds;
-                                }
-                            }
-                            else
-                            {
-                                CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << edgeBeginNodeId << "," << edgeEndNodeId << "] start/end IDs [" << nodeIdStart << "," << edgeEndNodeId << "]")
-                                isSuccess = false;
+                                pathCostFinal = pathCost;
+                                pathNodeIdsFinal = pathNodeIds;
                             }
                         }
-
-                        if (startSegmentNodeId_02 != endSegmentNodeId_02)
+                        if(isGetRoadPoints(startSegmentNodeId_02,endSegmentNodeId_02,pathCost,pathNodeIds))
                         {
-                            pathCost = INT32_MAX;
-                            pathNodeIds.clear();
-                            if (isFindShortestRoute(startSegmentNodeId_02, endSegmentNodeId_02, pathCost, pathNodeIds))
+                            pathCost += static_cast<int32_t> (distanceStartToStart_02 + distanceEndToEnd_02);
+                            if (pathCost < pathCostFinal)
                             {
-                                pathCost += static_cast<int32_t> (distanceStartToStart_02 + distanceEndToEnd_02);
-                                if (pathCost < pathCostFinal)
-                                {
-                                    planningNodeStart = startSegmentNodeId_02;
-                                    planningNodeEnd = endSegmentNodeId_02;
-                                    pathCostFinal = pathCost;
-                                    pathNodeIdsFinal = pathNodeIds;
-                                }
-                            }
-                            else
-                            {
-                                CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << edgeBeginNodeId << "," << edgeEndNodeId << "] start/end IDs [" << nodeIdStart << "," << edgeEndNodeId << "]")
-                                isSuccess = false;
+                                pathCostFinal = pathCost;
+                                pathNodeIdsFinal = pathNodeIds;
                             }
                         }
+                        
 
-                        if (pathNodeIdsFinal.size() > 1) // N--^--X-----X---^---N
+                        if (pathNodeIdsFinal.size() >= 1) // N--^--X-----X---^---N or N--^--X--^--N
                         {
 
                             // 7) build plan from closest start node to start node
@@ -951,7 +908,7 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                                 << nodeIdStart << ", "
                                 << nodeIdEnd << ", "
                                 << fullPathNodeIds.size() << ", "
-                                << pathCostFinal << ", "
+                                //<< pathCostFinal << ", "
                                 << m_searchTime_s << ", "
                                 << m_processPlanTime_s
                                 << std::endl;
@@ -970,6 +927,31 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
     return (isSuccess);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+
+bool OsmPlannerService::isGetRoadPoints(const int64_t& startNodeId,const int64_t& endNodeId,int32_t& pathCost,std::deque<int64_t>& pathNodeIds)
+{
+    bool isSuccess{true};
+    
+    pathCost = INT32_MAX;
+    pathNodeIds.clear();
+    if (startNodeId != endNodeId)
+    {
+        if (!isFindShortestRoute(startNodeId, endNodeId, pathCost, pathNodeIds))
+        {
+            CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << startNodeId << "," << endNodeId << "]")
+            isSuccess = false;
+        }
+    }
+    else
+    {
+        pathCost = 0;   //THIS IS THE COST OF THE INTERVENING SEGEMENTS
+        pathNodeIds.clear();
+        pathNodeIds.push_back(startNodeId);
+    }
+    return(isSuccess);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
 
@@ -1221,7 +1203,7 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
 }
 
 bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, bool>& nodeIdVs_isPlanningNode,
-        const std::vector<int64_t>& highWayIds)
+                                              const std::vector<int64_t>& highWayIds)
 {
     bool isSuccess(true);
 
@@ -1381,7 +1363,7 @@ bool OsmPlannerService::isBuildFullPlot(const std::vector<int64_t>& highWayIds)
 }
 
 bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planningNodeIds,
-        const std::vector<int64_t>& highWayIds)
+                                     const std::vector<int64_t>& highWayIds)
 {
     bool isSuccess(true);
 
@@ -1529,7 +1511,7 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
 }
 
 bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const int64_t& endNodeId,
-        int32_t& pathLength, std::deque<int64_t>& pathNodes)
+                                            int32_t& pathLength, std::deque<int64_t>& pathNodes)
 {
     bool isSuccess(false);
 
@@ -1554,11 +1536,11 @@ bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const in
             // call astar named parameter interface
             boost::astar_search
                     (*m_graph, start,
-                    //manhattan_distance_heuristic(m_idVsNode,m_planningIndexVsNodeId,*(itEndNode->second)),
-                    euclidean_distance_heuristic(m_idVsNode, m_planningIndexVsNodeId, *(itEndNode->second)),
-                    predecessor_map(boost::make_iterator_property_map(p.begin(), boost::get(boost::vertex_index, *m_graph))).
-                    distance_map(boost::make_iterator_property_map(d.begin(), boost::get(boost::vertex_index, *m_graph))).
-                    visitor(astar_goal_visitor(goal)));
+                     //manhattan_distance_heuristic(m_idVsNode,m_planningIndexVsNodeId,*(itEndNode->second)),
+                     euclidean_distance_heuristic(m_idVsNode, m_planningIndexVsNodeId, *(itEndNode->second)),
+                     predecessor_map(boost::make_iterator_property_map(p.begin(), boost::get(boost::vertex_index, *m_graph))).
+                     distance_map(boost::make_iterator_property_map(d.begin(), boost::get(boost::vertex_index, *m_graph))).
+                     visitor(astar_goal_visitor(goal)));
         }
         catch (found_goal fg)
         {
@@ -1614,7 +1596,7 @@ bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const in
 
 bool OsmPlannerService::isFindClosestNodeId(const n_FrameworkLib::CPosition& position,
                                             std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash >& cellVsNodeIds,
-        int64_t& nodeId, double& length_m)
+                                            int64_t& nodeId, double& length_m)
 {
     bool isFoundNewNode(false);
 
@@ -1650,10 +1632,10 @@ bool OsmPlannerService::isFindClosestNodeId(const n_FrameworkLib::CPosition& pos
 }
 
 bool OsmPlannerService::isExamineCellsInSquare(const n_FrameworkLib::CPosition& position,
-        const int32_t& northStart, const int32_t& northEnd,
-        const int32_t& eastStart, const int32_t& eastEnd,
+                                               const int32_t& northStart, const int32_t& northEnd,
+                                               const int32_t& eastStart, const int32_t& eastEnd,
                                                std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash >& cellVsNodeIds,
-        double& candidateLength_m, int64_t & candidateNodeId)
+                                               double& candidateLength_m, int64_t & candidateNodeId)
 {
     bool isFoundNewNode(false);
 
@@ -1688,9 +1670,9 @@ bool OsmPlannerService::isExamineCellsInSquare(const n_FrameworkLib::CPosition& 
 }
 
 bool OsmPlannerService::isExamineCell(const n_FrameworkLib::CPosition& position,
-        const int32_t& north, const int32_t& east,
+                                      const int32_t& north, const int32_t& east,
                                       std::unordered_multimap<std::pair<int32_t, int32_t>, int64_t, PairIdHash >& cellVsNodeIds,
-        double& candidateLength_m, int64_t & candidateNodeId)
+                                      double& candidateLength_m, int64_t & candidateNodeId)
 {
     bool isFoundNewNode(false);
 
@@ -1724,7 +1706,7 @@ bool OsmPlannerService::isExamineCell(const n_FrameworkLib::CPosition& position,
 }
 
 void OsmPlannerService::findRoadIntersectionsOfCircle(const n_FrameworkLib::CPosition& center, const double& radius_m,
-        std::vector<n_FrameworkLib::CPosition>& intersections)
+                                                      std::vector<n_FrameworkLib::CPosition>& intersections)
 {
     intersections.clear();
     //find all of the cells inside and containing the circle
@@ -1936,21 +1918,21 @@ void OsmPlannerService::savePythonPlotCode()
 
     if (!m_shortestPathFileName.empty())
     {
-    pythonFileStream << "\t# the shortest path file" << std::endl;
-    pythonFileStream << "\tPlotShortestPath = True" << std::endl;
-    pythonFileStream << "\tif PlotShortestPath:" << std::endl;
-    pythonFileStream << "\t\trecarrayShortestPath = []" << std::endl;
-    pythonFileStream << "\t\tfor ShortestPathFile in glob.glob('*" << m_shortestPathFileName << "*') :" << std::endl;
-    pythonFileStream << "\t\t\tprint 'loading [' + ShortestPathFile + ']'" << std::endl;
-    pythonFileStream << "\t\t\ttry:" << std::endl;
-    pythonFileStream << "\t\t\t\trecarrayShortestPath.append(mlab.csv2rec(ShortestPathFile))" << std::endl;
-    pythonFileStream << "\t\t\texcept StandardError:" << std::endl;
-    pythonFileStream << "\t\t\t\tprint 'No edges found in [' + ShortestPathFile + ']'" << std::endl;
-    pythonFileStream << "\t\t\tfor recarrayEdge in recarrayShortestPath :" << std::endl;
-    pythonFileStream << "\t\t\t\tfor edge in recarrayEdge :" << std::endl;
-    pythonFileStream << "\t\t\t\t\tline, = plt.plot([edge.edge_east_01, edge.edge_east_02], [edge.edge_north_01, edge.edge_north_02],linewidth=4.0, linestyle = '-', color = '#880000')" << std::endl;
-    pythonFileStream << "\t\t\t\t\tlabelString = '[' + str(edge.node_id_1) + ']'" << std::endl;
-    pythonFileStream << "\t\t\t\t\t# plt.text(edge.edge_east_01, edge.edge_north_01, labelString, horizontalalignment = 'left', verticalalignment = 'bottom')" << std::endl;
+        pythonFileStream << "\t# the shortest path file" << std::endl;
+        pythonFileStream << "\tPlotShortestPath = True" << std::endl;
+        pythonFileStream << "\tif PlotShortestPath:" << std::endl;
+        pythonFileStream << "\t\trecarrayShortestPath = []" << std::endl;
+        pythonFileStream << "\t\tfor ShortestPathFile in glob.glob('*" << m_shortestPathFileName << "*') :" << std::endl;
+        pythonFileStream << "\t\t\tprint 'loading [' + ShortestPathFile + ']'" << std::endl;
+        pythonFileStream << "\t\t\ttry:" << std::endl;
+        pythonFileStream << "\t\t\t\trecarrayShortestPath.append(mlab.csv2rec(ShortestPathFile))" << std::endl;
+        pythonFileStream << "\t\t\texcept StandardError:" << std::endl;
+        pythonFileStream << "\t\t\t\tprint 'No edges found in [' + ShortestPathFile + ']'" << std::endl;
+        pythonFileStream << "\t\t\tfor recarrayEdge in recarrayShortestPath :" << std::endl;
+        pythonFileStream << "\t\t\t\tfor edge in recarrayEdge :" << std::endl;
+        pythonFileStream << "\t\t\t\t\tline, = plt.plot([edge.edge_east_01, edge.edge_east_02], [edge.edge_north_01, edge.edge_north_02],linewidth=4.0, linestyle = '-', color = '#880000')" << std::endl;
+        pythonFileStream << "\t\t\t\t\tlabelString = '[' + str(edge.node_id_1) + ']'" << std::endl;
+        pythonFileStream << "\t\t\t\t\t# plt.text(edge.edge_east_01, edge.edge_north_01, labelString, horizontalalignment = 'left', verticalalignment = 'bottom')" << std::endl;
         pythonFileStream << "\t#############################################" << std::endl;
     }
 
