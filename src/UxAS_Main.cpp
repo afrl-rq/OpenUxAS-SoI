@@ -23,7 +23,7 @@
 #include "UxAS_StringUtil.h"
 
 #ifdef AFRL_INTERNAL_ENABLED
-#include "UxAS_SerialPortEmulator.h"
+//#include "UxAS_SerialPortEmulator.h"
 #endif
 
 #include "stdUniquePtr.h"
