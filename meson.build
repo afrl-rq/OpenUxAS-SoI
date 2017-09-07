@@ -16,6 +16,7 @@ elif os == 'windows'
 endif
 
 if get_option('afrl_internal')
+  add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
 endif
 
