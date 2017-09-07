@@ -1,0 +1,6 @@
+1. Rename libstdc++.so.6 in $MATLAB_FOLDER/sys/os/glnxa64. Otherwise Matlab uses this lib which can conflict with the system's libstd and cause uxas to crash when started from Matlab.
+2. In struct2xml.m (external dependency downloaded from Matlab file exchange), change the line containing “str = [];” with “str = ‘’;” in the val2str() function. This avoids issues with empty xml tags.
+3. Remove any commented out tags in the xml files. Otherwise xml2struct function can not correctly extract the xml structure.
+4. Correct the local path dependencies in the files “staliro_uxas_demo.m” and in “uxas_blackbox.m” (or the corresponding test setup files).
+5. Make sure the simulation time for AMASE scenario configuration is larger than the simulation time used to call staliro.
+6. See uxas examples folder, 06_Test_WaterwaySearch folder for xml configuration examples.
