@@ -23,16 +23,12 @@
 
         <h2>Changes</h2>
         
-        <h3>27 August 2017</h3>
-        <ul>
-            <li>Added 'AssociatedActions' to {@link CameraAction}. This makes it possible to command sensor pointing and zoom in the same message.</li>
-        </ul>
-        
         <h3>19 July 2017</h3>
 		<ul>
 			<li>Added maxmimum length bounds to all arrays. Does not change serialization API, however, it can be used to check properly formatted messages during deserialization. Because 'max array length' is informational, wire compatability is preserved (so version number is NOT incremented).</li>
 			<li>Added 'Optional' indicator on fields of messages that contain references to other messages. For fields that are not indicated as Optional, a viable message must not send 'null' in that field. Does not change serialization API and wire compatability is preserved (so version number is NOT incremented).</li>
 		</ul>
+		
         <h3>7 May 2015</h3>
 		<ul>
 			<li>Added nominal altitde in {@link EntityConfiguration}</li>
@@ -810,9 +806,6 @@
         <Struct Name="CameraAction" Extends="PayloadAction">
             <!-- The commanded horizontal (azimuth) field of view. -->
             <Field Name="HorizontalFieldOfView" Type="real32" Units="degree" />
-            <!-- Associated payload actions that should be performed simultaneously with the change in field of view. A frequent use case would be a gimbal pointing action. If payload ID is zero, then the gimbal on which the camera is mounted is selected. Note that this has the side-effect of steering all other payloads associated to that gimbal. -->
-            <Field Name="AssociatedActions" Type="PayloadAction[]"  MaxArrayLength="8" />
-
         </Struct>
 
         <!--
