@@ -9,7 +9,9 @@
 
 #include "UxAS_ConfigurationManager.h"
 
+#ifdef AFRL_INTERNAL_ENABLED
 #include "GroundHeight.h"   // utility function that needs dted configuration file names form the cfg file
+#endif
 
 #include "UxAS_ConsoleLogger.h"
 #include "UxAS_HeadLogDataDatabaseLogger.h"
@@ -146,7 +148,9 @@ ConfigurationManager::loadXml(const std::string& xml, bool isFile, bool isBaseXm
         {
             isSuccess = false;
         }
+#ifdef AFRL_INTERNAL_ENABLED
         loadUtilityValuesFromXmlNode(m_baseXmlDoc.root());
+#endif
     }
 
     if (isSuccess)
@@ -399,6 +403,7 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
     return (isSuccess);
 };
 
+#ifdef AFRL_INTERNAL_ENABLED
 void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 {
     pugi::xml_node xmlUxasNode = xmlNode.child(StringConstant::UxAS().c_str());
@@ -434,6 +439,7 @@ void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xm
         }
     }
 }
+#endif
 
 
 

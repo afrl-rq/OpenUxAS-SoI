@@ -267,6 +267,7 @@ private:
     bool
     setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode);
 
+#ifdef AFRL_INTERNAL_ENABLED
     /** \brief The <B><i>loadUtilityValuesFromXmlNode</i></B> method loads 
      * found within child nodes of the UxAS node. After loading the values
      * the utility initialization functions are called.
@@ -275,7 +276,8 @@ private:
      */
     void
     loadUtilityValuesFromXmlNode(const pugi::xml_node& xmlNode);
-
+#endif 
+    
 ////cfg_RoadMonitor2_V400.xml
 ////TcpBridge
 ////ICET_CCA
