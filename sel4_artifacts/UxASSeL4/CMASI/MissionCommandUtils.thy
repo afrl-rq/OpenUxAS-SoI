@@ -50,7 +50,9 @@ definition is_valid_MissionCommand where
     is_valid_MissionCommand_struct_C s mcp
     \<and> (\<forall> j < unat (get_waypoints_length s mcp).
         is_valid_Waypoint_struct_C'ptr s (get_waypoint_ptr_ptr s mcp j)
-        \<and> is_valid_Waypoint_struct_C s (get_waypoint_ptr s mcp j))"
+        \<and> is_valid_Waypoint_struct_C s (get_waypoint_ptr s mcp j) 
+        \<and> get_waypoint_ptr s mcp j \<noteq> NULL
+        \<and> get_waypoint_ptr_ptr s mcp j \<noteq> NULL)"
 
 (* Lift waypoints from a mission command into a list with the same order. *)
 fun lift_waypoints  where
@@ -200,12 +202,34 @@ lemma findwp_success:
     apply (unfold is_valid_MissionCommand_def)
     apply wp
     apply auto
-    done
-      
+    done   
+
+lemma c:"None = find_waypoint ws n \<Longrightarrow> \<forall> i < length ws. number_C (ws ! i) \<noteq> n"
+  proof(induct ws)
+    case Nil
+    then show ?case by auto
+  next
+    case (Cons x1 ws)
+    then show ?case 
+      by (metis Suc_less_eq find_waypoint.simps(2) gr0_conv_Suc length_Cons not_gr_zero nth_Cons' nth_Cons_Suc option.discI)
+  qed
+
+lemma d:"None = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) n 
+\<Longrightarrow> \<forall> i < get_waypoints_length s mcp. number_C (get_waypoint s mcp (int (unat i))) \<noteq> n"
+proof -
+  assume a:"None = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) n"
+  then obtain ws where y1:"ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))" and y2:"None = find_waypoint ws n" by auto
+  then have "\<forall>i<length ws. number_C (ws ! i) \<noteq> n" using c y2 by auto
+  then have "\<forall>i<unat (get_waypoints_length s mcp). number_C (ws ! i) \<noteq> n" using lift_waypoints_length[OF y1] by auto
+  then have "\<forall>i<unat (get_waypoints_length s mcp). number_C (get_waypoint s mcp (int i)) \<noteq> n" using lift_waypoints_to_get_waypoint[OF y1] by auto
+  thus ?thesis by (simp add: uint_nat word_less_def)
+qed
+  
 lemma findwp_failure:
 "\<lbrace> \<lambda> (s::lifted_globals).
   is_valid_MissionCommand s mcp
-  \<and> None = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i
+  \<and> ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))
+  \<and> None = find_waypoint ws i
   \<and> P s\<rbrace>
   MissionCommandUtils.MissionCommandUtils.FindWP' mcp i
 \<lbrace> \<lambda> r s. r = NULL \<and> P s\<rbrace>!"
@@ -214,13 +238,29 @@ lemma findwp_failure:
   apply(subst whileLoopE_add_inv[where M = "\<lambda> (j,s). unat (get_waypoints_length s mcp - j)"
                                  and I = "\<lambda> j s. P s 
 \<and> is_valid_MissionCommand s mcp
-\<and> None = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i
-\<and> None = find_waypoint (lift_waypoints s mcp (unat j)) i
-\<and> j \<le> get_waypoints_length s mcp
+\<and> lift_waypoints s mcp (unat (get_waypoints_length s mcp)) = ws
+(*\<and> (\<forall> k < (unat (get_waypoints_length s mcp)). get_waypoint s mcp k = nth ws k)*)
+\<and> None = find_waypoint ws i
+(*\<and> None = find_waypoint (lift_waypoints s mcp (unat j)) i *)
+(*\<and> i \<noteq> number_C (get_waypoint s mcp (unat j))*)
+(*\<and> j \<le> get_waypoints_length s mcp
+\<and> 0 < get_waypoints_length s mcp*)
 "])
     apply wp
     apply clarsimp
-    apply auto
-    sorry
+    apply (auto simp add: uint_nat findwp_success_aux4)
+  using d  apply blast
+                  using is_valid_MissionCommand_def word_less_nat_alt apply blast
 
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+                
+              apply wp
+              apply auto
+              using is_valid_MissionCommand_def word_less_nat_alt apply blast
+done
 end
