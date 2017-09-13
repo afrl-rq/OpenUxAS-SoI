@@ -1,0 +1,29 @@
+package UxAS_responds_pkg
+public
+	--Included DataTypes
+    with CMASI;
+    with UXTASK;
+    
+    -- Included Main Services
+	with AutomationRequestValidatorService_Pkg;	
+    
+    process UxAS_responds
+    	features
+    		AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
+    		UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
+    	annex agree {**
+    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, 
+    			UxAS responds with a UniqueAutomationRequest_out on the next timestep.":
+    			pre(event(AutomationRequest_in)) => event(UniqueAutomationRequest_out);
+    	**};
+    end UxAS_responds;
+    
+    process implementation UxAS_responds.i
+    	subcomponents
+    		 AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService;
+    	connections
+    		conn001: port AutomationRequest_in -> AutomationRequestValidatorService.AutomationRequest_in;
+    		conn002: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> UniqueAutomationRequest_out;
+    end UxAS_responds.i;
+    
+end UxAS_responds_pkg;
