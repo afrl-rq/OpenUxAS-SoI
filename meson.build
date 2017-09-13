@@ -127,7 +127,9 @@ subdir('src/Includes')
 deps = []
 
 # OpenGL, specifically the GLU library
-deps += [dependency('gl')]
+if not (target_machine.cpu_family() == 'arm')
+  deps += [dependency('gl')]
+endif
 if os == 'darwin'
   # newer MacOS splits out GLU into a separate framework, but we can't
   # ask Meson for the version in order to handle things differently
@@ -139,7 +141,9 @@ if os == 'darwin'
     endif
   endforeach
 elif os.startswith('linux')
-  deps += [dependency('glu')]
+  if not (target_machine.cpu_family() == 'arm')
+    deps += [dependency('glu')]
+  endif
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif

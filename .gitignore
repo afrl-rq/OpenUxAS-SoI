@@ -1,6 +1,7 @@
 # build directories
 build
 build_debug
+build_odroid
 
 # afrl internal directories
 UxAS-afrl_internal
