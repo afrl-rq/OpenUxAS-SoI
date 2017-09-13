@@ -32,6 +32,7 @@
 
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
+#include <afrl/cmasi/GimbalConfiguration.h>
 
 
 #define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "IMPCT_PS-IMPCT_PS-IMPCT_PS-IMPCT_PS:: ImpactPointSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
@@ -305,28 +306,39 @@ bool ImpactPointSearchTaskService::isCalculateOption(const int64_t& taskId, int6
 bool ImpactPointSearchTaskService::isProcessTaskImplementationRouteResponse(std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse, std::shared_ptr<TaskOptionClass>& taskOptionClass,
                                                                             int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route)
 {
-    //add the desired action, if any
-    if (!taskImplementationResponse->getTaskWaypoints().empty() && (m_pointSearchTask->getDesiredAction() != nullptr))
-    {
-        taskImplementationResponse->getTaskWaypoints().back()->getVehicleActionList().push_back(m_pointSearchTask->getDesiredAction()->clone());
-    }
-    return (false); // want the base class to build the response
+	//add the desired action, if any
+	if (!taskImplementationResponse->getTaskWaypoints().empty() && (m_pointSearchTask->getDesiredAction() != nullptr))
+	{
+		if (m_entityStates.find(taskImplementationResponse.get()->getVehicleID()) != m_entityStates.end())
+		{
+			auto lastWaypoint = taskImplementationResponse->getTaskWaypoints().back();
+			m_pointSearchTask->getDesiredAction()->getLocation()->setAltitude(lastWaypoint->getAltitude());
+
+			auto finalWaypoint = taskImplementationResponse->getTaskWaypoints().back();
+			finalWaypoint->getVehicleActionList().push_back(m_pointSearchTask->getDesiredAction()->clone());
+
+			//set up a gimbal stare action
+			auto gimbalStareAction = std::make_shared<afrl::cmasi::GimbalStareAction>();
+			gimbalStareAction->setStarepoint(m_pointSearchTask->getSearchLocation()->clone());
+			if (m_entityConfigurations.find(taskImplementationResponse.get()->getVehicleID()) != m_entityConfigurations.end())
+			{
+				auto config = m_entityConfigurations[taskImplementationResponse.get()->getVehicleID()];
+				for (auto payload : config->getPayloadConfigurationList())
+				{
+					if (afrl::cmasi::isGimbalConfiguration(payload))
+					{
+						gimbalStareAction->setPayloadID(payload->getPayloadID());
+					}
+				}
+			}
+			finalWaypoint->getVehicleActionList().push_back(gimbalStareAction->clone());
+		}
+	}
+	return (false); // want the base class to build the response
 }
 
 void ImpactPointSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)
 {
-    // point the camera at the search point
-    auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
-    //vehicleActionCommand->setCommandID();
-    vehicleActionCommand->setVehicleID(entityState->getID());
-    //vehicleActionCommand->setStatus();
-    auto gimbalStareAction = new afrl::cmasi::GimbalStareAction;
-    gimbalStareAction->setStarepoint(m_pointSearchTask->getSearchLocation()->clone());
-    vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction);
-    gimbalStareAction = nullptr; //gave up ownership
-    // send out the response
-    auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(vehicleActionCommand);
-    sendSharedLmcpObjectBroadcastMessage(newMessage);
 }
 
 
