@@ -10,10 +10,10 @@ public
     process UxAS_responds
     	features
     		AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
-    		UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
+    		            AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
     	annex agree {**
-    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, UxAS responds with a UniqueAutomationRequest_out on the next timestep.":
-    			true -> (pre(event(AutomationRequest_in)) => event(UniqueAutomationRequest_out));
+    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, UxAS responds with a AutomationResponse_out on the next timestep.":
+    			true -> (pre(event(AutomationRequest_in)) => event(AutomationResponse_out));
     	**};
     end UxAS_responds;
     
@@ -22,7 +22,7 @@ public
     		 AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService;
     	connections
     		conn001: port AutomationRequest_in -> AutomationRequestValidatorService.AutomationRequest_in;
-    		conn002: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> UniqueAutomationRequest_out;
+    		conn002: port AutomationRequestValidatorService.AutomationResponse_out -> AutomationResponse_out;
     end UxAS_responds.i;
     
 end UxAS_responds_pkg;
