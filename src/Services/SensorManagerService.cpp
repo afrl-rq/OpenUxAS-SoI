@@ -269,75 +269,61 @@ void SensorManagerService::FindSensorFootPrint(const std::shared_ptr<afrl::cmasi
                                 {
                                     //this is one of our cameras
                                     auto cameraConfiguration = static_cast<afrl::cmasi::CameraConfiguration*> (payloadConfiguration2);
-                                    if ((cameraConfiguration->getSupportedWavelengthBand() == wavelength) ||
-                                            (afrl::cmasi::WavelengthBand::AllAny == wavelength))
-                                    {
-                                        double dAspectRatio = (cameraConfiguration->getVideoStreamVerticalResolution() == 0) ? (1.0) :
-                                                (static_cast<double> (cameraConfiguration->getVideoStreamHorizontalResolution()) / static_cast<double> (cameraConfiguration->getVideoStreamVerticalResolution()));
-                                        double videoStreamResolutionMin = (cameraConfiguration->getVideoStreamHorizontalResolution() < cameraConfiguration->getVideoStreamVerticalResolution()) ?
-                                                (cameraConfiguration->getVideoStreamHorizontalResolution()) :
-                                                (cameraConfiguration->getVideoStreamVerticalResolution());
-                                        if (cameraConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Discrete)
-                                        {
-                                            for (auto& horizantalFov_deg : cameraConfiguration->getDiscreteHorizontalFieldOfViewList())
-                                            {
-                                                // calculate GSD
-                                                double horizantalFov_rad = horizantalFov_deg * n_Const::c_Convert::dDegreesToRadians();
-                                                double alpha_rad = (videoStreamResolutionMin <= 0.0) ? (n_Const::c_Convert::dPiO2() /*ERROR:: make it worst case*/) : (horizantalFov_rad / videoStreamResolutionMin);
-                                                double gsd_m = dSlantRangeMin_m * sin(alpha_rad);
-                                                double gsdDeltaDesired_m = desiredGsd_m - gsd_m;
-                                                // if the new GSD is less than or equal to the desired, and if is closer to the desired than the last one
-                                                if ((n_Const::c_Convert::bCompareDouble(gsdDeltaDesired_m, 0.0, n_Const::c_Convert::enGreaterEqual)) &&
-                                                        ((desiredGsd_m - sensorFootprint->getAchievedGSD()) > gsdDeltaDesired_m))
-                                                {
-                                                    sensorFootprint->setCameraID(sensorID);
-                                                    sensorFootprint->setGimbalID(gimbalId);
-                                                    sensorFootprint->setHorizontalFOV(horizantalFov_deg);
-                                                    sensorFootprint->setAglAltitude(altitudeAgl_m);
-                                                    sensorFootprint->setGimbalElevation(gimbalElevation_rad * n_Const::c_Convert::dRadiansToDegrees());
-                                                    sensorFootprint->setAspectRatio(dAspectRatio);
-                                                    sensorFootprint->setAchievedGSD(gsd_m);
-                                                    sensorFootprint->setCameraWavelength(cameraConfiguration->getSupportedWavelengthBand());
+									if ((cameraConfiguration->getSupportedWavelengthBand() == wavelength) ||
+										(afrl::cmasi::WavelengthBand::AllAny == wavelength))
+									{
+										double dAspectRatio = (cameraConfiguration->getVideoStreamVerticalResolution() == 0) ? (1.0) :
+											(static_cast<double> (cameraConfiguration->getVideoStreamHorizontalResolution()) / static_cast<double> (cameraConfiguration->getVideoStreamVerticalResolution()));
+										double videoStreamResolutionMin = (cameraConfiguration->getVideoStreamHorizontalResolution() < cameraConfiguration->getVideoStreamVerticalResolution()) ?
+											(cameraConfiguration->getVideoStreamHorizontalResolution()) :
+											(cameraConfiguration->getVideoStreamVerticalResolution());
 
-                                                    CalculateSensorFootprint(horizantalFov_rad, dAspectRatio, gimbalElevation_rad, altitudeAgl_m, sensorFootprint);
-                                                }
-                                            }
-                                        }
-                                        else if (cameraConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Continuous) //if(gimbalConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Discrete)
-                                        {
-                                            //TODO:: sweep through FOVs
-                                            for (double horizantalFov_deg = cameraConfiguration->getMinHorizontalFieldOfView();
-                                                    horizantalFov_deg <= cameraConfiguration->getMaxHorizontalFieldOfView();
-                                                    horizantalFov_deg += HORIZANTAL_FOV_STEP_SIZE_DEG)
-                                            {
-                                                // calculate GSD
-                                                double horizantalFov_rad = horizantalFov_deg * n_Const::c_Convert::dDegreesToRadians();
-                                                double alpha_rad = (videoStreamResolutionMin <= 0.0) ? (n_Const::c_Convert::dPiO2() /*ERROR:: make it worst case*/) : (horizantalFov_rad / videoStreamResolutionMin);
-                                                double gsd_m = dSlantRangeMin_m * sin(alpha_rad);
-                                                double gsdDeltaDesired_m = desiredGsd_m - gsd_m;
-                                                // if the new GSD is less than or equal to the desired, and if is closer to the desired than the last one
-                                                if ((n_Const::c_Convert::bCompareDouble(gsdDeltaDesired_m, 0.0, n_Const::c_Convert::enGreaterEqual)) &&
-                                                        ((desiredGsd_m - sensorFootprint->getAchievedGSD()) > gsdDeltaDesired_m))
-                                                {
-                                                    sensorFootprint->setCameraID(sensorID);
-                                                    sensorFootprint->setGimbalID(gimbalId);
-                                                    sensorFootprint->setHorizontalFOV(horizantalFov_deg);
-                                                    sensorFootprint->setAglAltitude(altitudeAgl_m);
-                                                    sensorFootprint->setGimbalElevation(gimbalElevation_rad * n_Const::c_Convert::dRadiansToDegrees());
-                                                    sensorFootprint->setAspectRatio(dAspectRatio);
-                                                    sensorFootprint->setAchievedGSD(gsd_m);
-                                                    sensorFootprint->setCameraWavelength(cameraConfiguration->getSupportedWavelengthBand());
+										std::vector<float> horizontalFieldOfViewList;
+										if (cameraConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Discrete)
+										{
+											horizontalFieldOfViewList = cameraConfiguration->getDiscreteHorizontalFieldOfViewList();
+										}
+										else if (cameraConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Continuous)
+										{
+											for (double horizantalFov_deg = cameraConfiguration->getMinHorizontalFieldOfView();
+												horizantalFov_deg <= cameraConfiguration->getMaxHorizontalFieldOfView();
+												horizantalFov_deg += HORIZANTAL_FOV_STEP_SIZE_DEG)
+											{
+												horizontalFieldOfViewList.push_back(horizantalFov_deg);
+											}
+										}
+										else
+										{
 
-                                                    CalculateSensorFootprint(horizantalFov_rad, dAspectRatio, gimbalElevation_rad, altitudeAgl_m, sensorFootprint);
-                                                }
-                                            }
-                                        }
-                                        else //if(gimbalConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Discrete)
-                                        {
-                                            CERR_FILE_LINE_MSG("ERROR::FindSensorFootPrint:: unknown FieldOfViewMode[" << cameraConfiguration->getFieldOfViewMode() << "]")
-                                        } //if(gimbalConfiguration->getFieldOfViewMode() == afrl::cmasi::FOVOperationMode::Discrete)
-                                    } //if(cameraConfiguration->getSupportedWavelengthBand() == wavelength)
-                                }
+										}
+										bool firstGsdInitialized = false;
+										for (auto& horizantalFov_deg : horizontalFieldOfViewList)
+										{
+											// calculate GSD
+											double horizantalFov_rad = horizantalFov_deg * n_Const::c_Convert::dDegreesToRadians();
+											double alpha_rad = (videoStreamResolutionMin <= 0.0) ? (n_Const::c_Convert::dPiO2() /*ERROR:: make it worst case*/) : (horizantalFov_rad / videoStreamResolutionMin);
+											double gsd_m = dSlantRangeMin_m * sin(alpha_rad);
+											double gsdDeltaDesired_m = abs(desiredGsd_m - gsd_m);
+											// if the new GSD is closer to the desired than the last one
+											if (!firstGsdInitialized || abs(desiredGsd_m - sensorFootprint->getAchievedGSD()) > gsdDeltaDesired_m)
+											{
+												firstGsdInitialized = true;
+
+												sensorFootprint->setCameraID(sensorID);
+												sensorFootprint->setGimbalID(gimbalId);
+												sensorFootprint->setHorizontalFOV(horizantalFov_deg);
+												sensorFootprint->setAglAltitude(altitudeAgl_m);
+												sensorFootprint->setGimbalElevation(gimbalElevation_rad * n_Const::c_Convert::dRadiansToDegrees());
+												sensorFootprint->setAspectRatio(dAspectRatio);
+												sensorFootprint->setAchievedGSD(gsd_m);
+												sensorFootprint->setCameraWavelength(cameraConfiguration->getSupportedWavelengthBand());
+
+												CalculateSensorFootprint(horizantalFov_rad, dAspectRatio, gimbalElevation_rad, altitudeAgl_m, sensorFootprint);
+											}
+										}
+
+									} //if(cameraConfiguration->getSupportedWavelengthBand() == wavelength)
+								}
                             } //for(auto itPayloadCamera=ptr_vGetPayloadConfigurationList()->begin();itPayloadCamera!=ptr_vGetPayloadConfigurationList()->end();itPayloadCamera++)
                         } //for(auto itSensorID=gimbalConfiguration->getContainedPayloadList().begi ...
                     } //for(double dGimbalElevation_rad=dGimbalElevationMin_rad; ...
