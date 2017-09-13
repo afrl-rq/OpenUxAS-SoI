@@ -12,9 +12,8 @@ public
     		AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
     		UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
     	annex agree {**
-    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, 
-    			UxAS responds with a UniqueAutomationRequest_out on the next timestep.":
-    			pre(event(AutomationRequest_in)) => event(UniqueAutomationRequest_out);
+    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, UxAS responds with a UniqueAutomationRequest_out on the next timestep.":
+    			true -> (pre(event(AutomationRequest_in)) => event(UniqueAutomationRequest_out));
     	**};
     end UxAS_responds;
     

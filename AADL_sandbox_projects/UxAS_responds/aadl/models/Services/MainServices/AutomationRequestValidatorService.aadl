@@ -10,8 +10,8 @@ thread AutomationRequestValidatorService
 		AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
 		UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
 	annex agree {**
-		guarantee "(Not realistic) AutomationRequestValidatorService responds on the next timestep.":
-			pre(event(AutomationRequest_in)) => event(UniqueAutomationRequest_out);
+		guarantee "(Timing not realistic, assumes no errors) AutomationRequestValidatorService responds on the next timestep.":
+			true -> (pre(event(AutomationRequest_in)) => event(UniqueAutomationRequest_out));
 	**};	
 end AutomationRequestValidatorService;
     	
