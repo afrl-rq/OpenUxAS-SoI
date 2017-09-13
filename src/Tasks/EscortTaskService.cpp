@@ -65,6 +65,7 @@ EscortTaskService::s_registrar(EscortTaskService::s_registryServiceTypeNames());
 EscortTaskService::EscortTaskService()
 : TaskServiceBase(EscortTaskService::s_typeName(), EscortTaskService::s_directoryName())
 {
+	m_isMakeTransitionWaypointsActive = true;
 };
 
 EscortTaskService::~EscortTaskService()
@@ -101,29 +102,10 @@ EscortTaskService::configureTask(const pugi::xml_node& ndComponent)
     } //isSuccessful
     if (isSuccessful)
     {
-        pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
-        if (entityStates)
-        {
-            for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
-            {
-
-                std::shared_ptr<afrl::cmasi::EntityState> entityState;
-                std::stringstream stringStream;
-                ndEntityState.print(stringStream);
-                avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-                if (object != nullptr)
-                {
-                    entityState.reset(static_cast<afrl::cmasi::EntityState*> (object));
-                    object = nullptr;
-
-                    if (entityState->getID() == m_escortTask->getSupportedEntityID())
-                    {
-                        m_supportedEntityStateLast = entityState;
-                        break;
-                    }
-                }
-            }
-        }
+		if (m_entityStates.find(m_escortTask->getSupportedEntityID()) != m_entityStates.end())
+		{
+			m_supportedEntityStateLast = m_entityStates[m_escortTask->getSupportedEntityID()];
+		}
     } //if(isSuccessful)
 
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
@@ -367,6 +349,7 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
 std::shared_ptr<afrl::cmasi::VehicleActionCommand> EscortTaskService::CalculateGimbalActions(const std::shared_ptr<afrl::cmasi::EntityState>& entityState, double lat, double lon)
 {
     std::shared_ptr<afrl::cmasi::VehicleActionCommand> caction(new afrl::cmasi::VehicleActionCommand);
+	caction->setVehicleID(entityState->getID());
 
     double surveyRadius = m_loiterRadius_m;
     double surveySpeed = entityState->getGroundspeed();

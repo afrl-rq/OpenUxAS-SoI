@@ -67,6 +67,7 @@ CommRelayTaskService::s_registrar(CommRelayTaskService::s_registryServiceTypeNam
 CommRelayTaskService::CommRelayTaskService()
 : TaskServiceBase(CommRelayTaskService::s_typeName(), CommRelayTaskService::s_directoryName())
 {
+	m_isMakeTransitionWaypointsActive = true;
 };
 
 CommRelayTaskService::~CommRelayTaskService()
@@ -103,29 +104,10 @@ CommRelayTaskService::configureTask(const pugi::xml_node& ndComponent)
     } //isSuccessful
     if (isSuccessful)
     {
-        pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
-        if (entityStates)
-        {
-            for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
-            {
-
-                std::shared_ptr<afrl::cmasi::EntityState> entityState;
-                std::stringstream stringStream;
-                ndEntityState.print(stringStream);
-                avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-                if (object != nullptr)
-                {
-                    entityState.reset(static_cast<afrl::cmasi::EntityState*> (object));
-                    object = nullptr;
-
-                    if (entityState->getID() == m_CommRelayTask->getSupportedEntityID())
-                    {
-                        m_supportedEntityStateLast = entityState;
-                    }
-                    m_idVsEntityState[entityState->getID()] = entityState;
-                }
-            }
-        }
+		if (m_entityStates.find(m_CommRelayTask->getSupportedEntityID()) != m_entityStates.end())
+		{
+			m_supportedEntityStateLast = m_entityStates[m_CommRelayTask->getSupportedEntityID()];
+		}
     } //if(isSuccessful)
     return (isSuccessful);
 }
@@ -281,7 +263,7 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         missionCommand->setCommandID(getUniqueEntitySendMessageId());
         missionCommand->setFirstWaypoint(1);
         missionCommand->setVehicleID(entityState->getID());
-        auto wp = new afrl::cmasi::Waypoint;
+		auto wp = std::make_shared<afrl::cmasi::Waypoint>();
         wp->setAltitude(entityState->getLocation()->getAltitude());
         wp->setAltitudeType(entityState->getLocation()->getAltitudeType());
         wp->setLatitude(lat);
@@ -326,7 +308,6 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         }
         else
         {
-            delete missionCommand;
             pResponse = std::static_pointer_cast<avtas::lmcp::Object>(actionCommand);
         }
         sendSharedLmcpObjectBroadcastMessage(pResponse);
@@ -340,6 +321,7 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
 std::shared_ptr<afrl::cmasi::VehicleActionCommand> CommRelayTaskService::CalculateGimbalActions(const std::shared_ptr<afrl::cmasi::EntityState>& entityState, double lat, double lon)
 {
     std::shared_ptr<afrl::cmasi::VehicleActionCommand> caction(new afrl::cmasi::VehicleActionCommand);
+	caction->setVehicleID(entityState->getID());
 
     double surveyRadius = m_loiterRadius_m;
     double surveySpeed = entityState->getGroundspeed();

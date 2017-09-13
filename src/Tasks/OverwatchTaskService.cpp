@@ -35,6 +35,7 @@
 
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
+#include <afrl/cmasi/GimbalConfiguration.h>
 
 #define STRING_XML_ENTITY_STATES "EntityStates" //TODO:: define this in some global place
 
@@ -58,6 +59,7 @@ OverwatchTaskService::OverwatchTaskService()
 
 OverwatchTaskService::~OverwatchTaskService()
 {
+	m_isMakeTransitionWaypointsActive = true;
 };
 
 bool
@@ -90,30 +92,10 @@ OverwatchTaskService::configureTask(const pugi::xml_node& ndComponent)
     } //isSuccessful
     if (isSuccessful)
     {
-            pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
-            if (entityStates)
-            {
-                for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
-                {
-
-                    std::shared_ptr<afrl::cmasi::EntityState> entityState;
-                    std::stringstream stringStream;
-                    ndEntityState.print(stringStream);
-                    avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-                    if (object != nullptr)
-                    {
-                        entityState.reset(static_cast<afrl::cmasi::EntityState*> (object));
-                        object = nullptr;
-
-                        if (entityState->getID() == m_watchTask->getWatchedEntityID())
-                        {
-                            m_watchedEntityStateLast = entityState;
-                            break;
-                        }
-                    }
-                }
-            }
-
+		if (m_entityStates.find(m_watchTask->getWatchedEntityID()) != m_entityStates.end())
+		{
+			m_watchedEntityStateLast = m_entityStates[m_watchTask->getWatchedEntityID()];
+		}
     } //if(isSuccessful)
     return (isSuccessful);
 }
@@ -200,13 +182,28 @@ void OverwatchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         //vehicleActionCommand->setCommandID();
         vehicleActionCommand->setVehicleID(entityState->getID());
         //vehicleActionCommand->setStatus();
-        auto gimbalStareAction = new afrl::cmasi::GimbalStareAction;
+		auto gimbalStareAction = std::make_shared<afrl::cmasi::GimbalStareAction>();
         gimbalStareAction->setStarepoint(m_watchedEntityStateLast->getLocation()->clone());
-        vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction);
-        gimbalStareAction = nullptr; //gave up ownership
+        vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction->clone());
+		if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
+		{
+			auto config = m_entityConfigurations[entityState->getID()];
+			for (auto payload : config->getPayloadConfigurationList())
+			{
+				if (afrl::cmasi::isGimbalConfiguration(payload))
+				{
+					gimbalStareAction->setPayloadID(payload->getPayloadID());
+				}
+			}
+		}
         // add the loiter
         auto loiterAction = new afrl::cmasi::LoiterAction();
         loiterAction->setLocation(m_watchedEntityStateLast->getLocation()->clone());
+		if (loiterAction->getLocation()->getAltitude() < 5) //too close to ground
+		{
+			//use current entityStates altitude
+			loiterAction->getLocation()->setAltitude(entityState->getLocation()->getAltitude());
+		}
         if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
         {
             loiterAction->setAirspeed(m_entityConfigurations[entityState->getID()]->getNominalSpeed());

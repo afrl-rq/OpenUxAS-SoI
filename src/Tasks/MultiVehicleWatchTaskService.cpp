@@ -96,29 +96,10 @@ MultiVehicleWatchTaskService::configureTask(const pugi::xml_node& ndComponent)
     } //isSuccessful
     if (isSuccessful)
     {
-        pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
-        if (entityStates)
-        {
-            for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
-            {
-
-                std::shared_ptr<afrl::cmasi::EntityState> entityState;
-                std::stringstream stringStream;
-                ndEntityState.print(stringStream);
-                avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-                if (object != nullptr)
-                {
-                    entityState.reset(static_cast<afrl::cmasi::EntityState*> (object));
-                    object = nullptr;
-
-                    if (entityState->getID() == m_MultiVehicleWatchTask->getWatchedEntityID())
-                    {
-                        m_watchedEntityStateLast = entityState;
-                    }
-                    m_idVsEntityState[entityState->getID()] = entityState;
-                }
-            }
-        }
+		if (m_entityStates.find(m_MultiVehicleWatchTask->getWatchedEntityID()) != m_entityStates.end())
+		{
+			m_watchedEntityStateLast = m_entityStates[m_MultiVehicleWatchTask->getWatchedEntityID()];
+		}
 
     } //if(isSuccessful)
     return (isSuccessful);
