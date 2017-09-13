@@ -25,6 +25,7 @@
 #include "afrl/impact/IMPACT.h"
 #include "uxas/messages/route/ROUTE.h"
 
+#include "afrl/vehicles/VEHICLES.h"
 #include "pugixml.hpp"
 
 #include <algorithm>
@@ -66,10 +67,10 @@ RoutePlannerService::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
     
     // service 'global' path planning requests (system assumes aircraft)
     addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
@@ -120,14 +121,14 @@ RoutePlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
         }
         m_airVehicles.insert(id);
     }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_groundVehicles.insert(id);
         // no region update for ground vehicles
     }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
@@ -157,14 +158,14 @@ RoutePlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
         }
         m_airVehicles.insert(id);
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
         m_groundVehicles.insert(id);
         // no region updates for ground vehicles
     }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
 
@@ -184,9 +185,9 @@ RoutePlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
         // check all surface vehicle configurations with this zone referenced
         for (auto e : m_entityConfigurations)
         {
-            if (afrl::impact::isSurfaceVehicleConfiguration(e.second.get()))
+            if (afrl::vehicles::isSurfaceVehicleConfiguration(e.second.get()))
             {
-                auto s = std::dynamic_pointer_cast<afrl::impact::SurfaceVehicleConfiguration>(e.second);
+                auto s = std::dynamic_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(e.second);
                 if (s->getWaterArea() == wzone->getZoneID())
                 {
                     UpdateRegions(std::dynamic_pointer_cast<avtas::lmcp::Object>(s));
@@ -270,7 +271,7 @@ void RoutePlannerService::BuildVisibilityRegion(std::shared_ptr<afrl::cmasi::Ope
         auto surfaceConfig = m_entityConfigurations.find(*id);
         if (surfaceConfig != m_entityConfigurations.end())
         {
-            std::shared_ptr<afrl::impact::SurfaceVehicleConfiguration> config = std::static_pointer_cast<afrl::impact::SurfaceVehicleConfiguration>(surfaceConfig->second);
+            std::shared_ptr<afrl::vehicles::SurfaceVehicleConfiguration> config = std::static_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(surfaceConfig->second);
             if (m_waterZones.find(config->getWaterArea()) != m_waterZones.end())
             {
                 waterzone = m_waterZones[config->getWaterArea()]->getBoundary();
@@ -300,9 +301,9 @@ void RoutePlannerService::UpdateRegions(std::shared_ptr<avtas::lmcp::Object> msg
             BuildVehicleSpecificRegion(region, avconfig->getID(), nullptr);
         }
     }
-    else if (afrl::impact::isSurfaceVehicleState(msg.get()))
+    else if (afrl::vehicles::isSurfaceVehicleState(msg.get()))
     {
-        std::shared_ptr<afrl::impact::SurfaceVehicleState> surfstate = std::static_pointer_cast<afrl::impact::SurfaceVehicleState>(msg);
+        std::shared_ptr<afrl::vehicles::SurfaceVehicleState> surfstate = std::static_pointer_cast<afrl::vehicles::SurfaceVehicleState>(msg);
         for (auto r = m_operatingRegions.begin(); r != m_operatingRegions.end(); r++)
         {
             std::shared_ptr<afrl::cmasi::OperatingRegion> region = r->second;
@@ -310,9 +311,9 @@ void RoutePlannerService::UpdateRegions(std::shared_ptr<avtas::lmcp::Object> msg
             BuildVehicleSpecificRegion(region, surfstate->getID(), nullptr);
         }
     }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(msg.get()))
+    else if (afrl::vehicles::isSurfaceVehicleConfiguration(msg.get()))
     {
-        std::shared_ptr<afrl::impact::SurfaceVehicleConfiguration> surfconfig = std::static_pointer_cast<afrl::impact::SurfaceVehicleConfiguration>(msg);
+        std::shared_ptr<afrl::vehicles::SurfaceVehicleConfiguration> surfconfig = std::static_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(msg);
         afrl::cmasi::AbstractGeometry* waterzone = nullptr;
         if (m_waterZones.find(surfconfig->getWaterArea()) != m_waterZones.end())
         {

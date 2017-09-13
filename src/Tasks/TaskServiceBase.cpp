@@ -21,10 +21,10 @@
 
 #include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "avtas/lmcp/LmcpXMLReader.h"
 #include "uxas/messages/task/TaskComplete.h"
 #include "uxas/messages/task/TaskInitialized.h"
@@ -162,10 +162,10 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationResponse::Subscription);
     addSubscriptionAddress(uxas::messages::route::RoutePlanResponse::Subscription);
@@ -658,7 +658,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                         isFirstWaypoint = false;
 
                                         // add task active waypoints
-                                        if ((!isRouteFromLastToTask || m_isMakeTransitionWaypointsActive) && !currentAutomationRequest->getSandBoxRequest())
+                                        if ((!isRouteFromLastToTask || m_isMakeTransitionWaypointsActive))
                                         {
                                             waypoint->getAssociatedTasks().push_back(m_task->getTaskID());
                                         }

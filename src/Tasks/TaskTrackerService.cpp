@@ -27,6 +27,7 @@
 #include "afrl/impact/PointOfInterest.h"
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/AreaOfInterest.h"
+#include "afrl/vehicles/VEHICLES.h"
 
 #include <map>
 #include <algorithm>
@@ -50,8 +51,8 @@ TaskTrackerService::configure(const pugi::xml_node& serviceXmlNode)
 {
     // track all vehicles
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
 
     addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
     addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
@@ -90,8 +91,8 @@ TaskTrackerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
         HandleMissionCommand(mish);
     }
     else if (afrl::cmasi::isAirVehicleState(msg.get()) ||
-            afrl::impact::isGroundVehicleState(msg.get()) ||
-            afrl::impact::isSurfaceVehicleState(msg.get()))
+            afrl::vehicles::isGroundVehicleState(msg.get()) ||
+            afrl::vehicles::isSurfaceVehicleState(msg.get()))
     {
         auto state = std::static_pointer_cast<afrl::cmasi::EntityState>(msg);
         m_states[state->getID()] = state;

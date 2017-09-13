@@ -27,12 +27,12 @@
 #include "afrl/cmasi/MissionCommand.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
 #include "afrl/impact/RadioTowerConfiguration.h"
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "afrl/impact/RadioTowerState.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
 #include "uxas/messages/task/TaskOption.h"
@@ -217,7 +217,7 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         }
 
         // only send out every 2 seconds (even on fast simulation mode)
-        if (!afrl::impact::isGroundVehicleState(entityState.get()) || m_throttle[entityState->getID()] + 2000 <= uxas::common::utilities::c_TimeUtilities::getTimeNow_ms())
+        if (!afrl::vehicles::isGroundVehicleState(entityState.get()) || m_throttle[entityState->getID()] + 2000 <= uxas::common::utilities::c_TimeUtilities::getTimeNow_ms())
         {
             m_throttle[entityState->getID()] = uxas::common::utilities::c_TimeUtilities::getTimeNow_ms();
         }
@@ -291,35 +291,28 @@ void CommRelayTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         wp->setSpeed(speed);
         wp->setTurnType(afrl::cmasi::TurnType::TurnShort);
         wp->getAssociatedTasks().push_back(m_task->getTaskID());
-        missionCommand->getWaypointList().push_back(wp);
+        missionCommand->getWaypointList().push_back(wp->clone());
 
         for (size_t a = 0; a < actionCommand->getVehicleActionList().size(); a++)
         {
             auto act = actionCommand->getVehicleActionList().at(a);
             wp->getVehicleActionList().push_back(act->clone());
         }
-        missionCommand->getWaypointList().push_back(wp);
+        missionCommand->getWaypointList().push_back(wp->clone());
 
         // check if surface or ground vehicle
-        if ((afrl::impact::isSurfaceVehicleState(entityState.get()) || afrl::impact::isGroundVehicleState(entityState.get())) && !missionCommand->getWaypointList().empty())
+        if ((afrl::vehicles::isSurfaceVehicleState(entityState.get()) || afrl::vehicles::isGroundVehicleState(entityState.get())) && !missionCommand->getWaypointList().empty())
         {
             afrl::cmasi::Waypoint* hwp = wp->clone();
             hwp->setNumber(2);
             hwp->setNextWaypoint(2);
             missionCommand->getWaypointList().front()->setNextWaypoint(2);
-            for (auto a : missionCommand->getWaypointList().front()->getVehicleActionList())
-            {
-                delete a;
-            }
+
             missionCommand->getWaypointList().front()->getVehicleActionList().clear();
             missionCommand->getWaypointList().push_back(hwp);
         }
         else
         {
-            for (auto wypt : missionCommand->getWaypointList())
-            {
-                delete wypt;
-            }
             missionCommand->getWaypointList().clear();
         }
 
@@ -367,8 +360,8 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> CommRelayTaskService::Calcula
         }
 
         // calculate proper radius
-        if (afrl::impact::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
+        if (afrl::vehicles::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
+                afrl::vehicles::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
             surveyRadius = 0.0;
             surveyType = afrl::cmasi::LoiterType::Hover;
