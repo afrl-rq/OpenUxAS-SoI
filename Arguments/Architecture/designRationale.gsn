@@ -112,8 +112,8 @@
 
                   <s
                       id="__gsn__15d3bd80438"
-                      name="Properties">
-                    Argue by the design properties that contribute to the system characteristic.
+                      name="Ensures">
+                    The algorithm approach ensures responsiveness.
 
                     <g
                         id="__gsn__15d3bd8c1f2"
@@ -127,7 +127,7 @@
                         <g
                             id="__gsn__15d3bdd1d35"
                             name="Feasible Depth-First Search Path">
-                          An initial depth-first, greedy algorithm finds a feasible solution path in reasonable time.
+                          An initial depth-first, greedy algorithm finds a feasible solution path
 
                           <s
                               id="__gsn__15d3be67eeb"
@@ -136,53 +136,126 @@
                             <g
                                 id="__gsn__15d3be265d3"
                                 name="Generally Efficient Feasible Path Search">
-                              The mission goal constraints are often under-constrained, and so many paths leads to solutions.
+                              the vast majority of missions are underconstrained and have an exponential (relative to numbers of vehicles and tasks) number of solutions from which an efficient one must be discovered.
 
                               <e
                                   id="__gsn__15d3be6d8e1"
                                   name="Evidence">
                                 A description of typical mission constraints and a model of the size of the solution set relative to the search space.
                               </e>
+
+                              <e
+                                  id="__gsn__15e5df3af5d"
+                                  name="Evidence">
+                                An understanding of pathlogical cases and the environments that can create them.
+                              </e>
+
+                              <comment
+                                  id="__gsn__15d3c47f87f"
+                                  color="#55DD55"
+                                  name="Pg 11. Statement AAAAA">
+                                This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                              </comment>
                             </g>
                           </s>
+
+                          <comment
+                              id="__gsn__15d3c48147a"
+                              color="#55DD55"
+                              name="Pg 11. Statement AAAA">
+                            This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                          </comment>
                         </g>
 
                         <g
-                            id="__gsn__15d3be33d5d"
-                            name="Bounded Backtracking Optimization">
-                          The search space surrounding the feasible solution is explored by backtracking and pruning based on best case cost found.
+                            id="__gsn__15d3c38a31c"
+                            name="Bound Search Path">
+                          The cost of the greedy solution acts a bound beyond which no solution is be [sic] considered.
 
                           <s
-                              id="__gsn__15d3be8be6d"
-                              name="Argue by Algorithm">
+                              id="__gsn__15d3c4c2d53"
+                              name="Algorithm">
 
                             <g
-                                id="__gsn__15d3be92442"
-                                name="Pruned Search">
-                              as more efficient solutions are discovered, any partial solution that exeeds the cost of the current best solution will immediately be abandoned (cut) to focus search effort in the part of the space that could possibly lead to better solutions.
-                            </g>
+                                id="__gsn__15d3be33d5d"
+                                name="Bounded Backtracking Optimization">
+                              The search space surrounding the feasible solution is explored by backtracking and pruning based on best case cost found.
 
-                            <g
-                                id="__gsn__15d3be927f3"
-                                name="Bounded Tree Depth">
-                              search progresses until all possibilities have been exhausted or a pre-determined tree size has been searched.
+                              <s
+                                  id="__gsn__15d3be8be6d"
+                                  name="Argue by Algorithm">
 
-                              <e
-                                  id="__gsn__15d3bea48bd"
-                                  name="Evidence">
-                                Show by specification-level algorithm proof
-                              </e>
+                                <g
+                                    id="__gsn__15d3be92442"
+                                    name="Pruned Search">
+                                  as more efficient solutions are discovered, any partial solution that exeeds the cost of the current best solution will immediately be abandoned (cut) to focus search effort in the part of the space that could possibly lead to better solutions.
+
+                                  <comment
+                                      id="__gsn__15d3c483a75"
+                                      color="#55DD55"
+                                      name="Pg 11. Statement AAABA">
+                                    This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                                  </comment>
+                                </g>
+
+                                <g
+                                    id="__gsn__15d3be927f3"
+                                    name="Bounded Tree Depth">
+                                  . By placing an upper limit on the size of the tree to search.
+
+                                  <e
+                                      id="__gsn__15d3bea48bd"
+                                      name="Evidence">
+                                    Show by specification-level algorithm proof
+                                  </e>
+
+                                  <comment
+                                      id="__gsn__15d3c4843ed"
+                                      color="#55DD55"
+                                      name="Pg 11. Statement AAABB">
+                                    This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                                  </comment>
+                                </g>
+                              </s>
                             </g>
                           </s>
+
+                          <comment
+                              id="__gsn__15d3c45daca"
+                              color="#55DD55"
+                              name="Pg 11. Statement AAAB">
+                            This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                          </comment>
                         </g>
                       </s>
+
+                      <comment
+                          id="__gsn__15d3c364b49"
+                          color="#55DD55"
+                          name="Pg 11. Statement AAA">
+                        This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                      </comment>
                     </g>
+
+                    <comment
+                        id="__gsn__15d3c595fdf"
+                        color="#55DD55"
+                        name="Pg 11. Statement AA">
+                      This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
+                    </comment>
                   </s>
 
                   <comment
                       id="__gsn__15d3bfd5642"
                       name="This is an example sub-argument">
                     This is an example sub-argument that was captured from the Core Services Description page on the wiki.
+                  </comment>
+
+                  <comment
+                      id="__gsn__15d3c3313cb"
+                      color="#55DD55"
+                      name="Pg 11. Statement A">
+                    This statement appears on pg. 11 of the annotated “Core Services Description” text saved from the afrl-rq/OpenUxAS Wiki” document.
                   </comment>
                 </g>
               </s>
