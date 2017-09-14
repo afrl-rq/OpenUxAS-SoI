@@ -55,11 +55,11 @@ OverwatchTaskService::s_registrar(OverwatchTaskService::s_registryServiceTypeNam
 OverwatchTaskService::OverwatchTaskService()
 : TaskServiceBase(OverwatchTaskService::s_typeName(), OverwatchTaskService::s_directoryName())
 {
+	m_isMakeTransitionWaypointsActive = true;
 };
 
 OverwatchTaskService::~OverwatchTaskService()
 {
-	m_isMakeTransitionWaypointsActive = true;
 };
 
 bool
@@ -184,7 +184,6 @@ void OverwatchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         //vehicleActionCommand->setStatus();
 		auto gimbalStareAction = std::make_shared<afrl::cmasi::GimbalStareAction>();
         gimbalStareAction->setStarepoint(m_watchedEntityStateLast->getLocation()->clone());
-        vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction->clone());
 		if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
 		{
 			auto config = m_entityConfigurations[entityState->getID()];
@@ -196,6 +195,8 @@ void OverwatchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
 				}
 			}
 		}
+		vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction->clone());
+
         // add the loiter
         auto loiterAction = new afrl::cmasi::LoiterAction();
         loiterAction->setLocation(m_watchedEntityStateLast->getLocation()->clone());

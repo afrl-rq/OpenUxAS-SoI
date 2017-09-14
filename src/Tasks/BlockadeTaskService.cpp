@@ -98,28 +98,10 @@ BlockadeTaskService::configureTask(const pugi::xml_node& ndComponent)
     } //isSuccessful
     if (isSuccessful)
     {
-        pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
-        if (entityStates)
-        {
-            for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
-            {
-                std::shared_ptr<afrl::cmasi::EntityState> entityState;
-                std::stringstream stringStream;
-                ndEntityState.print(stringStream);
-                avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-                if (object != nullptr)
-                {
-                    entityState.reset(static_cast<afrl::cmasi::EntityState*> (object));
-                    object = nullptr;
-
-                    if (entityState->getID() == m_blockadeTask->getBlockedEntityID())
-                    {
-                        m_blockedEntityStateLast = entityState;
-                    }
-                    m_idVsEntityState[entityState->getID()] = entityState;
-                }
-            }
-        }
+		if (m_entityStates.find(m_blockadeTask->getBlockedEntityID()) != m_entityStates.end())
+		{
+			m_blockedEntityStateLast = m_entityStates[m_blockadeTask->getBlockedEntityID()];
+		}
     } //if(isSuccessful)
     return (isSuccessful);
 }
@@ -137,7 +119,7 @@ BlockadeTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp:
         {
             m_blockedEntityStateLast = entityState;
         }
-        m_idVsEntityState[entityState->getID()] = entityState;
+        m_entityStates[entityState->getID()] = entityState;
     }
     return (false); // always false implies never terminating service from here
 };
