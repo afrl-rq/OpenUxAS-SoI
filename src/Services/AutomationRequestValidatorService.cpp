@@ -118,28 +118,12 @@ AutomationRequestValidatorService::configure(const pugi::xml_node & ndComponent)
     }
 
     // TASKS
-    addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
-    //CMASI TASKS
-    addSubscriptionAddress(afrl::cmasi::AreaSearchTask::Subscription);
-    addSubscriptionAddress(afrl::cmasi::LineSearchTask::Subscription);
-    //addSubscriptionAddress(afrl::cmasi::LoiterTask::LOITERTASK_FULL_LMCP_TYPE_NAME);
-    addSubscriptionAddress(afrl::cmasi::MustFlyTask::Subscription);
-    addSubscriptionAddress(afrl::cmasi::PointSearchTask::Subscription);
-    //IMPACT TASKS
-    addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
-    addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
-    addSubscriptionAddress(afrl::impact::PointOfInterest::Subscription);
-    addSubscriptionAddress(afrl::impact::AngledAreaSearchTask::Subscription);
-    addSubscriptionAddress(afrl::impact::BlockadeTask::Subscription);
-    addSubscriptionAddress(afrl::impact::CordonTask::Subscription);
-    addSubscriptionAddress(afrl::impact::CommRelayTask::Subscription);
-    addSubscriptionAddress(afrl::impact::EscortTask::Subscription);
-    addSubscriptionAddress(afrl::impact::ImpactLineSearchTask::Subscription);
-    addSubscriptionAddress(afrl::impact::ImpactPointSearchTask::Subscription);
-    addSubscriptionAddress(afrl::impact::MultiVehicleWatchTask::Subscription);
-    addSubscriptionAddress(afrl::impact::PatternSearchTask::Subscription);
-    addSubscriptionAddress(afrl::impact::WatchTask::Subscription);
-    addSubscriptionAddress(afrl::cmasi::LoiterTask::Subscription);
+	addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
+	// Subscribe to Task and all derivatives of Task
+	addSubscriptionAddress(afrl::cmasi::Task::Subscription);
+	std::vector< std::string > childtasks = afrl::cmasi::TaskDescendants();
+	for (auto child : childtasks)
+		addSubscriptionAddress(child);
 
     // KEEP-IN/OUT/OPERATING
     addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
