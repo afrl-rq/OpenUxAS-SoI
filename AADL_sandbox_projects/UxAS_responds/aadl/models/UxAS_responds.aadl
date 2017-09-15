@@ -15,9 +15,9 @@ public
     		assume "Process one automation request at a time" :
         		pre(PLTL.Once(event(AutomationRequest_in))) => not event(AutomationRequest_in);
 
-    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, 
+    		guarantee "(UxAS responds, 1 cpt, no errors) When an AutomationRequest_in is received by UxAS, 
     			UxAS responds with an AutomationResponse_out on the next timestep.":
-    			(prev(event(AutomationRequest_in), false) => event(AutomationResponse_out));
+    			true -> (pre(event(AutomationRequest_in)) => event(AutomationResponse_out));
     		
     		---------------------------------
     		--DRAFT STUFF FOR TWO TIMESTEPS (NOT THERE YET)
