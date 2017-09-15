@@ -10,8 +10,12 @@ thread AutomationRequestValidatorService
 		AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
         AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
 	annex agree {**
-		guarantee "(Timing not realistic, assumes no errors) Upon receiving an AutomationRequest_in, the AutomationRequestValidatorService responds on the next timestep with an AutomationResponse_out.":
+		guarantee "(Timing not realistic, assumes no errors) Upon receiving an AutomationRequest_in, 
+			the AutomationRequestValidatorService responds on the next timestep with an AutomationResponse_out.":
 			true -> (pre(event(AutomationRequest_in)) => event(AutomationResponse_out));
+			
+		guarantee "No spurious responses" :
+			prev(not PLTL.Once(event(AutomationRequest_in)), false) => not event(AutomationResponse_out);
 	**};	
 end AutomationRequestValidatorService;
     	
