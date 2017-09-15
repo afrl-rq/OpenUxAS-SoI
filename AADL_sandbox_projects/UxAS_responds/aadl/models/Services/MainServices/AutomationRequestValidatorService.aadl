@@ -15,7 +15,7 @@ thread AutomationRequestValidatorService
 			true -> (pre(event(AutomationRequest_in)) => event(AutomationResponse_out));
 			
 		guarantee "No spurious responses" :
-			prev(not PLTL.Once(event(AutomationRequest_in)), false) => not event(AutomationResponse_out);
+			prev(not PLTL.Once(event(AutomationRequest_in)), true) => not event(AutomationResponse_out);
 	**};	
 end AutomationRequestValidatorService;
     	
