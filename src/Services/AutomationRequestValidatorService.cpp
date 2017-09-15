@@ -125,6 +125,12 @@ AutomationRequestValidatorService::configure(const pugi::xml_node & ndComponent)
 	for (auto child : childtasks)
 		addSubscriptionAddress(child);
 
+	//IMPACT TASKS
+	addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
+	addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
+	addSubscriptionAddress(afrl::impact::PointOfInterest::Subscription);
+
+
     // KEEP-IN/OUT/OPERATING
     addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
     addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
