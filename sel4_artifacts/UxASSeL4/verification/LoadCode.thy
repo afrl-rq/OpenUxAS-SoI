@@ -69,6 +69,8 @@ proof -
     by (simp add: add.commute diff_add_eq_diff_diff_swap measure_unat)
 qed
 
+lemma [simp]: "j < i \<Longrightarrow> int (unat j) = uint j" by (simp add: uint_nat)
+
 
 
 end
