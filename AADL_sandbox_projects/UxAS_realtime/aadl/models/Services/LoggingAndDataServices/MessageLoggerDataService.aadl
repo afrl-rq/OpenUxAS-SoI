@@ -1,0 +1,8 @@
+package MessageLoggerDataService_Pkg
+public
+    -- no includes
+    
+    thread MessageLoggerDataService
+    end MessageLoggerDataService;
+    
+end MessageLoggerDataService_Pkg;

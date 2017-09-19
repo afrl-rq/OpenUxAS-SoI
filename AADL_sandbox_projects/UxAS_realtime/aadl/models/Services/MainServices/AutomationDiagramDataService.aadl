@@ -1,0 +1,30 @@
+package AutomationDiagramDataService_Pkg
+public
+    -- Included DataTypes
+    with CMASI;
+    with UXTASK;
+    with IMPACT;
+
+    -- Includes
+	with ServiceBase_Pkg;
+    
+    thread AutomationDiagramDataService extends ServiceBase_Pkg::ServiceBase
+        features
+            KeepOutZone_in: in event data port cmasi::KeepOutZone.i;
+            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            KeepInZone_in: in event data port cmasi::KeepInZone.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            OperatingRegion_in: in event data port cmasi::OperatingRegion.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end AutomationDiagramDataService;
+
+    
+end AutomationDiagramDataService_Pkg;

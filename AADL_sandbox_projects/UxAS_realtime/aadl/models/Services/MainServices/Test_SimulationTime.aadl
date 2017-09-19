@@ -1,0 +1,14 @@
+package Test_SimulationTime_Pkg
+public
+    -- Data_types Packages
+    with CMASI;
+    
+    -- Included
+    with ServiceBase_Pkg;
+    
+    thread Test_SimulationTime extends ServiceBase_Pkg::ServiceBase
+        features
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+    end Test_SimulationTime;
+    
+end Test_SimulationTime_Pkg;

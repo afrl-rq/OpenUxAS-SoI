@@ -1,0 +1,303 @@
+package PlanBuilderService_Pkg
+public
+    with CMASI;
+    with UXTASK;
+    with IMPACT;
+    
+       -- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		features
+			TaskAssignmentSummary_in : in event data port uxtask::TaskAssignmentSummary.i;
+			TaskImplementationResponse_in : in event data port uxtask::TaskImplementationResponse.i;
+			TaskImplementationRequest_out : out event data port uxtask::TaskImplementationRequest.i;
+			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+			
+		annex agree {**
+			eq event_TaskAssignmentSummary_in : bool = event(TaskAssignmentSummary_in);
+			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
+			eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+			
+			assume "TaskAssignmentSummary_in must provide a TaskList of size greater than 0 and less than or equal to 10":
+        		event(TaskAssignmentSummary_in) => 
+        			TaskAssignmentSummary_in.TaskListSize > 0 and TaskAssignmentSummary_in.TaskListSize <= 10;
+			
+			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
+				
+			eq event_TaskImplementationResponse_in : bool = event(TaskImplementationResponse_in);
+			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskImplementationResponse_in occurs sporadic with IAT 0.003;
+				
+			--TEMP guarantees: expecting these guarantees to be false (testing if prover finds obvious false guarantees quickly)
+			guarantee "TAS to TIR" :
+				whenever event_TaskAssignmentSummary_in occurs event_TaskImplementationRequest_out occurs during [0.0,5.0];
+				
+			guarantee "UAR to TIR" :
+				whenever event_UniqueAutomationRequest_in occurs event_TaskImplementationRequest_out occurs during [0.0,5.0];
+				
+			eq uar_in_idle_waiting_state : bool;
+			guarantee "UAR in idle to TIR":
+				whenever uar_in_idle_waiting_state occurs event_TaskImplementationRequest_out occurs during [0.0,5.0];
+				
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread PlanBuilderService; 
+		connections
+			conn0 : port TaskAssignmentSummary_in -> sub.TaskAssignmentSummary_in;
+			conn1 : port TaskImplementationResponse_in -> sub.TaskImplementationResponse_in;
+			conn3 : port sub.TaskImplementationRequest_out -> TaskImplementationRequest_out;
+			conn4 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
+			
+		annex agree {**
+			-- These lemmas could be captured in SpeAR as properties
+			
+			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+			lemma "False indicates the IDLE_WAITING state is reachable" : sub.state != sub.IDLE_WAITING; 
+			lemma "False indicates the BUSY_REQUESTING state is reachable" : sub.state != sub.BUSY_REQUESTING; 
+			lemma "False indicates the BUSY_WAITING state is reachable" : sub.state != sub.BUSY_WAITING; 
+
+			lemma "True indicates we have enumerated all states in the reachability observers" :
+				sub.state = sub.IDLE or
+				sub.state = sub.IDLE_WAITING or
+				sub.state = sub.BUSY_REQUESTING or
+				sub.state = sub.BUSY_WAITING;
+			
+			lemma "False indicates idle_to_idle_waiting transition is executable/reachable" : 
+           		 not sub.idle_to_idle_waiting;	
+				
+			lemma "False indicates idle_waiting_to_busy_requesting transition is executable/reachable" : 
+           		 not sub.idle_waiting_to_busy_requesting;
+           		 
+           	lemma "False indicates busy_requesting_to_busy_waiting transition is executable/reachable" : 
+           		 not sub.busy_requesting_to_busy_waiting;
+           		 
+           	lemma "False indicates busy_waiting_to_busy_requesting transition is executable/reachable" : 
+           		 not sub.busy_waiting_to_busy_requesting;
+           	
+           	lemma "False indicates busy_requesting_to_idle transition is executable/reachable" : 
+           		 not sub.busy_requesting_to_idle;
+           		 
+           	lemma "True if only stated transitions are executed (no missing transitions)." :
+                sub.some_transition or sub.state = sub.previous_state;	
+										
+				
+		**};
+	end top_level.Impl;	
+    
+    thread PlanBuilderService
+        features
+            TaskImplementationResponse_in: in event data port uxtask::TaskImplementationResponse.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            TaskAssignmentSummary_in: in event data port uxtask::TaskAssignmentSummary.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            
+            ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
+            UniqueAutomationResponse_out: out event data port uxtask::UniqueAutomationResponse.i;
+            TaskImplementationRequest_out: out event data port uxtask::TaskImplementationRequest.i;
+          
+        properties
+            Dispatch_Protocol => Sporadic;
+            
+        annex agree{**
+        		
+        	eq state : int;
+       		
+       		--Task States
+       		const IDLE : 				int = 1;
+			--IMPLIED SUB-STATES ADDED FOR SPEC SIMPLICITY
+			const IDLE_WAITING	  : 	int = 2;
+       		const BUSY_REQUESTING : 	int = 3;
+       		const BUSY_WAITING : 		int = 4;
+
+       	-------------------------------------------------------------
+		--State machine support macros
+			eq previous_state: int = prev(state,IDLE);
+			eq some_transition: bool = (idle_to_idle_waiting or
+										idle_waiting_to_busy_requesting or
+										busy_requesting_to_busy_waiting or
+										busy_waiting_to_busy_requesting or
+										busy_requesting_to_idle);
+										
+		-------------------------------------------------------------	
+        	
+        	--ASK DEREK: what if no unique automation request comes in before the task assignment summary? 
+        	--Should the spec transition also include the unique automation request has arrived? 
+        	--For now making a new set of states to ensure the automation request is first made
+
+        	eq idle_to_idle_waiting : bool = (false ->
+        		(previous_state = IDLE and pre(event(UniqueAutomationRequest_in))));
+        		
+        	--The UniqueAutomationRequest is stored until a 
+        	--TaskAssignmentSummary that corresponds to the unique ID is received. 
+        	eq idle_waiting_to_busy_requesting : bool = (false ->
+        		(previous_state = IDLE_WAITING and
+        		pre(event(TaskAssignmentSummary_in)) and
+        		pre(TaskAssignmentSummary_in.CorrespondingAutomationRequestID = cached_unique_automation_request_id)));
+
+        	--TODO: do we need an assumption that the assignment summary includes at least one task? 
+        	eq busy_requesting_to_busy_waiting : bool = (false ->
+        		(previous_state = BUSY_REQUESTING  and
+        			pre(event(TaskImplementationRequest_out))));
+        				
+        	eq busy_waiting_to_busy_requesting : bool = (false->
+        		(previous_state = BUSY_WAITING and 
+        		 	pre(event(TaskImplementationResponse_in)) and
+        		 	pre(TaskImplementationResponse_in.ResponseID = cached_task_implmentation_request_id)));
+        		
+        	--[Implied and Altered Spec]: Once a unique automation response is made, transition to IDLE.
+        	eq busy_requesting_to_idle : bool = (false ->
+        		(previous_state = BUSY_REQUESTING and
+        		pre(event(UniqueAutomationResponse_out)) and
+        		pre(UniqueAutomationResponse_out.ResponseID = cached_unique_automation_request_id)));
+        		
+        	--The UniqueAutomationRequest is stored until a TaskAssignmentSummary that 
+        	--corresponds to the unique ID is received. 
+        	eq cached_unique_automation_request_id : int;
+        	eq cached_task_implmentation_request_id : int;
+        	
+        	--TODO: ASK DEREK: arbitrary number chosen here
+        	const MAX_TASKS : int = 10;
+        	--Note: unbounded allowing for cases where 0 tasks need to be serviced
+        	eq all_tasks_serviced : bool; 
+        	eq current_total_tasks_to_service : int; 
+        	eq current_serviced_tasks_counter : int;
+        	
+        	--TODO: is there a way to remove this assumption and place it in the parent system?
+        	--The purpose of this assumption is to ensure it is OK to use MAX_TASKS as an upper bound. 
+        	assume "TaskAssignmentSummary_in must provide a TaskList of size greater than 0 and less than or equal to 10":
+        		event(TaskAssignmentSummary_in) => 
+        			TaskAssignmentSummary_in.TaskListSize > 0 and TaskAssignmentSummary_in.TaskListSize <= MAX_TASKS;
+        	
+        	--TODO: is there a way to get total tasks from the TaskAssignmentSummary array directly? 
+        	
+        	guarantee "Self loops": not some_transition => (state = previous_state);   
+        	
+        	guarantee "The PlanBuilderService begins in the IDLE state" : 
+        		(state =IDLE)->true;  		
+        	
+        	--Similar to both the RouteAggregator and the AssignmentTreeBranchBoundService, 
+        	--the PlanBuilderService utilizes a received UniqueAutomationRequest to detect 
+        	--that a new mission request has been made to the system. The UniqueAutomationRequest is stored ...
+        	guarantee "The latest automation request ID is cached when in the IDLE state, otherwise
+        		the cached request ID does not change" : 
+        		if (state = IDLE and event(UniqueAutomationRequest_in))  then
+        			cached_unique_automation_request_id = UniqueAutomationRequest_in.RequestID
+        		else
+        		--TODO: ASK DEREK: Assuming ignoring requests in all other cases (keep previous cached request constant)
+        			(cached_unique_automation_request_id = pre(cached_unique_automation_request_id));
+        
+        	guarantee "[ADDED STATE] Transition to IDLE_WAITING after a unique automation request is received" :
+        		idle_to_idle_waiting =>
+        			(state = IDLE_WAITING);
+        	
+        	guarantee "The UniqueAutomationRequest is stored until a TaskAssignmentSummary that corresponds 
+        		to the unique ID is received. At this point, the PlanBuilderService transitions from the idle 
+        		state to the busy [requesting] state.":
+        		idle_waiting_to_busy_requesting =>
+        			((state = BUSY_REQUESTING) and
+        			(current_total_tasks_to_service = pre(TaskAssignmentSummary_in.TaskListSize)) and 
+        			current_serviced_tasks_counter = 0);
+        		
+        	guarantee "[Added Guarantee] When not transitioning to BUSY_REQUESTING the internal caching variables 
+        		current_total_task_to_service and cached_unique_automation_request_id remain constant" :
+        		not idle_waiting_to_busy_requesting =>
+        			(current_total_tasks_to_service = pre(current_total_tasks_to_service));
+        			
+        	guarantee "[In the BUSY REQUESTING state] Using the list of ordered Tasks dictated by the TaskAssignmentSummary, the PlanBuilderService sends 
+        		a TaskImplementationRequest to each Task in order and waits for a TaskImplementationResponse from each Task 
+        		before moving to the next. " : 
+        			if (state = BUSY_REQUESTING and not all_tasks_serviced) then
+        				event(TaskImplementationRequest_out) and
+        				cached_task_implmentation_request_id = TaskImplementationRequest_out.RequestID
+        			else
+        				(not event(TaskImplementationRequest_out)) and
+        				(cached_task_implmentation_request_id = pre(cached_task_implmentation_request_id));
+        		
+        	guarantee "[TODO: Stub guarantee] Must ensure each TaskImplementationRequest_out is sent out for a task 'in order'" :
+        		true;
+        				
+        	guarantee "[New constraint for timing] All tasks are serviced by the PlanBuilderService in a TaskAssignmentSummary if
+        			the current serviced tasks counter is equal to the current total tasks":
+        		current_total_tasks_to_service = current_serviced_tasks_counter <=>
+        			all_tasks_serviced;
+        		
+        	guarantee "[In the BUSY REQUESTING state and] Once [if and only if] all Tasks have responded with a TaskImplementationResponse, 
+        	the PlanBuilderService links all waypoints 
+        	for each vehicle into a complete MissionCommand. The total set of MissionCommands are collected into the UniqueAutomationResponse 
+        	which is broadcast to the system and represents a complete solution to the original AutomationRequest.  " : 
+        		(state = BUSY_REQUESTING and all_tasks_serviced) <=>
+        			(UniqueAutomationResponse_out.ResponseID = cached_unique_automation_request_id and
+        			true and --TODO: placeholder predicate for collecting mission commands? 
+        			event(UniqueAutomationResponse_out));
+        	
+        	guarantee "[Implied and Altered Spec]: [In the BUSY REQUESTING state] Once a UniqueAutomationResponse_out is made, transition to IDLE." :
+        		busy_requesting_to_idle =>
+        			(state = IDLE);
+        	
+        	guarantee "[NEW STATE TRANSITION] Transition from busy requesting to busy waiting once a TaskImplementationRequest_out has been sent out" :
+        		busy_requesting_to_busy_waiting =>
+        			state = BUSY_WAITING;
+        	
+        	guarantee "[NEW STATE TRANSITION] In BUSY_WAITING, when a TaskImplementationResponse_in is received
+        		that has the expected response ID (matching the original request) transition back to BUSY_REQUSTING and
+        		increment the serviced tasks counter (a task is considered serviced in this event)" :
+        		busy_waiting_to_busy_requesting =>
+        			(state = BUSY_REQUESTING and
+        			(current_serviced_tasks_counter = pre(current_serviced_tasks_counter)+1));
+        		 		
+        	guarantee "[ADDED GUARANTEE] The current_serviced_tasks_counter does not change unless
+        		transitioning from BUSY_WAITING to BUSY_REQUESTING or IDLE_WAITING to BUSY_REQUESTING" :
+        		(not busy_waiting_to_busy_requesting and not idle_waiting_to_busy_requesting) =>
+        			(current_serviced_tasks_counter = pre(current_serviced_tasks_counter));
+        	
+        	--Timing Properties
+        	
+--        	"Response" to TaskAssignmentSummary_in
+--        	idle -> busy, create a queue of ordered TaskImplementationRequest messages in the order --NOTE: now corresponds to idle_waiting_to_busy_requesting
+--        	prescribed by the TaskAssignmentSummary. Emit request at top of queue.	
+
+			eq event_TaskAssignmentSummary_in : bool = event(TaskAssignmentSummary_in);
+			eq event_expected_tas_in_idle_waiting : bool = event_TaskAssignmentSummary_in and 
+							TaskAssignmentSummary_in.CorrespondingAutomationRequestID = cached_unique_automation_request_id and
+							state = IDLE_WAITING;
+			
+			--NOTE: in this spec, the event occurs and the state transitions at the same time, i.e., must check the previous state is IDLE_WAITING
+			guarantee "The service transitions to BUSY_REQUESTING within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state " :
+				whenever event_expected_tas_in_idle_waiting occurs idle_waiting_to_busy_requesting occurs during [0.0,0.002];
+				
+			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
+			--NOTE: Likely redundant with the above guarantee given the semantics of the state change
+			guarantee "A TaskImplementationRequest_out is emitted within 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state
+				i.e., the queued TaskImplementationRequest_out requests begin being emitted before 2ms after receiving TaskAssignmentSummary_in in the IDLE_WAITING state" :
+				whenever event_expected_tas_in_idle_waiting occurs event_TaskImplementationRequest_out occurs during [0.0,0.002];	
+				
+		
+--			"Response" to TaskImplementationResponse_in
+--			Remove top of task request queue and update predicted locations of vehicles. 
+--			If task request queue is not empty, configure request at top of queue with predicted 
+--			vehicle positions and emit the corresponding TaskImplementationRequest message. If queue is empty, busy -> idle.
+			eq event_TaskImplementationResponse_in : bool = event(TaskImplementationResponse_in);
+			eq event_tir_in_busy_waiting_state : bool = event_TaskImplementationResponse_in and state = BUSY_WAITING;
+			
+			--NOTE: there is no explicit timing information available on UniqueAutomationResponse_out, 
+			--it is however implied that presumably UniqueAutomationResponse_out would happen when transitioning back to idle and thus occur within 2ms 
+			--in the spec. 
+			--For now I am ignoring timing on UniqueAutomationResponse_out as I am not sure how to reconcile timing on the transition and timing when the event occurs
+			
+			eq request_out_or_busy_requesting_to_idle : bool = event_TaskImplementationRequest_out or busy_requesting_to_idle;
+			
+			guarantee "The service configures the request at the top of the 'queue' with predicted vehicle positions and emits a TaskImplementationRequest_out message or
+				transitions to IDLE within 2ms of receiving TaskImplementationResponse_in in the BUSY_WAITING state." :
+				whenever event_tir_in_busy_waiting_state occurs request_out_or_busy_requesting_to_idle occurs during [0.0,0.002];
+				
+        **};
+    end PlanBuilderService;
+    
+end PlanBuilderService_Pkg;
