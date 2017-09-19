@@ -18,7 +18,6 @@ endif
 if get_option('afrl_internal')
   add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
-  buildtools_dir = '/home/steve/RAS/Development/uxas/systems/Odroid_XU4/BuildTools/'
 endif
 
 # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
