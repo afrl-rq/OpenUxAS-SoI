@@ -4,4 +4,4 @@
 
 .aadlbin-gen/
 diagrams/
-aadl/models/instances
+instances/
