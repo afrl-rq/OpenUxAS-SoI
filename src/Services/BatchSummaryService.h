@@ -106,8 +106,6 @@ namespace uxas
         private:
 
 
-
-
             void HandleBatchSummaryRequest(std::shared_ptr<afrl::impact::BatchSummaryRequest>);
             void HandleEgressRouteResponse(std::shared_ptr<uxas::messages::route::EgressRouteResponse>);
             void BatchSummaryService::UpdateSummary(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
@@ -124,12 +122,7 @@ namespace uxas
             // storage
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_entityStates;
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_entityConfigs;
-            std::unordered_set<int64_t> m_airVehicles;
-            std::unordered_set<int64_t> m_groundVehicles;
-            std::unordered_set<int64_t> m_surfaceVehicles;
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::Task> > m_multiVehicleTasks;
-            std::unordered_map<int64_t, std::vector<std::shared_ptr<afrl::cmasi::Location3D> > > m_taskLocations;
-            std::unordered_map<int64_t, std::unordered_map<int64_t, float> > m_taskLengths; // taskId, timing, length
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::Location3D> > m_towerLocations;
             std::unordered_map<int64_t, std::pair<float, bool> > m_towerRanges;
 
@@ -145,19 +138,11 @@ namespace uxas
             std::unordered_map<int64_t, std::shared_ptr<afrl::impact::BatchSummaryResponse> > m_workingResponse;
             std::unordered_map<int64_t, std::shared_ptr<afrl::impact::BatchSummaryRequest> > m_workingRequests;
 
-            std::unordered_set<int64_t> m_readyResponse;
-
-            int64_t m_routeId{ 5000000 }; // start outside of any task or waypoint id
-                                          //                route id,                   returned response
-            std::unordered_map<int64_t, std::shared_ptr<uxas::messages::route::RoutePlanResponse> > m_routeResponses;
-
             std::unordered_map<int64_t, std::shared_ptr<messages::task::TaskAutomationRequest>> m_pendingTaskAutomationRequests;
             std::unordered_map<int64_t, std::shared_ptr<messages::task::TaskAutomationResponse>> m_workingTaskAutomationResponses;
 
             //                route id, response id
             std::unordered_map<int64_t, int64_t> m_pendingRouteResponses;
-            //                route id,         vehicle id, task id, prev task id
-            std::unordered_map<int64_t, std::tuple<int64_t, int64_t, int64_t> > m_routeTaskPairing;
             std::unordered_map<int64_t, std::shared_ptr<GsPolygon> > m_keepOutZones;
 
 

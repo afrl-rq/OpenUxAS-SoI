@@ -32,7 +32,6 @@
 #define STRING_COMPONENT_NAME "BatchSummary"
 #define STRING_XML_COMPONENT_TYPE STRING_COMPONENT_NAME
 #define STRING_XML_COMPONENT "Component"
-#define STRING_XML_TYPE "Type"
 #define STRING_XML_FAST_PLAN "FastPlan"
 #define STRING_XML_LANE_SPACING "LaneSpacing"
 
@@ -96,43 +95,33 @@ namespace uxas
             BatchSummaryService::configure(const pugi::xml_node & ndComponent)
 
         {
-            std::string strBasePath = m_workDirectoryPath;
-            uint32_t ui32EntityID = m_entityId;
-            uint32_t ui32LmcpMessageSize_max = 100000;
-            std::stringstream sstrErrors;
-
-            std::string strComponentType = ndComponent.attribute(STRING_XML_TYPE).value();
-
             std::string strFastPlan = ndComponent.attribute(STRING_XML_FAST_PLAN).value();
             if (!strFastPlan.empty())
             {
                 m_fastPlan = ndComponent.attribute(STRING_XML_FAST_PLAN).as_bool();
             }
 
-            // track states for watch task location prediction
-            addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-            addSubscriptionAddress(afrl::impact::RadioTowerConfiguration::Subscription);
-            addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-            addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-            addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
-            addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
-            addSubscriptionAddress(afrl::impact::RadioTowerState::Subscription);
-            addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-            addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-            addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+			
+			addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+			for (auto descendant : afrl::cmasi::EntityStateDescendants())
+				addSubscriptionAddress(descendant);
+
+			addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+			for (auto descendant : afrl::cmasi::EntityConfigurationDescendants())
+				addSubscriptionAddress(descendant);
 
             // Tasks which are handled by this planner
             // track all tasks
 #define SUBSCRIBE_TO_TASKS
 #include "00_ServiceList.h"
 
-            addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);//assume all KOZs apply to all vehicles
+			//assume all KOZs apply to all vehicles for checking conflictsWithROZ
+            addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
 
-                                                                           // Primary messages for actual route construction
+            // Primary messages for actual route construction
             addSubscriptionAddress(afrl::impact::BatchSummaryRequest::Subscription);
             addSubscriptionAddress(messages::task::TaskAutomationResponse::Subscription);
             addSubscriptionAddress(messages::route::EgressRouteResponse::Subscription);
-            addSubscriptionAddress(uxas::messages::task::TaskPlanOptions::Subscription);
 
             return true; // may not have the proper fast plan value, but proceed anyway
         }
@@ -171,46 +160,21 @@ namespace uxas
                     m_towerRanges[id] = std::make_pair(rconfig->getRange(), rconfig->getEnabled());
                 }
             }
-            else if (afrl::cmasi::isEntityState(receivedLmcpMessage->m_object.get()))
+            else if (std::dynamic_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object))
             {
-                int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
-                m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-            }
-            else if (afrl::impact::isRadioTowerState(receivedLmcpMessage->m_object.get()))
-            {
-                int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
-                m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-                m_towerLocations[id] = std::shared_ptr<afrl::cmasi::Location3D>(m_entityStates[id]->getLocation()->clone());
-                auto rs = std::static_pointer_cast<afrl::impact::RadioTowerState>(receivedLmcpMessage->m_object);
-                if (m_towerRanges.find(id) != m_towerRanges.end())
-                {
-                    m_towerRanges[id].second = rs->getEnabled();
-                }
-            }
-            else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
-            {
-                int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
-                m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-                m_airVehicles.insert(id);
-            }
-            else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
-            {
-                int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
-                m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-                m_groundVehicles.insert(id);
-            }
-            else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
-            {
-                int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
-                m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-                m_surfaceVehicles.insert(id);
-            }
-            else if (uxas::messages::task::isTaskPlanOptions(receivedLmcpMessage->m_object.get()))
-            {
-                auto taskOptions = std::static_pointer_cast<uxas::messages::task::TaskPlanOptions>(receivedLmcpMessage->m_object);
-                for (auto option : taskOptions->getOptions()) {
-                    m_taskLengths[taskOptions->getTaskID()][option->getOptionID()] = option->getCost();
-                }
+				auto state = std::dynamic_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
+				int64_t id = state->getID();
+				m_entityStates[id] = state;
+
+				if (afrl::impact::isRadioTowerState(receivedLmcpMessage->m_object.get()))
+				{
+					m_towerLocations[id] = std::shared_ptr<afrl::cmasi::Location3D>(state->getLocation()->clone());
+					auto rs = std::static_pointer_cast<afrl::impact::RadioTowerState>(receivedLmcpMessage->m_object);
+					if (m_towerRanges.find(id) != m_towerRanges.end())
+					{
+						m_towerRanges[id].second = rs->getEnabled();
+					}
+				}
             }
 
             else if (messages::task::isTaskAutomationResponse(receivedLmcpMessage->m_object))
@@ -605,23 +569,23 @@ namespace uxas
                     if (isLoiterAction(action))
                     {
                         afrl::cmasi::LoiterAction* loiter = dynamic_cast<afrl::cmasi::LoiterAction*>(action);
-                        //GsPnt2 p;
+                        GsPnt2 p;
                         unitConversions.ConvertLatLong_degToNorthEast_m(loiter->getLocation()->getLatitude(), loiter->getLocation()->getLongitude(), north, east);
                         auto length = loiter->getRadius();
                         //assume circular
-                        //for (auto koz : m_keepOutZones)
-                        //{
-                        //    for (double rad = 0; rad < n_Const::c_Convert::dTwoPi(); rad += n_Const::c_Convert::dPiO10())
-                        //    {
-                        //        p.x = east + length * cos(rad);
-                        //        p.y = north + length * sin(rad);
-                        //        if (koz.second->contains(p))
-                        //        {
-                        //            sum->setConflictsWithROZ(true);
-                        //            break;
-                        //        }
-                        //    }
-                        //}
+                        for (auto koz : m_keepOutZones)
+                        {
+                            for (double rad = 0; rad < n_Const::c_Convert::dTwoPi(); rad += n_Const::c_Convert::dPiO10())
+                            {
+                                p.x = east + length * cos(rad);
+                                p.y = north + length * sin(rad);
+                                if (koz.second->contains(p))
+                                {
+                                    sum->setConflictsWithROZ(true);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -756,26 +720,10 @@ namespace uxas
                 double w = rectangle->getWidth() / 2;
                 double h = rectangle->getHeight() / 2;
 
-                auto rot1 = VisiLibity::Point::rotate(VisiLibity::Point(east + w - c.x(), north + h - c.y()), a);
-                rot1.set_x(rot1.x() + c.x());
-                rot1.set_y(rot1.y() + c.y());
-
-                auto rot2 = VisiLibity::Point::rotate(VisiLibity::Point(east - w - c.x(), north + h - c.y()), a);
-                rot2.set_x(rot2.x() + c.x());
-                rot2.set_y(rot2.y() + c.y());
-
-                auto rot3 = VisiLibity::Point::rotate(VisiLibity::Point(east - w - c.x(), north - h - c.y()), a);
-                rot3.set_x(rot3.x() + c.x());
-                rot3.set_y(rot3.y() + c.y());
-
-                auto rot4 = VisiLibity::Point::rotate(VisiLibity::Point(east + w - c.x(), north - h - c.y()), a);
-                rot4.set_x(rot4.x() + c.x());
-                rot4.set_y(rot4.y() + c.y());
-
-                poly.push_back(rot1);
-                poly.push_back(rot2);
-                poly.push_back(rot3);
-                poly.push_back(rot4);
+				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w, north + h) - c, a) + c);
+				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w, north + h) - c, a) + c);
+				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w, north - h) - c, a) + c);
+				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w, north - h) - c, a) + c);
 
                 isValid = true;
             }
