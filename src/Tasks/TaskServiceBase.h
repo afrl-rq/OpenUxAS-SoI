@@ -129,7 +129,71 @@ namespace task
      * 
      * \par The <B><i>TaskServiceBase</i></B> is a base class that implements 
      * storage/functions common to all tasks.
+     *
+     * ASSUMPTIONS:
+     *  - can handle one 'UniqueAutomationRequest' at a time
      * 
+     * OPERATIONS
+     * 1) When an 'EntityConfiguration', ('AirVehicleConfiguration', 'GroundVehicleConfiguration', 
+     *  'SurfaceVehicleConfiguration') for an entity listed in the task's eligible 
+     *  entities is received, it is stored in 'm_entityConfigurations' and its ID 
+     *  is entered into the map 'm_speedAltitudeVsEligibleEntityIds', based on its
+     *  nominal speed and altitude.
+     * 
+     * 2) When an 'UniqueAutomationRequest' is received, call the virtual function 
+     *  'buildTaskPlanOptions()'.
+     * 
+     * 3) When a 'TaskImplementationRequest' is received call the function 
+     *  'buildAndSendImplementationRouteRequestBase'.
+     * 
+     * 4) When a 'UniqueAutomationResponse' is received, save the VehicleIDs for
+     *  the vehicles assigned to this task.
+     * 
+     * 
+     * 
+     * TASK SPECIFIC VIRTUAL FUNCTIONS:
+     * 
+     * THE FOLLOWING 5 FUNCTIONS ARE CALLED FROM THE CORRESPONDING VIRTUAL
+     * FUNCTIONS FROM 'ServiceBase':
+     * 
+     *  configureTask(...)
+     *  initializeTask(...)
+     *  startTask(...)
+     *  terminateTask(...)
+     *  processReceivedLmcpMessageTask(...)
+     * 
+     *  activeEntityState(...) the task is active
+     *      called each time::
+     *      - an 'afrl::cmasi::EntityState' message received
+     *      - the entityID, from the message, is found in 'm_assignedVehicleIds'
+     *      - this taskID is included in the message's 'AssociatedTasks'
+     *  taskComplete(...) the task has just completed
+     *      called each time:
+     *      - an 'afrl::cmasi::EntityState' message received
+     *      - the entityID, from the message, is found in 'm_assignedVehicleIds'
+     *      - this taskID is NOT included in the message's 'AssociatedTasks'
+     *      - the entityID, from the message, is found in 'm_activeEntities',
+     *          indicating that the task was active last time an 'EntityState' 
+     *          message was received from this entity.
+     * 
+     *  buildTaskPlanOptions(...) the task's function that builds the 
+     *      'uxas::messages::task::TaskPlanOptions' message. This is a pure 
+     *      virtual function and must be overridden by the task.
+     *      called each time:
+     *          - a 'uxas::messages::task::UniqueAutomationRequest' is received.
+     * 
+     *  isHandleOptionsRouteResponse(...) overridden by the task to add custom
+     *      reponses to 'uxas::messages::route::RoutePlanResponse' messages
+     *      (SHOULD BE DEPRECATED ??)
+     * 
+     *  isBuildAndSendImplementationRouteRequest(...) overridden by the task to 
+     *      add custom Implementation Route Planning
+     *      (SHOULD BE DEPRECATED ??)
+     * 
+     *  isProcessTaskImplementationRouteResponse(...)  overridden by the task to 
+     *      add custom task Implementation actions
+     * 
+     *  
      * @n
      * TASK: Subscribed Messages:
      *  - afrl::cmasi::EntityState
@@ -146,12 +210,12 @@ namespace task
      *  - uxas::messages::task::TaskImplementationRequest
      * 
      * TASK: Sent Messages:
-     *  - uxas::messages::task::TaskInitialized
-     *  - uxas::messages::task::TaskActive
-     *  - uxas::messages::task::TaskComplete
-     *  - uxas::messages::route::RoutePlanRequest
-     *  - uxas::messages::task::TaskPlanOptions
-     *  - uxas::messages::task::TaskImplementationResponse
+     *  - uxas::messages::task::TaskInitialized - sent out when the task have successfully started.
+     *  - uxas::messages::task::TaskActive - sent once each time the task becomes active.
+     *  - uxas::messages::task::TaskComplete - sent once each time the task becomes inactive.
+     *  - uxas::messages::route::RoutePlanRequest - sent to build the routes necessary to implement the task
+     *  - uxas::messages::task::TaskPlanOptions - the options are constructed by the task and sent to the assignment algorithm
+     *  - uxas::messages::task::TaskImplementationResponse - the implemented option
      */
     class TaskServiceBase: public ServiceBase
     {
