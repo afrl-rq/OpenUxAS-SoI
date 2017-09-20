@@ -32,6 +32,7 @@
 #include <list>
 #include "afrl/impact/ImpactAutomationRequest.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
+#include "BatchSummaryService.h"
 
 namespace uxas
 {

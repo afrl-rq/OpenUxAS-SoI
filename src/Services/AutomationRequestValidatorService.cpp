@@ -340,7 +340,7 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
                                 summary->setDestinationTaskID(task);
                                 if (!resp->getOriginalResponse()->getMissionCommandList().empty())
                                 {
-                                    //BatchSummaryService::UpdateSummaryUtil(summary.get(), resp->getOriginalResponse()->getMissionCommandList().front()->getWaypointList());
+                                    BatchSummaryService::UpdateSummaryUtil(summary.get(), resp->getOriginalResponse()->getMissionCommandList().front()->getWaypointList());
                                 }
                             }
                         }
