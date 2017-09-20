@@ -3,6 +3,7 @@ public
 	--Included DataTypes
     with CMASI;
     with UXTASK;
+    with UxAS_Node_Lib;
     
     -- Included Main Services
 	with AutomationRequestValidatorService_Pkg;	
@@ -12,25 +13,17 @@ public
     		AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
     		AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
     	annex agree {**
-    		assume "Process one automation request at a time" :
-        		pre(PLTL.Once(event(AutomationRequest_in))) => not event(AutomationRequest_in);
-
-    		guarantee "(UxAS responds, 1 cpt, no errors) When an AutomationRequest_in is received by UxAS, 
-    			UxAS responds with an AutomationResponse_out on the next timestep.":
-    			true -> (pre(event(AutomationRequest_in)) => event(AutomationResponse_out));
+    		    			
+    		--Note: We do not accept a new request until the previous request has been responded to. 
+    		--  The UxAS_Node_Lib.responds_exactly_once_within pattern ignores requests received while processing.
+    		guarantee "(UxAS responds, 1 cpt, no errors) Upon receiving an AutomationRequest_in, 
+				UxAS responds exactly once, on the next timestep, with an AutomationResponse_out.":
+    			UxAS_Node_Lib.responds_exactly_once_within(
+    				event(AutomationResponse_out), 
+    				event(AutomationRequest_in), 
+    				1
+    			); 
     		
-    		---------------------------------
-    		--DRAFT STUFF FOR TWO TIMESTEPS (NOT THERE YET)
-    		--eq TIME_BOUND : int = 2;
-    		
-    		--Use responds or responds within. Do we have something like that in SpeAR now? Maybe I should try
-    		-- it out there first.
-    		--guarantee ""
-    		
---    		guarantee "(Timing not realistic.) When an AutomationRequest_in is received by UxAS, 
---    			UxAS responds with an AutomationResponse_out within two timesteps.":
---    			(prev(prev(event(AutomationRequest_in), false), false) => event(AutomationResponse_out));
-			---------------------------------
     	**};
     end UxAS_responds;
     

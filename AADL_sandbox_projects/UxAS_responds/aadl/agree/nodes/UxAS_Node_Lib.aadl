@@ -24,6 +24,62 @@ public
 		   res = if a then 1 else 0;
 		tel;
 	
+	-----------------------------------------------------------------
+	-- The responds_exactly_once_within(a,b,n) node returns true if and only if 
+	--    a (response) responds to b (request) exactly once within n steps. 
+	-- We ignore requests that are received after some earlier request b_i and before the response to b_i is sent. 
+	-- We do not allow response on the same timestep as the request. It needs to be sent at least one timestep later.
+	-- We do not allow spontaneous responses--they need to follow a request.
+	-----------------------------------------------------------------
+	
+	node responds_exactly_once_within(a : bool, b : bool, n: int) returns (holds2 : bool);
+		var
+		 latch : int;
+		 pre_i : int;
+		 i : int;
+		 pre_state : int;
+		 state : int;
+		 some_transition : bool;
+		 T_0_to_1 : bool;
+		 T_1_to_2 : bool;
+		 T_0_to_2 : bool;
+		 T_1_to_0 : bool;
+		 
+		let
+		 --Support macros
+		 latch = prev(latch,n);
+		 pre_state = prev(state,0);
+		 pre_i = prev(i,0);
+		 some_transition = T_0_to_1 or T_1_to_2 or T_0_to_2 or T_1_to_0;
+		 
+		 --State transition conditions
+		 T_0_to_1 = pre_state = 0 and b and not a;
+		 T_1_to_2 = pre_state = 1 and not a and i >= latch;
+		 T_0_to_2 = pre_state = 0 and a;
+		 T_1_to_0 = pre_state = 1 and a;
+		 
+		 state = 
+		 	if T_0_to_1 
+	 		then 1
+	 		else if T_1_to_2
+	 			then 2
+	 			else if T_0_to_2
+	 				then 2
+	 				else if T_1_to_0
+	 					then 0
+	 					else pre_state;
+		 
+		 i = 0 -> 
+		 	if (pre_state = 0) 
+	 		then 0
+	 		else if (pre_state = 1)
+	 			then pre_i + 1
+	 			else pre_i;	
+	 			
+	 	 holds2 = (state = 0) or (state = 1);
+	 	  	 
+		tel;
+		
 	**};
 	
 end UxAS_Node_Lib;
