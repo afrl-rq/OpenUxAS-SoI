@@ -24,9 +24,9 @@ thread AutomationRequestValidatorService
 				1
 			);
 			
-		guarantee "(2 cpts, no errors) Upon receiving a UniqueAutomationResponse_in (from the PlanBuilderService),  
-			the AutomationRequestValidatorService produces exactly one AutomationResponse_out
-			and it does so on the next timestep.":
+		guarantee "(2 cpts, no errors) Upon receiving a UniqueAutomationResponse_in 
+			(from the PlanBuilderService), the AutomationRequestValidatorService produces exactly 
+			one AutomationResponse_out and it does so on the next timestep.":
 			UxAS_Node_Lib.responds_exactly_once_within(
 				event(AutomationResponse_out), 
 				event(UniqueAutomationResponse_in), 
