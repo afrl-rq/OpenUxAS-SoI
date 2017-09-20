@@ -15,10 +15,13 @@ public
     		AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
     	annex agree {**
     		
+    		assume "A new AutomationRequest is not made until a AutomationResponse has been sent to the previous request.":
+    		UxAS_Node_Lib.one_request_at_a_time(event(AutomationResponse_out), event(AutomationRequest_in));
+    		
     		eq NUM_STEPS : int = 3;
     					
     		--Note: We do not accept a new request until the previous request has been responded to. 
-    		--  The UxAS_Node_Lib.responds_exactly_once_within pattern ignores requests received while processing.
+    		--  The UxAS_Node_Lib.responds_exactly_once_within node ignores requests received while processing.
     		guarantee "(UxAS responds, 2 cpts, no errors) Upon receiving an AutomationRequest_in, UxAS responds exactly once with an AutomationResponse_out within NUM_STEPS steps.":
     			UxAS_Node_Lib.responds_exactly_once_within(
     				event(AutomationResponse_out), 
