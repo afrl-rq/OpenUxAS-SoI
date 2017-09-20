@@ -82,7 +82,7 @@ public
 	-----------------------------------------------------------------	
 	--	Node: "A new request is not made until a response has been sent to the previous request."
 	--	We assume it takes at least one timestep to respond to a request, so we don't count same-timestep responses.
-	--	We allow a new request on the timestep after the response was sent.
+	--	We allow a new request starting with the timestep after the response was sent.
 	--	Note that this node constrains the input/request (b) only and not the output/response (a).
 	-----------------------------------------------------------------
 	node one_request_at_a_time(a : bool, b : bool) returns (holds2 : bool);
