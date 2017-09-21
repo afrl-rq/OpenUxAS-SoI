@@ -4,20 +4,35 @@ public
     with CMASI;
     with UXTASK;
     with IMPACT;
+    with UxAS_Node_Lib;
 
 thread AutomationRequestValidatorService
 	features
 		AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
+		UniqueAutomationRequest_out: out event data port uxtask::UniqueAutomationRequest.i;
+		UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
         AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
+        
 	annex agree {**
-		guarantee "(1 cpt, no errors) Upon receiving an AutomationRequest_in, 
-			the AutomationRequestValidatorService responds on the next timestep 
-			with an AutomationResponse_out.":
-			true -> (pre(event(AutomationRequest_in)) => event(AutomationResponse_out));
+				
+		guarantee "(2 cpts, no errors) Upon receiving an AutomationRequest_in,  
+			the AutomationRequestValidatorService produces exactly one UniqueAutomationRequest_out
+			and it does so on the next timestep.":
+			UxAS_Node_Lib.responds_exactly_once_within(
+				event(UniqueAutomationRequest_out), 
+				event(AutomationRequest_in), 
+				1
+			);
 			
-		guarantee "(1 cpt, no errors) No spurious responses" :
-			prev(not PLTL.Once(event(AutomationRequest_in)), true) => 
-				not event(AutomationResponse_out);
+		guarantee "(2 cpts, no errors) Upon receiving a UniqueAutomationResponse_in 
+			(from the PlanBuilderService), the AutomationRequestValidatorService produces exactly 
+			one AutomationResponse_out and it does so on the next timestep.":
+			UxAS_Node_Lib.responds_exactly_once_within(
+				event(AutomationResponse_out), 
+				event(UniqueAutomationResponse_in), 
+				1
+			);
+			
 	**};	
 end AutomationRequestValidatorService;
     	

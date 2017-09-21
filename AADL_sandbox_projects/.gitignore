@@ -13,3 +13,11 @@ Examples/diagrams/
 UxAS_Arch_Model_sjsr/.aadlbin-gen
 UxAS_Arch_Model_sjsr/instances
 UxAS_Arch_Model_sjsr/diagrams
+
+UxAS_responds/.aadlbin-gen/
+UxAS_responds/instances
+UxAS_responds/diagrams
+
+UxAS_responds_realtime/.aadlbin-gen/
+UxAS_responds_realtime/instances
+UxAS_responds_realtime/diagrams
