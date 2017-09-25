@@ -148,4 +148,23 @@ lemma findwp_to_funspec:
     apply blast
   apply wp
   using find_waypoint_def is_valid_MissionCommand_def by auto
+
+lemma MCWaypointSubSequence_to_funspec:
+"\<lbrace> \<lambda> (s::lifted_globals).
+  P s
+  \<and> is_valid_MissionCommand s mcp
+  \<and> ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))
+  \<and> waypoints_wf ws
+\<rbrace>
+  LoadCode.MissionCommandUtils.MCWaypointSubSequence' mcp i n mcpe 
+\<lbrace> \<lambda> r s. 
+  P s 
+  \<and> r = 1 \<longrightarrow> (\<exists> rmcp. rmcp = (ptr_coerce mcpe) \<and> Some (lift_waypoints s rmcp (unat (get_waypoints_length s rmcp))) = waypoints_window ws i (unat n)) \<rbrace>!"    
+ apply (unfold LoadCode.MissionCommandUtils.MCWaypointSubSequence'_def)
+  apply (simp add: skipE_def)
+              apply(simp add: unlessE_def)
+  apply wp 
+
+          apply clarsimp
+
 end

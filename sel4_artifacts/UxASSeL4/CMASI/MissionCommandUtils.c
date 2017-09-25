@@ -85,7 +85,9 @@ bool MCWaypointSubSequence(const MissionCommand * omcp,
 
     /* assumption: all ids in the waypoint list can be found. */
     wp = FindWP(omcp, idit);
-    assert(wp != NULL);
+    if(wp != NULL) {
+      return false;
+    }
     wmcep->waypoints[i] = *wp;
     if(wp->number == wp->nextwaypoint) {
       i++;
