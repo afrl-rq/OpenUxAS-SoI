@@ -60,19 +60,7 @@ public
                 message to properly destroy the service that was created to fulfill the original Task.":
                 event(RemoveTasks_in) =>
                     true; --TBD
-                    
-             --Timing properties
-             eq event_Task_in : bool = event(Task_in);
-             eq event_CreateNewService_out : bool = event(CreateNewService_out);
-             guarantee "CreateNewService_out is emited within 1ms of receiving Task_in":
-              	whenever event_Task_in occurs event_CreateNewService_out occurs during [0.0,0.001];
-              	
-            eq event_RemoveTasks_in : bool = event(RemoveTasks_in);
-            eq event_KillService_out: bool = event(KillService_out);
-            
-            guarantee "KillService_out is emited within 1ms of receiving RemoveTasks_in" :
-            	whenever event_RemoveTasks_in occurs event_KillService_out occurs during [0.0,0.001];
-             
+
         **};
         
     end TaskManagerService;

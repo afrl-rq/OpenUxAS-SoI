@@ -27,79 +27,8 @@ public
 		annex agree {**
 				
 			eq state_counter : int = (0->(pre(state_counter)+1));
-				
-			--Assumptions for composite example
 			
---			--Prime that in model state 1, event UniqueAutomationRequest_in has occurred
---			assume "In the initial state, event UniqueAutomationRequest_in has occurred" :
---				state_counter = 1 => event(UniqueAutomationRequest_in);
---				
---			--Prime that AssignmentCostMatrix_in events occurs after model state 1
---			assume "AssignmentCostMatrix_in is not true initially":
---				state_counter <= 1 => not event(AssignmentCostMatrix_in) ;
-				
-				--event(AssignmentCostMatrix_in) <=> state_counter =1;
-					
---			eq builder_in_idle_waiting : bool; 
---			assume "builder is in the idle waiting state":
---				builder_in_idle_waiting;
 			
-			--TODO: guarantee that states if an automation request is received, a puilder response is received in bounded time. 
-				
-			--Test guarantee	
---			eq event_TaskImplementationRequest_out : bool = event(TaskImplementationRequest_out);
---			guarantee "If an AssignmentCostMatrix_in occurs, a TaskImplementationRequest_out occurs within 200 seconds":
---				whenever event_AssignmentCostMatrix_in occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
---				
-			eq event_expected_acm_in_wait_state_and_expected_task_options_received: bool;
---			guarantee "Test1: ATBB to Builder test":
---				whenever event_expected_acm_in_wait_state_and_expected_task_options_received occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
-				
-			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
-			--Note: previously proven
-			guarantee "Test2: Sanity check:
-				Once the triggering condition is met for sending a TaskAssignmentSummary_out in the WAIT state is met,
-				the service will send out a TaskAssignmentSummary_out within a reasonble upper bound.":
-				whenever event_expected_acm_in_wait_state_and_expected_task_options_received occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
-			
-			eq event_uar_in_attb_idle_state : bool;
-			guarantee "Test3: end-to-end AssignmentTreeBranchBoundBase check: 
-				UniqueAutomationRequest_in in the IDLE state will result in TaskAssignmentSummary_out with a reasonable upper limit (200.0s)":
-				whenever event_uar_in_attb_idle_state occurs event_TaskAssignmentSummary_out occurs during [0.0,200.0];
-				
---			guarantee "Test4: ATBB to Builder test":
---				whenever event_uar_in_attb_idle_state occurs event_TaskImplementationRequest_out occurs during [0.0,200.0];
---				
-			--Note: counterexample generated for this guarantee on the linquest "supercomputer" when
-			--All component timing guarantees are removed (takes over an hour to produce)
-			guarantee "Test5: Sanity check:
-				A reasonable upper bound after a UniqueAutomationRequest_in is recieved in the IDLE state, the service will reach the triggering
-				condition for sending a TaskAssignmentSummary_out":
-				whenever event_uar_in_attb_idle_state occurs event_expected_acm_in_wait_state_and_expected_task_options_received occurs during [0.0,200.0];
-			
-			eq allExpectedTaskOptionsReceived : bool;
-			--Note: passed with assumptions alone (no timing information in the child component) using the Linquest "supercomputer"
-			guarantee "Test6: Sanity check:
-				all expected task options are always received within a reasonable upper after a 
-				UniqueAutomationRequest_in is received in the IDLE state.":
-				whenever event_uar_in_attb_idle_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
-			
-			eq component_in_wait_state : bool ;
-			--Note: previously proven
-			guarantee "Test7: Sanity check:
-				the service always enteres the WAIT state within a reasonable upper bound from the IDLE state when
-				a UniqueAutomationRequest_in is recieved." :
-				whenever event_uar_in_attb_idle_state occurs component_in_wait_state occurs during [0.0,200.0];
-				
-			--Note: previously proven after 7-8 hours on linquest "supercomputer"
-			guarantee "Test8: Sanity check:
-				 all expected task options are always received in the WAIT state within a reasonable upper bound" :
-				whenever component_in_wait_state occurs allExpectedTaskOptionsReceived occurs during [0.0,200.0];
-				
-			guarantee "Test 9: Sanity check:
-				In the WAIT state, within a reasonable upper bound, the expected AssignmentCostMatrix_in is recieved." :
-				whenever component_in_wait_state occurs event_expected_acm occurs during [0.0,200.0];
-				
 			------------------------------------------	
 			--Assumptions for AssignmentTreeBranchBound	
 				
@@ -152,7 +81,6 @@ public
 --			sub2 : thread PlanBuilderService_pkg::PlanBuilderService;
 		connections
 			conn0 : port AssignmentCostMatrix_in -> sub.AssignmentCostMatrix_in;
-			--conn1 : port sub.TaskAssignmentSummary_out -> TaskAssignmentSummary_out;
 --			conn1 : port sub.TaskAssignmentSummary_out -> sub2.TaskAssignmentSummary_in;
 			conn1a : port sub.TaskAssignmentSummary_out -> TaskAssignmentSummary_out ;
 			conn2 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
@@ -160,21 +88,6 @@ public
 			conn4 : port TaskPlanOptions_in -> sub.TaskPlanOptions_in;
 		annex agree {**
 				
---			assign event_TaskImplementationResponse_in = event(sub2.TaskImplementationResponse_in);
-			assign event_expected_acm_in_wait_state_and_expected_task_options_received = sub.send_task_assignment_summary;
-			assign event_uar_in_attb_idle_state = event(UniqueAutomationRequest_in) and sub.state = sub.IDLE;
-			assign allExpectedTaskOptionsReceived = sub.allExpectedTaskOptionsReceived;
-			assign event_expected_acm = event(AssignmentCostMatrix_in) and 
-				AssignmentCostMatrix_in.CorrespondingAutomationRequestID = sub.curUniqueAutomationRequestID;
-      		assign component_in_wait_state = sub.state = sub.WAIT;
- --			assign builder_in_idle_waiting = (sub2.state = sub2.IDLE_WAITING) and sub.state = sub.IDLE;
-
-			-- These lemmas could be captured in SpeAR as properties
-			
-			--States to check for reachability:
-			    -- IDLE
-			    -- WAIT 
-			
 			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
 			lemma "False indicates the INIT state is reachable" : sub.state != sub.IDLE; 
 			lemma "False indicates the IDLE state is reachable" : sub.state != sub.WAIT; 
@@ -376,51 +289,6 @@ public
       			at which point this service returns to the idle state.":
       			wait_to_idle =>
       				state = IDLE;
-      					
-      		--Timing properties
-      		
---      		"Response" to UniqueAutomationRequest_in
---      		idle -> wait, store request ID for identification of corresponding TaskPlanOptions and AssignmentCostMatrix.
---      		
-      		eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
-      		eq event_uar_in_idle_state : bool = event_UniqueAutomationRequest_in and state = IDLE;
-      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
-      		--small amount of time instead of 0 for this guarantee. 
-      		guarantee "The service transitions to WAIT within 0ms of receiving UniqueAutomationRequest_in from the IDLE state":
-      			whenever event_uar_in_idle_state occurs idle_to_wait occurs during [0.0,0.0000001];
-      			
-      		eq uar_id_cached : bool = curUniqueAutomationRequestID = UniqueAutomationRequest_in.RequestID;
-      		--NOTE: could not have a 0 time guarantee without issues with the verification. Altered the spec to use a very
-      		--small amount of time instead of 0 for this guarantee. 
-      		guarantee "The service caches the ID of a received UniqueAutomationRequest_in within 0ms in the IDLE state":
-      			whenever event_uar_in_idle_state occurs uar_id_cached occurs during [0.0,0.0000001];
-      		
---      		"Response" to AssignmentCostMatrix_in
---      		Using the cost of each task option (from the stored TaskPlanOptions messages) 
---      		and the cost for each vehicle to reach each option (from AssignmentCostMatrix), 
---      		perform an optimization attempting to find the minimal cost mission that adheres to the 
---      		Process Algebra contraints. Upon completion, emit TaskAssignmentSummary and wait -> idle.
-
-			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
-			eq event_AssignmentCostMatrix_in : bool = event(AssignmentCostMatrix_in);
-			eq event_acm_in_wait_state : bool = event_AssignmentCostMatrix_in and state = WAIT;
-			
-			--NOTE: originally I had only considered an AssignmentConstMatrix_in message in the wait state
-			--but forgot about the 'send_task_assignment_summary' that more accurately specifies the conditions
-			--under which a TaskAssignmentSummary_out is sent.
-
-			guarantee "TaskAssignmentSummary_out is emitted within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state":
---				whenever event_acm_in_wait_state occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
-				whenever send_task_assignment_summary occurs event_TaskAssignmentSummary_out occurs during [0.0,1.5];
-				
---			guarantee "The service transitions to IDLE within 1500ms after receiving an expected AssignmentCostMatrix_in in the WAIT state ":
-----				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
---				whenever send_task_assignment_summary occurs wait_to_idle occurs during [0.0,1.5];
-
-			guarantee "The service transitions to IDLE within 0ms after a TaskAssignmentSummary_out is emited":
---				whenever event_acm_in_wait_state occurs wait_to_idle occurs during [0.0,1.5];
-				whenever event_TaskAssignmentSummary_out occurs wait_to_idle occurs during [0.0,0.0000001];
-
       	**};
     end AssignmentTreeBranchBoundBase;
 

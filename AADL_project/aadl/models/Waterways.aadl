@@ -50,18 +50,6 @@ public
         	assume "Process one automation request at a time" :
         		pre(PLTL.Once(event(AutomationRequest_in))) => not event(AutomationRequest_in);
         	
---        	assume "time_init": time = 0.0 -> time = pre(time)+1.0;
-        	
---        	eq event_RoutePlanRequest_in : bool;
---        	eq event_RoutePlanResponse_out : bool;
---        	guarantee "RoutePlannerVisibilityService responsiveness" : 
---        		whenever event_RoutePlanRequest_in occurs event_RoutePlanResponse_out occurs during [0.0,5.0];
-
-			eq event_rasc_AssignmentCostMatrix_out : bool;
-			eq event_pbs_TaskImplementationRequest_out: bool;
-			guarantee "An AssignmentCostMatrix_out produced from the RouteAggregatorService_Collector a TaskImplementation_Request_out is emited from the
-				PlanBuilderService within 200 seconds":
-				whenever event_rasc_AssignmentCostMatrix_out occurs event_pbs_TaskImplementationRequest_out occurs during [0.0,200.0];
         **};
     end waterways;
 
@@ -306,9 +294,9 @@ public
             prove isolation(this) 
         **};
         annex agree {**
-        		
-        	assign event_rasc_AssignmentCostMatrix_out = event(RouteAggregatorService_Collector.AssignmentCostMatrix_out);
-			assign event_pbs_TaskImplementationRequest_out = event(PlanBuilderService.TaskImplementationRequest_out);
+
+			lemma "Placeholder lemma so that AGREE/OSATE can build." : true;
+
         	
  --       	lemma "Trace" : pre(PLTL.Once(event(UniqueAutomationRequest_in))) => not event(AutomationRequest_in);
         	
