@@ -85,18 +85,6 @@ public
         	--  I'll make a one-timestep draft and will relax that assumption if needed after a team discussion.
         	-- Discussed with Aaron: We agreed that it shouldn't be one timestep since this is one of the "slower" services.
         	-- Ideally, we'll put a bound on it (TBD by Derek).
-        	
-        	eq event_RoutePlanRequest_in : bool = event(RoutePlanRequest_in);
-        	eq event_RoutePlanResponse_out : bool = event(RoutePlanResponse_out);
-        	
-        	--I made this an if and only if. And the response occurs on the next timestep.
-            guarantee "A RoutePlanResponse is produced whenever a RoutePlanRequest is received.":
-        		event(RoutePlanResponse_out) = (false -> pre(event(RoutePlanRequest_in)));
-
---			--Version with timing (no longer an if and only if, not as strong as it needs to be, allows spontaneous RoutePlanResponse_out
-			--  and more than one per input request)
---        	guarantee "A RoutePlanResponse is produced whenever a RoutePlanRequest is received.":
---        		whenever event_RoutePlanRequest_in occurs event_RoutePlanResponse_out occurs during [0.0,0.1];
         		        		
         	--I don't have any guarantees regarding the other inputs to this component.        	
         	--Q: What, if anything, should we say about those?
