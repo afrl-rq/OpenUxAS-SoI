@@ -51,27 +51,6 @@ public
         		event(UniqueAutomationRequest_in) => 
         			UniqueAutomationRequest_in.OriginalRequest.TaskListSize > 0 and UniqueAutomationRequest_in.OriginalRequest.TaskListSize <= 10;
         	
-        	-----------------------------
-        	--assumptions for PlanBuilder
---        	assume "TaskAssignmentSummary_in must provide a TaskList of size greater than 0 and less than or equal to 10":
---        		event(TaskAssignmentSummary_out) => 
---        			TaskAssignmentSummary_out.TaskListSize > 0 and TaskAssignmentSummary_out.TaskListSize <= 10;
---			
---			
-			--Assumption was not necessary given the interrelationship between components
---			assume "TaskAssignmentSummary_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
---				condition event_TaskAssignmentSummary_in occurs sporadic with IAT 0.003;
---				
---			eq event_TaskImplementationResponse_in : bool;
---			assume "TaskImplementationResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
---				condition event_TaskImplementationResponse_in occurs each 0.003; --sporadic with IAT 0.003;
---        	
-			--NOTE: I expect this guarantee to be false (currently). If a AssignmentCostMatrix is received before an automation
-			--request, I believe the automata will not emit a TaskAssignmentSummary_out. Also, the AssignmentCostMatrix cannot be
-			--arbirary. It must have specific characteristics at a specific point in processing to result in emitting a TaskAssignmentSummary_out;
---			eq event_TaskAssignmentSummary_out : bool = event(TaskAssignmentSummary_out);
---			guarantee "Timing Test: AssignmentCostMatrix_in results in a TaskAssignmentSummary_out within 5 seconds" : 
---				whenever event_AssignmentCostMatrix_in occurs event_TaskAssignmentSummary_out occurs during [0.0,5.0];
 		**};
 	end top_level;
 	

@@ -472,13 +472,6 @@ thread RouteAggregatorService_AggregatorRole
 		eq all_RoutePlanRequests_sent_for_last_route_request : bool = 
 			last_route_request_table.number_of_requests = num_of_route_plan_requests_sent_for_current_route_request;
 
-		--TODO: start with assuming one plan per request
-		--ASK DEREK: one request at a time or all requests at once? 
-			--Confirmed by Derek: timing for all requests at once
-		guarantee "When a RouteRequest_in is received, all corresponding RoutePlanRequest_out messages are sent (one
-			for each vehicle in the RouteReuqest_in) no later than 1ms following reception of the RouteRequest_in." : 
-			whenever event_RouteRequest_in occurs all_RoutePlanRequests_sent_for_last_route_request occurs during [0.0,0.001];
-			
 		--RoutePlanResponse_in occurs
 		--Store response and check to see if this message completes any checklist. 
 		--If a checklist is complete, use the corresponding request ID to create a
@@ -502,11 +495,6 @@ thread RouteAggregatorService_AggregatorRole
 					or ((RouteRequest3Table_all_plans_received and not pre(RouteRequest3Table_all_plans_received))
 						and not (RouteRequest2Table_all_plans_received and not pre(RouteRequest2Table_all_plans_received))
 						and not (RouteRequest1Table_all_plans_received and not pre(RouteRequest1Table_all_plans_received)));
-	
-		eq event_RouteResponse_out : bool = event(RouteResponse_out);
-		guarantee "When the set of all expected RoutePlanResponse_in messages is received for a given RouteRequest_in, 
-			a RouteResponse_out message is emitted no later than 1ms following reception of the final satisfying RoutePlanResponse_in.":
-		whenever individual_route_request_checklist_complete occurs event_RouteResponse_out occurs during [0.0,0.001];
 
 
 	**};
