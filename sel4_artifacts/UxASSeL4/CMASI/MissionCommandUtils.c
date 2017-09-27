@@ -56,14 +56,16 @@ bool MCWaypointSubSequence(const MissionCommand * omcp,
               const uint16_t len,
               MissionCommandExt * wmcep) {
   MissionCommand * wmcp = (MissionCommand*)wmcep;
-  uint16_t i;
-  Waypoint * wp;
+  uint16_t i = 0;
+  Waypoint * wp = NULL;
   int64_t idit = id;
-
+  bool loop = true;
   /* assumption: omcp is not NULL. */
   assert(omcp != NULL);
   /* assumption: f is not NULL. */
   assert(wmcp != NULL);
+  /* assumption: len is not 0. */
+  assert(len > 0)
 
   /* Ensure that a bad id was not provided. */
   wp = FindWP(omcp, idit);
@@ -72,30 +74,23 @@ bool MCWaypointSubSequence(const MissionCommand * omcp,
     return false;
   }
 
-  /* Ensure that a 0 length prefix was not asked for. */
-  if(len == 0) {
-    return false;
-  }
-
   Waypoint ** tmp = wmcp->waypointlist;
   *wmcp = *omcp;
   wmcp->waypointlist = tmp;
   
-  for(i=0; i<len ; i++) {
+  for(i=0; i<len && loop == true; i++) {
 
     /* assumption: all ids in the waypoint list can be found. */
     wp = FindWP(omcp, idit);
-    if(wp != NULL) {
-      return false;
-    }
+    assert(wp != NULL);
     wmcep->waypoints[i] = *wp;
     if(wp->number == wp->nextwaypoint) {
       i++;
-      break;
+      loop = false;
+    } else {
+      idit = wp->nextwaypoint;
     }
-    idit = wp->nextwaypoint;
-  }
-  
+  }  
   wmcp->waypointlist_ai.length = i;
   wmcp->waypointlist[i - 1]->nextwaypoint = wmcp->waypointlist[i - 1]->number;
   wmcp->firstwaypoint = id;

@@ -1,4 +1,4 @@
-theory FindWPToFunSpec imports 
+theory ImplToFunSpec imports 
 "LoadCode"
 "WaypointManagerFunSpec"
 begin
@@ -116,6 +116,7 @@ lemma findwp_failure:
   apply simp
   apply wp
   using is_valid_MissionCommand_def by auto
+
     
 lemma findwp_to_funspec:
 "\<lbrace> \<lambda> (s::lifted_globals).
@@ -149,22 +150,40 @@ lemma findwp_to_funspec:
   apply wp
   using find_waypoint_def is_valid_MissionCommand_def by auto
 
+lemma findwp_changes_nothing[wp]:
+"\<lbrace> \<lambda> (s::lifted_globals).
+  P s\<rbrace>
+  LoadCode.MissionCommandUtils.FindWP' mcp i
+\<lbrace> \<lambda> r s. P s \<rbrace>!"
+  sorry    
+    
 lemma MCWaypointSubSequence_to_funspec:
 "\<lbrace> \<lambda> (s::lifted_globals).
-  P s
-  \<and> is_valid_MissionCommand s mcp
+  is_valid_MissionCommand s mcp
+  \<and> is_valid_MissionCommand s (ptr_coerce mcpe)
   \<and> ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))
+  \<and> Some w = find_waypoint ws i
   \<and> waypoints_wf ws
+  \<and> n > 0
 \<rbrace>
   LoadCode.MissionCommandUtils.MCWaypointSubSequence' mcp i n mcpe 
-\<lbrace> \<lambda> r s. 
-  P s 
-  \<and> r = 1 \<longrightarrow> (\<exists> rmcp. rmcp = (ptr_coerce mcpe) \<and> Some (lift_waypoints s rmcp (unat (get_waypoints_length s rmcp))) = waypoints_window ws i (unat n)) \<rbrace>!"    
+\<lbrace> \<lambda> r s. r = r \<rbrace>!"    
  apply (unfold LoadCode.MissionCommandUtils.MCWaypointSubSequence'_def)
-  apply (simp add: skipE_def)
-              apply(simp add: unlessE_def)
-  apply wp 
-
-          apply clarsimp
+     apply(subst validNF_whileLoop_inv_measure
+      [where 
+          M = "\<lambda> ((i,idit,wp),s). unat (n - i)"
+          and I = 
+            "\<lambda> (j,idit,wp) s. 
+j \<le> n
+\<and> j \<ge> 0
+\<and> is_valid_MissionCommand s mcp
+\<and> \<not> Option.is_none (find_waypoint ws (of_int idit))
+  \<and> ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))
+  \<and> Some w = find_waypoint ws i
+  \<and> waypoints_wf ws
+  \<and> n > 0
+"
+      ])
+  using findwp_changes_nothing apply wp
 
 end

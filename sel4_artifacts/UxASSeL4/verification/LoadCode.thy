@@ -2,7 +2,6 @@ theory LoadCode imports
 "/home/dacosta/dev/rc/l4v/tools/autocorres/AutoCorres"
 begin
   
-  
 install_C_file "../CMASI/MissionCommandUtils.c"
 autocorres[ts_rules = nondet, heap_abs_syntax] "../CMASI/MissionCommandUtils.c"  
   
