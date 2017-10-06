@@ -5,49 +5,18 @@ begin
   
 locale WaypointManager =
   fixes get_number :: "'w \<Rightarrow> 'id"
-   fixes get_nextwp :: "'w \<Rightarrow> 'id"
+  fixes get_nextwp :: "'w \<Rightarrow> 'id"
+  fixes update_nextwp :: "'w \<Rightarrow> 'id \<Rightarrow> 'w"
+  assumes correct_update1[simp,intro]:"get_nextwp (update_nextwp w i) = i"
+  assumes correct_update2[simp,intro]:"get_number (update_nextwp w i) = get_number w"
+  assumes correct_update3[simp,intro]:"get_nextwp w = i \<Longrightarrow> w = update_nextwp w i"
+    
 context WaypointManager begin
 
 (* FUNSPEC(find_wp): Find a waypoint in a list of waypoints by its number. This is how we 
    notionally expect the find_wp function to work. *)
 definition find_waypoint :: "'w list \<Rightarrow> 'id \<Rightarrow> 'w option" where
 "find_waypoint ws i \<equiv> List.find (\<lambda> w. get_number w = i) ws" 
-
-fun find_waypoint_aux where
-  "find_waypoint_aux [] _ = None"
-| "find_waypoint_aux (x#xs) i = (if get_number x = i then Some x else find_waypoint_aux xs i)"
-
-lemma stuff:"find_waypoint_aux xs i = Some x \<Longrightarrow> get_number x = i"
-  apply(induct xs arbitrary:i)
-   apply auto
-    by (metis option.inject)
-      
-lemma "x = find_waypoint_aux ws i \<Longrightarrow> x = find_waypoint ws i"
-  proof(induct ws arbitrary: i)
-    case Nil
-    then show ?case using find_waypoint_def by auto
-  next
-    case (Cons a ws)
-    then have "x = Some a \<or> x \<noteq> Some a" by auto
-    thus ?case
-    proof 
-      assume a:"x = Some a"
-      then have "get_number a = i" using Cons stuff by presburger 
-      thus ?case using Cons a by (simp add: find_waypoint_def)
-    next 
-      assume a:"x \<noteq> Some a"
-      then have "get_number a \<noteq> i" using Cons by auto
-      thus ?case using a Cons find_waypoint_def by auto
-    qed
-qed
-
-lemma "x = find_waypoint ws i \<Longrightarrow> x = find_waypoint_aux ws i"
-  apply(induct ws arbitrary: i)
-  by (simp add: find_waypoint_def)+
-
-lemma "x = find_waypoint_aux ws i \<Longrightarrow> x = find_waypoint ws i"
-  apply(induct ws arbitrary: i)
-  by (simp add: find_waypoint_def)+
       
 (* Extending the waypoint list by an uninteresting waypoint preserve find_waypoint failure. *)
 lemma find_waypoint_none_extend: 
@@ -137,136 +106,224 @@ lemma find_waypoint_disaggree_absurd:"None = find_waypoint ws i \<Longrightarrow
   
 (* Whatever find_waypoints finds is in the list. *)
 lemma find_waypoint_success_membership:"Some w = find_waypoint ws i \<Longrightarrow> List.member ws w"
-  using WaypointManager.find_waypoint_success_construction in_set_member by fastforce
+  using WaypointManager.find_waypoint_success_construction in_set_member WaypointManager_axioms by fastforce
 
+lemma find_waypoint_correct:"find_waypoint ws i = Some w \<Longrightarrow> get_number w = i"
+  apply(induct ws)
+   apply (simp add: find_waypoint_def)
+   by (metis find_waypoint_success_id)
+        
 definition waypoints_wf where
-  "waypoints_wf ws \<equiv> (\<forall> w'. List.member ws w' \<longrightarrow> (\<exists> w. Some w = find_waypoint ws (get_nextwp w')))"
+  "waypoints_wf ws \<equiv> 
+  (\<forall> w'. List.member ws w' \<longrightarrow> (\<exists> w. Some w = find_waypoint ws (get_nextwp w'))) 
+  \<and> (\<forall> w'. List.member (tl ws) w' \<longrightarrow>  (\<exists> w. Some w' = find_waypoint ws (get_nextwp w)))"
+    
+fun waypoints_window :: "'w list \<Rightarrow> 'id \<Rightarrow> nat \<Rightarrow> ('w list) option" where
+case1:"waypoints_window ws i 0 = None"
+|case2:"waypoints_window ws i (Suc 0) = 
+  (case find_waypoint ws i of 
+    None \<Rightarrow> None 
+    | Some w \<Rightarrow> Some [update_nextwp w i])"
+|case3:"waypoints_window ws i (Suc (Suc n)) = 
+  (case find_waypoint ws i of 
+    None \<Rightarrow> None 
+    | Some w \<Rightarrow> 
+      (if get_nextwp w = i 
+        then Some [w]
+        else 
+          (case waypoints_window ws (get_nextwp w) (Suc n) of
+            None \<Rightarrow> None
+            | Some win \<Rightarrow> Some (w # win))))"
+
+lemma waypoints_window_elim1:"waypoints_window ws i 0 = x \<Longrightarrow> x = None"
+  apply(cases rule:waypoints_window.cases) by auto
+    
+lemma waypoints_window_elim2:
+  "waypoints_window ws i (Suc 0) = x \<Longrightarrow> find_waypoint ws i = Some w \<Longrightarrow> x = Some [update_nextwp w i]"
+apply(cases rule:waypoints_window.elims) by auto 
+
+lemma waypoints_window_elim3: "waypoints_window ws i n = x \<Longrightarrow> find_waypoint ws i = None \<Longrightarrow> x = None"
+  apply(cases rule:waypoints_window.elims) by auto
+    
+lemma waypoints_window_elim4: "waypoints_window ws i (Suc (Suc n)) = x \<Longrightarrow> find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w = i \<Longrightarrow> x = Some [update_nextwp w i]"
+  apply(cases rule:waypoints_window.elims) by auto
+    
+lemma waypoints_window_elim5: "waypoints_window ws i (Suc (Suc n)) = x \<Longrightarrow> find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w \<noteq> i \<Longrightarrow> waypoints_window ws (get_nextwp w) (Suc n) = None \<Longrightarrow> x = None"
+  apply(cases rule:waypoints_window.elims) by auto
+    
+lemma waypoints_window_elim6: "waypoints_window ws i (Suc (Suc n)) = x \<Longrightarrow> find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w \<noteq> i \<Longrightarrow> waypoints_window ws (get_nextwp w) (Suc n) = Some win \<Longrightarrow> x = Some (w # win)"
+  apply(cases rule:waypoints_window.elims) by auto
+    
+lemma waypoints_window_elim7:
+  "waypoints_window ws i (Suc 0) = Some win \<Longrightarrow> \<exists> w. find_waypoint ws i = Some w \<and> win = [update_nextwp w i]"
+  apply(cases rule:waypoints_window.cases,auto) by (metis (no_types, lifting) option.case_eq_if option.collapse option.inject option.simps(3))
+
+lemma waypoints_window_intro1:"waypoints_window ws i 0 = None"
+  apply(cases rule:waypoints_window.elims) by auto
+ 
+lemma waypoints_window_intro2: "find_waypoint ws i = Some w \<Longrightarrow> waypoints_window ws i (Suc 0) = Some [update_nextwp w i]"
+apply(cases rule:waypoints_window.elims) by auto 
+
+lemma waypoints_window_intro3: "find_waypoint ws i = None \<Longrightarrow> waypoints_window ws i n = None"
+  apply(cases rule:waypoints_window.elims) by auto
+
+lemma waypoints_window_intro4: "find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w = i \<Longrightarrow> waypoints_window ws i (Suc (Suc n)) = Some [update_nextwp w i]"
+  apply(cases rule:waypoints_window.elims) by auto
+
+lemma waypoints_window_intro5: "find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w \<noteq> i \<Longrightarrow> waypoints_window ws (get_nextwp w) (Suc n) = None \<Longrightarrow> waypoints_window ws i (Suc (Suc n)) = None"
+  apply(cases rule:waypoints_window.elims) by auto
+
+lemma waypoints_window_intro6: "find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w \<noteq> i \<Longrightarrow> waypoints_window ws (get_nextwp w) (Suc n) = Some win \<Longrightarrow> waypoints_window ws i (Suc (Suc n)) = Some (w # win)"
+  apply(cases rule:waypoints_window.elims) by auto    
+ 
+lemma waypoints_window_intro7:"Some w = find_waypoint ws i \<Longrightarrow> get_nextwp w = i \<Longrightarrow> waypoints_window ws i (Suc 0) = Some [w]"
+  by (metis correct_update3 waypoints_window_intro2)
+
+lemma waypoints_window_intro8:"Some w = find_waypoint ws i \<Longrightarrow> get_nextwp w \<noteq> i \<Longrightarrow> waypoints_window ws i (Suc 0) = Some [update_nextwp w i]"
+  using waypoints_window_intro2 by presburger
+
+lemma waypoints_window_success_find_waypoint_success:"waypoints_window ws i (Suc n) = Some ws \<Longrightarrow> \<exists> w. find_waypoint ws i = Some w"
+  using waypoints_window_intro3 by fastforce
   
-inductive waypoints_window_ind :: "'w list \<Rightarrow> 'id \<Rightarrow> nat \<Rightarrow> ('w list) option \<Rightarrow> bool" where
- "find_waypoint ws i = None \<Longrightarrow> waypoints_window_ind ws i n None"
-| "find_waypoint ws i = Some w 
-  \<Longrightarrow> get_nextwp w \<noteq> i
-  \<Longrightarrow> waypoints_window_ind ws (get_nextwp w) n None 
-  \<Longrightarrow> waypoints_window_ind ws i (Suc n) None"
-| "find_waypoint ws i = Some w \<Longrightarrow> waypoints_window_ind ws i 0 (Some [])"
-| "find_waypoint ws i = Some w \<Longrightarrow> get_nextwp w = i \<Longrightarrow> waypoints_window_ind ws i (Suc n) (Some [w])"
-| "find_waypoint ws i = Some w 
-  \<Longrightarrow> get_nextwp w \<noteq> i 
-  \<Longrightarrow> waypoints_window_ind ws (get_nextwp w) n (Some ws') 
-  \<Longrightarrow> waypoints_window_ind ws i (Suc n) (Some (w # ws'))"
-
-(* If a zero sized window cant be found then the waypoint corresponding to i cannot be found. *)
-lemma waypoints_window_ind_zero_none_find_waypoint_none:"waypoints_window_ind ws i 0 None \<Longrightarrow> None = find_waypoint ws i"
-  apply(cases rule:waypoints_window_ind.cases) by auto
-
-(* If a zero sized window can be found then the waypoint corresponding to i can be found. *)    
-lemma waypoints_window_ind_zero_some_find_waypoint_some:"waypoints_window_ind ws i 0 (Some ws') \<Longrightarrow> \<exists> w. Some w = find_waypoint ws i"
-  apply(cases rule:waypoints_window_ind.cases) by auto
-
-(* If you couldnt get a window for some size you cant get a larger window. *)    
-lemma waypoints_window_ind_none_extend:"waypoints_window_ind ws i n' None \<Longrightarrow> \<forall> n>n'. waypoints_window_ind ws i n' None"
-  apply(induct "n'" arbitrary: i) by auto
-
-(* If you cant get the first waypoint you cant get a window for any size. *)
-lemma find_waypoint_none_waypoints_window_ind_none:"find_waypoint ws i = None \<Longrightarrow> waypoints_window_ind ws i n win \<Longrightarrow> win = None"    
-  apply(cases rule:waypoints_window_ind.cases) by auto
-
-(* If you get a zero sized window it is empty. *)    
-lemma waypoints_window_ind_zero_some:"waypoints_window_ind ws i 0 (Some ws') \<Longrightarrow> ws' = []"
-  apply(cases rule:waypoints_window_ind.cases) by auto
-
-(* If you have a zero sized window you have a window size of 1. *)
-lemma waypoints_window_ind_zero_some_extend:
-  assumes a1:"waypoints_window_ind ws i 0 (Some [])"
-  and a2:"find_waypoint ws i = Some w"
-shows "Ex (waypoints_window_ind ws i (Suc 0))"
-  by (metis (full_types) not_Some_eq waypoints_window_ind.intros)  
-
-(* TODO: Not sure what to say about this. *)
-lemma waypoints_window_ind_extend:"waypoints_window_ind ws i n winopt \<Longrightarrow> \<exists>winopt. waypoints_window_ind ws i (Suc n) winopt"
-  apply(induct rule:waypoints_window_ind.induct)
-   by (metis split_option_ex waypoints_window_ind.intros waypoints_window_ind_zero_some_extend)+
-
-(* Self-explanatory. *)
-lemma waypoints_window_ind_is_injective:"\<exists> winopt. waypoints_window_ind ws i n winopt"
-  apply(induct n)
-   apply(cases "find_waypoint ws i")
-   by (meson WaypointManager.waypoints_window_ind.intros waypoints_window_ind_extend)+
-
-(* Cases that cause a window failure. *)
-lemma waypoints_window_ind_none_cases:"waypoints_window_ind ws i n None 
-\<Longrightarrow> None = find_waypoint ws i \<or> (\<exists> w. Some w = find_waypoint ws i \<and> get_nextwp w \<noteq> i \<and> waypoints_window_ind ws (get_nextwp w) (n - 1) None)"
-  apply(cases rule:waypoints_window_ind.cases) by auto
-
-(* self-explanatory. *)
-lemma waypoints_window_ind_is_deterministic:"waypoints_window_ind ws i n winopt' \<Longrightarrow> waypoints_window_ind ws i n winopt \<Longrightarrow> winopt' = winopt"
-proof(induct n arbitrary: i winopt winopt')
-  case 0
-  then show ?case by (metis (full_types) WaypointManager.waypoints_window_ind_zero_none_find_waypoint_none WaypointManager.waypoints_window_ind_zero_some not_None_eq waypoints_window_ind_zero_some_find_waypoint_some)
+lemma waypoints_window_size_one_success_is_size_one:
+  "waypoints_window ws i (Suc 0) = Some win \<Longrightarrow> length win = (Suc 0)" using waypoints_window_elim7 by force
+    
+    
+lemma case_rewrite[simp]:"(Some x = (case f of None \<Rightarrow> None | Some y \<Rightarrow> g y)) = (\<exists> y. Some x = g y \<and> f = Some y)"
+proof
+  assume "Some x = (case f of None \<Rightarrow> None | Some y \<Rightarrow> g y)"
+  thus "\<exists>y. Some x = g y \<and> f = Some y" by (metis option.case_eq_if option.exhaust_sel option.simps(3))
 next
-  case (Suc n)
-  thus ?case
-  proof(cases rule:waypoints_window_ind.cases[OF Suc(2)])
-    case (1 ws i n)
-    then show ?thesis  by (cases rule:waypoints_window_ind.cases[OF Suc(3)],auto)
-  next
-    case (2 ws i w n)
-    then show ?thesis using Suc  by (cases rule:waypoints_window_ind.cases[OF Suc(3)],auto)
-  next
-    case (3 ws i w)
-    then show ?thesis  by (cases rule:waypoints_window_ind.cases[OF Suc(3)],auto)
-  next
-    case (4 ws i w n)
-    then show ?thesis  by (cases rule:waypoints_window_ind.cases[OF Suc(3)],auto)
-  next
-    case (5 ws i w n ws')
-    then show ?thesis  using Suc by (cases rule:waypoints_window_ind.cases[OF Suc(3)],auto)
-  qed 
-qed    
-
-fun "waypoints_window" where
-"waypoints_window ws i n = (SOME p. waypoints_window_ind ws i n p)"
-
-(* If the waypoint list is well-formed and you can find a waypoint in the list then you can find the next waypoint in the list. *)
-lemma waypoints_wf_membership:"waypoints_wf ws \<Longrightarrow> Some w' = find_waypoint ws i \<Longrightarrow> \<exists> w. Some w = find_waypoint ws (get_nextwp w')"
-  apply(unfold waypoints_wf_def) by (simp add: WaypointManager.find_waypoint_success_membership)
-
-(* The only way an empty window is found is if the window size is 0. *)
-lemma waypoints_window_ind_success_empty_zero_length:"waypoints_window_ind ws i n (Some []) \<Longrightarrow> n = 0"
-  apply(cases rule:waypoints_window_ind.cases) by auto
-
-(* If you find window with a size greater than one than you can get a smaller window or you are at the last waypoint. *)    
-lemma waypoints_window_ind_success_length_gt_one:"waypoints_window_ind ws i n (Some win) \<Longrightarrow> length win > 0 \<Longrightarrow> \<exists> w. waypoints_window_ind ws (get_nextwp w) (n - 1) (Some (tl win)) \<or> get_nextwp w = i"
-  apply(induct win)
-    apply (cases rule:waypoints_window_ind.cases)
-        apply auto
-        apply (cases rule:waypoints_window_ind.cases)
-    by auto
-
-lemma waypoints_window_lteq_len_aux:"waypoints_window_ind ws i len out \<Longrightarrow> out = Some win \<Longrightarrow> waypoints_wf ws \<Longrightarrow> Some w = find_waypoint ws i \<Longrightarrow> length win \<le> len"
-  proof(induct arbitrary: win w rule:waypoints_window_ind.induct)
-    case (1 ws i n)
+  assume "\<exists>y. Some x = g y \<and> f = Some y"
+  thus "Some x = (case f of None \<Rightarrow> None | Some y \<Rightarrow> g y)" by auto
+qed
+    
+lemma waypoints_window_lteq_len:"waypoints_window ws i len = Some win \<Longrightarrow> length win \<le> len"
+  apply(induct arbitrary: win rule:waypoints_window.induct)  
+    apply(auto split: option.splits)
+   by (metis One_nat_def Suc_eq_plus1_left le_add_same_cancel1 less_Suc_eq_le option.simps(3) waypoints_window_intro7 waypoints_window_size_one_success_is_size_one zero_less_Suc eq_iff le0 le_Suc_eq length_Cons list.size(3) nat_le_linear option.sel)+
+  
+lemma waypoints_window_output_forms:"waypoints_window ws i len = None \<or> (\<exists> w win. waypoints_window ws i len = Some (w # win))"
+  apply(cases rule:waypoints_window.induct) by (auto simp add: option.case_eq_if)
+  
+lemma waypoints_window_not_empty:"waypoints_window ws i len = Some [] \<Longrightarrow> False"
+  by (metis list.distinct(1) not_None_eq option.inject waypoints_window_output_forms)
+    
+lemma waypoints_window_length_one_head_end_or_not:"waypoints_window ws i (Suc n) = Some win \<Longrightarrow> get_nextwp (hd win) = i \<or> get_nextwp (hd win) \<noteq> i"    
+  apply(cases rule:waypoints_window.cases) by auto
+ 
+thm waypoints_window.elims    
+    
+lemma waypoints_window_success_self_reference: "waypoints_window ws i (Suc n) = Some win \<Longrightarrow> get_nextwp (hd win) = i \<Longrightarrow> length win = 1"
+  apply(cases n)
+    apply (auto split:option.splits)
+    by (metis option.simps(3) waypoints_window_intro7 waypoints_window_size_one_success_is_size_one length_Cons list.sel(1) list.size(3) option.sel)+
+    
+lemma waypoints_window_length_one: "waypoints_window ws i (Suc 0) = Some win \<Longrightarrow> (\<exists> w. win = w # [] \<and> get_nextwp w = get_number w)"
+  apply (cases rule:waypoints_window.cases)
+    apply (auto split: option.splits)
+  by (metis find_waypoint_success_id)
+    
+lemma waypoints_window_last_is_cycle:"waypoints_window ws i len = Some win \<Longrightarrow> get_number (last win) = x \<Longrightarrow> get_nextwp (last win) = x"
+  apply(induct arbitrary: win x rule:waypoints_window.induct)
+    apply (auto split:option.splits)
+    by (metis find_waypoint_succuss find_waypoint_correct last_ConsL option.inject last.simps option.sel waypoints_window_not_empty)+
+(*  
+lemma waypoints_window_succes_first_two:" waypoints_window ws i len = Some win \<Longrightarrow> get_nextwp (hd win) = get_number (hd win) \<or> get_nextwp (hd win) = get_number (hd (tl win))" 
+  apply(cases len)
+   apply auto
+    sledgehammer[z3 e spass]
+  
+  proof(induct arbitrary: win rule:waypoints_window.induct)
+    case (1 ws i)
     then show ?case by auto
   next
-    case (2 ws i w n)
-    then show ?case by auto
+    case (2 ws i)
+    then obtain w where y1:"find_waypoint ws i = Some w" by fastforce
+    thus ?case by (metis 2 append_Nil hd_Cons_tl last_snoc length_0_conv length_Suc_conv list.sel waypoints_window_last_is_cycle waypoints_window_size_one_success_is_size_one)
   next
-    case (3 ws i w)
-    then show ?case by auto
-  next
-    case (4 ws i w n)
-    then show ?case by auto
-  next
-    case (5 ws i w' n ws')
-    then obtain x where "Some x = find_waypoint ws (get_nextwp w')" by (metis WaypointManager.waypoints_wf_membership)
-    then have "length ws' \<le> n" using 5 by auto
-    thus ?case using 5 by auto
+    case (3 ws i n)
+    then obtain w where y1:"find_waypoint ws i = Some w" by fastforce
+    then have y2:"get_nextwp w = i \<or> get_nextwp w \<noteq> i" by auto
+    thus ?case
+    proof
+      assume "get_nextwp w = i"
+      thus ?case using 3 y1 by (metis (mono_tags) find.simps find_waypoint_correct1 find_waypoint_def list.sel member_rec option.sel waypoints_wf_def waypoints_window_simp3)
+    next
+      assume a:"get_nextwp w \<noteq> i"
+      then obtain win' where y3:"waypoints_window ws (get_nextwp w) (Suc n) = Some win'" and y4:"win = w # win'" using waypoints_window_size_at_least_two_success_elim 3 y1 by blast
+      then have "find_waypoint ws (get_nextwp w) = Some w" 
+ sledgehammer[z3 e spass]
+(*      then show ?case using 3(1)[OF y1 a y3] *)
   qed
+*)
+    
+lemma waypoint_wf_update_singleton:"waypoints_wf [update_nextwp w (get_number w)]"
+  by (simp add: find_waypoint_def member_rec waypoints_wf_def)
 
-lemma waypoints_window_lteq_len:"waypoints_wf ws \<Longrightarrow> Some w = find_waypoint ws i \<Longrightarrow> Some win = waypoints_window ws i len \<Longrightarrow> length win \<le> len"
-  using   waypoints_window_lteq_len_aux 
-  by (metis tfl_some waypoints_window.simps waypoints_window_ind_is_injective)
+lemma foo:"((if get_nextwp w = i then Some [w] else Some (w # ws)) = Some win) = ((Some [w] = Some win \<and> get_nextwp w = i) \<or> (Some (w # ws) = Some win \<and> get_nextwp w \<noteq> i))"  
+sorry
 
+lemma waypoints_window_wf:" waypoints_window ws i len = Some win \<Longrightarrow> waypoints_wf win"
+proof(induct arbitrary: win rule:waypoints_window.induct)
+  case (1 ws i)
+  then show ?case by auto
+next
+  case (2 ws i)
+  then show ?case by (metis correct_update3 waypoint_wf_update_singleton waypoints_window_length_one)
+next
+  case (3 ws i n)
+  then obtain w where y1:"find_waypoint ws i = Some w" by fastforce
+  then have "get_nextwp w = i \<or> get_nextwp w \<noteq> i" by auto
+  thus ?case
+  proof
+    assume a:"get_nextwp w = i"
+    then have "win = [w]" using 3 y1 by force
+    thus ?thesis by (metis a correct_update3 find_waypoint_correct waypoint_wf_update_singleton y1)
+  next
+    assume a:"get_nextwp w \<noteq> i"
+    then obtain win' where y2:"waypoints_window ws (get_nextwp w) (Suc n) = Some win'" and y3:"win = w # win'" sorry
+    then have "waypoints_wf win'" using 3 y1 a by blast
+    then have "find_waypoint ws (get_nextwp w) = Some (hd win')" sledgehammer[z3 e spass]
+qed
+  
+
+(*  
+proof(induct arbitrary: win rule:waypoints_window.induct)
+  case (1 ws i)
+  then show ?case by auto
+next
+  case (2 ws i)
+  then obtain w where y1:"find_waypoint ws i = Some w" by fastforce
+  then have y2:"get_nextwp w = i \<or> get_nextwp w \<noteq> i" by auto
+  thus ?case
+  proof
+    assume a:"get_nextwp w = i"
+    then have "win= [w]" using 2 y1 by auto 
+    thus ?case by (metis "2.prems" append_Nil find.simps find_waypoint_def find_waypoint_none_extend_some last.simps list.sel member_rec waypoints_wf_def waypoints_window_last_is_cycle)
+  next
+    assume "get_nextwp w \<noteq> i"
+    then have y2:"win = [update_nextwp w i]" using 2 y1 by auto
+     thus ?case by (metis 2 append_Nil find.simps(1) find_waypoint_def find_waypoint_none_extend_some last.simps list.sel member_rec waypoints_wf_def waypoints_window_last_is_cycle)   
+  qed
+next
+  case (3 ws i n)
+  then obtain w where y1:"find_waypoint ws i = Some w" by fastforce
+  then have y2:"get_nextwp w = i \<or> get_nextwp w \<noteq> i" by auto
+  thus ?case
+  proof
+    assume "get_nextwp w = i"
+    thus ?case using 3 y1 by (metis (mono_tags) find.simps find_waypoint_correct1 find_waypoint_def list.sel member_rec option.sel waypoints_wf_def waypoints_window_simp3)
+  next
+    assume a:"get_nextwp w \<noteq> i"
+    then obtain win' where y3:"waypoints_window ws (get_nextwp w) (Suc n) = Some win'" and y4:"win = w # win'" using waypoints_window_size_at_least_two_success_elim 3 y1 by blast
+    then obtain w' win'' where y5:"win' = w' # win''"using y1 3 a by (metis neq_Nil_conv waypoints_window_not_empty)
+    then have y6:"find_waypoint ws (get_nextwp w) = Some w'"(* sledgehammer[z3 e spass]*)
+(*    then have "get_nextwp w = get_number(hd win')" sledgehammer[z3 e spass] *)
+(*    thus ?case using 3(1)[OF y1 a y3] a y1 sledgehammer[z3 e spass] *)
+  qed *)
+qed
+    
 end
   
 end
