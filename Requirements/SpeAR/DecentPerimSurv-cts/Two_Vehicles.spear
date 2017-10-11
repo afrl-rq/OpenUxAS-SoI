@@ -4,13 +4,13 @@ Imports:
 import "DecentPerimSurvDefs.spear"
 
 Constants:
-initial_pos_UAV1 : positionT = 3.2 m
-initial_direction_UAV1 : signT = 1
-initial_pos_UAV2 : positionT = 8.6 m
-initial_direction_UAV2 : signT = -1
 N : int = 2 //number of vehicles in this case
 
 Inputs:
+initial_pos_UAV1 : positionT
+initial_direction_UAV1 : signT
+initial_pos_UAV2 : positionT
+initial_direction_UAV2 : signT
 
 Outputs:
 pos_UAV1 : positionT 
@@ -57,6 +57,10 @@ met_neighbor : bool = false -> if previous meet_neighbor then true else previous
 
 Assumptions:
 a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
+a1 : true -> initial_pos_UAV1 == previous initial_pos_UAV1
+a2 : true -> initial_direction_UAV1 == previous initial_direction_UAV1
+a3 : true -> initial_pos_UAV2 == previous initial_pos_UAV2
+a4 : true -> initial_direction_UAV2 == previous initial_direction_UAV2
 
 Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
