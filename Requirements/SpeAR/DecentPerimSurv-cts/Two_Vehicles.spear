@@ -34,7 +34,7 @@ time_to_reach_neighbor : timeT = time_to_reach_neighbor(previous direction_UAV1,
 															)
 time_until_UAV1_reaches_endpoint : timeT = time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1)
 
-time_until_UAV2_reaches_endpoint : timeT = time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1)
+time_until_UAV2_reaches_endpoint : timeT = time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2)
 
 time_until_UAV1_reaches_shared_border : timeT = time_to_reach_target_position(previous direction_UAV1, previous pos_UAV1, S_1_R)
 
