@@ -110,5 +110,21 @@ r4 : pos_UAV2 == (initial_pos_UAV2 ->
 Properties:
 p0 : true //Just want SpeAR to run predicate subtype checks
 
+o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
+				and initial_direction_UAV2 == -1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
 
+o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
+				and initial_direction_UAV2 == -1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+
+o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
+				and initial_direction_UAV2 == 1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
 
