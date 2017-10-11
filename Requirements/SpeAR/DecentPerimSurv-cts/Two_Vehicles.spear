@@ -108,23 +108,47 @@ r4 : pos_UAV2 == (initial_pos_UAV2 ->
 							previous pos_UAV2 - V*(time - previous time))
  
 Properties:
-p0 : true //Just want SpeAR to run predicate subtype checks
+//o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
+//				and initial_direction_UAV2 == -1
+//				and initial_pos_UAV1 == 3.1 m
+//				and initial_pos_UAV2 == 8.4 m
+//				and time > 20.0 s
+//
+//o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
+//				and initial_direction_UAV2 == -1
+//				and initial_pos_UAV1 == 3.1 m
+//				and initial_pos_UAV2 == 8.4 m
+//				and time > 20.0 s
+//
+//o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
+//				and initial_direction_UAV2 == 1
+//				and initial_pos_UAV1 == 3.1 m
+//				and initial_pos_UAV2 == 8.4 m
+//				and time > 20.0 s
 
-o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
-				and initial_direction_UAV2 == -1
-				and initial_pos_UAV1 == 3.1 m
-				and initial_pos_UAV2 == 8.4 m
-				and time > 20.0 s
+p_shared_border_calc_matches : S_1_R == S_2_L
 
-o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
-				and initial_direction_UAV2 == -1
-				and initial_pos_UAV1 == 3.1 m
-				and initial_pos_UAV2 == 8.4 m
-				and time > 20.0 s
+p_lemma_stay_stable : true -> previous ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+					) 
+					implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+					)
 
-o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
-				and initial_direction_UAV2 == 1
-				and initial_pos_UAV1 == 3.1 m
-				and initial_pos_UAV2 == 8.4 m
-				and time > 20.0 s
+p_lemma_get_stable_in_7_steps: counter == 7 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L))
 
+p_lemma_stable_after_7_steps: counter > 7 implies 
+					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+					)
+
+p_lemma_7_steps_leq_2T : counter == 7 implies time <= 2.0*Time_to_travel_full_length
+
+		
+Theorem_Alg_A_Two_Vehicles : time > 2.0*Time_to_travel_full_length implies
+					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+					)
+					
+					 

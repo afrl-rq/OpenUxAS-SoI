@@ -17,6 +17,7 @@ positionT : {l : nonnegLengthT | l <= P_global }
 Constants:
 V : velocityT = 1.0 mps
 P_global : nonnegLengthT = 10.0 m //Total perimeter size -- useful to bound initial positions of vehicles
+Time_to_travel_full_length : timeT = P_global/V
 
 Patterns:
 	
