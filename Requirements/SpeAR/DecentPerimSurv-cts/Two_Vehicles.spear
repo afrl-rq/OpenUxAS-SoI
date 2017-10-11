@@ -4,9 +4,9 @@ Imports:
 import "DecentPerimSurvDefs.spear"
 
 Constants:
-initial_pos_UAV1 : positionT = 0.0 m
+initial_pos_UAV1 : positionT = 3.2 m
 initial_direction_UAV1 : signT = 1
-initial_pos_UAV2 : positionT = 10.0 m
+initial_pos_UAV2 : positionT = 8.6 m
 initial_direction_UAV2 : signT = -1
 N : int = 2 //number of vehicles in this case
 
@@ -40,15 +40,20 @@ time_until_UAV1_reaches_shared_border : timeT = time_to_reach_target_position(pr
 
 time_until_UAV2_reaches_shared_border : timeT = time_to_reach_target_position(previous direction_UAV2, previous pos_UAV2, S_2_L)
 
-deltaT : timeT = min_time(time_until_UAV1_reaches_endpoint,
-								min_time(time_until_UAV2_reaches_endpoint,
-											min_time(time_to_reach_neighbor,
-												min_time(time_until_UAV1_reaches_shared_border,
-													time_until_UAV2_reaches_shared_border))))
+deltaT : timeT = if met_neighbor 
+					then min_time(time_until_UAV1_reaches_endpoint,
+							min_time(time_until_UAV2_reaches_endpoint,
+								min_time(time_to_reach_neighbor,
+									min_time(time_until_UAV1_reaches_shared_border,
+										time_until_UAV2_reaches_shared_border))))
+					else //have yet to meet neighbor, no need to to check shared border yet
+						min_time(time_until_UAV1_reaches_endpoint,
+							min_time(time_until_UAV2_reaches_endpoint,
+										time_to_reach_neighbor))
 
 meet_neighbor : bool = (pos_UAV1 == pos_UAV2) and (previous (pos_UAV1 <> pos_UAV2) with initial value true)
 //Assumes only one neighbor meeting will ever take place, and that's the only one that matters. 
-met_neighbor : bool = false -> if meet_neighbor then true else previous met_neighbor
+met_neighbor : bool = false -> if previous meet_neighbor then true else previous met_neighbor
 
 Assumptions:
 a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
