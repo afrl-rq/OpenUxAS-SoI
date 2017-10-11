@@ -58,3 +58,19 @@ pattern time_to_reach_neighbor( direction_UAV1: signT,
 						then 0.5*(position_UAV1 - position_UAV2)/V
 						else P_global/V //we'll reach an endpoint first, so just use the max time to reach an endpoint
 	tel	
+	
+pattern time_to_reach_target_position(direction: signT, 
+								UAV_pos: positionT, 
+								target_pos : positionT
+								) returns (out : timeT)
+	let	
+		out = if target_pos > UAV_pos and direction == 1 
+				then 
+					(target_pos - UAV_pos)/V 
+				else if target_pos < UAV_pos and direction == -1
+						then 
+							(UAV_pos - target_pos)/V
+						else //we're traveling away from the target position
+							P_global/V //we'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
+				
+	tel

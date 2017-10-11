@@ -22,19 +22,33 @@ direction_UAV2 : signT
 time : timeT
 
 Macros:
-S_1_L : positionT = real(floor(real(1) - 0.5*real(sign(1))))*P_global/real(N) 
+//S_1_L : positionT = real(floor(real(1) - 0.5*real(sign(1))))*P_global/real(N) // not used in this version 
 S_1_R : positionT = real(floor(real(1) + 0.5*real(sign(1))))*P_global/real(N)
 S_2_L : positionT = real(floor(real(2) - 0.5*real(sign(2))))*P_global/real(N) 
-S_2_R : positionT = real(floor(real(2) + 0.5*real(sign(2))))*P_global/real(N)
+//S_2_R : positionT = real(floor(real(2) + 0.5*real(sign(2))))*P_global/real(N) // not used in this version
 
 time_to_reach_neighbor : timeT = time_to_reach_neighbor(previous direction_UAV1,
 															previous direction_UAV2,
 															previous pos_UAV1,
 															previous pos_UAV2
 															)
-deltaT : timeT = min_time(time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1),
-								min_time(time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2),
-											time_to_reach_neighbor))
+time_until_UAV1_reaches_endpoint : timeT = time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1)
+
+time_until_UAV2_reaches_endpoint : timeT = time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1)
+
+time_until_UAV1_reaches_shared_border : timeT = time_to_reach_target_position(previous direction_UAV1, previous pos_UAV1, S_1_R)
+
+time_until_UAV2_reaches_shared_border : timeT = time_to_reach_target_position(previous direction_UAV2, previous pos_UAV2, S_2_L)
+
+deltaT : timeT = min_time(time_until_UAV1_reaches_endpoint,
+								min_time(time_until_UAV2_reaches_endpoint,
+											min_time(time_to_reach_neighbor,
+												min_time(time_until_UAV1_reaches_shared_border,
+													time_until_UAV2_reaches_shared_border))))
+
+meet_neighbor : bool = (pos_UAV1 == pos_UAV2) and (previous (pos_UAV1 <> pos_UAV2) with initial value true)
+//Assumes only one neighbor meeting will ever take place, and that's the only one that matters. 
+met_neighbor : bool = false -> if meet_neighbor then true else previous met_neighbor
 
 Assumptions:
 a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
@@ -45,11 +59,17 @@ Requirements:
 r0 : time == (0.0 s -> previous time + deltaT)
 
 r1 : direction_UAV1 == (initial_direction_UAV1 ->
-					if previous pos_UAV1 <= 0.0 m
-					then 1
-					else if previous pos_UAV1 >= P_global
-							then -1
-							else previous direction_UAV1)
+					if meet_neighbor and previous pos_UAV1 >= S_1_R
+						then -1
+						else if meet_neighbor and previous pos_UAV1 < S_1_R
+								then 1
+								else if met_neighbor and previous pos_UAV1 >= S_1_R
+										then -1
+										else if previous pos_UAV1 <= 0.0 m
+												then 1
+												else if previous pos_UAV1 >= P_global
+														then -1
+														else previous direction_UAV1)
 	
 r2 : pos_UAV1 == (initial_pos_UAV1 ->
 						if direction_UAV1 == 1 
@@ -58,12 +78,18 @@ r2 : pos_UAV1 == (initial_pos_UAV1 ->
 						else //direction == -1
 							previous pos_UAV1 - V*(time - previous time))
 
-r3 : direction_UAV2 == (initial_direction_UAV2 ->
-					if previous pos_UAV2 <= 0.0 m
-					then 1
-					else if previous pos_UAV2 >= P_global
-							then -1
-							else previous direction_UAV2)
+r3 : direction_UAV1 == (initial_direction_UAV2 ->
+					if meet_neighbor and previous pos_UAV2 >= S_2_L
+						then -1
+						else if meet_neighbor and previous pos_UAV2 < S_2_L
+								then 1
+								else if met_neighbor and previous pos_UAV2 <= S_2_L
+										then 1
+										else if previous pos_UAV2 <= 0.0 m
+												then 1
+												else if previous pos_UAV2 >= P_global
+														then -1
+														else previous direction_UAV2)
 	
 r4 : pos_UAV2 == (initial_pos_UAV2 ->
 						if direction_UAV2 == 1 
