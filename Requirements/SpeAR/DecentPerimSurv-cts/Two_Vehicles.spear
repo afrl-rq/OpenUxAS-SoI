@@ -1,0 +1,79 @@
+Specification Two_Vehicles
+
+Imports:
+import "DecentPerimSurvDefs.spear"
+
+Constants:
+initial_pos_UAV1 : positionT = 0.0 m
+initial_direction_UAV1 : signT = 1
+initial_pos_UAV2 : positionT = 10.0 m
+initial_direction_UAV2 : signT = -1
+N : int = 2 //number of vehicles in this case
+
+Inputs:
+
+Outputs:
+pos_UAV1 : positionT 
+pos_UAV2 : positionT 
+
+State:
+direction_UAV1 : signT
+direction_UAV2 : signT
+time : timeT
+
+Macros:
+S_1_L : positionT = real(floor(real(1) - 0.5*real(sign(1))))*P_global/real(N) 
+S_1_R : positionT = real(floor(real(1) + 0.5*real(sign(1))))*P_global/real(N)
+S_2_L : positionT = real(floor(real(2) - 0.5*real(sign(2))))*P_global/real(N) 
+S_2_R : positionT = real(floor(real(2) + 0.5*real(sign(2))))*P_global/real(N)
+
+time_to_reach_neighbor : timeT = time_to_reach_neighbor(previous direction_UAV1,
+															previous direction_UAV2,
+															previous pos_UAV1,
+															previous pos_UAV2
+															)
+deltaT : timeT = min_time(time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1),
+								min_time(time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2),
+											time_to_reach_neighbor))
+
+Assumptions:
+a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
+
+Requirements:
+//The next time is the previous time plus the minimum time until a decision/change is made.
+// In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
+r0 : time == (0.0 s -> previous time + deltaT)
+
+r1 : direction_UAV1 == (initial_direction_UAV1 ->
+					if previous pos_UAV1 <= 0.0 m
+					then 1
+					else if previous pos_UAV1 >= P_global
+							then -1
+							else previous direction_UAV1)
+	
+r2 : pos_UAV1 == (initial_pos_UAV1 ->
+						if direction_UAV1 == 1 
+						then 
+							previous pos_UAV1 + V*(time - previous time)
+						else //direction == -1
+							previous pos_UAV1 - V*(time - previous time))
+
+r3 : direction_UAV2 == (initial_direction_UAV2 ->
+					if previous pos_UAV2 <= 0.0 m
+					then 1
+					else if previous pos_UAV2 >= P_global
+							then -1
+							else previous direction_UAV2)
+	
+r4 : pos_UAV2 == (initial_pos_UAV2 ->
+						if direction_UAV2 == 1 
+						then 
+							previous pos_UAV2 + V*(time - previous time)
+						else //direction == -1
+							previous pos_UAV2 - V*(time - previous time))
+ 
+Properties:
+p0 : true //Just want SpeAR to run predicate subtype checks
+
+
+

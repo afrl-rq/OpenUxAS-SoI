@@ -1,0 +1,60 @@
+Definitions DecentPerimSurvDefs
+
+Units:
+s "seconds"
+m "meters"
+mps : m/s "meters per second"
+
+Types:
+nonnegIntT : {i : int | i >=0}
+timeT: real s
+lengthT: real m
+nonnegLengthT : {l : lengthT | l >= 0.0 m}
+velocityT : real mps
+signT : {i : int | i == -1 or i == 1 }
+positionT : {l : nonnegLengthT | l <= P_global }
+
+Constants:
+V : velocityT = 1.0 mps
+P_global : nonnegLengthT = 10.0 m //Total perimeter size -- useful to bound initial positions of vehicles
+
+Patterns:
+	
+pattern sign(i: int) returns (output : signT)
+	let
+		output = if i mod 2 == 0 then 1 else -1
+	tel
+
+//Returns the minimum of two timeTs
+pattern min_time(a: timeT, b : timeT) returns (out: timeT)
+	let
+		out = if a <= b then a else b 
+	tel
+
+//Computes the time to reach the endpoint that the vehicle is heading toward
+// direction of -1 means the vehicle is heading toward 0
+// direction of +1 means the vehicle is heading toward P_global
+pattern time_to_reach_endpoint(direction: signT, position: positionT) returns (out : timeT)
+	let	
+		out = if direction == 1 
+				then 
+					(P_global - position)/V 
+				else //direction == -1 
+					position/V
+	tel
+
+pattern time_to_reach_neighbor( direction_UAV1: signT, 
+								direction_UAV2 : signT, 
+								position_UAV1: positionT, 
+								position_UAV2 : positionT) 
+								returns (out : timeT)
+	let	
+		out = if position_UAV2 >= position_UAV1 
+				then if direction_UAV1 == 1 and direction_UAV2 == -1
+						then 0.5*(position_UAV2 - position_UAV1)/V
+						else P_global/V //we'll reach an endpoint first, so just use the max time to reach an endpoint
+				else // position_UAV2 < position_UAV1 
+					if direction_UAV1 == -1 and direction_UAV2 == 1
+						then 0.5*(position_UAV1 - position_UAV2)/V
+						else P_global/V //we'll reach an endpoint first, so just use the max time to reach an endpoint
+	tel	

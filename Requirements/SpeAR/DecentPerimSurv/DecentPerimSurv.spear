@@ -1,0 +1,29 @@
+Specification DecentPerimSurv
+
+Imports:
+import "DecentPerimSurvDefs.spear"
+
+Units:
+
+Types:
+
+Constants:
+
+Patterns:
+
+Inputs:
+ P : real
+ N : nonnegIntT
+ 
+Outputs:
+
+State:
+
+Macros:
+
+Assumptions:
+
+Requirements:
+
+Properties:
+

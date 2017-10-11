@@ -1,0 +1,193 @@
+type USER_timeT = real;
+type USER_positionT = USER_nonnegLengthT;
+type USER_signT = int;
+type USER_velocityT = real;
+type USER_lengthT = real;
+type USER_nonnegLengthT = USER_lengthT;
+
+const USER_P_global = 10.0;
+const USER_deltaT = 0.5;
+const USER_V = 1.0;
+
+node initially(
+  signal : bool
+) returns (
+  holds : bool
+);
+let
+  holds = (signal -> true);
+
+tel;
+
+node historically(
+  signal : bool
+) returns (
+  holds : bool
+);
+let
+  holds = (signal and (true -> (pre holds)));
+
+tel;
+
+node once(
+  signal : bool
+) returns (
+  holds : bool
+);
+let
+  holds = (signal or (false -> (pre holds)));
+
+tel;
+
+node since(
+  a : bool;
+  b : bool
+) returns (
+  holds : bool
+);
+let
+  holds = (b or (a and (false -> (pre holds))));
+
+tel;
+
+node triggers(
+  a : bool;
+  b : bool
+) returns (
+  holds : bool
+);
+let
+  holds = (b and (a or (false -> (pre holds))));
+
+tel;
+
+node responds(
+  a : bool;
+  b : bool;
+  n : int
+) returns (
+  holds : bool
+);
+var
+  latch : int;
+  i : int;
+  pre_state : int;
+  state : int;
+let
+  latch = (n -> (pre latch));
+
+  pre_state = (0 -> (pre state));
+
+  state = (if (pre_state = 0) then (if ((not b) or (a and b)) then 0 else 1) else (if (pre_state = 1) then (if ((not a) and (i < latch)) then 1 else (if (a and b) then 1 else (if ((not a) and (i >= latch)) then 2 else 0))) else 2));
+
+  i = (if (pre_state = 0) then 0 else (if (pre_state = 1) then (if (not a) then (i + 1) else (if (a and b) then 0 else (pre i))) else (pre i)));
+
+  holds = ((state = 0) or (state = 1));
+
+tel;
+
+node precedes(
+  a : bool;
+  b : bool
+) returns (
+  holds : bool
+);
+var
+  state : int;
+  pre_state : int;
+let
+  pre_state = (0 -> (pre state));
+
+  state = (if (pre_state = 0) then (if (a and b) then 0 else (if (a and (not b)) then 1 else 2)) else (if (pre_state = 1) then (if b then 0 else 1) else 2));
+
+  holds = ((state = 0) or (state = 1));
+
+tel;
+
+node count(
+  a : bool
+) returns (
+  c : int
+);
+let
+  c = ((0 -> (pre c)) + (if a then 1 else 0));
+
+tel;
+
+node ccount(
+  a : bool
+) returns (
+  c : int
+);
+let
+  c = (if a then ((0 -> (pre c)) + 1) else 0);
+
+tel;
+
+node btoi(
+  a : bool
+) returns (
+  c : int
+);
+let
+  c = (if a then 1 else 0);
+
+tel;
+
+node fmod(
+  a : real;
+  b : real
+) returns (
+  x : real
+);
+let
+  x = (a - (b * real(floor((a / b)))));
+
+tel;
+
+node USER_Solo_Vehicle(
+  USER_pos : USER_positionT;
+  USER_direction : USER_signT
+) returns (
+  constraints : bool
+);
+var
+  USER_a1 : bool;
+  USER_a2 : bool;
+  USER_r1 : bool;
+  USER_r2 : bool;
+  USER_p1 : bool;
+  USER_p2 : bool;
+  USER_pos_satisfies_predicate : bool;
+  USER_direction_satisfies_predicate : bool;
+  counter : int;
+let
+  --%MAIN;
+  counter = (0 -> ((pre counter) + 1));
+
+  USER_a1 = initially(((USER_pos = 0.0) or ((USER_pos = 1.0) or ((USER_pos = 2.0) or ((USER_pos = 3.0) or ((USER_pos = 4.0) or ((USER_pos = 5.0) or ((USER_pos = 6.0) or ((USER_pos = 7.0) or ((USER_pos = 8.0) or ((USER_pos = 9.0) or (USER_pos = 10.0))))))))))));
+
+  USER_a2 = initially(((USER_direction = 1) or (USER_direction = (-1))));
+
+  USER_r1 = (USER_direction = (if ((pre USER_pos) = 0.0) then 1 else (if ((pre USER_pos) = USER_P_global) then (-1) else (pre USER_direction))));
+
+  USER_r2 = (USER_pos = ((pre USER_pos) + ((real(USER_direction) * USER_V) * USER_deltaT)));
+
+  USER_p1 = (constraints => (USER_pos <= USER_P_global));
+
+  USER_p2 = (constraints => (USER_pos >= 0.0));
+
+  USER_pos_satisfies_predicate = (constraints => ((USER_pos <= USER_P_global) and (USER_pos >= 0.0)));
+
+  USER_direction_satisfies_predicate = (constraints => ((USER_direction = (-1)) or (USER_direction = 1)));
+
+  constraints = historically((USER_r1 and USER_r2));
+
+  assert (USER_a1 and USER_a2);
+
+  --%PROPERTY USER_p1;
+  --%PROPERTY USER_p2;
+  --%PROPERTY USER_pos_satisfies_predicate;
+  --%PROPERTY USER_direction_satisfies_predicate;
+
+tel;

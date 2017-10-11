@@ -1,0 +1,56 @@
+Specification Vehicle
+
+Imports:
+import "DecentPerimSurvDefs.spear"
+
+Inputs:
+P_R_i : positionT
+P_L_i : positionT
+N_R_i : nonnegIntT
+N_L_i : nonnegIntT
+
+Outputs:
+pos : positionT
+
+State:
+direction : signT
+
+Macros:
+N : nonnegIntT = N_R_i + N_L_i
+P : positionT = P_R_i + P_L_i
+n : nonnegIntT = N_L_i + 1
+S_i_L : positionT = real(floor(real(n) - 0.5*real(sign(n))))*P/real(N) 
+S_i_R : positionT = real(floor(real(n) + 0.5*real(sign(n))))*P/real(N)
+
+Assumptions:
+a0 : true -> 
+	((P_R_i == previous P_R_i) and
+	(P_L_i == previous P_L_i) and
+	(N_R_i == previous N_R_i) and
+	(N_L_i == previous N_L_i))
+
+a1 : initially(pos in {0.0 m, 1.0 m, 2.0 m, 3.0 m, 4.0 m, 5.0 m, 6.0 m, 7.0 m, 8.0 m, 9.0 m, 10.0 m})
+a2 : initially(direction in {-1, 1})
+a3 : N == N_global
+a4 : P == P_global
+a5 : N_L_i < N_global
+a6 : N_R_i < N_global
+//Both a7 and a8 are implied since P_L_i and P_R_i are nonnegative and add to P;
+// however, adding them as assumptions results in a realizable spec instead of a spec of 
+// unknown realizability. They seem to help the tool quite a bit.
+a7 : P_L_i <= P
+a8 : P_R_i <= P
+
+Requirements:
+//Temporarily, use the solo vehicle formulas for position and direction
+r3 : true -> (pos == previous pos + real(direction)*V*deltaT) 
+r4 : true -> (direction == if previous pos equal to 0.0 m
+					then 1
+					else if previous pos equal to P
+							then -1
+							else previous direction)
+
+Properties:
+p1 : P == P_global
+p2 : pos <= P
+p3 : pos >= 0.0 m

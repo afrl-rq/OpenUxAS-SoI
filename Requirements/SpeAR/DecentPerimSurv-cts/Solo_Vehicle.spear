@@ -1,0 +1,51 @@
+Specification Solo_Vehicle
+
+Imports:
+import "DecentPerimSurvDefs.spear"
+
+Inputs:
+initial_pos : positionT
+initial_direction : signT
+
+Outputs:
+pos : positionT
+
+State:
+direction : signT
+time : timeT
+
+Macros:
+
+Assumptions:
+a2 : true -> initial_pos == previous initial_pos
+a3 : true -> initial_direction == previous initial_direction
+
+Requirements:
+//The next time is the previous time plus the minimum time until a decision/change is made.
+// In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
+r0 : time == (0.0 s -> previous time + time_to_reach_endpoint(previous direction, previous pos))
+
+r1 : direction == (initial_direction ->
+					if previous pos <= 0.0 m
+					then 1
+					else if previous pos >= P_global
+							then -1
+							else previous direction)
+	
+r2 : pos == (initial_pos ->
+						if direction == 1 
+						then 
+							previous pos + V*(time - previous time)
+						else //direction == -1
+							previous pos - V*(time - previous time))
+ 
+Properties:
+p1 : pos <= P_global
+p2 : pos >= 0.0 m
+
+//Observe a trace with a starting location other than 0
+o1 observe : (initial_pos == 2.4 m) and (time > 20.0 s)
+
+//Observe a trace starting in the positive direction (heading toward P_global)
+o2 observe : (initial_direction == 1) and (time > 20.0 s)
+
