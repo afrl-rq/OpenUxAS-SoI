@@ -28,13 +28,7 @@ Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
 // In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
 r0 : time == (0.0 s -> previous time + min_time(time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1),
-											min_time(time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2),
-												time_to_reach_neighbor(previous direction_UAV1,
-																		previous direction_UAV2,
-																		previous pos_UAV1,
-																		previous pos_UAV2
-																		)
-												)))
+											time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2)))
 
 r1 : direction_UAV1 == (initial_direction_UAV1 ->
 					if previous pos_UAV1 <= 0.0 m
@@ -65,7 +59,6 @@ r4 : pos_UAV2 == (initial_pos_UAV2 ->
 							previous pos_UAV2 - V*(time - previous time))
  
 Properties:
-p0 : true //Just want SpeAR to run predicate subtype checks
-
+o1 observe : time > 30.0 s
 
 
