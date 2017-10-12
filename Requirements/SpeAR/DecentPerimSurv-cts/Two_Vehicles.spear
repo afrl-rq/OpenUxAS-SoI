@@ -56,7 +56,7 @@ meet_neighbor : bool = (pos_UAV1 == pos_UAV2) and (previous (pos_UAV1 <> pos_UAV
 met_neighbor : bool = false -> if previous meet_neighbor then true else previous met_neighbor
 
 Assumptions:
-a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
+a0 : initial_pos_UAV1 <= initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
 a1 : true -> initial_pos_UAV1 == previous initial_pos_UAV1
 a2 : true -> initial_direction_UAV1 == previous initial_direction_UAV1
 a3 : true -> initial_pos_UAV2 == previous initial_pos_UAV2
