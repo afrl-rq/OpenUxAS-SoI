@@ -1,0 +1,27 @@
+package WaypointPlanManagerService_Pkg
+public
+    -- Included DataTypes
+    with CMASI;
+    with UXNATIVE;
+    
+    thread WaypointPlanManagerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            IncrementWaypoint_in: in event data port uxnative::IncrementWaypoint.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end WaypointPlanManagerService;
+    
+    thread Sel4WaypointPlanManagerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            IncrementWaypoint_in: in event data port uxnative::IncrementWaypoint.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end Sel4WaypointPlanManagerService;
+    
+end WaypointPlanManagerService_Pkg;

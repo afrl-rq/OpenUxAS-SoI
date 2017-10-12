@@ -1,0 +1,21 @@
+package AssignmentCoordinatorTask_Package
+public
+    -- Data_types Packages
+    with CMASI;
+    with UXTASK;
+    
+    -- Included
+    with TaskServiceBase_Package;
+    
+    thread AssignmentCoordinatorTask extends TaskServiceBase_Package::TaskServiceBase
+        features
+            AssignmentCoordination_in: in event data port uxtask::AssignmentCoordination.i;
+            CoordinatedAutomationRequest_in: in event data port uxtask::CoordinatedAutomationRequest.i;
+            AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
+            AssignmentCoordination_out: out event data port uxtask::AssignmentCoordination.i;
+            TaskAutomationRequest_out: out event data port uxtask::TaskAutomationRequest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end AssignmentCoordinatorTask;
+    
+end AssignmentCoordinatorTask_Package;

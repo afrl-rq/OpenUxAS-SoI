@@ -1,0 +1,21 @@
+package TaskTrackerService_Pkg
+public
+    with CMASI;
+    with IMPACT;
+    
+    thread TaskTrackerService
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end TaskTrackerService;
+    
+end TaskTrackerService_Pkg;

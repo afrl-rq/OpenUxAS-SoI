@@ -1,0 +1,22 @@
+package AngledAreaSearchTask_Package
+public
+    -- Data_types Packages
+    with UXTASK;
+    
+    -- Included
+    with TaskServiceBase_Package;
+    
+    thread AngledAreaSearchTask extends TaskServiceBase_Package::TaskServiceBase
+        features
+            SensorFootprintResponse_in: refined to in event data port uxtask::SensorFootprintResponse.i;
+            SensorFootprintRequests_out: refined to out event data port uxtask::SensorFootprintRequests.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+            
+        -- NOTE: Have to copy/paste base component contracts in each task
+--        annex{**
+--            
+--        **}
+    end AngledAreaSearchTask;
+    
+end AngledAreaSearchTask_Package;

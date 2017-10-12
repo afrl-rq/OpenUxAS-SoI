@@ -1,0 +1,568 @@
+package TaskServiceBase_Package
+public
+    -- Data_types Packages
+    with CMASI;
+    with UXTASK;
+    with IMPACT;
+    with ROUTE;
+    with UXNATIVE;
+    
+	-- This is a "dummy" top-level system. We use it so that we can check 
+	--  "properties" of our component contract.
+	process top_level
+		features
+			TaskImplementationRequest_in: in event data port uxtask::TaskImplementationRequest.i;
+			RouteResponse_in: in event data port route::RouteResponse.i;
+			SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
+			UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+			TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
+			EntityState_in: in event data port cmasi::EntityState.i;
+			
+		annex agree {**
+			guarantee "Placeholder guarantee to force agree to run" : true;
+			
+			eq event_UniqueAutomationRequest_in : bool = event(UniqueAutomationRequest_in);
+			eq event_TaskPlanOptions_out : bool = event(TaskPlanOptions_out);
+			eq event_TaskImplementationRequest_in : bool = event(TaskImplementationRequest_in);
+			eq event_RouteResponse_in : bool = event(RouteResponse_in);
+			eq event_SensorFootprintResponse_in : bool = event(SensorFootprintResponse_in);
+			eq event_EntityState_in : bool = event(EntityState_in);
+			
+
+			assume "UniqueAutomationRequest_in occurs every 1s":
+				condition event_UniqueAutomationRequest_in occurs each 10.0;
+				
+			assume "TaskImplementationRequest_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_TaskImplementationRequest_in occurs sporadic with IAT 1.0; --0.003;
+				
+			assume "event_RouteResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 3ms" :
+				condition event_RouteResponse_in occurs sporadic with IAT 1.0; -- 0.003;
+			
+			assume "SensorFootprintResponse_in is assumed to occur sporadically with an inter arrival time no sooner than 2ms" :
+				condition event_SensorFootprintResponse_in occurs sporadic with IAT 1.0; --0.002;
+				
+			assume "EntityState_in is assumed to occur sporadically with an inter arrival time no sooner than ...":
+				condition event_EntityState_in occurs sporadic with IAT 1.0;
+			
+		**};
+	end top_level;
+	
+	process implementation top_level.Impl
+		subcomponents
+			sub : thread TaskServiceBase; 
+			
+		connections
+			conn0 : port TaskImplementationRequest_in -> sub.TaskImplementationRequest_in;
+			conn1 : port RouteResponse_in -> sub.RouteResponse_in;
+			conn2 : port SensorFootprintResponse_in-> sub.SensorFootprintResponse_in;
+			conn3 : port UniqueAutomationRequest_in -> sub.UniqueAutomationRequest_in;
+			conn4 : port sub.TaskPlanOptions_out -> TaskPlanOptions_out;
+			conn5 : port EntityState_in -> sub.EntityState_in;
+			
+		annex agree {**
+				eq dummy : bool = true;
+				
+			-- These lemmas could be captured in SpeAR as properties
+			
+--			--States to check for reachability:
+--			    -- INIT 
+--	       		-- IDLE 
+--	       		-- SENSOR_REQUEST 
+--	       		-- OPTION_ROUTES 
+--	       		-- OPTIONS_PUBLISHED 
+--	       		-- FINAL_ROUTES 
+--	       		-- OPTION_SELECTED 
+--	       		-- ACTIVE 
+--	       		-- COMPLETED 
+--			
+--			-- These lemmas could be captured in SpeAR as oberservers (without the negation)
+--			lemma "False indicates the INIT state is reachable" : sub.state != sub.INIT; 
+--			lemma "False indicates the IDLE state is reachable" : sub.state != sub.IDLE; 
+--			lemma "False indicates the SENSOR_REQUEST state is reachable" : sub.state != sub.SENSOR_REQUEST; 
+--			lemma "False indicates the OPTION_ROUTES state is reachable" : sub.state != sub.OPTION_ROUTES; 
+--			lemma "False indicates the OPTIONS_PUBLISHED state is reachable" : sub.state != sub.OPTIONS_PUBLISHED; 
+--			lemma "False indicates the FINAL_ROUTES state is reachable" : sub.state != sub.FINAL_ROUTES; 
+--			lemma "False indicates the OPTION_SELECTED state is reachable" : sub.state != sub.OPTION_SELECTED; 
+--			lemma "False indicates the ACTIVE state is reachable" : sub.state != sub.ACTIVE; 
+----			lemma "False indicates the COMPLETED state is reachable" : sub.state != sub.COMPLETED; 
+--			
+--			lemma "True indicates we have enumerated all states in the reachability observers" :
+--				sub.state = sub.INIT or
+--				sub.state = sub.IDLE or
+--				sub.state = sub.SENSOR_REQUEST or
+--				sub.state = sub.OPTION_ROUTES or
+--				sub.state = sub.OPTIONS_PUBLISHED or
+--				sub.state = sub.FINAL_ROUTES or
+--				sub.state = sub.OPTION_SELECTED or
+--				sub.state = sub.ACTIVE;-- or
+----				sub.state = sub.COMPLETED;
+--				
+--			lemma "False indicates init_to_idle transition is reachable" : 
+--           		 not sub.init_to_idle;
+--           		 
+--           	lemma "False indicates idle_to_sensor_request transition is reachable" : 
+--           		 not sub.idle_to_sensor_request;	
+--           		 
+--           	lemma "False indicates sensor_request_to_option_routes transition is reachable" : 
+--           		 not sub.sensor_request_to_option_routes;	
+--           		 
+--      		lemma "False indicates option_routes_to_options_published transition is reachable" : 
+--           		 not sub.option_routes_to_options_published;	
+--           		 
+--           	lemma "False indicates options_published_to_final_routes transition is reachable" : 
+--           		 not sub.options_published_to_final_routes;	
+--           		 
+--           	lemma "False indicates final_routes_to_option_selected transition is reachable" : 
+--           		 not sub.final_routes_to_option_selected;	
+--           		 
+--           	lemma "False indicates option_selected_to_sensor_request transition is reachable" : 
+--           		 not sub.option_selected_to_sensor_request;	
+--           		 
+--           	lemma "False indicates option_selected_to_active transition is reachable" : 
+--           		 not sub.option_selected_to_active;	
+--           		 
+--           	lemma "False indicates active_to_idle transition is reachable" :
+--           		not sub.active_to_idle;
+--           		
+----           	lemma "False indicates active_to_completed transition is reachable" : 
+----           		 not sub.active_to_completed;	
+----           		 
+----           	lemma "False indicates completed_to_idle transition is reachable" : 
+----           		  not sub.completed_to_idle;	
+--           		 
+--           	lemma "True if only stated transitions are executed (no missing transitions)." :
+--                sub.some_transition or sub.state = sub.previous_state;	
+--				
+--			-- Inadvertent internal variable constraint checks	
+--				
+--			lemma "False if the internal variable cached_task_plan_options is not constant (no inadvertent constraints)":
+--				true -> sub.cached_task_plan_options = pre(sub.cached_task_plan_options);	
+--				
+--			lemma "False if the internal variable cached_route_request_id is not constant (no inadvertent constraints)"	:
+--				true -> sub.cached_route_request_id = pre(sub.cached_route_request_id);
+--				
+--			lemma "False if the internal variable cached_sensor_request_id is not constant (no inadvertent constraints)":
+--				true -> sub.cached_sensor_request_id = pre(sub.cached_sensor_request_id);
+--				
+--			lemma "False if the internal variable cached_task_id is not constant (no inadvertent constraints)"	:
+--				true -> sub.cached_task_id = pre(sub.cached_task_id);
+			
+				
+		**};
+	end top_level.Impl;	
+	
+	
+    thread TaskServiceBase
+        features
+            CreateNewService_in: in event data port uxnative::CreateNewService.i;
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            EntityState_in: in event data port cmasi::EntityState.i;
+            TaskImplementationRequest_in: in event data port uxtask::TaskImplementationRequest.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
+            UniqueAutomationResponse_in: in event data port uxtask::UniqueAutomationResponse.i;
+--            RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            TaskInitialized_out: out event data port uxtask::TaskInitialized.i;
+            --RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
+            TaskActive_out: out event data port uxtask::TaskActive.i;
+            TaskImplementationResponse_out: out event data port uxtask::TaskImplementationResponse.i;
+            TaskComplete_out: out event data port uxtask::TaskComplete.i;
+            TaskPlanOptions_out: out event data port uxtask::TaskPlanOptions.i;
+            
+            --TODO: temp for testing not in the original aadl. 
+            SensorFootprintRequests_out: out event data port uxtask::SensorFootprintRequests.i;
+            SensorFootprintResponse_in: in event data port uxtask::SensorFootprintResponse.i;
+            VehicleActionCommand_out: out event data port cmasi::VehicleActionCommand.i;
+            
+            --NOTE: derek changed these from RoutePlanRequest and RoutePlanResponse            
+            RouteRequest_out: out event data port route::RouteRequest.i;
+            RouteResponse_in: in event data port route::RouteResponse.i;
+                        
+            
+        properties
+            Dispatch_Protocol => Sporadic;
+            
+        -- NOTES: 
+        -- > BRodes: agree might not be able to handle inheritance, might require copy/paste
+        -- > AFifarek (20170615): The agree annex does not reason about contracts defined in an "extended" component therefore the inherited components will need their contracts copy/paste
+        
+       	annex agree{**
+       		eq state : int;
+       		
+       		eq init_complete : bool ;
+       		eq entity_state_task_id_present : bool;
+       		eq unique_automation_request_task_id_present : bool;
+       		
+       		--Task States
+       		const INIT : 				int = 1;
+       		const IDLE : 				int = 2;
+       		const SENSOR_REQUEST : 		int = 3;
+       		const OPTION_ROUTES :		int = 4;
+       		const OPTIONS_PUBLISHED : 	int = 5;
+       		const FINAL_ROUTES : 		int = 6;
+       		const OPTION_SELECTED : 	int = 7;
+       		const ACTIVE : 				int = 8;
+--       		const COMPLETED :			int = 9;
+       		
+
+       	-------------------------------------------------------------
+		--State machine support macros
+			eq previous_state: int = prev(state,INIT);
+			eq some_transition: bool = init_to_idle
+									or idle_to_sensor_request
+									or sensor_request_to_option_routes
+									or option_routes_to_options_published
+									or options_published_to_final_routes
+									or final_routes_to_option_selected
+									or option_selected_to_sensor_request
+									or option_selected_to_active 
+									or active_to_idle;
+--									or active_to_completed
+--									or completed_to_idle;
+		-------------------------------------------------------------		
+		
+		eq cached_task_plan_options : int; 
+		eq cached_route_request_id : int;
+		eq cached_sensor_request_id : int; 
+		eq cached_task_id : int;
+		
+		--routes are "whispered"
+		--sensors maybe whisipered
+		--TODO ask john about changes to code implications on AADL/AGREE
+		--TODO: check all transition normative specs... reconsider (idiom recording? out on transition means eventually? )
+			--Events on transitions only? What about assignments of temporary caching variables? Currently in consequent as a ad hoc idiom. 
+			--Does the eventually apply to the next state or the previous state? Example: idle to sensor request, eventually idle sends out a sensor request
+			
+		--------------------------State Transition Predicates-----------------------------------	
+			eq init_to_idle : bool = false->
+				previous_state = INIT 
+				--and init_complete
+				 and pre(event(TaskInitialized_out));
+				
+			eq idle_to_sensor_request : bool = false ->
+				previous_state = IDLE and 
+--				event(UniqueAutomationRequest_in)  and 
+--				unique_automation_request_task_id_present and
+				--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+				pre(event(SensorFootprintRequests_out)); 
+		
+			eq sensor_request_to_option_routes : bool = false ->
+				previous_state = SENSOR_REQUEST and 
+--				event(SensorFootprintResponse_in) and 
+--				cached_sensor_request_id = SensorFootprintResponse_in.ResponseID and 
+				--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+				pre(event(RouteRequest_out)); 
+				
+			eq option_routes_to_options_published : bool = false ->
+				previous_state = OPTION_ROUTES and 
+--				event(RouteResponse_in) and 
+--				cached_route_request_id = RouteResponse_in.ResponseID and
+				--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+				pre(event(TaskPlanOptions_out)); --TODO: this is new, make sure the text is in the guarantee
+				
+			eq options_published_to_final_routes : bool = false ->
+				previous_state = OPTIONS_PUBLISHED  
+				--TaskPlanOptions_out ID matches UniqueAutomationRequest ID RequestID
+				--cache TaskPlanOptions_out.CorrespondingAutomationRequestID (published immediately before transition)
+				--check the cached options equal the talkimplementationrequest_in request ID
+--				and event(TaskImplementationRequest_in) 
+--				and cached_task_plan_options = TaskImplementationRequest_in.CorrespondingAutomationRequestID
+				--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+				and pre(event(RouteRequest_out)); 
+				
+				
+			eq final_routes_to_option_selected : bool = false ->
+				previous_state = FINAL_ROUTES 
+--				event(RouteResponse_in) and 
+--				RouteResponse_in.ResponseID = cached_route_request_id
+				--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+				and pre(event(TaskImplementationResponse_out));
+       		
+       		eq option_selected_to_sensor_request : bool = false ->
+       			previous_state = OPTION_SELECTED  
+--       			event(UniqueAutomationRequest_in) and 
+--       			unique_automation_request_task_id_present and
+       			--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+       			and pre(event(SensorFootprintRequests_out)); 
+       			
+       		--Note: the transition pattern differs here
+       		--No events are sent out that trigger this transition
+       		--The transition occurs immediately when the expected EntityState_in is received.
+       		--Also note, that changing this transition to use "pre" yielded realizability issues.
+       		eq option_selected_to_active : bool = false ->
+       			previous_state = OPTION_SELECTED and 
+       			event(EntityState_in) and 
+       			entity_state_task_id_present;
+       		
+       		--NOTE: this used to be active_to_complete, but Derek
+       		--commented that we can immediately transition to IDLE so long as a 
+       		--TaskComplete_out is sent (the complete state was only used to send this message previously)
+       		eq active_to_idle : bool = false ->
+       			previous_state = ACTIVE  
+--       			((event(EntityState_in) and not entity_state_task_id_present) or 
+--       				(event(UniqueAutomationRequest_in) and unique_automation_request_task_id_present))
+				--NOTE: Derek noted spec incomplete, don't leave state until this message is also sent. 
+				--NOTE: above commented out conditions triggers sending this message out (now part of new guarantees)
+       			and pre(event(TaskComplete_out));
+       				
+       			--NOTE: removed at the request of Derek, to simplify the state transitions (see comments above)
+--       		eq  completed_to_idle : bool = false ->
+--       			previous_state = COMPLETED and 
+--       			event(TaskComplete_out); 
+       			
+       		guarantee "Self loops": not some_transition => (state = previous_state);
+       			
+       		guarantee  " all Tasks start in the init state ":
+       			(state = INIT)->true;
+       			
+       		guarantee "all tasks remain in init until all internal initialization is complete, transitioning to idle after.
+       		When a Task has completed its internal initialization, it must report transition from this state 
+       		via the TaskInitialized message." :
+       			if init_to_idle then 
+       				state = IDLE and 
+       				--event(TaskInitialized_out) and --Note, now becoming an "eventually" for init (on transition)
+       				cached_task_id = TaskInitialized_out.TaskID --and --Not part of the spec, but used for other specs.
+       				--event(TaskInitialized_out) 
+       			else
+       				cached_task_id = pre(cached_task_id);
+       				
+--       		guarantee "The IDLE represents the state ... before any requests have been made that include the Task. " :
+--       			true; --not really what was meant I think
+       			
+       		guarantee "[Implied: latch init_complete, once init_complete is true, it stays true]" :
+       			pre(init_complete) =>
+       				init_complete = pre(init_complete);
+       				
+       		guarantee "[Implied: in the init state, once init_complete is true, immediately send out a 
+       				event(TaskInitialized_out).]":
+       				--NOTE: this would send out a event(TaskInitialized_out) in every time step that init_complete
+       					--is true within state INIT, however, the transition condition to idle occurs on the next
+       					--time step after event(TaskInitialized_out) is sent. 
+       			state = INIT =>
+       				(init_complete <=>
+       					event(TaskInitialized_out));
+       				
+       		guarantee "[Not originally specified: in the idle state, once an automation request
+       				is recieved that is present in the set of expected task IDs, send a SensorFootprintRequests_out]" :
+       			state = IDLE => 
+       				((event(UniqueAutomationRequest_in)  and 
+					unique_automation_request_task_id_present) <=>
+						event(SensorFootprintRequests_out));
+       				
+       		guarantee "UniqueAutomationRequest messages trigger a transition from the idle state into the SensorRequest state.
+       			When a Task is notified of its inclusion (by noting the presence of its ID in the Tasks list of an 
+       			UniqueAutomationRequest message), it can request calculations that pertain to the sensors onboard the vehicles 
+       			that are also included in the UniqueAutomationRequest message.
+       			[ASSUMPTION: calculations requests are assumed to mean SensorFootprintRequests_in]" :
+       			--NOTE: the SensorFootprintResponse_in is not a defined output of the base task. 
+       			if idle_to_sensor_request then 
+       				state = SENSOR_REQUEST and
+       				cached_sensor_request_id = SensorFootprintRequests_out.RequestID
+       			else
+       				cached_sensor_request_id = pre(cached_sensor_request_id);
+       				--event(SensorFootprintRequests_out) and --NOTE: we don't really mean this happens every time step, putting on the edge
+       				--true; --TODO: pertain to sensors on board? --NOTE: derek says a well-formed request would only have sensors that "pertain"
+       		
+--       		guarantee "[IMPLIED: in the SensorRequest state] While waiting for a response from the SensorManagerService, a Task is in the SensorRequest state and 
+--       			will remain so until the response from the SensorManagerService is received.":
+--       			--NOTE: the SensorFootprintResponse_out is not a defined output of the base task. 
+--       			--TODO: how do I know the sensor footprint is for the given task or does it matter? 
+--       			 pre(state) = SENSOR_REQUEST and pre(not event(SensorFootprintResponse_in)) => 
+--       				state = SENSOR_REQUEST;
+       			
+       		guarantee "[Not originally specified: in the SENSOR_REQUEST state, if the expected SensorFootprintResponse_in is received
+       				send a RouteRequest_out]" :
+       			state = SENSOR_REQUEST => 
+       				((event(SensorFootprintResponse_in) and 
+					cached_sensor_request_id = SensorFootprintResponse_in.ResponseID) <=>
+						event(RouteRequest_out));
+					 	
+       			
+       		--TODO: is the current state implication correct? 
+       		guarantee "[IMPLIED: in the SensorRequest state] After the SensorManagerService has replied with the appropriate sensor calculations 
+       			[IMPLIED: the service will then be in OptionRoutes state]" :
+       			--NOTE: the SensorFootprintResponse_out is not a defined output of the base task. 
+       			--TODO: how do I know the sensor footprint is for the given task or does it matter? 
+--       			sensor_request_to_option_routes =>
+--       				state = OPTION_ROUTES and
+--       				cached_route_request_id = RouteRequest_out.RequestID;
+       			sensor_request_to_option_routes =>
+       				state = OPTION_ROUTES and
+       				cached_route_request_id = RouteRequest_out.RequestID;
+       			
+       		--The there are two transitions that both set cached_route_reuquest_id, hence a separate 
+       		--is necessary that checks that if not in both transitions, the cached_route_request_id
+       		--does not change. 
+       		guarantee "[ADDED GUARANTEE] If not transition from sensor request to options routes or
+       				options published to final routes, the cached_route_request_id is not modified.":
+       			not sensor_request_to_option_routes and not options_published_to_final_routes =>
+       				cached_route_request_id = pre(cached_route_request_id);
+       		
+       		--Note: now part of the transition into OptionRoutes ....Blame derek :-)
+--       		guarantee "[IMPLIED: in OPTION_ROUTES state] the Task can request waypoints from the RouteAggregatorService that carry out the on-Task goals.
+--       				[ASSUMPTION: assumed based on features of services the request is a RoutePlanRequest_out]" :
+--       			state = OPTION_ROUTES => 
+--       				--event(RoutePlanRequest_out) or not event(RoutePlanRequest_out);
+--       				true; 
+--       		
+       		guarantee "[Not originally specified: if in the OPTION_ROUTES state and an expected RouteResponse_in is received
+       				send an event(TaskPlanOptions_out)]":
+       			state = OPTION_ROUTES => 
+       				((event(RouteResponse_in) and 
+					cached_route_request_id = RouteResponse_in.ResponseID) <=>
+						event(TaskPlanOptions_out));
+				
+				
+       		guarantee "The Task remains in the OptionRoutes state until the RouteAggregatorService replies.
+       		When routes are returned [IMPLIED: from the route aggregator service the service will be in the OPTIONS_PUBLISHED state] 
+       		[ASSUMPTION: the replies are assumed to be RoutePlanResponse_in]":
+       		if option_routes_to_options_published then
+       			state = OPTIONS_PUBLISHED and
+       			cached_task_plan_options = TaskPlanOptions_out.CorrespondingAutomationRequestID  --NOTE: used only for model checking
+       		else
+       			cached_task_plan_options = pre(cached_task_plan_options);
+       			
+--       			if pre(state)= OPTION_ROUTES and pre(event(RoutePlanResponse_in)) then
+--       				state = OPTIONS_PUBLISHED
+--       			else
+--       				state = OPTION_ROUTES;
+       			
+       			--Note: now handled on the transition into options_published (part of left hand side of the implication) 
+--       		guarantee "[IMPLIED: in OPTIONS_PUBLISHED state the service] will utilize all route and sensor 
+--       		information to identify and publish the applicable TaskOptions.
+--       		[ASSUMPTION: task option is the same as TaskPlanOptions_out ] " :
+--       			state = OPTIONS_PUBLISHED => 
+--       				true --TBD: utilize spec is not formalizable?
+--       				and event(TaskPlanOptions_out); --TODO: this doesn't account for will eventually?
+       				
+       			
+       			
+       		guarantee "[Not originally specified: if in the OPTION_ROUTES state and an expected TaskImplementationRequest_in,
+       				send a RouteRequest_out]":
+       			state = OPTION_ROUTES =>
+       				((event(TaskImplementationRequest_in) and
+					cached_task_plan_options = TaskImplementationRequest_in.CorrespondingAutomationRequestID) <=>
+						event(RouteRequest_out));
+       				
+       			
+       		--TODO: INCORRECT AGREE SPECIFICATION
+       		--TODO: check use of once here, talk to aaron, use since? use variable? 
+       		guarantee "After publication of the options, a Task waits in the OptionsPublished state until the TaskImplementationRequest
+       		 message is received, whereupon it switches to FinalRoutes.": 
+       		--TODO: implied? check for responses for the given task? 
+       			options_published_to_final_routes =>
+       				state = FINAL_ROUTES and
+       				cached_route_request_id = RouteRequest_out.RequestID;
+       				
+       			
+       		guarantee "[Not originally specified: if in the FINAL_ROUTES state and an expected RouteResponse_in is recieved,
+       				send a TaskImplementationResponse_out]":
+       			state = FINAL_ROUTES =>
+       				((event(RouteResponse_in) and 
+					RouteResponse_in.ResponseID = cached_route_request_id) <=>
+						event(TaskImplementationResponse_out));
+					
+       			
+       		guarantee "When a Task is Active, it is allowed to update sensor navigation commands to on-task vehicles." :
+       		--NOTE: this contract is not valid in the parent type as there is no VehicleActionCommand_out defined in the parent
+       			state = ACTIVE =>
+       				--event(VehicleActionCommand_out) or not event(VehicleActionCommand_out) ;
+       				true;
+       				
+       		--TODO: in all states make vehicleactioncommand_out not possible (check for other similar scnenarios)
+       				
+       			
+       			--Note: "create waypoints" means make a route request which is now done in transition from options published to final routes
+--       		guarantee "[IMPLIED: in FINAL_ROUTES] Upon reception of a TaskImplementationRequest, a Task is informed of the option that was selected by the assignment service. 
+--       		At this point, a Task must create the final set of waypoints that include both enroute and on-task waypoints from the specified vehicle 
+--       		location. The Task is required to create the enroute waypoints since a route refinement is possible, taking advantage of the concrete prior 
+--       		position of the selected vehicle." :
+--       			state = FINAL_ROUTES and event(TaskImplementationRequest_in) and TaskImplementationRequest_in.TaskID = task_id =>
+--       				true; --TBD:
+--       			
+ 
+       		guarantee "The Task remains in the FinalRoutes state until the route request is fulfilled by the RouteAggregatorService
+       		[IMPLIED: at which point the task transitions to OptionSelected] and When the final waypoints are returned from the RouteAggregatorService, 
+       		the Task publishes a complete TaskImplementationResponse message. 
+       		[ASSUMPTION: fulfillment of the RouteAggregatorService is assumed to be specified in RoutePlanResponse_in]
+       		[ASSUMPTION: the response task ID must match this task's ID]" :
+       			final_routes_to_option_selected =>
+       				state = OPTION_SELECTED; 
+       				--event(TaskImplementationResponse_out); --NOTE: put in the transition to this state as per eventually idiom
+       			
+       		--state = OPTION_SELECTION  and  pre(state) != OPTION_SELECTION => event(TaskImplementationResponse_out);
+       		--TODO: put in separate state transition and init state 
+       		
+       		
+       		guarantee "[Not originally specified: if in the OPTION_SELECTED state an the expected UniqueAutomationRequest_in is received,
+       				send SensorFootprintRequests_out]":
+       			state = OPTION_SELECTED =>
+       				((event(UniqueAutomationRequest_in) and 
+       				unique_automation_request_task_id_present) <=>
+       					event(SensorFootprintRequests_out));
+       				
+       		guarantee "If during this state [OPTION_SELECTED], a subsequent UniqueAutomationRequest is made, the Task returns to the SensorRequest state and 
+       		immediately attempts to fulfill the requirements of the new UniqueAutomationRequest. This behavior implies that a Task can only be 
+       		part of a single AutomationRequest and subsequent requests always override previous requests.":
+       			option_selected_to_sensor_request  =>
+       				state = SENSOR_REQUEST;
+       		
+       				 				
+       		guarantee "If the Task is in the OptionSelected state and an EntityState message is received which includes the Task ID 
+       		in the AssociatedTaskList, then the Task switches to the Activestate. 
+       		A Task will remain in this [OptionSelected] state until an EntityState message includes this Task ID in its AssociatedTaskList.":
+				option_selected_to_active =>
+					state = ACTIVE;
+						--TODO?: in active the task can send payload action messages and vehicle action commands
+       				
+       		guarantee "[Not originally specified: If in the ACTIVE state and either (1) an new expected EntityState_in is recieved or 
+       				(2) an expected UniqueAutomationRequest_in is recieved, send TaskComplete_out]":
+       			state = ACTIVE =>
+       				((((event(EntityState_in) and not entity_state_task_id_present) or 
+       				(event(UniqueAutomationRequest_in) and unique_automation_request_task_id_present)))	<=>
+       					event(TaskComplete_out));	
+       				
+       		guarantee "A Task remains in the Active state until a subsequent EntityState message does not list the Task ID in its AssociatedTaskList. 
+       		At which point, a transition to Completed is made. 
+       		If a UniqueAutomationRequest message that includes this TaskID is received in the Active state, it transitions to the Completed state. ": 
+       			--active_to_completed =>
+       			active_to_idle =>
+       				--state = COMPLETED and
+       				--NOTE: Derek noted that the completed state is only used to send out a 
+       				--TaskComplete message. Instead of forcing a transition to a state that would
+       				--otherwise immediately transition to another state (IDLE) when entered, we
+       				--send the task complete message out and transition to IDLE, collapsing the "complete" state
+       				--into this transition. 
+       				state = IDLE and 
+       				--When in active we discover there is no longer a need to be in active, 
+       				--transition immediately to IDLE and send out TaskComplete_out. 
+       				--(Note this means the first step in IDLE from this transition will be the time step when
+       				--TaskComplete_out is actually sent (risking edge state change)). 
+       				event(TaskComplete_out);
+       				
+--       		guarantee "In the completed state, the Task publishes a TaskComplete message." : 
+--       			state = COMPLETED =>
+--       				event(TaskComplete_out); --eventually
+--       		
+--       		--NOTE: IDIOM: the fact an output port is used to specify the state transition implies/necessitates
+--       		--the implemented task must eventually pass a message on the specified output port. 
+--       		guarantee "In the completed state, the Task publishes a TaskComplete message.
+--       		In the completed state, [IMPLIED: once the task complete message is sent] then immediately transition to the Idle state." :
+--       			completed_to_idle =>
+--       				state = IDLE;
+
+       	**};
+       	
+    end TaskServiceBase;
+end TaskServiceBase_Package;

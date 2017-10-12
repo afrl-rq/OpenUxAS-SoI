@@ -1,0 +1,20 @@
+package EscortTask_Package
+public
+    -- Data_types Packages
+    with CMASI;
+    with IMPACT;
+    
+    -- Included
+    with TaskServiceBase_Package;
+    
+    thread EscortTask extends TaskServiceBase_Package::TaskServiceBase
+        features
+            MissionCommand_in: in event data port cmasi::MissionCommand.i;
+            FollowPathCommand_in: in event data port cmasi::FollowPathCommand.i;
+            AutomationResponse_in: in event data port cmasi::AutomationResponse.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end EscortTask;
+    
+end EscortTask_Package;

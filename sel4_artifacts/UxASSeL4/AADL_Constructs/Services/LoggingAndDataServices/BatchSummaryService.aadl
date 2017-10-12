@@ -1,0 +1,36 @@
+package BatchSummaryService_Pkg
+public
+    -- Data_types Packages
+    with CMASI;
+    with ROUTE;
+    with IMPACT;
+
+    -- Includes
+	with ServiceBase_Pkg;    
+    
+    thread BatchSummaryService extends ServiceBase_Pkg::ServiceBase
+        features
+            RadioTowerState_in: in event data port impact::RadioTowerState.i;
+            GroundVehicleConfiguration_in: in event data port impact::GroundVehicleConfiguration.i;
+            EntityConfiguration_in: in event data port cmasi::EntityConfiguration.i;
+            SurfaceVehicleConfiguration_in: in event data port impact::SurfaceVehicleConfiguration.i;
+            AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
+            BatchSummaryRequest_in: in event data port impact::BatchSummaryRequest.i;
+            EntityState_in: in event data port cmasi::EntityState.i;
+            GroundVehicleState_in: in event data port impact::GroundVehicleState.i;
+            PointOfInterest_in: in event data port impact::PointOfInterest.i;
+            RadioTowerConfiguration_in: in event data port impact::RadioTowerConfiguration.i;
+            Task_in: in event data port cmasi::Task.i;
+            AirVehicleState_in: in event data port cmasi::AirVehicleState.i;
+            SurfaceVehicleState_in: in event data port impact::SurfaceVehicleState.i;
+            RoutePlanResponse_in: in event data port route::RoutePlanResponse.i;
+            AreaOfInterest_in: in event data port impact::AreaOfInterest.i;
+            EgressRouteResponse_in: in event data port route::EgressRouteResponse.i;
+            LineOfInterest_in: in event data port impact::LineOfInterest.i;
+            EgressRouteRequest_out: out event data port route::EgressRouteRequest.i;
+            RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
+            BatchSummaryResponse_out: out event data port impact::BatchSummaryResponse.i;
+    end BatchSummaryService;
+
+    
+end BatchSummaryService_Pkg;

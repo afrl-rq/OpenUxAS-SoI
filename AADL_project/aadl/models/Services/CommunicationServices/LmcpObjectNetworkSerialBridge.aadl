@@ -1,0 +1,9 @@
+package LmcpObjectNetworkSerialBridge_Pkg
+public
+    -- empty
+    
+    thread LmcpObjectNetworkSerialBridge
+    -- Look up in the code what this exactly does. This inherits from LmcpObjectNetworkClientBase
+    end LmcpObjectNetworkSerialBridge;
+    
+end LmcpObjectNetworkSerialBridge_Pkg;

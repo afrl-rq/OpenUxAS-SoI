@@ -1,0 +1,16 @@
+package ImpactPointSearchTask_Package
+public
+    -- Data_types Packages
+    with CMASI;
+    
+    -- Included
+    with TaskServiceBase_Package;
+    
+    thread ImpactPointSearchTask extends TaskServiceBase_Package::TaskServiceBase
+        features
+            VehicleActionCommand_out: refined to out event data port cmasi::VehicleActionCommand.i;
+        properties
+            Dispatch_Protocol => Sporadic;
+    end ImpactPointSearchTask;
+    
+end ImpactPointSearchTask_Package;

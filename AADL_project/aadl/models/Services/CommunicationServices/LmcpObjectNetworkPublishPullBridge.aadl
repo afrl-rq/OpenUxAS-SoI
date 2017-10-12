@@ -1,0 +1,9 @@
+package LmcpObjectNetworkPublishPullBridge_Pkg
+public
+    -- empty
+    
+    thread LmcpObjectNetworkPublishPullBridge
+    -- Look up in the code what this exactly does. This inherits from LmcpObjectNetworkClientBase
+    end LmcpObjectNetworkPublishPullBridge;
+    
+end LmcpObjectNetworkPublishPullBridge_Pkg;

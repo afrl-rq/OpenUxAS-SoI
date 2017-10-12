@@ -1,0 +1,185 @@
+package UXNATIVE
+public
+	with CMASI;
+	with Common_Data;
+	with Base_Types;
+	with Data_Model;
+	renames Common_Data::all;
+	renames CMASI::all;
+	
+data VideoRecord
+end VideoRecord;
+
+--Start/Stop recording
+data implementation VideoRecord.i
+    subcomponents
+        --Start [true] or stop [false] video recording
+        FIXMERecord: data bool.i;
+end VideoRecord.i;
+
+data StartupComplete
+end StartupComplete;
+
+--Message sent when all services have been started
+data implementation StartupComplete.i
+end StartupComplete.i;
+
+data CreateNewService
+end CreateNewService;
+
+--Create a new service in UxAS
+data implementation CreateNewService.i
+    subcomponents
+        --Globally unique ID for this service. Negative ServiceIDs are
+        --invalid. If ServiceID == 0, then a unique service ID will be
+        --generated.
+        ServiceID: data int64.i;
+        --XML configuration for this service
+        XmlConfiguration: data string.i {Data_Model::Data_Representation => Array;};
+end CreateNewService.i;
+
+data KillService
+end KillService;
+
+--Remove an existing service from UxAS
+data implementation KillService.i
+    subcomponents
+        --Globally unique ID for the service to be removed. If ServiceID == 0,
+        --then no service will be killed. ServiceID == -1 causes all services to
+        --be killed and UxAS to be shutdown.
+        ServiceID: data int64.i;
+end KillService.i;
+
+data IncrementWaypoint
+end IncrementWaypoint;
+
+--Indicate to the waypoint manager to move to the next waypoint in the
+--current list
+data implementation IncrementWaypoint.i
+    subcomponents
+        --ID of vehicle which should move to the next waypoint in its list
+        VehicleID: data int64.i;
+end IncrementWaypoint.i;
+
+data EntityLocation
+end EntityLocation;
+
+--Simple location broadcast from entities for tracking
+data implementation EntityLocation.i
+    subcomponents
+        --Entity ID
+        EntityID: data int64.i;
+        --Current location of entity
+        Position: data CMASI::Location3D.i;
+        --Corresponding time in milli-seconds since 1 Jan 1970
+        Time: data int64.i;
+end EntityLocation.i;
+
+data BandwidthTest extends EntityLocation
+end BandwidthTest;
+
+--Message for measuring actual bandwidth between entities
+data implementation BandwidthTest.i extends EntityLocation.i
+    subcomponents
+        --Message ID to track message loss
+        MessageID: data int64.i;
+        --Data payload for creating arbitrarily sized messages
+        Payload: data string.i;
+end BandwidthTest.i;
+
+data BandwidthReceiveReport
+end BandwidthReceiveReport;
+
+--Report for a received message containing positions of both entities
+--and the payload size
+data implementation BandwidthReceiveReport.i
+    subcomponents
+        --Entity from which the message was sent
+        EntitySender: data EntityLocation.i;
+        --Entity which received the message
+        EntityReceiver: data EntityLocation.i;
+        --Size of the message that was received
+        TransferPayloadSize: data uint32.i;
+end BandwidthReceiveReport.i;
+
+data SubTaskExecution
+end SubTaskExecution;
+
+--Command entity to execute subtasks either in strict order or
+--determined by optimization. Replaces all current sub-tasks being
+--executed. In addtion to executing the sub-tasks, the mission command
+--used to complete the sub-tasks is returned.
+data implementation SubTaskExecution.i
+    subcomponents
+        --List of tasks that current entity should complete
+        SubTasks: data CMASI::Task.i {Data_Model::Data_Representation => Array;};
+        --Enable strict ordering
+        StrictOrder: data bool.i;
+end SubTaskExecution.i;
+
+data SubTaskAssignment
+end SubTaskAssignment;
+
+--Command an entity to perform a complete task assignment for the
+--entire team and then execute own role
+data implementation SubTaskAssignment.i
+    subcomponents
+        --List of tasks that current team should complete
+        SubTasks: data CMASI::Task.i {Data_Model::Data_Representation => Array;};
+        --Neighboring entities to consider
+        Neighbors: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
+end SubTaskAssignment.i;
+
+data AutopilotKeepAlive
+end AutopilotKeepAlive;
+
+--Message to enable onboard processor to send commands to the
+--autopilot, and the gimbal
+data implementation AutopilotKeepAlive.i
+    subcomponents
+        --Enable communications between UxAS and the autopilot
+        AutopilotEnabled: data bool.i;
+        --Enable communications between UxAS and the Gimbal. Note: this does
+        --not effect the video stream.
+        GimbalEnabled: data bool.i;
+        --Time that this message was sent
+        TimeSent: data int64.i;
+end AutopilotKeepAlive.i;
+
+data OnboardProcessorIsAlive
+end OnboardProcessorIsAlive;
+
+--Message reporting that the onboard processor is functioning
+data implementation OnboardProcessorIsAlive.i
+    subcomponents
+        --ID of vehicle with onboard processor
+        VehicleID: data int64.i;
+        --Time that this message was sent
+        TimeSent: data int64.i;
+end OnboardProcessorIsAlive.i;
+
+data EntityJoin
+end EntityJoin;
+
+--Entity Join
+data implementation EntityJoin.i
+    subcomponents
+        --ID of entity joining network
+        EntityID: data int64.i;
+        --Label of entity joining network
+        Label: data string.i;
+end EntityJoin.i;
+
+data EntityExit
+end EntityExit;
+
+--Entity Exit
+data implementation EntityExit.i
+    subcomponents
+        --ID of entity exiting network
+        EntityID: data int64.i;
+        --Label of entity exiting network
+        Label: data string.i;
+end EntityExit.i;
+
+end UXNATIVE;
