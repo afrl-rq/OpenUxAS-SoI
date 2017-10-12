@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_KeyValuePair_SUB "afrl.cmasi.KeyValuePair"
@@ -11,15 +8,16 @@
 
 #define LMCP_KeyValuePair_TYPE 2
 
-typedef struct {
+struct KeyValuePair_struct {
     lmcp_object super;
-    char* Key;
-    array_info Key_ai;
+    char* key;
+    array_info key_ai;
 
-    char* Value;
-    array_info Value_ai;
+    char* value;
+    array_info value_ai;
 
-} KeyValuePair;
+};
+typedef struct KeyValuePair_struct KeyValuePair;
 void lmcp_pp_KeyValuePair(KeyValuePair* s);
 size_t lmcp_packsize_KeyValuePair (KeyValuePair* i);
 size_t lmcp_pack_KeyValuePair_header(uint8_t* buf, KeyValuePair* i);

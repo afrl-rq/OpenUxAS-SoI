@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AirVehicleState.h"
@@ -9,27 +7,27 @@ void lmcp_pp_AirVehicleState(AirVehicleState* s) {
     printf("AirVehicleState{");
     printf("Inherited from EntityState:\n");
     lmcp_pp_EntityState(&(s->super));
-    printf("Airspeed: ");
-    printf("%f",s->Airspeed);
+    printf("airspeed: ");
+    printf("%u",s->airspeed);
     printf("\n");
-    printf("VerticalSpeed: ");
-    printf("%f",s->VerticalSpeed);
+    printf("verticalspeed: ");
+    printf("%u",s->verticalspeed);
     printf("\n");
-    printf("WindSpeed: ");
-    printf("%f",s->WindSpeed);
+    printf("windspeed: ");
+    printf("%u",s->windspeed);
     printf("\n");
-    printf("WindDirection: ");
-    printf("%f",s->WindDirection);
+    printf("winddirection: ");
+    printf("%u",s->winddirection);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_AirVehicleState (AirVehicleState* i) {
     size_t out = 0;
     out += lmcp_packsize_EntityState(&(i->super));
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     return out;
 }
 size_t lmcp_pack_AirVehicleState_header(uint8_t* buf, AirVehicleState* i) {
@@ -69,19 +67,19 @@ int lmcp_unpack_AirVehicleState(uint8_t** inb, size_t *size_remain, AirVehicleSt
     }
     AirVehicleState* out = outp;
     CHECK(lmcp_unpack_EntityState(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Airspeed)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->VerticalSpeed)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->WindSpeed)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->WindDirection)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->airspeed)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->verticalspeed)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->windspeed)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->winddirection)))
     return 0;
 }
 size_t lmcp_pack_AirVehicleState(uint8_t* buf, AirVehicleState* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_EntityState(outb, &(i->super));
-    outb += lmcp_pack_float(outb, i->Airspeed);
-    outb += lmcp_pack_float(outb, i->VerticalSpeed);
-    outb += lmcp_pack_float(outb, i->WindSpeed);
-    outb += lmcp_pack_float(outb, i->WindDirection);
+    outb += lmcp_pack_uint32_t(outb, i->airspeed);
+    outb += lmcp_pack_uint32_t(outb, i->verticalspeed);
+    outb += lmcp_pack_uint32_t(outb, i->windspeed);
+    outb += lmcp_pack_uint32_t(outb, i->winddirection);
     return (outb - buf);
 }

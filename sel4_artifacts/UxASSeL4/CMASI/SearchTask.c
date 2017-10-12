@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "SearchTask.h"
@@ -10,18 +8,18 @@ void lmcp_pp_SearchTask(SearchTask* s) {
     printf("SearchTask{");
     printf("Inherited from Task:\n");
     lmcp_pp_Task(&(s->super));
-    printf("DesiredWavelengthBands: ");
+    printf("desiredwavelengthbands: ");
     printf("[");
-    for (uint32_t index = 0; index < s->DesiredWavelengthBands_ai.length; index++) {
-        printf("%i", s->DesiredWavelengthBands[index]);
+    for (uint32_t index = 0; index < s->desiredwavelengthbands_ai.length; index++) {
+        printf("%i", s->desiredwavelengthbands[index]);
         printf(",");
     }
     printf("\n");
-    printf("DwellTime: ");
-    printf("%lld",s->DwellTime);
+    printf("dwelltime: ");
+    printf("%lld",s->dwelltime);
     printf("\n");
-    printf("GroundSampleDistance: ");
-    printf("%f",s->GroundSampleDistance);
+    printf("groundsampledistance: ");
+    printf("%u",s->groundsampledistance);
     printf("\n");
     printf("}");
 }
@@ -29,11 +27,11 @@ size_t lmcp_packsize_SearchTask (SearchTask* i) {
     size_t out = 0;
     out += lmcp_packsize_Task(&(i->super));
     out += 2;
-    for (uint32_t index = 0; index < i->DesiredWavelengthBands_ai.length; index++) {
+    for (uint32_t index = 0; index < i->desiredwavelengthbands_ai.length; index++) {
         out += 4;
     }
     out += sizeof(int64_t);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
     return out;
 }
 size_t lmcp_pack_SearchTask_header(uint8_t* buf, SearchTask* i) {
@@ -55,8 +53,8 @@ void lmcp_free_SearchTask(SearchTask* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_Task(&(out->super), 0);
-    if (out->DesiredWavelengthBands != NULL) {
-        free(out->DesiredWavelengthBands);
+    if (out->desiredwavelengthbands != NULL) {
+        free(out->desiredwavelengthbands);
     }
     if (out_malloced == 1) {
         free(out);
@@ -80,27 +78,27 @@ int lmcp_unpack_SearchTask(uint8_t** inb, size_t *size_remain, SearchTask* outp)
     CHECK(lmcp_unpack_Task(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->DesiredWavelengthBands = malloc(sizeof(int32_t*) * tmp);
-    if (out->DesiredWavelengthBands==0) {
+    (out)->desiredwavelengthbands = malloc(sizeof(int32_t*) * tmp);
+    if (out->desiredwavelengthbands==0) {
         return -1;
     }
-    out->DesiredWavelengthBands_ai.length = tmp;
-    for (uint32_t index = 0; index < out->DesiredWavelengthBands_ai.length; index++) {
-        CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &out->DesiredWavelengthBands[index]))
+    out->desiredwavelengthbands_ai.length = tmp;
+    for (uint32_t index = 0; index < out->desiredwavelengthbands_ai.length; index++) {
+        CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &out->desiredwavelengthbands[index]))
     }
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->DwellTime)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->GroundSampleDistance)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->dwelltime)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->groundsampledistance)))
     return 0;
 }
 size_t lmcp_pack_SearchTask(uint8_t* buf, SearchTask* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_Task(outb, &(i->super));
-    outb += lmcp_pack_uint16_t(outb, i->DesiredWavelengthBands_ai.length);
-    for (uint32_t index = 0; index < i->DesiredWavelengthBands_ai.length; index++) {
-        outb += lmcp_pack_int32_t(outb, (int) i->DesiredWavelengthBands[index]);
+    outb += lmcp_pack_uint16_t(outb, i->desiredwavelengthbands_ai.length);
+    for (uint32_t index = 0; index < i->desiredwavelengthbands_ai.length; index++) {
+        outb += lmcp_pack_int32_t(outb, (int) i->desiredwavelengthbands[index]);
     }
-    outb += lmcp_pack_int64_t(outb, i->DwellTime);
-    outb += lmcp_pack_float(outb, i->GroundSampleDistance);
+    outb += lmcp_pack_int64_t(outb, i->dwelltime);
+    outb += lmcp_pack_uint32_t(outb, i->groundsampledistance);
     return (outb - buf);
 }

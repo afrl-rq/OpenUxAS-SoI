@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_RemoveTasks_SUB "afrl.cmasi.RemoveTasks"
@@ -11,12 +8,13 @@
 
 #define LMCP_RemoveTasks_TYPE 44
 
-typedef struct {
+struct RemoveTasks_struct {
     lmcp_object super;
-    int64_t* TaskList;
-    array_info TaskList_ai;
+    int64_t* tasklist;
+    array_info tasklist_ai;
 
-} RemoveTasks;
+};
+typedef struct RemoveTasks_struct RemoveTasks;
 void lmcp_pp_RemoveTasks(RemoveTasks* s);
 size_t lmcp_packsize_RemoveTasks (RemoveTasks* i);
 size_t lmcp_pack_RemoveTasks_header(uint8_t* buf, RemoveTasks* i);

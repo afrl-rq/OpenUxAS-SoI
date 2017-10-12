@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VideoStreamConfiguration.h"
@@ -9,10 +7,10 @@ void lmcp_pp_VideoStreamConfiguration(VideoStreamConfiguration* s) {
     printf("VideoStreamConfiguration{");
     printf("Inherited from PayloadConfiguration:\n");
     lmcp_pp_PayloadConfiguration(&(s->super));
-    printf("AvailableSensorList: ");
+    printf("availablesensorlist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->AvailableSensorList_ai.length; index++) {
-        printf("%lld",s->AvailableSensorList[index]);
+    for (uint32_t index = 0; index < s->availablesensorlist_ai.length; index++) {
+        printf("%lld",s->availablesensorlist[index]);
         printf(",");
     }
     printf("\n");
@@ -22,7 +20,7 @@ size_t lmcp_packsize_VideoStreamConfiguration (VideoStreamConfiguration* i) {
     size_t out = 0;
     out += lmcp_packsize_PayloadConfiguration(&(i->super));
     out += 2;
-    for (uint32_t index = 0; index < i->AvailableSensorList_ai.length; index++) {
+    for (uint32_t index = 0; index < i->availablesensorlist_ai.length; index++) {
         out += sizeof(int64_t);
     }
     return out;
@@ -46,8 +44,8 @@ void lmcp_free_VideoStreamConfiguration(VideoStreamConfiguration* out, int out_m
     if (out == NULL)
         return;
     lmcp_free_PayloadConfiguration(&(out->super), 0);
-    if (out->AvailableSensorList != NULL) {
-        free(out->AvailableSensorList);
+    if (out->availablesensorlist != NULL) {
+        free(out->availablesensorlist);
     }
     if (out_malloced == 1) {
         free(out);
@@ -71,13 +69,13 @@ int lmcp_unpack_VideoStreamConfiguration(uint8_t** inb, size_t *size_remain, Vid
     CHECK(lmcp_unpack_PayloadConfiguration(inb, size_remain, &(out->super)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->AvailableSensorList = malloc(sizeof(int64_t*) * tmp);
-    if (out->AvailableSensorList==0) {
+    (out)->availablesensorlist = malloc(sizeof(int64_t*) * tmp);
+    if (out->availablesensorlist==0) {
         return -1;
     }
-    out->AvailableSensorList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->AvailableSensorList_ai.length; index++) {
-        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->AvailableSensorList[index]))
+    out->availablesensorlist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->availablesensorlist_ai.length; index++) {
+        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->availablesensorlist[index]))
     }
     return 0;
 }
@@ -85,9 +83,9 @@ size_t lmcp_pack_VideoStreamConfiguration(uint8_t* buf, VideoStreamConfiguration
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_PayloadConfiguration(outb, &(i->super));
-    outb += lmcp_pack_uint16_t(outb, i->AvailableSensorList_ai.length);
-    for (uint32_t index = 0; index < i->AvailableSensorList_ai.length; index++) {
-        outb += lmcp_pack_int64_t(outb, i->AvailableSensorList[index]);
+    outb += lmcp_pack_uint16_t(outb, i->availablesensorlist_ai.length);
+    for (uint32_t index = 0; index < i->availablesensorlist_ai.length; index++) {
+        outb += lmcp_pack_int64_t(outb, i->availablesensorlist[index]);
     }
     return (outb - buf);
 }

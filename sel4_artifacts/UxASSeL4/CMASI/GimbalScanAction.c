@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "GimbalScanAction.h"
@@ -9,38 +7,38 @@ void lmcp_pp_GimbalScanAction(GimbalScanAction* s) {
     printf("GimbalScanAction{");
     printf("Inherited from PayloadAction:\n");
     lmcp_pp_PayloadAction(&(s->super));
-    printf("AzimuthSlewRate: ");
-    printf("%f",s->AzimuthSlewRate);
+    printf("azimuthslewrate: ");
+    printf("%u",s->azimuthslewrate);
     printf("\n");
-    printf("ElevationSlewRate: ");
-    printf("%f",s->ElevationSlewRate);
+    printf("elevationslewrate: ");
+    printf("%u",s->elevationslewrate);
     printf("\n");
-    printf("StartAzimuth: ");
-    printf("%f",s->StartAzimuth);
+    printf("startazimuth: ");
+    printf("%u",s->startazimuth);
     printf("\n");
-    printf("EndAzimuth: ");
-    printf("%f",s->EndAzimuth);
+    printf("endazimuth: ");
+    printf("%u",s->endazimuth);
     printf("\n");
-    printf("StartElevation: ");
-    printf("%f",s->StartElevation);
+    printf("startelevation: ");
+    printf("%u",s->startelevation);
     printf("\n");
-    printf("EndElevation: ");
-    printf("%f",s->EndElevation);
+    printf("endelevation: ");
+    printf("%u",s->endelevation);
     printf("\n");
-    printf("Cycles: ");
-    printf("%u",s->Cycles);
+    printf("cycles: ");
+    printf("%u",s->cycles);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_GimbalScanAction (GimbalScanAction* i) {
     size_t out = 0;
     out += lmcp_packsize_PayloadAction(&(i->super));
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     out += sizeof(uint32_t);
     return out;
 }
@@ -81,25 +79,25 @@ int lmcp_unpack_GimbalScanAction(uint8_t** inb, size_t *size_remain, GimbalScanA
     }
     GimbalScanAction* out = outp;
     CHECK(lmcp_unpack_PayloadAction(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->AzimuthSlewRate)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->ElevationSlewRate)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->StartAzimuth)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->EndAzimuth)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->StartElevation)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->EndElevation)))
-    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->Cycles)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->azimuthslewrate)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->elevationslewrate)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->startazimuth)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->endazimuth)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->startelevation)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->endelevation)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->cycles)))
     return 0;
 }
 size_t lmcp_pack_GimbalScanAction(uint8_t* buf, GimbalScanAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_PayloadAction(outb, &(i->super));
-    outb += lmcp_pack_float(outb, i->AzimuthSlewRate);
-    outb += lmcp_pack_float(outb, i->ElevationSlewRate);
-    outb += lmcp_pack_float(outb, i->StartAzimuth);
-    outb += lmcp_pack_float(outb, i->EndAzimuth);
-    outb += lmcp_pack_float(outb, i->StartElevation);
-    outb += lmcp_pack_float(outb, i->EndElevation);
-    outb += lmcp_pack_uint32_t(outb, i->Cycles);
+    outb += lmcp_pack_uint32_t(outb, i->azimuthslewrate);
+    outb += lmcp_pack_uint32_t(outb, i->elevationslewrate);
+    outb += lmcp_pack_uint32_t(outb, i->startazimuth);
+    outb += lmcp_pack_uint32_t(outb, i->endazimuth);
+    outb += lmcp_pack_uint32_t(outb, i->startelevation);
+    outb += lmcp_pack_uint32_t(outb, i->endelevation);
+    outb += lmcp_pack_uint32_t(outb, i->cycles);
     return (outb - buf);
 }

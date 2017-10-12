@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleAction.h"
@@ -12,9 +9,10 @@
 
 #define LMCP_NavigationAction_TYPE 32
 
-typedef struct {
+struct NavigationAction_struct {
     VehicleAction super;
-} NavigationAction;
+};
+typedef struct NavigationAction_struct NavigationAction;
 void lmcp_pp_NavigationAction(NavigationAction* s);
 size_t lmcp_packsize_NavigationAction (NavigationAction* i);
 size_t lmcp_pack_NavigationAction_header(uint8_t* buf, NavigationAction* i);

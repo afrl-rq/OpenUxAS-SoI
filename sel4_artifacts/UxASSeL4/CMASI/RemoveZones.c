@@ -1,15 +1,13 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "RemoveZones.h"
 void lmcp_pp_RemoveZones(RemoveZones* s) {
     printf("RemoveZones{");
-    printf("ZoneList: ");
+    printf("zonelist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->ZoneList_ai.length; index++) {
-        printf("%lld",s->ZoneList[index]);
+    for (uint32_t index = 0; index < s->zonelist_ai.length; index++) {
+        printf("%lld",s->zonelist[index]);
         printf(",");
     }
     printf("\n");
@@ -18,7 +16,7 @@ void lmcp_pp_RemoveZones(RemoveZones* s) {
 size_t lmcp_packsize_RemoveZones (RemoveZones* i) {
     size_t out = 0;
     out += 2;
-    for (uint32_t index = 0; index < i->ZoneList_ai.length; index++) {
+    for (uint32_t index = 0; index < i->zonelist_ai.length; index++) {
         out += sizeof(int64_t);
     }
     return out;
@@ -41,8 +39,8 @@ size_t lmcp_pack_RemoveZones_header(uint8_t* buf, RemoveZones* i) {
 void lmcp_free_RemoveZones(RemoveZones* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->ZoneList != NULL) {
-        free(out->ZoneList);
+    if (out->zonelist != NULL) {
+        free(out->zonelist);
     }
     if (out_malloced == 1) {
         free(out);
@@ -65,22 +63,22 @@ int lmcp_unpack_RemoveZones(uint8_t** inb, size_t *size_remain, RemoveZones* out
     uint16_t tmp16;
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->ZoneList = malloc(sizeof(int64_t*) * tmp);
-    if (out->ZoneList==0) {
+    (out)->zonelist = malloc(sizeof(int64_t*) * tmp);
+    if (out->zonelist==0) {
         return -1;
     }
-    out->ZoneList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->ZoneList_ai.length; index++) {
-        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->ZoneList[index]))
+    out->zonelist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->zonelist_ai.length; index++) {
+        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->zonelist[index]))
     }
     return 0;
 }
 size_t lmcp_pack_RemoveZones(uint8_t* buf, RemoveZones* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_uint16_t(outb, i->ZoneList_ai.length);
-    for (uint32_t index = 0; index < i->ZoneList_ai.length; index++) {
-        outb += lmcp_pack_int64_t(outb, i->ZoneList[index]);
+    outb += lmcp_pack_uint16_t(outb, i->zonelist_ai.length);
+    for (uint32_t index = 0; index < i->zonelist_ai.length; index++) {
+        outb += lmcp_pack_int64_t(outb, i->zonelist[index]);
     }
     return (outb - buf);
 }

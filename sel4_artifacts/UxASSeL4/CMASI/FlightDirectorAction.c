@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "FlightDirectorAction.h"
@@ -10,35 +8,35 @@ void lmcp_pp_FlightDirectorAction(FlightDirectorAction* s) {
     printf("FlightDirectorAction{");
     printf("Inherited from NavigationAction:\n");
     lmcp_pp_NavigationAction(&(s->super));
-    printf("Speed: ");
-    printf("%f",s->Speed);
+    printf("speed: ");
+    printf("%u",s->speed);
     printf("\n");
-    printf("SpeedType: ");
-    printf("%i", s->SpeedType);
+    printf("speedtype: ");
+    printf("%i", s->speedtype);
     printf("\n");
-    printf("Heading: ");
-    printf("%f",s->Heading);
+    printf("heading: ");
+    printf("%u",s->heading);
     printf("\n");
-    printf("Altitude: ");
-    printf("%f",s->Altitude);
+    printf("altitude: ");
+    printf("%u",s->altitude);
     printf("\n");
-    printf("AltitudeType: ");
-    printf("%i", s->AltitudeType);
+    printf("altitudetype: ");
+    printf("%i", s->altitudetype);
     printf("\n");
-    printf("ClimbRate: ");
-    printf("%f",s->ClimbRate);
+    printf("climbrate: ");
+    printf("%u",s->climbrate);
     printf("\n");
     printf("}");
 }
 size_t lmcp_packsize_FlightDirectorAction (FlightDirectorAction* i) {
     size_t out = 0;
     out += lmcp_packsize_NavigationAction(&(i->super));
-    out += sizeof(float);
+    out += sizeof(uint32_t);
     out += 4;
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     out += 4;
-    out += sizeof(float);
+    out += sizeof(uint32_t);
     return out;
 }
 size_t lmcp_pack_FlightDirectorAction_header(uint8_t* buf, FlightDirectorAction* i) {
@@ -78,23 +76,23 @@ int lmcp_unpack_FlightDirectorAction(uint8_t** inb, size_t *size_remain, FlightD
     }
     FlightDirectorAction* out = outp;
     CHECK(lmcp_unpack_NavigationAction(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Speed)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->SpeedType)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Heading)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Altitude)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->AltitudeType)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->ClimbRate)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->speed)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->speedtype)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->heading)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->altitude)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->altitudetype)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->climbrate)))
     return 0;
 }
 size_t lmcp_pack_FlightDirectorAction(uint8_t* buf, FlightDirectorAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_NavigationAction(outb, &(i->super));
-    outb += lmcp_pack_float(outb, i->Speed);
-    outb += lmcp_pack_int32_t(outb, (int) i->SpeedType);
-    outb += lmcp_pack_float(outb, i->Heading);
-    outb += lmcp_pack_float(outb, i->Altitude);
-    outb += lmcp_pack_int32_t(outb, (int) i->AltitudeType);
-    outb += lmcp_pack_float(outb, i->ClimbRate);
+    outb += lmcp_pack_uint32_t(outb, i->speed);
+    outb += lmcp_pack_int32_t(outb, (int) i->speedtype);
+    outb += lmcp_pack_uint32_t(outb, i->heading);
+    outb += lmcp_pack_uint32_t(outb, i->altitude);
+    outb += lmcp_pack_int32_t(outb, (int) i->altitudetype);
+    outb += lmcp_pack_uint32_t(outb, i->climbrate);
     return (outb - buf);
 }

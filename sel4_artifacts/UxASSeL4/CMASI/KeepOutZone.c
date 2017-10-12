@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "KeepOutZone.h"
@@ -10,8 +8,8 @@ void lmcp_pp_KeepOutZone(KeepOutZone* s) {
     printf("KeepOutZone{");
     printf("Inherited from AbstractZone:\n");
     lmcp_pp_AbstractZone(&(s->super));
-    printf("ZoneType: ");
-    printf("%i", s->ZoneType);
+    printf("zonetype: ");
+    printf("%i", s->zonetype);
     printf("\n");
     printf("}");
 }
@@ -58,13 +56,13 @@ int lmcp_unpack_KeepOutZone(uint8_t** inb, size_t *size_remain, KeepOutZone* out
     }
     KeepOutZone* out = outp;
     CHECK(lmcp_unpack_AbstractZone(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->ZoneType)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->zonetype)))
     return 0;
 }
 size_t lmcp_pack_KeepOutZone(uint8_t* buf, KeepOutZone* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_AbstractZone(outb, &(i->super));
-    outb += lmcp_pack_int32_t(outb, (int) i->ZoneType);
+    outb += lmcp_pack_int32_t(outb, (int) i->zonetype);
     return (outb - buf);
 }

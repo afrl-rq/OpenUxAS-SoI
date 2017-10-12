@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadAction.h"
@@ -12,29 +9,30 @@
 
 #define LMCP_GimbalScanAction_TYPE 25
 
-typedef struct {
+struct GimbalScanAction_struct {
     PayloadAction super;
 // Units: degree/second
-    float AzimuthSlewRate;
+    uint32_t azimuthslewrate;
 
 // Units: degree/second
-    float ElevationSlewRate;
+    uint32_t elevationslewrate;
 
 // Units: degree
-    float StartAzimuth;
+    uint32_t startazimuth;
 
 // Units: degree
-    float EndAzimuth;
+    uint32_t endazimuth;
 
 // Units: degree
-    float StartElevation;
+    uint32_t startelevation;
 
 // Units: degree
-    float EndElevation;
+    uint32_t endelevation;
 
-    uint32_t Cycles;
+    uint32_t cycles;
 
-} GimbalScanAction;
+};
+typedef struct GimbalScanAction_struct GimbalScanAction;
 void lmcp_pp_GimbalScanAction(GimbalScanAction* s);
 size_t lmcp_packsize_GimbalScanAction (GimbalScanAction* i);
 size_t lmcp_pack_GimbalScanAction_header(uint8_t* buf, GimbalScanAction* i);

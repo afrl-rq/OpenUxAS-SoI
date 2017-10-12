@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AbstractGeometry.h"
@@ -13,20 +10,21 @@
 
 #define LMCP_Rectangle_TYPE 43
 
-typedef struct {
+struct Rectangle_struct {
     AbstractGeometry super;
-    Location3D* CenterPoint;
+    Location3D* centerpoint;
 
 // Units: meter
-    float Width;
+    uint32_t width;
 
 // Units: meter
-    float Height;
+    uint32_t height;
 
 // Units: degree
-    float Rotation;
+    uint32_t rotation;
 
-} Rectangle;
+};
+typedef struct Rectangle_struct Rectangle;
 void lmcp_pp_Rectangle(Rectangle* s);
 size_t lmcp_packsize_Rectangle (Rectangle* i);
 size_t lmcp_pack_Rectangle_header(uint8_t* buf, Rectangle* i);

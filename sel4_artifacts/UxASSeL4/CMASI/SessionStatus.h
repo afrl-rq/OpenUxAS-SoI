@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "enums.h"
@@ -13,22 +10,23 @@
 
 #define LMCP_SessionStatus_TYPE 46
 
-typedef struct {
+struct SessionStatus_struct {
     lmcp_object super;
-    SimulationStatusType State;
+    SimulationStatusType state;
 
 // Units: millisecond
-    int64_t StartTime;
+    int64_t starttime;
 
 // Units: millisecond
-    int64_t ScenarioTime;
+    int64_t scenariotime;
 
-    float RealTimeMultiple;
+    uint32_t realtimemultiple;
 
-    KeyValuePair** Parameters;
-    array_info Parameters_ai;
+    KeyValuePair** parameters;
+    array_info parameters_ai;
 
-} SessionStatus;
+};
+typedef struct SessionStatus_struct SessionStatus;
 void lmcp_pp_SessionStatus(SessionStatus* s);
 size_t lmcp_packsize_SessionStatus (SessionStatus* i);
 size_t lmcp_pack_SessionStatus_header(uint8_t* buf, SessionStatus* i);

@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleAction.h"
@@ -12,12 +9,13 @@
 
 #define LMCP_PayloadAction_TYPE 4
 
-typedef struct {
+struct PayloadAction_struct {
     VehicleAction super;
 // Units: None
-    int64_t PayloadID;
+    int64_t payloadid;
 
-} PayloadAction;
+};
+typedef struct PayloadAction_struct PayloadAction;
 void lmcp_pp_PayloadAction(PayloadAction* s);
 size_t lmcp_packsize_PayloadAction (PayloadAction* i);
 size_t lmcp_pack_PayloadAction_header(uint8_t* buf, PayloadAction* i);

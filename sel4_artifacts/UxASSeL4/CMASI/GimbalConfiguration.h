@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadConfiguration.h"
@@ -13,53 +10,54 @@
 
 #define LMCP_GimbalConfiguration_TYPE 24
 
-typedef struct {
+struct GimbalConfiguration_struct {
     PayloadConfiguration super;
 // Units: None
-    GimbalPointingMode* SupportedPointingModes;
-    array_info SupportedPointingModes_ai;
+    GimbalPointingMode* supportedpointingmodes;
+    array_info supportedpointingmodes_ai;
 
 // Units: degree
-    float MinAzimuth;
+    uint32_t minazimuth;
 
 // Units: degree
-    float MaxAzimuth;
+    uint32_t maxazimuth;
 
 // Units: None
-    uint8_t IsAzimuthClamped;
+    uint8_t isazimuthclamped;
 
 // Units: degree
-    float MinElevation;
+    uint32_t minelevation;
 
 // Units: degree
-    float MaxElevation;
+    uint32_t maxelevation;
 
 // Units: None
-    uint8_t IsElevationClamped;
+    uint8_t iselevationclamped;
 
 // Units: degree
-    float MinRotation;
+    uint32_t minrotation;
 
 // Units: degree
-    float MaxRotation;
+    uint32_t maxrotation;
 
 // Units: None
-    uint8_t IsRotationClamped;
+    uint8_t isrotationclamped;
 
 // Units: degree/sec
-    float MaxAzimuthSlewRate;
+    uint32_t maxazimuthslewrate;
 
 // Units: degree/sec
-    float MaxElevationSlewRate;
+    uint32_t maxelevationslewrate;
 
 // Units: degree/sec
-    float MaxRotationRate;
+    uint32_t maxrotationrate;
 
 // Units: None
-    int64_t* ContainedPayloadList;
-    array_info ContainedPayloadList_ai;
+    int64_t* containedpayloadlist;
+    array_info containedpayloadlist_ai;
 
-} GimbalConfiguration;
+};
+typedef struct GimbalConfiguration_struct GimbalConfiguration;
 void lmcp_pp_GimbalConfiguration(GimbalConfiguration* s);
 size_t lmcp_packsize_GimbalConfiguration (GimbalConfiguration* i);
 size_t lmcp_pack_GimbalConfiguration_header(uint8_t* buf, GimbalConfiguration* i);

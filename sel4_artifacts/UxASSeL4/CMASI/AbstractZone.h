@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "enums.h"
@@ -13,41 +10,42 @@
 
 #define LMCP_AbstractZone_TYPE 10
 
-typedef struct {
+struct AbstractZone_struct {
     lmcp_object super;
 // Units: None
-    int64_t ZoneID;
+    int64_t zoneid;
 
 // Units: meter
-    float MinAltitude;
+    uint32_t minaltitude;
 
-    AltitudeType MinAltitudeType;
+    AltitudeType minaltitudetype;
 
 // Units: meter
-    float MaxAltitude;
+    uint32_t maxaltitude;
 
-    AltitudeType MaxAltitudeType;
+    AltitudeType maxaltitudetype;
 
 // Units: None
-    int64_t* AffectedAircraft;
-    array_info AffectedAircraft_ai;
+    int64_t* affectedaircraft;
+    array_info affectedaircraft_ai;
 
 // Units: milliseconds
-    int64_t StartTime;
+    int64_t starttime;
 
 // Units: milliseconds
-    int64_t EndTime;
+    int64_t endtime;
 
 // Units: meters
-    float Padding;
+    uint32_t padding;
 
-    char* Label;
-    array_info Label_ai;
+    char* label;
+    array_info label_ai;
 
 // Units: None
-    AbstractGeometry* Boundary;
+    AbstractGeometry* boundary;
 
-} AbstractZone;
+};
+typedef struct AbstractZone_struct AbstractZone;
 void lmcp_pp_AbstractZone(AbstractZone* s);
 size_t lmcp_packsize_AbstractZone (AbstractZone* i);
 size_t lmcp_pack_AbstractZone_header(uint8_t* buf, AbstractZone* i);

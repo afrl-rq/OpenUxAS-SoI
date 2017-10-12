@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Task.h"
@@ -13,18 +10,19 @@
 
 #define LMCP_SearchTask_TYPE 9
 
-typedef struct {
+struct SearchTask_struct {
     Task super;
-    WavelengthBand* DesiredWavelengthBands;
-    array_info DesiredWavelengthBands_ai;
+    WavelengthBand* desiredwavelengthbands;
+    array_info desiredwavelengthbands_ai;
 
 // Units: milliseconds
-    int64_t DwellTime;
+    int64_t dwelltime;
 
 // Units: meters/pixel
-    float GroundSampleDistance;
+    uint32_t groundsampledistance;
 
-} SearchTask;
+};
+typedef struct SearchTask_struct SearchTask;
 void lmcp_pp_SearchTask(SearchTask* s);
 size_t lmcp_packsize_SearchTask (SearchTask* i);
 size_t lmcp_pack_SearchTask_header(uint8_t* buf, SearchTask* i);

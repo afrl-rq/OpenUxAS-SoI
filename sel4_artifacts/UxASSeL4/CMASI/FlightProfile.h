@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_FlightProfile_SUB "afrl.cmasi.FlightProfile"
@@ -11,28 +8,29 @@
 
 #define LMCP_FlightProfile_TYPE 12
 
-typedef struct {
+struct FlightProfile_struct {
     lmcp_object super;
 // Units: None
-    char* Name;
-    array_info Name_ai;
+    char* name;
+    array_info name_ai;
 
 // Units: meter/sec
-    float Airspeed;
+    uint32_t airspeed;
 
 // Units: degree
-    float PitchAngle;
+    uint32_t pitchangle;
 
 // Units: meter/sec
-    float VerticalSpeed;
+    uint32_t verticalspeed;
 
 // Units: degree
-    float MaxBankAngle;
+    uint32_t maxbankangle;
 
 // Units: %/sec
-    float EnergyRate;
+    uint32_t energyrate;
 
-} FlightProfile;
+};
+typedef struct FlightProfile_struct FlightProfile;
 void lmcp_pp_FlightProfile(FlightProfile* s);
 size_t lmcp_packsize_FlightProfile (FlightProfile* i);
 size_t lmcp_pack_FlightProfile_header(uint8_t* buf, FlightProfile* i);

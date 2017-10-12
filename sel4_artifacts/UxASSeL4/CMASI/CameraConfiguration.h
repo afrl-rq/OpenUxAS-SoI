@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadConfiguration.h"
@@ -13,30 +10,31 @@
 
 #define LMCP_CameraConfiguration_TYPE 19
 
-typedef struct {
+struct CameraConfiguration_struct {
     PayloadConfiguration super;
-    WavelengthBand SupportedWavelengthBand;
+    WavelengthBand supportedwavelengthband;
 
 // Units: None
-    FOVOperationMode FieldOfViewMode;
+    FOVOperationMode fieldofviewmode;
 
 // Units: degree
-    float MinHorizontalFieldOfView;
+    uint32_t minhorizontalfieldofview;
 
 // Units: degree
-    float MaxHorizontalFieldOfView;
+    uint32_t maxhorizontalfieldofview;
 
 // Units: degree
-    float* DiscreteHorizontalFieldOfViewList;
-    array_info DiscreteHorizontalFieldOfViewList_ai;
+    uint32_t* discretehorizontalfieldofviewlist;
+    array_info discretehorizontalfieldofviewlist_ai;
 
 // Units: pixel
-    uint32_t VideoStreamHorizontalResolution;
+    uint32_t videostreamhorizontalresolution;
 
 // Units: pixel
-    uint32_t VideoStreamVerticalResolution;
+    uint32_t videostreamverticalresolution;
 
-} CameraConfiguration;
+};
+typedef struct CameraConfiguration_struct CameraConfiguration;
 void lmcp_pp_CameraConfiguration(CameraConfiguration* s);
 size_t lmcp_packsize_CameraConfiguration (CameraConfiguration* i);
 size_t lmcp_pack_CameraConfiguration_header(uint8_t* buf, CameraConfiguration* i);

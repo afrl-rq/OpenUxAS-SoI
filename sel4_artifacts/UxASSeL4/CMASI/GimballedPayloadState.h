@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadState.h"
@@ -13,20 +10,21 @@
 
 #define LMCP_GimballedPayloadState_TYPE 20
 
-typedef struct {
+struct GimballedPayloadState_struct {
     PayloadState super;
-    GimbalPointingMode PointingMode;
+    GimbalPointingMode pointingmode;
 
 // Units: degree
-    float Azimuth;
+    uint32_t azimuth;
 
 // Units: degree
-    float Elevation;
+    uint32_t elevation;
 
 // Units: degree
-    float Rotation;
+    uint32_t rotation;
 
-} GimballedPayloadState;
+};
+typedef struct GimballedPayloadState_struct GimballedPayloadState;
 void lmcp_pp_GimballedPayloadState(GimballedPayloadState* s);
 size_t lmcp_packsize_GimballedPayloadState (GimballedPayloadState* i);
 size_t lmcp_pack_GimballedPayloadState_header(uint8_t* buf, GimballedPayloadState* i);

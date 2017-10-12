@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "GoToWaypointAction.h"
@@ -9,8 +7,8 @@ void lmcp_pp_GoToWaypointAction(GoToWaypointAction* s) {
     printf("GoToWaypointAction{");
     printf("Inherited from NavigationAction:\n");
     lmcp_pp_NavigationAction(&(s->super));
-    printf("WaypointNumber: ");
-    printf("%lld",s->WaypointNumber);
+    printf("waypointnumber: ");
+    printf("%lld",s->waypointnumber);
     printf("\n");
     printf("}");
 }
@@ -57,13 +55,13 @@ int lmcp_unpack_GoToWaypointAction(uint8_t** inb, size_t *size_remain, GoToWaypo
     }
     GoToWaypointAction* out = outp;
     CHECK(lmcp_unpack_NavigationAction(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->WaypointNumber)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->waypointnumber)))
     return 0;
 }
 size_t lmcp_pack_GoToWaypointAction(uint8_t* buf, GoToWaypointAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_NavigationAction(outb, &(i->super));
-    outb += lmcp_pack_int64_t(outb, i->WaypointNumber);
+    outb += lmcp_pack_int64_t(outb, i->waypointnumber);
     return (outb - buf);
 }

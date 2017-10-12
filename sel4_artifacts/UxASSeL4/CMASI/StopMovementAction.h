@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleAction.h"
@@ -13,11 +10,12 @@
 
 #define LMCP_StopMovementAction_TYPE 58
 
-typedef struct {
+struct StopMovementAction_struct {
     VehicleAction super;
-    Location3D* Location;
+    Location3D* location;
 
-} StopMovementAction;
+};
+typedef struct StopMovementAction_struct StopMovementAction;
 void lmcp_pp_StopMovementAction(StopMovementAction* s);
 size_t lmcp_packsize_StopMovementAction (StopMovementAction* i);
 size_t lmcp_pack_StopMovementAction_header(uint8_t* buf, StopMovementAction* i);

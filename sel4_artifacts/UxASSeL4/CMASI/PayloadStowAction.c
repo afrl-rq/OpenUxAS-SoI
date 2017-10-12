@@ -1,13 +1,11 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "PayloadStowAction.h"
 void lmcp_pp_PayloadStowAction(PayloadStowAction* s) {
     printf("PayloadStowAction{");
-    printf("PayloadID: ");
-    printf("%lld",s->PayloadID);
+    printf("payloadid: ");
+    printf("%lld",s->payloadid);
     printf("\n");
     printf("}");
 }
@@ -51,12 +49,12 @@ int lmcp_unpack_PayloadStowAction(uint8_t** inb, size_t *size_remain, PayloadSto
         return -1;
     }
     PayloadStowAction* out = outp;
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->PayloadID)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->payloadid)))
     return 0;
 }
 size_t lmcp_pack_PayloadStowAction(uint8_t* buf, PayloadStowAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_int64_t(outb, i->PayloadID);
+    outb += lmcp_pack_int64_t(outb, i->payloadid);
     return (outb - buf);
 }

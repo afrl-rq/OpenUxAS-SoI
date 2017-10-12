@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "KeyValuePair.h"
@@ -12,29 +9,30 @@
 
 #define LMCP_Task_TYPE 8
 
-typedef struct {
+struct Task_struct {
     lmcp_object super;
 // Units: None
-    int64_t TaskID;
+    int64_t taskid;
 
-    char* Label;
-    array_info Label_ai;
+    char* label;
+    array_info label_ai;
 
 // Units: None
-    int64_t* EligibleEntities;
-    array_info EligibleEntities_ai;
+    int64_t* eligibleentities;
+    array_info eligibleentities_ai;
 
 // Units: sec
-    float RevisitRate;
+    uint32_t revisitrate;
 
-    KeyValuePair** Parameters;
-    array_info Parameters_ai;
+    KeyValuePair** parameters;
+    array_info parameters_ai;
 
-    uint8_t Priority;
+    uint8_t priority;
 
-    uint8_t Required;
+    uint8_t required;
 
-} Task;
+};
+typedef struct Task_struct Task;
 void lmcp_pp_Task(Task* s);
 size_t lmcp_packsize_Task (Task* i);
 size_t lmcp_pack_Task_header(uint8_t* buf, Task* i);

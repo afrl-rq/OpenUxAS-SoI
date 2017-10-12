@@ -1,15 +1,13 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleAction.h"
 void lmcp_pp_VehicleAction(VehicleAction* s) {
     printf("VehicleAction{");
-    printf("AssociatedTaskList: ");
+    printf("associatedtasklist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->AssociatedTaskList_ai.length; index++) {
-        printf("%lld",s->AssociatedTaskList[index]);
+    for (uint32_t index = 0; index < s->associatedtasklist_ai.length; index++) {
+        printf("%lld",s->associatedtasklist[index]);
         printf(",");
     }
     printf("\n");
@@ -18,7 +16,7 @@ void lmcp_pp_VehicleAction(VehicleAction* s) {
 size_t lmcp_packsize_VehicleAction (VehicleAction* i) {
     size_t out = 0;
     out += 2;
-    for (uint32_t index = 0; index < i->AssociatedTaskList_ai.length; index++) {
+    for (uint32_t index = 0; index < i->associatedtasklist_ai.length; index++) {
         out += sizeof(int64_t);
     }
     return out;
@@ -41,8 +39,8 @@ size_t lmcp_pack_VehicleAction_header(uint8_t* buf, VehicleAction* i) {
 void lmcp_free_VehicleAction(VehicleAction* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->AssociatedTaskList != NULL) {
-        free(out->AssociatedTaskList);
+    if (out->associatedtasklist != NULL) {
+        free(out->associatedtasklist);
     }
     if (out_malloced == 1) {
         free(out);
@@ -65,22 +63,22 @@ int lmcp_unpack_VehicleAction(uint8_t** inb, size_t *size_remain, VehicleAction*
     uint16_t tmp16;
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->AssociatedTaskList = malloc(sizeof(int64_t*) * tmp);
-    if (out->AssociatedTaskList==0) {
+    (out)->associatedtasklist = malloc(sizeof(int64_t*) * tmp);
+    if (out->associatedtasklist==0) {
         return -1;
     }
-    out->AssociatedTaskList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->AssociatedTaskList_ai.length; index++) {
-        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->AssociatedTaskList[index]))
+    out->associatedtasklist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->associatedtasklist_ai.length; index++) {
+        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->associatedtasklist[index]))
     }
     return 0;
 }
 size_t lmcp_pack_VehicleAction(uint8_t* buf, VehicleAction* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_uint16_t(outb, i->AssociatedTaskList_ai.length);
-    for (uint32_t index = 0; index < i->AssociatedTaskList_ai.length; index++) {
-        outb += lmcp_pack_int64_t(outb, i->AssociatedTaskList[index]);
+    outb += lmcp_pack_uint16_t(outb, i->associatedtasklist_ai.length);
+    for (uint32_t index = 0; index < i->associatedtasklist_ai.length; index++) {
+        outb += lmcp_pack_int64_t(outb, i->associatedtasklist[index]);
     }
     return (outb - buf);
 }

@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Waypoint.h"
@@ -12,12 +9,13 @@
 
 #define LMCP_PathWaypoint_TYPE 57
 
-typedef struct {
+struct PathWaypoint_struct {
     Waypoint super;
 // Units: milliseconds
-    int64_t PauseTime;
+    int64_t pausetime;
 
-} PathWaypoint;
+};
+typedef struct PathWaypoint_struct PathWaypoint;
 void lmcp_pp_PathWaypoint(PathWaypoint* s);
 size_t lmcp_packsize_PathWaypoint (PathWaypoint* i);
 size_t lmcp_pack_PathWaypoint_header(uint8_t* buf, PathWaypoint* i);

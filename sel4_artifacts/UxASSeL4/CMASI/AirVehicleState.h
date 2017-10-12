@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "EntityState.h"
@@ -12,21 +9,22 @@
 
 #define LMCP_AirVehicleState_TYPE 15
 
-typedef struct {
+struct AirVehicleState_struct {
     EntityState super;
 // Units: meter/sec
-    float Airspeed;
+    uint32_t airspeed;
 
 // Units: meter/sec
-    float VerticalSpeed;
+    uint32_t verticalspeed;
 
 // Units: meter/sec
-    float WindSpeed;
+    uint32_t windspeed;
 
 // Units: degree
-    float WindDirection;
+    uint32_t winddirection;
 
-} AirVehicleState;
+};
+typedef struct AirVehicleState_struct AirVehicleState;
 void lmcp_pp_AirVehicleState(AirVehicleState* s);
 size_t lmcp_packsize_AirVehicleState (AirVehicleState* i);
 size_t lmcp_pack_AirVehicleState_header(uint8_t* buf, AirVehicleState* i);

@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "KeyValuePair.h"
@@ -12,12 +9,13 @@
 
 #define LMCP_OperatorSignal_TYPE 38
 
-typedef struct {
+struct OperatorSignal_struct {
     lmcp_object super;
-    KeyValuePair** Signals;
-    array_info Signals_ai;
+    KeyValuePair** signals;
+    array_info signals_ai;
 
-} OperatorSignal;
+};
+typedef struct OperatorSignal_struct OperatorSignal;
 void lmcp_pp_OperatorSignal(OperatorSignal* s);
 size_t lmcp_packsize_OperatorSignal (OperatorSignal* i);
 size_t lmcp_pack_OperatorSignal_header(uint8_t* buf, OperatorSignal* i);

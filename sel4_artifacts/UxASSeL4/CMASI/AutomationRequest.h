@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_AutomationRequest_SUB "afrl.cmasi.AutomationRequest"
@@ -11,22 +8,23 @@
 
 #define LMCP_AutomationRequest_TYPE 40
 
-typedef struct {
+struct AutomationRequest_struct {
     lmcp_object super;
-    int64_t* EntityList;
-    array_info EntityList_ai;
+    int64_t* entitylist;
+    array_info entitylist_ai;
 
-    int64_t* TaskList;
-    array_info TaskList_ai;
+    int64_t* tasklist;
+    array_info tasklist_ai;
 
-    char* TaskRelationships;
-    array_info TaskRelationships_ai;
+    char* taskrelationships;
+    array_info taskrelationships_ai;
 
-    int64_t OperatingRegion;
+    int64_t operatingregion;
 
-    uint8_t RedoAllTasks;
+    uint8_t redoalltasks;
 
-} AutomationRequest;
+};
+typedef struct AutomationRequest_struct AutomationRequest;
 void lmcp_pp_AutomationRequest(AutomationRequest* s);
 size_t lmcp_packsize_AutomationRequest (AutomationRequest* i);
 size_t lmcp_pack_AutomationRequest_header(uint8_t* buf, AutomationRequest* i);

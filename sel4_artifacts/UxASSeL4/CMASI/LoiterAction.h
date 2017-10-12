@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "NavigationAction.h"
@@ -14,32 +11,33 @@
 
 #define LMCP_LoiterAction_TYPE 33
 
-typedef struct {
+struct LoiterAction_struct {
     NavigationAction super;
 // Units: none
-    LoiterType LoiterType;
+    LoiterType loitertype;
 
 // Units: meter
-    float Radius;
+    uint32_t radius;
 
 // Units: degree
-    float Axis;
+    uint32_t axis;
 
 // Units: meter
-    float Length;
+    uint32_t length;
 
 // Units: None
-    LoiterDirection Direction;
+    LoiterDirection direction;
 
 // Units: milliseconds
-    int64_t Duration;
+    int64_t duration;
 
 // Units: meter/sec
-    float Airspeed;
+    uint32_t airspeed;
 
-    Location3D* Location;
+    Location3D* location;
 
-} LoiterAction;
+};
+typedef struct LoiterAction_struct LoiterAction;
 void lmcp_pp_LoiterAction(LoiterAction* s);
 size_t lmcp_packsize_LoiterAction (LoiterAction* i);
 size_t lmcp_pack_LoiterAction_header(uint8_t* buf, LoiterAction* i);

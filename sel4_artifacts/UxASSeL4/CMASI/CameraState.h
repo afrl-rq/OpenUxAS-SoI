@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "GimballedPayloadState.h"
@@ -14,21 +11,22 @@
 
 #define LMCP_CameraState_TYPE 21
 
-typedef struct {
+struct CameraState_struct {
     GimballedPayloadState super;
 // Units: degree
-    float HorizontalFieldOfView;
+    uint32_t horizontalfieldofview;
 
 // Units: degree
-    float VerticalFieldOfView;
+    uint32_t verticalfieldofview;
 
 // Units: None
-    Location3D** Footprint;
-    array_info Footprint_ai;
+    Location3D** footprint;
+    array_info footprint_ai;
 
-    Location3D* Centerpoint;
+    Location3D* centerpoint;
 
-} CameraState;
+};
+typedef struct CameraState_struct CameraState;
 void lmcp_pp_CameraState(CameraState* s);
 size_t lmcp_packsize_CameraState (CameraState* i);
 size_t lmcp_pack_CameraState_header(uint8_t* buf, CameraState* i);

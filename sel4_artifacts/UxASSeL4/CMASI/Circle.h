@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AbstractGeometry.h"
@@ -13,14 +10,15 @@
 
 #define LMCP_Circle_TYPE 22
 
-typedef struct {
+struct Circle_struct {
     AbstractGeometry super;
-    Location3D* CenterPoint;
+    Location3D* centerpoint;
 
 // Units: meter
-    float Radius;
+    uint32_t radius;
 
-} Circle;
+};
+typedef struct Circle_struct Circle;
 void lmcp_pp_Circle(Circle* s);
 size_t lmcp_packsize_Circle (Circle* i);
 size_t lmcp_pack_Circle_header(uint8_t* buf, Circle* i);

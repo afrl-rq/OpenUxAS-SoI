@@ -1,22 +1,20 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "KeyValuePair.h"
 void lmcp_pp_KeyValuePair(KeyValuePair* s) {
     printf("KeyValuePair{");
-    printf("Key: ");
+    printf("key: ");
     printf("[");
-    for (uint32_t index = 0; index < s->Key_ai.length; index++) {
-        printf("%c",s->Key[index]);
+    for (uint32_t index = 0; index < s->key_ai.length; index++) {
+        printf("%c",s->key[index]);
         printf(",");
     }
     printf("\n");
-    printf("Value: ");
+    printf("value: ");
     printf("[");
-    for (uint32_t index = 0; index < s->Value_ai.length; index++) {
-        printf("%c",s->Value[index]);
+    for (uint32_t index = 0; index < s->value_ai.length; index++) {
+        printf("%c",s->value[index]);
         printf(",");
     }
     printf("\n");
@@ -25,11 +23,11 @@ void lmcp_pp_KeyValuePair(KeyValuePair* s) {
 size_t lmcp_packsize_KeyValuePair (KeyValuePair* i) {
     size_t out = 0;
     out += 2;
-    for (uint32_t index = 0; index < i->Key_ai.length; index++) {
+    for (uint32_t index = 0; index < i->key_ai.length; index++) {
         out += sizeof(char);
     }
     out += 2;
-    for (uint32_t index = 0; index < i->Value_ai.length; index++) {
+    for (uint32_t index = 0; index < i->value_ai.length; index++) {
         out += sizeof(char);
     }
     return out;
@@ -52,11 +50,11 @@ size_t lmcp_pack_KeyValuePair_header(uint8_t* buf, KeyValuePair* i) {
 void lmcp_free_KeyValuePair(KeyValuePair* out, int out_malloced) {
     if (out == NULL)
         return;
-    if (out->Key != NULL) {
-        free(out->Key);
+    if (out->key != NULL) {
+        free(out->key);
     }
-    if (out->Value != NULL) {
-        free(out->Value);
+    if (out->value != NULL) {
+        free(out->value);
     }
     if (out_malloced == 1) {
         free(out);
@@ -79,36 +77,36 @@ int lmcp_unpack_KeyValuePair(uint8_t** inb, size_t *size_remain, KeyValuePair* o
     uint16_t tmp16;
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->Key = malloc(sizeof(char*) * tmp);
-    if (out->Key==0) {
+    (out)->key = malloc(sizeof(char*) * tmp);
+    if (out->key==0) {
         return -1;
     }
-    out->Key_ai.length = tmp;
-    for (uint32_t index = 0; index < out->Key_ai.length; index++) {
-        CHECK(lmcp_unpack_char(inb, size_remain, &out->Key[index]))
+    out->key_ai.length = tmp;
+    for (uint32_t index = 0; index < out->key_ai.length; index++) {
+        CHECK(lmcp_unpack_char(inb, size_remain, &out->key[index]))
     }
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->Value = malloc(sizeof(char*) * tmp);
-    if (out->Value==0) {
+    (out)->value = malloc(sizeof(char*) * tmp);
+    if (out->value==0) {
         return -1;
     }
-    out->Value_ai.length = tmp;
-    for (uint32_t index = 0; index < out->Value_ai.length; index++) {
-        CHECK(lmcp_unpack_char(inb, size_remain, &out->Value[index]))
+    out->value_ai.length = tmp;
+    for (uint32_t index = 0; index < out->value_ai.length; index++) {
+        CHECK(lmcp_unpack_char(inb, size_remain, &out->value[index]))
     }
     return 0;
 }
 size_t lmcp_pack_KeyValuePair(uint8_t* buf, KeyValuePair* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
-    outb += lmcp_pack_uint16_t(outb, i->Key_ai.length);
-    for (uint32_t index = 0; index < i->Key_ai.length; index++) {
-        outb += lmcp_pack_char(outb, i->Key[index]);
+    outb += lmcp_pack_uint16_t(outb, i->key_ai.length);
+    for (uint32_t index = 0; index < i->key_ai.length; index++) {
+        outb += lmcp_pack_char(outb, i->key[index]);
     }
-    outb += lmcp_pack_uint16_t(outb, i->Value_ai.length);
-    for (uint32_t index = 0; index < i->Value_ai.length; index++) {
-        outb += lmcp_pack_char(outb, i->Value[index]);
+    outb += lmcp_pack_uint16_t(outb, i->value_ai.length);
+    for (uint32_t index = 0; index < i->value_ai.length; index++) {
+        outb += lmcp_pack_char(outb, i->value[index]);
     }
     return (outb - buf);
 }

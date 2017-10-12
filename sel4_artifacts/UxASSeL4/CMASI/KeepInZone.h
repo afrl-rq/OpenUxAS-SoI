@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "AbstractZone.h"
@@ -12,9 +9,10 @@
 
 #define LMCP_KeepInZone_TYPE 29
 
-typedef struct {
+struct KeepInZone_struct {
     AbstractZone super;
-} KeepInZone;
+};
+typedef struct KeepInZone_struct KeepInZone;
 void lmcp_pp_KeepInZone(KeepInZone* s);
 size_t lmcp_packsize_KeepInZone (KeepInZone* i);
 size_t lmcp_pack_KeepInZone_header(uint8_t* buf, KeepInZone* i);

@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "CameraConfiguration.h"
@@ -10,30 +8,30 @@ void lmcp_pp_CameraConfiguration(CameraConfiguration* s) {
     printf("CameraConfiguration{");
     printf("Inherited from PayloadConfiguration:\n");
     lmcp_pp_PayloadConfiguration(&(s->super));
-    printf("SupportedWavelengthBand: ");
-    printf("%i", s->SupportedWavelengthBand);
+    printf("supportedwavelengthband: ");
+    printf("%i", s->supportedwavelengthband);
     printf("\n");
-    printf("FieldOfViewMode: ");
-    printf("%i", s->FieldOfViewMode);
+    printf("fieldofviewmode: ");
+    printf("%i", s->fieldofviewmode);
     printf("\n");
-    printf("MinHorizontalFieldOfView: ");
-    printf("%f",s->MinHorizontalFieldOfView);
+    printf("minhorizontalfieldofview: ");
+    printf("%u",s->minhorizontalfieldofview);
     printf("\n");
-    printf("MaxHorizontalFieldOfView: ");
-    printf("%f",s->MaxHorizontalFieldOfView);
+    printf("maxhorizontalfieldofview: ");
+    printf("%u",s->maxhorizontalfieldofview);
     printf("\n");
-    printf("DiscreteHorizontalFieldOfViewList: ");
+    printf("discretehorizontalfieldofviewlist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->DiscreteHorizontalFieldOfViewList_ai.length; index++) {
-        printf("%f",s->DiscreteHorizontalFieldOfViewList[index]);
+    for (uint32_t index = 0; index < s->discretehorizontalfieldofviewlist_ai.length; index++) {
+        printf("%u",s->discretehorizontalfieldofviewlist[index]);
         printf(",");
     }
     printf("\n");
-    printf("VideoStreamHorizontalResolution: ");
-    printf("%u",s->VideoStreamHorizontalResolution);
+    printf("videostreamhorizontalresolution: ");
+    printf("%u",s->videostreamhorizontalresolution);
     printf("\n");
-    printf("VideoStreamVerticalResolution: ");
-    printf("%u",s->VideoStreamVerticalResolution);
+    printf("videostreamverticalresolution: ");
+    printf("%u",s->videostreamverticalresolution);
     printf("\n");
     printf("}");
 }
@@ -42,11 +40,11 @@ size_t lmcp_packsize_CameraConfiguration (CameraConfiguration* i) {
     out += lmcp_packsize_PayloadConfiguration(&(i->super));
     out += 4;
     out += 4;
-    out += sizeof(float);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
+    out += sizeof(uint32_t);
     out += 2;
-    for (uint32_t index = 0; index < i->DiscreteHorizontalFieldOfViewList_ai.length; index++) {
-        out += sizeof(float);
+    for (uint32_t index = 0; index < i->discretehorizontalfieldofviewlist_ai.length; index++) {
+        out += sizeof(uint32_t);
     }
     out += sizeof(uint32_t);
     out += sizeof(uint32_t);
@@ -71,8 +69,8 @@ void lmcp_free_CameraConfiguration(CameraConfiguration* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_PayloadConfiguration(&(out->super), 0);
-    if (out->DiscreteHorizontalFieldOfViewList != NULL) {
-        free(out->DiscreteHorizontalFieldOfViewList);
+    if (out->discretehorizontalfieldofviewlist != NULL) {
+        free(out->discretehorizontalfieldofviewlist);
     }
     if (out_malloced == 1) {
         free(out);
@@ -94,37 +92,37 @@ int lmcp_unpack_CameraConfiguration(uint8_t** inb, size_t *size_remain, CameraCo
     uint32_t tmp;
     uint16_t tmp16;
     CHECK(lmcp_unpack_PayloadConfiguration(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->SupportedWavelengthBand)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->FieldOfViewMode)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->MinHorizontalFieldOfView)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->MaxHorizontalFieldOfView)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->supportedwavelengthband)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->fieldofviewmode)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->minhorizontalfieldofview)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->maxhorizontalfieldofview)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->DiscreteHorizontalFieldOfViewList = malloc(sizeof(float*) * tmp);
-    if (out->DiscreteHorizontalFieldOfViewList==0) {
+    (out)->discretehorizontalfieldofviewlist = malloc(sizeof(uint32_t*) * tmp);
+    if (out->discretehorizontalfieldofviewlist==0) {
         return -1;
     }
-    out->DiscreteHorizontalFieldOfViewList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->DiscreteHorizontalFieldOfViewList_ai.length; index++) {
-        CHECK(lmcp_unpack_float(inb, size_remain, &out->DiscreteHorizontalFieldOfViewList[index]))
+    out->discretehorizontalfieldofviewlist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->discretehorizontalfieldofviewlist_ai.length; index++) {
+        CHECK(lmcp_unpack_uint32_t(inb, size_remain, &out->discretehorizontalfieldofviewlist[index]))
     }
-    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->VideoStreamHorizontalResolution)))
-    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->VideoStreamVerticalResolution)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->videostreamhorizontalresolution)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->videostreamverticalresolution)))
     return 0;
 }
 size_t lmcp_pack_CameraConfiguration(uint8_t* buf, CameraConfiguration* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_PayloadConfiguration(outb, &(i->super));
-    outb += lmcp_pack_int32_t(outb, (int) i->SupportedWavelengthBand);
-    outb += lmcp_pack_int32_t(outb, (int) i->FieldOfViewMode);
-    outb += lmcp_pack_float(outb, i->MinHorizontalFieldOfView);
-    outb += lmcp_pack_float(outb, i->MaxHorizontalFieldOfView);
-    outb += lmcp_pack_uint16_t(outb, i->DiscreteHorizontalFieldOfViewList_ai.length);
-    for (uint32_t index = 0; index < i->DiscreteHorizontalFieldOfViewList_ai.length; index++) {
-        outb += lmcp_pack_float(outb, i->DiscreteHorizontalFieldOfViewList[index]);
+    outb += lmcp_pack_int32_t(outb, (int) i->supportedwavelengthband);
+    outb += lmcp_pack_int32_t(outb, (int) i->fieldofviewmode);
+    outb += lmcp_pack_uint32_t(outb, i->minhorizontalfieldofview);
+    outb += lmcp_pack_uint32_t(outb, i->maxhorizontalfieldofview);
+    outb += lmcp_pack_uint16_t(outb, i->discretehorizontalfieldofviewlist_ai.length);
+    for (uint32_t index = 0; index < i->discretehorizontalfieldofviewlist_ai.length; index++) {
+        outb += lmcp_pack_uint32_t(outb, i->discretehorizontalfieldofviewlist[index]);
     }
-    outb += lmcp_pack_uint32_t(outb, i->VideoStreamHorizontalResolution);
-    outb += lmcp_pack_uint32_t(outb, i->VideoStreamVerticalResolution);
+    outb += lmcp_pack_uint32_t(outb, i->videostreamhorizontalresolution);
+    outb += lmcp_pack_uint32_t(outb, i->videostreamverticalresolution);
     return (outb - buf);
 }

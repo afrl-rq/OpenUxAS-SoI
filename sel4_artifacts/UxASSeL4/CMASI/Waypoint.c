@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-#include <inttypes.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "Waypoint.h"
@@ -11,41 +9,41 @@ void lmcp_pp_Waypoint(Waypoint* s) {
     printf("Waypoint{");
     printf("Inherited from Location3D:\n");
     lmcp_pp_Location3D(&(s->super));
-    printf("Number: ");
-    printf("%lld",s->Number);
+    printf("number: ");
+    printf("%lld",s->number);
     printf("\n");
-    printf("NextWaypoint: ");
-    printf("%lld",s->NextWaypoint);
+    printf("nextwaypoint: ");
+    printf("%lld",s->nextwaypoint);
     printf("\n");
-    printf("Speed: ");
-    printf("%f",s->Speed);
+    printf("speed: ");
+    printf("%u",s->speed);
     printf("\n");
-    printf("SpeedType: ");
-    printf("%i", s->SpeedType);
+    printf("speedtype: ");
+    printf("%i", s->speedtype);
     printf("\n");
-    printf("ClimbRate: ");
-    printf("%f",s->ClimbRate);
+    printf("climbrate: ");
+    printf("%u",s->climbrate);
     printf("\n");
-    printf("TurnType: ");
-    printf("%i", s->TurnType);
+    printf("turntype: ");
+    printf("%i", s->turntype);
     printf("\n");
-    printf("VehicleActionList: ");
+    printf("vehicleactionlist: ");
     printf("[");
-    for (uint32_t index = 0; index < s->VehicleActionList_ai.length; index++) {
-        lmcp_pp_VehicleAction((s->VehicleActionList[index]));
+    for (uint32_t index = 0; index < s->vehicleactionlist_ai.length; index++) {
+        lmcp_pp_VehicleAction((s->vehicleactionlist[index]));
         printf(",");
     }
     printf("\n");
-    printf("ContingencyWaypointA: ");
-    printf("%lld",s->ContingencyWaypointA);
+    printf("contingencywaypointa: ");
+    printf("%lld",s->contingencywaypointa);
     printf("\n");
-    printf("ContingencyWaypointB: ");
-    printf("%lld",s->ContingencyWaypointB);
+    printf("contingencywaypointb: ");
+    printf("%lld",s->contingencywaypointb);
     printf("\n");
-    printf("AssociatedTasks: ");
+    printf("associatedtasks: ");
     printf("[");
-    for (uint32_t index = 0; index < s->AssociatedTasks_ai.length; index++) {
-        printf("%lld",s->AssociatedTasks[index]);
+    for (uint32_t index = 0; index < s->associatedtasks_ai.length; index++) {
+        printf("%lld",s->associatedtasks[index]);
         printf(",");
     }
     printf("\n");
@@ -56,18 +54,18 @@ size_t lmcp_packsize_Waypoint (Waypoint* i) {
     out += lmcp_packsize_Location3D(&(i->super));
     out += sizeof(int64_t);
     out += sizeof(int64_t);
-    out += sizeof(float);
+    out += sizeof(uint32_t);
     out += 4;
-    out += sizeof(float);
+    out += sizeof(uint32_t);
     out += 4;
     out += 2;
-    for (uint32_t index = 0; index < i->VehicleActionList_ai.length; index++) {
-        out += 15 + lmcp_packsize_VehicleAction(i->VehicleActionList[index]);
+    for (uint32_t index = 0; index < i->vehicleactionlist_ai.length; index++) {
+        out += 15 + lmcp_packsize_VehicleAction(i->vehicleactionlist[index]);
     }
     out += sizeof(int64_t);
     out += sizeof(int64_t);
     out += 2;
-    for (uint32_t index = 0; index < i->AssociatedTasks_ai.length; index++) {
+    for (uint32_t index = 0; index < i->associatedtasks_ai.length; index++) {
         out += sizeof(int64_t);
     }
     return out;
@@ -91,16 +89,16 @@ void lmcp_free_Waypoint(Waypoint* out, int out_malloced) {
     if (out == NULL)
         return;
     lmcp_free_Location3D(&(out->super), 0);
-    if (out->VehicleActionList != NULL) {
-        for (uint32_t index = 0; index < out->VehicleActionList_ai.length; index++) {
-            if (out->VehicleActionList[index] != NULL) {
-                lmcp_free_VehicleAction(out->VehicleActionList[index], 1);
+    if (out->vehicleactionlist != NULL) {
+        for (uint32_t index = 0; index < out->vehicleactionlist_ai.length; index++) {
+            if (out->vehicleactionlist[index] != NULL) {
+                lmcp_free_VehicleAction(out->vehicleactionlist[index], 1);
             }
         }
-        free(out->VehicleActionList);
+        free(out->vehicleactionlist);
     }
-    if (out->AssociatedTasks != NULL) {
-        free(out->AssociatedTasks);
+    if (out->associatedtasks != NULL) {
+        free(out->associatedtasks);
     }
     if (out_malloced == 1) {
         free(out);
@@ -122,46 +120,46 @@ int lmcp_unpack_Waypoint(uint8_t** inb, size_t *size_remain, Waypoint* outp) {
     uint32_t tmp;
     uint16_t tmp16;
     CHECK(lmcp_unpack_Location3D(inb, size_remain, &(out->super)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->Number)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->NextWaypoint)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->Speed)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->SpeedType)))
-    CHECK(lmcp_unpack_float(inb, size_remain, &(out->ClimbRate)))
-    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->TurnType)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->number)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->nextwaypoint)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->speed)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->speedtype)))
+    CHECK(lmcp_unpack_uint32_t(inb, size_remain, &(out->climbrate)))
+    CHECK(lmcp_unpack_int32_t(inb, size_remain, (int*) &(out->turntype)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->VehicleActionList = malloc(sizeof(VehicleAction*) * tmp);
-    if (out->VehicleActionList==0) {
+    (out)->vehicleactionlist = malloc(sizeof(VehicleAction*) * tmp);
+    if (out->vehicleactionlist==0) {
         return -1;
     }
-    out->VehicleActionList_ai.length = tmp;
-    for (uint32_t index = 0; index < out->VehicleActionList_ai.length; index++) {
+    out->vehicleactionlist_ai.length = tmp;
+    for (uint32_t index = 0; index < out->vehicleactionlist_ai.length; index++) {
         uint8_t isnull;
         uint32_t objtype;
         uint16_t objseries;
         char seriesname[8];
         CHECK(lmcp_unpack_uint8_t(inb, size_remain, &isnull))
         if (isnull == 0 && inb != NULL) {
-            out->VehicleActionList[index] = NULL;
+            out->vehicleactionlist[index] = NULL;
         } else if (inb != NULL) {
             CHECK(lmcp_unpack_8byte(inb, size_remain, seriesname))
             CHECK(lmcp_unpack_uint32_t(inb, size_remain, &objtype))
             CHECK(lmcp_unpack_uint16_t(inb, size_remain, &objseries))
-            lmcp_init_VehicleAction(&(out->VehicleActionList[index]));
-            CHECK(lmcp_unpack_VehicleAction(inb, size_remain, (out->VehicleActionList[index])))
+            lmcp_init_VehicleAction(&(out->vehicleactionlist[index]));
+            CHECK(lmcp_unpack_VehicleAction(inb, size_remain, (out->vehicleactionlist[index])))
         }
     }
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ContingencyWaypointA)))
-    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->ContingencyWaypointB)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->contingencywaypointa)))
+    CHECK(lmcp_unpack_int64_t(inb, size_remain, &(out->contingencywaypointb)))
     CHECK(lmcp_unpack_uint16_t(inb, size_remain, &tmp16))
     tmp = tmp16;
-    (out)->AssociatedTasks = malloc(sizeof(int64_t*) * tmp);
-    if (out->AssociatedTasks==0) {
+    (out)->associatedtasks = malloc(sizeof(int64_t*) * tmp);
+    if (out->associatedtasks==0) {
         return -1;
     }
-    out->AssociatedTasks_ai.length = tmp;
-    for (uint32_t index = 0; index < out->AssociatedTasks_ai.length; index++) {
-        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->AssociatedTasks[index]))
+    out->associatedtasks_ai.length = tmp;
+    for (uint32_t index = 0; index < out->associatedtasks_ai.length; index++) {
+        CHECK(lmcp_unpack_int64_t(inb, size_remain, &out->associatedtasks[index]))
     }
     return 0;
 }
@@ -169,15 +167,15 @@ size_t lmcp_pack_Waypoint(uint8_t* buf, Waypoint* i) {
     if (i == NULL) return 0;
     uint8_t* outb = buf;
     outb += lmcp_pack_Location3D(outb, &(i->super));
-    outb += lmcp_pack_int64_t(outb, i->Number);
-    outb += lmcp_pack_int64_t(outb, i->NextWaypoint);
-    outb += lmcp_pack_float(outb, i->Speed);
-    outb += lmcp_pack_int32_t(outb, (int) i->SpeedType);
-    outb += lmcp_pack_float(outb, i->ClimbRate);
-    outb += lmcp_pack_int32_t(outb, (int) i->TurnType);
-    outb += lmcp_pack_uint16_t(outb, i->VehicleActionList_ai.length);
-    for (uint32_t index = 0; index < i->VehicleActionList_ai.length; index++) {
-        if (i->VehicleActionList[index]==NULL) {
+    outb += lmcp_pack_int64_t(outb, i->number);
+    outb += lmcp_pack_int64_t(outb, i->nextwaypoint);
+    outb += lmcp_pack_uint32_t(outb, i->speed);
+    outb += lmcp_pack_int32_t(outb, (int) i->speedtype);
+    outb += lmcp_pack_uint32_t(outb, i->climbrate);
+    outb += lmcp_pack_int32_t(outb, (int) i->turntype);
+    outb += lmcp_pack_uint16_t(outb, i->vehicleactionlist_ai.length);
+    for (uint32_t index = 0; index < i->vehicleactionlist_ai.length; index++) {
+        if (i->vehicleactionlist[index]==NULL) {
             outb += lmcp_pack_uint8_t(outb, 0);
         } else {
             outb += lmcp_pack_uint8_t(outb, 1);
@@ -187,14 +185,14 @@ size_t lmcp_pack_Waypoint(uint8_t* buf, Waypoint* i) {
                 *outb = 0;
             outb += lmcp_pack_uint32_t(outb, 7);
             outb += lmcp_pack_uint16_t(outb, 3);
-            outb += lmcp_pack_VehicleAction(outb, i->VehicleActionList[index]);
+            outb += lmcp_pack_VehicleAction(outb, i->vehicleactionlist[index]);
         }
     }
-    outb += lmcp_pack_int64_t(outb, i->ContingencyWaypointA);
-    outb += lmcp_pack_int64_t(outb, i->ContingencyWaypointB);
-    outb += lmcp_pack_uint16_t(outb, i->AssociatedTasks_ai.length);
-    for (uint32_t index = 0; index < i->AssociatedTasks_ai.length; index++) {
-        outb += lmcp_pack_int64_t(outb, i->AssociatedTasks[index]);
+    outb += lmcp_pack_int64_t(outb, i->contingencywaypointa);
+    outb += lmcp_pack_int64_t(outb, i->contingencywaypointb);
+    outb += lmcp_pack_uint16_t(outb, i->associatedtasks_ai.length);
+    for (uint32_t index = 0; index < i->associatedtasks_ai.length; index++) {
+        outb += lmcp_pack_int64_t(outb, i->associatedtasks[index]);
     }
     return (outb - buf);
 }

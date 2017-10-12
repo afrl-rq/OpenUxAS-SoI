@@ -55,7 +55,7 @@
 
 // TODO: These macros should be shared between all components.
 #define DEBUG(fmt,args...) \
-  printf("%s,%s,%i:"fmt,__FUNCTION__,"waypoint_manager.c",__LINE__,##args)
+  //printf("%s,%s,%i:"fmt,__FUNCTION__,"waypoint_manager.c",__LINE__,##args)
 #define UART_PACKET_SZ 255
 
 static bool missionSendState = false;

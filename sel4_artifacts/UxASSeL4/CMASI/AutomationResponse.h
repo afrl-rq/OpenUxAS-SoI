@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "MissionCommand.h"
@@ -14,18 +11,19 @@
 
 #define LMCP_AutomationResponse_TYPE 51
 
-typedef struct {
+struct AutomationResponse_struct {
     lmcp_object super;
-    MissionCommand** MissionCommandList;
-    array_info MissionCommandList_ai;
+    MissionCommand** missioncommandlist;
+    array_info missioncommandlist_ai;
 
-    VehicleActionCommand** VehicleCommandList;
-    array_info VehicleCommandList_ai;
+    VehicleActionCommand** vehiclecommandlist;
+    array_info vehiclecommandlist_ai;
 
-    KeyValuePair** Info;
-    array_info Info_ai;
+    KeyValuePair** info;
+    array_info info_ai;
 
-} AutomationResponse;
+};
+typedef struct AutomationResponse_struct AutomationResponse;
 void lmcp_pp_AutomationResponse(AutomationResponse* s);
 size_t lmcp_packsize_AutomationResponse (AutomationResponse* i);
 size_t lmcp_pack_AutomationResponse_header(uint8_t* buf, AutomationResponse* i);

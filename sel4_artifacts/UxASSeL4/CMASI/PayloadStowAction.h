@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #define LMCP_PayloadStowAction_SUB "afrl.cmasi.PayloadStowAction"
@@ -11,11 +8,12 @@
 
 #define LMCP_PayloadStowAction_TYPE 60
 
-typedef struct {
+struct PayloadStowAction_struct {
     lmcp_object super;
-    int64_t PayloadID;
+    int64_t payloadid;
 
-} PayloadStowAction;
+};
+typedef struct PayloadStowAction_struct PayloadStowAction;
 void lmcp_pp_PayloadStowAction(PayloadStowAction* s);
 size_t lmcp_packsize_PayloadStowAction (PayloadStowAction* i);
 size_t lmcp_pack_PayloadStowAction_header(uint8_t* buf, PayloadStowAction* i);

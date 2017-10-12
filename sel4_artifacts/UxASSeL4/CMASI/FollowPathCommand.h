@@ -1,8 +1,5 @@
 
 #pragma once
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
 #include "common/struct_defines.h"
 #include "common/conv.h"
 #include "VehicleActionCommand.h"
@@ -14,22 +11,23 @@
 
 #define LMCP_FollowPathCommand_TYPE 56
 
-typedef struct {
+struct FollowPathCommand_struct {
     VehicleActionCommand super;
-    int64_t FirstWaypoint;
+    int64_t firstwaypoint;
 
-    PathWaypoint** WaypointList;
-    array_info WaypointList_ai;
-
-// Units: milliseconds
-    int64_t StartTime;
+    PathWaypoint** waypointlist;
+    array_info waypointlist_ai;
 
 // Units: milliseconds
-    int64_t StopTime;
+    int64_t starttime;
 
-    TravelMode RepeatMode;
+// Units: milliseconds
+    int64_t stoptime;
 
-} FollowPathCommand;
+    TravelMode repeatmode;
+
+};
+typedef struct FollowPathCommand_struct FollowPathCommand;
 void lmcp_pp_FollowPathCommand(FollowPathCommand* s);
 size_t lmcp_packsize_FollowPathCommand (FollowPathCommand* i);
 size_t lmcp_pack_FollowPathCommand_header(uint8_t* buf, FollowPathCommand* i);
