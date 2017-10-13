@@ -53,11 +53,11 @@ pattern time_to_reach_neighbor( direction_UAV1: signT,
 		out = if position_UAV2 >= position_UAV1 
 				then if direction_UAV1 == 1 and direction_UAV2 == -1
 						then 0.5*(position_UAV2 - position_UAV1)/V
-						else P_global/V //we'll reach an endpoint first, so just use the max time to reach an endpoint
+						else Time_to_travel_full_length //we'll reach an endpoint first, so just use the max time to reach an endpoint
 				else // position_UAV2 < position_UAV1 
 					if direction_UAV1 == -1 and direction_UAV2 == 1
 						then 0.5*(position_UAV1 - position_UAV2)/V
-						else P_global/V //we'll reach an endpoint first, so just use the max time to reach an endpoint
+						else Time_to_travel_full_length //we'll reach an endpoint first, so just use the max time to reach an endpoint
 	tel	
 	
 pattern time_to_reach_target_position(direction: signT, 
@@ -72,6 +72,6 @@ pattern time_to_reach_target_position(direction: signT,
 						then 
 							(UAV_pos - target_pos)/V
 						else //we're traveling away from the target position
-							P_global/V //we'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
+							Time_to_travel_full_length //we'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
 				
 	tel
