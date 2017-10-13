@@ -38,7 +38,7 @@ r1 : direction_UAV1 == (initial_direction_UAV1 ->
 							else previous direction_UAV1)
 	
 r2 : pos_UAV1 == (initial_pos_UAV1 ->
-						if direction_UAV1 == 1 
+						if previous direction_UAV1 == 1 
 						then 
 							previous pos_UAV1 + V*(time - previous time)
 						else //direction == -1
@@ -52,7 +52,7 @@ r3 : direction_UAV2 == (initial_direction_UAV2 ->
 							else previous direction_UAV2)
 	
 r4 : pos_UAV2 == (initial_pos_UAV2 ->
-						if direction_UAV2 == 1 
+						if previous direction_UAV2 == 1 
 						then 
 							previous pos_UAV2 + V*(time - previous time)
 						else //direction == -1
@@ -61,4 +61,6 @@ r4 : pos_UAV2 == (initial_pos_UAV2 ->
 Properties:
 o1 observe : time > 30.0 s
 
+two_vehicles_travel_loop_stable : ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+	or (pos_UAV1 == P_global and pos_UAV2 == 0.0 m))
 
