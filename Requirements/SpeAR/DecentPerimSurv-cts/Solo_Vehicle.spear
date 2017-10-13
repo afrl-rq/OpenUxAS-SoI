@@ -26,9 +26,9 @@ Requirements:
 r0 : time == (0.0 s -> previous time + time_to_reach_endpoint(previous direction, previous pos))
 
 r1 : direction == (initial_direction ->
-					if previous pos <= 0.0 m
+					if pos <= 0.0 m
 					then 1
-					else if previous pos >= P_global
+					else if pos >= P_global
 							then -1
 							else previous direction)
 	
