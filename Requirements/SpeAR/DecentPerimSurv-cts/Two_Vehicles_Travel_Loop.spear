@@ -26,7 +26,7 @@ Assumptions:
 
 Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
-// In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
+// In the case of two vehicles following the full line, that is reaching an endpoint of the perimeter.
 r0 : time == (0.0 s -> previous time + min_time(time_to_reach_endpoint(previous direction_UAV1, previous pos_UAV1),
 											time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2)))
 
