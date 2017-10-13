@@ -61,6 +61,7 @@ meet_neighbor : bool = (pos_UAV1 == pos_UAV2) and (previous (pos_UAV1 <> pos_UAV
 met_neighbor : bool = false -> if previous meet_neighbor then true else previous met_neighbor
 
 Assumptions:
+//Update this to be <= once I get this version working!
 a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
 a1 : true -> initial_pos_UAV1 == previous initial_pos_UAV1
 a2 : true -> initial_direction_UAV1 == previous initial_direction_UAV1
@@ -73,63 +74,67 @@ Requirements:
 r0 : time == (0.0 s -> previous time + deltaT)
 
 r1 : direction_UAV1 == (initial_direction_UAV1 ->
-					if meet_neighbor and pre_pos_UAV1 >= S_1_R
+					if meet_neighbor and pos_UAV1 >= S_1_R
 						then -1
-						else if meet_neighbor and pre_pos_UAV1 < S_1_R
+						else if meet_neighbor and pos_UAV1 < S_1_R
 								then 1
-								else if met_neighbor and pre_pos_UAV1 >= S_1_R
+								else if met_neighbor and pos_UAV1 >= S_1_R
 										then -1
-										else if pre_pos_UAV1 <= 0.0 m
+										else if pos_UAV1 <= 0.0 m
 												then 1
-												else if pre_pos_UAV1 >= P_global
+												else if pos_UAV1 >= P_global
 														then -1
 														else pre_direction_UAV1)
 	
 r2 : pos_UAV1 == (initial_pos_UAV1 ->
-						if direction_UAV1 == 1 
+						if pre_direction_UAV1 == 1 
 						then 
 							pre_pos_UAV1 + V*(time - previous time)
 						else //direction == -1
 							pre_pos_UAV1 - V*(time - previous time))
 
 r3 : direction_UAV2 == (initial_direction_UAV2 ->
-					if meet_neighbor and pre_pos_UAV2 >= S_2_L
+					if meet_neighbor and pos_UAV2 > S_2_L
 						then -1
-						else if meet_neighbor and pre_pos_UAV2 < S_2_L
+						else if meet_neighbor and pos_UAV2 <= S_2_L
 								then 1
-								else if met_neighbor and pre_pos_UAV2 <= S_2_L
+								else if met_neighbor and pos_UAV2 <= S_2_L
 										then 1
-										else if pre_pos_UAV2 <= 0.0 m
+										else if pos_UAV2 <= 0.0 m
 												then 1
-												else if pre_pos_UAV2 >= P_global
+												else if pos_UAV2 >= P_global
 														then -1
 														else pre_direction_UAV2)
 	
 r4 : pos_UAV2 == (initial_pos_UAV2 ->
-						if direction_UAV2 == 1 
+						if pre_direction_UAV2 == 1 
 						then 
 							pre_pos_UAV2 + V*(time - previous time)
 						else //direction == -1
 							pre_pos_UAV2 - V*(time - previous time))
  
 Properties:
-//o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
-//				and initial_direction_UAV2 == -1
-//				and initial_pos_UAV1 == 3.1 m
-//				and initial_pos_UAV2 == 8.4 m
-//				and time > 20.0 s
-//
-//o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
-//				and initial_direction_UAV2 == -1
-//				and initial_pos_UAV1 == 3.1 m
-//				and initial_pos_UAV2 == 8.4 m
-//				and time > 20.0 s
-//
-//o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
-//				and initial_direction_UAV2 == 1
-//				and initial_pos_UAV1 == 3.1 m
-//				and initial_pos_UAV2 == 8.4 m
-//				and time > 20.0 s
+o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
+				and initial_direction_UAV2 == -1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+
+o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
+				and initial_direction_UAV2 == -1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+
+o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
+				and initial_direction_UAV2 == 1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+
+o4_still_converging_at_3_steps observe: counter == 3 and 
+	not	((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)) 
 
 p_shared_border_calc_matches : S_1_R == S_2_L
 
@@ -140,15 +145,15 @@ p_lemma_stay_stable : true -> previous ((pos_UAV1 == 0.0 m and pos_UAV2 == P_glo
 						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
 					)
 
-p_lemma_get_stable_in_7_steps: counter == 7 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+p_lemma_get_stable_in_4_steps: counter == 4 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
 						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L))
 
-p_lemma_stable_after_7_steps: counter > 7 implies 
+p_lemma_stable_after_4_steps: counter > 4 implies 
 					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
 						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
 					)
 
-p_lemma_7_steps_leq_2T : counter == 7 implies time <= 2.0*Time_to_travel_full_length
+p_lemma_4_steps_leq_2T : counter == 4 implies time <= 2.0*Time_to_travel_full_length
 
 		
 Theorem_Alg_A_Two_Vehicles : time > 2.0*Time_to_travel_full_length implies
