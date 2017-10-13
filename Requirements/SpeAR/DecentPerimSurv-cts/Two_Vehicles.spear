@@ -57,12 +57,11 @@ deltaT : timeT = if met_neighbor
 										time_to_reach_neighbor))
 
 meet_neighbor : bool = (pos_UAV1 == pos_UAV2) and (previous (pos_UAV1 <> pos_UAV2) with initial value true)
-//Assumes only one neighbor meeting will ever take place, and that's the only one that matters. 
+//Assumes only one neighbor exists. 
 met_neighbor : bool = false -> if previous meet_neighbor then true else previous met_neighbor
 
 Assumptions:
-//Update this to be <= once I get this version working!
-a0 : initial_pos_UAV1 < initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
+a0 : initial_pos_UAV1 <= initial_pos_UAV2 //Assume UAV1 is the left UAV and UAV2 is the right UAV.
 a1 : true -> initial_pos_UAV1 == previous initial_pos_UAV1
 a2 : true -> initial_direction_UAV1 == previous initial_direction_UAV1
 a3 : true -> initial_pos_UAV2 == previous initial_pos_UAV2
@@ -73,7 +72,7 @@ Requirements:
 // In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
 r0 : time == (0.0 s -> previous time + deltaT)
 
-r1 : direction_UAV1 == (initial_direction_UAV1 ->
+r1 : direction_UAV1 == 
 					if meet_neighbor and pos_UAV1 < S_1_R
 						then 1
 						else if (meet_neighbor or met_neighbor) and pos_UAV1 >= S_1_R
@@ -82,7 +81,7 @@ r1 : direction_UAV1 == (initial_direction_UAV1 ->
 										then 1
 										else if pos_UAV1 >= P_global
 												then -1
-												else pre_direction_UAV1)
+												else pre_direction_UAV1
 
 r2 : pos_UAV1 == (initial_pos_UAV1 ->
 						if pre_direction_UAV1 == 1 
@@ -91,7 +90,7 @@ r2 : pos_UAV1 == (initial_pos_UAV1 ->
 						else //direction == -1
 							pre_pos_UAV1 - V*(time - previous time))
 
-r3 : direction_UAV2 == (initial_direction_UAV2 ->
+r3 : direction_UAV2 == 
 					if meet_neighbor and pos_UAV2 > S_2_L
 						then -1
 						else if (meet_neighbor or met_neighbor) and pos_UAV2 <= S_2_L
@@ -100,7 +99,7 @@ r3 : direction_UAV2 == (initial_direction_UAV2 ->
 										then 1
 										else if pos_UAV2 >= P_global
 												then -1
-												else pre_direction_UAV2)
+												else pre_direction_UAV2
 	
 r4 : pos_UAV2 == (initial_pos_UAV2 ->
 						if pre_direction_UAV2 == 1 
@@ -132,6 +131,13 @@ o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1
 o4_still_converging_at_4_steps observe: counter == 3 and 
 	not	((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
 						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)) 
+
+o5_start_in_same_location observe : initial_pos_UAV1 == initial_pos_UAV1 and time > 20.0 s 
+
+o6_start_at_shared_border_position observe : initial_pos_UAV1 == initial_pos_UAV1 
+	and initial_pos_UAV1 == S_1_R
+	and initial_direction_UAV1 == 1
+	and time > 20.0 s
 
 p_shared_border_calc_matches : S_1_R == S_2_L
 
