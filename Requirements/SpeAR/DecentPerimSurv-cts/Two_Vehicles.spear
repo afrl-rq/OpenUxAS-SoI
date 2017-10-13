@@ -23,8 +23,8 @@ time : timeT
 
 Macros:
 S_1_R : positionT = real(floor(real(1) - 0.5*real(sign(1))))*P_global/real(N)  
-//S_1_L : positionT = real(floor(real(1) + 0.5*real(sign(1))))*P_global/real(N)
-S_2_L : positionT = real(floor(real(2) - 0.5*real(sign(2))))*P_global/real(N) // not used in this version
+//S_1_L : positionT = real(floor(real(1) + 0.5*real(sign(1))))*P_global/real(N) // not used in this version
+S_2_L : positionT = real(floor(real(2) - 0.5*real(sign(2))))*P_global/real(N) 
 //S_2_R : positionT = real(floor(real(2) + 0.5*real(sign(2))))*P_global/real(N) // not used in this version
 
 pre_pos_UAV1 : positionT = previous pos_UAV1 with initial value initial_pos_UAV1
