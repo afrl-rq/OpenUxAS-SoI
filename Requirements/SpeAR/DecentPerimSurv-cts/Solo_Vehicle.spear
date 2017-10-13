@@ -33,7 +33,7 @@ r1 : direction == (initial_direction ->
 							else previous direction)
 	
 r2 : pos == (initial_pos ->
-						if direction == 1 
+						if previous direction == 1 
 						then 
 							previous pos + V*(time - previous time)
 						else //direction == -1
