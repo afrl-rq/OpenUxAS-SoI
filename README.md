@@ -1,6 +1,6 @@
 # License
 
-*OpenUxAS* is developed by the Air Force Research Laboratory, Aerospace System Directorate, Power and Control Division. 
+*OpenUxAS* is developed by the Air Force Research Laboratory, Aerospace System Directorate, Power and Control Division.
 The LMCP specification and all source code for *OpenUxAS* is publicaly released under the Air Force Open Source Agreement
 Version 1.0. See LICENSE.md for complete details. The Air Force Open Source Agreement closely follows the NASA Open Source
 Agreement Verion 1.3. **NOTE the terms of the license include registering use of the software by emailing <a href="mailto:afrl.rq.opensource@us.af.mil?subject=OpenUxAS Registration&body=Please register me for use of OpenUxAS. Name: ____________">afrl.rq.opensource@us.af.mil</a>.**
@@ -55,7 +55,7 @@ If you need to pull the newest versions of the UxAS code from the server and rec
 
     cd /home/$USER/UxAS_pulls/OpenUxAS
     ./checkout_plus_config.sh -d /home/$USER/UxAS_pulls BRANCH
-    
+
 replacing ***BRANCH*** with the branch of OpenUxAS that you want (e.g., develop, architecture, rta ...).
 
 Alternately, if you change your mind after the fact and want to use (e.g.) the architecture branch for things, try:
@@ -114,46 +114,46 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
 ### Installing Prerequisite Tools on Ubuntu Linux
 
 1. Install `git`: in terminal
-   - `sudo apt-get install git`
-   - `sudo apt-get install gitk`
+   * `sudo apt-get install git`
+   * `sudo apt-get install gitk`
 1. Install OpenGL development headers: in terminal
-   - `sudo apt-get install libglu1-mesa-dev`
+   * `sudo apt-get install libglu1-mesa-dev`
 1. Install unique ID creation library: in terminal
-   - `sudo apt-get install uuid-dev`
+   * `sudo apt-get install uuid-dev`
 1. Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
-   - `sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev`
+   * `sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev`
 1. Install doxygen and related packages (**optional**): in terminal
-   - `sudo apt-get install doxygen`
-   - `sudo apt-get install graphviz`
-   - `sudo apt-get install texlive`
-   - `sudo apt-get install texlive-latex-extra`
+   * `sudo apt-get install doxygen`
+   * `sudo apt-get install graphviz`
+   * `sudo apt-get install texlive`
+   * `sudo apt-get install texlive-latex-extra`
 1. Install pip3: in terminal
-   - `sudo apt install python3-pip`
-   - `sudo -H pip3 install --upgrade pip`
+   * `sudo apt install python3-pip`
+   * `sudo -H pip3 install --upgrade pip`
 1. Install ninja build system: in terminal
-   - `sudo -H pip3 install ninja`
+   * `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   - `sudo -H pip3 install meson`
+   * `sudo -H pip3 install meson`
 1. Ensure dependency search for meson is supported: in terminal
-   - `sudo apt-get install pkg-config`
+   * `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
-   - `sudo apt install python3-tk`
-   - `sudo -H pip3 install matplotlib`
-   - `sudo -H pip3 install pandas`
+   * `sudo apt install python3-tk`
+   * `sudo -H pip3 install matplotlib`
+   * `sudo -H pip3 install pandas`
 1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
-   - Download the Linux x64 version
-   - Run downloaded install script: in terminal
-   - `cd ~/Downloads; sh jdk-8u131-nb-8_w-linux-x64.sh`
-   - Click `Next` three times, then `Install`
+   * Download the Linux x64 version
+   * Run downloaded install script: in terminal
+   * `cd ~/Downloads; sh jdk-8u131-nb-8_w-linux-x64.sh`
+   * Click `Next` three times, then `Install`
 1. Enable C/C++ plug-in in NetBeans (**optional**)
-   - Open NetBeans (in Ubuntu search, type `NetBeans`)
-   - Choose Tools->Plugins from the top menu
-   - In the `Available Plugins` tab, search for `C++`
-   - Select `C/C++` and click `Install`
+   * Open NetBeans (in Ubuntu search, type `NetBeans`)
+   * Choose Tools->Plugins from the top menu
+   * In the `Available Plugins` tab, search for `C++`
+   * Select `C/C++` and click `Install`
 1. Install Oracle Java run-time (required for *LmcpGen*): in terminal
-   - `sudo add-apt-repository ppa:webupd8team/java`
-   - `sudo apt update; sudo apt install oracle-java8-installer`
-   - `sudo apt install oracle-java8-set-default`
+   * `sudo add-apt-repository ppa:webupd8team/java`
+   * `sudo apt update; sudo apt install oracle-java8-installer`
+   * `sudo apt install oracle-java8-set-default`
 
 ### Install Prerequisites on Mac OS X
 1. Install [XCode](https://developer.apple.com/xcode/)
@@ -164,69 +164,82 @@ Note that the most up-to-date instructions on the dependencies-needed for UxAS a
 1. Install `git`: in terminal `brew install git`
 1. Install unique ID library: in terminal `brew install ossp-uuid`
 1. Install Boost library and configure it in a fresh shell: in terminal
-   - `brew install boost`
-   - `echo 'export BOOST_ROOT=/usr/local' >> ~/.bash_profile`
-   - `bash`
+   * `brew install boost`
+   * `echo 'export BOOST_ROOT=/usr/local' >> ~/.bash_profile`
+   * `bash`
 1. Install `doxygen` and related packages (**optional**): in terminal
-   - `brew install doxygen`
-   - `brew install graphviz`
-   - `brew cask install mactex`
+   * `brew install doxygen`
+   * `brew install graphviz`
+   * `brew cask install mactex`
 1. Install pip3: in terminal
-   - `brew install python3`
+   * `brew install python3`
 1. Install ninja build system: in terminal
-   - `brew install cmake`
-   - `brew install pkg-config`
-   - `sudo -H pip3 install scikit-build`
-   - `sudo -H pip3 install ninja`
+   * `brew install cmake`
+   * `brew install pkg-config`
+   * `sudo -H pip3 install scikit-build`
+   * `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   - `sudo -H pip3 install meson`
+   * `sudo -H pip3 install meson`
 1. Install python plotting capabilities (**optional**): in terminal
-   - `sudo -H pip3 install matplotlib`
-   - `sudo -H pip3 install pandas`
+   * `sudo -H pip3 install matplotlib`
+   * `sudo -H pip3 install pandas`
 1. Install [Oracle Java run-time](https://java.com/en/download/mac_download.jsp) (required for *LmcpGen*)
 1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
-   - Download the Mac OSX version
-   - Install .dmg
+   * Download the Mac OSX version
+   * Install .dmg
 1. Enable C/C++ plug-in in NetBeans (**optional**)
-   - Open NetBeans
-   - Choose Tools->Plugins from the top menu
-   - In the `Available Plugins` tab, search for `C++`
-   - Select `C/C++` and click `Install`
+   * Open NetBeans
+   * Choose Tools->Plugins from the top menu
+   * In the `Available Plugins` tab, search for `C++`
+   * Select `C/C++` and click `Install`
 
 ### Prep and Build on Native Windows
 
 1. Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/downloads/)
-   - Ensure C++ selected in `Workloads` tab
-   - Ensure `Git for Windows` is selected in `Individual components` tab
+   * Ensure C++ selected in `Workloads` tab
+   * Ensure `Git for Windows` is selected in `Individual components` tab
 1. Install [Git](https://git-scm.com/download/win) with Bash shell
 1. Install [Python 3](https://www.python.org/ftp/python/3.6.1/python-3.6.1.exe)
-   - Make sure to check `Add Python 3.6 to PATH`
-   - Choose standard install (`Install Now`, requires admin)
-   - Verify installation by: `python --version` in `cmd` prompt
-   - Verify *pip* is also installed: `pip --version` in `cmd` prompt
-   - If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
+   * Make sure to check `Add Python 3.6 to PATH`
+   * Choose standard install (`Install Now`, requires admin)
+   * Verify installation by: `python --version` in `cmd` prompt
+   * Verify *pip* is also installed: `pip --version` in `cmd` prompt
+   * If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
 1. Install *meson*
-   - In `cmd` prompt **with admin priviledges**: `pip install meson`
+   * In `cmd` prompt **with admin priviledges**: `pip install meson`
 1. Install [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download)
-   - Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
+   * Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
 1. Pull UxAS repositories (from Git Bash shell)
-   - `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
-   - `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
+   * `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
+   * `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
+   * `git -c https://github.com/afrl-rq/OpenAMASE.git`
+1. Build OpenAMASE
+  * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
-   - Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
-   - Place `LmcpGen.jar` in `LmcpGen/dist` folder
-   - From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
+   * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
+   * Place `LmcpGen.jar` in `LmcpGen/dist` folder
+   * From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
+   * Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE repositories follow the folder structure labeled in the [Configure UxAS and Related Projects](#configure-uxas-and-related-projects) section.
 1. Prepare build
-   - Open VS command prompt (Tools -> Visual Studio Command Prompt)
-   - `python prepare`
-   - `meson.py build --backend=vs`
+   * Open VS command prompt (Tools -> Visual Studio Command Prompt)
+   * Note: If the Visual Studio Command Prompt is absent from Visual Studio, it is also possible to perform the following actions by searching for the `Developer Command Prompt for VS 2017` application and switching the working directory to the root OpenUxAS directory
+   * `python prepare`
+   * `meson.py build --backend=vs` This should create a Visual Studio solution in the build folder.
+   * Note: If the meson.py fails to build the misc.py file may need to be modified. This file is located in the AppData\\Local\\Programs\\Python\\Python36\\Lib\\site-packages\\mesonbuild\\dependencies\\ folder. Line 232 should be changed to `if self.libdir and self.boost\_root`
+1. Set UxAS as the Startup Project
+  * Open the OpenUxAS.sln with Visual Studio, right-click the UxAS project found in the Solution Explorer
+  * Select Set as StartUp Project
+1. Add the boost library to the Library Directories for the dependent projects
+  * With the OpenUxAS solution open in Visaul Studio, right-click the uxas project from the Solution Explorer and select `Properties` from the context menu.
+  * Select `VC++ Directories` located within the `Configuration Properties` node in the `uxas Properties Pages` Pop Up
+  * In under the general tab, there will be a `Library Directories` option. Add the absolute path of the boost libraries here. Given boost was setup with the instruction above, this path should be `C:\local\boost_1_64_0\lib32-msvc-14.1`
 1. Build project with Visual Studio
-   - Open project file `OpenUxAS.sln` in the `OpenUxAS/build` directory
-   - In the Solution Explorer, right-click the `uxas` project, and click `Build`
+   * Open project file `OpenUxAS.sln` in the `OpenUxAS/build` directory
+   * In the `Solution Explorer`, right-click the `uxas` project, and select `Build` from the context menu
 
 #### Caveats
 
-- The Visual Studio backend for Meson mostly works, but will fail when regenerating build files. If you modify one of the `meson.build` files, delete the `build` directory and run `meson.py build --backend=vs` again.
+- The Visual Studio backend for Meson mostly works, but will fail when regenerating build files. If you modify one of the `meson.build` files, delete the `build` directory and run `meson.py build --backend=vs` again. The steps following the `meson.build` command must also be performed.
 - The UxAS test suite uses some hardcoded POSIX-style paths, and so does not currently work on Windows.
 
 # Configure and Build UxAS and Related Projects
@@ -238,19 +251,19 @@ The following is a bash script that helps to partially-automate the "configure U
 This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
 1. Download these two scripts from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) OR `cd` to your `git clone`d *OpenUxAS* directory
-    - `checkout_plus_config.sh`
-    - `get_dlvsco_wd_f.sh`
+    * `checkout_plus_config.sh`
+    * `get_dlvsco_wd_f.sh`
 1. Run the `checkout_plus_config.sh` script at the terminal:
-    - If you want to download the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -d`
-    - If you want to compile the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -c`
+    * If you want to download the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -d`
+    * If you want to compile the .jar files for OpenAMASE and LmcpGen, try: `./checkout_plus_config.sh -c`
 1. Follow the on-screen instructions
 
 Note that this sets up your UxAS workspace under a default directory (`/home/$USER/UxAS_pulls`). If you want to specify a workspace other than the default, then pass the absolute path to the script as a second argument when calling the script (e.g., `./checkout_plus_config.sh -d /home/$USER/my_checkout_dir`).
 
 
-## Configure UxAS and Related Projects
+## <a name="configure-uxas-and-related-projects"></a> Configure UxAS and Related Projects
 
-Expected file system layout:
+ Expected file system layout:
 ```
 ./
   OpenAMASE
@@ -283,28 +296,28 @@ Expected file system layout:
 ```
 
 1. EITHER Checkout + compile *OpenAMASE* (**optional**)
-   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
+   * File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
    1. Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
    2. Compile: Load provided Netbeans project, click `Build`  
-   
+
    OR Download *OpenAMASE* (**optional**)
-   - File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
+   * File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
    1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.3.0/OpenAMASE.jar)
    2. Place `OpenAMASE.jar` in `OpenAMASE/OpenAMASE/dist` folder
 2. EITHER Checkout + compile *LmcpGen*
-   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
+   * File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
    1. Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
    2. Compile: Load provided Netbeans project, click `Build`  
-   
+
    OR Download *LmcpGen*
-   - File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
+   * File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
    1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
    2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
 3. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
-   - Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
-   - `sh RunLmcpGen.sh`
+   * Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
+   * `sh RunLmcpGen.sh`
 4. Prepare UxAS specific patches to external libraries: in terminal in `OpenUxAS` directory
-   - `./prepare`
+   * `./prepare`
 
 The above preparation (i.e. `./prepare`) needs to be done prior to the first build and any
 time a file is modified in one of the `/3rd/wrap_patches` subdirectories or the `/3rd/*.wrap.tmpl` files.
@@ -313,23 +326,23 @@ This also needs to be done any time you move or rename your source tree.
 
 ## Building at the Command Line
 1. Configure for release build: in terminal
-   - `meson build --buildtype=release`
+   * `meson build --buildtype=release`
 1. Configure for debug build: in terminal
-   - `meson build_debug --buildtype=debug`
-   - These two steps only need to be done prior to the first build. If you
+   * `meson build_debug --buildtype=debug`
+   * These two steps only need to be done prior to the first build. If you
 modify the Meson files, just build as normal in step 3 and the changes
 will be automatically incorporated.
 1. Build UxAS: in terminal
-   - `ninja -C build all`
-   - This step is the only step necessary in day-to-day development work. It's
+   * `ninja -C build all`
+   * This step is the only step necessary in day-to-day development work. It's
 the Meson equivalent of `make all`. Note that the name of `ninja` may differ by distro. On Fedora, for example,
 it's `ninja-build`.
-   - To clean the build, add the `clean` target at the end of your ninja
+   * To clean the build, add the `clean` target at the end of your ninja
 command: `ninja -C build clean`
 1. Run UxAS tests: in terminal
-   - `ninja -C build test`
-   - Confirm all tests passed
-   
+   * `ninja -C build test`
+   * Confirm all tests passed
+
 ### Compiling using NetBeans (Debug Mode)
 
 1. Open NetBeans
@@ -429,11 +442,11 @@ unexpected trouble may arise on other platforms.
 
 1. Assuming that in the file system, *OpenAMASE* is at the same level as `OpenUxAS`
 1. Add python package for UxAS plotting (src/Utilities/localcoords)
-   - `sudo -H python3 setup.py install`
+   * `sudo -H python3 setup.py install`
 1. Run examples
-   - Example 2: Follow README.md in `examples/02_Example_WaterwaySearch`
-   - Example 3: Follow README.md in `examples/03_Example_DistributedCooperation`
-   
+   * Example 2: Follow README.md in `examples/02_Example_WaterwaySearch`
+   * Example 3: Follow README.md in `examples/03_Example_DistributedCooperation`
+
 # Building the Documentation
 
 ## Building the Documentation on Ubuntu Linux / Bash on Ubuntu on Windows -or- Mac OS X (Partially-Automated)
@@ -455,13 +468,13 @@ If you'd like to do this process manually, then:
 1. The User Manual can be generated by running:
    `pdflatex UxAS_UserManual.tex` in the folder `doc/reference/UserManual/`
 1. Create HTML Doxygen reference documenation:
-   - Open terminal in directory `doc/doxygen`
-   - `sh RunDoxygen.sh`
-   - In newly created `html` folder, open index.html
+   * Open terminal in directory `doc/doxygen`
+   * `sh RunDoxygen.sh`
+   * In newly created `html` folder, open index.html
 1. Doxygen PDF reference manual can be created by:
-   - Copy the line from `ExtraLineToFixLatex.txt` into `doc/doxygen/latex/refman.tex` just above the line `%===== C O N T E N T S =====`
-   - In the folder `doc/doxygen/latex` run the command `pdflatex refman.tex`
-   - The complete reference manual can be found at `doc/doxygen/latex/refman.pdf`
+   * Copy the line from `ExtraLineToFixLatex.txt` into `doc/doxygen/latex/refman.tex` just above the line `%===== C O N T E N T S =====`
+   * In the folder `doc/doxygen/latex` run the command `pdflatex refman.tex`
+   * The complete reference manual can be found at `doc/doxygen/latex/refman.pdf`
 
 # Branching and Repository Management
 
@@ -501,16 +514,16 @@ here we are focusing on the "how".
 The repository will typically have a branching structure like the following:
 
 - `master`
-  - very stable, only updated by pull request from `develop`
+  * very stable, only updated by pull request from `develop`
 - `develop`
-  - stable, only updated by pull request from feature branches
+  * stable, only updated by pull request from feature branches
 - `teamA`
-  - team branch for Team A
-  - stable at the discretion of Team A
-  - updated by merging in feature branches and `develop`
+  * team branch for Team A
+  * stable at the discretion of Team A
+  * updated by merging in feature branches and `develop`
 - `teamA-feature1`
-  - feature branch for Team A
-  - when finished, merged into `develop` via pull request
+  * feature branch for Team A
+  * when finished, merged into `develop` via pull request
 - `teamB`
 - `teamB-feature1`
 - etc.
