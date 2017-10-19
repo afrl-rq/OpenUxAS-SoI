@@ -25,71 +25,32 @@ For an Ubuntu 16.04 or Mac OS X system with prerequisites installed, UxAS should
 - [Mac](#install-prerequisites-on-mac-os-x)
 - [Windows](#prep-and-build-on-windows)
 
+
 ## Build UxAS
 
 Expected file system layout:
 ```
 ./
   OpenAMASE
-          /OpenAMASE
-                    /config
-                    /data
-                    /dist
-                         OpenAMASE.jar <-- add this here to avoid compilation
-                    /docs
-                    /example scenarios
-                    /lib
-                    /native
-                    /nbproject
-                    /run
-                    /src
   LcmpGen
-          /dist
-               LmcpGen.jar <-- add this here to avoid compilation
-          /nbproject
-          /src
   OpenUxAS
-          /3rd
-          /doc
-          /examples
-          /mdms
-          /resources
-          /src
-          /tests
-          /wrap_patches
 ```
 
 1. Checkout *OpenUxAS*: `git clone https://github.com/afrl-rq/OpenUxAS.git`
-1. EITHER Checkout + compile *OpenAMASE* (**optional**)
-   * File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
-   1. Checkout: `git clone https://github.com/afrl-rq/OpenAMASE.git`
-   2. Compile: Load provided Netbeans project, click `Build`  
+1. Checkout *LmcpGen*: `git clone https://github.com/afrl-rq/LmcpGen.git`
+1. Build *LmcpGen*: `cd LmcpGen; ant jar; cd ..`
+1. Auto-generate source code for LMCP libraries: `cd OpenUxAS; sh RunLmcpGen.sh; cd ..`
+1. Prepare UxAS specific patches to external libraries: `cd OpenUxAS; ./prepare; cd ..`
+1. (**optional**) Checkout *OpenAMASE*: `git clone https://github.com/afrl-rq/OpenAMASE.git`
+1. (**optional**) Build *OpenAMASE*: `cd OpenAMASE/OpenAMASE; ant jar; cd ../..`
 
-   OR Download *OpenAMASE* (**optional**)
-   * File system layout: *OpenAMASE* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.3.0/OpenAMASE.jar)
-   2. Place `OpenAMASE.jar` in `OpenAMASE/OpenAMASE/dist` folder
-1. EITHER Checkout + compile *LmcpGen*
-   * File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
-   1. Checkout: `git clone https://github.com/afrl-rq/LmcpGen.git`
-   2. Compile: Load provided Netbeans project, click `Build`  
-
-   OR Download *LmcpGen*
-   * File system layout: *LmcpGen* should be a sibling to *OpenUxAS* (see above)
-   1. Download: from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
-   2. Place `LmcpGen.jar` in `LmcpGen/dist` folder
-1. Auto-generate source code for LMCP libraries: in terminal in `OpenUxAS` directory
-   * Assuming that in the file system, *LmcpGen* is at the same level as `OpenUxAS` (see above)
-   * `sh RunLmcpGen.sh`
-1. Prepare UxAS specific patches to external libraries: in terminal in `OpenUxAS` directory
-   * `./prepare`
-
-The above preparation (i.e. `./prepare`) needs to be done prior to the first build and any
+Note, `./prepare` needs to be done prior to the first build and any
 time a file is modified in one of the `/3rd/wrap_patches` subdirectories or the `/3rd/*.wrap.tmpl` files.
 
 This also needs to be done any time you move or rename your source tree.
 
 ## Building at the Command Line
+1. From the *OpenUxAS* local repository (i.e. `cd OpenUxAS`)
 1. Configure for release build: in terminal
    * `meson build --buildtype=release`
 1. Configure for debug build: in terminal
@@ -287,7 +248,9 @@ in the `/3rd` directory by `./prepare`.
    * `sudo add-apt-repository ppa:webupd8team/java`
    * `sudo apt update; sudo apt install oracle-java8-installer`
    * `sudo apt install oracle-java8-set-default`
-1. [Build](#building-at-the-command-line)
+1. Install `ant` for command line build of java programs: in terminal
+   * `brew install ant`
+1. [Build](#build-uxas)
 
 ## Install Prerequisites on Mac OS X
 1. Install [XCode](https://developer.apple.com/xcode/)
@@ -318,6 +281,8 @@ in the `/3rd` directory by `./prepare`.
    * `sudo -H pip3 install matplotlib`
    * `sudo -H pip3 install pandas`
 1. Install [Oracle Java run-time](https://java.com/en/download/mac_download.jsp) (required for *LmcpGen*)
+1. Install `ant` for command line build of java programs: in terminal
+   * `brew install ant`
 1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html) (**optional**)
    * Download the Mac OSX version
    * Install .dmg
@@ -326,7 +291,7 @@ in the `/3rd` directory by `./prepare`.
    * Choose Tools->Plugins from the top menu
    * In the `Available Plugins` tab, search for `C++`
    * Select `C/C++` and click `Install`
-1. [Build](#building-at-the-command-line)
+1. [Build](#build-uxas)
 
 ## Prep and Build on Windows
 
