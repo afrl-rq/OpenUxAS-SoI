@@ -38,7 +38,7 @@ install:
   # tries to check out the same branch as the one we're building if it's
   # available, so that development can proceed in tandem
   # - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)
-  - cd ../LmcpGen; ant jar; pwd
+  - cd ../LmcpGen; ant jar; cd ../OpenUxAS
   - sh RunLmcpGen.sh
   # process the wraps and their patches
   - ./prepare
