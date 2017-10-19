@@ -22,7 +22,7 @@ before_install:
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
   # install verion of Meson that is compatible with UxAS build
-  - curl -L -s https://github.com/mesonbuild/meson/releases/download/0.42.1/meson-0.42.1.zip -o meson-linux.zip
+  - curl -L -s https://github.com/mesonbuild/meson/archive/0.42.1.zip -o meson-linux.zip
   - unzip meson-linux.zip
   - mv meson ~/.local/bin
   - meson --version
