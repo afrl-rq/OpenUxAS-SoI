@@ -306,15 +306,15 @@ in the `/3rd` directory by `./prepare`.
    * Verify *pip* is also installed: `pip --version` in `cmd` prompt
    * If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
 1. Install *meson*
-   * In `cmd` prompt **with admin priviledges**: `pip install meson`
+   * In `cmd` prompt **with admin priviledges**: `pip install meson==0.42.1`
 1. Install [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download)
    * Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
 1. Pull UxAS repositories (from Git Bash shell)
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
    * `git -c https://github.com/afrl-rq/OpenAMASE.git`
-1. Build OpenAMASE
-  * Load the OpenAMASE project in NetBeans and click `Build`
+1. (**optionall**) Build OpenAMASE
+   * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
    * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
    * Place `LmcpGen.jar` in `LmcpGen/dist` folder
@@ -327,12 +327,12 @@ in the `/3rd` directory by `./prepare`.
    * `meson.py build --backend=vs` This should create a Visual Studio solution in the build folder.
    * Note: If the meson.py fails to build the misc.py file may need to be modified. This file is located in the AppData\\Local\\Programs\\Python\\Python36\\Lib\\site-packages\\mesonbuild\\dependencies\\ folder. Line 232 should be changed to `if self.libdir and self.boost\_root`
 1. Set UxAS as the Startup Project
-  * Open the OpenUxAS.sln with Visual Studio, right-click the UxAS project found in the Solution Explorer
-  * Select Set as StartUp Project
+   * Open the OpenUxAS.sln with Visual Studio, right-click the UxAS project found in the Solution Explorer
+   * Select Set as StartUp Project
 1. Add the boost library to the Library Directories for the dependent projects
-  * With the OpenUxAS solution open in Visaul Studio, right-click the uxas project from the Solution Explorer and select `Properties` from the context menu.
-  * Select `VC++ Directories` located within the `Configuration Properties` node in the `uxas Properties Pages` Pop Up
-  * In under the general tab, there will be a `Library Directories` option. Add the absolute path of the boost libraries here. Given boost was setup with the instruction above, this path should be `C:\local\boost_1_64_0\lib32-msvc-14.1`
+   * With the OpenUxAS solution open in Visaul Studio, right-click the uxas project from the Solution Explorer and select `Properties` from the context menu.
+   * Select `VC++ Directories` located within the `Configuration Properties` node in the `uxas Properties Pages` Pop Up
+   * In under the general tab, there will be a `Library Directories` option. Add the absolute path of the boost libraries here. Given boost was setup with the instruction above, this path should be `C:\local\boost_1_64_0\lib32-msvc-14.1`
 1. Build project with Visual Studio
    * Open project file `OpenUxAS.sln` in the `OpenUxAS/build` directory
    * In the `Solution Explorer`, right-click the `uxas` project, and select `Build` from the context menu
