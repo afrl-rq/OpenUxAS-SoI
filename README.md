@@ -319,7 +319,7 @@ in the `/3rd` directory by `./prepare`.
    * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
    * Place `LmcpGen.jar` in `LmcpGen/dist` folder
    * From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
-   * Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE repositories follow the folder structure labeled in the [Configure UxAS and Related Projects](#configure-uxas-and-related-projects) section.
+   * Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE repositories follow the folder structure labeled in the [Build UxAS](#build-uxas) section.
 1. Prepare build
    * Open VS command prompt (Tools -> Visual Studio Command Prompt)
    * Note: If the Visual Studio Command Prompt is absent from Visual Studio, it is also possible to perform the following actions by searching for the `Developer Command Prompt for VS 2017` application and switching the working directory to the root OpenUxAS directory
