@@ -22,7 +22,7 @@ before_install:
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
   # install newer Meson than is packaged in repos
-  - pip3 install --user -Iv https://github.com/mesonbuild/meson/releases/download/0.42.1/meson-0.42.1.tar.gz
+  - pip3 install --user https://github.com/mesonbuild/meson/releases/download/0.42.1/meson-0.42.1.tar.gz
   - meson --version
   # download newer Ninja than is packaged in repos
   - curl -L -s https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip -o ninja-linux.zip
