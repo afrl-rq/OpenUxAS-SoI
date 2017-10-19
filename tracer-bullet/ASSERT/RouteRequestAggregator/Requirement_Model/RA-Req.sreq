@@ -1,0 +1,37 @@
+uri "http://sadl.org/RA-Req.sreq" alias rareq.
+import "http://sadl.org/RequestAggregator.sadl".
+
+Context: ReqAggregator with receive1 RouteRequestMsg
+and xid is mID of rrm of RouteRequestMsg  // i can drop this
+and xindex is an int // to iterate over vehicle list
+//and xvi is element xindex of vi of rrm of RouteRequestMsg
+.
+
+Assumption A1: 
+ReqAggregator assumes that 
+//	xindex > 0 and 
+	xindex <= length of vi of rrm of RouteRequestMsg.
+
+Assumption A2:
+ReqAggregator assumes that 
+length of vi of rrm of RouteRequestMsg > 0.
+
+Assumption A3:
+ReqAggregator assumes that 
+length of vi of rrm of RouteRequestMsg <= 10.
+
+Requirement R1: 
+ReqAggregator shall insert xxx 
+						into previous requestList of ReqAggregator at end
+where xxx is (a RouteRequestInfo
+				with mID (mID of rrm of RouteRequestMsg)
+				with numPlansPending (length of vi of rrm of RouteRequestMsg)
+				with vi (vi of rrm of RouteRequestMsg)
+              ).
+
+Requirement R2:  // send out vehicle plan requests
+ReqAggregator shall set send1 of ReqAggregator to vpr
+where vpr is (a RoutePlanRequestMsg
+				with mID (mID of rrm of RouteRequestMsg)
+				with vehicleInfo (element xindex of (vi of (rrm of RouteRequestMsg)))  
+             ).

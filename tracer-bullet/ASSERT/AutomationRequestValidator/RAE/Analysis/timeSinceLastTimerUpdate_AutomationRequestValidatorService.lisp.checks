@@ -1,0 +1,1126 @@
+(CW "~%~|**XX**ACL2s Requirements Analysis Engine Version ~p0.**XX**~%~%"
+     *REQUIREMENTSVERSIONNUMBER*)(DEFTTAG T)(CW "~%~|**XX**Starting inner contingency analyses.**XX**~%~%")(DEFTTAG T)(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|PublishAutomationRequest|
+     '(SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+             0))(CONTINGENCY-ANALYSIS (AND (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|))
+                       (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                              0)
+                       T
+                       (|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                |automationRequestList of AutomationRequestValidatorService|)
+                                                   (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                 |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                   (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                   (:VARS |previous state of AutomationRequestValidatorService|
+                                                          |automationRequestList of AutomationRequestValidatorService|
+                                                          |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                           |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                           |int_0_TO_11P|)
+                                                   (:ASSUMPTIONSP)
+                                                   (:ASSUMPTIONS)
+                                                   (:SRL-NAME . |PublishAutomationRequest|)
+                                                   (:BODY RIMPLIES
+                                                          (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                      '|Idle|)
+                                                               (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                      0))
+                                                          (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                 0)))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|PublishAutomationRequest|
+     '(EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+             0))(CONTINGENCY-ANALYSIS (AND (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                       (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                              0)
+                       T
+                       (|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                |automationRequestList of AutomationRequestValidatorService|)
+                                                   (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                 |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                   (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                   (:VARS |previous state of AutomationRequestValidatorService|
+                                                          |automationRequestList of AutomationRequestValidatorService|
+                                                          |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                           |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                           |int_0_TO_11P|)
+                                                   (:ASSUMPTIONSP)
+                                                   (:ASSUMPTIONS)
+                                                   (:SRL-NAME . |PublishAutomationRequest|)
+                                                   (:BODY RIMPLIES
+                                                          (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                      '|Idle|)
+                                                               (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                      0))
+                                                          (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                 0)))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|ResponseReceived|
+     '(SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+              10))(CONTINGENCY-ANALYSIS (AND (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                       (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                               10)
+                       T
+                       (|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                        |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                        |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                           (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                         |intP|
+                                                         |uxas__messages__task__UniqueAutomationResponseP|)
+                                           (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                           (:OUTPUT-TYPES |int_0_TO_11P|)
+                                           (:VARS |previous state of AutomationRequestValidatorService|
+                                                  |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                  |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                  |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                           (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                   |intP|
+                                                   |uxas__messages__task__UniqueAutomationResponseP|
+                                                   |int_0_TO_11P|)
+                                           (:ASSUMPTIONSP)
+                                           (:ASSUMPTIONS)
+                                           (:SRL-NAME . |ResponseReceived|)
+                                           (:BODY RIMPLIES
+                                                  (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                              '|Busy|)
+                                                       (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                              '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                       (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                               10))
+                                                  (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                         0)))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|ResponseReceived|
+     '(EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+             0))(CONTINGENCY-ANALYSIS (AND (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                       (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                              0)
+                       T
+                       (|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                        |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                        |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                           (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                         |intP|
+                                                         |uxas__messages__task__UniqueAutomationResponseP|)
+                                           (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                           (:OUTPUT-TYPES |int_0_TO_11P|)
+                                           (:VARS |previous state of AutomationRequestValidatorService|
+                                                  |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                  |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                  |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                           (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                   |intP|
+                                                   |uxas__messages__task__UniqueAutomationResponseP|
+                                                   |int_0_TO_11P|)
+                                           (:ASSUMPTIONSP)
+                                           (:ASSUMPTIONS)
+                                           (:SRL-NAME . |ResponseReceived|)
+                                           (:BODY RIMPLIES
+                                                  (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                              '|Busy|)
+                                                       (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                              '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                       (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                               10))
+                                                  (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                         0)))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|Timeout|
+     '(SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+              10))(CONTINGENCY-ANALYSIS (AND (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                       (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                               10)
+                       T
+                       (|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                               |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                               |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                  (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                |intP|
+                                                |uxas__messages__task__UniqueAutomationResponseP|)
+                                  (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                  (:OUTPUT-TYPES |int_0_TO_11P|)
+                                  (:VARS |previous state of AutomationRequestValidatorService|
+                                         |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                         |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                         |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                  (:TYPES |AutomationRequestValidatorServiceStateP|
+                                          |intP|
+                                          |uxas__messages__task__UniqueAutomationResponseP|
+                                          |int_0_TO_11P|)
+                                  (:ASSUMPTIONSP)
+                                  (:ASSUMPTIONS)
+                                  (:SRL-NAME . |Timeout|)
+                                  (:BODY RIMPLIES
+                                         (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Busy|)
+                                              (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                              '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                  (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                          10)))
+                                         (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                0)))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|Timeout|
+     '(EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+             0))(CONTINGENCY-ANALYSIS (AND (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                       (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                              0)
+                       T
+                       (|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                               |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                               |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                  (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                |intP|
+                                                |uxas__messages__task__UniqueAutomationResponseP|)
+                                  (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                  (:OUTPUT-TYPES |int_0_TO_11P|)
+                                  (:VARS |previous state of AutomationRequestValidatorService|
+                                         |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                         |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                         |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                  (:TYPES |AutomationRequestValidatorServiceStateP|
+                                          |intP|
+                                          |uxas__messages__task__UniqueAutomationResponseP|
+                                          |int_0_TO_11P|)
+                                  (:ASSUMPTIONSP)
+                                  (:ASSUMPTIONS)
+                                  (:SRL-NAME . |Timeout|)
+                                  (:BODY RIMPLIES
+                                         (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Busy|)
+                                              (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                              '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                  (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                          10)))
+                                         (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                0)))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~|**XX**Inner contingency analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting contingency analyses.**XX**~%~%")(DEFTTAG T)(CW "~%~|**XX**Contingency analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting global contingency analysis.**XX**~%~%")(DEFTTAG T)(CW "~%~|**XX**Global contingency analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting pair-conflict analyses.**XX**~%~%")(DEFTTAG T)(CW "~%~%**RMsg**~%
+Pair-conflict analysis.
+~|Requirement1: ~x0 
+~|Requirement2: ~x1 
+~|!!RMsg!!~%"
+     '|PublishAutomationRequest|
+     '|ResponseReceived|)(MV-LET (ERP X1 STATE)
+         (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                       (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                       (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|))
+                                  (EQUAL (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Idle|)
+                                              (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                     0)
+                                              (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Busy|)
+                                              (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                     '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                              (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                      10))
+                                         NIL)))
+         (IF (NOT ERP)
+             (PROGN! (CW "~%The pair-conflict analysis check passes ~
+because these two requirements have disjoint antecedents.~%")
+                     (TABLE RAE-DISJOINT-TABLE
+                            '(|PublishAutomationRequest| |ResponseReceived|)
+                            T)
+                     (TABLE RAE-DISJOINT-TABLE
+                            '(|ResponseReceived| |PublishAutomationRequest|)
+                            T)
+                     (MV NIL :PAIR-CONFLICT-PASSED STATE))
+             (MV-LET (ERP X1 STATE)
+                     (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                                   (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                   (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                                   (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Idle|)
+                                                   (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                          0)
+                                                   (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Busy|)
+                                                   (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                          '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                   (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                           10))
+                                              (EQUAL (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            0)
+                                                     (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            0))))
+                     (IF (NOT ERP)
+                         (PROG2$ (CW "~%The pair-conflict analysis check passes because these ~
+two requirements agree on the value of the controlled variable ~
+when their antecedents overlap.~%")
+                                 (MV NIL :PAIR-CONFLICT-PASSED STATE))
+                         (MV-LET (CTS? X1 STATE)
+                                 (RAE-TEST? (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                                          (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                          (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                          (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                          (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                                          (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Idle|)
+                                                          (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                 0)
+                                                          (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Busy|)
+                                                          (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                 '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                          (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                  10))
+                                                     (EQUAL (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                   0)
+                                                            (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                   0))))
+                                 (LET ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+                                      (COND ((AND (NOT CTS?) (NOT RES))
+                                             (PROG2$ (CW "~%The pair-conflict analysis check passes because these ~
+two requirements agree on the value of the controlled variable ~
+when their antecedents overlap.~%")
+                                                     (MV NIL :PAIR-CONFLICT-PASSED STATE)))
+                                            (CTS? (PROG2$ (CW "~%**EMsg**~%RAE found a pair-conflict error.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|The requirements disagree on the value of the controlled variable ~
+for the following system state. 
+~|~S3~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Error\" msgName=\"pair-conflict-analysis-error\" 
+msgText=\"RAE found a pair-conflict error.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|The requirements disagree on the value of the controlled variable ~
+for the following system state. 
+~|~S3\">~%<ObjectID>PublishAutomationRequest</ObjectID>~%<ObjectID>ResponseReceived</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Pair-conflict analyses: failed.**XX**~%~%"
+                                                              (STRIP-REQ-NAME (CAR '(|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                             |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                                (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                              |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                                                                                (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                                (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                                (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                       |automationRequestList of AutomationRequestValidatorService|
+                                                                                                                       |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                                (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                        |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                                                                                        |int_0_TO_11P|)
+                                                                                                                (:ASSUMPTIONSP)
+                                                                                                                (:ASSUMPTIONS)
+                                                                                                                (:SRL-NAME . |PublishAutomationRequest|)
+                                                                                                                (:BODY RIMPLIES
+                                                                                                                       (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                                   '|Idle|)
+                                                                                                                            (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                                                   0))
+                                                                                                                       (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                              0)))))
+                                                              (STRIP-REQ-NAME (CAR '(|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                     |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                     |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                                        (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                      |intP|
+                                                                                                                      |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                                        (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                        (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                        (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                               |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                               |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                               |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                        (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                |intP|
+                                                                                                                |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                                |int_0_TO_11P|)
+                                                                                                        (:ASSUMPTIONSP)
+                                                                                                        (:ASSUMPTIONS)
+                                                                                                        (:SRL-NAME . |ResponseReceived|)
+                                                                                                        (:BODY RIMPLIES
+                                                                                                               (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                           '|Busy|)
+                                                                                                                    (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                           '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                                                                                    (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                            10))
+                                                                                                               (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                      0)))))
+                                                              '"timeSinceLastTimerUpdate of AutomationRequestValidatorService"
+                                                              (TO-TABLE-STRING (RESTRICT-CGEN-RESULT '(|previous state of AutomationRequestValidatorService| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                                                             |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                                                             |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                     CGEN-STATE)))
+                                                          (MV T
+                                                              (CONS :PAIR-CONFLICT-FAILED CGEN-STATE)
+                                                              STATE)))
+                                            (T (PROG2$ (CW "~%**EMsg**~%RAE: We were not able to falsify the pair-conflict analysis check.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check passes.
+~|Therefore, we cannot determine whether these two requirements satisfy the pair-conflict analysis.~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Warning\" msgName=\"pair-conflict-analysis-potential-error\" 
+msgText=\"RAE: We were not able to falsify the pair-conflict analysis check.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check passes.
+~|Therefore, we cannot determine whether these two requirements satisfy the pair-conflict analysis.\">~%<ObjectID>PublishAutomationRequest</ObjectID>~%<ObjectID>ResponseReceived</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Pair-conflict analyses: undetermined.**XX**~%~%"
+                                                           (STRIP-REQ-NAME (CAR '(|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                          |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                             (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                           |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                                                                             (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                             (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                             (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                    |automationRequestList of AutomationRequestValidatorService|
+                                                                                                                    |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                             (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                     |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                                                                                     |int_0_TO_11P|)
+                                                                                                             (:ASSUMPTIONSP)
+                                                                                                             (:ASSUMPTIONS)
+                                                                                                             (:SRL-NAME . |PublishAutomationRequest|)
+                                                                                                             (:BODY RIMPLIES
+                                                                                                                    (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                                '|Idle|)
+                                                                                                                         (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                                                0))
+                                                                                                                    (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                           0)))))
+                                                           (STRIP-REQ-NAME (CAR '(|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                  |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                  |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                                     (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                   |intP|
+                                                                                                                   |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                                     (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                     (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                     (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                            |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                            |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                            |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                     (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                             |intP|
+                                                                                                             |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                             |int_0_TO_11P|)
+                                                                                                     (:ASSUMPTIONSP)
+                                                                                                     (:ASSUMPTIONS)
+                                                                                                     (:SRL-NAME . |ResponseReceived|)
+                                                                                                     (:BODY RIMPLIES
+                                                                                                            (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                        '|Busy|)
+                                                                                                                 (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                        '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                                                                                 (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                         10))
+                                                                                                            (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                   0)))))
+                                                           '"timeSinceLastTimerUpdate of AutomationRequestValidatorService")
+                                                       (MV NIL :PAIR-CONFLICT-? STATE))))))))))(CW "~%~%**RMsg**~%
+Pair-conflict analysis.
+~|Requirement1: ~x0 
+~|Requirement2: ~x1 
+~|!!RMsg!!~%"
+     '|PublishAutomationRequest|
+     '|Timeout|)(MV-LET (ERP X1 STATE)
+         (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                       (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                       (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|))
+                                  (EQUAL (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Idle|)
+                                              (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                     0)
+                                              (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Busy|)
+                                              (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                              '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                  (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                          10)))
+                                         NIL)))
+         (IF (NOT ERP)
+             (PROGN! (CW "~%The pair-conflict analysis check passes ~
+because these two requirements have disjoint antecedents.~%")
+                     (TABLE RAE-DISJOINT-TABLE
+                            '(|PublishAutomationRequest| |Timeout|)
+                            T)
+                     (TABLE RAE-DISJOINT-TABLE
+                            '(|Timeout| |PublishAutomationRequest|)
+                            T)
+                     (MV NIL :PAIR-CONFLICT-PASSED STATE))
+             (MV-LET (ERP X1 STATE)
+                     (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                                   (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                   (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                                   (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Idle|)
+                                                   (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                          0)
+                                                   (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Busy|)
+                                                   (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                   '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                       (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                               10)))
+                                              (EQUAL (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            0)
+                                                     (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            0))))
+                     (IF (NOT ERP)
+                         (PROG2$ (CW "~%The pair-conflict analysis check passes because these ~
+two requirements agree on the value of the controlled variable ~
+when their antecedents overlap.~%")
+                                 (MV NIL :PAIR-CONFLICT-PASSED STATE))
+                         (MV-LET (CTS? X1 STATE)
+                                 (RAE-TEST? (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                                          (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                          (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                          (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                          (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                                          (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Idle|)
+                                                          (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                 0)
+                                                          (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Busy|)
+                                                          (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                          '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                              (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                      10)))
+                                                     (EQUAL (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                   0)
+                                                            (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                   0))))
+                                 (LET ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+                                      (COND ((AND (NOT CTS?) (NOT RES))
+                                             (PROG2$ (CW "~%The pair-conflict analysis check passes because these ~
+two requirements agree on the value of the controlled variable ~
+when their antecedents overlap.~%")
+                                                     (MV NIL :PAIR-CONFLICT-PASSED STATE)))
+                                            (CTS? (PROG2$ (CW "~%**EMsg**~%RAE found a pair-conflict error.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|The requirements disagree on the value of the controlled variable ~
+for the following system state. 
+~|~S3~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Error\" msgName=\"pair-conflict-analysis-error\" 
+msgText=\"RAE found a pair-conflict error.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|The requirements disagree on the value of the controlled variable ~
+for the following system state. 
+~|~S3\">~%<ObjectID>PublishAutomationRequest</ObjectID>~%<ObjectID>Timeout</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Pair-conflict analyses: failed.**XX**~%~%"
+                                                              (STRIP-REQ-NAME (CAR '(|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                             |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                                (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                              |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                                                                                (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                                (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                                (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                       |automationRequestList of AutomationRequestValidatorService|
+                                                                                                                       |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                                (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                        |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                                                                                        |int_0_TO_11P|)
+                                                                                                                (:ASSUMPTIONSP)
+                                                                                                                (:ASSUMPTIONS)
+                                                                                                                (:SRL-NAME . |PublishAutomationRequest|)
+                                                                                                                (:BODY RIMPLIES
+                                                                                                                       (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                                   '|Idle|)
+                                                                                                                            (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                                                   0))
+                                                                                                                       (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                              0)))))
+                                                              (STRIP-REQ-NAME (CAR '(|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                            |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                            |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                               (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                             |intP|
+                                                                                                             |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                               (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                               (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                               (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                      |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                      |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                      |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                               (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                       |intP|
+                                                                                                       |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                       |int_0_TO_11P|)
+                                                                                               (:ASSUMPTIONSP)
+                                                                                               (:ASSUMPTIONS)
+                                                                                               (:SRL-NAME . |Timeout|)
+                                                                                               (:BODY RIMPLIES
+                                                                                                      (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                  '|Busy|)
+                                                                                                           (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                           '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                                                                               (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                       10)))
+                                                                                                      (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                             0)))))
+                                                              '"timeSinceLastTimerUpdate of AutomationRequestValidatorService"
+                                                              (TO-TABLE-STRING (RESTRICT-CGEN-RESULT '(|previous state of AutomationRequestValidatorService| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                                                             |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                                                             |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                     CGEN-STATE)))
+                                                          (MV T
+                                                              (CONS :PAIR-CONFLICT-FAILED CGEN-STATE)
+                                                              STATE)))
+                                            (T (PROG2$ (CW "~%**EMsg**~%RAE: We were not able to falsify the pair-conflict analysis check.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check passes.
+~|Therefore, we cannot determine whether these two requirements satisfy the pair-conflict analysis.~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Warning\" msgName=\"pair-conflict-analysis-potential-error\" 
+msgText=\"RAE: We were not able to falsify the pair-conflict analysis check.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check passes.
+~|Therefore, we cannot determine whether these two requirements satisfy the pair-conflict analysis.\">~%<ObjectID>PublishAutomationRequest</ObjectID>~%<ObjectID>Timeout</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Pair-conflict analyses: undetermined.**XX**~%~%"
+                                                           (STRIP-REQ-NAME (CAR '(|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                          |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                             (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                           |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                                                                             (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                             (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                             (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                    |automationRequestList of AutomationRequestValidatorService|
+                                                                                                                    |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                             (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                     |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                                                                                     |int_0_TO_11P|)
+                                                                                                             (:ASSUMPTIONSP)
+                                                                                                             (:ASSUMPTIONS)
+                                                                                                             (:SRL-NAME . |PublishAutomationRequest|)
+                                                                                                             (:BODY RIMPLIES
+                                                                                                                    (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                                '|Idle|)
+                                                                                                                         (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                                                                                0))
+                                                                                                                    (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                           0)))))
+                                                           (STRIP-REQ-NAME (CAR '(|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                         |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                         |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                            (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                          |intP|
+                                                                                                          |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                            (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                            (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                            (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                   |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                   |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                   |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                            (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                    |intP|
+                                                                                                    |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                    |int_0_TO_11P|)
+                                                                                            (:ASSUMPTIONSP)
+                                                                                            (:ASSUMPTIONS)
+                                                                                            (:SRL-NAME . |Timeout|)
+                                                                                            (:BODY RIMPLIES
+                                                                                                   (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                               '|Busy|)
+                                                                                                        (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                        '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                                                                            (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                    10)))
+                                                                                                   (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                          0)))))
+                                                           '"timeSinceLastTimerUpdate of AutomationRequestValidatorService")
+                                                       (MV NIL :PAIR-CONFLICT-? STATE))))))))))(CW "~%~%**RMsg**~%
+Pair-conflict analysis.
+~|Requirement1: ~x0 
+~|Requirement2: ~x1 
+~|!!RMsg!!~%"
+     '|ResponseReceived|
+     '|Timeout|)(MV-LET (ERP X1 STATE)
+         (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                       (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                       (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                                  (EQUAL (AND (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                     '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                              (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                      10)
+                                              (EQUAL |previous state of AutomationRequestValidatorService|
+                                                     '|Busy|)
+                                              (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                              '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                  (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                          10)))
+                                         NIL)))
+         (IF (NOT ERP)
+             (PROGN! (CW "~%The pair-conflict analysis check passes ~
+because these two requirements have disjoint antecedents.~%")
+                     (TABLE RAE-DISJOINT-TABLE
+                            '(|ResponseReceived| |Timeout|)
+                            T)
+                     (TABLE RAE-DISJOINT-TABLE
+                            '(|Timeout| |ResponseReceived|)
+                            T)
+                     (MV NIL :PAIR-CONFLICT-PASSED STATE))
+             (MV-LET (ERP X1 STATE)
+                     (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                                   (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                   (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                   (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                          '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                   (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                           10)
+                                                   (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Busy|)
+                                                   (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                   '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                       (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                               10)))
+                                              (EQUAL (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            0)
+                                                     (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            0))))
+                     (IF (NOT ERP)
+                         (PROG2$ (CW "~%The pair-conflict analysis check passes because these ~
+two requirements agree on the value of the controlled variable ~
+when their antecedents overlap.~%")
+                                 (MV NIL :PAIR-CONFLICT-PASSED STATE))
+                         (MV-LET (CTS? X1 STATE)
+                                 (RAE-TEST? (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                                          (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                          (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                          (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                          (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                 '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                          (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                  10)
+                                                          (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Busy|)
+                                                          (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                          '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                              (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                      10)))
+                                                     (EQUAL (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                   0)
+                                                            (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                   0))))
+                                 (LET ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+                                      (COND ((AND (NOT CTS?) (NOT RES))
+                                             (PROG2$ (CW "~%The pair-conflict analysis check passes because these ~
+two requirements agree on the value of the controlled variable ~
+when their antecedents overlap.~%")
+                                                     (MV NIL :PAIR-CONFLICT-PASSED STATE)))
+                                            (CTS? (PROG2$ (CW "~%**EMsg**~%RAE found a pair-conflict error.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|The requirements disagree on the value of the controlled variable ~
+for the following system state. 
+~|~S3~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Error\" msgName=\"pair-conflict-analysis-error\" 
+msgText=\"RAE found a pair-conflict error.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|The requirements disagree on the value of the controlled variable ~
+for the following system state. 
+~|~S3\">~%<ObjectID>ResponseReceived</ObjectID>~%<ObjectID>Timeout</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Pair-conflict analyses: failed.**XX**~%~%"
+                                                              (STRIP-REQ-NAME (CAR '(|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                     |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                     |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                                        (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                      |intP|
+                                                                                                                      |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                                        (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                        (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                        (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                               |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                               |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                               |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                        (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                |intP|
+                                                                                                                |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                                |int_0_TO_11P|)
+                                                                                                        (:ASSUMPTIONSP)
+                                                                                                        (:ASSUMPTIONS)
+                                                                                                        (:SRL-NAME . |ResponseReceived|)
+                                                                                                        (:BODY RIMPLIES
+                                                                                                               (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                           '|Busy|)
+                                                                                                                    (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                           '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                                                                                    (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                            10))
+                                                                                                               (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                      0)))))
+                                                              (STRIP-REQ-NAME (CAR '(|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                            |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                            |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                               (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                             |intP|
+                                                                                                             |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                               (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                               (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                               (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                      |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                      |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                      |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                               (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                       |intP|
+                                                                                                       |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                       |int_0_TO_11P|)
+                                                                                               (:ASSUMPTIONSP)
+                                                                                               (:ASSUMPTIONS)
+                                                                                               (:SRL-NAME . |Timeout|)
+                                                                                               (:BODY RIMPLIES
+                                                                                                      (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                  '|Busy|)
+                                                                                                           (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                           '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                                                                               (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                       10)))
+                                                                                                      (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                             0)))))
+                                                              '"timeSinceLastTimerUpdate of AutomationRequestValidatorService"
+                                                              (TO-TABLE-STRING (RESTRICT-CGEN-RESULT '(|previous state of AutomationRequestValidatorService| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                                                             |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                                     CGEN-STATE)))
+                                                          (MV T
+                                                              (CONS :PAIR-CONFLICT-FAILED CGEN-STATE)
+                                                              STATE)))
+                                            (T (PROG2$ (CW "~%**EMsg**~%RAE: We were not able to falsify the pair-conflict analysis check.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check passes.
+~|Therefore, we cannot determine whether these two requirements satisfy the pair-conflict analysis.~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Warning\" msgName=\"pair-conflict-analysis-potential-error\" 
+msgText=\"RAE: We were not able to falsify the pair-conflict analysis check.
+~|Requirement1: ~s0 
+~|Requirement2: ~s1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check passes.
+~|Therefore, we cannot determine whether these two requirements satisfy the pair-conflict analysis.\">~%<ObjectID>ResponseReceived</ObjectID>~%<ObjectID>Timeout</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Pair-conflict analyses: undetermined.**XX**~%~%"
+                                                           (STRIP-REQ-NAME (CAR '(|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                                  |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                  |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                                     (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                                   |intP|
+                                                                                                                   |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                                     (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                     (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                                     (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                            |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                            |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                            |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                                     (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                             |intP|
+                                                                                                             |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                             |int_0_TO_11P|)
+                                                                                                     (:ASSUMPTIONSP)
+                                                                                                     (:ASSUMPTIONS)
+                                                                                                     (:SRL-NAME . |ResponseReceived|)
+                                                                                                     (:BODY RIMPLIES
+                                                                                                            (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                                        '|Busy|)
+                                                                                                                 (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                        '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                                                                                 (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                         10))
+                                                                                                            (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                   0)))))
+                                                           (STRIP-REQ-NAME (CAR '(|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                                                         |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                         |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                                                                            (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                          |intP|
+                                                                                                          |uxas__messages__task__UniqueAutomationResponseP|)
+                                                                                            (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                            (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                                                            (:VARS |previous state of AutomationRequestValidatorService|
+                                                                                                   |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                   |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                   |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                                                            (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                                                                    |intP|
+                                                                                                    |uxas__messages__task__UniqueAutomationResponseP|
+                                                                                                    |int_0_TO_11P|)
+                                                                                            (:ASSUMPTIONSP)
+                                                                                            (:ASSUMPTIONS)
+                                                                                            (:SRL-NAME . |Timeout|)
+                                                                                            (:BODY RIMPLIES
+                                                                                                   (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                                                               '|Busy|)
+                                                                                                        (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                        '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                                                                            (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                    10)))
+                                                                                                   (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                          0)))))
+                                                           '"timeSinceLastTimerUpdate of AutomationRequestValidatorService")
+                                                       (MV NIL :PAIR-CONFLICT-? STATE))))))))))(CW "~%~|**XX**Pair-conflict analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting completeness analysis.**XX**~%~%")(DEFTTAG T)(CW "~%~%**RMsg**~%
+Completeness analysis. 
+~|Requirements: ~x0 
+~|!!RMsg!!~%"
+     '(|Timeout| |ResponseReceived|
+                 |PublishAutomationRequest|))(DEFTTAG T)(MV-LET (ERP X1 STATE)
+         (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                       (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                       (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                       (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|))
+                                  (EQUAL (BOR (EQUAL (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                     0)
+                                              (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Busy|)
+                                                   (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                   '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                       (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                               10)))
+                                              (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Busy|)
+                                                   (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                          '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                   (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                           10))
+                                              (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Idle|)
+                                                   (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                          0)))
+                                         T)))
+         (IF (NOT ERP)
+             (PROG2$ (CW "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the completeness check.~%")
+                     (MV NIL :COMPLETENESS-PASSED STATE))
+             (MV-LET (CTS? X1 STATE)
+                     (RAE-TEST? (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                              (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                              (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                              (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                              (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|))
+                                         (EQUAL (BOR (EQUAL (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                            0)
+                                                     (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Busy|)
+                                                          (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                          '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                                              (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                      10)))
+                                                     (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Busy|)
+                                                          (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                 '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                          (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                  10))
+                                                     (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Idle|)
+                                                          (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                 0)))
+                                                T)))
+                     (LET ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+                          (COND ((AND (NOT CTS?) (NOT RES))
+                                 (PROG2$ (CW "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the completeness check.~%")
+                                         (MV NIL :COMPLETENESS-PASSED STATE)))
+                                (CTS? (PROG2$ (CW "~%**EMsg**~%RAE found a completeness error.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~S3~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Error\" msgName=\"completeness-analysis-error\" 
+msgText=\"RAE found a completeness error.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~S3\">~%<ObjectID>Timeout</ObjectID>~%<ObjectID>ResponseReceived</ObjectID>~%<ObjectID>PublishAutomationRequest</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Completeness analysis: failed.**XX**~%~%"
+                                                  (STRIP-REQ-NAMES '(|PublishAutomationRequest| |ResponseReceived| |Timeout|))
+                                                  '""
+                                                  '"timeSinceLastTimerUpdate of AutomationRequestValidatorService"
+                                                  (TO-TABLE-STRING (RESTRICT-CGEN-RESULT '(|previous state of AutomationRequestValidatorService| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                                                                                                                 |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                                                                                                                 |automationRequestList of AutomationRequestValidatorService|)
+                                                                                         CGEN-STATE)))
+                                              (MV T (CONS :COMPLETENESS-FAILED CGEN-STATE)
+                                                  STATE)))
+                                (T (PROG2$ (CW "~%**EMsg**~%RAE: We were not able to falsify the completeness check.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Warning\" msgName=\"completeness-analysis-potential-error\" 
+msgText=\"RAE: We were not able to falsify the completeness check.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.\">~%<ObjectID>Timeout</ObjectID>~%<ObjectID>ResponseReceived</ObjectID>~%<ObjectID>PublishAutomationRequest</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Completeness analysis: undetermined.**XX**~%~%"
+                                               (STRIP-REQ-NAMES '(|PublishAutomationRequest| |ResponseReceived| |Timeout|))
+                                               '""
+                                               '"timeSinceLastTimerUpdate of AutomationRequestValidatorService")
+                                           (MV NIL :COMPLETENESS-? STATE))))))))(CW "~%~|**XX**Completeness analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting independence analyses.**XX**~%~%")(DEFTTAG T)(INDEPENDENCE-ALL ((|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                    (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                    (|int_0_TO_11P| |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                    (|intP| |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                    (|uxas__messages__task__UniqueAutomationResponseP| |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|))
+                   ((|PublishAutomationRequest| |previous state of AutomationRequestValidatorService|
+                                                |automationRequestList of AutomationRequestValidatorService|
+                                                |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                    (|ResponseReceived| |previous state of AutomationRequestValidatorService|
+                                        |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                        |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                        |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                    (|Timeout| |previous state of AutomationRequestValidatorService|
+                               |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                               |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                               |timeSinceLastTimerUpdate of AutomationRequestValidatorService|))
+                   ((|Timeout| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                            |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                            |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                               (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                             |intP|
+                                             |uxas__messages__task__UniqueAutomationResponseP|)
+                               (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                               (:OUTPUT-TYPES |int_0_TO_11P|)
+                               (:VARS |previous state of AutomationRequestValidatorService|
+                                      |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                      |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                      |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                               (:TYPES |AutomationRequestValidatorServiceStateP|
+                                       |intP|
+                                       |uxas__messages__task__UniqueAutomationResponseP|
+                                       |int_0_TO_11P|)
+                               (:ASSUMPTIONSP)
+                               (:ASSUMPTIONS)
+                               (:SRL-NAME . |Timeout|)
+                               (:BODY RIMPLIES
+                                      (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                  '|Busy|)
+                                           (OR (NOT (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                           '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|))
+                                               (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                       10)))
+                                      (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                             0)))
+                    (|ResponseReceived| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                     |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                     |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|)
+                                        (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                      |intP|
+                                                      |uxas__messages__task__UniqueAutomationResponseP|)
+                                        (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                        (:OUTPUT-TYPES |int_0_TO_11P|)
+                                        (:VARS |previous state of AutomationRequestValidatorService|
+                                               |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                               |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                               |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                        (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                |intP|
+                                                |uxas__messages__task__UniqueAutomationResponseP|
+                                                |int_0_TO_11P|)
+                                        (:ASSUMPTIONSP)
+                                        (:ASSUMPTIONS)
+                                        (:SRL-NAME . |ResponseReceived|)
+                                        (:BODY RIMPLIES
+                                               (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                           '|Busy|)
+                                                    (EQUAL |uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService|
+                                                           '|http://sadl.org/Validator.sadl#uxas__messages__task__UniqueAutomationResponse|)
+                                                    (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                            10))
+                                               (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                      0)))
+                    (|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                             |automationRequestList of AutomationRequestValidatorService|)
+                                                (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                              |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                (:OUTPUT-VARS |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                (:OUTPUT-TYPES |int_0_TO_11P|)
+                                                (:VARS |previous state of AutomationRequestValidatorService|
+                                                       |automationRequestList of AutomationRequestValidatorService|
+                                                       |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                                                (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                        |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                        |int_0_TO_11P|)
+                                                (:ASSUMPTIONSP)
+                                                (:ASSUMPTIONS)
+                                                (:SRL-NAME . |PublishAutomationRequest|)
+                                                (:BODY RIMPLIES
+                                                       (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                   '|Idle|)
+                                                            (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                   0))
+                                                       (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService|
+                                                              0))))
+                   (|Timeout| |ResponseReceived|
+                              |PublishAutomationRequest|)
+                   ((:SURJECTIVITY-STRICT)
+                    (:COMPLETENESS-STRICT)
+                    (:CONFLICT-STRICT)
+                    (:INDEPENDENCE-STRICT)
+                    (:CONTINGENCY-STRICT)
+                    (:STRICT-SAT))
+                   ((:CONTROLLED-VARIABLE .
+                                          |timeSinceLastTimerUpdate of AutomationRequestValidatorService|)
+                    (:ASSUMPTIONS-LIST)
+                    (:REQUIREMENTS-LIST |PublishAutomationRequest|
+                                        |ResponseReceived| |Timeout|)
+                    (:ASSUMPTIONS)
+                    (:CONDITIONAL-COMPLETENESS-FORM ((|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|))
+                                                    ((EQUAL (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                            0))))
+                   NIL)(CW "~%~|**XX**Independence analysis completed successfully.**XX**~%~%")

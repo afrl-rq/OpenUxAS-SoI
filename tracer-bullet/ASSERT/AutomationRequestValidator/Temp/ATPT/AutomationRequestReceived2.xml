@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Requirement xmlns="urn:com:ge:atpt:plugins:truecourse:dmbl:addinfo" Name="AutomationRequestReceived2">
+    <RequirementInstance Name="AutomationRequestReceived2_instance_3">
+        <SpecificationName Name="previous(Validator__stat)__Validator__AutomationRequestValidatorService)">
+            <TestInstance Name="Idle">
+                <TestInstanceName>Idle</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="Busy">
+                <TestInstanceName>Busy</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__uxas__messages__task__TaskAutomationRequest__Subscription__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="Validator.sadl_uxas__messages__task__TaskAutomationRequest_Val">
+                <TestInstanceName>Validator.sadl_uxas__messages__task__TaskAutomationRequest_Val</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__automationRequestList__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__maxListLength__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__timeSinceLastTimerUpdate__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__uxas__messages__task__UniqueAutomationResponse__Subscription__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val">
+                <TestInstanceName>Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__denialOfService__Validator__System"/>
+        <SpecificationName Name="Validator__errorMsg__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="ErrorMsgTooManyRequests">
+                <TestInstanceName>ErrorMsgTooManyRequests</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="ErrorMsgTimeout">
+                <TestInstanceName>ErrorMsgTimeout</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+    </RequirementInstance>
+</Requirement>

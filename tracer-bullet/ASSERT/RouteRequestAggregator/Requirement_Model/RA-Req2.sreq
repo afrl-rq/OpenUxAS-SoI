@@ -1,0 +1,20 @@
+uri "http://sadl.org/RA-Req2.sreq" alias rareq2.
+import "http://sadl.org/RequestAggregator.sadl".
+
+//we get back a route plan for a vehicle 
+Context: ReqAggregator with receive2 RoutePlanGeneratedMsg
+and xindex is an int  
+and request is element xindex of requestList of ReqAggregator
+and mID of request is mID of RoutePlanGeneratedMsg 
+and xvilist is vi of request //vehicle info list; now get the index of the correct vehicle
+and yindex is an int
+and mID of element yindex of xvilist is mID of vpm of RoutePlanGeneratedMsg  // vehicle ids match
+.
+
+// fill in appropriate slot with the generated plan
+// we should check if we have already receive plan for that route request and vehicle id (i.e. this is a duplicate message)
+Requirement R3: 
+ReqAggregator shall set plan of (element yindex of vi of (element xindex of requestList of ReqAggregator)) 
+                        to plan of vpm of RoutePlanGeneratedMsg
+and set numPlansPending of (element xindex of requestList of ReqAggregator)
+	to previous numPlansPending of (element xindex of requestList of ReqAggregator) - 1.	

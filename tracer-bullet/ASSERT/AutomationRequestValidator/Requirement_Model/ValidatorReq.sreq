@@ -1,0 +1,90 @@
+uri "http://sadl.org/ValidatorReq.sreq" alias ValReq.
+import "http://sadl.org/Validator.sadl".
+
+Context: AutomationRequestValidatorService.
+
+Requirement AutomationRequestReceived:
+AutomationRequestValidatorService shall insert uxas__messages__task__TaskAutomationRequest__Subscription into
+	                previous automationRequestList at end
+when uxas__messages__task__TaskAutomationRequest__Subscription is a uxas__messages__task__TaskAutomationRequest
+     and length of previous automationRequestList < maxListLength
+     and denialOfService of System is false.
+
+Requirement AutomationRequestReceived2:
+AutomationRequestValidatorService shall set errorMsg of AutomationRequestValidatorService to ErrorMsgTooManyRequests
+when uxas__messages__task__TaskAutomationRequest__Subscription is a uxas__messages__task__TaskAutomationRequest
+     and (length of automationRequestList = maxListLength
+          or denialOfService of System is true)
+     and not (previous state is Busy   // it is not timeout
+//              and (previous timerFlag has been true for the past 10 seconds  //why did I use "previous" - because it was in "Timeout"???
+              and (timeSinceLastTimerUpdate >= 10
+                   or not(uxas__messages__task__UniqueAutomationResponse__Subscription is uxas__messages__task__UniqueAutomationResponse)))     .
+          
+Requirement ResponseReceived:
+AutomationRequestValidatorService shall set state to Idle
+//                and set timerFlag to false  
+                and set timeSinceLastTimerUpdate to 0
+                and remove element 1 from previous automationRequestList of AutomationRequestValidatorService
+                and set uxas__messages__task__TaskAutomationResponse_out to content of uxas__messages__task__UniqueAutomationResponse
+when previous state is Busy
+//     and previous timerFlag has not been true for the past 10 seconds
+     and previous timeSinceLastTimerUpdate <= 10  
+     and uxas__messages__task__UniqueAutomationResponse__Subscription is uxas__messages__task__UniqueAutomationResponse. 
+
+Requirement Timeout:
+AutomationRequestValidatorService shall set state to Idle
+//                and set timerFlag to false
+                and set timeSinceLastTimerUpdate to 0
+                and remove element 1 from previous automationRequestList of AutomationRequestValidatorService
+                and set errorMsg to ErrorMsgTimeout
+when previous state is Busy
+//     and (previous timerFlag has been true for the past 10 seconds
+     and (previous timeSinceLastTimerUpdate >= 10
+          or not(uxas__messages__task__UniqueAutomationResponse__Subscription is uxas__messages__task__UniqueAutomationResponse)).
+
+Requirement PublishAutomationRequest:
+AutomationRequestValidatorService shall set uxas__messages__task__UniqueAutomationRequest_out to msg 
+//                and set timerFlag to true
+                and set timeSinceLastTimerUpdate to 0
+                and set state to Busy
+when previous state is Idle
+     and length of automationRequestList > 0 
+where
+newid is (a GenID)
+ and msg is (a uxas__messages__task__UniqueAutomationRequest
+ 			with ResponseID (result of newid)).
+ 			
+Requirement PublishAutomationRequest2:
+AutomationRequestValidatorService shall set state to Idle
+when previous state is Idle
+     and length of automationRequestList = 0 . 
+
+Assertion A1:
+//AutomationRequestValidatorService asserts that timerFlag is immaterial
+AutomationRequestValidatorService asserts that timeSinceLastTimerUpdate is immaterial
+when length of automationRequestList = 0.
+
+Assertion A2:
+AutomationRequestValidatorService asserts that uxas__messages__task__UniqueAutomationRequest_out is immaterial
+when not(previous state is Idle
+         and length of automationRequestList > 0). 
+
+Assertion A3:
+AutomationRequestValidatorService asserts that uxas__messages__task__TaskAutomationResponse_out is immaterial
+when uxas__messages__task__UniqueAutomationResponse__Subscription is a uxas__messages__task__UniqueAutomationResponse
+    and (previous state is Idle
+//    	 or previous timerFlag has been true for the past 10 seconds). //AM: why did I use "previous"?
+    	 or timeSinceLastTimerUpdate >= 10).
+
+Assertion A4: AutomationRequestValidatorService asserts that errorMsg is immaterial
+when not (uxas__messages__task__TaskAutomationRequest__Subscription is a uxas__messages__task__TaskAutomationRequest
+     and (length of automationRequestList = maxListLength
+          or denialOfService of System is true)).
+
+Assertion A5: AutomationRequestValidatorService asserts that automationRequestList is immaterial
+when length of previous automationRequestList >= maxListLength
+     or previous state is Idle.
+
+Assertion A6: AutomationRequestValidatorService asserts that automationRequestList is immaterial
+when length of previous automationRequestList = 0
+     or previous state is Idle.

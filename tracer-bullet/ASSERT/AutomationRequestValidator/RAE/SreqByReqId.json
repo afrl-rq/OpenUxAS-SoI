@@ -1,0 +1,29 @@
+{
+    "A1": [
+        "ValidatorReq.sreq"
+    ],
+    "A2": [
+        "ValidatorReq.sreq"
+    ],
+    "A3": [
+        "ValidatorReq.sreq"
+    ],
+    "AUTOMATIONREQUESTRECEIVED": [
+        "ValidatorReq.sreq"
+    ],
+    "AUTOMATIONREQUESTRECEIVED2": [
+        "ValidatorReq.sreq"
+    ],
+    "PUBLISHAUTOMATIONREQUEST": [
+        "ValidatorReq.sreq"
+    ],
+    "PUBLISHAUTOMATIONREQUEST2": [
+        "ValidatorReq.sreq"
+    ],
+    "RESPONSERECEIVED": [
+        "ValidatorReq.sreq"
+    ],
+    "TIMEOUT": [
+        "ValidatorReq.sreq"
+    ]
+}

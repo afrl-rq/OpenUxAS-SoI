@@ -1,0 +1,44 @@
+{
+    "start": [
+        "**XX**ACL2s Requirements Analysis Engine Version \"2017-9-16\".**XX**"
+    ],
+    "inner contingency": [
+        "**XX**Starting inner contingency analyses.**XX**",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |AutomationRequestReceived2| \nTerm: (EQUAL (LEN-C |automationRequestList of AutomationRequestValidatorService|) |maxListLength of AutomationRequestValidatorService|) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |AutomationRequestReceived2| \nTerm: (EQUAL |denialOfService of System| 'TRUE) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |AutomationRequestReceived2| \nTerm: (SRL-< |timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |Timeout| \nTerm: (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**XX**Inner contingency analyses completed successfully.**XX**"
+    ],
+    "contingency": [
+        "**XX**Starting contingency analyses.**XX**",
+        "**XX**Contingency analyses completed successfully.**XX**"
+    ],
+    "global contingency": [
+        "**XX**Starting global contingency analysis.**XX**",
+        "**XX**Global contingency analysis completed successfully.**XX**"
+    ],
+    "pair-conflict": [
+        "**XX**Starting pair-conflict analyses.**XX**",
+        "**RMsg**\n\nPair-conflict analysis.\nRequirement1: |AutomationRequestReceived2| \nRequirement2: |Timeout| \n!!RMsg!!",
+        ":PAIR-CONFLICT-PASSED",
+        "**XX**Pair-conflict analyses completed successfully.**XX**"
+    ],
+    "completeness": [
+        "**XX**Starting completeness analysis.**XX**",
+        "**RMsg**\n\nCompleteness analysis. \nRequirements: (|Timeout| |AutomationRequestReceived2|) \n!!RMsg!!",
+        "**XX**Completeness analysis completed successfully.**XX**"
+    ],
+    "independence": [
+        "**XX**Starting independence analyses.**XX**",
+        ":INDEPENDENCE-PASSED",
+        "**XX**Independence analysis completed successfully.**XX**"
+    ],
+    "end": [
+        "Requirement Analysis Complete!!!"
+    ]
+}

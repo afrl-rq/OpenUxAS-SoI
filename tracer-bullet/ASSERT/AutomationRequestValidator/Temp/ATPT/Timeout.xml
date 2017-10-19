@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Requirement xmlns="urn:com:ge:atpt:plugins:truecourse:dmbl:addinfo" Name="Timeout">
+    <RequirementInstance Name="Timeout_instance_19">
+        <SpecificationName Name="previous(Validator__stat)__Validator__AutomationRequestValidatorService)">
+            <TestInstance Name="Idle">
+                <TestInstanceName>Idle</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="Busy">
+                <TestInstanceName>Busy</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__timeSinceLastTimerUpdat)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__uxas__messages__task__UniqueAutomationResponse__Subscription__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val">
+                <TestInstanceName>Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__automationRequestLis)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__automationRequestList__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__errorMsg__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="ErrorMsgTooManyRequests">
+                <TestInstanceName>ErrorMsgTooManyRequests</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="ErrorMsgTimeout">
+                <TestInstanceName>ErrorMsgTimeout</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__timeSinceLastTimerUpdate__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__state__Validator__AutomationRequestValidatorService"/>
+    </RequirementInstance>
+    <RequirementInstance Name="Timeout_instance_23">
+        <SpecificationName Name="previous(Validator__stat)__Validator__AutomationRequestValidatorService)">
+            <TestInstance Name="Idle">
+                <TestInstanceName>Idle</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="Busy">
+                <TestInstanceName>Busy</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__timeSinceLastTimerUpdat)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__uxas__messages__task__UniqueAutomationResponse__Subscription__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val">
+                <TestInstanceName>Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__automationRequestLis)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__automationRequestList__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__errorMsg__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="ErrorMsgTooManyRequests">
+                <TestInstanceName>ErrorMsgTooManyRequests</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="ErrorMsgTimeout">
+                <TestInstanceName>ErrorMsgTimeout</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__timeSinceLastTimerUpdate__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__state__Validator__AutomationRequestValidatorService"/>
+    </RequirementInstance>
+    <RequirementInstance Name="Timeout_instance_17">
+        <SpecificationName Name="previous(Validator__stat)__Validator__AutomationRequestValidatorService)">
+            <TestInstance Name="Idle">
+                <TestInstanceName>Idle</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="Busy">
+                <TestInstanceName>Busy</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__timeSinceLastTimerUpdat)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__uxas__messages__task__UniqueAutomationResponse__Subscription__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val">
+                <TestInstanceName>Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__automationRequestLis)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__automationRequestList__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__errorMsg__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="ErrorMsgTooManyRequests">
+                <TestInstanceName>ErrorMsgTooManyRequests</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="ErrorMsgTimeout">
+                <TestInstanceName>ErrorMsgTimeout</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__timeSinceLastTimerUpdate__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__state__Validator__AutomationRequestValidatorService"/>
+    </RequirementInstance>
+    <RequirementInstance Name="Timeout_instance_25">
+        <SpecificationName Name="previous(Validator__stat)__Validator__AutomationRequestValidatorService)">
+            <TestInstance Name="Idle">
+                <TestInstanceName>Idle</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="Busy">
+                <TestInstanceName>Busy</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__timeSinceLastTimerUpdat)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__uxas__messages__task__UniqueAutomationResponse__Subscription__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val">
+                <TestInstanceName>Validator.sadl_uxas__messages__task__UniqueAutomationResponse_Val</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="previous(Validator__automationRequestLis)__Validator__AutomationRequestValidatorService)"/>
+        <SpecificationName Name="Validator__automationRequestList__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__errorMsg__Validator__AutomationRequestValidatorService">
+            <TestInstance Name="ErrorMsgTooManyRequests">
+                <TestInstanceName>ErrorMsgTooManyRequests</TestInstanceName>
+            </TestInstance>
+            <TestInstance Name="ErrorMsgTimeout">
+                <TestInstanceName>ErrorMsgTimeout</TestInstanceName>
+            </TestInstance>
+        </SpecificationName>
+        <SpecificationName Name="Validator__timeSinceLastTimerUpdate__Validator__AutomationRequestValidatorService"/>
+        <SpecificationName Name="Validator__state__Validator__AutomationRequestValidatorService"/>
+    </RequirementInstance>
+</Requirement>

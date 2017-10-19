@@ -1,0 +1,28 @@
+2017-10-02 16:46:02,560 - INFO: Starting Requirements Analysis Engine Version:v1.3.3b
+2017-10-02 16:46:02,560 - INFO: Configuration: EnablePreprocessing: true, StopOnError: true, PerformSelectiveAnalysis: false, AnalysisTimeout: 600, RunPartialAnalysis: false, ReservedCores: 1
+2017-10-02 16:46:02,576 - INFO: Full analysis will be performed
+2017-10-02 16:46:02,576 - INFO: Starting Pre-processing
+2017-10-02 16:46:02,622 - INFO_FILE: Running Pre-process
+2017-10-02 16:46:04,652 - INFO_FILE: Check for output from Pre-processing
+2017-10-02 16:46:04,652 - WARNING: state_AutomationRequestValidatorService.lisp did not go through pre-processing. File extension .rae.lisp not found
+2017-10-02 16:46:04,668 - WARNING: uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp did not go through pre-processing. File extension .rae.lisp not found
+2017-10-02 16:46:04,668 - INFO: Starting Analysis
+2017-10-02 16:46:04,886 - INFO: Running on 6 cores
+2017-10-02 16:46:04,996 - INFO_FILE: Running Analysis 6/6 for uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:05,011 - INFO_FILE: Running Analysis 5/6 for uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:05,011 - INFO_FILE: Running Analysis 4/6 for timeSinceLastTimerUpdate_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:05,011 - INFO_FILE: Running Analysis 3/6 for state_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:05,011 - INFO_FILE: Running Analysis 2/6 for errorMsg_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:05,027 - INFO_FILE: Running Analysis 1/6 for automationRequestList_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:06,281 - INFO_FILE: Completed Analysis for state_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:07,295 - INFO_FILE: Completed Analysis for uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:15,262 - INFO_FILE: Completed Analysis for uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:16,276 - INFO_FILE: Completed Analysis for timeSinceLastTimerUpdate_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:20,274 - INFO_FILE: Completed Analysis for errorMsg_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:31,282 - INFO_FILE: Completed Analysis for automationRequestList_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:31,610 - INFO: Analysis Finished
+2017-10-02 16:46:31,610 - INFO: Creating Summary Files
+2017-10-02 16:46:31,641 - ERROR: Unknown error "ABORTING from raw Lisp" for file errorMsg_AutomationRequestValidatorService.lisp.results
+2017-10-02 16:46:31,641 - ERROR: No certificate was created for file state_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:31,656 - ERROR: No certificate was created for file uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp
+2017-10-02 16:46:31,672 - INFO: Requirements Analysis Engine Finished

@@ -1,0 +1,32 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sadllistmodel="http://sadl.org/sadllistmodel#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:base="http://sadl.org/sadllistmodel"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">Typed List model for SADL.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="List"/>
+  <owl:ObjectProperty rdf:ID="rest">
+    <rdfs:range rdf:resource="#List"/>
+    <rdfs:domain rdf:resource="#List"/>
+  </owl:ObjectProperty>
+  <rdf:Property rdf:ID="first">
+    <rdfs:domain rdf:resource="#List"/>
+  </rdf:Property>
+  <owl:DatatypeProperty rdf:ID="maxLengthRestriction">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#List"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="lengthRestriction">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#List"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="minLengthRestriction">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#List"/>
+  </owl:DatatypeProperty>
+  <owl:AnnotationProperty rdf:ID="listtype"/>
+</rdf:RDF>

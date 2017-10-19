@@ -1,0 +1,97 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/sadlimplicitmodel">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'SadlImplicitModel.sadl' and should not be directly edited.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="Specification"/>
+  <owl:Class rdf:ID="TEST_MAPPING"/>
+  <owl:Class rdf:ID="UnittedQuantity"/>
+  <owl:Class rdf:ID="INTERFACE_DEFINITION"/>
+  <owl:Class rdf:ID="TAD_MAPPING"/>
+  <owl:Class rdf:ID="Requirement">
+    <rdfs:subClassOf rdf:resource="#Specification"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Assertion">
+    <rdfs:subClassOf rdf:resource="#Specification"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Verify">
+    <rdfs:subClassOf rdf:resource="#Specification"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Assumption">
+    <rdfs:subClassOf rdf:resource="#Specification"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Assuption">
+    <rdfs:subClassOf rdf:resource="#Specification"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Event"/>
+  <owl:Class rdf:ID="Rule"/>
+  <owl:Class rdf:ID="TEST_INTERFACE">
+    <owl:equivalentClass>
+      <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+          <sadlimplicitmodel:TEST_INTERFACE rdf:ID="Test_Input"/>
+          <sadlimplicitmodel:TEST_INTERFACE rdf:ID="Test_Output"/>
+          <sadlimplicitmodel:TEST_INTERFACE rdf:ID="Test_Input_Output"/>
+          <sadlimplicitmodel:TEST_INTERFACE rdf:ID="No_Test_Interface"/>
+        </owl:oneOf>
+      </owl:Class>
+    </owl:equivalentClass>
+  </owl:Class>
+  <owl:Class rdf:ID="NamedQuery"/>
+  <owl:ObjectProperty rdf:ID="test_mapping">
+    <rdfs:range rdf:resource="#TEST_MAPPING"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="test_interface">
+    <rdfs:range rdf:resource="#TEST_INTERFACE"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:ID="functional_min">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="functional_max">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="resolution">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="tolerance">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="value">
+    <rdfs:domain rdf:resource="#UnittedQuantity"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="physical_min">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="unit">
+    <rdfs:domain rdf:resource="#UnittedQuantity"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="physical_max">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:AnnotationProperty rdf:ID="input"/>
+  <owl:AnnotationProperty rdf:ID="reference_test_name"/>
+  <owl:AnnotationProperty rdf:ID="reference_class"/>
+  <owl:AnnotationProperty rdf:ID="reference_range"/>
+  <owl:AnnotationProperty rdf:ID="reference_property"/>
+  <owl:AnnotationProperty rdf:ID="instance"/>
+  <owl:AnnotationProperty rdf:ID="description"/>
+  <owl:AnnotationProperty rdf:ID="expandedProperty"/>
+  <owl:AnnotationProperty rdf:ID="testAugmentationId"/>
+  <owl:AnnotationProperty rdf:ID="requirementId"/>
+  <owl:AnnotationProperty rdf:ID="impliedProperty"/>
+</rdf:RDF>

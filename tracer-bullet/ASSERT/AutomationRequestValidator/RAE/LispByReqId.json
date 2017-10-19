@@ -1,0 +1,46 @@
+{
+    "A1": [
+        "timeSinceLastTimerUpdate_AutomationRequestValidatorService.lisp"
+    ],
+    "A2": [
+        "uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService.lisp"
+    ],
+    "A3": [
+        "uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp"
+    ],
+    "A4": [
+        "errorMsg_AutomationRequestValidatorService.lisp"
+    ],
+    "A5": [
+        "automationRequestList_AutomationRequestValidatorService.lisp"
+    ],
+    "A6": [
+        "automationRequestList_AutomationRequestValidatorService.lisp"
+    ],
+    "AUTOMATIONREQUESTRECEIVED": [
+        "automationRequestList_AutomationRequestValidatorService.lisp"
+    ],
+    "AUTOMATIONREQUESTRECEIVED2": [
+        "errorMsg_AutomationRequestValidatorService.lisp"
+    ],
+    "PUBLISHAUTOMATIONREQUEST": [
+        "state_AutomationRequestValidatorService.lisp",
+        "timeSinceLastTimerUpdate_AutomationRequestValidatorService.lisp",
+        "uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService.lisp"
+    ],
+    "PUBLISHAUTOMATIONREQUEST2": [
+        "state_AutomationRequestValidatorService.lisp"
+    ],
+    "RESPONSERECEIVED": [
+        "automationRequestList_AutomationRequestValidatorService.lisp",
+        "state_AutomationRequestValidatorService.lisp",
+        "timeSinceLastTimerUpdate_AutomationRequestValidatorService.lisp",
+        "uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp"
+    ],
+    "TIMEOUT": [
+        "automationRequestList_AutomationRequestValidatorService.lisp",
+        "errorMsg_AutomationRequestValidatorService.lisp",
+        "state_AutomationRequestValidatorService.lisp",
+        "timeSinceLastTimerUpdate_AutomationRequestValidatorService.lisp"
+    ]
+}

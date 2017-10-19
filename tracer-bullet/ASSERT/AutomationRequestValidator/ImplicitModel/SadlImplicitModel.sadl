@@ -1,0 +1,44 @@
+uri "http://sadl.org/sadlimplicitmodel" alias sadlimplicitmodel.
+
+Event is a class.
+impliedProperty is a type of annotation.
+expandedProperty is a type of annotation.
+UnittedQuantity is a class,
+	described by ^value with values of type decimal,
+	described by unit with values of type string.
+^Rule is a class.
+NamedQuery is a class.
+
+
+Event is a class.
+Specification is a class.
+Assertion is a type of Specification.
+Assumption is a type of Specification.
+Requirement is a type of Specification.
+
+input is a type of annotation.
+description is a type of annotation.
+
+TAD_MAPPING is a class.
+requirementId is a type of annotation.
+testAugmentationId is a type of annotation.
+
+reference_class is a type of annotation.
+reference_property is a type of annotation.
+reference_range is a type of annotation.
+instance is a type of annotation.
+reference_test_name is a type of annotation.
+INTERFACE_DEFINITION is a class.
+	functional_max describes INTERFACE_DEFINITION with values of type decimal.
+	functional_min describes INTERFACE_DEFINITION with values of type decimal.
+	physical_max describes INTERFACE_DEFINITION with values of type decimal.
+	physical_min describes INTERFACE_DEFINITION with values of type decimal.
+	tolerance describes INTERFACE_DEFINITION with values of type decimal.
+	resolution describes INTERFACE_DEFINITION with values of type decimal.
+	test_interface describes INTERFACE_DEFINITION with values of type TEST_INTERFACE.
+	TEST_INTERFACE is a class, must be one of {Test_Input, Test_Output, Test_Input_Output, No_Test_Interface}.
+	test_mapping describes INTERFACE_DEFINITION with values of type TEST_MAPPING.
+	TEST_MAPPING is a class.
+	
+Specification is a class.
+{Requirement, Assertion, Assuption, Verify} are types of Specification.	

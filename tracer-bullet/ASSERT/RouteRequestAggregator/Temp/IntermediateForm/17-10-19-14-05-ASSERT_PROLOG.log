@@ -1,0 +1,307 @@
+result request received
+[query=targetVar(['_DummyVar']).
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- load_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- stage1_translation('C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RA-Req.sreq.pl','C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/RA-Req.sreq.pl').
+]
+writing query 
+targetVar(['_DummyVar']).
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- load_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- stage1_translation('C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RA-Req.sreq.pl','C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/RA-Req.sreq.pl').
+
+[32m% Parsed "requestaggregator.owl" in 0.00 sec; 152 triples
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-4896-8013-918e-ba18.nsk1200001866g.pl:4:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-4896-8013-918e-ba18.nsk1200001866g.pl:4:
+	Goal (directive) failed: '4896-8013-918e-ba18.NSK1200001866G':load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl')
+[0m[32m% Parsed "sadlimplicitmodel.owl" in 0.00 sec; 11 triples
+[0m[32m% Parsed "sadlbuiltinfunctions.owl" in 0.00 sec; 57 triples
+[0m[32m% Parsed "test.owl" in 0.02 sec; 56 triples
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-4896-8013-918e-ba18.nsk1200001866g.pl:8:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-4896-8013-918e-ba18.nsk1200001866g.pl:8:
+	Goal (directive) failed: '4896-8013-918e-ba18.NSK1200001866G':load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl')
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/owlmodels/ra-req.sreq.pl:4:
+	Deprecated declaration has no effect: style_check(atom)
+[0mresult request received
+[query=targetVar(['_DummyVar']).
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- unload_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- true.
+]
+writing query 
+targetVar(['_DummyVar']).
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- unload_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- true.
+
+[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-0ec3-8698-2291-cf3e.nsk1200001866g.pl:4:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-0ec3-8698-2291-cf3e.nsk1200001866g.pl:4:
+	Goal (directive) failed: '0ec3-8698-2291-cf3e.NSK1200001866G':unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl')
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-0ec3-8698-2291-cf3e.nsk1200001866g.pl:8:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-0ec3-8698-2291-cf3e.nsk1200001866g.pl:8:
+	Goal (directive) failed: '0ec3-8698-2291-cf3e.NSK1200001866G':unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl')
+[0mresult request received
+[query=targetVar(['_DummyVar']).
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- load_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- stage1_translation('C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RA-Req2.sreq.pl','C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/RA-Req2.sreq.pl').
+]
+writing query 
+targetVar(['_DummyVar']).
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- load_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- stage1_translation('C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RA-Req2.sreq.pl','C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/RA-Req2.sreq.pl').
+
+[32m% Parsed "requestaggregator.owl" in 0.00 sec; 152 triples
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-ae07-31f9-1836-abd8.nsk1200001866g.pl:4:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-ae07-31f9-1836-abd8.nsk1200001866g.pl:4:
+	Goal (directive) failed: 'ae07-31f9-1836-abd8.NSK1200001866G':load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl')
+[0m[32m% Parsed "sadlimplicitmodel.owl" in 0.00 sec; 11 triples
+[0m[32m% Parsed "sadlbuiltinfunctions.owl" in 0.00 sec; 57 triples
+[0m[32m% Parsed "test.owl" in 0.02 sec; 56 triples
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-ae07-31f9-1836-abd8.nsk1200001866g.pl:8:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-ae07-31f9-1836-abd8.nsk1200001866g.pl:8:
+	Goal (directive) failed: 'ae07-31f9-1836-abd8.NSK1200001866G':load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl')
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/owlmodels/ra-req2.sreq.pl:4:
+	Deprecated declaration has no effect: style_check(atom)
+[0mresult request received
+[query=targetVar(['_DummyVar']).
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- unload_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- true.
+]
+writing query 
+targetVar(['_DummyVar']).
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- unload_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- true.
+
+[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-9c91-61d3-03f2-14eb.nsk1200001866g.pl:4:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-9c91-61d3-03f2-14eb.nsk1200001866g.pl:4:
+	Goal (directive) failed: '9c91-61d3-03f2-14eb.NSK1200001866G':unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl')
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-9c91-61d3-03f2-14eb.nsk1200001866g.pl:8:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-9c91-61d3-03f2-14eb.nsk1200001866g.pl:8:
+	Goal (directive) failed: '9c91-61d3-03f2-14eb.NSK1200001866G':unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl')
+[0mresult request received
+[query=targetVar(['_DummyVar']).
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- load_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- stage1_translation('C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RA-Req3.sreq.pl','C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/RA-Req3.sreq.pl').
+]
+writing query 
+targetVar(['_DummyVar']).
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- load_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- stage1_translation('C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RA-Req3.sreq.pl','C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/RA-Req3.sreq.pl').
+
+[32m% Parsed "requestaggregator.owl" in 0.00 sec; 152 triples
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-11e5-b93f-1fc8-7cdb.nsk1200001866g.pl:4:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-11e5-b93f-1fc8-7cdb.nsk1200001866g.pl:4:
+	Goal (directive) failed: '11e5-b93f-1fc8-7cdb.NSK1200001866G':load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl')
+[0m[32m% Parsed "sadlimplicitmodel.owl" in 0.00 sec; 11 triples
+[0m[32m% Parsed "sadlbuiltinfunctions.owl" in 0.00 sec; 57 triples
+[0m[32m% Parsed "test.owl" in 0.02 sec; 56 triples
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-11e5-b93f-1fc8-7cdb.nsk1200001866g.pl:8:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-11e5-b93f-1fc8-7cdb.nsk1200001866g.pl:8:
+	Goal (directive) failed: '11e5-b93f-1fc8-7cdb.NSK1200001866G':load_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl')
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/owlmodels/ra-req3.sreq.pl:4:
+	Deprecated declaration has no effect: style_check(atom)
+[0m[31;1mERROR: [Thread 10] c:/sadlworkspace28/reqaggregator-v4/owlmodels/ra-req3.sreq.pl:19:106: Syntax error: Operator expected
+[0mresult request received
+[query=targetVar(['_DummyVar']).
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- unload_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- true.
+]
+writing query 
+targetVar(['_DummyVar']).
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/RequestAggregator.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlImplicitModel.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/test.owl').
+:- unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl').
+:- unload_pl_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBuiltinFunctions.sadl.pl').
+
+qresult([true]) :- true.
+
+[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-687f-e6a7-621d-124e.nsk1200001866g.pl:4:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-687f-e6a7-621d-124e.nsk1200001866g.pl:4:
+	Goal (directive) failed: '687f-e6a7-621d-124e.NSK1200001866G':unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlBaseModel.owl')
+[0m[31;1mERROR: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-687f-e6a7-621d-124e.nsk1200001866g.pl:8:
+	source_sink `'/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl'' does not exist
+[0m[31mWarning: c:/sadlworkspace28/reqaggregator-v4/temp/intermediateform/prolog-service-temp/temp-687f-e6a7-621d-124e.nsk1200001866g.pl:8:
+	Goal (directive) failed: '687f-e6a7-621d-124e.NSK1200001866G':unload_rdf_file('/C:/SadlWorkspace28/ReqAggregator-v4/OwlModels/SadlListModel.owl')
+[0mresult request received
+[query=targetVar(['_DummyVar']).
+:- load_into_db(acl2s_output_dir('C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/')).
+qresult([true]) :- true.
+]
+writing query 
+targetVar(['_DummyVar']).
+:- load_into_db(acl2s_output_dir('C:/SadlWorkspace28/ReqAggregator-v4/Temp/IntermediateForm/')).
+qresult([true]) :- true.
+
+result request received
+[query=targetVar(['_DummyVar']).
+qresult([true]) :- print_stats.
+]
+writing query 
+targetVar(['_DummyVar']).
+qresult([true]) :- print_stats.
+
+
+
+ Total requirements found: 9
+
+
+ Total requirements processed: 9
+
+
+ Unprocessed requirements: []
+
+
+ Total time taken in seconds: 2.4024930000305176
+
+ Stage 1 Exceptions: 
+[]
+
+result request received
+[query=targetVar(['_DummyVar']).
+:- retract_all(timeout(X)).
+:- retract_all(acl2s_output_dir(X)).
+:- retract_all(stage1_output_dir(X)).
+qresult([true]) :- true.
+]
+writing query 
+targetVar(['_DummyVar']).
+:- retract_all(timeout(X)).
+:- retract_all(acl2s_output_dir(X)).
+:- retract_all(stage1_output_dir(X)).
+qresult([true]) :- true.
+
+result request received
+[query=targetVar(['_DummyVar']).
+qresult([true]) :- print_version_info.
+]
+writing query 
+targetVar(['_DummyVar']).
+qresult([true]) :- print_version_info.
+
+ACL2 Sedan Translator Version 1.98:
+  Added support for no-contingency-check in lisp file.
+  Removed Bookline tag from lisp file.
+  Fixed Error with Linked Decomposition in ACL2S Translator.
+  Fixed bug with User Defined Equation in ACL2S Translator(found by UDV Team).
+  Added support for Supporting sublist in ACL2S.
+  Fixed error in identifying all abstract classes to ground
+  Fixed error in variable resolution when subject is an instance in SRL
+  Equation definitions issues identified by UDV team were fixed
+  Corrected a bug for equation definitions
+  Added support to User defined equations
+  Added support to log acl2s translator output to a file.
+  Added support for abs and exp operators
+  Supports decomposition
+  Supports "atomic" context - ex: "SYSTEM"
+  Added check to ignore a requirement if the Stage 1 output has term depth greater than 5000
+  Supports additional inline operators
+  Generates inferred assumptions
+  Eliminates property chains for generating controlled/monitored variables
+  Supports controlled event variables
+  Ignores requirements where a controlled property is an annotation property
+  Writes "Priority" metrics - files are saved in the output folders
+  Supports Assertions
+  Stage 1 supports sublists
+  Stage 1 translator supports equations
+  Truncates file names that exceed maximum permitted length
+  Supports is-a and is-not-a constructs
+  Supports Assumptions
+  Writes meta-data to output files
+  Supports time constructs - assumes time constructs are in normal form
+  Supports negation of complex expressions
+  Supports most of the list constructs; sublist, sort, are not yet supported
+  Dropping Requirements that are not supported in Stage 1
+  Supports Basic Requirements
+  Supports Events
+  Supports Causality (Previous)
+  Tested on SWI-Prolog version 7.2.3 (http://www.swi-prolog.org/)
+
+[32m% halt
+[0m

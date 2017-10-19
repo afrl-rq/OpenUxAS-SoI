@@ -1,0 +1,10 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/test.sadl.metrics">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">SADL model metrics</rdfs:comment>
+  </owl:Ontology>
+</rdf:RDF>

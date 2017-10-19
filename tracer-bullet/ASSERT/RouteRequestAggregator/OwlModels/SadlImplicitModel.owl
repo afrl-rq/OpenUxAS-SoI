@@ -1,0 +1,22 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/sadlimplicitmodel">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'SadlImplicitModel.sadl' and should not be directly edited.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="UnittedQuantity"/>
+  <owl:Class rdf:ID="Event"/>
+  <owl:DatatypeProperty rdf:ID="value">
+    <rdfs:domain rdf:resource="#UnittedQuantity"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="unit">
+    <rdfs:domain rdf:resource="#UnittedQuantity"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:AnnotationProperty rdf:ID="impliedProperty"/>
+</rdf:RDF>

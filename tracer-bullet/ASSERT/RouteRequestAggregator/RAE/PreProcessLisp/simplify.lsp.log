@@ -1,0 +1,143 @@
+IN>(cw "~%ACL2 Initialized!!!~%")
+Welcome to Clozure Common Lisp Version 1.11-r16635  (WindowsX8664)!
+
+ ACL2 Version 7.1 built April 18, 2016  10:18:02
+                   then January 30, 2017  21:42:33.
+ Copyright (C) 2015, Regents of the University of Texas
+ ACL2 comes with ABSOLUTELY NO WARRANTY.  This is free software and you
+ are welcome to redistribute it under certain conditions.  For details,
+ see the LICENSE file distributed with ACL2.
+
+ Initialized with (INITIALIZE-ACL2 'INCLUDE-BOOK *ACL2-PASS-2-FILES*).
+
+ Includes support for hash cons, memoization, and applicative hash
+ tables.
+
+ See the documentation topic note-7-1 for recent changes.
+ Note: We have modified the prompt in some underlying Lisps to further
+ distinguish it from the ACL2 prompt.
+
+MODIFICATION NOTICE:
+
+Loaded ASSERT Requirement Analysis Book 2017-1-27 ccl64 acl2v1.1.8.1
+
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+ACL2 Initialized!!!
+NIL
+ACL2 !>
+Exiting the ACL2 read-eval-print loop.  To re-enter, execute (LP).
+? *RAE-DIR*
+? #P"C:/ASSERT/SADL_Extra_Tools/LispScripts/rae-settings.lsp"
+? *URIS-NAMES*
+? *NAMES-URIS*
+? *REQS-CONTEXT*
+? *CONTEXT-REQS*
+? *URI-NAME-FILE*
+? *NAME-URI-FILE*
+? *REQ-CONTEXT-FILE*
+? *CONTEXT-REQ-FILE*
+? *SIMP-LISP-EXT*
+? *BADINPUT*
+? *CONTEXT-EXT*
+? *URI-PREFIX*
+? *SIMPLIFICATION-METHOD*
+? *LIST-RANGES*
+? *LIST-LEN-FACTOR*
+? *SINGLETON-TYPE-VARS*
+? *EVENT-VARS*
+? *DECOMP-VARS*
+? *EQUATION-VARS*
+? *VAR-META-DATA*
+? *VAR-TYPE-INFO*
+? *DEFAULT-MAX-LIST-LEN*
+? *NO-CONTINGENCY*
+? *ACL2-NON-ALLOWED-NAMES*
+? LIST-ALL-SYMBOLS
+? HAS-PREFIXP
+? STRIP-PREFIX
+? *NON-ALLOWED-NAMES*
+? PRINT-HTABLE
+? PRINT-CONTEXT-HTABLE
+? URI-SYMBOLP
+? URI-*-SYMBOLP
+? URI-GENERAL-SYMBOLP
+? URI-P-SYMBOLP
+? URI-VALUES-SYMBOLP
+? URI-VALS-SYMBOLP
+? GET-LAST-NAME
+? GET-FIRST-NAME
+? GET-FIRST-NAME-STRING
+? STRIP-FIRST-NAME
+? GET-CHAIN-NAME
+? GET-NAME
+? NEW-NAME
+? FIX-URI-SYMBOL
+? FIX-SYMBOL
+? FIX-META-FORM
+? FIX-FORM
+? NEW-META-NAME
+? TREE-MEMP
+? UPDATE-TBL-META-DATA
+? UPDATE-TBL-DISPLAY-NAME
+? GET-TBLROW
+? UPDATE-CONTEXT
+? UPDATE-DEFREQ
+? LIST-NEW-HYPS
+? UPDATE-LR-BODY
+? PROCESS-LIST-RANGE-INFO
+? ;Compiler warnings :
+;   In UPDATE-ENUMERATOR-LISTOF-RANGE: Unused lexical variable ONAME
+;   In UPDATE-ENUMERATOR-LISTOF-RANGE: Unused lexical variable ILL-MIN
+UPDATE-ENUMERATOR-LISTOF-RANGE
+? UPDATE-DEFDATA
+? ADD-LIST-RANGE-INFO
+? UPDATE-EVENTS-LIST
+? PROCESS-DEFDECOMP
+? UPDATE-NO-CONTINGENCY
+? PROCESS-EQUATION
+? PROCESS-FORM
+? GET-CONTROLLED-VAR-TYPE-PAIR
+? LARGE-SIZE-SUBTYPE
+? LARGE-SIZE-TYPE-CONTROLLED-VAR-TYPE
+? UPDATE-LIST-RANGES
+? COLLECT-LIST-RANGES
+IN>(cw "~%Ready for next command!!~%")
+? REGISTER-NO-INNER-CONTINGENCY-VARS
+? REGISTER-NO-CONTINGENCY-REQS
+? CONTAINS-DECOMPOSITION-EQUATION
+? ;Compiler warnings :
+;   In SIMPLIFY-FILE: Unused lexical variable TOUCH-STREAM
+;   In SIMPLIFY-FILE: Unused lexical variable CONDITION
+SIMPLIFY-FILE
+?
+Ready for next command!!
+NIL
+IN>(simplify-file "C:/SadlWorkspace28/ReqAggregator-v4/RAE/PreProcessLisp/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).assump")
+IN>(cw "~%Ready for next command!!~%")
+? NIL
+?
+Ready for next command!!
+NIL
+IN>(simplify-file "C:/SadlWorkspace28/ReqAggregator-v4/RAE/PreProcessLisp/plan_(element_rareq2_yindex_vi_var14).assump")
+IN>(cw "~%Ready for next command!!~%")
+? NIL
+?
+Ready for next command!!
+NIL
+IN>(LP)
+
+IN>(good-bye)
+
+?
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+End of file

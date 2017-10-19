@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<crrm:Requirement xmlns:ccim="urn:com:ge:util:dmbl:ccim" xmlns:crrm="urn:com:ge:atg:dmbl:crrm" xmlns:base="urn:com:ge:atg:dmbl:base" Name="PublishAutomationRequest2">
+    <crrm:DisplayName>PublishAutomationRequest2</crrm:DisplayName>
+    <crrm:NumberOfTableRows>1</crrm:NumberOfTableRows>
+    <crrm:IsAssumption>false</crrm:IsAssumption>
+    <crrm:IsUserTestCase>false</crrm:IsUserTestCase>
+    <crrm:ReqFileName>ValidatorReq.sreq</crrm:ReqFileName>
+    <crrm:VersionDescriptor>
+        <ccim:OptionData Name="SADLVersion">2.1.0.201709221328</ccim:OptionData>
+        <ccim:OptionData Name="TranslatorVersion">3.0.0.201709292107</ccim:OptionData>
+    </crrm:VersionDescriptor>
+    <crrm:Context Id="Context_0">
+        <crrm:Description>true</crrm:Description>
+    </crrm:Context>
+    <crrm:Variables IsEvent="false" VariableName="var_4">
+        <base:DisplayName>automationRequestList of AutomationRequestValidatorService</base:DisplayName>
+        <base:SpecificationName>Validator__automationRequestList__Validator__AutomationRequestValidatorService</base:SpecificationName>
+        <base:SRLName>automationRequestList of AutomationRequestValidatorService</base:SRLName>
+        <base:DataType>
+            <base:List>
+                <base:Type>
+                    <base:Enum EnumName="Enum0">
+                        <base:EnumElements Name="Validator.sadl_uxas__messages__task__TaskAutomationRequest_Val_1" InVariableRange="true">
+                            <base:PhysicalValue>0</base:PhysicalValue>
+                        </base:EnumElements>
+                        <base:EnumElements Name="Validator.sadl_uxas__messages__task__TaskAutomationRequest_Val_2" InVariableRange="true">
+                            <base:PhysicalValue>1</base:PhysicalValue>
+                        </base:EnumElements>
+                    </base:Enum>
+                </base:Type>
+            </base:List>
+        </base:DataType>
+        <base:Direction>IN</base:Direction>
+        <base:TestInterface>Internal</base:TestInterface>
+    </crrm:Variables>
+    <crrm:Variables IsEvent="false" VariableName="var_6">
+        <base:DisplayName>previous state of AutomationRequestValidatorService</base:DisplayName>
+        <base:SpecificationName>previous(Validator__stat)__Validator__AutomationRequestValidatorService)</base:SpecificationName>
+        <base:SRLName>previous state of AutomationRequestValidatorService</base:SRLName>
+        <base:DataType>
+            <base:Enum EnumName="Enum1">
+                <base:EnumElements Name="Idle" InVariableRange="true">
+                    <base:PhysicalValue>0</base:PhysicalValue>
+                </base:EnumElements>
+                <base:EnumElements Name="Busy" InVariableRange="true">
+                    <base:PhysicalValue>1</base:PhysicalValue>
+                </base:EnumElements>
+            </base:Enum>
+        </base:DataType>
+        <base:Direction>IN</base:Direction>
+        <base:TestInterface>Internal</base:TestInterface>
+    </crrm:Variables>
+    <crrm:Variables IsEvent="false" VariableName="var_7">
+        <base:DisplayName>state of AutomationRequestValidatorService</base:DisplayName>
+        <base:SpecificationName>Validator__state__Validator__AutomationRequestValidatorService</base:SpecificationName>
+        <base:SRLName>state of AutomationRequestValidatorService</base:SRLName>
+        <base:DataType>
+            <base:Enum EnumName="Enum1">
+                <base:EnumElements Name="Idle" InVariableRange="true">
+                    <base:PhysicalValue>0</base:PhysicalValue>
+                </base:EnumElements>
+                <base:EnumElements Name="Busy" InVariableRange="true">
+                    <base:PhysicalValue>1</base:PhysicalValue>
+                </base:EnumElements>
+            </base:Enum>
+        </base:DataType>
+        <base:Direction>OUT</base:Direction>
+        <base:TestInterface>Internal</base:TestInterface>
+    </crrm:Variables>
+    <crrm:Instance Name="PublishAutomationRequest2_instance_33">
+        <crrm:ContextId>Context_0</crrm:ContextId>
+        <crrm:TableRowNum>1</crrm:TableRowNum>
+        <crrm:Transformations>( (grounding PublishAutomationRequest2_instance_33))</crrm:Transformations>
+        <crrm:Expression xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="base:operationType" Operator="IMPLY">
+            <base:Parameter xsi:type="base:operationType" Operator="AND">
+                <base:Parameter xsi:type="base:operationType" Operator="EQUAL">
+                    <base:Parameter xsi:type="base:variableType" Name="var_6"/>
+                    <base:Parameter xsi:type="base:literalType" Value="Enum1.Idle"/>
+                </base:Parameter>
+                <base:Parameter xsi:type="base:operationType" Operator="EQUAL">
+                    <base:Parameter xsi:type="base:operationType" Operator="LENGTH">
+                        <base:Parameter xsi:type="base:variableType" Name="var_4"/>
+                    </base:Parameter>
+                    <base:Parameter xsi:type="base:literalType" Value="0"/>
+                </base:Parameter>
+            </base:Parameter>
+            <base:Parameter xsi:type="base:operationType" Operator="EQUAL">
+                <base:Parameter xsi:type="base:variableType" Name="var_7"/>
+                <base:Parameter xsi:type="base:literalType" Value="Enum1.Idle"/>
+            </base:Parameter>
+        </crrm:Expression>
+    </crrm:Instance>
+</crrm:Requirement>

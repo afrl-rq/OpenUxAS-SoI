@@ -1,0 +1,33 @@
+{
+    "start": [
+        "**XX**ACL2s Requirements Analysis Engine Version \"2017-9-16\".**XX**"
+    ],
+    "inner contingency": [
+        "**XX**Starting inner contingency analyses.**XX**",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |AutomationRequestReceived| \nTerm: (EQUAL |denialOfService of System| 'FALSE) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |AutomationRequestReceived| \nTerm: (SRL-< (LEN-C |previous automationRequestList of AutomationRequestValidatorService|) |maxListLength of AutomationRequestValidatorService|) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |AutomationRequestReceived| \nTerm: (EQUAL |automationRequestList of AutomationRequestValidatorService| (SNOC |uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService| |previous automationRequestList of AutomationRequestValidatorService|)) \n!!RMsg!!",
+        "**EMsg**\nRAE found an inner contingency error.\n\nThe expression (equal\n |automationRequestList of AutomationRequestValidatorService|\n (snoc\n  |uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService|\n  |previous automationRequestList of AutomationRequestValidatorService|)) is always false. \n\nTherefore, it can never be satisfied.\n!!EMsg!!",
+        "**XX**Inner contingency analyses: failed.**XX**",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |ResponseReceived| \nTerm: (EQUAL |previous state of AutomationRequestValidatorService| '|Busy|) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |ResponseReceived| \nTerm: (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |ResponseReceived| \nTerm: (EQUAL |automationRequestList of AutomationRequestValidatorService| (REMOVE-NTH 1 |previous automationRequestList of AutomationRequestValidatorService|)) \n!!RMsg!!",
+        "**EMsg**\nRAE found an inner contingency error.\n\nThe expression (equal\n |automationRequestList of AutomationRequestValidatorService|\n (remove-nth\n      1\n      |previous automationRequestList of AutomationRequestValidatorService|)) is always false. \n\nTherefore, it can never be satisfied.\n!!EMsg!!",
+        "**XX**Inner contingency analyses: failed.**XX**",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |Timeout| \nTerm: (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |Timeout| \nTerm: (EQUAL |previous state of AutomationRequestValidatorService| '|Busy|) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |Timeout| \nTerm: (EQUAL |automationRequestList of AutomationRequestValidatorService| (REMOVE-NTH 1 |previous automationRequestList of AutomationRequestValidatorService|)) \n!!RMsg!!",
+        "**EMsg**\nRAE found an inner contingency error.\n\nThe expression (equal\n |automationRequestList of AutomationRequestValidatorService|\n (remove-nth\n      1\n      |previous automationRequestList of AutomationRequestValidatorService|)) is always false. \n\nTherefore, it can never be satisfied.\n!!EMsg!!",
+        "**XX**Inner contingency analyses: failed.**XX**",
+        "**XX**Inner contingency analyses completed successfully.**XX**"
+    ],
+    "end": [
+        "Requirement Analysis Complete!!!"
+    ]
+}

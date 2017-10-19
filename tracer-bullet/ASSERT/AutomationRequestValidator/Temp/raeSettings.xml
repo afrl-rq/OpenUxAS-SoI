@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>RCE RAE settings export</comment>
+<entry key="ReservedCores">1</entry>
+<entry key="hyps-independence">true</entry>
+<entry key="contingency">true</entry>
+<entry key="independence">true</entry>
+<entry key="EnablePreprocessing">true</entry>
+<entry key="global-contingency">true</entry>
+<entry key="StopOnError">true</entry>
+<entry key="AnalysisTimeout">600</entry>
+<entry key="inner-contingency">true</entry>
+<entry key="hyps-conflict">true</entry>
+<entry key="global-conflict">true</entry>
+<entry key="PerformSelectiveAnalysis">false</entry>
+<entry key="pair-conflict">true</entry>
+<entry key="hyps-completeness">true</entry>
+<entry key="completeness">true</entry>
+<entry key="RunPartialAnalysis">false</entry>
+<entry key="surjectivity">true</entry>
+<entry key="self-conflict">true</entry>
+</properties>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config>
+    <!-- Config version number, used to determine if local copy (in project) needs to be replaced !-->
+    <configVersion value="1.1"/>
+    
+    <!-- Requirements analysis is performed on multiple processes
+	by default 1 core of your PC is reserved so it stays responsive
+	you can go to zero but don't try to do anything else !-->
+	<reservedCores value="1"/>
+	
+    <!-- From Pete Manolios
+	Here is the idea. When a requirements engineer is developing requirements, say for component C, they might write 
+	requirements R1, ..., Rn. Say they are not done, so they know that the requirements are incomplete. However, they 
+	still want to evaluate these requirements to the extent that they can without getting false alarms. So the question is: 
+	which analyses do we run? If we run all of them (the current state of affairs) then we get false alarms.  For example, 
+	we will get completeness errors. So, what we want to do is to identify which analyses have the property that if they were
+	to report an error, even for an incomplete set of requirements, then that really is an error and cannot be a false alarm.
+	After reviewing the analyses, all of them except for completeness, hypothesis completeness and surjectivity can be used on 
+	incomplete requirements without false alarms. !-->
+	<runPartialAnalysis value="false"/>
+	
+    <!-- Configuration to enable or disable the pre-processing
+     recommend leaving this enabled as pre-processing is an important part of analysis
+     however it may be useful for debugging. !-->
+    <enablePreprocessing value="true"/>
+
+	<!--When performing analyses stop when you get to an error.
+	if you continue, other dependent checks may fail !-->
+	<stopOnError value="true"/>
+
+	<!--The "Requirement Certification Timeout" parameter is used by the RA tool to put a time limit on how long the certification of 
+	an individual requirement can take. If the certification of any requirement exceeds the timeout, then the certification for 
+	the whole file will fail. If that happens, you can increase this parameter.
+	This also sets the total timeout for the main ACL2s analysis threads !-->
+	<analysisTimeout value="600"/>
+</config>

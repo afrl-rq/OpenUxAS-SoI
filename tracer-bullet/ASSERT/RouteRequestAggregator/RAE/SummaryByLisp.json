@@ -1,0 +1,28 @@
+{
+    "numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp.summary": {
+        "inner contingency 1/1": "Pass",
+        "contingency 1/1": "Pass",
+        "hypotheses completeness 1/1": "Pass",
+        "Finished": "Pass"
+    },
+    "plan_(element_rareq2_yindex_vi_var14).lisp.summary": {
+        "inner contingency 2/2": "Pass",
+        "contingency 0/1": "Fail",
+        "Finished": "Pass"
+    },
+    "requestList_ReqAggregator.lisp.summary": {
+        "inner contingency 3/4": "Undetermined",
+        "hypotheses completeness 1/1": "Pass",
+        "Finished": "Pass"
+    },
+    "send1_ReqAggregator.lisp.summary": {
+        "inner contingency 6/6": "Pass",
+        "hypotheses completeness 1/1": "Pass",
+        "Finished": "Pass"
+    },
+    "send2_ReqAggregator.lisp.summary": {
+        "inner contingency 3/3": "Pass",
+        "hypotheses completeness 1/1": "Pass",
+        "Finished": "Pass"
+    }
+}

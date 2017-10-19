@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MarkerService xmlns="urn:com:ge:aviation:rce:markerservice">
+  <Process name="Requirements Analysis Engine" build="2017-9-16" pn="">
+<Marker markerType="Error" msgName="inner-contingency-analysis-error"
+msgText="RAE found an inner contingency error.
+
+The expression (equal
+ |automationRequestList of AutomationRequestValidatorService|
+ (snoc
+  |uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService|
+  |previous automationRequestList of AutomationRequestValidatorService|)) is always false.
+
+Therefore, it can never be satisfied.">
+<ObjectID>AutomationRequestReceived</ObjectID>
+</Marker>
+<Marker markerType="Error" msgName="inner-contingency-analysis-error"
+msgText="RAE found an inner contingency error.
+
+The expression (equal
+ |automationRequestList of AutomationRequestValidatorService|
+ (remove-nth
+      1
+      |previous automationRequestList of AutomationRequestValidatorService|)) is always false.
+
+Therefore, it can never be satisfied.">
+<ObjectID>ResponseReceived</ObjectID>
+</Marker>
+<Marker markerType="Error" msgName="inner-contingency-analysis-error"
+msgText="RAE found an inner contingency error.
+
+The expression (equal
+ |automationRequestList of AutomationRequestValidatorService|
+ (remove-nth
+      1
+      |previous automationRequestList of AutomationRequestValidatorService|)) is always false.
+
+Therefore, it can never be satisfied.">
+<ObjectID>Timeout</ObjectID>
+</Marker>
+</Process>
+</MarkerService>

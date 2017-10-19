@@ -1,0 +1,85 @@
+IN>(cw "~%ACL2 Initialized!!!~%")
+Welcome to Clozure Common Lisp Version 1.11-r16635  (WindowsX8664)!
+
+ ACL2 Version 7.1 built April 18, 2016  10:18:02
+                   then January 30, 2017  21:42:33.
+ Copyright (C) 2015, Regents of the University of Texas
+ ACL2 comes with ABSOLUTELY NO WARRANTY.  This is free software and you
+ are welcome to redistribute it under certain conditions.  For details,
+ see the LICENSE file distributed with ACL2.
+
+ Initialized with (INITIALIZE-ACL2 'INCLUDE-BOOK *ACL2-PASS-2-FILES*).
+
+ Includes support for hash cons, memoization, and applicative hash
+ tables.
+
+ See the documentation topic note-7-1 for recent changes.
+ Note: We have modified the prompt in some underlying Lisps to further
+ distinguish it from the ACL2 prompt.
+
+MODIFICATION NOTICE:
+
+Loaded ASSERT Requirement Analysis Book 2017-1-27 ccl64 acl2v1.1.8.1
+
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+ACL2 Initialized!!!
+NIL
+ACL2 !>
+Exiting the ACL2 read-eval-print loop.  To re-enter, execute (LP).
+? *RAE-DIR*
+? #P"C:/ASSERT/SADL_Extra_Tools/LispScripts/rae-settings.lsp"
+? *MERGE-LISP-EXT*
+? *CONTEXT-REQ-EXT*
+? *REQ-CONTEXT-EXT*
+? *BADINPUT*
+? *REQ-LIST*
+? *REQS-CONTEXT*
+? *CONTEXT-REQS*
+IN>(cw "~%Ready for next command!!~%")
+? *NO-CONTINGENCY*
+? ADD-TO-RES
+? MERGE-REQS
+? COLLECT-EXTRA-TYPES
+? COLLECT-HYPS
+? COMBINE-REQS
+? PRINT-REQS
+? PRINT-REQ-ALIST
+? POST-PROCESS-REQS
+? READ-CONTEXT-FILES
+? STRIP-SIMP-CLEAN-INFER
+? ;Compiler warnings :
+;   In MERGE-FILE: Unused lexical variable TOUCH-STREAM
+;   In MERGE-FILE: Unused lexical variable CONDITION
+MERGE-FILE
+?
+Ready for next command!!
+NIL
+IN>(merge-file "C:/SadlWorkspace28/ReqAggregator-v4/RAE/PreProcessLisp/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).assump.simp.time.clean.infer")
+IN>(cw "~%Ready for next command!!~%")
+? (NIL)
+?
+Ready for next command!!
+NIL
+IN>(merge-file "C:/SadlWorkspace28/ReqAggregator-v4/RAE/PreProcessLisp/plan_(element_rareq2_yindex_vi_var14).assump.simp.time.clean.infer")
+IN>(cw "~%Ready for next command!!~%")
+? (NIL)
+?
+Ready for next command!!
+NIL
+IN>(LP)
+
+IN>(good-bye)
+
+?
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+End of file

@@ -1,0 +1,68 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions"
+    xmlns:test="http://sadl.org/test.sadl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/test.sadl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="builtinfunctions"/>
+    <owl:imports rdf:resource="sadlimplicitmodel"/>
+    <owl:imports rdf:resource="sadlbasemodel"/>
+    <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'test.sadl' and should not be directly edited.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="INTERFACE_DEFINITION"/>
+  <owl:Class rdf:ID="TEST_MAPPING"/>
+  <owl:Class rdf:ID="TEST_INTERFACE">
+    <owl:equivalentClass>
+      <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+          <test:TEST_INTERFACE rdf:ID="Test_Input"/>
+          <test:TEST_INTERFACE rdf:ID="Test_Output"/>
+          <test:TEST_INTERFACE rdf:ID="Test_Input_Output"/>
+          <test:TEST_INTERFACE rdf:ID="No_Test_Interface"/>
+        </owl:oneOf>
+      </owl:Class>
+    </owl:equivalentClass>
+  </owl:Class>
+  <owl:ObjectProperty rdf:ID="test_mapping">
+    <rdfs:range rdf:resource="#TEST_MAPPING"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="test_interface">
+    <rdfs:range rdf:resource="#TEST_INTERFACE"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:ID="functional_min">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="tolerance">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="resolution">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="physical_max">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="functional_max">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="physical_min">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#INTERFACE_DEFINITION"/>
+  </owl:DatatypeProperty>
+  <owl:AnnotationProperty rdf:ID="reference_class"/>
+  <owl:AnnotationProperty rdf:ID="reference_test_name"/>
+  <owl:AnnotationProperty rdf:ID="instance"/>
+  <owl:AnnotationProperty rdf:ID="reference_range"/>
+  <owl:AnnotationProperty rdf:ID="reference_property"/>
+</rdf:RDF>

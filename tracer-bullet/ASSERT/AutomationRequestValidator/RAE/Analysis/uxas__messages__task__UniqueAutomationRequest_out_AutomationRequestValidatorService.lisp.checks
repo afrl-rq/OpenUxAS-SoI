@@ -1,0 +1,147 @@
+(CW "~%~|**XX**ACL2s Requirements Analysis Engine Version ~p0.**XX**~%~%"
+     *REQUIREMENTSVERSIONNUMBER*)(DEFTTAG T)(CW "~%~|**XX**Starting inner contingency analyses.**XX**~%~%")(DEFTTAG T)(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|PublishAutomationRequest|
+     '(EQUAL |previous state of AutomationRequestValidatorService|
+             '|Idle|))(CONTINGENCY-ANALYSIS (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|))
+                       (EQUAL |previous state of AutomationRequestValidatorService|
+                              '|Idle|)
+                       T
+                       (|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                |automationRequestList of AutomationRequestValidatorService|)
+                                                   (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                 |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                   (:OUTPUT-VARS |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|)
+                                                   (:OUTPUT-TYPES |uxas__messages__task__UniqueAutomationRequestP|)
+                                                   (:VARS |previous state of AutomationRequestValidatorService|
+                                                          |automationRequestList of AutomationRequestValidatorService|
+                                                          |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|)
+                                                   (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                           |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                           |uxas__messages__task__UniqueAutomationRequestP|)
+                                                   (:ASSUMPTIONSP)
+                                                   (:ASSUMPTIONS)
+                                                   (:SRL-NAME . |PublishAutomationRequest|)
+                                                   (:BODY RIMPLIES
+                                                          (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                      '|Idle|)
+                                                               (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                      0))
+                                                          (EQUAL |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|
+                                                                 (|http://sadl.org/ValidatorReq.sreq#msg_PublishAutomationRequest| (|http://sadl.org/Validator.sadl#result^http://sadl.org/ValidatorReq.sreq#newid_PublishAutomationRequest|)))))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+     '|PublishAutomationRequest|
+     '(SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+             0))(CONTINGENCY-ANALYSIS (AND (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|))
+                       (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                              0)
+                       T
+                       (|PublishAutomationRequest| (:INPUT-VARS |previous state of AutomationRequestValidatorService|
+                                                                |automationRequestList of AutomationRequestValidatorService|)
+                                                   (:INPUT-TYPES |AutomationRequestValidatorServiceStateP|
+                                                                 |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|)
+                                                   (:OUTPUT-VARS |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|)
+                                                   (:OUTPUT-TYPES |uxas__messages__task__UniqueAutomationRequestP|)
+                                                   (:VARS |previous state of AutomationRequestValidatorService|
+                                                          |automationRequestList of AutomationRequestValidatorService|
+                                                          |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|)
+                                                   (:TYPES |AutomationRequestValidatorServiceStateP|
+                                                           |LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP|
+                                                           |uxas__messages__task__UniqueAutomationRequestP|)
+                                                   (:ASSUMPTIONSP)
+                                                   (:ASSUMPTIONS)
+                                                   (:SRL-NAME . |PublishAutomationRequest|)
+                                                   (:BODY RIMPLIES
+                                                          (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                      '|Idle|)
+                                                               (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                      0))
+                                                          (EQUAL |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|
+                                                                 (|http://sadl.org/ValidatorReq.sreq#msg_PublishAutomationRequest| (|http://sadl.org/Validator.sadl#result^http://sadl.org/ValidatorReq.sreq#newid_PublishAutomationRequest|)))))
+                       ((:SURJECTIVITY-STRICT)
+                        (:COMPLETENESS-STRICT)
+                        (:CONFLICT-STRICT)
+                        (:INDEPENDENCE-STRICT)
+                        (:CONTINGENCY-STRICT)
+                        (:STRICT-SAT)))(CW "~%~|**XX**Inner contingency analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting contingency analyses.**XX**~%~%")(DEFTTAG T)(CW "~%~|**XX**Contingency analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting global contingency analysis.**XX**~%~%")(CW "~%~|**XX**Global contingency analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting pair-conflict analyses.**XX**~%~%")(CW "~%~|**XX**Pair-conflict analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting completeness analysis.**XX**~%~%")(DEFTTAG T)(CW "~%~%**RMsg**~%
+Completeness analysis. 
+~|Requirements: ~x0 
+~|!!RMsg!!~%"
+     '(|PublishAutomationRequest|))(DEFTTAG T)(MV-LET (ERP X1 STATE)
+         (THM-NO-HEROICS (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                       (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                       (|uxas__messages__task__UniqueAutomationRequestP| |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|))
+                                  (EQUAL (BOR (NOT (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                          0))
+                                              (NOT (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Idle|))
+                                              (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                          '|Idle|)
+                                                   (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                          0)))
+                                         T)))
+         (IF (NOT ERP)
+             (PROG2$ (CW "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the completeness check.~%")
+                     (MV NIL :COMPLETENESS-PASSED STATE))
+             (MV-LET (CTS? X1 STATE)
+                     (RAE-TEST? (IMPLIES (AND (|AutomationRequestValidatorServiceStateP| |previous state of AutomationRequestValidatorService|)
+                                              (|LIST_OF_1_TO_1_uxas__messages__task__TaskAutomationRequestP| |automationRequestList of AutomationRequestValidatorService|)
+                                              (|uxas__messages__task__UniqueAutomationRequestP| |uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService|))
+                                         (EQUAL (BOR (NOT (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                 0))
+                                                     (NOT (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Idle|))
+                                                     (AND (EQUAL |previous state of AutomationRequestValidatorService|
+                                                                 '|Idle|)
+                                                          (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|)
+                                                                 0)))
+                                                T)))
+                     (LET ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+                          (COND ((AND (NOT CTS?) (NOT RES))
+                                 (PROG2$ (CW "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the completeness check.~%")
+                                         (MV NIL :COMPLETENESS-PASSED STATE)))
+                                (CTS? (PROG2$ (CW "~%**EMsg**~%RAE found a completeness error.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~S3~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Error\" msgName=\"completeness-analysis-error\" 
+msgText=\"RAE found a completeness error.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~S3\">~%<ObjectID>PublishAutomationRequest</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Completeness analysis: failed.**XX**~%~%"
+                                                  (STRIP-REQ-NAMES '(|PublishAutomationRequest|))
+                                                  '""
+                                                  '"uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService"
+                                                  (TO-TABLE-STRING (RESTRICT-CGEN-RESULT '(|automationRequestList of AutomationRequestValidatorService| |previous state of AutomationRequestValidatorService|)
+                                                                                         CGEN-STATE)))
+                                              (MV T (CONS :COMPLETENESS-FAILED CGEN-STATE)
+                                                  STATE)))
+                                (T (PROG2$ (CW "~%**EMsg**~%RAE: We were not able to falsify the completeness check.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.~|!!EMsg!!~%~%~%**XmlMsg**~%<Marker markerType=\"Warning\" msgName=\"completeness-analysis-potential-error\" 
+msgText=\"RAE: We were not able to falsify the completeness check.
+~|Requirements: ~S0. ~S1
+~|Controlled Variable: ~S2
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.\">~%<ObjectID>PublishAutomationRequest</ObjectID>~%</Marker>~|!!XmlMsg!!~%~%~%~|**XX**Completeness analysis: undetermined.**XX**~%~%"
+                                               (STRIP-REQ-NAMES '(|PublishAutomationRequest|))
+                                               '""
+                                               '"uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService")
+                                           (MV NIL :COMPLETENESS-? STATE))))))))(CW "~%~|**XX**Completeness analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting independence analyses.**XX**~%~%")(CW "~%~|**XX**Independence analysis completed successfully.**XX**~%~%")

@@ -1,0 +1,132 @@
+Report run: 02:05PM on October 19, 2017
+===============================================================
+             REQUIREMENT TRANSLATIONS SUMMARY
+
+Total # Requirements in sreq files: 4
+Found in 3 files.
+
+Total # Direct Write Requirements: 4
+Found in 3 files.
+
+Total # Stage 1 Translation Requirements: 4
+Found in 3 files
+
+Total # RA Stage 2 Requirements: 5
+Found in 5 files.
+
+Stage 1 Translation failed for 0 requirements:
+
+
+Stage 2 ACL2s Translation failed for 0 requirements:
+
+
+===============================================================
+             REQUIREMENT ANALYSIS SUMMARY 
+
+Run 1: Full analysis
+RAE Start Time: 21 Jul 2017 13:50:22
+RAE End Time: 21 Jul 2017 13:51:05
+RAE Run Time: 0:00:43
+
+Warnings:0 Errors:0
+
+---------------------------------------------------------------
+Run 2: Partial analysis
+RAE Start Time: 21 Jul 2017 13:52:05
+RAE End Time: 21 Jul 2017 13:52:17
+RAE Run Time: 0:00:12
+
+Warnings:0 Errors:0
+
+---------------------------------------------------------------
+Run 3: No analysis
+RAE Start Time: 19 Oct 2017 14:05:53
+RAE End Time: 19 Oct 2017 14:05:53
+RAE Run Time: 0:00:00
+
+Warnings:0 Errors:0
+
+---------------------------------------------------------------
+Pre-processing was run successfully on 2/5 files
+Pre-processing failed on 3 files
+	requestList_ReqAggregator
+	send1_ReqAggregator
+	send2_ReqAggregator
+
+Certification passed on 2/5 files
+Certification failed on 3 files
+	requestList_ReqAggregator
+	send1_ReqAggregator
+	send2_ReqAggregator
+
+Analysis ran on 5/5 files
+Analyses completed on 5 files
+Analyses ran on all files
+
+inner contingency was run on 5 files with no failures and undetermined on 1 file
+	Undetermined - requestList_ReqAggregator
+
+contingency was run on 2 files - failed on 1 file
+	Failed - plan_(element_rareq2_yindex_vi_var14)
+
+hypotheses completeness was run on 4 files with no failures
+
+===============================================================
+                    ANALYSIS RESULTS
+
+All analyses passed in 4 files.
+	numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator)
+	requestList_ReqAggregator
+	send1_ReqAggregator
+	send2_ReqAggregator
+
+4/5 requirements in which all lisp files passed all analyses
+	A5
+	R1
+	R2
+	R4
+
+0/5 requirements in which no analysis was performed (no input lisp file)
+
+4/5 requirements in which at least one lisp file failed certification
+	A5
+	R1
+	R2
+	R4
+
+5/5 requirements in which at least 1 lisp file passed all analyses
+	A5
+	R1
+	R2
+	R3
+	R4
+
+
+===============================================================
+                     CONFIGURATION
+
+RCE directory found from environmental variable ASSERTROOT: C:\ASSERT\SADL
+com.ge.research.jena_3.0.0.201702021429
+com.ge.research.sadl_3.0.0.201702021429
+com.ge.research.sadl.errorgenerator_3.0.0.201702021429
+com.ge.research.sadl.externalmodels_3.0.0.201702021429
+com.ge.research.sadl.ide_3.0.0.201702021429
+com.ge.research.sadl.jena_3.0.0.201702021429
+com.ge.research.sadl.jena-wrapper-for-sadl_3.0.0.201702021429
+com.ge.research.sadl.perspective_3.0.0.201702021429
+com.ge.research.sadl.requirements_2.0.0.201702021432
+com.ge.research.sadl.requirements.errorgenerator_2.0.0.201702021432
+com.ge.research.sadl.requirements.ide_2.0.0.201702021432
+com.ge.research.sadl.requirements.toprolog_2.0.0.201702021432
+com.ge.research.sadl.requirements.ui_2.0.0.201702021432
+com.ge.research.sadl.softwarevnv-plugin_2.0.0.201702021432
+com.ge.research.sadl.swi-prolog-plugin_3.0.0.201702021429
+com.ge.research.sadl.ui_3.0.0.201702021429
+com.ge.research.sadl.verify_2.0.0.201702021432
+com.ge.research.sadl.verify.ide_2.0.0.201702021432
+com.ge.research.sadl.verify.toprolog_2.0.0.201702021432
+com.ge.research.sadl.verify.ui_2.0.0.201702021432
+
+RA UI version :v1.1.16
+ACL2S Version :2017-1-27
+ACL2S Translator Version :1.98

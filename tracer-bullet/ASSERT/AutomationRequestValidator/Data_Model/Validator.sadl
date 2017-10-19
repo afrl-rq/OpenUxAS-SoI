@@ -1,0 +1,88 @@
+uri "http://sadl.org/Validator.sadl" alias Val.
+
+import "http://sadl.org/test.sadl".
+
+// Started with Validator5 and added substituted class names etc with what is extracted UxAS ontology from UxAS code
+// renamed send3 to errorMsg
+
+System is a class
+	described by denialOfService with a single value of type boolean.
+
+//ErrorMsg is a class,  //AM: on 10/2 moved it to this position in file
+//   must be one of {ErrorMsgTooManyRequests, ErrorMsgTimeout}.	
+	
+AutomationRequestValidatorService is a class 
+	described by state with a single value of type AutomationRequestValidatorServiceState
+	described by automationRequestList with a single value of type uxas__messages__task__TaskAutomationRequest List 
+	described by maxListLength with a single value of type int
+	described by uxas__messages__task__TaskAutomationRequest__Subscription with values of type uxas__messages__task__TaskAutomationRequest 
+	described by uxas__messages__task__UniqueAutomationRequest_out with values of type uxas__messages__task__UniqueAutomationRequest 
+	described by uxas__messages__task__UniqueAutomationResponse__Subscription with values of type uxas__messages__task__UniqueAutomationResponse	
+	described by uxas__messages__task__TaskAutomationResponse_out with values of type uxas__messages__task__TaskAutomationResponse 
+	described by errorMsg with values of type ErrorMsg
+//	described by timerFlag with a single value of type boolean
+	described by timeSinceLastTimerUpdate with a single value of type int.
+
+//AM: added following - could I drop some of these by altering statements above?
+state of AutomationRequestValidatorService only has values of type AutomationRequestValidatorServiceState.	
+state of AutomationRequestValidatorService has exactly 1 values.
+automationRequestList of AutomationRequestValidatorService only has values of type uxas__messages__task__TaskAutomationRequest List.
+//automationRequestList of AutomationRequestValidatorService has exactly 1 values. //AM: is this being handled correctly? No
+maxListLength of AutomationRequestValidatorService only has values of type int.
+maxListLength of AutomationRequestValidatorService has exactly 1 values.
+uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService only has values of type uxas__messages__task__TaskAutomationRequest. 
+uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService has exactly 1 values.
+uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService only has values of type uxas__messages__task__UniqueAutomationRequest. 
+uxas__messages__task__UniqueAutomationRequest_out of AutomationRequestValidatorService has exactly 1 values.
+uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService only has values of type uxas__messages__task__UniqueAutomationResponse. 
+uxas__messages__task__UniqueAutomationResponse__Subscription of AutomationRequestValidatorService has exactly 1 values.
+uxas__messages__task__TaskAutomationResponse_out of AutomationRequestValidatorService only has values of type uxas__messages__task__TaskAutomationResponse. 
+uxas__messages__task__TaskAutomationResponse_out of AutomationRequestValidatorService has exactly 1 values.
+errorMsg of AutomationRequestValidatorService only has values of type ErrorMsg. 
+errorMsg of AutomationRequestValidatorService has exactly 1 values.
+//timerFlag of AutomationRequestValidatorService only has values of type boolean.
+timeSinceLastTimerUpdate of AutomationRequestValidatorService only has values of type int.
+timeSinceLastTimerUpdate has exactly 1 values.
+
+AutomationRequestValidatorServiceState is a class, must be one of {Idle, Busy}.
+uxas__messages__task__UniqueAutomationRequest is a class 
+	described by ResponseID with a single value of type int. 
+ResponseID of uxas__messages__task__UniqueAutomationRequest only has values of type int.	
+uxas__messages__task__TaskAutomationRequest is a class. 
+uxas__messages__task__TaskAutomationResponse is a class. 
+uxas__messages__task__UniqueAutomationResponse is a class 
+	described by content with a single value of type uxas__messages__task__TaskAutomationResponse.
+content of uxas__messages__task__UniqueAutomationResponse only has values of type uxas__messages__task__TaskAutomationResponse.	
+ErrorMsg is a class,  
+   must be one of {ErrorMsgTooManyRequests, ErrorMsgTimeout}.
+
+GenID is a class
+	described by result with a single value of type int.
+result of GenID only has values of type int.
+	
+//automationRequestList of AutomationRequestValidatorService only has values of type uxas__messages__task__TaskAutomationRequest List. //was present earlier
+
+    ONT-1 is a INTERFACE_DEFINITION,
+      with reference_class AutomationRequestValidatorService .
+
+      ONT-2 is a INTERFACE_DEFINITION,
+        with reference_class AutomationRequestValidatorService,
+        with reference_property timeSinceLastTimerUpdate,
+        with functional_max 11,
+        with functional_min 0,
+        with physical_max 11,
+        with physical_min 0,
+        with tolerance 1,
+        with resolution 1,
+        with test_interface Test_Input .
+
+      ONT-3 is a INTERFACE_DEFINITION,
+        with reference_class AutomationRequestValidatorService,
+        with reference_property maxListLength,
+        with functional_max 20,
+        with functional_min 0,
+        with physical_max 20,
+        with physical_min 0,
+        with tolerance 1,
+        with resolution 1,
+        with test_interface Test_Input .   

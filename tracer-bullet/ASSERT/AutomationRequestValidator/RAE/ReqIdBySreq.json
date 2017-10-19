@@ -1,0 +1,13 @@
+{
+    "ValidatorReq.sreq": [
+        "A1",
+        "A2",
+        "A3",
+        "AUTOMATIONREQUESTRECEIVED",
+        "AUTOMATIONREQUESTRECEIVED2",
+        "PUBLISHAUTOMATIONREQUEST",
+        "PUBLISHAUTOMATIONREQUEST2",
+        "RESPONSERECEIVED",
+        "TIMEOUT"
+    ]
+}

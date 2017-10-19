@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MarkerService xmlns="urn:com:ge:aviation:rce:markerservice">
+  <Process name="Requirements Analysis Engine" build="2017-9-16" pn="">
+<Marker markerType="Warning" msgName="Potential type-checking error" 
+msgText="RAE: No analysis was performed for this requirement due to a certification failure.
+Controlled Variable: NIL.
+For more details see log file uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp"></Marker>
+</Process>
+</MarkerService>

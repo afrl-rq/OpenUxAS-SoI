@@ -1,0 +1,94 @@
+uri "http://sadl.org/builtinfunctions" alias builtinfunctions.
+
+// Please do not edit!! This model was auto-generated and may be replaced at any time.
+//   The content of this model is provided by the selected reasoner/translator pair.
+External sum(decimal X, decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#sum".
+
+External minus(decimal X, decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#minus".
+
+External product(decimal X, decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#product".
+
+External divide(decimal X, decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#divide".
+
+External atoi(string X) returns long:
+"http://sadl.org/builtinfunctions#atoi".
+
+External max(decimal X, decimal X, ...) returns decimal:
+"http://sadl.org/builtinfunctions#max".
+
+External min(decimal X, decimal X, ...) returns decimal:
+"http://sadl.org/builtinfunctions#min".
+
+External mod(decimal X, decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#mod".
+
+External power(decimal X, decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#power".
+
+External abs(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#abs".
+
+External ^and(boolean X, boolean X) returns boolean:
+"http://sadl.org/builtinfunctions#and".
+
+External ^or(boolean X, boolean X) returns boolean:
+"http://sadl.org/builtinfunctions#or".
+
+External ^not(boolean X) returns boolean:
+"http://sadl.org/builtinfunctions#not".
+
+External ^is(boolean X) returns boolean:
+"http://sadl.org/builtinfunctions#is".
+
+External ge(decimal X, decimal X) returns boolean:
+"http://sadl.org/builtinfunctions#ge".
+
+External gt(decimal X, decimal X) returns boolean:
+"http://sadl.org/builtinfunctions#gt".
+
+External le(decimal X, decimal X) returns boolean:
+"http://sadl.org/builtinfunctions#le".
+
+External lt(decimal X, decimal X) returns boolean:
+"http://sadl.org/builtinfunctions#lt".
+
+External sin(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#sin".
+
+External cos(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#cos".
+
+External tan(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#tan".
+
+External cotan(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#cotan".
+
+External sec(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#sec".
+
+External cosec(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#cosec".
+
+External arc_sin(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#arc_sin".
+
+External arc_cos(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#arc_cos".
+
+External arc_tan(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#arc_tan".
+
+External arc_cotan(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#arc_cotan".
+
+External arc_sec(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#arc_sec".
+
+External arc_cosec(decimal X) returns decimal:
+"http://sadl.org/builtinfunctions#arc_cosec".
+

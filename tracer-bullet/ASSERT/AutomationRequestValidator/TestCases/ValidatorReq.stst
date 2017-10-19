@@ -1,0 +1,382 @@
+------------------------------------------------------------------------------------------
+--                        TEST SPECIFICATION                                            --
+------------------------------------------------------------------------------------------
+--                                                                                      --
+-- Product            : <not specified!>                                                --
+--                                                                                      --
+-- File Name          : ValidatorReq.stst                                               --
+--                                                                                      --
+-- Requirements Source: ValidatorReq.sreq                                               --
+--                                                                                      --
+-- ATCG Environment   :                                                                 --
+--                      ATG                    2.0                                      --
+--                      SADLVersion            2.1.0.201709221328                       --
+--                      TranslatorVersion      3.0.0.201709282101                       --
+--                                                                                      --
+-- Date Generated     : 02 Oct 2017, 16:31:52                                           --
+--                                                                                      --
+-- Purpose            : ATG Test Description and Test Case Analysis                     --
+--                                                                                      --
+-- Copyright 2017 GE Aviation Systems Ltd                                               --
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+
+==========================================
+1. REQUIREMENTS COVERAGE
+==========================================
+
+// This section defines the requirements for which ATCG test cases have been generated.
+// Related assumptions and linked requirements are also listed here.
+
+
+AutomationRequestReceived
+
+
+==========================================
+2. TEST STRATEGY
+==========================================
+
+// This section defines the ATCG test strategy breakdown to verify the requirements.
+
+
+Strategy1 : Functional Data Completeness Analysis
+Strategy2 : Logic Coverage Analysis
+Strategy3 : Equivalence Class Partitioning Analysis
+Strategy4 : Boundary Value Analysis
+Strategy5 : Robustness Test Analysis
+Strategy6 : Decomposition and Equation Coverage
+Strategy7 : Manual Test Cases
+Strategy8 : Context Analysis
+
+ ---------------------------------------------------------------------------
+| Strategy:                    1     2     3     4     5     6     7     8  |
+|                             Fun   LCA   ECP   BVA   Rob   DEC   MTC   Ctx |
+ ---------------------------------------------------------------------------
+| AutomationRequestReceived |  X  |  X  |  -  |  -  |  -  |  -  |  -  |  -  |
+ ---------------------------------------------------------------------------
+(KEY: 'X'=fully covered. 'P'=limited coverage. '-'=no coverage. ' '=N/A. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+
+==========================================
+3. SHORT NAME DEFINITION
+==========================================
+
+// This section defines the short names used by the remaining sections.
+
+
+Monitored (Input) Variables - Literals
+----------------------------------------------------------------
+Mv2      : uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService
+Mv2.1    : uxas__messages__task__TaskAutomationRequest
+ 
+Mv3      : denialOfService of System
+Mv3.1    : true
+Mv3.2    : false
+ 
+Monitored (Input) Variables - Numeric
+----------------------------------------------------------------
+Mv1      : maxListLength of AutomationRequestValidatorService
+ 
+Lists
+----------------------------------------------------------------
+List1    : automationRequestList of AutomationRequestValidatorService
+ 
+List2    : previous automationRequestList of AutomationRequestValidatorService
+ 
+
+
+==========================================
+4. FUNCTIONAL DATA COMPLETENESS ANALYSIS
+==========================================
+
+// This section details the coverage of numeric, non-numeric, list and event data types.
+// See section 2.1.2 of SW-STD-241.
+
+
+Literal Coverage Table
+ -------------------------------------------------------------------------
+|                     .1                                .2                |
+ -------------------------------------------------------------------------
+| Mv2 | AutomationRequestReceived-TC001 |                                 |
+| Mv3 |                -                | AutomationRequestReceived-TC001 |
+ -------------------------------------------------------------------------
+(KEY: 'TCxxx'=Test Case. ' '=N/A. '-'=no coverage. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+Numeric Coverage Table
+ ----------------------------------------------
+|       Min   Mid(-ve)   Zero   Mid(+ve)   Max |
+ ----------------------------------------------
+| Mv1 |     |          |      |          |     |
+ ----------------------------------------------
+(KEY: 'TCxxx'=Test Case. ' '=N/A. '-'=no coverage. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+
+List Coverage Table
+ ---------------------------------------------------------------------------------------
+|                     Lowest                Mid-Range               Highest             |
+ ---------------------------------------------------------------------------------------
+| List1 |                -                |     -     |                -                |
+| List2 | AutomationRequestReceived-TC004 |     -     | AutomationRequestReceived-TC006 |
+ ---------------------------------------------------------------------------------------
+(KEY: 'TCxxx'=Test Case. ' '=N/A. '-'=no coverage. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+
+==========================================
+5. LOGIC COVERAGE ANALYSIS
+==========================================
+
+// This section defines the test cases for achieving adequate function coverage of conditions 
+// in a logic equation. See section 2.1.1.2.3 of SW-STD-241.
+
+
+----------------------------------------------------------------
+AutomationRequestReceived:
+----------------------------------------------------------------
+
+Logic1   : Cond1.1 and (Cond1.2 and Cond1.3)
+Cond1.1  : Mv2 is uxas__messages__task__TaskAutomationRequest
+Cond1.2  : (length of List2) < Mv1
+Cond1.3  : Mv3 is false
+
+Logic Coverage Analysis Table for Logic1:
+ ---------------------------------------------------------------
+|                                   Cond1.1   Cond1.2   Cond1.3 |
+ ---------------------------------------------------------------
+| AutomationRequestReceived-TC001 |   *T    |    T    |    T    |
+| AutomationRequestReceived-TC002 |    T    |   *T    |    T    |
+| AutomationRequestReceived-TC003 |    T    |    T    |   *T    |
+ ---------------------------------------------------------------
+(KEY: 'TCxxx'=Test Case. ' '=Don't care. '-'=no coverage. 'J'=justified no coverage. '*'=Condition under test)
+
+Justifications:
+None.
+
+
+
+==========================================
+6. EQUIVALENCE CLASS PARTITIONING ANALYSIS
+==========================================
+
+// This section identifies valid ranges of inputs values where testing one value is equivalent.
+// See section 2.1.1.1 of SW-STD-241.
+
+
+Equivalence Class Table
+ ----------
+| Mv \ ECP |
+ ----------
+(KEY: 'TCxxx'=Test Case. ' '=N/A. '-'=no coverage. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+
+==========================================
+7. BOUNDARY VALUE ANALYSIS
+==========================================
+
+// This section defines the test cases for achieving coverage at the boundary between
+// valid equivalence classes. See section 2.1.1.2 of SW-STD-241.
+// The requirement that results in the boundary value is listed in brackets
+
+
+Boundary Value Table
+ ---------
+| Mv \ BV |
+ ---------
+(KEY: 'TCxxx'=Test Case. ' '=N/A. '-'=no coverage. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+
+==========================================
+8. DECOMPOSITION / EQUATION COVERAGE
+==========================================
+
+// This section defines the test cases which verify equations that exist in each requirement
+
+Numeric Coverage Columns
+1    : Minimum (0%)
+2    : Lower point (10%)
+3    : Mid lower quartile (25%)
+4    : Mid point (50%)
+5    : Upper point (90%)
+6    : Mid upper quartile (75%)
+7    : Maximum (100%)
+8    : Zero value
+
+
+
+==========================================
+9. ROBUSTNESS TEST ANALYSIS
+==========================================
+
+// This section defines the robustness test case selection. See section 2.1.3 of SW-STD-241.
+// Note this section is only showing a subset of tests necessary to achieve compliance to SW-STD-241.
+
+Ro1      : Robustness Range Min
+Ro2      : Robustness Range Max
+Ro3      : Normal Range Min - resolution
+Ro4      : Normal Range Max + resolution
+Ro5      : NaN (Not a Number)
+
+Robustness Coverage Table
+ ----------------------
+|    1   2   3   4   5 |
+ ----------------------
+(KEY: 'TCxxx'=Test Case. ' '=N/A. '-'=no coverage. 'J'=justified no coverage.)
+
+Justifications:
+None.
+
+
+==========================================
+10. MANUAL TEST CASES
+==========================================
+
+// This section summarizes test cases that have been manually supplied by the user.
+
+
+
+==========================================
+11. CONTEXT TESTING ANALYSIS
+==========================================
+
+Context 00A   AutomationRequestValidatorService.
+
+ ---------------------------------------
+|                                   00A |
+ ---------------------------------------
+| AutomationRequestReceived-TC001 |  X  |
+| AutomationRequestReceived-TC002 |  X  |
+| AutomationRequestReceived-TC003 |  X  |
+| AutomationRequestReceived-TC004 |  X  |
+| AutomationRequestReceived-TC005 |  X  |
+| AutomationRequestReceived-TC006 |  X  |
+ ---------------------------------------
+(KEY: 'TCxxx'=Test Case. 'X'=Test case covered in context. ' '=N/A. '-'=no coverage.)
+
+Justifications:
+None.
+
+
+==========================================
+13. TEST CASES
+==========================================
+
+----------------------------------------------------------------
+Test Context 00A:
+----------------------------------------------------------------
+   AutomationRequestValidatorService.
+
+----------------------------------------------------------------
+AutomationRequestReceived:
+----------------------------------------------------------------
+Test Case AutomationRequestReceived-TC001_00A:
+
+Verify
+  automationRequestList of AutomationRequestValidatorService is
+  previous automationRequestList of AutomationRequestValidatorService with
+  uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService inserted at the end
+When
+  uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService is
+  uxas__messages__task__TaskAutomationRequest
+While
+  (length of previous automationRequestList of AutomationRequestValidatorService <
+   maxListLength of AutomationRequestValidatorService) AND (denialOfService of System is false)
+
+ 
+Test Case AutomationRequestReceived-TC002_00A:
+
+Verify
+  automationRequestList of AutomationRequestValidatorService is
+  previous automationRequestList of AutomationRequestValidatorService with
+  uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService inserted at the end
+When
+  length of previous automationRequestList of AutomationRequestValidatorService <
+  maxListLength of AutomationRequestValidatorService
+While
+  (uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService is
+   uxas__messages__task__TaskAutomationRequest) AND (denialOfService of System is false)
+
+ 
+Test Case AutomationRequestReceived-TC003_00A:
+
+Verify
+  automationRequestList of AutomationRequestValidatorService is
+  previous automationRequestList of AutomationRequestValidatorService with
+  uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService inserted at the end
+When
+  denialOfService of System is false
+While
+  (uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService is
+   uxas__messages__task__TaskAutomationRequest) AND
+  (length of previous automationRequestList of AutomationRequestValidatorService <
+   maxListLength of AutomationRequestValidatorService)
+
+ 
+Test Case AutomationRequestReceived-TC004_00A:
+
+Verify
+  automationRequestList of AutomationRequestValidatorService is
+  previous automationRequestList of AutomationRequestValidatorService with
+  uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService inserted at the end
+When
+  (length of previous automationRequestList of AutomationRequestValidatorService <
+   maxListLength of AutomationRequestValidatorService) AND
+  (length of previous automationRequestList of AutomationRequestValidatorService is 0)
+While
+  (uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService is
+   uxas__messages__task__TaskAutomationRequest) AND (denialOfService of System is false)
+
+ 
+Test Case AutomationRequestReceived-TC005_00A:
+
+Verify
+  (automationRequestList of AutomationRequestValidatorService is
+   previous automationRequestList of AutomationRequestValidatorService with
+   uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService
+   inserted at the end) AND (length of previous automationRequestList of AutomationRequestValidatorService is 0)
+When
+  denialOfService of System is false
+While
+  (uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService is
+   uxas__messages__task__TaskAutomationRequest) AND
+  (length of previous automationRequestList of AutomationRequestValidatorService <
+   maxListLength of AutomationRequestValidatorService)
+
+ 
+Test Case AutomationRequestReceived-TC006_00A:
+
+Verify
+  (automationRequestList of AutomationRequestValidatorService is
+   previous automationRequestList of AutomationRequestValidatorService with
+   uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService
+   inserted at the end) AND (length of previous automationRequestList of AutomationRequestValidatorService is 19)
+When
+  denialOfService of System is false
+While
+  (uxas__messages__task__TaskAutomationRequest__Subscription of AutomationRequestValidatorService is
+   uxas__messages__task__TaskAutomationRequest) AND
+  (length of previous automationRequestList of AutomationRequestValidatorService <
+   maxListLength of AutomationRequestValidatorService)
+
+ 
+
+==========================================
+               END OF TEST
+==========================================

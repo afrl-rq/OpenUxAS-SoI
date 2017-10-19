@@ -1,0 +1,6 @@
+"num_reqs_in",9,"Number of requirements given to S1"
+"num_reqs_out",9,"Number of requirements processed in S1"
+"endtime - starttime",2.4024930000305176,"Duration of tool run in seconds"
+"num_reqs_in - num_reqs_out",0,"Number of requirements that did not make it through S1"
+"num_reqs_error",0,"Number of requirements with S1 errors"
+"num_errors",0,"Number of tool errors"

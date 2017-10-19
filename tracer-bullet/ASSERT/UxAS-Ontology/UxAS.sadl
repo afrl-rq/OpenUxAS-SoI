@@ -1,0 +1,505 @@
+// ----------------------------------------------
+// Copyright © 2017 
+// ---------------------------------------------
+
+// Authors: Paul Meng, Han Yu
+
+
+uri "http://sadl.org/UxAS" alias UxAS.
+
+import "http://sadl.org/MsgTypeDef".
+manhattan_distance_heuristic is a class.
+AggregatorTaskOptionPair is a class.
+c_Node_Base is a class.
+c_StaticAssignmentParameters is a class.
+astar_goal_visitor is a class.
+found_goal is a class.
+LmcpObjectNetworkClientBase is a class.
+c_TaskAssignmentState is a class.
+c_TaskInformationStatic is a class.
+c_VehicleInformationStatic is a class.
+euclidean_distance_heuristic is a class.
+AdapterServiceHelper is a class.
+c_VehicleAssignmentState is a class.
+TaskOptionClass is a class.
+{AssignmentTreeBranchBoundService} are types of AssignmentTreeBranchBoundBase.
+{c_Node_TreeBranchAndBound} are types of c_Node_Base.
+{AssignmentCoordinatorTaskService, ImpactPointSearchTaskService, ImpactLineSearchTaskService, CmasiAreaSearchTaskService, 
+ CmasiLineSearchTaskService, CommRelayTaskService, PatternSearchTaskService, CordonTaskService, EscortTaskService, 
+ BlockadeTaskService, c00_TaskTemplate, CmasiPointSearchTaskService, MultiVehicleWatchTaskService, AngledAreaSearchTaskService, 
+ OverwatchTaskService
+} are types of TaskServiceBase.
+{AssignmentTreeBranchBoundBase, OperatingRegionStateService, PlanBuilderService, RouteAggregatorService, 
+	SendMessagesService, SensorManagerService, TaskTrackerService, AutomationRequestValidatorService, 
+	HelloWorld, AutomationDiagramDataService, WaypointPlanManagerService, TcpBridge, TaskManagerService, 
+	c00_ServiceTemplate, OsmPlannerService, RoutePlannerVisibilityService, TaskServiceBase, ServiceManager, 
+	MessageLoggerDataService, BatchSummaryService, RoutePlannerService, Test_SimulationTime, SerialAutomationRequestTestService
+} are types of ServiceBase.
+{ServiceBase} are types of LmcpObjectNetworkClientBase.
+
+UxAS is a class,
+    described by afrl__cmasi__AirVehicleState_in with values of type afrl__cmasi__AirVehicleState,
+    described by manhattandistanceheuristic with values of type manhattan_distance_heuristic,
+    described by aggregatorTaskOptionPair with values of type AggregatorTaskOptionPair,
+    described by cNodeBase with values of type c_Node_Base,
+    described by cStaticAssignmentParameters with values of type c_StaticAssignmentParameters,
+    described by routeAggregatorService with values of type RouteAggregatorService,
+    described by sendMessagesService with values of type SendMessagesService,
+    described by sensorManagerService with values of type SensorManagerService,
+    described by automationRequestValidatorService with values of type AutomationRequestValidatorService,
+    described by automationDiagramDataService with values of type AutomationDiagramDataService,
+    described by waypointPlanManagerService with values of type WaypointPlanManagerService,
+    described by taskManagerService with values of type TaskManagerService,
+    described by adapterServiceHelper with values of type AdapterServiceHelper,
+    described by osmPlannerService with values of type OsmPlannerService,
+    described by routePlannerVisibilityService with values of type RoutePlannerVisibilityService,
+    described by taskServiceBase with values of type TaskServiceBase,
+    described by batchSummaryService with values of type BatchSummaryService,
+    described by routePlannerService with values of type RoutePlannerService,
+    described by testSimulationTime with values of type Test_SimulationTime,
+    described by serialAutomationRequestTestService with values of type SerialAutomationRequestTestService,
+    described by assignmentTreeBranchBoundBase with values of type AssignmentTreeBranchBoundBase,
+    described by operatingRegionStateService with values of type OperatingRegionStateService,
+    described by planBuilderService with values of type PlanBuilderService,
+    described by astargoalvisitor with values of type astar_goal_visitor,
+    described by foundgoal with values of type found_goal,
+    described by taskTrackerService with values of type TaskTrackerService,
+    described by cTaskAssignmentState with values of type c_TaskAssignmentState,
+    described by helloWorld with values of type HelloWorld,
+    described by tcpBridge with values of type TcpBridge,
+    described by cTaskInformationStatic with values of type c_TaskInformationStatic,
+    described by cVehicleInformationStatic with values of type c_VehicleInformationStatic,
+    described by c00ServiceTemplate with values of type c00_ServiceTemplate,
+    described by euclideandistanceheuristic with values of type euclidean_distance_heuristic,
+    described by messageLoggerDataService with values of type MessageLoggerDataService,
+    described by cVehicleAssignmentState with values of type c_VehicleAssignmentState,
+    described by taskOptionClass with values of type TaskOptionClass,
+    described by assignmentTreeBranchBoundService with values of type AssignmentTreeBranchBoundService,
+    described by cNodeTreeBranchAndBound with values of type c_Node_TreeBranchAndBound,
+    described by assignmentCoordinatorTaskService with values of type AssignmentCoordinatorTaskService,
+    described by impactPointSearchTaskService with values of type ImpactPointSearchTaskService,
+    described by impactLineSearchTaskService with values of type ImpactLineSearchTaskService,
+    described by cmasiAreaSearchTaskService with values of type CmasiAreaSearchTaskService,
+    described by cmasiLineSearchTaskService with values of type CmasiLineSearchTaskService,
+    described by commRelayTaskService with values of type CommRelayTaskService,
+    described by patternSearchTaskService with values of type PatternSearchTaskService,
+    described by cordonTaskService with values of type CordonTaskService,
+    described by escortTaskService with values of type EscortTaskService,
+    described by blockadeTaskService with values of type BlockadeTaskService,
+    described by c00TaskTemplate with values of type c00_TaskTemplate,
+    described by cmasiPointSearchTaskService with values of type CmasiPointSearchTaskService,
+    described by multiVehicleWatchTaskService with values of type MultiVehicleWatchTaskService,
+    described by angledAreaSearchTaskService with values of type AngledAreaSearchTaskService,
+    described by overwatchTaskService with values of type OverwatchTaskService.
+
+
+// 10 input ports for RouteAggregatorService
+uxas__messages__task__UniqueAutomationRequest__Subscription describes RouteAggregatorService with values of type uxas__messages__task__UniqueAutomationRequest.
+uxas__messages__route__RoutePlanResponse__Subscription describes RouteAggregatorService with values of type uxas__messages__route__RoutePlanResponse.
+afrl__cmasi__AirVehicleState__Subscription describes RouteAggregatorService with values of type afrl__cmasi__AirVehicleState.
+afrl__impact__GroundVehicleConfiguration__Subscription describes RouteAggregatorService with values of type afrl__impact__GroundVehicleConfiguration.
+uxas__messages__route__RouteRequest__Subscription describes RouteAggregatorService with values of type uxas__messages__route__RouteRequest.
+afrl__impact__GroundVehicleState__Subscription describes RouteAggregatorService with values of type afrl__impact__GroundVehicleState.
+uxas__messages__task__TaskPlanOptions__Subscription describes RouteAggregatorService with values of type uxas__messages__task__TaskPlanOptions.
+afrl__impact__SurfaceVehicleState__Subscription describes RouteAggregatorService with values of type afrl__impact__SurfaceVehicleState.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes RouteAggregatorService with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes RouteAggregatorService with values of type afrl__cmasi__AirVehicleConfiguration.
+
+
+// 4 output ports for RouteAggregatorService
+uxas__messages__route__RouteResponse_out describes RouteAggregatorService with values of type uxas__messages__route__RouteResponse.
+uxas__messages__route__RoutePlanRequest_out describes RouteAggregatorService with values of type uxas__messages__route__RoutePlanRequest.
+afrl__cmasi__ServiceStatus_out describes RouteAggregatorService with values of type afrl__cmasi__ServiceStatus.
+uxas__messages__task__AssignmentCostMatrix_out describes RouteAggregatorService with values of type uxas__messages__task__AssignmentCostMatrix.
+
+
+// 1 input ports for SendMessagesService
+uxas__messages__uxnative__StartupComplete__Subscription describes SendMessagesService with values of type uxas__messages__uxnative__StartupComplete.
+
+
+// 5 input ports for SensorManagerService
+afrl__impact__GroundVehicleConfiguration__Subscription describes SensorManagerService with values of type afrl__impact__GroundVehicleConfiguration.
+uxas__messages__task__SensorFootprintRequests__Subscription describes SensorManagerService with values of type uxas__messages__task__SensorFootprintRequests.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes SensorManagerService with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__cmasi__RemoveTasks__Subscription describes SensorManagerService with values of type afrl__cmasi__RemoveTasks.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes SensorManagerService with values of type afrl__cmasi__AirVehicleConfiguration.
+
+
+// 1 output ports for SensorManagerService
+uxas__messages__task__SensorFootprintResponse_out describes SensorManagerService with values of type uxas__messages__task__SensorFootprintResponse.
+
+
+// 2 input ports for CmasiAreaSearchTaskService
+uxas__messages__route__RouteResponse__Subscription describes CmasiAreaSearchTaskService with values of type uxas__messages__route__RouteResponse.
+uxas__messages__task__SensorFootprintResponse__Subscription describes CmasiAreaSearchTaskService with values of type uxas__messages__task__SensorFootprintResponse.
+
+
+// 4 output ports for CmasiAreaSearchTaskService
+uxas__messages__route__RoutePlanRequest_out describes CmasiAreaSearchTaskService with values of type uxas__messages__route__RoutePlanRequest.
+afrl__cmasi__VehicleActionCommand_out describes CmasiAreaSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__uxnative__VideoRecord_out describes CmasiAreaSearchTaskService with values of type uxas__messages__uxnative__VideoRecord.
+uxas__messages__task__SensorFootprintRequests_out describes CmasiAreaSearchTaskService with values of type uxas__messages__task__SensorFootprintRequests.
+
+
+// 19 input ports for AutomationRequestValidatorService
+afrl__impact__PointOfInterest__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__PointOfInterest.
+afrl__impact__GroundVehicleConfiguration__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__GroundVehicleConfiguration.
+uxas__messages__task__UniqueAutomationResponse__Subscription describes AutomationRequestValidatorService with values of type uxas__messages__task__UniqueAutomationResponse.
+uxas__messages__task__TaskAutomationRequest__Subscription describes AutomationRequestValidatorService with values of type uxas__messages__task__TaskAutomationRequest.
+afrl__impact__AreaOfInterest__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__AreaOfInterest.
+afrl__impact__SurfaceVehicleState__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__SurfaceVehicleState.
+afrl__cmasi__Task__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__Task.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__AirVehicleConfiguration.
+afrl__cmasi__OperatingRegion__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__OperatingRegion.
+afrl__cmasi__AutomationRequest__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__AutomationRequest.
+afrl__cmasi__AirVehicleState__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__AirVehicleState.
+afrl__cmasi__KeepInZone__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__KeepInZone.
+afrl__impact__LineOfInterest__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__LineOfInterest.
+afrl__impact__ImpactAutomationRequest__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__ImpactAutomationRequest.
+afrl__impact__GroundVehicleState__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__GroundVehicleState.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes AutomationRequestValidatorService with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__cmasi__RemoveTasks__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__RemoveTasks.
+afrl__cmasi__KeepOutZone__Subscription describes AutomationRequestValidatorService with values of type afrl__cmasi__KeepOutZone.
+uxas__messages__task__TaskInitialized__Subscription describes AutomationRequestValidatorService with values of type uxas__messages__task__TaskInitialized.
+
+
+// 5 output ports for AutomationRequestValidatorService
+afrl__impact__ImpactAutomationResponse_out describes AutomationRequestValidatorService with values of type afrl__impact__ImpactAutomationResponse.
+uxas__messages__task__TaskAutomationResponse_out describes AutomationRequestValidatorService with values of type uxas__messages__task__TaskAutomationResponse.
+afrl__cmasi__ServiceStatus_out describes AutomationRequestValidatorService with values of type afrl__cmasi__ServiceStatus.
+uxas__messages__task__UniqueAutomationRequest_out describes AutomationRequestValidatorService with values of type uxas__messages__task__UniqueAutomationRequest.
+afrl__cmasi__AutomationResponse_out describes AutomationRequestValidatorService with values of type afrl__cmasi__AutomationResponse.
+
+
+// 12 input ports for AutomationDiagramDataService
+uxas__messages__task__UniqueAutomationRequest__Subscription describes AutomationDiagramDataService with values of type uxas__messages__task__UniqueAutomationRequest.
+afrl__impact__PointOfInterest__Subscription describes AutomationDiagramDataService with values of type afrl__impact__PointOfInterest.
+afrl__cmasi__OperatingRegion__Subscription describes AutomationDiagramDataService with values of type afrl__cmasi__OperatingRegion.
+afrl__cmasi__AirVehicleState__Subscription describes AutomationDiagramDataService with values of type afrl__cmasi__AirVehicleState.
+afrl__cmasi__KeepInZone__Subscription describes AutomationDiagramDataService with values of type afrl__cmasi__KeepInZone.
+afrl__impact__LineOfInterest__Subscription describes AutomationDiagramDataService with values of type afrl__impact__LineOfInterest.
+afrl__impact__GroundVehicleState__Subscription describes AutomationDiagramDataService with values of type afrl__impact__GroundVehicleState.
+uxas__messages__task__UniqueAutomationResponse__Subscription describes AutomationDiagramDataService with values of type uxas__messages__task__UniqueAutomationResponse.
+afrl__impact__AreaOfInterest__Subscription describes AutomationDiagramDataService with values of type afrl__impact__AreaOfInterest.
+afrl__impact__SurfaceVehicleState__Subscription describes AutomationDiagramDataService with values of type afrl__impact__SurfaceVehicleState.
+afrl__cmasi__Task__Subscription describes AutomationDiagramDataService with values of type afrl__cmasi__Task.
+afrl__cmasi__KeepOutZone__Subscription describes AutomationDiagramDataService with values of type afrl__cmasi__KeepOutZone.
+
+
+// 4 input ports for WaypointPlanManagerService
+afrl__cmasi__AirVehicleState__Subscription describes WaypointPlanManagerService with values of type afrl__cmasi__AirVehicleState.
+uxas__messages__uxnative__IncrementWaypoint__Subscription describes WaypointPlanManagerService with values of type uxas__messages__uxnative__IncrementWaypoint.
+afrl__cmasi__MissionCommand__Subscription describes WaypointPlanManagerService with values of type afrl__cmasi__MissionCommand.
+afrl__cmasi__AutomationResponse__Subscription describes WaypointPlanManagerService with values of type afrl__cmasi__AutomationResponse.
+
+
+// 1 output ports for WaypointPlanManagerService
+// avtas__lmcp__Object_out describes WaypointPlanManagerService with values of type avtas__lmcp__Object.
+
+
+// 16 input ports for TaskManagerService
+afrl__impact__PointOfInterest__Subscription describes TaskManagerService with values of type afrl__impact__PointOfInterest.
+afrl__impact__GroundVehicleConfiguration__Subscription describes TaskManagerService with values of type afrl__impact__GroundVehicleConfiguration.
+afrl__cmasi__EntityConfiguration__Subscription describes TaskManagerService with values of type afrl__cmasi__EntityConfiguration.
+afrl__impact__AreaOfInterest__Subscription describes TaskManagerService with values of type afrl__impact__AreaOfInterest.
+afrl__impact__SurfaceVehicleState__Subscription describes TaskManagerService with values of type afrl__impact__SurfaceVehicleState.
+afrl__cmasi__Task__Subscription describes TaskManagerService with values of type afrl__cmasi__Task.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes TaskManagerService with values of type afrl__cmasi__AirVehicleConfiguration.
+afrl__cmasi__AirVehicleState__Subscription describes TaskManagerService with values of type afrl__cmasi__AirVehicleState.
+afrl__impact__LineOfInterest__Subscription describes TaskManagerService with values of type afrl__impact__LineOfInterest.
+afrl__cmasi__EntityState__Subscription describes TaskManagerService with values of type afrl__cmasi__EntityState.
+afrl__impact__GroundVehicleState__Subscription describes TaskManagerService with values of type afrl__impact__GroundVehicleState.
+afrl__cmasi__MissionCommand__Subscription describes TaskManagerService with values of type afrl__cmasi__MissionCommand.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes TaskManagerService with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__cmasi__RemoveTasks__Subscription describes TaskManagerService with values of type afrl__cmasi__RemoveTasks.
+afrl__cmasi__AutomationResponse__Subscription describes TaskManagerService with values of type afrl__cmasi__AutomationResponse.
+afrl__cmasi__FollowPathCommand__Subscription describes TaskManagerService with values of type afrl__cmasi__FollowPathCommand.
+
+
+// 3 output ports for TaskManagerService
+uxas__messages__uxnative__CreateNewService_out describes TaskManagerService with values of type uxas__messages__uxnative__CreateNewService.
+uxas__messages__task__UniqueAutomationRequest_out describes TaskManagerService with values of type uxas__messages__task__UniqueAutomationRequest.
+uxas__messages__uxnative__KillService_out describes TaskManagerService with values of type uxas__messages__uxnative__KillService.
+
+
+// 3 input ports for OsmPlannerService
+uxas__messages__route__EgressRouteRequest__Subscription describes OsmPlannerService with values of type uxas__messages__route__EgressRouteRequest.
+uxas__messages__route__RoutePlanRequest__Subscription describes OsmPlannerService with values of type uxas__messages__route__RoutePlanRequest.
+afrl__impact__GroundVehicleConfiguration__Subscription describes OsmPlannerService with values of type afrl__impact__GroundVehicleConfiguration.
+
+
+// 2 output ports for OsmPlannerService
+uxas__messages__route__EgressRouteResponse_out describes OsmPlannerService with values of type uxas__messages__route__EgressRouteResponse.
+uxas__messages__route__RoutePlanResponse_out describes OsmPlannerService with values of type uxas__messages__route__RoutePlanResponse.
+
+
+// 11 input ports for RoutePlannerVisibilityService
+afrl__cmasi__OperatingRegion__Subscription describes RoutePlannerVisibilityService with values of type afrl__cmasi__OperatingRegion.
+afrl__impact__GroundVehicleConfiguration__Subscription describes RoutePlannerVisibilityService with values of type afrl__impact__GroundVehicleConfiguration.
+uxas__messages__route__RoutePlanRequest__Subscription describes RoutePlannerVisibilityService with values of type uxas__messages__route__RoutePlanRequest.
+afrl__cmasi__AirVehicleState__Subscription describes RoutePlannerVisibilityService with values of type afrl__cmasi__AirVehicleState.
+afrl__cmasi__KeepInZone__Subscription describes RoutePlannerVisibilityService with values of type afrl__cmasi__KeepInZone.
+uxas__messages__route__RouteRequest__Subscription describes RoutePlannerVisibilityService with values of type uxas__messages__route__RouteRequest.
+afrl__impact__GroundVehicleState__Subscription describes RoutePlannerVisibilityService with values of type afrl__impact__GroundVehicleState.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes RoutePlannerVisibilityService with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__impact__SurfaceVehicleState__Subscription describes RoutePlannerVisibilityService with values of type afrl__impact__SurfaceVehicleState.
+afrl__cmasi__KeepOutZone__Subscription describes RoutePlannerVisibilityService with values of type afrl__cmasi__KeepOutZone.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes RoutePlannerVisibilityService with values of type afrl__cmasi__AirVehicleConfiguration.
+
+
+// 1 output ports for RoutePlannerVisibilityService
+uxas__messages__route__RoutePlanResponse_out describes RoutePlannerVisibilityService with values of type uxas__messages__route__RoutePlanResponse.
+
+
+// 12 input ports for TaskServiceBase
+uxas__messages__task__UniqueAutomationRequest__Subscription describes TaskServiceBase with values of type uxas__messages__task__UniqueAutomationRequest.
+uxas__messages__route__RoutePlanResponse__Subscription describes TaskServiceBase with values of type uxas__messages__route__RoutePlanResponse.
+afrl__cmasi__AirVehicleState__Subscription describes TaskServiceBase with values of type afrl__cmasi__AirVehicleState.
+afrl__impact__GroundVehicleConfiguration__Subscription describes TaskServiceBase with values of type afrl__impact__GroundVehicleConfiguration.
+afrl__cmasi__EntityState__Subscription describes TaskServiceBase with values of type afrl__cmasi__EntityState.
+afrl__cmasi__EntityConfiguration__Subscription describes TaskServiceBase with values of type afrl__cmasi__EntityConfiguration.
+afrl__impact__GroundVehicleState__Subscription describes TaskServiceBase with values of type afrl__impact__GroundVehicleState.
+uxas__messages__task__TaskImplementationRequest__Subscription describes TaskServiceBase with values of type uxas__messages__task__TaskImplementationRequest.
+uxas__messages__task__UniqueAutomationResponse__Subscription describes TaskServiceBase with values of type uxas__messages__task__UniqueAutomationResponse.
+afrl__impact__SurfaceVehicleState__Subscription describes TaskServiceBase with values of type afrl__impact__SurfaceVehicleState.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes TaskServiceBase with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes TaskServiceBase with values of type afrl__cmasi__AirVehicleConfiguration.
+
+
+// 6 output ports for TaskServiceBase
+uxas__messages__route__RoutePlanRequest_out describes TaskServiceBase with values of type uxas__messages__route__RoutePlanRequest.
+uxas__messages__task__TaskPlanOptions_out describes TaskServiceBase with values of type uxas__messages__task__TaskPlanOptions.
+uxas__messages__task__TaskImplementationResponse_out describes TaskServiceBase with values of type uxas__messages__task__TaskImplementationResponse.
+uxas__messages__task__TaskInitialized_out describes TaskServiceBase with values of type uxas__messages__task__TaskInitialized.
+uxas__messages__task__TaskActive_out describes TaskServiceBase with values of type uxas__messages__task__TaskActive.
+uxas__messages__task__TaskComplete_out describes TaskServiceBase with values of type uxas__messages__task__TaskComplete.
+
+
+// 17 input ports for BatchSummaryService
+afrl__impact__RadioTowerState__Subscription describes BatchSummaryService with values of type afrl__impact__RadioTowerState.
+afrl__impact__PointOfInterest__Subscription describes BatchSummaryService with values of type afrl__impact__PointOfInterest.
+afrl__impact__GroundVehicleConfiguration__Subscription describes BatchSummaryService with values of type afrl__impact__GroundVehicleConfiguration.
+afrl__cmasi__EntityConfiguration__Subscription describes BatchSummaryService with values of type afrl__cmasi__EntityConfiguration.
+afrl__impact__AreaOfInterest__Subscription describes BatchSummaryService with values of type afrl__impact__AreaOfInterest.
+afrl__impact__RadioTowerConfiguration__Subscription describes BatchSummaryService with values of type afrl__impact__RadioTowerConfiguration.
+afrl__impact__SurfaceVehicleState__Subscription describes BatchSummaryService with values of type afrl__impact__SurfaceVehicleState.
+afrl__impact__BatchSummaryRequest__Subscription describes BatchSummaryService with values of type afrl__impact__BatchSummaryRequest.
+afrl__cmasi__Task__Subscription describes BatchSummaryService with values of type afrl__cmasi__Task.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes BatchSummaryService with values of type afrl__cmasi__AirVehicleConfiguration.
+uxas__messages__route__RoutePlanResponse__Subscription describes BatchSummaryService with values of type uxas__messages__route__RoutePlanResponse.
+afrl__cmasi__AirVehicleState__Subscription describes BatchSummaryService with values of type afrl__cmasi__AirVehicleState.
+afrl__impact__LineOfInterest__Subscription describes BatchSummaryService with values of type afrl__impact__LineOfInterest.
+afrl__cmasi__EntityState__Subscription describes BatchSummaryService with values of type afrl__cmasi__EntityState.
+afrl__impact__GroundVehicleState__Subscription describes BatchSummaryService with values of type afrl__impact__GroundVehicleState.
+uxas__messages__route__EgressRouteResponse__Subscription describes BatchSummaryService with values of type uxas__messages__route__EgressRouteResponse.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes BatchSummaryService with values of type afrl__impact__SurfaceVehicleConfiguration.
+
+
+// 3 output ports for BatchSummaryService
+afrl__impact__BatchSummaryResponse_out describes BatchSummaryService with values of type afrl__impact__BatchSummaryResponse.
+uxas__messages__route__EgressRouteRequest_out describes BatchSummaryService with values of type uxas__messages__route__EgressRouteRequest.
+uxas__messages__route__RoutePlanRequest_out describes BatchSummaryService with values of type uxas__messages__route__RoutePlanRequest.
+
+
+// 13 input ports for RoutePlannerService
+afrl__impact__GroundVehicleConfiguration__Subscription describes RoutePlannerService with values of type afrl__impact__GroundVehicleConfiguration.
+uxas__messages__route__RoutePlanRequest__Subscription describes RoutePlannerService with values of type uxas__messages__route__RoutePlanRequest.
+afrl__cmasi__EntityConfiguration__Subscription describes RoutePlannerService with values of type afrl__cmasi__EntityConfiguration.
+afrl__impact__SurfaceVehicleState__Subscription describes RoutePlannerService with values of type afrl__impact__SurfaceVehicleState.
+afrl__impact__WaterZone__Subscription describes RoutePlannerService with values of type afrl__impact__WaterZone.
+afrl__cmasi__AirVehicleConfiguration__Subscription describes RoutePlannerService with values of type afrl__cmasi__AirVehicleConfiguration.
+afrl__cmasi__OperatingRegion__Subscription describes RoutePlannerService with values of type afrl__cmasi__OperatingRegion.
+afrl__cmasi__AirVehicleState__Subscription describes RoutePlannerService with values of type afrl__cmasi__AirVehicleState.
+afrl__cmasi__KeepInZone__Subscription describes RoutePlannerService with values of type afrl__cmasi__KeepInZone.
+afrl__cmasi__EntityState__Subscription describes RoutePlannerService with values of type afrl__cmasi__EntityState.
+afrl__impact__GroundVehicleState__Subscription describes RoutePlannerService with values of type afrl__impact__GroundVehicleState.
+afrl__impact__SurfaceVehicleConfiguration__Subscription describes RoutePlannerService with values of type afrl__impact__SurfaceVehicleConfiguration.
+afrl__cmasi__KeepOutZone__Subscription describes RoutePlannerService with values of type afrl__cmasi__KeepOutZone.
+
+
+// 1 output ports for RoutePlannerService
+uxas__messages__route__RoutePlanResponse_out describes RoutePlannerService with values of type uxas__messages__route__RoutePlanResponse.
+
+
+// 1 input ports for Test_SimulationTime
+afrl__cmasi__AirVehicleState__Subscription describes Test_SimulationTime with values of type afrl__cmasi__AirVehicleState.
+
+
+// 4 input ports for SerialAutomationRequestTestService
+afrl__cmasi__AutomationRequest__Subscription describes SerialAutomationRequestTestService with values of type afrl__cmasi__AutomationRequest.
+afrl__impact__ImpactAutomationRequest__Subscription describes SerialAutomationRequestTestService with values of type afrl__impact__ImpactAutomationRequest.
+afrl__impact__ImpactAutomationResponse__Subscription describes SerialAutomationRequestTestService with values of type afrl__impact__ImpactAutomationResponse.
+afrl__cmasi__AutomationResponse__Subscription describes SerialAutomationRequestTestService with values of type afrl__cmasi__AutomationResponse.
+
+
+// 1 output ports for SerialAutomationRequestTestService
+uxas__messages__task__UniqueAutomationRequest_out describes SerialAutomationRequestTestService with values of type uxas__messages__task__UniqueAutomationRequest.
+
+
+// 2 input ports for AngledAreaSearchTaskService
+uxas__messages__route__RouteResponse__Subscription describes AngledAreaSearchTaskService with values of type uxas__messages__route__RouteResponse.
+uxas__messages__task__SensorFootprintResponse__Subscription describes AngledAreaSearchTaskService with values of type uxas__messages__task__SensorFootprintResponse.
+
+
+// 4 output ports for AngledAreaSearchTaskService
+uxas__messages__route__RoutePlanRequest_out describes AngledAreaSearchTaskService with values of type uxas__messages__route__RoutePlanRequest.
+afrl__cmasi__VehicleActionCommand_out describes AngledAreaSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__uxnative__VideoRecord_out describes AngledAreaSearchTaskService with values of type uxas__messages__uxnative__VideoRecord.
+uxas__messages__task__SensorFootprintRequests_out describes AngledAreaSearchTaskService with values of type uxas__messages__task__SensorFootprintRequests.
+
+
+// 3 input ports for AssignmentTreeBranchBoundBase
+uxas__messages__task__UniqueAutomationRequest__Subscription describes AssignmentTreeBranchBoundBase with values of type uxas__messages__task__UniqueAutomationRequest.
+uxas__messages__task__AssignmentCostMatrix__Subscription describes AssignmentTreeBranchBoundBase with values of type uxas__messages__task__AssignmentCostMatrix.
+uxas__messages__task__TaskPlanOptions__Subscription describes AssignmentTreeBranchBoundBase with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 2 output ports for AssignmentTreeBranchBoundBase
+afrl__cmasi__ServiceStatus_out describes AssignmentTreeBranchBoundBase with values of type afrl__cmasi__ServiceStatus.
+uxas__messages__task__TaskAssignmentSummary_out describes AssignmentTreeBranchBoundBase with values of type uxas__messages__task__TaskAssignmentSummary.
+
+
+// 3 input ports for OperatingRegionStateService
+afrl__cmasi__RemoveZones__Subscription describes OperatingRegionStateService with values of type afrl__cmasi__RemoveZones.
+afrl__cmasi__KeepInZone__Subscription describes OperatingRegionStateService with values of type afrl__cmasi__KeepInZone.
+afrl__cmasi__KeepOutZone__Subscription describes OperatingRegionStateService with values of type afrl__cmasi__KeepOutZone.
+
+
+// 1 output ports for OperatingRegionStateService
+afrl__cmasi__OperatingRegion_out describes OperatingRegionStateService with values of type afrl__cmasi__OperatingRegion.
+
+
+// 6 input ports for PlanBuilderService
+uxas__messages__task__UniqueAutomationRequest__Subscription describes PlanBuilderService with values of type uxas__messages__task__UniqueAutomationRequest.
+uxas__messages__task__TaskAssignmentSummary__Subscription describes PlanBuilderService with values of type uxas__messages__task__TaskAssignmentSummary.
+uxas__messages__task__TaskImplementationResponse__Subscription describes PlanBuilderService with values of type uxas__messages__task__TaskImplementationResponse.
+afrl__cmasi__AirVehicleState__Subscription describes PlanBuilderService with values of type afrl__cmasi__AirVehicleState.
+afrl__impact__GroundVehicleState__Subscription describes PlanBuilderService with values of type afrl__impact__GroundVehicleState.
+afrl__impact__SurfaceVehicleState__Subscription describes PlanBuilderService with values of type afrl__impact__SurfaceVehicleState.
+
+
+// 3 output ports for PlanBuilderService
+uxas__messages__task__UniqueAutomationResponse_out describes PlanBuilderService with values of type uxas__messages__task__UniqueAutomationResponse.
+afrl__cmasi__ServiceStatus_out describes PlanBuilderService with values of type afrl__cmasi__ServiceStatus.
+uxas__messages__task__TaskImplementationRequest_out describes PlanBuilderService with values of type uxas__messages__task__TaskImplementationRequest.
+
+
+// 5 input ports for AssignmentCoordinatorTaskService
+afrl__cmasi__AirVehicleState__Subscription describes AssignmentCoordinatorTaskService with values of type afrl__cmasi__AirVehicleState.
+uxas__messages__task__CoordinatedAutomationRequest__Subscription describes AssignmentCoordinatorTaskService with values of type uxas__messages__task__CoordinatedAutomationRequest.
+afrl__cmasi__EntityState__Subscription describes AssignmentCoordinatorTaskService with values of type afrl__cmasi__EntityState.
+uxas__messages__task__UniqueAutomationResponse__Subscription describes AssignmentCoordinatorTaskService with values of type uxas__messages__task__UniqueAutomationResponse.
+uxas__messages__task__AssignmentCoordination__Subscription describes AssignmentCoordinatorTaskService with values of type uxas__messages__task__AssignmentCoordination.
+
+
+// 3 output ports for AssignmentCoordinatorTaskService
+uxas__messages__task__TaskAutomationRequest_out describes AssignmentCoordinatorTaskService with values of type uxas__messages__task__TaskAutomationRequest.
+uxas__messages__task__AssignmentCoordination_out describes AssignmentCoordinatorTaskService with values of type uxas__messages__task__AssignmentCoordination.
+afrl__cmasi__AutomationResponse_out describes AssignmentCoordinatorTaskService with values of type afrl__cmasi__AutomationResponse.
+
+
+// 9 input ports for TaskTrackerService
+afrl__impact__PointOfInterest__Subscription describes TaskTrackerService with values of type afrl__impact__PointOfInterest.
+afrl__cmasi__AirVehicleState__Subscription describes TaskTrackerService with values of type afrl__cmasi__AirVehicleState.
+afrl__impact__LineOfInterest__Subscription describes TaskTrackerService with values of type afrl__impact__LineOfInterest.
+afrl__impact__GroundVehicleState__Subscription describes TaskTrackerService with values of type afrl__impact__GroundVehicleState.
+afrl__impact__AreaOfInterest__Subscription describes TaskTrackerService with values of type afrl__impact__AreaOfInterest.
+afrl__cmasi__MissionCommand__Subscription describes TaskTrackerService with values of type afrl__cmasi__MissionCommand.
+afrl__impact__SurfaceVehicleState__Subscription describes TaskTrackerService with values of type afrl__impact__SurfaceVehicleState.
+afrl__cmasi__Task__Subscription describes TaskTrackerService with values of type afrl__cmasi__Task.
+afrl__cmasi__AutomationResponse__Subscription describes TaskTrackerService with values of type afrl__cmasi__AutomationResponse.
+
+
+// 1 input ports for HelloWorld
+afrl__cmasi__KeyValuePair__Subscription describes HelloWorld with values of type afrl__cmasi__KeyValuePair.
+
+
+// 1 input ports for c00_ServiceTemplate
+afrl__cmasi__KeyValuePair__Subscription describes c00_ServiceTemplate with values of type afrl__cmasi__KeyValuePair.
+
+
+// 1 output ports for c00_ServiceTemplate
+afrl__cmasi__KeyValuePair_out describes c00_ServiceTemplate with values of type afrl__cmasi__KeyValuePair.
+
+
+// 2 input ports for PatternSearchTaskService
+uxas__messages__route__RouteResponse__Subscription describes PatternSearchTaskService with values of type uxas__messages__route__RouteResponse.
+uxas__messages__task__SensorFootprintResponse__Subscription describes PatternSearchTaskService with values of type uxas__messages__task__SensorFootprintResponse.
+
+
+// 5 output ports for PatternSearchTaskService
+uxas__messages__route__RoutePlanRequest_out describes PatternSearchTaskService with values of type uxas__messages__route__RoutePlanRequest.
+uxas__messages__task__TaskPlanOptions_out describes PatternSearchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+afrl__cmasi__VehicleActionCommand_out describes PatternSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__uxnative__VideoRecord_out describes PatternSearchTaskService with values of type uxas__messages__uxnative__VideoRecord.
+uxas__messages__task__SensorFootprintRequests_out describes PatternSearchTaskService with values of type uxas__messages__task__SensorFootprintRequests.
+
+
+// 2 input ports for CordonTaskService
+uxas__messages__route__RouteResponse__Subscription describes CordonTaskService with values of type uxas__messages__route__RouteResponse.
+uxas__messages__route__EgressRouteResponse__Subscription describes CordonTaskService with values of type uxas__messages__route__EgressRouteResponse.
+
+
+// 2 output ports for CordonTaskService
+uxas__messages__route__EgressRouteRequest_out describes CordonTaskService with values of type uxas__messages__route__EgressRouteRequest.
+uxas__messages__task__TaskPlanOptions_out describes CordonTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 4 input ports for EscortTaskService
+afrl__impact__LineOfInterest__Subscription describes EscortTaskService with values of type afrl__impact__LineOfInterest.
+afrl__cmasi__MissionCommand__Subscription describes EscortTaskService with values of type afrl__cmasi__MissionCommand.
+afrl__cmasi__AutomationResponse__Subscription describes EscortTaskService with values of type afrl__cmasi__AutomationResponse.
+afrl__cmasi__FollowPathCommand__Subscription describes EscortTaskService with values of type afrl__cmasi__FollowPathCommand.
+
+
+// 2 output ports for EscortTaskService
+// avtas__lmcp__Object_out describes EscortTaskService with values of type avtas__lmcp__Object.
+uxas__messages__task__TaskPlanOptions_out describes EscortTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 1 input ports for c00_TaskTemplate
+afrl__cmasi__KeyValuePair__Subscription describes c00_TaskTemplate with values of type afrl__cmasi__KeyValuePair.
+
+
+// 2 output ports for ImpactPointSearchTaskService
+afrl__cmasi__VehicleActionCommand_out describes ImpactPointSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__task__TaskPlanOptions_out describes ImpactPointSearchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 3 output ports for ImpactLineSearchTaskService
+uxas__messages__uxnative__VideoRecord_out describes ImpactLineSearchTaskService with values of type uxas__messages__uxnative__VideoRecord.
+afrl__cmasi__VehicleActionCommand_out describes ImpactLineSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__task__TaskPlanOptions_out describes ImpactLineSearchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 2 output ports for BlockadeTaskService
+// avtas__lmcp__Object_out describes BlockadeTaskService with values of type avtas__lmcp__Object.
+uxas__messages__task__TaskPlanOptions_out describes BlockadeTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 2 output ports for MultiVehicleWatchTaskService
+// avtas__lmcp__Object_out describes MultiVehicleWatchTaskService with values of type avtas__lmcp__Object.
+uxas__messages__task__TaskPlanOptions_out describes MultiVehicleWatchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 3 output ports for CmasiLineSearchTaskService
+afrl__cmasi__VehicleActionCommand_out describes CmasiLineSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__uxnative__VideoRecord_out describes CmasiLineSearchTaskService with values of type uxas__messages__uxnative__VideoRecord.
+uxas__messages__task__TaskPlanOptions_out describes CmasiLineSearchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 2 output ports for CommRelayTaskService
+// avtas__lmcp__Object_out describes CommRelayTaskService with values of type avtas__lmcp__Object.
+uxas__messages__task__TaskPlanOptions_out describes CommRelayTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 2 output ports for CmasiPointSearchTaskService
+afrl__cmasi__VehicleActionCommand_out describes CmasiPointSearchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__task__TaskPlanOptions_out describes CmasiPointSearchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+
+// 2 output ports for OverwatchTaskService
+afrl__cmasi__VehicleActionCommand_out describes OverwatchTaskService with values of type afrl__cmasi__VehicleActionCommand.
+uxas__messages__task__TaskPlanOptions_out describes OverwatchTaskService with values of type uxas__messages__task__TaskPlanOptions.
+
+

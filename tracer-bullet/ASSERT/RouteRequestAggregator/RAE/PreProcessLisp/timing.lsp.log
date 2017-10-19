@@ -1,0 +1,90 @@
+IN>(cw "~%ACL2 Initialized!!!~%")
+Welcome to Clozure Common Lisp Version 1.11-r16635  (WindowsX8664)!
+
+ ACL2 Version 7.1 built April 18, 2016  10:18:02
+                   then January 30, 2017  21:42:33.
+ Copyright (C) 2015, Regents of the University of Texas
+ ACL2 comes with ABSOLUTELY NO WARRANTY.  This is free software and you
+ are welcome to redistribute it under certain conditions.  For details,
+ see the LICENSE file distributed with ACL2.
+
+ Initialized with (INITIALIZE-ACL2 'INCLUDE-BOOK *ACL2-PASS-2-FILES*).
+
+ Includes support for hash cons, memoization, and applicative hash
+ tables.
+
+ See the documentation topic note-7-1 for recent changes.
+ Note: We have modified the prompt in some underlying Lisps to further
+ distinguish it from the ACL2 prompt.
+
+MODIFICATION NOTICE:
+
+Loaded ASSERT Requirement Analysis Book 2017-1-27 ccl64 acl2v1.1.8.1
+
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+ACL2 Initialized!!!
+NIL
+ACL2 !>
+Exiting the ACL2 read-eval-print loop.  To re-enter, execute (LP).
+? *TIMING-LISP-EXT*
+? *BADINPUT*
+? *VAR-I->FVAR*
+? *FVAR->VAR-I*
+? *VAR-I->FVAR-FILE*
+? *FVAR->VAR-I-FILE*
+? PROCESS-I-REQUIREMENT
+? POST-PROCESS-I-REQUIREMENT
+? GET-MVARS
+? GET-CVARS
+? GET-VARS
+? GET-SYMBOLS
+? GET-TVARS
+? GET-I-FILE
+? CREATE-TBL-NAME
+? NEW-I-NAME
+IN>(cw "~%Ready for next command!!~%")
+? GEN-NAME
+? UPDATE-MVARS
+? SHOW-HT
+? DUR-TO-L
+? HAS-ALIST
+? UPDATE-HASBEEN
+? UPDATE-WAS
+? UPDATE-BODY
+? UPDATE-REQUIREMENT
+? PROCESS-VAL
+? PRINT-HTABLE
+? PRINT-HTABLES
+? UNTIME-FILE
+?
+Ready for next command!!
+NIL
+IN>(untime-file "C:/SadlWorkspace28/ReqAggregator-v4/RAE/PreProcessLisp/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).assump.simp")
+IN>(cw "~%Ready for next command!!~%")
+? NIL
+?
+Ready for next command!!
+NIL
+IN>(untime-file "C:/SadlWorkspace28/ReqAggregator-v4/RAE/PreProcessLisp/plan_(element_rareq2_yindex_vi_var14).assump.simp")
+IN>(cw "~%Ready for next command!!~%")
+? NIL
+?
+Ready for next command!!
+NIL
+IN>(LP)
+
+IN>(good-bye)
+
+?
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+End of file

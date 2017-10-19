@@ -1,0 +1,8 @@
+2017-10-19 14:05:53,345 - INFO: Starting Requirements Analysis Engine Version:v1.1.16
+2017-10-19 14:05:53,361 - INFO: Configuration: configVersion:1.1 reservedCores:1 runPartialAnalysis:false enablePreprocessing:true stopOnError:true analysisTimeout:600 
+2017-10-19 14:05:53,407 - INFO: Requirement has not changed so analysis will be skipped for: numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp 
+2017-10-19 14:05:53,423 - INFO: Requirement has not changed so analysis will be skipped for: plan_(element_rareq2_yindex_vi_var14).lisp 
+2017-10-19 14:05:53,423 - INFO: Requirement has not changed so analysis will be skipped for: requestList_ReqAggregator.lisp 
+2017-10-19 14:05:53,439 - INFO: Requirement has not changed so analysis will be skipped for: send1_ReqAggregator.lisp 
+2017-10-19 14:05:53,454 - INFO: Requirement has not changed so analysis will be skipped for: send2_ReqAggregator.lisp 
+2017-10-19 14:05:53,454 - INFO: No analysis was performed

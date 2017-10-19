@@ -1,0 +1,18 @@
+{
+    "numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp": [
+        "R3"
+    ],
+    "plan_(element_rareq2_yindex_vi_var14).lisp": [
+        "R3"
+    ],
+    "requestList_ReqAggregator.lisp": [
+        "R1"
+    ],
+    "send1_ReqAggregator.lisp": [
+        "R2"
+    ],
+    "send2_ReqAggregator.lisp": [
+        "A5",
+        "R4"
+    ]
+}

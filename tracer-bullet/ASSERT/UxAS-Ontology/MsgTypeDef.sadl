@@ -1,0 +1,765 @@
+// ----------------------------------------------
+// Copyright © 2017 
+// ---------------------------------------------
+
+// Authors: Paul Meng, Han Yu
+
+uri "http://sadl.org/MsgTypeDef" alias MsgTypeDef.
+
+intList is a type of int List.
+decimalList is a type of decimal List.
+decimalList3 is a type of decimal List length 0-3.
+
+afrl__impact__PowerPlant is a class,
+    must be one of {Gasoline, JP5, JP8, FuelCell, Hybrid}.
+afrl__impact__ImpactPayloadType is a class,
+    must be one of {Unknown, EO, FLIR, MWIR, LFIR, Track, Tag, Megaphone, Siren, SearchLight, FiftyCal, M240B, Flashbang, TearGas, Taser, HeatBeam, SEGM, CommRelay, GMTI, LaserDesignator}.
+afrl__impact__AreaSearchPattern is a class,
+    must be one of {Spiral, Sector, Sweep}.
+afrl__cmasi__NavigationMode is a class,
+    must be one of {Waypoint, Loiter, FlightDirector, TargetTrack, FollowLeader, LostComm}.
+afrl__cmasi__ZoneAvoidanceType is a class,
+    must be one of {Physical, Regulatory, Acoustic, Threat, Visual}.
+afrl__cmasi__SpeedType is a class,
+    must be one of {airspeed, groundspeed}.
+afrl__cmasi__GimbalPointingMode is a class,
+    must be one of {Unknown, AirVehicleRelativeAngle, AirVehicleRelativeSlewRate, LatLonSlaved, InertialRelativeSlewRate, Scan, Stowed}.
+afrl__cmasi__FOVOperationMode is a class,
+    must be one of {Continuous, Discrete}.
+afrl__cmasi__TurnType is a class,
+    must be one of {TurnShort, FlyOver}.
+afrl__cmasi__CommandStatusType is a class,
+    must be one of {Pending, Approved, InProcess, Executed, Cancelled}.
+afrl__cmasi__WaypointTransferMode is a class,
+    must be one of {RequestWaypoints, AddWaypoints, ClearWaypoints, ReportWaypoints}.
+afrl__cmasi__TravelMode is a class,
+    must be one of {SinglePass, ReverseCourse, Loop}.
+afrl__cmasi__LoiterDirection is a class,
+    must be one of {VehicleDefault, CounterClockwise, Clockwise}.
+afrl__cmasi__AltitudeType is a class,
+    must be one of {AGL, MSL}.
+afrl__cmasi__ServiceStatusType is a class,
+    must be one of {Information, Warning, Error}.
+afrl__cmasi__SimulationStatusType is a class,
+    must be one of {Stopped, Running, Paused, Reset}.
+afrl__cmasi__LoiterType is a class,
+    must be one of {VehicleDefault, Circular, Racetrack, FigureEight, Hover}.
+afrl__cmasi__WavelengthBand is a class,
+    must be one of {AllAny, EO, LWIR, SWIR, MWIR, Other}.
+uxas__messages__uxnative__EntityJoin is a class,
+  described by EntityID with values of type int,
+  described by Label with values of type string.
+uxas__messages__uxnative__BandwidthReceiveReport is a class,
+  described by EntityReceiver with values of type uxas__messages__uxnative__EntityLocation,
+  described by EntitySender with values of type uxas__messages__uxnative__EntityLocation,
+  described by TransferPayloadSize with values of type int.
+uxas__messages__uxnative__IncrementWaypoint is a class,
+  described by VehicleID with values of type int.
+uxas__messages__uxnative__EntityExit is a class,
+  described by EntityID with values of type int,
+  described by Label with values of type string.
+uxas__messages__uxnative__VideoRecord is a class,
+  described by Record with values of type boolean.
+uxas__messages__uxnative__KillService is a class,
+  described by ServiceID with values of type int.
+uxas__messages__uxnative__AutopilotKeepAlive is a class,
+  described by TimeSent with values of type int,
+  described by AutopilotEnabled with values of type boolean,
+  described by GimbalEnabled with values of type boolean.
+uxas__messages__uxnative__EntityLocation is a class,
+  described by EntityID with values of type int,
+  described by Position with values of type afrl__cmasi__Location3D,
+  described by Time with values of type int.
+uxas__messages__uxnative__SubTaskExecution is a class,
+  described by SubTasks with values of type afrl__cmasi__Task List,
+  described by StrictOrder with values of type boolean.
+uxas__messages__uxnative__StartupComplete is a class.
+uxas__messages__uxnative__OnboardProcessorIsAlive is a class,
+  described by TimeSent with values of type int,
+  described by VehicleID with values of type int.
+uxas__messages__uxnative__BandwidthTest is a type of uxas__messages__uxnative__EntityLocation,
+  described by Payload with values of type string,
+  described by MessageID with values of type int.
+uxas__messages__uxnative__CreateNewService is a class,
+  described by XmlConfiguration with values of type string List,
+  described by ServiceID with values of type int.
+uxas__messages__uxnative__SubTaskAssignment is a class,
+  described by Neighbors with values of type afrl__cmasi__EntityState List,
+  described by SubTasks with values of type afrl__cmasi__Task List.
+afrl__impact__AreaOfInterest is a class,
+  described by Area with values of type afrl__cmasi__AbstractGeometry,
+  described by AreaID with values of type int.
+afrl__impact__BatchSummaryResponse is a class,
+  described by ResponseID with values of type int,
+  described by Summaries with values of type afrl__impact__TaskSummary List.
+afrl__impact__TaskTimingPair is a class,
+  described by InitialTaskPercentage with values of type decimal,
+  described by TimeToGo with values of type int,
+  described by VehicleID with values of type int,
+  described by InitialTaskID with values of type int,
+  described by DestinationTaskID with values of type int.
+afrl__impact__PointOfInterest is a class,
+  described by PointID with values of type int,
+  described by Location with values of type afrl__cmasi__Location3D.
+afrl__impact__MultiVehicleWatchTask is a type of afrl__cmasi__SearchTask,
+  described by NumberVehicles with values of type int,
+  described by WatchedEntityID with values of type int.
+afrl__impact__BatchSummaryRequest is a class,
+  described by RequestID with values of type int,
+  described by InterTaskPercentage with values of type decimalList,
+  described by TaskList with values of type intList,
+  described by OperatingRegion with values of type int,
+  described by Vehicles with values of type intList.
+afrl__impact__PatternSearchTask is a type of afrl__cmasi__SearchTask,
+  described by Pattern with values of type afrl__impact__AreaSearchPattern,
+  described by SearchLocation with values of type afrl__cmasi__Location3D,
+  described by Extent with values of type decimal,
+  described by SearchLocationID with values of type int.
+afrl__impact__GroundVehicleState is a type of afrl__cmasi__EntityState.
+afrl__impact__ImpactAutomationResponse is a class,
+  described by SolutionID with values of type int,
+  described by ResponseID with values of type int,
+  described by Summaries with values of type afrl__impact__TaskSummary List,
+  described by TrialResponse with values of type afrl__cmasi__AutomationResponse,
+  described by PlayID with values of type int,
+  described by Sandbox with values of type boolean.
+afrl__impact__RadioConfiguration is a type of afrl__cmasi__PayloadConfiguration,
+  described by Timeout with values of type int,
+  described by Range with values of type decimal,
+  described by RallyPoint with values of type afrl__cmasi__Location3D.
+afrl__impact__WaterReport is a class,
+  described by CurrentSpeed with values of type decimal,
+  described by WaveHeight with values of type decimal,
+  described by Area with values of type afrl__cmasi__AbstractGeometry,
+  described by CurrentDirection with values of type decimal,
+  described by WaveDirection with values of type decimal.
+afrl__impact__ImpactComponentLeave is a class,
+  described by ComponentLabel with values of type string.
+afrl__impact__GroundVehicleConfiguration is a type of afrl__cmasi__EntityConfiguration,
+  described by RoadGraphID with values of type int,
+  described by MinimumSpeed with values of type decimal,
+  described by MaximumSpeed with values of type decimal,
+  described by EnergyRate with values of type decimal.
+afrl__impact__CommRelayTask is a type of uxas__messages__task__TaskProgressRequest,
+  described by TowerID with values of type int,
+  described by SupportedEntityID with values of type int,
+  described by DestinationLocation with values of type afrl__cmasi__Location3D.
+afrl__impact__RadioTowerState is a type of afrl__cmasi__EntityState,
+  described by Enabled with values of type boolean.
+afrl__impact__SurfaceVehicleState is a type of afrl__cmasi__EntityState,
+  described by Speed with values of type decimal,
+  described by BankAngle with values of type decimal.
+afrl__impact__AngledAreaSearchTask is a type of afrl__cmasi__SearchTask,
+  described by SweepAngle with values of type decimal,
+  described by StartPoint with values of type afrl__cmasi__Location3D,
+  described by SearchAreaID with values of type int.
+afrl__impact__BatchRoutePlanResponse is a class,
+  described by ResponseID with values of type int,
+  described by VehicleTiming with values of type afrl__impact__TaskTimingPair List.
+afrl__impact__PowerConfiguration is a type of afrl__cmasi__PayloadConfiguration,
+  described by NominalPowerConfiguration with values of type afrl__impact__PowerPlant.
+afrl__impact__RadioTowerConfiguration is a type of afrl__cmasi__EntityConfiguration,
+  described by Position with values of type afrl__cmasi__Location3D,
+  described by Enabled with values of type boolean,
+  described by Range with values of type decimal.
+afrl__impact__SpeedAltPair is a class,
+  described by AltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by Speed with values of type decimal,
+  described by VehicleID with values of type int,
+  described by Altitude with values of type decimal.
+afrl__impact__WatchTask is a type of afrl__cmasi__SearchTask,
+  described by WatchedEntityID with values of type int.
+afrl__impact__EscortTask is a type of afrl__cmasi__SearchTask,
+  described by StandoffDistance with values of type decimal,
+  described by PrescribedWaypoints with values of type afrl__cmasi__WaypointTransferMode List,
+  described by SupportedEntityID with values of type int,
+  described by RouteID with values of type int.
+afrl__impact__BatchRoutePlanRequest is a class,
+  described by ComputeTaskToTaskTiming with values of type boolean,
+  described by RequestID with values of type int,
+  described by InterTaskPercentage with values of type decimalList,
+  described by TaskList with values of type intList,
+  described by OperatingRegion with values of type int,
+  described by Vehicles with values of type intList,
+  described by ComputeInterTaskToTaskTiming with values of type boolean.
+afrl__impact__ImpactPayloadConfiguration is a type of afrl__cmasi__PayloadConfiguration,
+  described by AvailablePayloads with values of type afrl__impact__ImpactPayloadType List.
+afrl__impact__ImpactHeartbeat is a class,
+  described by ComponentLabel with values of type string,
+  described by HeartbeatTime with values of type int.
+afrl__impact__ImpactAutomationRequest is a class,
+  described by RequestID with values of type int,
+  described by SolutionID with values of type int,
+  described by OverridePlanningConditions with values of type afrl__impact__SpeedAltPair List,
+  described by TrialRequest with values of type afrl__cmasi__AutomationRequest,
+  described by PlayID with values of type int,
+  described by Sandbox with values of type boolean.
+afrl__impact__ImpactComponentJoin is a class,
+  described by ComponentLabel with values of type string.
+afrl__impact__WaterZone is a type of afrl__cmasi__AbstractZone.
+afrl__impact__ImpactLineSearchTask is a type of afrl__cmasi__SearchTask,
+  described by LineID with values of type int,
+  described by UseInertialViewAngles with values of type boolean,
+  described by ViewAngleList with values of type afrl__cmasi__Wedge List.
+afrl__impact__PowerPlantState is a type of afrl__cmasi__PayloadState,
+  described by ActivePowerPlant with values of type afrl__impact__PowerPlant.
+afrl__impact__BlockadeTask is a type of uxas__messages__task__TaskProgressRequest,
+  described by StandoffDistance with values of type decimal,
+  described by NumberVehicles with values of type int,
+  described by ProtectedLocation with values of type afrl__cmasi__Location3D,
+  described by BlockedEntityID with values of type int.
+afrl__impact__ConfigurationRequest is a class,
+  described by VehicleIDList with values of type intList.
+afrl__impact__TaskSummary is a class,
+  described by TaskID with values of type int,
+  described by BestEffort with values of type decimal,
+  described by PerformingVehicles with values of type afrl__impact__VehicleSummary List.
+afrl__impact__LineOfInterest is a class,
+  described by Line with values of type afrl__cmasi__Location3D List,
+  described by LineID with values of type int.
+afrl__impact__DeployImpactPayload is a type of afrl__cmasi__VehicleAction,
+  described by VehicleID with values of type int,
+  described by TargetEntityID with values of type int,
+  described by DeployedPayload with values of type afrl__impact__ImpactPayloadType.
+afrl__impact__CordonTask is a type of uxas__messages__task__TaskProgressRequest,
+  described by StandoffDistance with values of type decimal,
+  described by CordonLocation with values of type afrl__cmasi__Location3D.
+afrl__impact__SurfaceVehicleConfiguration is a type of afrl__cmasi__EntityConfiguration,
+  described by WaterArea with values of type int,
+  described by MinimumSpeed with values of type decimal,
+  described by MaximumSpeed with values of type decimal,
+  described by MaxBankAngle with values of type decimal,
+  described by EnergyRate with values of type decimal,
+  described by MaxBankRate with values of type decimal.
+afrl__impact__VehicleSummary is a class,
+  described by EstimateTimeToTaskPercentage with values of type int,
+  described by InitialTaskPercentage with values of type decimal,
+  described by TimeOnTask with values of type int,
+  described by TimeToArrive with values of type int,
+  described by VehicleID with values of type int,
+  described by InitialTaskID with values of type int,
+  described by DestinationTaskID with values of type int,
+  described by EnergyRemaining with values of type decimal,
+  described by BeyondCommRange with values of type boolean.
+afrl__impact__ImpactPointSearchTask is a type of afrl__cmasi__SearchTask,
+  described by StandoffDistance with values of type decimal,
+  described by SearchLocation with values of type afrl__cmasi__Location3D,
+  described by DesiredAction with values of type afrl__cmasi__LoiterAction,
+  described by SearchLocationID with values of type int,
+  described by ViewAngleList with values of type afrl__cmasi__Wedge List.
+afrl__impact__RadioState is a type of afrl__cmasi__PayloadState,
+  described by InRange with values of type boolean,
+  described by Enabled with values of type boolean.
+uxas__messages__route__EgressRouteRequest is a class,
+  described by Radius with values of type decimal,
+  described by RequestID with values of type int,
+  described by StartLocation with values of type afrl__cmasi__Location3D.
+uxas__messages__route__RoutePlanRequest is a class,
+  described by IsCostOnlyRequest with values of type boolean,
+  described by RequestID with values of type int,
+  described by RouteRequests with values of type uxas__messages__route__RouteConstraints List,
+  described by VehicleID with values of type int,
+  described by AssociatedTaskID with values of type int,
+  described by OperatingRegion with values of type int.
+uxas__messages__route__RouteRequest is a class,
+  described by IsCostOnlyRequest with values of type boolean,
+  described by RequestID with values of type int,
+  described by RouteRequests with values of type uxas__messages__route__RouteConstraints List,
+  described by VehicleIDList with values of type intList,
+  described by AssociatedTaskID with values of type int,
+  described by OperatingRegion with values of type int.
+uxas__messages__route__RouteResponse is a class,
+  described by ResponseID with values of type int,
+  described by Routes with values of type uxas__messages__route__RoutePlanResponse List.
+uxas__messages__route__GraphNode is a class,
+  described by AssociatedEdges with values of type intList,
+  described by Coordinates with values of type afrl__cmasi__Location3D,
+  described by NodeID with values of type int.
+uxas__messages__route__GraphRegion is a class,
+  described by NodeList with values of type uxas__messages__route__GraphNode List,
+  described by ID with values of type int,
+  described by EdgeList with values of type uxas__messages__route__GraphEdge List.
+uxas__messages__route__EgressRouteResponse is a class,
+  described by Headings with values of type decimalList,
+  described by NodeLocations with values of type afrl__cmasi__Location3D List,
+  described by ResponseID with values of type int.
+uxas__messages__route__RoutePlan is a class,
+  described by Waypoints with values of type afrl__cmasi__WaypointTransferMode List,
+  described by RouteError with values of type afrl__cmasi__KeyValuePair List,
+  described by RouteID with values of type int,
+  described by RouteCost with values of type int.
+uxas__messages__route__GraphEdge is a class,
+  described by Waypoints with values of type afrl__cmasi__Location3D List,
+  described by StartNode with values of type int,
+  described by EndNode with values of type int,
+  described by EdgeID with values of type int.
+uxas__messages__route__RouteConstraints is a class,
+  described by StartLocation with values of type afrl__cmasi__Location3D,
+  described by EndLocation with values of type afrl__cmasi__Location3D,
+  described by RouteID with values of type int,
+  described by UseStartHeading with values of type boolean,
+  described by StartHeading with values of type decimal,
+  described by EndHeading with values of type decimal,
+  described by UseEndHeading with values of type boolean.
+uxas__messages__route__RoutePlanResponse is a class,
+  described by ResponseID with values of type int,
+  described by VehicleID with values of type int,
+  described by RouteResponses with values of type uxas__messages__route__RoutePlan List,
+  described by AssociatedTaskID with values of type int,
+  described by OperatingRegion with values of type int.
+uxas__messages__task__PlanningState is a class,
+  described by EntityID with values of type int,
+  described by PlanningPosition with values of type afrl__cmasi__Location3D,
+  described by PlanningHeading with values of type decimal.
+uxas__messages__task__TaskImplementationRequest is a class,
+  described by TaskID with values of type int,
+  described by RequestID with values of type int,
+  described by OptionID with values of type int,
+  described by TimeThreshold with values of type int,
+  described by StartTime with values of type int,
+  described by VehicleID with values of type int,
+  described by StartingWaypointID with values of type int,
+  described by RegionID with values of type int,
+  described by StartPosition with values of type afrl__cmasi__Location3D,
+  described by StartHeading with values of type decimal.
+uxas__messages__task__FootprintRequest is a class,
+  described by EligibleWavelengths with values of type afrl__cmasi__WavelengthBand List,
+  described by FootprintRequestID with values of type int,
+  described by GroundSampleDistances with values of type decimalList,
+  described by VehicleID with values of type int,
+  described by AglAltitudes with values of type decimalList,
+  described by ElevationAngles with values of type decimalList.
+uxas__messages__task__TaskProgress is a class,
+  described by TaskID with values of type int,
+  described by PercentComplete with values of type decimal,
+  described by ResponseID with values of type int,
+  described by EntitiesEngaged with values of type intList.
+uxas__messages__task__SensorFootprintRequests is a class,
+  described by RequestID with values of type int,
+  described by Footprints with values of type uxas__messages__task__FootprintRequest List.
+uxas__messages__task__AssignmentCoordination is a class,
+  described by PlanningState with values of type uxas__messages__task__PlanningState,
+  described by CoordinatedAutomationRequestID with values of type int.
+uxas__messages__task__AssignmentCostMatrix is a class,
+  described by TaskList with values of type intList,
+  described by CorrespondingAutomationRequestID with values of type int,
+  described by TaskLevelRelationship with values of type string,
+  described by OperatingRegion with values of type int,
+  described by CostMatrix with values of type uxas__messages__task__TaskOptionCost List.
+uxas__messages__task__TaskPause is a class,
+  described by TaskID with values of type int.
+uxas__messages__task__AssignmentCoordinatorTask is a type of afrl__cmasi__Task.
+uxas__messages__task__TaskPlanOptions is a class,
+  described by Options with values of type uxas__messages__task__TaskOptionCost List,
+  described by Composition with values of type string,
+  described by TaskID with values of type int,
+  described by CorrespondingAutomationRequestID with values of type int.
+uxas__messages__task__TaskComplete is a class,
+  described by TaskID with values of type int,
+  described by TimeTaskCompleted with values of type int,
+  described by EntitiesInvolved with values of type intList.
+uxas__messages__task__CancelTask is a class,
+  described by CanceledTasks with values of type intList,
+  described by Vehicles with values of type intList.
+uxas__messages__task__SensorFootprint is a class,
+  described by WidthCenter with values of type decimal,
+  described by CameraWavelength with values of type afrl__cmasi__WavelengthBand,
+  described by HorizontalToLeadingEdge with values of type decimal,
+  described by VehicleID with values of type int,
+  described by GimbalID with values of type int,
+  described by AchievedGSD with values of type decimal,
+  described by CameraID with values of type int,
+  described by HorizontalToCenter with values of type decimal,
+  described by AspectRatio with values of type decimal,
+  described by AglAltitude with values of type decimal,
+  described by GimbalElevation with values of type decimal,
+  described by HorizontalFOV with values of type decimal,
+  described by SlantRangeToCenter with values of type decimal,
+  described by FootprintResponseID with values of type int,
+  described by HorizontalToTrailingEdge with values of type decimal.
+uxas__messages__task__TaskOptionCost is a class,
+  described by DestinationTaskOption with values of type int,
+  described by TimeToGo with values of type int,
+  described by VehicleID with values of type int,
+  described by IntialTaskID with values of type int,
+  described by DestinationTaskID with values of type int,
+  described by IntialTaskOption with values of type int.
+uxas__messages__task__TaskAssignment is a class,
+  described by TaskID with values of type int,
+  described by OptionID with values of type int,
+  described by TimeTaskCompleted with values of type int,
+  described by TimeThreshold with values of type int,
+  described by AssignedVehicle with values of type int.
+uxas__messages__task__TaskOption is a class,
+  described by TaskID with values of type int,
+  described by OptionID with values of type int,
+  described by StartLocation with values of type afrl__cmasi__Location3D,
+  described by EndLocation with values of type afrl__cmasi__Location3D,
+  described by EligibleEntities with values of type intList,
+  described by Cost with values of type int,
+  described by StartHeading with values of type decimal,
+  described by EndHeading with values of type decimal.
+uxas__messages__task__TaskAutomationRequest is a class,
+  described by SandBoxRequest with values of type boolean,
+  described by RequestID with values of type int,
+  described by OriginalRequest with values of type afrl__cmasi__AutomationRequest,
+  described by PlanningStates with values of type uxas__messages__task__PlanningState List.
+uxas__messages__task__TaskAutomationResponse is a class,
+  described by ResponseID with values of type int,
+  described by OriginalResponse with values of type afrl__cmasi__AutomationResponse.
+uxas__messages__task__TaskResume is a class,
+  described by RestartCompletely with values of type boolean,
+  described by TaskID with values of type int,
+  described by ReAssign with values of type uxas__messages__task__TaskAssignment.
+uxas__messages__task__SensorFootprintResponse is a class,
+  described by ResponseID with values of type int,
+  described by Footprints with values of type uxas__messages__task__SensorFootprint List.
+uxas__messages__task__TaskImplementationResponse is a class,
+  described by FinalHeading with values of type decimal,
+  described by TaskID with values of type int,
+  described by TaskWaypoints with values of type afrl__cmasi__WaypointTransferMode List,
+  described by OptionID with values of type int,
+  described by ResponseID with values of type int,
+  described by VehicleID with values of type int,
+  described by FinalLocation with values of type afrl__cmasi__Location3D,
+  described by FinalTime with values of type int.
+uxas__messages__task__TaskProgressRequest is a class,
+  described by TaskID with values of type int,
+  described by RequestID with values of type int.
+uxas__messages__task__TaskInitialized is a class,
+  described by TaskID with values of type int.
+uxas__messages__task__UniqueAutomationResponse is a class,
+  described by ResponseID with values of type int,
+  described by OriginalResponse with values of type afrl__cmasi__AutomationResponse.
+uxas__messages__task__TaskActive is a class,
+  described by EntityID with values of type int,
+  described by TaskID with values of type int,
+  described by TimeTaskActivated with values of type int.
+uxas__messages__task__TaskAssignmentSummary is a class,
+  described by TaskList with values of type uxas__messages__task__TaskAssignment List,
+  described by CorrespondingAutomationRequestID with values of type int,
+  described by OperatingRegion with values of type int.
+uxas__messages__task__CoordinatedAutomationRequest is a class,
+  described by RequestID with values of type int,
+  described by MaximumResponseTime with values of type int,
+  described by OriginalRequest with values of type afrl__cmasi__AutomationRequest,
+  described by PlanningStates with values of type uxas__messages__task__PlanningState List.
+uxas__messages__task__UniqueAutomationRequest is a class,
+  described by SandBoxRequest with values of type boolean,
+  described by RequestID with values of type int,
+  described by OriginalRequest with values of type afrl__cmasi__AutomationRequest,
+  described by PlanningStates with values of type uxas__messages__task__PlanningState List.
+afrl__cmasi__Task is a class,
+  described by TaskID with values of type int,
+  described by Parameters with values of type afrl__cmasi__KeyValuePair List,
+  described by Required with values of type boolean,
+  described by Priority with values of type int,
+  described by Label with values of type string,
+  described by EligibleEntities with values of type intList,
+  described by RevisitRate with values of type decimal.
+afrl__cmasi__AutomationResponse is a class,
+  described by MissionCommandList with values of type afrl__cmasi__MissionCommand List,
+  described by VehicleCommandList with values of type afrl__cmasi__VehicleActionCommand List,
+  described by Info with values of type afrl__cmasi__KeyValuePair List.
+afrl__cmasi__AreaSearchTask is a type of afrl__cmasi__SearchTask,
+  described by SearchArea with values of type afrl__cmasi__AbstractGeometry,
+  described by ViewAngleList with values of type afrl__cmasi__Wedge List.
+afrl__cmasi__KeepOutZone is a type of afrl__cmasi__AbstractZone,
+  described by ZoneType with values of type afrl__cmasi__ZoneAvoidanceType.
+afrl__cmasi__Rectangle is a type of afrl__cmasi__AbstractGeometry,
+  described by CenterPoint with values of type afrl__cmasi__Location3D,
+  described by Height with values of type decimal,
+  described by Width with values of type decimal,
+  described by Rotation with values of type decimal.
+afrl__cmasi__PayloadStowAction is a class,
+  described by PayloadID with values of type int.
+afrl__cmasi__VideoStreamState is a type of afrl__cmasi__PayloadState,
+  described by ActiveSensor with values of type int.
+afrl__cmasi__FollowPathCommand is a type of afrl__cmasi__VehicleActionCommand,
+  described by FirstWaypoint with values of type int,
+  described by RepeatMode with values of type afrl__cmasi__TravelMode,
+  described by WaypointList with values of type afrl__cmasi__PathWaypoint List,
+  described by StartTime with values of type int,
+  described by StopTime with values of type int.
+afrl__cmasi__RemoveTasks is a class,
+  described by TaskList with values of type intList.
+afrl__cmasi__VehicleActionCommand is a class,
+  described by Status with values of type afrl__cmasi__CommandStatusType,
+  described by VehicleID with values of type int,
+  described by CommandID with values of type int,
+  described by VehicleActionList with values of type afrl__cmasi__VehicleAction List.
+afrl__cmasi__LoiterTask is a type of uxas__messages__task__TaskProgressRequest,
+  described by DesiredAction with values of type afrl__cmasi__LoiterAction.
+afrl__cmasi__PayloadAction is a type of afrl__cmasi__VehicleAction,
+  described by PayloadID with values of type int.
+afrl__cmasi__VideoStreamAction is a type of afrl__cmasi__VehicleAction,
+  described by VideoStreamID with values of type int,
+  described by ActiveSensor with values of type int.
+afrl__cmasi__SearchTask is a type of uxas__messages__task__TaskProgressRequest,
+  described by GroundSampleDistance with values of type decimal,
+  described by DesiredWavelengthBands with values of type afrl__cmasi__WavelengthBand List,
+  described by DwellTime with values of type int.
+afrl__cmasi__StopMovementAction is a type of afrl__cmasi__VehicleAction,
+  described by Location with values of type afrl__cmasi__Location3D.
+afrl__cmasi__AirVehicleConfiguration is a type of afrl__cmasi__EntityConfiguration,
+  described by MinAltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by MinimumSpeed with values of type decimal,
+  described by MinimumAltitude with values of type decimal,
+  described by MaximumSpeed with values of type decimal,
+  described by MaximumAltitude with values of type decimal,
+  described by AvailableLoiterTypes with values of type afrl__cmasi__LoiterType List,
+  described by AlternateFlightProfiles with values of type afrl__cmasi__FlightProfile List,
+  described by AvailableTurnTypes with values of type afrl__cmasi__TurnType List,
+  described by NominalFlightProfile with values of type afrl__cmasi__FlightProfile,
+  described by MaxAltitudeType with values of type afrl__cmasi__AltitudeType.
+afrl__cmasi__ServiceStatus is a class,
+  described by PercentComplete with values of type decimal,
+  described by StatusType with values of type afrl__cmasi__ServiceStatusType,
+  described by Info with values of type afrl__cmasi__KeyValuePair List.
+afrl__cmasi__SessionStatus is a class,
+  described by RealTimeMultiple with values of type decimal,
+  described by Parameters with values of type afrl__cmasi__KeyValuePair List,
+  described by State with values of type afrl__cmasi__SimulationStatusType,
+  described by StartTime with values of type int,
+  described by ScenarioTime with values of type int.
+afrl__cmasi__GimbalState is a type of afrl__cmasi__PayloadState,
+  described by Elevation with values of type decimal,
+  described by Azimuth with values of type decimal,
+  described by PointingMode with values of type afrl__cmasi__GimbalPointingMode,
+  described by Rotation with values of type decimal.
+afrl__cmasi__LineSearchTask is a type of afrl__cmasi__SearchTask,
+  described by PointList with values of type afrl__cmasi__Location3D List,
+  described by UseInertialViewAngles with values of type boolean,
+  described by ViewAngleList with values of type afrl__cmasi__Wedge List.
+afrl__cmasi__Polygon is a type of afrl__cmasi__AbstractGeometry,
+  described by BoundaryPoints with values of type afrl__cmasi__Location3D List.
+afrl__cmasi__MustFlyTask is a type of uxas__messages__task__TaskProgressRequest,
+  described by UseAltitude with values of type boolean,
+  described by Position with values of type afrl__cmasi__Location3D.
+afrl__cmasi__Circle is a type of afrl__cmasi__AbstractGeometry,
+  described by Radius with values of type decimal,
+  described by CenterPoint with values of type afrl__cmasi__Location3D.
+afrl__cmasi__NavigationAction is a type of afrl__cmasi__VehicleAction.
+afrl__cmasi__RemoveZones is a class,
+  described by ZoneList with values of type intList.
+afrl__cmasi__AirVehicleState is a type of afrl__cmasi__EntityState,
+  described by Airspeed with values of type decimal,
+  described by WindSpeed with values of type decimal,
+  described by VerticalSpeed with values of type decimal,
+  described by WindDirection with values of type decimal.
+afrl__cmasi__GoToWaypointAction is a type of afrl__cmasi__NavigationAction,
+  described by WaypointNumber with values of type int.
+afrl__cmasi__KeyValuePair is a class,
+  described by Value with values of type string,
+  described by Key with values of type string.
+afrl__cmasi__AbstractZone is a class,
+  described by AffectedAircraft with values of type intList,
+  described by MinAltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by ZoneID with values of type int,
+  described by EndTime with values of type int,
+  described by StartTime with values of type int,
+  described by Label with values of type string,
+  described by MaxAltitude with values of type decimal,
+  described by Padding with values of type decimal,
+  described by MinAltitude with values of type decimal,
+  described by MaxAltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by Boundary with values of type afrl__cmasi__AbstractGeometry.
+afrl__cmasi__LoiterAction is a type of afrl__cmasi__NavigationAction,
+  described by Radius with values of type decimal,
+  described by Airspeed with values of type decimal,
+  described by Length with values of type decimal,
+  described by LoiterType with values of type afrl__cmasi__LoiterType,
+  described by Duration with values of type int,
+  described by Direction with values of type afrl__cmasi__LoiterDirection,
+  described by Axis with values of type decimal,
+  described by Location with values of type afrl__cmasi__Location3D.
+afrl__cmasi__KeepInZone is a type of afrl__cmasi__AbstractZone.
+afrl__cmasi__CameraState is a type of afrl__cmasi__GimballedPayloadState,
+  described by HorizontalFieldOfView with values of type decimal,
+  described by Footprint with values of type afrl__cmasi__Location3D List,
+  described by Centerpoint with values of type afrl__cmasi__Location3D,
+  described by VerticalFieldOfView with values of type decimal.
+afrl__cmasi__FlightDirectorAction is a type of afrl__cmasi__NavigationAction,
+  described by AltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by Speed with values of type decimal,
+  described by Heading with values of type decimal,
+  described by ClimbRate with values of type decimal,
+  described by SpeedType with values of type afrl__cmasi__SpeedType,
+  described by Altitude with values of type decimal.
+afrl__cmasi__PointSearchTask is a type of afrl__cmasi__SearchTask,
+  described by StandoffDistance with values of type decimal,
+  described by SearchLocation with values of type afrl__cmasi__Location3D,
+  described by ViewAngleList with values of type afrl__cmasi__Wedge List.
+afrl__cmasi__Waypoint is a type of afrl__cmasi__Location3D,
+  described by AssociatedTasks with values of type intList,
+  described by NextWaypoint with values of type int,
+  described by Speed with values of type decimal,
+  described by Number with values of type int,
+  described by ClimbRate with values of type decimal,
+  described by ContingencyWaypointB with values of type int,
+  described by SpeedType with values of type afrl__cmasi__SpeedType,
+  described by ContingencyWaypointA with values of type int,
+  described by TurnType with values of type afrl__cmasi__TurnType,
+  described by VehicleActionList with values of type afrl__cmasi__VehicleAction List.
+afrl__cmasi__PathWaypoint is a type of afrl__cmasi__WaypointTransferMode,
+  described by PauseTime with values of type int.
+afrl__cmasi__Location3D is a class,
+  described by AltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by Latitude with values of type decimal,
+  described by Longitude with values of type decimal,
+  described by Altitude with values of type decimal.
+afrl__cmasi__PayloadConfiguration is a class,
+  described by PayloadID with values of type int,
+  described by PayloadKind with values of type string,
+  described by Parameters with values of type afrl__cmasi__KeyValuePair List.
+afrl__cmasi__FlightProfile is a class,
+  described by Airspeed with values of type decimal,
+  described by PitchAngle with values of type decimal,
+  described by MaxBankAngle with values of type decimal,
+  described by EnergyRate with values of type decimal,
+  described by VerticalSpeed with values of type decimal,
+  described by Name with values of type string.
+afrl__cmasi__AbstractGeometry is a class.
+afrl__cmasi__GimbalScanAction is a type of afrl__cmasi__PayloadAction,
+  described by Cycles with values of type int,
+  described by StartAzimuth with values of type decimal,
+  described by AzimuthSlewRate with values of type decimal,
+  described by EndAzimuth with values of type decimal,
+  described by ElevationSlewRate with values of type decimal,
+  described by EndElevation with values of type decimal,
+  described by StartElevation with values of type decimal.
+afrl__cmasi__OperatorSignal is a class,
+  described by Signals with values of type afrl__cmasi__KeyValuePair List.
+afrl__cmasi__EntityConfiguration is a class,
+  described by EntityType with values of type string,
+  described by NominalSpeed with values of type decimal,
+  described by Label with values of type string,
+  described by ID with values of type int,
+  described by Info with values of type afrl__cmasi__KeyValuePair List,
+  described by NominalAltitude with values of type decimal,
+  described by NominalAltitudeType with values of type afrl__cmasi__AltitudeType,
+  described by PayloadConfigurationList with values of type afrl__cmasi__PayloadConfiguration List,
+  described by Affiliation with values of type string.
+afrl__cmasi__PayloadState is a class,
+  described by PayloadID with values of type int,
+  described by Parameters with values of type afrl__cmasi__KeyValuePair List.
+afrl__cmasi__WeatherReport is a class,
+  described by Area with values of type afrl__cmasi__AbstractZone,
+  described by CloudCoverage with values of type decimal,
+  described by WindSpeed with values of type decimal,
+  described by Visibility with values of type decimal,
+  described by CloudCeiling with values of type decimal,
+  described by WindDirection with values of type decimal.
+afrl__cmasi__MissionCommand is a type of afrl__cmasi__VehicleActionCommand,
+  described by FirstWaypoint with values of type int,
+  described by WaypointList with values of type afrl__cmasi__WaypointTransferMode List.
+afrl__cmasi__WaypointTransfer is a class,
+  described by EntityID with values of type int,
+  described by Waypoints with values of type afrl__cmasi__WaypointTransferMode List,
+  described by TransferMode with values of type afrl__cmasi__WaypointTransferMode.
+afrl__cmasi__CameraAction is a type of afrl__cmasi__PayloadAction,
+  described by HorizontalFieldOfView with values of type decimal,
+  described by AssociatedActions with values of type afrl__cmasi__PayloadAction List.
+afrl__cmasi__GimbalConfiguration is a type of afrl__cmasi__PayloadConfiguration,
+  described by MaxAzimuthSlewRate with values of type decimal,
+  described by IsElevationClamped with values of type boolean,
+  described by MaxRotation with values of type decimal,
+  described by MaxElevation with values of type decimal,
+  described by MaxRotationRate with values of type decimal,
+  described by IsRotationClamped with values of type boolean,
+  described by SupportedPointingModes with values of type afrl__cmasi__GimbalPointingMode List,
+  described by MinElevation with values of type decimal,
+  described by ContainedPayloadList with values of type intList,
+  described by MinAzimuth with values of type decimal,
+  described by IsAzimuthClamped with values of type boolean,
+  described by MinRotation with values of type decimal,
+  described by MaxAzimuth with values of type decimal,
+  described by MaxElevationSlewRate with values of type decimal.
+afrl__cmasi__VehicleAction is a class,
+  described by AssociatedTaskList with values of type intList.
+afrl__cmasi__GimbalStareAction is a type of afrl__cmasi__PayloadAction,
+  described by Duration with values of type int,
+  described by Starepoint with values of type afrl__cmasi__Location3D.
+afrl__cmasi__AutomationRequest is a class,
+  described by TaskList with values of type intList,
+  described by EntityList with values of type intList,
+  described by TaskRelationships with values of type string,
+  described by OperatingRegion with values of type int,
+  described by RedoAllTasks with values of type boolean.
+afrl__cmasi__EntityState is a class,
+  described by AssociatedTasks with values of type intList,
+  described by udot with values of type decimal,
+  described by Heading with values of type decimal,
+  described by wdot with values of type decimal,
+  described by Time with values of type int,
+  described by PayloadStateList with values of type afrl__cmasi__PayloadState List,
+  described by Groundspeed with values of type decimal,
+  described by ID with values of type int,
+  described by CurrentCommand with values of type int,
+  described by Course with values of type decimal,
+  described by CurrentWaypoint with values of type int,
+  described by vdot with values of type decimal,
+  described by ActualEnergyRate with values of type decimal,
+  described by Mode with values of type afrl__cmasi__NavigationMode,
+  described by EnergyAvailable with values of type decimal,
+  described by Info with values of type afrl__cmasi__KeyValuePair List,
+  described by p with values of type decimal,
+  described by q with values of type decimal,
+  described by r with values of type decimal,
+  described by u with values of type decimal,
+  described by v with values of type decimal,
+  described by w with values of type decimal,
+  described by Pitch with values of type decimal,
+  described by Roll with values of type decimal,
+  described by Location with values of type afrl__cmasi__Location3D.
+afrl__cmasi__GimbalAngleAction is a type of afrl__cmasi__PayloadAction,
+  described by Elevation with values of type decimal,
+  described by Azimuth with values of type decimal,
+  described by Rotation with values of type decimal.
+afrl__cmasi__Wedge is a class,
+  described by AzimuthExtent with values of type decimal,
+  described by VerticalExtent with values of type decimal,
+  described by VerticalCenterline with values of type decimal,
+  described by AzimuthCenterline with values of type decimal.
+afrl__cmasi__OperatingRegion is a class,
+  described by ID with values of type int,
+  described by KeepOutAreas with values of type intList,
+  described by KeepInAreas with values of type intList.
+afrl__cmasi__GimballedPayloadState is a type of afrl__cmasi__PayloadState,
+  described by Elevation with values of type decimal,
+  described by Azimuth with values of type decimal,
+  described by PointingMode with values of type afrl__cmasi__GimbalPointingMode,
+  described by Rotation with values of type decimal.
+afrl__cmasi__RemoveEntities is a class,
+  described by EntityList with values of type intList.
+afrl__cmasi__VideoStreamConfiguration is a type of afrl__cmasi__PayloadConfiguration,
+  described by AvailableSensorList with values of type intList.
+afrl__cmasi__CameraConfiguration is a type of afrl__cmasi__PayloadConfiguration,
+  described by VideoStreamHorizontalResolution with values of type int,
+  described by FieldOfViewMode with values of type afrl__cmasi__FOVOperationMode,
+  described by MinHorizontalFieldOfView with values of type decimal,
+  described by VideoStreamVerticalResolution with values of type int,
+  described by SupportedWavelengthBand with values of type afrl__cmasi__WavelengthBand,
+  described by MaxHorizontalFieldOfView with values of type decimal,
+  described by DiscreteHorizontalFieldOfViewList with values of type decimalList.
+afrl__cmasi__perceive__EntityPerception is a class,
+  described by AttitudeValid with values of type boolean,
+  described by PerceivedEntityID with values of type int,
+  described by VelocityError with values of type decimalList3,
+  described by AttitudeError with values of type decimalList3,
+  described by Attitude with values of type decimalList3,
+  described by TimeLastSeen with values of type int,
+  described by VelocityValid with values of type boolean,
+  described by LocationError with values of type decimalList3,
+  described by PerceiverID with values of type int,
+  described by PerceiverPayloads with values of type intList,
+  described by Velocity with values of type decimalList3,
+  described by Location with values of type afrl__cmasi__Location3D.
+afrl__cmasi__perceive__TrackEntityTask is a type of afrl__cmasi__Task,
+  described by EntityID with values of type int,
+  described by SensorModality with values of type afrl__cmasi__WavelengthBand,
+  described by GroundSampleDistance with values of type decimal.
+afrl__cmasi__perceive__TrackEntityAction is a type of afrl__cmasi__VehicleAction,
+  described by EntityID with values of type int,
+  described by ReturnToWaypoint with values of type int,
+  described by SensorID with values of type int.

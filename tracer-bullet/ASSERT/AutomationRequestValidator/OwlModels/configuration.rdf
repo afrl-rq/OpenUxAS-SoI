@@ -1,0 +1,12 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://com.ge.research.sadl.configuration#">
+  <Category rdf:about="http://com.ge.research.sadl.configuration#ReasonerSpec">
+    <reasonerClassName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.ge.research.sadl.softwarevv.reasoner.SWIPrologReasonerPlugin</reasonerClassName>
+  </Category>
+  <rdf:Description rdf:about="http://com.ge.research.sadl.configuration#SRL-SWI-Prolog-Reasoner">
+    <translatorClassName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.ge.aviation.sadl.requirements.srl_to_acl2s_translator.SRLTranslatorPlugin</translatorClassName>
+  </rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,52 @@
+**XX**ACL2s Requirements Analysis Engine Version "2017-9-16".**XX**
+**XX**Starting inner contingency analyses.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |PublishAutomationRequest| 
+Term: (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|) 0) 
+!!RMsg!!
+**EMsg**
+RAE found an inner contingency error.
+
+The expression (srl-> (len-c |automationRequestList of AutomationRequestValidatorService|)
+       0) is always true. Therefore, it can never be falsified.
+!!EMsg!!
+**XX**Inner contingency analyses: failed.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |PublishAutomationRequest| 
+Term: (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService| 0) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |ResponseReceived| 
+Term: (SRL-<= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |ResponseReceived| 
+Term: (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService| 0) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |Timeout| 
+Term: (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |Timeout| 
+Term: (EQUAL |timeSinceLastTimerUpdate of AutomationRequestValidatorService| 0) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**XX**Inner contingency analyses completed successfully.**XX**
+Requirement Analysis Complete!!!

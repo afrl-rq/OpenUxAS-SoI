@@ -1,0 +1,6 @@
+"num_reqs_in",9,"Number of requirements given to S2 RAT"
+"num_reqs_out",9,"Number of requirements processed by S2 RAT"
+"endtime - starttime",3.4165310859680176,"Duration of tool run in seconds"
+"num_reqs_in - num_reqs_out",0,"Number of requirements that did not make it through S2 RAT"
+"num_reqs_error",0,"Number of requirements with S2 RAT errors"
+"num_errors",0,"Number of tool errors"

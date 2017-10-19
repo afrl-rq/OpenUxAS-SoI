@@ -1,0 +1,17 @@
+{
+    "start": [
+        "**XX**ACL2s Requirements Analysis Engine Version \"2017-9-16\".**XX**"
+    ],
+    "inner contingency": [
+        "**XX**Starting inner contingency analyses.**XX**",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |PublishAutomationRequest| \nTerm: (EQUAL |previous state of AutomationRequestValidatorService| '|Idle|) \n!!RMsg!!",
+        ":INNER-CONTINGENCY-PASSED",
+        "**RMsg**\n\nInner contingency analysis.   \nRequirement: |PublishAutomationRequest| \nTerm: (SRL-> (LEN-C |automationRequestList of AutomationRequestValidatorService|) 0) \n!!RMsg!!",
+        "**EMsg**\nRAE found an inner contingency error.\n\nThe expression (srl-> (len-c |automationRequestList of AutomationRequestValidatorService|)\n       0) is always true. Therefore, it can never be falsified.\n!!EMsg!!",
+        "**XX**Inner contingency analyses: failed.**XX**",
+        "**XX**Inner contingency analyses completed successfully.**XX**"
+    ],
+    "end": [
+        "Requirement Analysis Complete!!!"
+    ]
+}

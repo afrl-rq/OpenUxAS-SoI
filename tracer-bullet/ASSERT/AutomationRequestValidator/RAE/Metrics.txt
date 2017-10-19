@@ -1,0 +1,125 @@
+Report run: 04:46PM on October 02, 2017
+===============================================================
+             REQUIREMENT TRANSLATIONS SUMMARY
+
+Total # Requirements in sreq files: 9
+Found in 1 files.
+
+Total # Direct Write Requirements: 6
+Found in 1 files.
+
+Total # ACL2S Requirements: 12
+Found in 6 files.
+
+===============================================================
+             REQUIREMENT ANALYSIS SUMMARY 
+
+Run 1: Full analysis
+RAE Start Time: 02 Oct 2017 16:46:02
+RAE End Time: 02 Oct 2017 16:46:31
+RAE Run Time: 0:00:29
+
+Warnings:0 Errors:0
+
+---------------------------------------------------------------
+Run 2: Full analysis
+RAE Start Time: 02 Oct 2017 16:46:02
+RAE End Time: 02 Oct 2017 16:46:31
+RAE Run Time: 0:00:29
+
+Warnings:0 Errors:0
+
+---------------------------------------------------------------
+Pre-processing was run successfully on 10/6 files
+
+Certification passed on 4/6 files
+Certification failed on 2 files
+	state_AutomationRequestValidatorService
+	uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService
+
+Analysis ran on 3/6 files
+Analyses completed on 3 files
+Analyses did not run on 3 files
+	errorMsg_AutomationRequestValidatorService
+	state_AutomationRequestValidatorService
+	uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService
+
+inner contingency was run on 3 files and failed on 3 files
+	Failed - automationRequestList_AutomationRequestValidatorService
+	Failed - timeSinceLastTimerUpdate_AutomationRequestValidatorService
+	Failed - uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService
+
+contingency was not run on 3 files
+	Not Run - automationRequestList_AutomationRequestValidatorService
+	Not Run - timeSinceLastTimerUpdate_AutomationRequestValidatorService
+	Not Run - uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService
+
+pair-conflict was not run on 3 files
+	Not Run - automationRequestList_AutomationRequestValidatorService
+	Not Run - timeSinceLastTimerUpdate_AutomationRequestValidatorService
+	Not Run - uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService
+
+global contingency was not run on 3 files
+	Not Run - automationRequestList_AutomationRequestValidatorService
+	Not Run - timeSinceLastTimerUpdate_AutomationRequestValidatorService
+	Not Run - uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService
+
+completeness was not run on 3 files
+	Not Run - automationRequestList_AutomationRequestValidatorService
+	Not Run - timeSinceLastTimerUpdate_AutomationRequestValidatorService
+	Not Run - uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService
+
+independence was not run on 3 files
+	Not Run - automationRequestList_AutomationRequestValidatorService
+	Not Run - timeSinceLastTimerUpdate_AutomationRequestValidatorService
+	Not Run - uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService
+
+===============================================================
+                    ANALYSIS RESULTS
+
+All analyses passed in 0 files.
+
+0/12 requirements in which all lisp files passed all analyses
+
+0/12 requirements in which no analysis was performed (no input lisp file)
+
+5/12 requirements in which at least one lisp file failed certification
+	A3
+	PUBLISHAUTOMATIONREQUEST
+	PUBLISHAUTOMATIONREQUEST2
+	RESPONSERECEIVED
+	TIMEOUT
+
+0/12 requirements in which at least 1 lisp file passed all analyses
+
+
+===============================================================
+                     CONFIGURATION
+
+RCE directory found from environmental variable ASSERTROOT: C:\ASSERT\SADL
+com.ge.research.jena_3.1.0.201709221322
+com.ge.research.sadl_3.1.0.201709221322
+com.ge.research.sadl.errorgenerator_3.1.0.201709221322
+com.ge.research.sadl.externalmodels_3.1.0.201709221322
+com.ge.research.sadl.ide_3.1.0.201709221322
+com.ge.research.sadl.jena_3.1.0.201709221322
+com.ge.research.sadl.jena-wrapper-for-sadl_3.1.0.201709221322
+com.ge.research.sadl.perspective_3.1.0.201709221322
+com.ge.research.sadl.requirements_2.1.0.201709221328
+com.ge.research.sadl.requirements.errorgenerator_2.1.0.201709221328
+com.ge.research.sadl.requirements.ide_2.1.0.201709221328
+com.ge.research.sadl.requirements.toprolog_2.1.0.201709221328
+com.ge.research.sadl.requirements.ui_2.1.0.201709221328
+com.ge.research.sadl.softwarevnv-plugin_2.1.0.201709221328
+com.ge.research.sadl.swi-prolog-plugin_3.1.0.201709221322
+com.ge.research.sadl.ui_3.1.0.201709221322
+com.ge.research.sadl.verify_2.1.0.201709221328
+com.ge.research.sadl.verify.ide_2.1.0.201709221328
+com.ge.research.sadl.verify.toprolog_2.1.0.201709221328
+com.ge.research.sadl.verify.ui_2.1.0.201709221328
+com.ge.research.sadl.xtextgenerator_3.1.0.201709221322
+
+RA UI version :v1.3.3b
+ACL2S Version :2017-9-16
+Multiple ACl2s Translator Versions used, consider cleaning input
+ACL2S Translator Versions :[]

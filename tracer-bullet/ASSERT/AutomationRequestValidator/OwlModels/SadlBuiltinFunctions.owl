@@ -1,0 +1,134 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:j.0="http://sadl.org/sadlbasemodel#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/builtinfunctions">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="sadlbasemodel"/>
+    <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'SadlBuiltinFunctions.sadl' and should not be directly edited.</rdfs:comment>
+  </owl:Ontology>
+  <j.0:ExternalEquation rdf:ID="power">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#power</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="cotan">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#cotan</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="arc_cotan">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#arc_cotan</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="or">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#or</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="mod">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#mod</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="sec">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#sec</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="sum">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#sum</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="arc_sec">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#arc_sec</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="cosec">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#cosec</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="minus">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#minus</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="min">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#min</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="is">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#is</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="atoi">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#atoi</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="arc_tan">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#arc_tan</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="sin">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#sin</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="product">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#product</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="cos">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#cos</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="le">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#le</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="max">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#max</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="ge">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#ge</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="divide">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#divide</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="abs">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#abs</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="arc_cos">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#arc_cos</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="arc_cosec">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#arc_cosec</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="arc_sin">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#arc_sin</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="not">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#not</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="lt">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#lt</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="and">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#and</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="tan">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#tan</j.0:externalURI>
+  </j.0:ExternalEquation>
+  <j.0:ExternalEquation rdf:ID="gt">
+    <j.0:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://sadl.org/builtinfunctions#gt</j.0:externalURI>
+  </j.0:ExternalEquation>
+</rdf:RDF>

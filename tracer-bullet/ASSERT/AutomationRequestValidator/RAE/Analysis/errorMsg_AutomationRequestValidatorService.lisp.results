@@ -1,0 +1,55 @@
+**XX**ACL2s Requirements Analysis Engine Version "2017-9-16".**XX**
+**XX**Starting inner contingency analyses.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |AutomationRequestReceived2| 
+Term: (EQUAL (LEN-C |automationRequestList of AutomationRequestValidatorService|) |maxListLength of AutomationRequestValidatorService|) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |AutomationRequestReceived2| 
+Term: (EQUAL |denialOfService of System| 'TRUE) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |AutomationRequestReceived2| 
+Term: (SRL-< |timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: |Timeout| 
+Term: (SRL->= |previous timeSinceLastTimerUpdate of AutomationRequestValidatorService| 10) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**XX**Inner contingency analyses completed successfully.**XX**
+**XX**Starting contingency analyses.**XX**
+**XX**Contingency analyses completed successfully.**XX**
+**XX**Starting global contingency analysis.**XX**
+**XX**Global contingency analysis completed successfully.**XX**
+**XX**Starting pair-conflict analyses.**XX**
+**RMsg**
+
+Pair-conflict analysis.
+Requirement1: |AutomationRequestReceived2| 
+Requirement2: |Timeout| 
+!!RMsg!!
+:PAIR-CONFLICT-PASSED
+**XX**Pair-conflict analyses completed successfully.**XX**
+**XX**Starting completeness analysis.**XX**
+**RMsg**
+
+Completeness analysis. 
+Requirements: (|Timeout| |AutomationRequestReceived2|) 
+!!RMsg!!
+**XX**Completeness analysis completed successfully.**XX**
+**XX**Starting independence analyses.**XX**
+:INDEPENDENCE-PASSED
+**XX**Independence analysis completed successfully.**XX**
+Requirement Analysis Complete!!!

@@ -1,0 +1,180 @@
+; Generated using "SADL Requirements Language to ACL2 Sedan" Translator Version 1.98
+(in-package "ACL2S")
+(set-ignore-ok t)
+(defttag :progn!)
+(include-book "requirements-analyses-book")
+
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8| (enum '(|http://www.w3.org/2001/XMLSchema#string| )))
+(deffconst |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8-VALS*| (quote-all |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8-VALUES*|))
+(displayname |http://sadl.org/RequestAggregator.sadl#mID^var8| |mID of var8|)
+(displayname |http://sadl.org/RequestAggregator.sadl#mID^var8P| |mID of var8P|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8| |translator generated name for mID of var8|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8P| |translator generated name for mID of var8P|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#mID^var8-VALS*| |*mID of var8-VALS*|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#mID^var8-VALUES*| |*mID of var8-VALUES*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8-VALS*| |*translator generated name for mID of var8-VALS*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8-VALUES*| |*translator generated name for mID of var8-VALUES*|)
+
+(defdata |translator_generated_name^translator_intermediate_variable_10^http://sadl.org/RequestAggregator.sadl#vi^var11| (enum '(|http://sadl.org/RequestAggregator.sadl#VehiclePlanInfo| )))
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vi^var11| (listof |translator_generated_name^translator_intermediate_variable_10^http://sadl.org/RequestAggregator.sadl#vi^var11|))
+(displayname |translator_intermediate_variable_10^http://sadl.org/RequestAggregator.sadl#vi^var11| |translator_intermediate_variable_10 of vi of var11|)
+(displayname |translator_intermediate_variable_10^http://sadl.org/RequestAggregator.sadl#vi^var11P| |translator_intermediate_variable_10 of vi of var11P|)
+(displayname |translator_generated_name^translator_intermediate_variable_10^http://sadl.org/RequestAggregator.sadl#vi^var11| |translator generated name for translator_intermediate_variable_10 of vi of var11|)
+(displayname |translator_generated_name^translator_intermediate_variable_10^http://sadl.org/RequestAggregator.sadl#vi^var11P| |translator generated name for translator_intermediate_variable_10 of vi of var11P|)
+(displayname |http://sadl.org/RequestAggregator.sadl#vi^var11| |vi of var11|)
+(displayname |http://sadl.org/RequestAggregator.sadl#vi^var11P| |vi of var11P|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vi^var11| |translator generated name for vi of var11|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vi^var11P| |translator generated name for vi of var11P|)
+
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2| (range integer (*SRL-data-minimum* <= _ <= *SRL-data-maximum*)))
+(deffconst |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2-VALS*| (quote-all (gen-int-range *SRL-data-minimum* *SRL-data-maximum*)))
+(displayname |http://sadl.org/RequestAggregator.sadl#numPlansPending^var2| |numPlansPending of var2|)
+(displayname |http://sadl.org/RequestAggregator.sadl#numPlansPending^var2P| |numPlansPending of var2P|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2| |translator generated name for numPlansPending of var2|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2P| |translator generated name for numPlansPending of var2P|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#numPlansPending^var2-VALS*| |*numPlansPending of var2-VALS*|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#numPlansPending^var2-VALUES*| |*numPlansPending of var2-VALUES*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2-VALS*| |*translator generated name for numPlansPending of var2-VALS*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2-VALUES*| |*translator generated name for numPlansPending of var2-VALUES*|)
+
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator| (enum '(|http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| )))
+(deffconst |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator-VALS*| (quote-all |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator-VALUES*|))
+(displayname |http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator| |send2 of ReqAggregator|)
+(displayname |http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregatorP| |send2 of ReqAggregatorP|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator| |translator generated name for send2 of ReqAggregator|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregatorP| |translator generated name for send2 of ReqAggregatorP|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator-VALS*| |*send2 of ReqAggregator-VALS*|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator-VALUES*| |*send2 of ReqAggregator-VALUES*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator-VALS*| |*translator generated name for send2 of ReqAggregator-VALS*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator-VALUES*| |*translator generated name for send2 of ReqAggregator-VALUES*|)
+
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| (enum '(|http://www.w3.org/2001/XMLSchema#string| )))
+(deffconst |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALS*| (quote-all |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALUES*|))
+(displayname |http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| |mID of RouteGeneratedMsg|)
+(displayname |http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP| |mID of RouteGeneratedMsgP|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| |translator generated name for mID of RouteGeneratedMsg|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP| |translator generated name for mID of RouteGeneratedMsgP|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALS*| |*mID of RouteGeneratedMsg-VALS*|)
+(displayname |*http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALUES*| |*mID of RouteGeneratedMsg-VALUES*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALS*| |*translator generated name for mID of RouteGeneratedMsg-VALS*|)
+(displayname |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALUES*| |*translator generated name for mID of RouteGeneratedMsg-VALUES*|)
+
+(defdata |translator_generated_name^translator_intermediate_variable_11^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| (enum '(|http://sadl.org/RequestAggregator.sadl#VehiclePlanInfo| )))
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| (listof |translator_generated_name^translator_intermediate_variable_11^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg|))
+(displayname |translator_intermediate_variable_11^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| |translator_intermediate_variable_11 of vehiclePlansInfo of RouteGeneratedMsg|)
+(displayname |translator_intermediate_variable_11^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP| |translator_intermediate_variable_11 of vehiclePlansInfo of RouteGeneratedMsgP|)
+(displayname |translator_generated_name^translator_intermediate_variable_11^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| |translator generated name for translator_intermediate_variable_11 of vehiclePlansInfo of RouteGeneratedMsg|)
+(displayname |translator_generated_name^translator_intermediate_variable_11^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP| |translator generated name for translator_intermediate_variable_11 of vehiclePlansInfo of RouteGeneratedMsgP|)
+(displayname |http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| |vehiclePlansInfo of RouteGeneratedMsg|)
+(displayname |http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP| |vehiclePlansInfo of RouteGeneratedMsgP|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| |translator generated name for vehiclePlansInfo of RouteGeneratedMsg|)
+(displayname |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP| |translator generated name for vehiclePlansInfo of RouteGeneratedMsgP|)
+
+(defdata |translator_generated_name^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg| (enum '(|http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg|)))
+(deffconst |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALS*| (quote-all |*translator_generated_name^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsg-VALUES*|))
+(defdecomposition |rareq3_newelement|
+((|inputvar1| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP|)
+(|inputvar2| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vehiclePlansInfo^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP|))
+((|outputvar| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#RouteGeneratedMsgP|)))
+
+(defrequirement R4_instance_0
+  (    (|http://sadl.org/RequestAggregator.sadl#mID^var8| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#mID^var8P|)
+    (|http://sadl.org/RequestAggregator.sadl#vi^var11| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#vi^var11P|)
+    (|http://sadl.org/RequestAggregator.sadl#numPlansPending^var2| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#numPlansPending^var2P|)
+  )
+  (    (|http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregatorP|)
+  )
+(rimplies (equal |http://sadl.org/RequestAggregator.sadl#numPlansPending^var2| 0) (equal |http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator| (|rareq3_newelement| |http://sadl.org/RequestAggregator.sadl#mID^var8| |http://sadl.org/RequestAggregator.sadl#vi^var11|))))
+
+(SRL-meta-data 
+  requirement-history 
+  ((:SRL-name R4)
+   (:Context 3)
+   (:transformations ((grounding R4_instance_0)))
+   (:RA-name R4_instance_0)
+   (:ModelGenFile "")
+   (:VarMapFile "")
+      (:Variables ((
+                  (:name |http://sadl.org/RequestAggregator.sadl#mID^var8|)
+                  (:display-name |mID of var8|)
+                  (:SRL-names (|mID of var8|))
+                  (:direction monitored)
+                  (:type string)
+                  (:functional-max :unspecified)
+                  (:functional-min :unspecified)
+                  (:tolerance :unspecified)
+                  (:resolution :unspecified)
+                  (:event-variable? nil)
+                  (:no-contingency-checking? nil)
+                  )
+                  (
+                  (:name |http://sadl.org/RequestAggregator.sadl#vi^var11|)
+                  (:display-name |vi of var11|)
+                  (:SRL-names (|vi of var11|))
+                  (:direction monitored)
+                  (:type list)
+                  (:min-length 1)
+                  (:max-length 10)
+                  (:event-variable? nil)
+                  (:no-contingency-checking? nil)
+                  )
+                  (
+                  (:name |http://sadl.org/RequestAggregator.sadl#numPlansPending^var2|)
+                  (:display-name |numPlansPending of var2|)
+                  (:SRL-names (|numPlansPending of var2|))
+                  (:direction monitored)
+                  (:type int)
+                  (:functional-max :unspecified)
+                  (:functional-min :unspecified)
+                  (:tolerance :unspecified)
+                  (:resolution :unspecified)
+                  (:event-variable? nil)
+                  (:no-contingency-checking? nil)
+                  )
+                  (
+                  (:name |http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator|)
+                  (:display-name |send2 of ReqAggregator|)
+                  (:SRL-names (|send2 of ReqAggregator|))
+                  (:direction controlled)
+                  (:type enum)
+                  (:event-variable? t)
+                  (:no-contingency-checking? nil)
+                  )))
+  )
+)
+
+(SRL-meta-data 
+  context 
+  ((:context-id 3)
+   (:exp (|ReqAggregator|))))
+
+(defimmaterial A5_instance_0
+  (  )
+  (    (|http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator| |translator_generated_name^http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregatorP|)
+  )
+T)
+
+(SRL-meta-data 
+  immaterial-history 
+  ((:SRL-name A5)
+   (:Context 3)
+   (:transformations ((grounding A5_instance_0)))
+   (:Assertion-name A5_instance_0)
+      (:Variables (
+                  (
+                  (:name |http://sadl.org/RequestAggregator.sadl#send2^http://sadl.org/RequestAggregator.sadl#ReqAggregator|)
+                  (:display-name |send2 of ReqAggregator|)
+                  (:SRL-names (|send2 of ReqAggregator|))
+                  (:direction controlled)
+                  (:type enum)
+                  (:event-variable? t)
+                  )))
+  )
+)
+
+
+
+
+
+
+

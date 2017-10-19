@@ -1,0 +1,256 @@
+Welcome to Clozure Common Lisp Version 1.11-r16635  (WindowsX8664)!
+
+ ACL2 Version 7.4 built September 16, 2017  20:29:20
+                   then September 20, 2017  00:00:41.
+ Copyright (C) 2017, Regents of the University of Texas
+ ACL2 comes with ABSOLUTELY NO WARRANTY.  This is free software and you
+ are welcome to redistribute it under certain conditions.  For details,
+ see the LICENSE file distributed with ACL2.
+
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + WARNING: This is NOT an ACL2 release; it is a development snapshot  +
+ + (git commit hash: ea290ccff3dd496f70eabc561cb2cd0b324c38bf).        +
+ + The authors of ACL2 consider such distributions to be experimental; +
+ + they may be incomplete, fragile, and unable to pass our own         +
+ + regression tests.                                                   +
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ Initialized with (INITIALIZE-ACL2 'INCLUDE-BOOK *ACL2-PASS-2-FILES*).
+ See the documentation topic note-7-4 for recent changes.
+ Note: We have modified the prompt in some underlying Lisps to further
+ distinguish it from the ACL2 prompt.
+
+MODIFICATION NOTICE:
+
+Requirements Analysis Engine Version 2017-9-16 ACL2s with CCL 1.11
+
+ACL2 Version 7.4.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/RA/".
+System books directory "C:/harshrc/build/acl2-7.4-dev-09182017/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2S !>
+ACL2 Initialized!!!
+NIL
+ACL2S !> "ACL2S"
+ACL2S !>
+Summary
+Form:  ( TABLE DEFUNC-DEFAULTS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ DEFUNC-DEFAULTS-TABLE
+ACL2S !> NIL
+ACL2S !>
+ACL2 Version 7.4.  Level 2.  Cbd "C:/ASSERT/SADL_Extra_Tools/RA/".
+System books directory "C:/harshrc/build/acl2-7.4-dev-09182017/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2S !>> ("Invariant-risk")
+ACL2S !>> ("theory")
+ACL2S !>> T
+ACL2S !>>
+
+ACL2S !>>>(ENABLE-ACL2S-RANDOM-TESTING)
+
+
+ACL2S !>>>(ADD-OVERRIDE-HINTS! '((LIST* :BACKTRACK
+                                        (CONS 'ACL2::TEST-CHECKPOINT
+                                              (CONS 'ID
+                                                    (CONS 'CLAUSE
+                                                          (CONS 'ACL2::CLAUSE-LIST
+                                                                (CONS 'ACL2::PROCESSOR
+                                                                      (CONS (CONS 'QUOTE (CONS PSPV 'NIL))
+                                                                            (CONS (CONS 'QUOTE (CONS HIST 'NIL))
+                                                                                  (CONS 'CTX (CONS 'STATE 'NIL)))))))))
+                                        ACL2::KEYWORD-ALIST)))
+
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':TESTING-ENABLED
+                 '(ACL2S-PARAM-INFO% T
+                                     (MEMBER-EQ VALUE *TESTING-ENABLED-VALUES*)
+                                     SET-ACL2S-RANDOM-TESTING-ENABLED))
+ ACL2S-DEFAULTS-TABLE
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':SAMPLING-METHOD
+                 '(ACL2S-PARAM-INFO% :UNIFORM-RANDOM
+                                     (MEMBER-EQ VALUE *SAMPLING-METHOD-VALUES*)
+                                     NIL))
+
+
+ACL2S !>>>(VALUE-TRIPLE ':UNIFORM-RANDOM)
+ :UNIFORM-RANDOM
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':NUM-WITNESSES
+                 '(ACL2S-PARAM-INFO% 0 (NATP VALUE) NIL))
+
+
+ACL2S !>>>(VALUE-TRIPLE '0)
+ 0
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE
+                 ':NUM-COUNTEREXAMPLES
+                 '(ACL2S-PARAM-INFO% 1 (NATP VALUE) NIL))
+
+
+ACL2S !>>>(VALUE-TRIPLE '1)
+ 1
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':NUM-TRIALS
+                 '(ACL2S-PARAM-INFO% 5000
+                                     (AND (NATP VALUE) (< VALUE 1000000000))
+                                     NIL))
+
+
+ACL2S !>>>(VALUE-TRIPLE '5000)
+ 5000
+ACL2S !>>
+Summary
+Form:  ( TABLE DEFUNC-DEFAULTS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ DEFUNC-DEFAULTS-TABLE
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':VERBOSITY-LEVEL
+                 '(ACL2S-PARAM-INFO% 2 (NATP VALUE) NIL))
+
+
+ACL2S !>>>(VALUE-TRIPLE '2)
+ 2
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':USE-FIXERS
+                 '(ACL2S-PARAM-INFO% NIL (BOOLEANP VALUE)
+                                     NIL))
+
+The event ( TABLE ACL2S-DEFAULTS-TABLE ...) is redundant.  See :DOC redundant-events.
+
+
+ACL2S !>>>(VALUE-TRIPLE 'NIL)
+ NIL
+ACL2S !>>
+
+ACL2S !>>>(TABLE ACL2S-DEFAULTS-TABLE ':RECURSIVELY-FIX
+                 '(ACL2S-PARAM-INFO% T (BOOLEANP VALUE)
+                                     NIL))
+
+The event ( TABLE ACL2S-DEFAULTS-TABLE ...) is redundant.  See :DOC redundant-events.
+
+
+ACL2S !>>>(VALUE-TRIPLE 'T)
+ T
+ACL2S !>>
+The event ( TABLE DEFUNC-DEFAULTS-TABLE ...) is redundant.  See :DOC redundant-events.
+
+Summary
+Form:  ( TABLE DEFUNC-DEFAULTS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ :REDUNDANT
+ACL2S !>>
+Summary
+Form:  ( TABLE DEFUNC-DEFAULTS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ DEFUNC-DEFAULTS-TABLE
+ACL2S !>>
+Summary
+Form:  ( TABLE RAE-SETTINGS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ RAE-SETTINGS-TABLE
+ACL2S !>>
+Summary
+Form:  ( TABLE RAE-SETTINGS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ RAE-SETTINGS-TABLE
+ACL2S !>>
+Summary
+Form:  ( TABLE RAE-SETTINGS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ RAE-SETTINGS-TABLE
+ACL2S !>>
+Summary
+Form:  ( TABLE RAE-SETTINGS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ RAE-SETTINGS-TABLE
+ACL2S !>>
+Summary
+Form:  ( TABLE RAE-SETTINGS-TABLE ...)
+Rules: NIL
+Time:  0.02 seconds (prove: 0.00, print: 0.00, other: 0.02)
+ RAE-SETTINGS-TABLE
+ACL2S !>>
+Summary
+Form:  ( TABLE RAE-SETTINGS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ RAE-SETTINGS-TABLE
+ACL2S !>>Bye.
+ :EOF
+ACL2S !>
+Note: Writing .port file, D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.port.
+
+CERTIFICATION ATTEMPT FOR "D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp"
+ACL2 Version 7.4
+
+* Step 1:  Read "D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.lisp" and compute its book-hash.
+
+* Step 2:  There were 25 forms in the file.  We now attempt to establish that each form, whether local or non-local, is indeed an admissible embedded event form in the context of the previously admitted ones.
+
+
+ACL2S !>>(SET-IGNORE-OK T)
+T
+
+
+ACL2S !>>(DEFTTAG :PROGN!)
+
+TTAG NOTE: Adding ttag :PROGN! from book D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService.
+:PROGN!
+
+
+ACL2S !>>(INCLUDE-BOOK "requirements-analyses-book")
+
+
+ACL2 Error in ( INCLUDE-BOOK "requirements-analyses-book" ...):  The file "D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/requirements-analyses-book.lisp" does not exist.
+
+
+Summary
+Form:  ( INCLUDE-BOOK "requirements-analyses-book" ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+ACL2 Error in ( INCLUDE-BOOK "requirements-analyses-book" ...):  See :DOC failure.
+
+******** FAILED ********
+
+ACL2 Warning in CERTIFY-BOOK:  The attempted CERTIFY-BOOK has failed while trying to establish the admissibility of one of the (local or non-local) forms in the book to be certified.
+
+
+Summary
+Form:  (CERTIFY-BOOK "D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService" ...)
+Rules: NIL
+Time:  0.20 seconds (prove: 0.00, print: 0.00, other: 0.20)
+
+ACL2 Error in (CERTIFY-BOOK "D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/uxas__messages__task__TaskAutomationResponse_out_AutomationRequestValidatorService" ...):  See :DOC failure.
+
+******** FAILED ********
+ACL2S !> T
+ACL2S !>
+TTAG NOTE: Adding ttag :PROGN! from the top level loop.
+ :PROGN!
+ACL2S !>
+Certification Complete!!!
+NIL
+IN>(good-bye)
+
+ACL2S !>
+End of file

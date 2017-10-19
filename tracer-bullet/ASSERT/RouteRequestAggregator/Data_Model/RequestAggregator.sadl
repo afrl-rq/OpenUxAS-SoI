@@ -1,0 +1,56 @@
+uri "http://sadl.org/RequestAggregator.sadl" alias RA.
+
+import "http://sadl.org/test.sadl".
+	
+ReqAggregator is a class
+	described by requestList with a single value of type RouteRequestInfo List 
+	described by receive1 with values of type RouteRequestMsg
+	described by receive2 with values of type RoutePlanGeneratedMsg  // for a single vehicle
+	described by send1 with values of type RoutePlanRequestMsg
+	described by send2 with values of type RouteGeneratedMsg.
+
+requestList of ReqAggregator only has values of type RouteRequestInfo List.
+
+numPlansPending describes RouteRequestInfo with a single value of type int.
+vi describes RouteRequestInfo with a single value of type VehiclePlanInfo List. 
+	
+vi of RouteRequestInfo only has values of type VehiclePlanInfo List.
+vi of RouteRequestInfo has at most 10 values.
+vi of RouteRequestInfo has at least 1 value.
+
+ClassWithID is a class
+	described by mID with a single value of type string.
+mID of ClassWithID only has values of type string.	
+	
+{VehiclePlanInfo, RouteRequestInfo, RouteRequestMsg, RoutePlanRequestMsg, RoutePlanGeneratedMsg, RouteGeneratedMsg} are types of ClassWithID.
+	
+vehicleType describes VehiclePlanInfo with a single value of type VehicleType.
+plan describes VehiclePlanInfo with a single value of type Plan.
+		
+VehicleType is a class, must be one of {Ground, Air}.			
+
+Plan is a class. //not specifying details of it for the moment  
+
+RoutePlanner is a class  //not used
+	described by vehicleType with a single value of type VehicleType.
+	
+// now specify each message received and sent as being an Event also
+{RouteRequestMsg, RoutePlanRequestMsg, RoutePlanGeneratedMsg, RouteGeneratedMsg} are types of Event.
+
+rrm describes RouteRequestMsg with a single value of type RouteRequestInfo. 
+
+vehicleInfo describes RoutePlanRequestMsg with a single value of type VehiclePlanInfo. 
+
+vpm describes RoutePlanGeneratedMsg with a single value of type VehiclePlanInfo.
+ 	
+vehiclePlansInfo describes RouteGeneratedMsg with a single value of type VehiclePlanInfo List.
+
+// ONT-1 is a INTERFACE_DEFINITION, //using an INTERFACE_DEFINITION makes analyses worse for R1 in ASSERT 17.1
+//        with reference_class RouteRequestInfo,
+//        with reference_property numPlansPending,
+//        with functional_max 6,
+//        with functional_min 0,
+//        with physical_max 6,
+//        with physical_min 0,
+//        with test_interface No_Test_Interface .
+	    

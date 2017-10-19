@@ -1,0 +1,29 @@
+{
+    "automationRequestList_AutomationRequestValidatorService": {
+        "inner contingency 6/9": "Fail",
+        "Finished": "Pass",
+        "contingency": "NotRun",
+        "global contingency": "NotRun",
+        "pair-conflict": "NotRun",
+        "completeness": "NotRun",
+        "independence": "NotRun"
+    },
+    "timeSinceLastTimerUpdate_AutomationRequestValidatorService": {
+        "inner contingency 5/7": "Fail",
+        "Finished": "Pass",
+        "contingency": "NotRun",
+        "global contingency": "NotRun",
+        "pair-conflict": "NotRun",
+        "completeness": "NotRun",
+        "independence": "NotRun"
+    },
+    "uxas__messages__task__UniqueAutomationRequest_out_AutomationRequestValidatorService": {
+        "inner contingency 1/2": "Fail",
+        "Finished": "Pass",
+        "contingency": "NotRun",
+        "global contingency": "NotRun",
+        "pair-conflict": "NotRun",
+        "completeness": "NotRun",
+        "independence": "NotRun"
+    }
+}

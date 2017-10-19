@@ -1,0 +1,63 @@
+**XX**ACL2s Requirements Analysis Engine Version "2017-1-27".**XX**
+**XX**Starting inner contingency analyses.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R1_INSTANCE_0 
+Term: 
+(>=
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)
+ 1)
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R1_INSTANCE_0 
+Term: 
+(<=
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)
+ 10)
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R1_INSTANCE_0 
+Term: 
+(>
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)
+ 0)
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R1_INSTANCE_0 
+Term: 
+(<=
+ |rareq_xindex|
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|))
+!!RMsg!!
+**EMsg**
+
+RAE found a potential inner contingency error.
+We were not able to falsify the expression.
+We were also not able to prove that the expression is always true.
+Therefore, we cannot determine whether the expression is inner contingent.
+!!EMsg!!
+**XX**Inner contingency analyses: undetermined.**XX**
+**XX**Inner contingency analyses completed successfully.**XX**
+**XX**Starting hypotheses completeness analysis.**XX**
+**RMsg**
+
+Hypotheses completeness analysis. 
+Requirements: (A3_INSTANCE_8 A1_INSTANCE_2 A2_INSTANCE_5 R1_INSTANCE_0)
+!!RMsg!!
+:HYPS-COMPLETENESS-PASSED
+**XX**Hypotheses completeness analysis completed successfully.**XX**
+Requirement Analysis Complete!!!

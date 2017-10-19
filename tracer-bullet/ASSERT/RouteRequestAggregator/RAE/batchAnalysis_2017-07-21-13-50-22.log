@@ -1,0 +1,35 @@
+2017-07-21 13:50:22,667 - INFO: Starting Requirements Analysis Engine Version:v1.1.16
+2017-07-21 13:50:22,667 - INFO: Configuration: configVersion:1.1 reservedCores:1 runPartialAnalysis:false enablePreprocessing:true stopOnError:true analysisTimeout:600 
+2017-07-21 13:50:22,698 - INFO: Full analysis will be performed
+2017-07-21 13:50:22,714 - INFO: Starting Pre-processing
+2017-07-21 13:50:22,760 - INFO_FILE: Running Pre-process Assumption
+2017-07-21 13:50:23,790 - INFO_FILE: Running Pre-process Simplify
+2017-07-21 13:50:25,787 - INFO_FILE: Running Pre-process Timing
+2017-07-21 13:50:27,784 - INFO_FILE: Running Pre-process Clean
+2017-07-21 13:50:29,780 - INFO_FILE: Running Pre-process Infer
+2017-07-21 13:50:31,793 - INFO_FILE: Running Pre-process Merge
+2017-07-21 13:50:33,790 - INFO_FILE: Check for output from Pre-processing
+2017-07-21 13:50:33,899 - INFO: Starting Analysis
+2017-07-21 13:50:33,899 - INFO: Running on 3 cores
+2017-07-21 13:50:34,008 - INFO_FILE: Running Analysis 8/8 for send2_ReqAggregator-noncompleteness.lisp
+2017-07-21 13:50:34,039 - INFO_FILE: Running Analysis 7/8 for send2_ReqAggregator-completeness.lisp
+2017-07-21 13:50:34,055 - INFO_FILE: Running Analysis 6/8 for send1_ReqAggregator-noncompleteness.lisp
+2017-07-21 13:50:41,324 - INFO_FILE: Completed Analysis for send2_ReqAggregator-completeness.lisp
+2017-07-21 13:50:41,324 - INFO_FILE: Completed Analysis for send2_ReqAggregator-noncompleteness.lisp
+2017-07-21 13:50:41,777 - INFO_FILE: Running Analysis 5/8 for send1_ReqAggregator-completeness.lisp
+2017-07-21 13:50:41,777 - INFO_FILE: Running Analysis 4/8 for requestList_ReqAggregator-noncompleteness.lisp
+2017-07-21 13:50:43,352 - INFO_FILE: Completed Analysis for send1_ReqAggregator-noncompleteness.lisp
+2017-07-21 13:50:43,836 - INFO_FILE: Running Analysis 3/8 for requestList_ReqAggregator-completeness.lisp
+2017-07-21 13:50:53,056 - INFO_FILE: Completed Analysis for send1_ReqAggregator-completeness.lisp
+2017-07-21 13:50:53,102 - INFO_FILE: Running Analysis 2/8 for plan_(element_rareq2_yindex_vi_var14).lisp
+2017-07-21 13:50:59,030 - INFO_FILE: Completed Analysis for requestList_ReqAggregator-noncompleteness.lisp
+2017-07-21 13:50:59,280 - INFO_FILE: Running Analysis 1/8 for numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp
+2017-07-21 13:50:59,389 - INFO_FILE: Completed Analysis for plan_(element_rareq2_yindex_vi_var14).lisp
+2017-07-21 13:51:04,163 - INFO_FILE: Completed Analysis for requestList_ReqAggregator-completeness.lisp
+2017-07-21 13:51:04,537 - INFO_FILE: Completed Analysis for numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp
+2017-07-21 13:51:05,005 - INFO: Analysis Finished
+2017-07-21 13:51:05,005 - INFO: Creating Summary Files
+2017-07-21 13:51:05,083 - INFO: joining requestList_ReqAggregator-noncompleteness.lisp.results and requestList_ReqAggregator-completeness.lisp.results
+2017-07-21 13:51:05,114 - INFO: joining send1_ReqAggregator-noncompleteness.lisp.results and send1_ReqAggregator-completeness.lisp.results
+2017-07-21 13:51:05,146 - INFO: joining send2_ReqAggregator-noncompleteness.lisp.results and send2_ReqAggregator-completeness.lisp.results
+2017-07-21 13:51:05,146 - INFO: Requirements Analysis Engine Finished

@@ -1,0 +1,12 @@
+{
+    "RA-Req.sreq": [
+        "R1",
+        "R2"
+    ],
+    "RA-Req2.sreq": [
+        "R3"
+    ],
+    "RA-Req3.sreq": [
+        "R4"
+    ]
+}

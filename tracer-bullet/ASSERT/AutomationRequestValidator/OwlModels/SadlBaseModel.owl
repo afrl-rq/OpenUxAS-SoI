@@ -1,0 +1,24 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">Base model for SADL. These concepts can be used without importing.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="ExternalEquation"/>
+  <owl:Class rdf:ID="Equation"/>
+  <owl:DatatypeProperty rdf:ID="location">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#ExternalEquation"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="externalURI">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:domain rdf:resource="#ExternalEquation"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="expression">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#Equation"/>
+  </owl:DatatypeProperty>
+</rdf:RDF>

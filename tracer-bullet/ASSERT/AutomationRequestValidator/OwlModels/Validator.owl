@@ -1,0 +1,405 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
+    xmlns:j.0="http://sadl.org/sadllistmodel#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions"
+    xmlns:j.1="http://sadl.org/sadlimplicitmodel#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:sadllistmodel="http://sadl.org/sadllistmodel"
+    xmlns:Val="http://sadl.org/Validator.sadl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/Validator.sadl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="sadllistmodel"/>
+    <owl:imports rdf:resource="test.sadl"/>
+    <owl:imports rdf:resource="builtinfunctions"/>
+    <owl:imports rdf:resource="sadlimplicitmodel"/>
+    <owl:imports rdf:resource="sadlbasemodel"/>
+    <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'Validator.sadl' and should not be directly edited.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="AutomationRequestValidatorService">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="errorMsg"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="uxas__messages__task__UniqueAutomationRequest_out"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="state"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="maxListLength"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#state"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="AutomationRequestValidatorServiceState"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#state"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="uxas__messages__task__TaskAutomationRequest__Subscription"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="uxas__messages__task__TaskAutomationResponse_out"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#maxListLength"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="uxas__messages__task__UniqueAutomationResponse__Subscription"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="uxas__messages__task__UniqueAutomationRequest"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#uxas__messages__task__UniqueAutomationRequest_out"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="ErrorMsg"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#errorMsg"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="uxas__messages__task__TaskAutomationResponse"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#uxas__messages__task__TaskAutomationResponse_out"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="timeSinceLastTimerUpdate"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#timeSinceLastTimerUpdate"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="automationRequestList"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="uxas__messages__task__TaskAutomationRequest"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#uxas__messages__task__TaskAutomationRequest__Subscription"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#maxListLength"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#uxas__messages__task__TaskAutomationRequest"/>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#automationRequestList"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="uxas__messages__task__UniqueAutomationResponse"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#uxas__messages__task__UniqueAutomationResponse__Subscription"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="System">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="denialOfService"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:nodeID="A0">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:nodeID="A0"/>
+        <owl:onProperty rdf:resource="sadllistmodel#rest"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#uxas__messages__task__TaskAutomationRequest"/>
+        <owl:onProperty rdf:resource="sadllistmodel#first"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="sadllistmodel#List"/>
+  </owl:Class>
+  <owl:Class rdf:ID="GenID">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="result"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#result"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#uxas__messages__task__UniqueAutomationResponse">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#uxas__messages__task__TaskAutomationResponse"/>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="content"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#content"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#ErrorMsg">
+    <owl:equivalentClass>
+      <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+          <Val:ErrorMsg rdf:ID="ErrorMsgTooManyRequests"/>
+          <Val:ErrorMsg rdf:ID="ErrorMsgTimeout"/>
+        </owl:oneOf>
+      </owl:Class>
+    </owl:equivalentClass>
+  </owl:Class>
+  <owl:Class rdf:about="#AutomationRequestValidatorServiceState">
+    <owl:equivalentClass>
+      <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+          <Val:AutomationRequestValidatorServiceState rdf:ID="Idle"/>
+          <Val:AutomationRequestValidatorServiceState rdf:ID="Busy"/>
+        </owl:oneOf>
+      </owl:Class>
+    </owl:equivalentClass>
+  </owl:Class>
+  <owl:Class rdf:about="#uxas__messages__task__UniqueAutomationRequest">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="ResponseID"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#ResponseID"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="#uxas__messages__task__UniqueAutomationRequest_out">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="#uxas__messages__task__UniqueAutomationRequest"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#uxas__messages__task__TaskAutomationResponse_out">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="#uxas__messages__task__TaskAutomationResponse"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#automationRequestList">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:nodeID="A0"/>
+    <j.0:listtype>LIST</j.0:listtype>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#content">
+    <rdfs:domain rdf:resource="#uxas__messages__task__UniqueAutomationResponse"/>
+    <rdfs:range rdf:resource="#uxas__messages__task__TaskAutomationResponse"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#uxas__messages__task__UniqueAutomationResponse__Subscription">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="#uxas__messages__task__UniqueAutomationResponse"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#state">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="#AutomationRequestValidatorServiceState"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#uxas__messages__task__TaskAutomationRequest__Subscription">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="#uxas__messages__task__TaskAutomationRequest"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#errorMsg">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="#ErrorMsg"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="#ResponseID">
+    <rdfs:domain rdf:resource="#uxas__messages__task__UniqueAutomationRequest"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#result">
+    <rdfs:domain rdf:resource="#GenID"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#maxListLength">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#timeSinceLastTimerUpdate">
+    <rdfs:domain rdf:resource="#AutomationRequestValidatorService"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#denialOfService">
+    <rdfs:domain rdf:resource="#System"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </owl:DatatypeProperty>
+  <j.1:INTERFACE_DEFINITION rdf:ID="ONT-2">
+    <j.1:physical_min rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >0</j.1:physical_min>
+    <j.1:resolution rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >1</j.1:resolution>
+    <j.1:functional_max rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >11</j.1:functional_max>
+    <j.1:reference_property rdf:resource="#timeSinceLastTimerUpdate"/>
+    <j.1:functional_min rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >0</j.1:functional_min>
+    <j.1:reference_class rdf:resource="#AutomationRequestValidatorService"/>
+    <j.1:test_interface rdf:resource="sadlimplicitmodel#Test_Input"/>
+    <j.1:tolerance rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >1</j.1:tolerance>
+    <j.1:physical_max rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >11</j.1:physical_max>
+  </j.1:INTERFACE_DEFINITION>
+  <owl:Restriction>
+    <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >1</owl:cardinality>
+    <owl:onProperty rdf:resource="#timeSinceLastTimerUpdate"/>
+  </owl:Restriction>
+  <j.1:INTERFACE_DEFINITION rdf:ID="ONT-1">
+    <j.1:reference_class rdf:resource="#AutomationRequestValidatorService"/>
+  </j.1:INTERFACE_DEFINITION>
+  <j.1:INTERFACE_DEFINITION rdf:ID="ONT-3">
+    <j.1:reference_property rdf:resource="#maxListLength"/>
+    <j.1:tolerance rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >1</j.1:tolerance>
+    <j.1:test_interface rdf:resource="sadlimplicitmodel#Test_Input"/>
+    <j.1:physical_min rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >0</j.1:physical_min>
+    <j.1:resolution rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >1</j.1:resolution>
+    <j.1:physical_max rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >20</j.1:physical_max>
+    <j.1:functional_max rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >20</j.1:functional_max>
+    <j.1:functional_min rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >0</j.1:functional_min>
+    <j.1:reference_class rdf:resource="#AutomationRequestValidatorService"/>
+  </j.1:INTERFACE_DEFINITION>
+</rdf:RDF>

@@ -1,0 +1,186 @@
+(CW "~%~|**XX**ACL2s Requirements Analysis Engine Version ~p0.**XX**~%~%"
+     *REQUIREMENTSVERSIONNUMBER*)(DEFTTAG T)(CW "~%~|**XX**Starting inner contingency analyses.**XX**~%~%")(DEFTTAG T)(CW
+  "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+  'R3_INSTANCE_1
+  '(>= (LEN-C |vi of var14|) 1))(CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_yindexP| |rareq2_yindex|)
+   (|translator generated name for vi of var14P| |vi of var14|)
+   (|translator generated name for plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for plan of (element rareq2_yindex of vi of var14)P|
+        |plan of (element rareq2_yindex of vi of var14)|))
+  (>= (LEN-C |vi of var14|) 1)
+  T)(CW
+  "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+  'R3_INSTANCE_1
+  '(<= (LEN-C |vi of var14|) 10))(CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_yindexP| |rareq2_yindex|)
+   (|translator generated name for vi of var14P| |vi of var14|)
+   (|translator generated name for plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for plan of (element rareq2_yindex of vi of var14)P|
+        |plan of (element rareq2_yindex of vi of var14)|))
+  (<= (LEN-C |vi of var14|) 10)
+  T)(CW
+    "~%~|**XX**Inner contingency analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting contingency analyses.**XX**~%~%")(DEFTTAG T)(CW "~%~%**RMsg**~%
+Contingency analysis. 
+~|Requirement: ~x0 
+~|!!RMsg!!~%"
+     'R3_INSTANCE_1)(CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_yindexP| |rareq2_yindex|)
+   (|translator generated name for vi of var14P| |vi of var14|)
+   (|translator generated name for plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for plan of (element rareq2_yindex of vi of var14)P|
+        |plan of (element rareq2_yindex of vi of var14)|))
+  (R3_INSTANCE_1
+   |rareq2_yindex| |vi of var14|
+   |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |mID of var3|
+   |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |mID of var9|
+   |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |plan of (element rareq2_yindex of vi of var14)|)
+  NIL)(CW "~%~|**XX**Contingency analyses completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting hypotheses conflict analysis.**XX**~%~%")(DEFTTAG T)(CW
+  "~%~|**XX**Hypotheses conflict analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting global contingency analysis.**XX**~%~%")(CW
+   "~%~|**XX**Global contingency analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting hypotheses completeness analysis.**XX**~%~%")(DEFTTAG T)(CW
+  "~%~%**RMsg**~%
+Hypotheses completeness analysis. 
+~|Requirements: ~x0 
+~|!!RMsg!!~%"
+  '(R3_INSTANCE_1))(DEFTTAG T)(MV-LET
+  (ERP X1 STATE)
+  (THM-NO-HEROICS
+   (IMPLIES
+    (AND
+     (|translator generated name for rareq2_yindexP| |rareq2_yindex|)
+     (|translator generated name for vi of var14P| |vi of var14|)
+     (|translator generated name for plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+      |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for mID of var3P| |mID of var3|)
+     (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+          |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for mID of var9P| |mID of var9|)
+     (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+      |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for plan of (element rareq2_yindex of vi of var14)P|
+          |plan of (element rareq2_yindex of vi of var14)|))
+    (OR
+     (AND
+      (EQUAL |mID of var3|
+             |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+      (EQUAL
+       |mID of var9|
+       |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+      (>= (LEN-C |vi of var14|) 1)
+      (<= (LEN-C |vi of var14|) 10)))))
+  (IF
+   (NOT ERP)
+   (PROG2$
+    (CW
+     "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the hypotheses completeness check.~%")
+    (MV NIL
+        :HYPS-COMPLETENESS-PASSED STATE))
+   (MV-LET
+    (CTS? X1 STATE)
+    (RAE-TEST?
+     (IMPLIES
+      (AND
+       (|translator generated name for rareq2_yindexP| |rareq2_yindex|)
+       (|translator generated name for vi of var14P| |vi of var14|)
+       (|translator generated name for plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for mID of var3P| |mID of var3|)
+       (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+            |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for mID of var9P| |mID of var9|)
+       (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for plan of (element rareq2_yindex of vi of var14)P|
+            |plan of (element rareq2_yindex of vi of var14)|))
+      (OR
+       (AND
+        (EQUAL |mID of var3|
+               |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+        (EQUAL
+         |mID of var9|
+         |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+        (>= (LEN-C |vi of var14|) 1)
+        (<= (LEN-C |vi of var14|) 10)))))
+    (LET
+     ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+     (COND
+      ((AND (NOT CTS?) (NOT RES))
+       (PROG2$
+        (CW
+         "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the hypotheses completeness check.~%")
+        (MV NIL
+            :HYPS-COMPLETENESS-PASSED STATE)))
+      (CTS?
+       (PROG2$
+        (CW
+         (CONCATENATE
+          'STRING
+          "~%**EMsg**~%
+RAE found a hypotheses completeness error.
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~x0 ~
+~|!!EMsg!!~%~%"
+          (GET-KEY :HYPS-COMPLETENESS *ALL-ANALYSES-FAIL-MESSAGES*))
+         (RESTRICT-CGEN-OUTPUT
+          '(|rareq2_yindex|
+            |vi of var14|
+            |plan of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+            |mID of var3|
+            |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+            |mID of var9|
+            |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+          CGEN-STATE))
+        (MV T
+            (CONS :HYPS-COMPLETENESS-FAILED CGEN-STATE)
+            STATE)))
+      (T
+       (PROG2$
+        (CW
+         (CONCATENATE
+          'STRING
+          "~%**EMsg**~%
+We were not able to falsify the hypotheses completeness check.
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.
+~|!!EMsg!!~%"
+          (GET-KEY :HYPS-COMPLETENESS *ALL-ANALYSES-?-MESSAGES*)))
+        (MV *HYPS-COMPLETENESS-STRICT*
+            :HYPS-COMPLETENESS-? STATE))))))))(CW
+  "~%~|**XX**Hypotheses completeness analysis completed successfully.**XX**~%~%")(CW "~%~|**XX**Starting independence analyses.**XX**~%~%")(CW "~%~|**XX**Independence analysis completed successfully.**XX**~%~%")

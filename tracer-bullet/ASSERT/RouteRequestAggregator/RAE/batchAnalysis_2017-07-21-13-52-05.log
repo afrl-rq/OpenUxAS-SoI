@@ -1,0 +1,26 @@
+2017-07-21 13:52:05,190 - INFO: Starting Requirements Analysis Engine Version:v1.1.16
+2017-07-21 13:52:05,190 - INFO: Configuration: configVersion:1.1 reservedCores:1 runPartialAnalysis:false enablePreprocessing:true stopOnError:true analysisTimeout:600 
+2017-07-21 13:52:05,237 - INFO: Requirement has not changed so analysis will be skipped for: requestList_ReqAggregator.lisp 
+2017-07-21 13:52:05,252 - INFO: Requirement has not changed so analysis will be skipped for: send1_ReqAggregator.lisp 
+2017-07-21 13:52:05,252 - INFO: Requirement has not changed so analysis will be skipped for: send2_ReqAggregator.lisp 
+2017-07-21 13:52:05,299 - INFO: Partial analysis will be performed
+2017-07-21 13:52:05,315 - INFO: Starting Pre-processing
+2017-07-21 13:52:05,393 - INFO_FILE: Running Pre-process Assumption
+2017-07-21 13:52:06,422 - INFO_FILE: Running Pre-process Simplify
+2017-07-21 13:52:07,421 - INFO_FILE: Running Pre-process Timing
+2017-07-21 13:52:08,419 - INFO_FILE: Running Pre-process Clean
+2017-07-21 13:52:09,418 - INFO_FILE: Running Pre-process Infer
+2017-07-21 13:52:10,416 - INFO_FILE: Running Pre-process Merge
+2017-07-21 13:52:11,414 - INFO_FILE: Check for output from Pre-processing
+2017-07-21 13:52:11,461 - INFO: Starting Analysis
+2017-07-21 13:52:11,461 - INFO: Running on 2 cores
+2017-07-21 13:52:11,570 - INFO_FILE: Running Analysis 2/2 for plan_(element_rareq2_yindex_vi_var14).lisp
+2017-07-21 13:52:11,602 - INFO_FILE: Running Analysis 1/2 for numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp
+2017-07-21 13:52:16,828 - INFO_FILE: Completed Analysis for plan_(element_rareq2_yindex_vi_var14).lisp
+2017-07-21 13:52:16,828 - INFO_FILE: Completed Analysis for numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp
+2017-07-21 13:52:17,264 - INFO: Analysis Finished
+2017-07-21 13:52:17,264 - INFO: Creating Summary Files
+2017-07-21 13:52:17,327 - ERROR: No certificate was created for file requestList_ReqAggregator.lisp
+2017-07-21 13:52:17,327 - ERROR: No certificate was created for file send1_ReqAggregator.lisp
+2017-07-21 13:52:17,327 - ERROR: No certificate was created for file send2_ReqAggregator.lisp
+2017-07-21 13:52:17,327 - INFO: Requirements Analysis Engine Finished

@@ -1,0 +1,86 @@
+**XX**ACL2s Requirements Analysis Engine Version "2017-1-27".**XX**
+**XX**Starting inner contingency analyses.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R2_INSTANCE_1 
+Term: 
+(INFER
+ (CONSP
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|))
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R2_INSTANCE_1 
+Term: 
+(INFER
+ (<=
+  |rareq_xindex|
+  (LEN
+   |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)))
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R2_INSTANCE_1 
+Term: 
+(>=
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)
+ 1)
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R2_INSTANCE_1 
+Term: 
+(<=
+ |rareq_xindex|
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|))
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R2_INSTANCE_1 
+Term: 
+(<=
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)
+ 10)
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R2_INSTANCE_1 
+Term: 
+(>
+ (LEN-C
+  |vi of RouteRequestInfo of rrm of RouteRequestMsg of receive1 of ReqAggregator|)
+ 0)
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**XX**Inner contingency analyses completed successfully.**XX**
+**XX**Starting contingency analyses.**XX**
+**XX**Contingency analyses completed successfully.**XX**
+**XX**Starting hypotheses conflict analysis.**XX**
+**XX**Hypotheses conflict analysis completed successfully.**XX**
+**XX**Starting global contingency analysis.**XX**
+**XX**Global contingency analysis completed successfully.**XX**
+**XX**Starting independence analyses.**XX**
+**XX**Independence analysis completed successfully.**XX**
+**XX**Starting hypotheses completeness analysis.**XX**
+**RMsg**
+
+Hypotheses completeness analysis. 
+Requirements: (A2_INSTANCE_5 A3_INSTANCE_8 A1_INSTANCE_2 R2_INSTANCE_1)
+!!RMsg!!
+:HYPS-COMPLETENESS-PASSED
+**XX**Hypotheses completeness analysis completed successfully.**XX**
+Requirement Analysis Complete!!!

@@ -1,0 +1,222 @@
+<rdf:RDF
+    xmlns:test="http://sadl.org/test.sadl"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions"
+    xmlns:j.0="http://sadl.org/range/annotation/"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:sadllistmodel="http://sadl.org/sadllistmodel"
+    xmlns:RA="http://sadl.org/RequestAggregator.sadl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/RequestAggregator.sadl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="sadllistmodel"/>
+    <owl:imports rdf:resource="test.sadl"/>
+    <owl:imports rdf:resource="builtinfunctions"/>
+    <owl:imports rdf:resource="sadlimplicitmodel"/>
+    <owl:imports rdf:resource="sadlbasemodel"/>
+    <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'RequestAggregator.sadl' and should not be directly edited.</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="RouteRequestMsg">
+    <rdfs:subClassOf rdf:resource="sadlimplicitmodel#Event"/>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="ClassWithID"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="VehiclePlanInfo">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#ClassWithID"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:nodeID="A0">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:nodeID="A0"/>
+        <owl:onProperty rdf:resource="sadllistmodel#rest"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#VehiclePlanInfo"/>
+        <owl:onProperty rdf:resource="sadllistmodel#first"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="sadllistmodel#List"/>
+  </owl:Class>
+  <owl:Class rdf:ID="ReqAggregator">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Class rdf:ID="RouteRequestInfo"/>
+        </owl:allValuesFrom>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="requestList"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="RoutePlanner"/>
+  <owl:Class rdf:ID="Plan"/>
+  <owl:Class rdf:ID="RoutePlanGeneratedMsg">
+    <rdfs:subClassOf rdf:resource="sadlimplicitmodel#Event"/>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#ClassWithID"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#ClassWithID">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="mID"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="RoutePlanRequestMsg">
+    <rdfs:subClassOf rdf:resource="sadlimplicitmodel#Event"/>
+    <rdfs:subClassOf rdf:resource="#ClassWithID"/>
+  </owl:Class>
+  <owl:Class rdf:ID="RouteGeneratedMsg">
+    <rdfs:subClassOf rdf:resource="sadlimplicitmodel#Event"/>
+    <rdfs:subClassOf rdf:resource="#ClassWithID"/>
+  </owl:Class>
+  <owl:Class rdf:about="#RouteRequestInfo">
+    <rdfs:subClassOf rdf:resource="#ClassWithID"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:minCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="vi"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >10</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#vi"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#VehiclePlanInfo"/>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#vi"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:nodeID="A1">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:nodeID="A1"/>
+        <owl:onProperty rdf:resource="sadllistmodel#rest"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#RouteRequestInfo"/>
+        <owl:onProperty rdf:resource="sadllistmodel#first"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="sadllistmodel#List"/>
+  </owl:Class>
+  <owl:Class rdf:nodeID="A2">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:nodeID="A2"/>
+        <owl:onProperty rdf:resource="sadllistmodel#rest"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="#VehiclePlanInfo"/>
+        <owl:onProperty rdf:resource="sadllistmodel#first"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="sadllistmodel#List"/>
+  </owl:Class>
+  <owl:Class rdf:ID="VehicleType">
+    <owl:equivalentClass>
+      <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+          <RA:VehicleType rdf:ID="Ground"/>
+          <RA:VehicleType rdf:ID="Air"/>
+        </owl:oneOf>
+      </owl:Class>
+    </owl:equivalentClass>
+  </owl:Class>
+  <owl:ObjectProperty rdf:ID="plan">
+    <rdfs:range rdf:resource="#Plan"/>
+    <rdfs:domain rdf:resource="#VehiclePlanInfo"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="vehicleType">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="#RoutePlanner"/>
+          <owl:Class rdf:about="#VehiclePlanInfo"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="#VehicleType"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="vehiclePlansInfo">
+    <j.0:listtype>LIST</j.0:listtype>
+    <rdfs:range rdf:nodeID="A2"/>
+    <rdfs:domain rdf:resource="#RouteGeneratedMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="send2">
+    <rdfs:domain rdf:resource="#ReqAggregator"/>
+    <rdfs:range rdf:resource="#RouteGeneratedMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="send1">
+    <rdfs:domain rdf:resource="#ReqAggregator"/>
+    <rdfs:range rdf:resource="#RoutePlanRequestMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="vpm">
+    <rdfs:range rdf:resource="#VehiclePlanInfo"/>
+    <rdfs:domain rdf:resource="#RoutePlanGeneratedMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="receive2">
+    <rdfs:domain rdf:resource="#ReqAggregator"/>
+    <rdfs:range rdf:resource="#RoutePlanGeneratedMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="receive1">
+    <rdfs:domain rdf:resource="#ReqAggregator"/>
+    <rdfs:range rdf:resource="#RouteRequestMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="rrm">
+    <rdfs:range rdf:resource="#RouteRequestInfo"/>
+    <rdfs:domain rdf:resource="#RouteRequestMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#requestList">
+    <rdfs:domain rdf:resource="#ReqAggregator"/>
+    <j.0:listtype>LIST</j.0:listtype>
+    <rdfs:range rdf:nodeID="A1"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="vehicleInfo">
+    <rdfs:range rdf:resource="#VehiclePlanInfo"/>
+    <rdfs:domain rdf:resource="#RoutePlanRequestMsg"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#vi">
+    <j.0:listtype>LIST</j.0:listtype>
+    <rdfs:range rdf:nodeID="A0"/>
+    <rdfs:domain rdf:resource="#RouteRequestInfo"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="#mID">
+    <rdfs:domain rdf:resource="#ClassWithID"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="numPlansPending">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#RouteRequestInfo"/>
+  </owl:DatatypeProperty>
+  <owl:AnnotationProperty rdf:about="range/annotation/listtype"/>
+</rdf:RDF>

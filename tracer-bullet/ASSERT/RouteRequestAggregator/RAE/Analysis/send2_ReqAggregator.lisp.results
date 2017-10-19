@@ -1,0 +1,41 @@
+**XX**ACL2s Requirements Analysis Engine Version "2017-1-27".**XX**
+**XX**Starting inner contingency analyses.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R4_INSTANCE_0 
+Term: (EQUAL |numPlansPending of var2| 0) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R4_INSTANCE_0 
+Term: (>= (LEN-C |vi of var11|) 1) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R4_INSTANCE_0 
+Term: (<= (LEN-C |vi of var11|) 10) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**XX**Inner contingency analyses completed successfully.**XX**
+**XX**Starting contingency analyses.**XX**
+**XX**Contingency analyses completed successfully.**XX**
+**XX**Starting hypotheses conflict analysis.**XX**
+**XX**Hypotheses conflict analysis completed successfully.**XX**
+**XX**Starting global contingency analysis.**XX**
+**XX**Global contingency analysis completed successfully.**XX**
+**XX**Starting independence analyses.**XX**
+**XX**Independence analysis completed successfully.**XX**
+**XX**Starting hypotheses completeness analysis.**XX**
+**RMsg**
+
+Hypotheses completeness analysis. 
+Requirements: (A5_INSTANCE_0 R4_INSTANCE_0) 
+!!RMsg!!
+:HYPS-COMPLETENESS-PASSED
+**XX**Hypotheses completeness analysis completed successfully.**XX**
+Requirement Analysis Complete!!!

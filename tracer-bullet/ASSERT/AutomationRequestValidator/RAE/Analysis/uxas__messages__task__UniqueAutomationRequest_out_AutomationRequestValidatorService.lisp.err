@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MarkerService xmlns="urn:com:ge:aviation:rce:markerservice">
+  <Process name="Requirements Analysis Engine" build="2017-9-16" pn="">
+<Marker markerType="Error" msgName="inner-contingency-analysis-error"
+msgText="RAE found an inner contingency error.
+
+The expression (srl-> (len-c |automationRequestList of AutomationRequestValidatorService|)
+       0) is always true. Therefore, it can never be falsified.">
+<ObjectID>PublishAutomationRequest</ObjectID>
+</Marker>
+</Process>
+</MarkerService>

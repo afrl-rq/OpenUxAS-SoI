@@ -1,0 +1,19 @@
+uri "http://sadl.org/test.sadl" alias test.
+
+
+reference_class is a type of annotation.
+reference_property is a type of annotation.
+reference_range is a type of annotation.
+instance is a type of annotation.
+reference_test_name is a type of annotation.
+ INTERFACE_DEFINITION is a class.
+  functional_max describes INTERFACE_DEFINITION with values of type int. //AM: made these int
+  functional_min describes INTERFACE_DEFINITION with values of type int.
+  physical_max describes INTERFACE_DEFINITION with values of type int.
+  physical_min describes INTERFACE_DEFINITION with values of type int.
+  tolerance describes INTERFACE_DEFINITION with values of type decimal.
+  resolution describes INTERFACE_DEFINITION with values of type decimal.
+  test_interface describes INTERFACE_DEFINITION with values of type TEST_INTERFACE.
+  TEST_INTERFACE is a class, must be one of {Test_Input, Test_Output, Test_Input_Output, No_Test_Interface}.
+  test_mapping describes INTERFACE_DEFINITION with values of type TEST_MAPPING.
+  TEST_MAPPING is a class.	

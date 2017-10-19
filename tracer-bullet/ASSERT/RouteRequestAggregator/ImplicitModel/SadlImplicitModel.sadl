@@ -1,0 +1,6 @@
+uri "http://sadl.org/sadlimplicitmodel" alias sadlimplicitmodel.
+Event is a class.
+impliedProperty is a type of annotation.
+UnittedQuantity is a class,
+ 	described by ^value with values of type decimal,
+ 	described by unit with values of type string.

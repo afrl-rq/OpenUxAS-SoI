@@ -1,0 +1,31 @@
+**XX**ACL2s Requirements Analysis Engine Version "2017-1-27".**XX**
+**XX**Starting inner contingency analyses.**XX**
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R3_INSTANCE_1 
+Term: (>= (LEN-C |vi of var14|) 1) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**RMsg**
+
+Inner contingency analysis.   
+Requirement: R3_INSTANCE_1 
+Term: (<= (LEN-C |vi of var14|) 10) 
+!!RMsg!!
+:INNER-CONTINGENCY-PASSED
+**XX**Inner contingency analyses completed successfully.**XX**
+**XX**Starting contingency analyses.**XX**
+**RMsg**
+
+Contingency analysis. 
+Requirement: R3_INSTANCE_1 
+!!RMsg!!
+**EMsg**
+
+RAE found a contingency error.
+The requirement is always true. Therefore, it can never be falsified.
+!!EMsg!!
+**XX**Contingency analyses: failed.**XX**
+**XX**Contingency analyses completed successfully.**XX**
+Requirement Analysis Complete!!!

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><?xml-stylesheet type='text/xsl' href='MetricsReport.xsl' ?>
+<metricsReportType xmlns="com.ge.aviation.systems.platform.assert.metricsreport">
+    <ReportingTool name="SRLTranslator" version="3.0.0.201709292107"/>
+    <CompatibleTool name="RCE" version="3.0.0.201709292107"/>
+    <CompatibleTool name="ATG" version="2.0"/>
+    <CompatibleTool name="RAE" version="2017-9-16"/>
+    <Metric xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="AggregateMetric" dateTime="2017-10-02T16:42:28.292-04:00" name="SRL Translator delta build of project, D:/SadlWorkspace42/Validator6-mod">
+        <SubMetric xsi:type="AggregateMetric" dateTime="2017-10-02T16:42:28.448-04:00" name="SRL Traslation of D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq">
+            <SubMetric xsi:type="RatioMetricType" unit="Requirements" dateTime="2017-10-02T16:42:28.479-04:00" name="SRL Translator Processed Requirements for RAE Inputs">
+                <Antecedent name="Processed">6.0</Antecedent>
+                <Consequent name="Processed">6.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="RatioMetricType" unit="Assumptions" name="SRL Translator Processed Assumptions for RAE Inputs">
+                <Antecedent name="Processed">0.0</Antecedent>
+                <Consequent name="Processed">0.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="RatioMetricType" unit="Assertions" dateTime="2017-10-02T16:42:28.495-04:00" name="SRL Translator Processed Assertions for RAE Inputs">
+                <Antecedent name="Processed">6.0</Antecedent>
+                <Consequent name="Processed">6.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="RatioMetricType" unit="Requirements" dateTime="2017-10-02T16:42:28.479-04:00" name="SRLTranslator Processed Requirements for ATG Inputs">
+                <Antecedent name="Processed">6.0</Antecedent>
+                <Consequent name="Processed">6.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="RatioMetricType" unit="Assumptions" name="SRLTranslator Processed Assumptions for ATG Inputs">
+                <Antecedent name="Processed">0.0</Antecedent>
+                <Consequent name="Processed">0.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="RatioMetricType" unit="Assertions" dateTime="2017-10-02T16:42:28.495-04:00" name="SRLTranslator Processed Assertions for ATG Inputs">
+                <Antecedent name="Processed">6.0</Antecedent>
+                <Consequent name="Processed">6.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="RatioMetricType" unit="TADs" name="SRLTranslator Processed User Defined Test Cases for ATG Inputs">
+                <Antecedent name="Processed">0.0</Antecedent>
+                <Consequent name="Processed">0.0</Consequent>
+                <Context>D:\SadlWorkspace42\Validator6-mod\Requirement_Model\ValidatorReq.sreq</Context>
+            </SubMetric>
+            <SubMetric xsi:type="ElapsedTimeMetricType" time="PT0.047S" dateTime="2017-10-02T16:42:28.495-04:00" name="Processing Time"/>
+        </SubMetric>
+        <SubMetric xsi:type="ElapsedTimeMetricType" time="PT0.062S" dateTime="2017-10-02T16:42:29.602-04:00" name="RAE ACL2s Lisp File Serialization"/>
+        <SubMetric xsi:type="ElapsedTimeMetricType" time="PT1.014S" dateTime="2017-10-02T16:42:29.602-04:00" name="ATG CRRM XML File Serialization"/>
+    </Metric>
+</metricsReportType>

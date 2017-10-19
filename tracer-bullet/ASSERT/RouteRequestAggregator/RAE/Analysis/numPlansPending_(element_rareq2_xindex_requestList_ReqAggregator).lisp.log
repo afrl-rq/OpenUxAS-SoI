@@ -1,0 +1,1995 @@
+IN>(cw "~%ACL2 Initialized!!!~%")
+Welcome to Clozure Common Lisp Version 1.11-r16635  (WindowsX8664)!
+
+ ACL2 Version 7.1 built April 18, 2016  10:18:02
+                   then January 30, 2017  21:42:33.
+ Copyright (C) 2015, Regents of the University of Texas
+ ACL2 comes with ABSOLUTELY NO WARRANTY.  This is free software and you
+ are welcome to redistribute it under certain conditions.  For details,
+ see the LICENSE file distributed with ACL2.
+
+ Initialized with (INITIALIZE-ACL2 'INCLUDE-BOOK *ACL2-PASS-2-FILES*).
+
+ Includes support for hash cons, memoization, and applicative hash
+ tables.
+
+ See the documentation topic note-7-1 for recent changes.
+ Note: We have modified the prompt in some underlying Lisps to further
+ distinguish it from the ACL2 prompt.
+
+MODIFICATION NOTICE:
+
+Loaded ASSERT Requirement Analysis Book 2017-1-27 ccl64 acl2v1.1.8.1
+
+ACL2 Version 7.1.  Level 1.  Cbd "C:/ASSERT/SADL_Extra_Tools/ACL2s/".
+System books directory "C:/ACL2s/plugins/acl2-image-7.1-ccl64/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2 !>
+ACL2 Initialized!!!
+NIL
+IN>(IN-PACKAGE "ACL2S")
+IN>(SET-DEFUNC-TIMEOUT 600)
+IN>(ACL2::CERTIFY-BOOK "C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator)" ACL2::? T :TTAGS :ALL :skip-proofs-okp t)
+IN>(set-ignore-ok T)
+IN>(defttag :progn!)
+IN>(cw "~%Certification Complete!!!~%")
+ACL2 !> "ACL2S"
+ACL2S !>
+Summary
+Form:  ( TABLE DEFUNC-DEFAULTS-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+ DEFUNC-DEFAULTS-TABLE
+ACL2S !>
+Note: Writing .port file, C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/num\
+PlansPending_(element_rareq2_xindex_requestList_ReqAggregator).port.
+
+CERTIFICATION ATTEMPT FOR
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp"
+
+ACL2 Version 7.1
+
+* Step 1:  Read
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp"
+and compute its check sum.
+
+* Step 2:  There were 31 forms in the file.  We now attempt to establish
+that each form, whether local or non-local, is indeed an admissible
+embedded event form in the context of the previously admitted ones.
+
+
+ACL2S >>(SET-IGNORE-OK T)
+T
+
+
+ACL2S >>(DEFTTAG :PROGN!)
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+:PROGN!
+
+
+ACL2S >>(DEFCONST *SRL-DATA-MINIMUM* (- (EXPT 2 31)))
+
+Summary
+Form:  ( DEFCONST *SRL-DATA-MINIMUM* ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+*SRL-DATA-MINIMUM*
+
+
+ACL2S >>(DEFCONST *SRL-DATA-MAXIMUM* (- (EXPT 2 31) 1))
+
+Summary
+Form:  ( DEFCONST *SRL-DATA-MAXIMUM* ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+*SRL-DATA-MAXIMUM*
+
+
+ACL2S >>(DEFDATA |translator generated name for rareq2_xindex|
+                 (RANGE INTEGER
+                        (*SRL-DATA-MINIMUM* <= _ <= *SRL-DATA-MAXIMUM*)))
+ Predicate events...
+Form:  ( DEFUN |translator generated name for rareq2_xindexP| ...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+ (|translator generated name for rareq2_xindexP| DEFDATA::V1) <= body
+-- not complete.
+Reasons: ("Illegal tau rule")
+ (|translator generated name for rareq2_xindexP| DEFDATA::V1) => body
+-- not complete.
+Reasons:
+("The formula fails to fit any of the forms for acceptable :TAU-SYSTEM rules.")
+
+Form:  ( DEFTHM |translator generated name for rareq2_xindex=>DEF|
+...)
+ Enumerator events...
+Form:  ( DEFUN |NTH-translator generated name for rareq2_xindex-BUILTIN|
+...)
+Form:  ( DEFUN |NTH-translator generated name for rareq2_xindex/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.05 seconds (prove: 0.00, print: 0.00, other: 0.05)
+ Registering type...
+** default value of
+|NTH-translator generated name for rareq2_xindex-BUILTIN| is -2147483648Form:  ( DEFUN |NTH-translator generated name for rareq2_xindex| ...)
+Form:  ( ENCAPSULATE (((|NTH-translator generated name for rareq2_xindex|
+* ...) ...) ...) ...)
+Form:  ( DEFUN |NTH-translator generated name for rareq2_xindex/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for rareq2_xindex/ACC| * ...) ...) ...)
+...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (|NTH-translator generated name for rareq2_xindex|
+|NTH-translator generated name for rareq2_xindex-BUILTIN|) ...)
+Form:  ( DEFATTACH (|NTH-translator generated name for rareq2_xindex/ACC|
+|NTH-translator generated name for rareq2_xindex/ACC-BUILTIN|) ...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.08 seconds (prove: 0.00, print: 0.00, other: 0.08)
+T
+
+
+ACL2S >>(DEFDATA
+         |translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|
+         '|http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|)
+ Predicate events...
+Form:  ( DEFUN
+|translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregatorP|
+...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+Defdata/Note:
+|translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregatorP|
+relatively complete for Tau.
+Form:  ( DEFTHM
+|DEF=>translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|
+...)
+Form:  ( DEFTHM
+|translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator=>DEF|
+...)
+ Enumerator events...
+Form:  ( DEFUN
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator-BUILTIN|
+...)
+Form:  ( DEFUN
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.05 seconds (prove: 0.02, print: 0.00, other: 0.03)
+ Registering type...
+** default value of
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator-BUILTIN|
+is |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|Form:  ( DEFUN
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|
+* ...) ...) ...) ...)
+Form:  ( DEFUN
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator-BUILTIN|)
+...)
+Form:  ( DEFATTACH (
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator/ACC|
+|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator/ACC-BUILTIN|)
+...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.08 seconds (prove: 0.02, print: 0.00, other: 0.06)
+T
+
+
+ACL2S >>(DEFFCONST
+         |*translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator-VALUES*|
+         '(|http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|))
+
+Summary
+Form:  ( DEFCONST
+|*translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator-VALUES*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator-VALUES*|
+
+
+ACL2S >>(DEFDATA
+         |translator generated name for requestList of ReqAggregator|
+         (LISTOF
+          |translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|))
+ Predicate events...
+Form:  ( DEFUN |translator generated name for requestList of ReqAggregatorP|
+...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Listof theory events...
+Form:  ( DEFTHM
+ACL2::|translator generated name for requestList of ReqAggregatorP-IMPLIES-TLP|
+...)
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+Defdata/Note: |translator generated name for requestList of ReqAggregatorP|
+relatively complete for Tau.
+Form:  ( DEFTHM
+|DEF=>translator generated name for requestList of ReqAggregator| ...)
+Form:  ( DEFTHM
+|translator generated name for requestList of ReqAggregator=>DEF| ...)
+ Polymorphic sig instantiation events...
+Form:  ( DEFTHM
+|APPEND-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REV-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|NTH-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|CONS-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|FIX-TRUE-LIST-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|LAST-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REPEAT-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|MAKE-LIST-AC-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|NTHCDR-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REMOVE-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REMOVE1-EQUAL-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REMOVE-DUPLICATES-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|CDR-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REVAPPEND-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REVERSE-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|SET-DIFFERENCE$-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|FIRST-N-AC-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|TAKE-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|SUBSEQ-LIST-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|SUBSEQ-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|UPDATE-NTH-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|LAST-ELEMENT-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|NTH-ELEMENT-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|INSERT-BEFORE--translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|INSERT-AFTER--translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|REPLACE-ALL1-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+Form:  ( DEFTHM
+|UPDATE-NTH-translator generated name for requestList of ReqAggregatorP-SIG|
+...)
+ Enumerator events...
+Form:  ( DEFUN
+|NTH-translator generated name for requestList of ReqAggregator-BUILTIN|
+...)
+Form:  ( DEFUN
+|NTH-translator generated name for requestList of ReqAggregator/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.66 seconds (prove: 0.48, print: 0.00, other: 0.17)
+ Registering type...
+** default value of
+|NTH-translator generated name for requestList of ReqAggregator-BUILTIN|
+is NILForm:  ( DEFUN
+|NTH-translator generated name for requestList of ReqAggregator| ...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for requestList of ReqAggregator| *
+...) ...) ...) ...)
+Form:  ( DEFUN
+|NTH-translator generated name for requestList of ReqAggregator/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for requestList of ReqAggregator/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (
+|NTH-translator generated name for requestList of ReqAggregator|
+|NTH-translator generated name for requestList of ReqAggregator-BUILTIN|)
+...)
+Form:  ( DEFATTACH (
+|NTH-translator generated name for requestList of ReqAggregator/ACC|
+|NTH-translator generated name for requestList of ReqAggregator/ACC-BUILTIN|)
+...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+
+TTAG NOTE: Adding ttag :PROGN! from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.69 seconds (prove: 0.48, print: 0.00, other: 0.20)
+T
+
+
+ACL2S >>(DEFUN
+         |NTH-translator generated name for requestList of ReqAggregator-EnUm-InFer/ACC|
+         (N S)
+         (DECLARE (XARGS :MODE :PROGRAM
+                         :GUARD (AND (NATP N) (UNSIGNED-BYTE-P 31 S))))
+         (LET ((N (NTH-INTEGER-BETWEEN N 0 50)))
+              (IF (<= N 0)
+                  (MV NIL S)
+                  (B* (((MV I S)
+                        (MV-LET (I SEED)
+                                (DEFDATA::RANDOM-NATURAL-SEED S)
+                                (MV (|NTH-translator generated name for translator_intermediate_variable_9 of requestList of ReqAggregator|
+                                         I)
+                                    (THE (UNSIGNED-BYTE 31) SEED))))
+                       ((MV L S)
+                        (|NTH-translator generated name for requestList of ReqAggregator-EnUm-InFer/ACC|
+                             (1- N)
+                             S)))
+                      (MV (CONS I L) S)))))
+
+Summary
+Form:  ( DEFUN
+|NTH-translator generated name for requestList of ReqAggregator-EnUm-InFer/ACC|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|NTH-translator generated name for requestList of ReqAggregator-EnUm-InFer/ACC|
+
+
+ACL2S >>(DEFDATA-ATTACH
+         |translator generated name for requestList of ReqAggregator|
+         :ENUM/ACC
+         |NTH-translator generated name for requestList of ReqAggregator-EnUm-InFer/ACC|)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+:ATTACHED
+
+
+ACL2S >>(DEFDATA
+            |translator generated name for previous numPlansPending of var22|
+            (RANGE INTEGER
+                   (*SRL-DATA-MINIMUM* <= _ <= *SRL-DATA-MAXIMUM*)))
+ Predicate events...
+Form:  ( DEFUN
+|translator generated name for previous numPlansPending of var22P|
+...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+
+(|translator generated name for previous numPlansPending of var22P|
+     DEFDATA::V1)
+<= body -- not complete.
+Reasons: ("Illegal tau rule")
+
+(|translator generated name for previous numPlansPending of var22P|
+     DEFDATA::V1)
+=> body -- not complete.
+Reasons:
+("The formula fails to fit any of the forms for acceptable :TAU-SYSTEM rules.")
+
+Form:  ( DEFTHM
+|translator generated name for previous numPlansPending of var22=>DEF|
+...)
+ Enumerator events...
+Form:  ( DEFUN
+|NTH-translator generated name for previous numPlansPending of var22-BUILTIN|
+...)
+Form:  ( DEFUN
+|NTH-translator generated name for previous numPlansPending of var22/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.05 seconds (prove: 0.02, print: 0.00, other: 0.03)
+ Registering type...
+** default value of
+|NTH-translator generated name for previous numPlansPending of var22-BUILTIN|
+is -2147483648Form:  ( DEFUN
+|NTH-translator generated name for previous numPlansPending of var22|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for previous numPlansPending of var22|
+* ...) ...) ...) ...)
+Form:  ( DEFUN
+|NTH-translator generated name for previous numPlansPending of var22/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for previous numPlansPending of var22/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (
+|NTH-translator generated name for previous numPlansPending of var22|
+|NTH-translator generated name for previous numPlansPending of var22-BUILTIN|)
+...)
+Form:  ( DEFATTACH (
+|NTH-translator generated name for previous numPlansPending of var22/ACC|
+|NTH-translator generated name for previous numPlansPending of var22/ACC-BUILTIN|)
+...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.08 seconds (prove: 0.02, print: 0.00, other: 0.06)
+T
+
+
+ACL2S >>(DEFDATA |translator generated name for mID of var3|
+                 '|http://www.w3.org/2001/XMLSchema#string|)
+ Predicate events...
+Form:  ( DEFUN |translator generated name for mID of var3P| ...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+Defdata/Note: |translator generated name for mID of var3P| relatively
+complete for Tau.
+Form:  ( DEFTHM |DEF=>translator generated name for mID of var3| ...)
+Form:  ( DEFTHM |translator generated name for mID of var3=>DEF| ...)
+ Enumerator events...
+Form:  ( DEFUN |NTH-translator generated name for mID of var3-BUILTIN|
+...)
+Form:  ( DEFUN |NTH-translator generated name for mID of var3/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.05 seconds (prove: 0.02, print: 0.00, other: 0.03)
+ Registering type...
+** default value of |NTH-translator generated name for mID of var3-BUILTIN|
+is |http://www.w3.org/2001/XMLSchema#string|Form:  ( DEFUN |NTH-translator generated name for mID of var3| ...)
+Form:  ( ENCAPSULATE (((|NTH-translator generated name for mID of var3|
+* ...) ...) ...) ...)
+Form:  ( DEFUN |NTH-translator generated name for mID of var3/ACC|
+...)
+Form:  ( ENCAPSULATE (((|NTH-translator generated name for mID of var3/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (|NTH-translator generated name for mID of var3|
+|NTH-translator generated name for mID of var3-BUILTIN|) ...)
+Form:  ( DEFATTACH (|NTH-translator generated name for mID of var3/ACC|
+|NTH-translator generated name for mID of var3/ACC-BUILTIN|) ...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.02 seconds (prove: 0.00, print: 0.00, other: 0.02)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.02 seconds (prove: 0.00, print: 0.00, other: 0.02)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.06 seconds (prove: 0.02, print: 0.00, other: 0.05)
+T
+
+
+ACL2S >>(DEFFCONST |*translator generated name for mID of var3-VALUES*|
+                   '(|http://www.w3.org/2001/XMLSchema#string|))
+
+Summary
+Form:  ( DEFCONST |*translator generated name for mID of var3-VALUES*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of var3-VALUES*|
+
+
+ACL2S >>(DEFFCONST
+            |*translator generated name for mID of var3-VALS*|
+            (QUOTE-ALL |*translator generated name for mID of var3-VALUES*|))
+
+Summary
+Form:  ( DEFCONST |*translator generated name for mID of var3-VALS*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of var3-VALS*|
+
+
+ACL2S >>(DEFDATA
+         |translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+         '|http://www.w3.org/2001/XMLSchema#string|)
+ Predicate events...
+Form:  ( DEFUN
+|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+Defdata/Note:
+|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+relatively complete for Tau.
+Form:  ( DEFTHM
+|DEF=>translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+...)
+Form:  ( DEFTHM
+|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator=>DEF|
+...)
+ Enumerator events...
+Form:  ( DEFUN
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-BUILTIN|
+...)
+Form:  ( DEFUN
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.25 seconds (prove: 0.22, print: 0.00, other: 0.03)
+ Registering type...
+** default value of
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-BUILTIN|
+is |http://www.w3.org/2001/XMLSchema#string|Form:  ( DEFUN
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+* ...) ...) ...) ...)
+Form:  ( DEFUN
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-BUILTIN|)
+...)
+Form:  ( DEFATTACH (
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC|
+|NTH-translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC-BUILTIN|)
+...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.28 seconds (prove: 0.22, print: 0.00, other: 0.06)
+T
+
+
+ACL2S >>(DEFFCONST
+         |*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|
+         '(|http://www.w3.org/2001/XMLSchema#string|))
+
+Summary
+Form:  ( DEFCONST
+|*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|
+
+
+ACL2S >>(DEFFCONST
+         |*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALS*|
+         (QUOTE-ALL
+          |*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|))
+
+Summary
+Form:  ( DEFCONST
+|*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALS*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALS*|
+
+
+ACL2S >>(DEFDATA |translator generated name for mID of var9|
+                 '|http://www.w3.org/2001/XMLSchema#string|)
+ Predicate events...
+Form:  ( DEFUN |translator generated name for mID of var9P| ...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+Defdata/Note: |translator generated name for mID of var9P| relatively
+complete for Tau.
+Form:  ( DEFTHM |DEF=>translator generated name for mID of var9| ...)
+Form:  ( DEFTHM |translator generated name for mID of var9=>DEF| ...)
+ Enumerator events...
+Form:  ( DEFUN |NTH-translator generated name for mID of var9-BUILTIN|
+...)
+Form:  ( DEFUN |NTH-translator generated name for mID of var9/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.05 seconds (prove: 0.02, print: 0.00, other: 0.03)
+ Registering type...
+** default value of |NTH-translator generated name for mID of var9-BUILTIN|
+is |http://www.w3.org/2001/XMLSchema#string|Form:  ( DEFUN |NTH-translator generated name for mID of var9| ...)
+Form:  ( ENCAPSULATE (((|NTH-translator generated name for mID of var9|
+* ...) ...) ...) ...)
+Form:  ( DEFUN |NTH-translator generated name for mID of var9/ACC|
+...)
+Form:  ( ENCAPSULATE (((|NTH-translator generated name for mID of var9/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (|NTH-translator generated name for mID of var9|
+|NTH-translator generated name for mID of var9-BUILTIN|) ...)
+Form:  ( DEFATTACH (|NTH-translator generated name for mID of var9/ACC|
+|NTH-translator generated name for mID of var9/ACC-BUILTIN|) ...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.08 seconds (prove: 0.02, print: 0.00, other: 0.06)
+T
+
+
+ACL2S >>(DEFFCONST |*translator generated name for mID of var9-VALUES*|
+                   '(|http://www.w3.org/2001/XMLSchema#string|))
+
+Summary
+Form:  ( DEFCONST |*translator generated name for mID of var9-VALUES*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of var9-VALUES*|
+
+
+ACL2S >>(DEFFCONST
+            |*translator generated name for mID of var9-VALS*|
+            (QUOTE-ALL |*translator generated name for mID of var9-VALUES*|))
+
+Summary
+Form:  ( DEFCONST |*translator generated name for mID of var9-VALS*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of var9-VALS*|
+
+
+ACL2S >>(DEFDATA
+         |translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+         '|http://www.w3.org/2001/XMLSchema#string|)
+ Predicate events...
+Form:  ( DEFUN
+|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+Defdata/Note:
+|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+relatively complete for Tau.
+Form:  ( DEFTHM
+|DEF=>translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+...)
+Form:  ( DEFTHM
+|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator=>DEF|
+...)
+ Enumerator events...
+Form:  ( DEFUN
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-BUILTIN|
+...)
+Form:  ( DEFUN
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.05 seconds (prove: 0.02, print: 0.00, other: 0.03)
+ Registering type...
+** default value of
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-BUILTIN|
+is |http://www.w3.org/2001/XMLSchema#string|Form:  ( DEFUN
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+* ...) ...) ...) ...)
+Form:  ( DEFUN
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-BUILTIN|)
+...)
+Form:  ( DEFATTACH (
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC|
+|NTH-translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator/ACC-BUILTIN|)
+...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.02 seconds (prove: 0.00, print: 0.00, other: 0.02)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.02 seconds (prove: 0.00, print: 0.00, other: 0.02)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.06 seconds (prove: 0.02, print: 0.00, other: 0.05)
+T
+
+
+ACL2S >>(DEFFCONST
+         |*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|
+         '(|http://www.w3.org/2001/XMLSchema#string|))
+
+Summary
+Form:  ( DEFCONST
+|*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|
+
+
+ACL2S >>(DEFFCONST
+         |*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALS*|
+         (QUOTE-ALL
+          |*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALUES*|))
+
+Summary
+Form:  ( DEFCONST
+|*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALS*|
+...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+
+Summary
+Form:  ( MAKE-EVENT (LET ...))
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+|*translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator-VALS*|
+
+
+ACL2S >>(DEFDATA
+         |translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+         (RANGE INTEGER
+                (*SRL-DATA-MINIMUM* <= _ <= *SRL-DATA-MAXIMUM*)))
+ Predicate events...
+Form:  ( DEFUN
+|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+...)
+Form:  ( IN-THEORY (ACL2::DISABLE* ...))
+Form:  ( IN-THEORY (ENABLE ...))
+Form:  ( TABLE ACL2::RULESET-TABLE ...)
+Form:  ( MAKE-EVENT (LET* ...))
+ Tau characterization events...
+
+(|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+     DEFDATA::V1)
+<= body -- not complete.
+Reasons: ("Illegal tau rule")
+
+(|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+     DEFDATA::V1)
+=> body -- not complete.
+Reasons:
+("The formula fails to fit any of the forms for acceptable :TAU-SYSTEM rules.")
+
+Form:  ( DEFTHM
+|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)=>DEF|
+...)
+ Enumerator events...
+Form:  ( DEFUN
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)-BUILTIN|
+...)
+Form:  ( DEFUN
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)/ACC-BUILTIN|
+...)
+Form:  ( PROGN (SET-BOGUS-DEFUN-HINTS-OK T) ...)
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.06 seconds (prove: 0.00, print: 0.00, other: 0.06)
+ Registering type...
+** default value of
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)-BUILTIN|
+is -2147483648Form:  ( DEFUN
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+* ...) ...) ...) ...)
+Form:  ( DEFUN
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)/ACC|
+...)
+Form:  ( ENCAPSULATE (((
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)/ACC|
+* ...) ...) ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( DEFATTACH (
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)-BUILTIN|)
+...)
+Form:  ( DEFATTACH (
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)/ACC|
+|NTH-translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)/ACC-BUILTIN|)
+...)
+Form:  ( TABLE DEFDATA::TYPE-METADATA-TABLE ...)
+Form:  ( PROGN (ENCAPSULATE ...) ...)
+
+TTAG NOTE: Adding ttag :DEFDATA-ATTACH from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Form:  ( ENCAPSULATE NIL (LOGIC) ...)
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( MAKE-EVENT (DEFDATA::REGISTER-TYPE-FN ...))
+Time:  0.03 seconds (prove: 0.00, print: 0.00, other: 0.03)
+Form:  ( PROGN (ENCAPSULATE NIL ...) ...)
+Time:  0.09 seconds (prove: 0.00, print: 0.00, other: 0.09)
+T
+
+
+ACL2S >>(REGISTER-SRL-NO-INNER-CONTINGENCY-VAR |event-variable|)
+
+Summary
+Form:  ( TABLE SRL-NO-INNER-CONTINGENCY-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+SRL-NO-INNER-CONTINGENCY-TABLE
+
+
+ACL2S >>(REGISTER-SRL-NO-INNER-CONTINGENCY-VAR |mID of var3|)
+
+Summary
+Form:  ( TABLE SRL-NO-INNER-CONTINGENCY-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+SRL-NO-INNER-CONTINGENCY-TABLE
+
+
+ACL2S >>(REGISTER-SRL-NO-INNER-CONTINGENCY-VAR
+             |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+
+Summary
+Form:  ( TABLE SRL-NO-INNER-CONTINGENCY-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+SRL-NO-INNER-CONTINGENCY-TABLE
+
+
+ACL2S >>(REGISTER-SRL-NO-INNER-CONTINGENCY-VAR |mID of var9|)
+
+Summary
+Form:  ( TABLE SRL-NO-INNER-CONTINGENCY-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+SRL-NO-INNER-CONTINGENCY-TABLE
+
+
+ACL2S >>(REGISTER-SRL-NO-INNER-CONTINGENCY-VAR
+         |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+
+Summary
+Form:  ( TABLE SRL-NO-INNER-CONTINGENCY-TABLE ...)
+Rules: NIL
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+SRL-NO-INNER-CONTINGENCY-TABLE
+
+
+ACL2S >>(DEFLISTREQUIREMENT
+         R3_INSTANCE_3
+         ((|rareq2_xindex| |translator generated name for rareq2_xindexP|)
+          (|requestList of ReqAggregator|
+               |translator generated name for requestList of ReqAggregatorP|)
+          (|previous numPlansPending of var22|
+           |translator generated name for previous numPlansPending of var22P|)
+          (|mID of var3| |translator generated name for mID of var3P|)
+          (|mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+           |translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|)
+          (|mID of var9| |translator generated name for mID of var9P|)
+          (|mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+           |translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|))
+         ((|numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+           |translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|))
+         (RIMPLIES
+          (AND
+           (EQUAL
+                |mID of var3|
+                |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+           (EQUAL
+            |mID of var9|
+            |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|))
+          (EQUAL
+           |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+           (- |previous numPlansPending of var22|
+              1))))
+Query: Testing body contracts ...
+
+TTAG NOTE: Adding ttag :CGEN from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Query: Testing function contract ...
+
+TTAG NOTE: Adding ttag :CGEN from book C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).
+Elapsed Run Time: 0.75 seconds
+Form:  ( DEFUN R3_INSTANCE_3 ...)
+Time:  0.02 seconds (prove: 0.00, print: 0.00, other: 0.02)
+Form:  ( DEFTHM R3_INSTANCE_3-CONTRACT ...)
+Time:  0.02 seconds (prove: 0.02, print: 0.00, other: 0.00)
+Form:  ( MAKE-EVENT (QUOTE ...))
+Time:  0.02 seconds (prove: 0.02, print: 0.00, other: 0.00)
+Form:  ( VERIFY-GUARDS R3_INSTANCE_3 ...)
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+Form:  ( MAKE-EVENT (QUOTE ...))
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+Elapsed Run Time: 0.06 seconds
+
+Function Name : R3_INSTANCE_3
+Termination proven -------- [*]
+Function Contract proven -- [*]
+Body Contracts proven ----- [*]
+DEFLISTREQUIREMENTS-TABLE
+
+* Step 3:  That completes the admissibility check.  Each form read
+was an embedded event form and was admissible.  No LOCAL forms make
+it necessary to check for local incompatibilities, so we skip that
+check.
+
+ACL2 Warning [Guards] in (CERTIFY-BOOK
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator)"
+...):  For the book
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp",
+its included sub-books and/or its certification world define functions
+DEFDATA::|(ALISTOF DEFDATA::A DEFDATA::B)P|, DEFDATA::|(LISTOF DEFDATA::A)P|,
+DEFDATA::|(LISTOF DEFDATA::B)P|, ACL2::ACCESS-B*-BINDINGS,
+ACL2S-DEFAULTS-VALUE-ALIST., CGEN::ADJACENCY-LIST1P, CGEN::ADJACENCY-LISTP,
+ACL2::ALIST-IDENTITY2, ACL2::ALISTS-DISAGREE-WITNESS,
+ACL2::ALISTS-INCOMPATIBLE-ON-KEYS-WITNESS, ACL2::ALISTS-INCOMPATIBLE-WITNESS,
+ALL-BUT-NTH, CGEN::ALL-FUNCTIONS, CGEN::ALL-FUNCTIONS-LST,
+CGEN::ALL-FUNCTIONS-LST., CGEN::ALL-FUNCTIONS.,
+CGEN::ALL-VARS-IN-VAR-TERM-ALST, APP-ALL, APP-SYMS, APPEND-ANALYSES,
+APPEND-ANALYSES-PLUS-VERSION-NUMBER, APPEND-RUN-ANALYSES,
+APPEND-RUN-ANALYSES-PLUS-VERSION-NUMBER, DEFDATA::APPLY-TO-X-LST,
+CGEN::APPROXIMATE-TOPOLOGICAL-SORT, ACL2::ASSIGNS-FOR-ASSOCS,
+CGEN::ASSIMILATE-APRIORI-TYPE-INFORMATION, ACL2::B*-ASSOC-SYMBOL-NAME,
+ACL2::B*-DECOMP-BINDINGS, ACL2::B*-DECOMP-ERR, ACL2::B*-DECOMP-FN,
+DEFDATA::BAD-RANGE-SYNTAX, ACL2::BOIL-THAT-DUSTSPECK,
+DEFDATA::BUILD-DEX-RECORDIMPL-BINDINGS,
+CGEN::BUILD-VARIABLE-DEPENDENCY-GRAPH, CGEN::BUILD-VDEPENDENCY-GRAPH,
+CGEN::CGEN-PARAMS-P1, CGEN::CLAUSE-MV-HYPS-CONCL, CGEN::CLAUSIFY-HYPS-CONCL,
+CGEN::COLLECT-CONSTRAINTS%, DEFDATA::COLLECT-INVERSE-DEF-THEORY-EVENTS,
+DEFDATA::COLLECT-MGET-VAR->FIELD-NAMES,
+DEFDATA::COLLECT-MGET-VAR->FIELD-NAMES-LST,
+DEFDATA::COLLECT-PER-FIELD-RECORD-EVENTS,
+ACL2::COLLECT-XARGS-INTO-SINGLE-DECLARE, ACL2::COMBINED-MANUAL-REF,
+COMPLETENESS-FN, COMPLETENESS-GEN, CGEN::COMPUTE-EVENT-CTX,
+CONFLICT-CONJUNCT, CONFLICT-CONJUNCTS, CONFLICT-FN, CONFLICT-FORMULA,
+CONFLICT-GEN, CONFLICT-GEN-PAIR, CONFLICT-PAIR-GEN, CONFLICT-PAIR-GEN-AUX,
+CONFLICT-TERM, DEFDATA::CONS-UP-CONX-PREX-EV, CONST-EXP, CGEN::CONSTANT-HYP?,
+DEFDATA::CONSTITUENT-TYPES, DEFDATA::CONSTITUENT-TYPES1,
+CONT-ERR-ALWAYS-FALSE, CONT-ERR-ALWAYS-TRUE, CONT-ERR-NO-FALSIFY,
+CONT-ERR-NO-FALSIFY-NO-THM, CONT-ERR-NO-SAT, CONT-ERR-NO-SAT-NO-THM,
+CONT-SUCCESS, CGEN::CONTAINS-VAR, CONTAINS-VARS, CONTINGENCY-ANALYSES-GEN,
+CONTINGENCY-ANALYSIS-FN, CONTINGENCY-ANALYSIS-GEN, ACL2::CONTROLLER-ALIST,
+DEFDATA::CONX-NON-RECUR-PRED-EVENTS,
+DEFDATA::CONX-PRED-EVENTS--RECUR/NON-RECUR, DEFDATA::CONX-RECUR-PRED-EVENTS,
+DEFDATA::CONX/DEX/MOD/RECORD-EVENTS, DEFDATA::CONX/DEX/MOD/RECORD-EVENTS1,
+CREATE-CVAR, CREATE-CVARS, CGEN::CS%-ENUMCALLS,
+ACL2::DECODE-VARNAME-FOR-PATBIND, CGEN::DEF-FN, CGEN::DEF-FN1,
+DEFDATA::DEFDATA-ATTACH/CONSTRAINT, DEFDATA::DEFDATA-ATTACH/ENUM,
+DEFDATA::DEFDATA-ATTACH/ENUM/ACC, DEFDATA::DEFDATA-ATTACH/EQUIV,
+DEFDATA::DEFDATA-ATTACH/FIXER, DEFDATA::DEFDATA-ATTACH/TEST-SUBTYPE-FN,
+DEFDATA-TESTING-ENABLED-EV, CGEN::DEFS-FN, XDOC::DEFXDOC-RAW-AFTER-CHECK,
+DEFDATA::DELETE-ASSOC-EQ-LST, DEFDATA::DEPTH-VAR, DEFDATA::DEPTH-VAR-LST,
+CGEN::DESTRUCT-SIMPLE-HYP, ACL2::DESTRUCTOR-BINDING-LIST,
+DEFDATA::DESTRUCTOR-FUNCTION-NAMES, CGEN::DFS-ALL-VERTICES, CGEN::DFS-VISIT1,
+CGEN::DFS1, CGEN::DIRECTED-2-REL?, DEFDATA::DISJOINT-P,
+CGEN::DISPLAYED-DEFDATA-TYPE/EQ-CONSTRAINT, CGEN::DISPLAYED-ENUM-ALIST,
+CGEN::DISPLAYED-RANGE, CGEN::DUMB-NEGATE-LIT-LST,
+CGEN::DUMB-TYPE-ALIST-INFER, CGEN::DUMB-TYPE-ALIST-INFER-FROM-TERM,
+CGEN::DUMB-TYPE-ALIST-INFER-FROM-TERMS, DEFDATA::DUMBER-NEGATE-LIT,
+DEFDATA::DUMBER-NEGATE-LIT-LST,
+ELEMENT-AFTER-INDUCTION-SCHEME-FROM-DEFINITION,
+ELEMENT-BEFORE-INDUCTION-SCHEME-FROM-DEFINITION, ACL2::ELEMENT-EQUIV,
+ACL2::ELEMENT-LIST-EQUIV, ACL2::ELEMENT-LIST-FIX, ACL2::ELEMENT-LIST-P,
+ACL2::ELEMENTLIST-MAPAPPEND, ACL2::ELEMENTLIST-PROJECTION,
+ACL2::EMPTY-TAU-INTERVALP, EQUAL-CVARS, CGEN::EQUIV-HYP?,
+ER-GET-CONSTANT-VALUE, DEFDATA::EXPAND-LAMBDA, DEFDATA::EXPAND-LAMBDA-LST,
+FILTER-CONST, FILTER-CONTINGENCY-REQS, FILTER-KEYWORDS, FILTER-STRINGS,
+DEFDATA::FILTER-TOP-LEVEL-TYPES, FILTER-XARGS-DECLS,
+ACL2::FIND-CONSTANT-ADDEND, ACL2::FIND-CONSTANT-FACTOR-<,
+ACL2::FIND-CONSTANT-FACTOR-EQUAL, ACL2::FIND-CONSTANT-FACTOR-FLOOR-MOD,
+FIND-FIRST-CALL, FIND-FIRST-CALL-LST, ACL2::FIND-RATIONAL-CONSTANT-FACTOR-<,
+ACL2::FIND-RUNED-LEMMA, DEFDATA::FIND-X-TERMS-=-DEPTH,
+DEFDATA::FIND-X-TERMS->=-DEPTH, CGEN::FIX-ADJACENCY-LIST, ACL2::FLOOR-REC,
+U::FORCE-TERM-LIST, CGEN::G$->ALST1, CGEN::G$->SYMBOL-ALIST,
+CGEN::G$->VAR-QUOTIENT-ALST, CGEN::G$->VAR-QUOTIENT-ALST1,
+GEN-INT-RANGE-INDUCTION-SCHEME-FROM-DEFINITION, GENERATE-ALL-ANALYSES-TO-RUN,
+GENERATE-ANALYSES, GENERATE-ANALYSES-TO-RUN, GET-ACL2S-DEFAULTS,
+GET-ALL-DASHED-REQ-CALLS, GET-ALL-HYPS, GET-ALL-I-VARS, GET-ALL-IVARS,
+GET-ALL-REQ-CALLS, GET-ALL-REQ-NAMES, GET-ALL-VARS, GET-ARGS,
+DEFDATA::GET-CONX-NAME, DEFDATA::GET-DEFCONST-VAL, CGEN::GET-ENUM-INFO%,
+CGEN::GET-FREE-VARS1, CGEN::GET-FREE-VARS1-LST, GET-HYPS, GET-KEY,
+CGEN::GET-S-HIST-GLOBAL, DEFDATA::GET-TAU-INT, ACL2::GET-THE-ENS-DANGEROUSLY,
+ACL2::GET-TYPE-FROM-TYPE-SET-DECODED, GET-TYPES,
+ACL2::GET-TYPES-FROM-TYPE-SET-DECODED-LST, CGEN::GET-VAR-FROM-I-OR-IS-LST,
+GLOBAL-CONTINGENCY-GEN, DEFDATA::GOVERNING-RECOGNIZER-CALL-WITH-VAR,
+HYPS-COMPLETENESS-GEN, HYPS-CONFLICT-GEN, HYPS-CONFLICT-GEN-AUX,
+HYPS-DISJOINT-CONFLICT-GEN, ACL2::IGNORE-VAR-NAME,
+DEFDATA::ILL-FORMED-METADATA-ENTRY-MSG1, U::IMPORT-AS-MACROS-FN,
+INDEPENDENT-ALL-FN, INDEPENDENT-FN, INDEPENDENT-GEN, CGEN::INIT-G$,
+CGEN::INIT-G$1, CGEN::INITIAL-S-HIST-ENTRY%, INNER-CONT-GEN-TERMS,
+INNER-CONTINGENCY-ANALYSES-GEN, INNER-CONTINGENCY-ANALYSIS-GEN,
+INPUT-CONTRACT, INSERT-AFTER--INDUCTION-SCHEME-FROM-DEFINITION,
+INSERT-BEFORE--INDUCTION-SCHEME-FROM-DEFINITION, CGEN::INSERT-BEFORE-KEY,
+ACL2::INT-STRING, ACL2::INTERSECTP-WITNESS, DEFDATA::IS-A-TYPENAME-CURRENT,
+DEFDATA::IS-ALLP-ALIAS, DEFDATA::IS-DATADEF-TYPE-PREDICATE,
+DEFDATA::IS-RECURSIVE-TYPE-EXP, DEFDATA::IS-TOP,
+DEFDATA::IS-TYPE-PREDICATE-CURRENT, SYMBOL-FNS::ITEM-TO-NUMBERED-SYMBOL-LIST,
+CGEN::KWOTE-SYMBOL-DOUBLET-LIST, ACL2::L-C-M-FN,
+CGEN::LET-BINDING->DEP-GRAPH-ALST, ACL2::LIST-IDENTITY2,
+LIST-TERMS-STRIP-AND, LIST-TERMS-STRIP-AND-OR, LIST-TERMS-STRIP-ARG,
+LIST-TERMS-STRIP-REC-AND, LIST-TERMS-STRIP-REC-AND-OR,
+LIST-TERMS-STRIP-REC-ARG, LIST-TERMS-STRIP-REC-ARG-LIST,
+ACL2::MACRO-NAME-FOR-PATBIND, DEFDATA::MAKE-ACL2-RANGE-CONSTRAINTS,
+CGEN::MAKE-CGEN-STATE-FN, CGEN::MAKE-CONCLUSION-VAL-DEFUNS,
+DEFDATA::MAKE-CONSTRUCTOR, DEFDATA::MAKE-CONSTRUCTOR-PREDICATE,
+MAKE-CONTRACT-DEFTHM, MAKE-CONTRACT-EV, DEFDATA::MAKE-DEFCONST-EVENT1,
+DEFDATA::MAKE-DESTRUCTORS, CGEN::MAKE-EMPTY-ADJ-LIST,
+DEFDATA::MAKE-ENUM-BODY-FOR-RANGE, MAKE-ENUM-TYPE-SYMBOL,
+CGEN::MAKE-ENUMERATOR-CALLS-ALIST, CGEN::MAKE-GUARD-VAR-MEMBER-EQ,
+CGEN::MAKE-HYP-VAL-LIST-DEFUNS, CGEN::MAKE-HYPOTHESES-VAL-DEFUNS,
+CGEN::MAKE-LET-BINDING-FOR-SIGMA, DEFDATA::MAKE-MODIFIERS,
+CGEN::MAKE-NEXT-SIGMA-DEFUNS, CGEN::MAKE-NEXT-SIGMA_MV-LET,
+CGEN::MAKE-RANGE-ENUM-INFO%, MAKE-SHOW-FAILURE-MSG-EV, MAKE-VERIFY-GUARDS-EV,
+XDOC::MAKE-XDOC-FRAGMENTS, DEFDATA::MAP-ATTACH-CONSTRAINT-RULES-EV,
+DEFDATA::MAP-ATTACH-CONSTRAINT-RULES-EVENTS, ACL2::MAP-IDENTITY2,
+DEFDATA::MAX-LIST, CGEN::MEET, DEFDATA::MEMBER-DEFCONST-EVENT,
+DEFDATA::MEMBER-ENUM-I, DEFDATA::MEMBER-ENUM/ACC-I, DEFDATA::MEMBER-PRED-I,
+CGEN::MEMBERSHIP-RELATIONP, CGEN::MERGE-CAR-SYMBOL-<,
+CGEN::MERGE-SORT-CAR-SYMBOL-<, ACL2::META-INTEGERP-UNHIDE, ACL2::MFC-POT-LST,
+ACL2::MFC-PT, ACL2::MOD-REC, DEFDATA::MODIFIER-FUNCTION-NAMES,
+ACL2::MODIFY-XARGS-DECL, CGEN::MV-LIST-IFY, CGEN::MV-LIST-IFY-LST,
+CGEN::MV-SIG-ALIST, CGEN::MY+, CGEN::MY-, ACL2::MY-NONLINEARP-DEFAULT-HINT,
+DEFDATA::NESTED-FUNCTIONAL-TERMS-WITH-VARS-P,
+DEFDATA::NEW-CONX/RECORD-EVENTS, DEFDATA::NEW-CONX/RECORD-EVENTS0,
+DEFDATA::NEW-CONX/RECORD-EVENTS1, CGEN::NON-EMPTY-NON-UNIVERSAL-INTERVAL-P,
+XDOC::NORMALIZE-BOOKNAME, ACL2::NOT-SUB-ALISTP-WITNESS,
+ACL2::NOT-TOO-MANY-ADDENDS, ACL2::NOT-TOO-MANY-ADDENDS-1,
+NTH-ACL2-NUMBER-BETWEEN, NTH-EMPTY/ACC, NTH-EVEN-BUILTIN,
+NTH-NUMBER-BETWEEN-FN, NTH-VAR-BUILTIN, NTH-VAR-STRING,
+ACL2::NTHS-BINDING-LIST, NUM-OCCURENCES-INDUCTION-SCHEME-FROM-DEFINITION,
+CGEN::ORDER-VAR-TE-ALIST, CGEN::ORDER-VAR-TE-ALIST., ACL2::OUTELEMENT-LIST-P,
+ACL2::P-O-2-G-FN, ACL2::PACK-LIST, ACL2::PACK-TERM, ACL2::PACK-TREE,
+ACL2::PATBINDFN, CGEN::POSSIBLE-CONSTANT-VALUE-EXPRESSIONP,
+CGEN::POSSIBLE-CONSTANT-VALUE-EXPRESSIONP-LST, ACL2::POW-2,
+DEFDATA::PP-RANGE-EXP, DEFDATA::PP-REL,
+DEFDATA::PREDICATE-MAPPING-FOR-VARS-IN-TERM,
+DEFDATA::PREDICATE-MAPPING-FOR-VARS-IN-TERMS, ACL2::PREDICATE-P,
+ACL2::PRESENT-IN-GOAL, PRINT-*-OR-SPACE, PRINT-GUARD-EXTRA-INFO-HYPS,
+PRINT-SUMMARY-EV, DEFDATA::PSIG-INST-TEMPLATES,
+CGEN::PUT-ADDITIONAL-CONSTRAINTS., ACL2::PUT-ASSOC-EQUAL-ELIM-RULE-VERSION,
+CGEN::PUT-DEFDATA-TYPE., CGEN::PUT-EQ-CONSTRAINT.,
+CGEN::PUT-INTERDEPENDENCY-EDGES-IN-ALST, CGEN::PUT-MEMBER-CONSTRAINT.,
+CGEN::PUT-RANGE-CONSTRAINT., CGEN::PUT-VAR-EQ-CONSTRAINT.,
+QUOTE-ALL-AUX-INDUCTION-SCHEME-FROM-DEFINITION,
+DEFDATA::RANDOM-ACL2-NUMBER-BETWEEN-SEED,
+DEFDATA::RANDOM-COMPLEX-RATIONAL-BETWEEN-SEED,
+DEFDATA::RANDOM-INDEX-LIST-SEED, DEFDATA::RANDOM-NATURAL-LIST-SEED,
+DEFDATA::RANDOM-NUMBER-BETWEEN-SEED-FN, DEFDATA::RANDOM-PROBABILITY-SEED,
+DEFDATA::RANDOM-RATIONAL-BETWEEN-SEED, DEFDATA::RANGE-ENUM-I,
+CGEN::RANGE-IS-ALIAS-P, DEFDATA::RANGE-PRED-I,
+U::REASON-FOR-NOT-KEYWORD-OPTION-LISTP, DEFDATA::RECOGNIZER-CALL-WITH-VAR,
+DEFDATA::RECORD-LOCAL-THEORY-EVENTS, CGEN::RECORD-P,
+DEFDATA::RECORD-PER-FIELD-INVERSE-DEF-THEORY-EVENTS,
+DEFDATA::RECORD-PER-FIELD-MODIFIER-THEORY-EVENTS,
+DEFDATA::RECORD-PER-FIELD-SELECTOR-THEORY-EVENTS,
+DEFDATA::RECORD-PREDICATE-THEORY-EVENTS, CGEN::RECORD-TESTRUN.,
+DEFDATA::RECORD-THEORY-EV-LST, DEFDATA::RECORD-THEORY-EVENTS-BUILTIN,
+DEFDATA::RECURSIVE-TYPE-P, DEFDATA::REG-RECORD-CONX-EVENTS,
+DEFDATA::REGISTER-CONX-EV, DEFDATA::REGISTER-DATA-CONSTRUCTOR-FN,
+DEFDATA::REGISTER-RECORD-CONX-EVENTS, DEFDATA::REGISTER-RECORD-CONX-EVENTS1,
+DEFDATA::REGISTER-USER-COMBINATOR-FN, REMOVE-ALL,
+CGEN::REMOVE-NON-CONSTANT-VALUE-ENTRIES,
+REPLACE-ALL1-INDUCTION-SCHEME-FROM-DEFINITION, REPLACE-CVARS-SYM,
+REPLACE-OLD-BY-NEW-INDUCTION-SCHEME-FROM-DEFINITION, REPLACE-REQ-CVARS-SYM,
+RESTRICT-CGEN-OUTPUT, ACL2::REWRITING-HYPOTHESIS, DEFDATA::RGET2,
+ACL2::RULETABLE-DELETE-TAGS, ACL2::RULETABLE-KEEP-TAGS, CGEN::RUN-N-TESTS.,
+CGEN::RUN-SINGLE-TEST., CGEN::RUN-TESTS-WITH-TIMEOUT, CGEN::RUN-TESTS.,
+S-CONFLICT-GEN, S-CONFLICTS-GEN, SATISFIABLE-FN, CGEN::SCC0, CGEN::SCC1,
+CGEN::SELECT, CGEN::SEPARATE-CONST/SIMPLE-HYPS., ACL2::SET-UNEQUAL-WITNESS,
+CGEN::SIMPLE-VAR-HYP?, ACL2::SIMPLER-TAKE-INDUCTION, CGEN::SINGLE-HYPOTHESIS,
+ACL2::SINGLETON-TAU-INTERVALP, CGEN::SINGLETON-TAU-INTERVALP,
+SQUEEZE-MULTIPLE-XARG-DECLS, CGEN::SS-STATS, STAGE1, ACL2::STR-NUM-SYM,
+STRIP-CADRS, CGEN::STRONGLY-CONNECTED-COMPONENTS, ACL2::SUBSETP-WITNESS,
+DEFDATA::SUBTYPE-P, SURJECTIVITY-DISJUNCT, SURJECTIVITY-DISJUNCTS,
+SURJECTIVITY-FN, SURJECTIVITY-FORMULA, SURJECTIVITY-GEN, SURJECTIVITY-GEN1,
+SURJECTIVITY-TESTS, CGEN::SYMBOL-ALIST->G$, CGEN::SYMBOL-ALST->G$1,
+DEFDATA::TEXP-CONSTITUENT-TYPES1, DEFDATA::TEXP-CONSTITUENT-TYPES1-LST,
+THEREIS-PROGRAMP, CGEN::TOTAL-TIME-SPENT-IN-TESTING, CGEN::TRANS-ARGLIST,
+CGEN::TRANS-BODY, CGEN::TRANSPOSE-ALST, CGEN::TRANSPOSE-ALST1,
+DEFDATA::TYPE-NAME, ACL2::UGLY-UNHIDE-HACK, ACL2::UGLY-UNHIDE-HACK-FN,
+ACL2::UGLY-UNHIDE-HACK-LOOP-STOPPER, CGEN::UNDIRECTED-2-REL?,
+CGEN::UNION-ENTRIES-IN-ADJ-LIST, CGEN::UNION-ENTRY-IN-ADJ-LIST,
+UNION-KEYWORD-VALUE-LISTS, CGEN::UPDATE-CGEN-STATE-GIVENS/USER-FN,
+UPDATE-TYPE, UPDATE-TYPES, ACL2::UPDATE-XARGS-DECLS-FN,
+DEFDATA::USER-RECORD-THEORY-EV, DEFDATA::USER-RECORD-THEORY-EV1,
+DEFDATA::USER-RECORD-THEORY-EVENTS, CGEN::V-CS%-ALIST-FROM-TERM.,
+CGEN::V-CS%-ALIST-FROM-TERMS., CGEN::VALID-CGEN-STATE-P1,
+ACL2::VAR-IGNORE-LIST-FOR-PATBIND-MV, CGEN::VARS-IN-DEPENDENCY-ORDER,
+CGEN::VERTEX-INDEXES, CGEN::VERTEX-NAMES, CGEN::WEAK-VINFO%-P,
+DEFDATA::WELL-FORMED-METADATA-ENTRY-P, DEFDATA::WELL-FORMED-TYPE-METADATA-P,
+XARGS-KWD-ALIST, XARGS-KWD-ALIST1 and ZIP-LIST, which have not had
+their guards verified.  See :DOC guards.
+
+
+* Step 4:  Write the certificate for
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp"
+in
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).cert".
+
+
+* Step 5:  Compile the functions defined in
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp".
+
+
+Writing book expansion file, C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/\
+numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator)@expansion.ls\
+p.
+
+
+Note: Deleting book expansion file,
+C:\SadlWorkspace28\ReqAggregator-v4\RAE\Analysis\numPlansPending_(element_-
+rareq2_xindex_requestList_ReqAggregator)@expansion.lsp.
+
+Summary
+Form:  (CERTIFY-BOOK
+"C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator)"
+...)
+Rules: NIL
+Warnings:  Guards
+Time:  2.82 seconds (prove: 0.80, print: 0.00, other: 2.03)
+Prover steps counted:  10100
+ "C:/SadlWorkspace28/ReqAggregator-v4/RAE/Analysis/numPlansPending_(element_rareq2_xindex_requestList_ReqAggregator).lisp"
+ACL2S !> T
+ACL2S !>
+TTAG NOTE: Adding ttag :PROGN! from the top level loop.
+ :PROGN!
+ACL2S !>
+Certification Complete!!!
+NIL
+IN>(print-all-analyses)
+IN>(cw "~%Determining Checks Complete!!!~%")
+ACL2S !>((CW "~%~|**XX**ACL2s Requirements Analysis Engine Version ~p0.**XX**~%~%"
+     *REQUIREMENTSVERSIONNUMBER*)
+ (DEFTTAG T)
+ (CW "~%~|**XX**Starting inner contingency analyses.**XX**~%~%")
+ (DEFTTAG T)
+ (CW
+  "~%~%**RMsg**~%
+Inner contingency analysis. ~
+~|Requirement: ~x0
+~|Term: ~x1
+~|!!RMsg!!~%"
+  'R3_INSTANCE_3
+  '(EQUAL
+    |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+    (- |previous numPlansPending of var22| 1)))
+ (CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+   (|translator generated name for requestList of ReqAggregatorP|
+        |requestList of ReqAggregator|)
+   (|translator generated name for previous numPlansPending of var22P|
+        |previous numPlansPending of var22|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+    |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+  (EQUAL
+   |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+   (- |previous numPlansPending of var22| 1))
+  T)
+ (CW
+    "~%~|**XX**Inner contingency analyses completed successfully.**XX**~%~%")
+ (CW "~%~|**XX**Starting contingency analyses.**XX**~%~%")
+ (DEFTTAG T)
+ (CW "~%~%**RMsg**~%
+Contingency analysis.
+~|Requirement: ~x0
+~|!!RMsg!!~%"
+     'R3_INSTANCE_3)
+ (CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+   (|translator generated name for requestList of ReqAggregatorP|
+        |requestList of ReqAggregator|)
+   (|translator generated name for previous numPlansPending of var22P|
+        |previous numPlansPending of var22|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+    |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+  (R3_INSTANCE_3
+   |rareq2_xindex|
+   |requestList of ReqAggregator|
+   |previous numPlansPending of var22|
+   |mID of var3|
+   |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |mID of var9|
+   |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|)
+  NIL)
+ (CW "~%~|**XX**Contingency analyses completed successfully.**XX**~%~%")
+ (CW "~%~|**XX**Starting hypotheses conflict analysis.**XX**~%~%")
+ (DEFTTAG T)
+ (CW
+  "~%~|**XX**Hypotheses conflict analysis completed successfully.**XX**~%~%")
+ (CW "~%~|**XX**Starting global contingency analysis.**XX**~%~%")
+ (CW
+   "~%~|**XX**Global contingency analysis completed successfully.**XX**~%~%")
+ (CW "~%~|**XX**Starting hypotheses completeness analysis.**XX**~%~%")
+ (DEFTTAG T)
+ (CW
+  "~%~%**RMsg**~%
+Hypotheses completeness analysis.
+~|Requirements: ~x0
+~|!!RMsg!!~%"
+  '(R3_INSTANCE_3))
+ (DEFTTAG T)
+ (MV-LET
+  (ERP X1 STATE)
+  (THM-NO-HEROICS
+   (IMPLIES
+    (AND
+     (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+     (|translator generated name for requestList of ReqAggregatorP|
+          |requestList of ReqAggregator|)
+     (|translator generated name for previous numPlansPending of var22P|
+          |previous numPlansPending of var22|)
+     (|translator generated name for mID of var3P| |mID of var3|)
+     (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+          |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for mID of var9P| |mID of var9|)
+     (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+      |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+      |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+    (OR
+     (AND
+      (EQUAL |mID of var3|
+             |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+      (EQUAL
+       |mID of var9|
+       |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)))))
+  (IF
+   (NOT ERP)
+   (PROG2$
+    (CW
+     "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the hypotheses completeness check.~%")
+    (MV NIL
+        :HYPS-COMPLETENESS-PASSED STATE))
+   (MV-LET
+    (CTS? X1 STATE)
+    (RAE-TEST?
+     (IMPLIES
+      (AND
+       (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+       (|translator generated name for requestList of ReqAggregatorP|
+            |requestList of ReqAggregator|)
+       (|translator generated name for previous numPlansPending of var22P|
+            |previous numPlansPending of var22|)
+       (|translator generated name for mID of var3P| |mID of var3|)
+       (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+            |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for mID of var9P| |mID of var9|)
+       (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+        |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+      (OR
+       (AND
+        (EQUAL |mID of var3|
+               |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+        (EQUAL
+         |mID of var9|
+         |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)))))
+    (LET
+     ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+     (COND
+      ((AND (NOT CTS?) (NOT RES))
+       (PROG2$
+        (CW
+         "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the hypotheses completeness check.~%")
+        (MV NIL
+            :HYPS-COMPLETENESS-PASSED STATE)))
+      (CTS?
+       (PROG2$
+        (CW
+         (CONCATENATE
+          'STRING
+          "~%**EMsg**~%
+RAE found a hypotheses completeness error.
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~x0 ~
+~|!!EMsg!!~%~%"
+          (GET-KEY :HYPS-COMPLETENESS *ALL-ANALYSES-FAIL-MESSAGES*))
+         (RESTRICT-CGEN-OUTPUT
+          '(|rareq2_xindex|
+            |requestList of ReqAggregator|
+            |previous numPlansPending of var22|
+            |mID of var3|
+            |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+            |mID of var9|
+            |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+          CGEN-STATE))
+        (MV T
+            (CONS :HYPS-COMPLETENESS-FAILED CGEN-STATE)
+            STATE)))
+      (T
+       (PROG2$
+        (CW
+         (CONCATENATE
+          'STRING
+          "~%**EMsg**~%
+We were not able to falsify the hypotheses completeness check.
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.
+~|!!EMsg!!~%"
+          (GET-KEY :HYPS-COMPLETENESS *ALL-ANALYSES-?-MESSAGES*)))
+        (MV *HYPS-COMPLETENESS-STRICT*
+            :HYPS-COMPLETENESS-? STATE))))))))
+ (CW
+  "~%~|**XX**Hypotheses completeness analysis completed successfully.**XX**~%~%")
+ (CW "~%~|**XX**Starting independence analyses.**XX**~%~%")
+ (CW "~%~|**XX**Independence analysis completed successfully.**XX**~%~%"))
+ACL2S !>
+Determining Checks Complete!!!
+NIL
+IN>(cw "~%####   Start of Analysis  ####~%")
+IN>(CW "~%~|**XX**ACL2s Requirements Analysis Engine Version ~p0.**XX**~%~%"
+     *REQUIREMENTSVERSIONNUMBER*)
+IN>(DEFTTAG T)
+IN>(CW "~%~|**XX**Starting inner contingency analyses.**XX**~%~%")
+IN>(DEFTTAG T)
+IN>(CW
+  "~%~%**RMsg**~%
+Inner contingency analysis. ~  
+~|Requirement: ~x0 
+~|Term: ~x1 
+~|!!RMsg!!~%"
+  'R3_INSTANCE_3
+  '(EQUAL
+    |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+    (- |previous numPlansPending of var22| 1)))
+IN>(CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+   (|translator generated name for requestList of ReqAggregatorP|
+        |requestList of ReqAggregator|)
+   (|translator generated name for previous numPlansPending of var22P|
+        |previous numPlansPending of var22|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+    |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+  (EQUAL
+   |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+   (- |previous numPlansPending of var22| 1))
+  T)
+IN>(CW
+    "~%~|**XX**Inner contingency analyses completed successfully.**XX**~%~%")
+ACL2S !>
+####   Start of Analysis  ####
+NIL
+ACL2S !>
+**XX**ACL2s Requirements Analysis Engine Version "2017-1-27".**XX**
+
+NIL
+ACL2S !>
+TTAG NOTE: Adding ttag :T from the top level loop.
+ :T
+ACL2S !>
+**XX**Starting inner contingency analyses.**XX**
+
+NIL
+ACL2S !> :T
+ACL2S !>
+
+**RMsg**
+
+Inner contingency analysis.
+Requirement: R3_INSTANCE_3
+Term:
+(EQUAL
+ |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+ (- |previous numPlansPending of var22| 1))
+!!RMsg!!
+NIL
+ACL2S !>
+TTAG NOTE: Adding ttag :CGEN from the top level loop.
+
+**Summary of Cgen/testing**
+We tested 1 examples across 1 subgoals, of which 1 (1 unique) satisfied
+the hypotheses, and found 1 counterexamples and 0 witnesses.
+
+We falsified the conjecture. Here are counterexamples:
+ [found in : "top"]
+ --
+((|numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+      -1650732258)
+ (|mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var9| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var3| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|previous numPlansPending of var22| -1937796151)
+ (|requestList of ReqAggregator|
+      '(|http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|))
+ (|rareq2_xindex| -1800132728))
+
+
+Test? found a counterexample.
+
+TTAG NOTE: Adding ttag :CGEN from the top level loop.
+
+**Summary of Cgen/testing**
+We tested 1 examples across 1 subgoals, of which 1 (1 unique) satisfied
+the hypotheses, and found 1 counterexamples and 0 witnesses.
+
+We falsified the conjecture. Here are counterexamples:
+ [found in : "top"]
+ --
+((|numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+      -1620651295)
+ (|mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var9| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var3| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|previous numPlansPending of var22| -1620651294)
+ (|requestList of ReqAggregator| NIL)
+ (|rareq2_xindex| -207652447))
+
+
+Test? found a counterexample.
+
+We were able to satisfy and falsify the expression.
+Therefore, the inner contingency analysis has passed.
+ :INNER-CONTINGENCY-PASSED
+ACL2S !>
+**XX**Inner contingency analyses completed successfully.**XX**
+IN>(CW "~%~|**XX**Starting contingency analyses.**XX**~%~%")
+
+IN>(DEFTTAG T)
+NIL
+IN>(CW "~%~%**RMsg**~%
+Contingency analysis. 
+~|Requirement: ~x0 
+~|!!RMsg!!~%"
+     'R3_INSTANCE_3)
+IN>(CONTINGENCY-ANALYSIS
+  (AND
+   (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+   (|translator generated name for requestList of ReqAggregatorP|
+        |requestList of ReqAggregator|)
+   (|translator generated name for previous numPlansPending of var22P|
+        |previous numPlansPending of var22|)
+   (|translator generated name for mID of var3P| |mID of var3|)
+   (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for mID of var9P| |mID of var9|)
+   (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+    |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+   (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+    |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+  (R3_INSTANCE_3
+   |rareq2_xindex|
+   |requestList of ReqAggregator|
+   |previous numPlansPending of var22|
+   |mID of var3|
+   |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |mID of var9|
+   |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+   |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|)
+  NIL)
+IN>(CW "~%~|**XX**Contingency analyses completed successfully.**XX**~%~%")
+ACL2S !>
+**XX**Starting contingency analyses.**XX**
+
+NIL
+ACL2S !>
+TTAG NOTE: Adding ttag :T from the top level loop.
+ :T
+ACL2S !>
+
+**RMsg**
+
+Contingency analysis.
+Requirement: R3_INSTANCE_3
+!!RMsg!!
+NIL
+ACL2S !>
+TTAG NOTE: Adding ttag :CGEN from the top level loop.
+
+**Summary of Cgen/testing**
+We tested 1 examples across 1 subgoals, of which 1 (1 unique) satisfied
+the hypotheses, and found 1 counterexamples and 0 witnesses.
+
+We falsified the conjecture. Here are counterexamples:
+ [found in : "top"]
+ --
+((|numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+      -412866071)
+ (|mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var9| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var3| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|previous numPlansPending of var22| -119798573)
+ (|requestList of ReqAggregator|
+      '(|http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|))
+ (|rareq2_xindex| -2063310643))
+
+
+Test? found a counterexample.
+
+TTAG NOTE: Adding ttag :CGEN from the top level loop.
+
+TTAG NOTE: Adding ttag :CGEN from the top level loop.
+
+**Summary of Cgen/testing**
+We tested 5001 examples across 2 subgoals, of which 5001 (5001 unique)
+satisfied the hypotheses, and found 1 counterexamples and 5000 witnesses.
+
+We falsified the conjecture. Here are counterexamples:
+ [found in : "Goal'4'"]
+(IMPLIES (AND (INTEGERP |rareq2_xindex|)
+              (<= -2147483648 |rareq2_xindex|)
+              (<= |rareq2_xindex| 2147483647)
+              (|translator generated name for requestList of ReqAggregatorP|
+                   |requestList of ReqAggregator|)
+              (INTEGERP |previous numPlansPending of var22|)
+              (<= |previous numPlansPending of var22|
+                  2147483647)
+              (INTEGERP (+ -1 |previous numPlansPending of var22|))
+              (<= -2147483647
+                  |previous numPlansPending of var22|))
+         (< 2147483648
+            |previous numPlansPending of var22|))
+
+ --
+((|numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|
+      -31110610)
+ (|mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var9| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+      '|http://www.w3.org/2001/XMLSchema#string|)
+ (|mID of var3| '|http://www.w3.org/2001/XMLSchema#string|)
+ (|previous numPlansPending of var22| -31110609)
+ (|requestList of ReqAggregator|
+      '(|http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|
+            |http://sadl.org/RequestAggregator.sadl#RouteRequestInfo|))
+ (|rareq2_xindex| -1493890302))
+
+
+Test? found a counterexample.
+
+We were able to satisfy and falsify the requirement.
+Therefore, the contingency analysis has passed.
+ :CONTINGENCY-PASSED
+ACL2S !>
+**XX**Contingency analyses completed successfully.**XX**
+
+IN>(CW "~%~|**XX**Starting hypotheses conflict analysis.**XX**~%~%")
+NIL
+IN>(DEFTTAG T)
+IN>(CW
+  "~%~|**XX**Hypotheses conflict analysis completed successfully.**XX**~%~%")
+ACL2S !>
+**XX**Starting hypotheses conflict analysis.**XX**
+
+NIL
+ACL2S !>
+TTAG NOTE: Adding ttag :T from the top level loop.
+ :T
+ACL2S !>
+**XX**Hypotheses conflict analysis completed successfully.**XX**
+IN>(CW "~%~|**XX**Starting global contingency analysis.**XX**~%~%")
+
+IN>(CW
+   "~%~|**XX**Global contingency analysis completed successfully.**XX**~%~%")
+NIL
+ACL2S !>
+**XX**Starting global contingency analysis.**XX**
+
+NIL
+ACL2S !>
+**XX**Global contingency analysis completed successfully.**XX**
+
+IN>(CW "~%~|**XX**Starting hypotheses completeness analysis.**XX**~%~%")
+NIL
+IN>(DEFTTAG T)
+IN>(CW
+  "~%~%**RMsg**~%
+Hypotheses completeness analysis. 
+~|Requirements: ~x0 
+~|!!RMsg!!~%"
+  '(R3_INSTANCE_3))
+IN>(DEFTTAG T)
+IN>(MV-LET
+  (ERP X1 STATE)
+  (THM-NO-HEROICS
+   (IMPLIES
+    (AND
+     (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+     (|translator generated name for requestList of ReqAggregatorP|
+          |requestList of ReqAggregator|)
+     (|translator generated name for previous numPlansPending of var22P|
+          |previous numPlansPending of var22|)
+     (|translator generated name for mID of var3P| |mID of var3|)
+     (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+          |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for mID of var9P| |mID of var9|)
+     (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+      |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+     (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+      |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+    (OR
+     (AND
+      (EQUAL |mID of var3|
+             |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+      (EQUAL
+       |mID of var9|
+       |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)))))
+  (IF
+   (NOT ERP)
+   (PROG2$
+    (CW
+     "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the hypotheses completeness check.~%")
+    (MV NIL
+        :HYPS-COMPLETENESS-PASSED STATE))
+   (MV-LET
+    (CTS? X1 STATE)
+    (RAE-TEST?
+     (IMPLIES
+      (AND
+       (|translator generated name for rareq2_xindexP| |rareq2_xindex|)
+       (|translator generated name for requestList of ReqAggregatorP|
+            |requestList of ReqAggregator|)
+       (|translator generated name for previous numPlansPending of var22P|
+            |previous numPlansPending of var22|)
+       (|translator generated name for mID of var3P| |mID of var3|)
+       (|translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+            |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for mID of var9P| |mID of var9|)
+       (|translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|
+        |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+       (|translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|
+        |numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)|))
+      (OR
+       (AND
+        (EQUAL |mID of var3|
+               |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+        (EQUAL
+         |mID of var9|
+         |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)))))
+    (LET
+     ((RES (CAR X1)) (CGEN-STATE (CADR X1)))
+     (COND
+      ((AND (NOT CTS?) (NOT RES))
+       (PROG2$
+        (CW
+         "~%The disjunction of the hypotheses is equal to true. Therefore, ~
+the requirements pass the hypotheses completeness check.~%")
+        (MV NIL
+            :HYPS-COMPLETENESS-PASSED STATE)))
+      (CTS?
+       (PROG2$
+        (CW
+         (CONCATENATE
+          'STRING
+          "~%**EMsg**~%
+RAE found a hypotheses completeness error.
+~|None of the above requirements specify the value of the controlled variable for the following system state.
+~|~x0 ~
+~|!!EMsg!!~%~%"
+          (GET-KEY :HYPS-COMPLETENESS *ALL-ANALYSES-FAIL-MESSAGES*))
+         (RESTRICT-CGEN-OUTPUT
+          '(|rareq2_xindex|
+            |requestList of ReqAggregator|
+            |previous numPlansPending of var22|
+            |mID of var3|
+            |mID of RoutePlanGeneratedMsg of receive2 of ReqAggregator|
+            |mID of var9|
+            |mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregator|)
+          CGEN-STATE))
+        (MV T
+            (CONS :HYPS-COMPLETENESS-FAILED CGEN-STATE)
+            STATE)))
+      (T
+       (PROG2$
+        (CW
+         (CONCATENATE
+          'STRING
+          "~%**EMsg**~%
+We were not able to falsify the hypotheses completeness check.
+~|We were also not able to prove that the check is always true.
+~|Therefore, we cannot determine whether the requirements are complete.
+~|!!EMsg!!~%"
+          (GET-KEY :HYPS-COMPLETENESS *ALL-ANALYSES-?-MESSAGES*)))
+        (MV *HYPS-COMPLETENESS-STRICT*
+            :HYPS-COMPLETENESS-? STATE))))))))
+IN>(CW
+  "~%~|**XX**Hypotheses completeness analysis completed successfully.**XX**~%~%")
+ACL2S !>
+**XX**Starting hypotheses completeness analysis.**XX**
+
+NIL
+ACL2S !> :T
+ACL2S !>
+
+**RMsg**
+
+Hypotheses completeness analysis.
+Requirements: (R3_INSTANCE_3)
+!!RMsg!!
+NIL
+ACL2S !> :T
+ACL2S !>
+Q.E.D.
+
+Summary
+Form:  ( THM ...)
+Rules: ((:DEFINITION
+         |translator generated name for mID of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|)
+        (:DEFINITION
+         |translator generated name for mID of VehiclePlanInfo of vpm of RoutePlanGeneratedMsg of receive2 of ReqAggregatorP|)
+        (:DEFINITION |translator generated name for mID of var3P|)
+        (:DEFINITION |translator generated name for mID of var9P|)
+        (:DEFINITION
+         |translator generated name for numPlansPending of (element rareq2_xindex of requestList of ReqAggregator)P|)
+        (:DEFINITION
+          |translator generated name for previous numPlansPending of var22P|)
+        (:DEFINITION |translator generated name for rareq2_xindexP|)
+        (:EXECUTABLE-COUNTERPART TAU-SYSTEM))
+Time:  0.00 seconds (prove: 0.00, print: 0.00, other: 0.00)
+Prover steps counted:  100
+
+Proof succeeded.
+
+The disjunction of the hypotheses is equal to true. Therefore, the
+requirements pass the hypotheses completeness check.
+ :HYPS-COMPLETENESS-PASSED
+ACL2S !>
+**XX**Hypotheses completeness analysis completed successfully.**XX**
+
+IN>(CW "~%~|**XX**Starting independence analyses.**XX**~%~%")
+NIL
+IN>(CW "~%~|**XX**Independence analysis completed successfully.**XX**~%~%")
+ACL2S !>
+**XX**Starting independence analyses.**XX**
+
+NIL
+ACL2S !>
+**XX**Independence analysis completed successfully.**XX**
+
+IN>(cw "~%Requirement Analysis Complete!!!~%")
+NIL
+ACL2S !>
+Requirement Analysis Complete!!!
+NIL
+IN>(good-bye)
+ACL2S !>
+End of file

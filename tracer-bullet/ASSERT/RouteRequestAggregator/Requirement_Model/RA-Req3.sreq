@@ -1,0 +1,24 @@
+uri "http://sadl.org/RA-Req3.sreq" alias rareq3.
+import "http://sadl.org/RequestAggregator.sadl".
+
+Context: ReqAggregator
+and xindex is an int //iterate over all route requests
+and xelement is element xindex of requestList of ReqAggregator 
+and viCount is length of vi of xelement.
+
+Assumption A4: 
+ReqAggregator assumes that 
+//	xindex > 0 and 
+	xindex <= length of vi of rrm of RouteRequestMsg.
+
+Assertion A5:  ReqAggregator asserts that send2 of ReqAggregator is immaterial 
+when numPlansPending of xelement > 0.
+
+Requirement R4:
+ReqAggregator shall set send2 of ReqAggregator to newelement
+when numPlansPending of xelement = 0 
+where newelement is (a RouteGeneratedMsg
+				      with mID (mID of xelement)
+				      with vehiclePlansInfo (vi of element xindex of requestList of ReqAggregator)
+                    ).
+                    

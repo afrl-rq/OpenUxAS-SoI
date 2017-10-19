@@ -1,0 +1,36 @@
+Welcome to Clozure Common Lisp Version 1.11-r16635  (WindowsX8664)!
+
+ ACL2 Version 7.4 built September 16, 2017  20:29:20
+                   then September 20, 2017  00:00:41.
+ Copyright (C) 2017, Regents of the University of Texas
+ ACL2 comes with ABSOLUTELY NO WARRANTY.  This is free software and you
+ are welcome to redistribute it under certain conditions.  For details,
+ see the LICENSE file distributed with ACL2.
+
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ + WARNING: This is NOT an ACL2 release; it is a development snapshot  +
+ + (git commit hash: ea290ccff3dd496f70eabc561cb2cd0b324c38bf).        +
+ + The authors of ACL2 consider such distributions to be experimental; +
+ + they may be incomplete, fragile, and unable to pass our own         +
+ + regression tests.                                                   +
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ Initialized with (INITIALIZE-ACL2 'INCLUDE-BOOK *ACL2-PASS-2-FILES*).
+ See the documentation topic note-7-4 for recent changes.
+ Note: We have modified the prompt in some underlying Lisps to further
+ distinguish it from the ACL2 prompt.
+
+MODIFICATION NOTICE:
+
+Requirements Analysis Engine Version 2017-9-16 ACL2s with CCL 1.11
+
+ACL2 Version 7.4.  Level 1.  Cbd "D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/".
+System books directory "C:/harshrc/build/acl2-7.4-dev-09182017/books/".
+Type :help for help.
+Type (good-bye) to quit completely out of ACL2.
+
+ACL2S !>
+Exiting the ACL2 read-eval-print loop.  To re-enter, execute (LP).
+? #P"D:/SadlWorkspace42/Validator6-mod/RAE/Analysis/remsg-summary.lsp"
+? NIL
+? 

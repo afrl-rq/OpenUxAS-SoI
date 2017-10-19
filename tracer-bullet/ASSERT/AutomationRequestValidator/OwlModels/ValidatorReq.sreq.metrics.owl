@@ -1,0 +1,472 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:j.0="http://com.ge.research.slr/srl2model#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:j.1="http://sadl.org/sadlimplicitmodel#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/ValidatorReq.sreq.metrics">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">SRL model metrics</rdfs:comment>
+    <owl:imports rdf:resource="ValidatorReq.sreq"/>
+  </owl:Ontology>
+  <owl:Class rdf:about="http://com.ge.research.slr/srl2model#DecompositionRequirement"/>
+  <owl:Class rdf:about="sadlimplicitmodel#Requirement"/>
+  <owl:Class rdf:about="http://com.ge.research.slr/srl2model#ListRequirement"/>
+  <owl:Class rdf:about="sadlimplicitmodel#Assertion"/>
+  <owl:Class rdf:about="http://com.ge.research.slr/srl2model#CausalityRequirement"/>
+  <j.0:ListRequirement rdf:about="ValidatorReq.sreq#A1">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="sadlimplicitmodel#Assertion"/>
+  </j.0:ListRequirement>
+  <j.0:CausalityRequirement rdf:about="ValidatorReq.sreq#A5">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#maxListLength"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#ListRequirement"/>
+    <rdf:type rdf:resource="sadlimplicitmodel#Assertion"/>
+  </j.0:CausalityRequirement>
+  <j.0:CausalityRequirement rdf:about="ValidatorReq.sreq#AutomationRequestReceived">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:rangeAndDomain>
+          <j.0:RangeAndDomain>
+            <j.0:domainOfRange rdf:parseType="Resource">
+              <j.0:isList>false</j.0:isList>
+              <j.0:identity rdf:resource="Validator.sadl#System"/>
+            </j.0:domainOfRange>
+            <j.0:range>
+              <j.0:Range>
+                <j.0:isList>false</j.0:isList>
+                <j.0:identity rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+              </j.0:Range>
+            </j.0:range>
+          </j.0:RangeAndDomain>
+        </j.0:rangeAndDomain>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#denialOfService"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#maxListLength"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#ListRequirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__TaskAutomationRequest__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="sadlimplicitmodel#Requirement"/>
+  </j.0:CausalityRequirement>
+  <j.1:Requirement rdf:about="ValidatorReq.sreq#AutomationRequestReceived2">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationResponse__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#CausalityRequirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__TaskAutomationRequest__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:rangeAndDomain>
+          <j.0:RangeAndDomain>
+            <j.0:domainOfRange rdf:parseType="Resource">
+              <j.0:isList>false</j.0:isList>
+              <j.0:identity rdf:resource="Validator.sadl#AutomationRequestValidatorService"/>
+            </j.0:domainOfRange>
+            <j.0:range>
+              <j.0:Range>
+                <j.0:isList>false</j.0:isList>
+                <j.0:identity rdf:resource="Validator.sadl#ErrorMsg"/>
+              </j.0:Range>
+            </j.0:range>
+          </j.0:RangeAndDomain>
+        </j.0:rangeAndDomain>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#errorMsg"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#ListRequirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#maxListLength"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:rangeAndDomain>
+          <j.0:RangeAndDomain>
+            <j.0:domainOfRange rdf:parseType="Resource">
+              <j.0:isList>false</j.0:isList>
+              <j.0:identity rdf:resource="Validator.sadl#System"/>
+            </j.0:domainOfRange>
+            <j.0:range>
+              <j.0:Range>
+                <j.0:isList>false</j.0:isList>
+                <j.0:identity rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+              </j.0:Range>
+            </j.0:range>
+          </j.0:RangeAndDomain>
+        </j.0:rangeAndDomain>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#denialOfService"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+  </j.1:Requirement>
+  <j.0:ListRequirement rdf:about="ValidatorReq.sreq#A4">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#errorMsg"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:rangeAndDomain>
+          <j.0:RangeAndDomain>
+            <j.0:domainOfRange rdf:parseType="Resource">
+              <j.0:isList>false</j.0:isList>
+              <j.0:identity rdf:resource="Validator.sadl#System"/>
+            </j.0:domainOfRange>
+            <j.0:range>
+              <j.0:Range>
+                <j.0:isList>false</j.0:isList>
+                <j.0:identity rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+              </j.0:Range>
+            </j.0:range>
+          </j.0:RangeAndDomain>
+        </j.0:rangeAndDomain>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#denialOfService"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#maxListLength"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__TaskAutomationRequest__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="sadlimplicitmodel#Assertion"/>
+  </j.0:ListRequirement>
+  <j.0:ListRequirement rdf:about="ValidatorReq.sreq#PublishAutomationRequest2">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#CausalityRequirement"/>
+    <rdf:type rdf:resource="sadlimplicitmodel#Requirement"/>
+  </j.0:ListRequirement>
+  <j.0:CausalityRequirement rdf:about="ValidatorReq.sreq#A3">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__TaskAutomationResponse_out"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationResponse__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="sadlimplicitmodel#Assertion"/>
+  </j.0:CausalityRequirement>
+  <j.0:DecompositionRequirement rdf:about="ValidatorReq.sreq#PublishAutomationRequest">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationRequest_out"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="sadlimplicitmodel#Requirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#ListRequirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#ResponseID"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#CausalityRequirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#result"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+  </j.0:DecompositionRequirement>
+  <j.1:Requirement rdf:about="ValidatorReq.sreq#ResponseReceived">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#content"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#CausalityRequirement"/>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__TaskAutomationResponse_out"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationResponse__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+  </j.1:Requirement>
+  <j.0:ListRequirement rdf:about="ValidatorReq.sreq#A2">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationRequest_out"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#CausalityRequirement"/>
+    <rdf:type rdf:resource="sadlimplicitmodel#Assertion"/>
+  </j.0:ListRequirement>
+  <j.0:CausalityRequirement rdf:about="ValidatorReq.sreq#A6">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="http://com.ge.research.slr/srl2model#ListRequirement"/>
+    <rdf:type rdf:resource="sadlimplicitmodel#Assertion"/>
+  </j.0:CausalityRequirement>
+  <j.0:RangeAndDomain>
+    <j.0:domainOfRange rdf:parseType="Resource">
+      <j.0:isList>false</j.0:isList>
+      <j.0:identity rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationResponse"/>
+    </j.0:domainOfRange>
+    <j.0:range>
+      <j.0:Range>
+        <j.0:isList>false</j.0:isList>
+        <j.0:identity rdf:resource="Validator.sadl#uxas__messages__task__TaskAutomationResponse"/>
+      </j.0:Range>
+    </j.0:range>
+  </j.0:RangeAndDomain>
+  <j.0:CausalityRequirement rdf:about="ValidatorReq.sreq#Timeout">
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#errorMsg"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#automationRequestList"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Controlled"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#uxas__messages__task__UniqueAutomationResponse__Subscription"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#timeSinceLastTimerUpdate"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <j.0:specProperty>
+      <j.0:SpecProperty>
+        <j.0:specRole rdf:resource="http://com.ge.research.slr/srl2model#Monitored"/>
+        <j.0:targetProperty rdf:resource="Validator.sadl#state"/>
+      </j.0:SpecProperty>
+    </j.0:specProperty>
+    <rdf:type rdf:resource="sadlimplicitmodel#Requirement"/>
+  </j.0:CausalityRequirement>
+</rdf:RDF>
