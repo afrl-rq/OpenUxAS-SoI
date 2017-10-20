@@ -578,29 +578,25 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
         /////////////////////////////////////////////////////////
         /////////  Return the results
         /////////////////////////////////////////////////////////
-        if (!nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.empty())
+        auto taskAssignmentSummary = std::make_shared<uxas::messages::task::TaskAssignmentSummary>();
+
+        taskAssignmentSummary->setOperatingRegion(assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getOperatingRegion());
+        taskAssignmentSummary->setCorrespondingAutomationRequestID(assigmentPrerequisites->m_uniqueAutomationRequest->getRequestID());
+
+        for (auto itVehicleAssignments = nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.begin();
+                itVehicleAssignments != nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.end();
+                itVehicleAssignments++)
         {
-            auto taskAssignmentSummary = std::make_shared<uxas::messages::task::TaskAssignmentSummary>();
-
-            taskAssignmentSummary->setOperatingRegion(assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getOperatingRegion());
-            taskAssignmentSummary->setCorrespondingAutomationRequestID(assigmentPrerequisites->m_uniqueAutomationRequest->getRequestID());
-
-            for (auto itVehicleAssignments = nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.begin();
-                    itVehicleAssignments != nodeAssignment->m_staticAssignmentParameters->m_candidateVehicleIdVsAssignmentState.end();
-                    itVehicleAssignments++)
+            for (auto itTaskAssignment = itVehicleAssignments->second->m_taskAssignments.begin();
+                    itTaskAssignment != itVehicleAssignments->second->m_taskAssignments.end();
+                    itTaskAssignment++)
             {
-                for (auto itTaskAssignment = itVehicleAssignments->second->m_taskAssignments.begin();
-                        itTaskAssignment != itVehicleAssignments->second->m_taskAssignments.end();
-                        itTaskAssignment++)
-                {
-                    taskAssignmentSummary->getTaskList().push_back((*itTaskAssignment)->clone());
-                }
+                taskAssignmentSummary->getTaskList().push_back((*itTaskAssignment)->clone());
             }
-            auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(taskAssignmentSummary);
-            sendSharedLmcpObjectBroadcastMessage(newMessage);
-            COUT_INFO_MSG("ASSIGNMENT COMPLETE!")
         }
-        //TODO:: what about errors!!!!!!    
+        auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(taskAssignmentSummary);
+        sendSharedLmcpObjectBroadcastMessage(newMessage);
+        COUT_INFO_MSG("ASSIGNMENT COMPLETE!")  
     } //if(!isError)
     nodeAssignment.reset();
 } //void AssignmentTreeBranchBoundBase::CalculateAssignment()

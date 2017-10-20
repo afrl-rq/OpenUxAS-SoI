@@ -49,6 +49,8 @@ OperatingRegionStateService::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::RemoveZones::Subscription);
+	addSubscriptionAddress(afrl::impact::WaterZone::Subscription);
+
 
     m_region.reset(new afrl::cmasi::OperatingRegion);
     m_region->setID(0); // YEAR2: simply match all requests from agent
@@ -62,6 +64,7 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
 {
     if (afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
     {
+		IMPACT_INFORM("Recieved Keep In Zone");
         auto kzone = std::static_pointer_cast<afrl::cmasi::KeepInZone>(receivedLmcpMessage->m_object);
         bool addZone = true;
         for (auto z : m_region->getKeepInAreas())
@@ -81,6 +84,7 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
     }
     else if (afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
     {
+		IMPACT_INFORM("Recieved Keep Out Zone");
         auto kzone = std::static_pointer_cast<afrl::cmasi::KeepOutZone>(receivedLmcpMessage->m_object);
         bool addZone = true;
         for (auto z : m_region->getKeepOutAreas())
@@ -98,6 +102,12 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             sendSharedLmcpObjectBroadcastMessage(sendMsg);
         }
     }
+	else if (afrl::impact::isWaterZone(receivedLmcpMessage->m_object.get()))
+	{
+		IMPACT_INFORM("Received WaterZone");
+		auto sendMsg = std::static_pointer_cast<avtas::lmcp::Object>(m_region);
+		sendSharedLmcpObjectBroadcastMessage(sendMsg);
+	}
     else if (afrl::cmasi::isRemoveZones(receivedLmcpMessage->m_object.get()))
     {
         auto rzones = std::static_pointer_cast<afrl::cmasi::RemoveZones>(receivedLmcpMessage->m_object);

@@ -31,12 +31,24 @@
             <li>Route plan requests rely on operating region rather than lists of zones</li>
             <li>GroundVehicle and SurfaceVehicle extend from Entity</li>
         </ul>
+ 
+        <h3>04 April 2017</h3>
+        <ul>
+            <li>Moved ground vehicle, surface vehicle, and stationary sensor definitions to separate MDM</li>
+        </ul>
+		
+		<h4>06 July 2017</h4>
+		<u1>
+			<li>Added is background boolean to PointOfInterest, LineOfInterest, and AreaOfInterest </li>
+			<li>Changed VehicleSummary RozIDs to int64[] from AreaOfInterest[] </li>
+			<li>Added power plant of "Electric" to PowerPlant enum </li>
+		</u1>
 -->
 
 <MDM>
     <SeriesName>IMPACT</SeriesName>
     <Namespace>afrl/impact</Namespace>
-    <Version>11</Version>
+    <Version>13</Version>
     
     <EnumList>
         
@@ -62,7 +74,19 @@
             <Entry Name="FuelCell" Value="3"/>
             <!-- Hybrid electric/gasoline -->
             <Entry Name="Hybrid" Value="4"/>
+			<!-- Hybrid electric/gasoline -->
+            <Entry Name="Electric" Value="5"/>
         </Enum>
+		
+		<!-- Fusion Area Actions -->
+		<Enum Name="AreaActionOptions">
+			<!-- creation action -->
+			<Entry Name="Created" Value="0"/>
+			<!-- destroyed action -->
+			<Entry Name="Destroyed" Value="1"/>
+			<!-- modify action -->
+			<Entry Name="Modified" Value="2"/>
+		</Enum>
         
         <!-- Impact specific payload types -->
         <Enum Name="ImpactPayloadType">
@@ -106,6 +130,8 @@
             <Entry Name="GMTI" Value="18"/>
             <!-- Laser Designator -->
             <Entry Name="LaserDesignator" Value="19"/>
+			<!-- LWIR -->
+            <Entry Name="LWIR" Value="20"/>
         </Enum>
         
     </EnumList>
@@ -122,16 +148,16 @@
         <Struct Name="RadioConfiguration" Extends="PayloadConfiguration" Series="CMASI" >
             <!-- The range of the radio -->
             <Field Name="Range" Type="real32" Units="meters" Default="1500.0" />
-            <!-- The vehicle's rally point during loss of comm contingency. When set to null, no defined loss of comm behavior. -->
-            <Field Name="RallyPoint" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
+            <!-- The vehicle's rally point -->
+            <Field Name="RallyPoint" Type="Location3D" Series="CMASI" />
             <!-- Time after loss of communications the vehicle should return to its rally point -->
             <Field Name="Timeout" Type="int64" Units="milliseconds" Default="120000" />
         </Struct>
 		
         <!-- Indicates a radio tower -->
         <Struct Name="RadioTowerConfiguration" Extends="EntityConfiguration" Series="CMASI" >
-            <!-- The position of the tower. A valid RadioTowerConfiguration must define Position (null not allowed) -->
-            <Field Name="Position" Type="Location3D" Series="CMASI" Optional="false" />
+            <!-- The position of the tower -->
+            <Field Name="Position" Type="Location3D" Series="CMASI" />
             <!-- The range of the radio -->
             <Field Name="Range" Type="real32" Units="meters" Default="1500.0" />
             <!-- Whether the radio is enabled -->
@@ -155,7 +181,7 @@
         <!-- Indicates the IMPACT specific payloads carried by an entity -->
         <Struct Name="ImpactPayloadConfiguration" Extends="PayloadConfiguration" Series="CMASI" >
             <!-- Payloads available for this entity -->
-            <Field Name="AvailablePayloads" Type="ImpactPayloadType[]" MaxArrayLength="16"  />
+            <Field Name="AvailablePayloads" Type="ImpactPayloadType[]" />
         </Struct>
         
         <!-- Indicator for use of an IMPACT payload -->
@@ -182,9 +208,9 @@
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
             <!-- An array of vehicles (by ID) to consider when planning -->
-            <Field Name="Vehicles" Type="int64[]" MaxArrayLength="16"  />
+            <Field Name="Vehicles" Type="int64[]" />
             <!-- List of task IDs to be planned to -->
-            <Field Name="TaskList" Type="int64[]" MaxArrayLength="16"  />
+            <Field Name="TaskList" Type="int64[]" />
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- Flag to report timing between tasks -->
@@ -192,7 +218,7 @@
             <!-- Flag to report timing between incremental progress on task and subsequent tasks -->
             <Field Name="ComputeInterTaskToTaskTiming" Type="bool" Default="false" />
             <!-- List of task percentages along task to plan from -->
-            <Field Name="InterTaskPercentage" Type="real32[]" MaxArrayLength="32" />
+            <Field Name="InterTaskPercentage" Type="real32[]" />
         </Struct>
         
         <!-- Batch Route plan response with vehicle-to-task timing reported. -->
@@ -200,7 +226,7 @@
             <!-- Response ID matching request from ({@link BatchRoutePlanRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- Set of task-to-task timings for each requested vehicle -->
-            <Field Name="VehicleTiming" Type="TaskTimingPair[]" MaxArrayLength="8192" />
+            <Field Name="VehicleTiming" Type="TaskTimingPair[]" />
         </Struct>
         
         <!-- Single task/vehicle timing information capturing the estimated time for
@@ -223,11 +249,15 @@
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
             <!-- An array of vehicles (by ID) to consider when planning -->
-            <Field Name="Vehicles" Type="int64[]" MaxArrayLength="16" />
+            <Field Name="Vehicles" Type="int64[]" />
             <!-- List of task IDs to be planned to -->
-            <Field Name="TaskList" Type="int64[]" MaxArrayLength="16" />
+            <Field Name="TaskList" Type="int64[]" />
+			<!-- string containing the relationship between requested tasks. If empty, all tasks are to be completed in any order. The
+            format of the string is specific to the automation service. This relationship string is the mechanism for incorporating
+            task precedence, priority, timing, etc. -->
+            <Field Name="TaskRelationships" Type="string"/>
             <!-- List of task percentages along task to plan from -->
-            <Field Name="InterTaskPercentage" Type="real32[]" MaxArrayLength="32" />
+            <Field Name="InterTaskPercentage" Type="real32[]" />
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
         </Struct>
@@ -237,7 +267,7 @@
             <!-- Response ID matching request from ({@link BatchSummaryRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- Set of vehicle-to-task and task-to-task summaries including timing, communication, and remaining energy -->
-            <Field Name="Summaries" Type="TaskSummary[]" MaxArrayLength="512" />
+            <Field Name="Summaries" Type="TaskSummary[]" />
         </Struct>
         
         <!-- Summary information that describes a particular way to carry out the task.
@@ -251,7 +281,7 @@
             <!-- Summary of information for each vehicle used simultaneously to complete this task.
             If there are zero performing vehicles, then 'TaskID' cannot be completed with any set of
             available vehicles in the system. -->
-            <Field Name="PerformingVehicles" Type="VehicleSummary[]" MaxArrayLength="16" />
+            <Field Name="PerformingVehicles" Type="VehicleSummary[]" />
             <!-- Task cannot be completed as specified and is using best effort. Estimated percent
             achieved while using best effort strategy. -->
             <Field Name="BestEffort" Type="real32" Units="%" Default="100.0" />
@@ -279,6 +309,18 @@
             <!-- Flag for indicating that the vehicle will leave communication range
             either enroute or during the task -->
             <Field Name="BeyondCommRange" Type="bool" Default="false" />
+			<!-- Flag for indicating that the vehicle will conflict with ROZ
+			enroute or during the task -->
+            <Field Name="ConflictsWithROZ" Type="bool" Default="false" />
+			<!-- IDs of ROZs that the vehicle will conflict with  -->
+			<Field Name="ROZIDs" Type="int64[]" />
+			<!-- The list of waypoints associated with this mission task.  Waypoints are linked, but the waypoint list may
+            contain waypoints that are not necessarily linked.  Multiple linked routes may be sent in a single waypoint list.
+            Waypoints are not necessarily ordered in the list.
+            -->
+            <Field Name="WaypointList" Type="Waypoint[]" Units="None" Series="CMASI" />
+            <!-- ID of the first waypoint in the plan. -->
+            <Field Name="FirstWaypoint" Type="int64"/>
         </Struct>
 
         <!-- Component heartbeat expected to be sent out @ 1Hz-->
@@ -305,6 +347,8 @@
         <Struct Name="SpeedAltPair" >
             <!-- ID of vehicle for which altitude and speed is attached -->
             <Field Name="VehicleID" Type="int64" />
+			<!-- ID of task for which altitude and speed is attached. If TaskID is zero, then alt/speed setting applies to all tasks in the automation request -->
+			<Field Name="TaskID" Type="int64" Default="0"/>
             <!-- The speed attached to this vehicle -->
             <Field Name="Speed" Type="real32" Units="meter/sec" />
             <!-- Altitude attached to this vehicle -->
@@ -317,10 +361,10 @@
         <Struct Name="ImpactAutomationRequest" >
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
-            <!-- Standard CMASI Automation request. A valid ImpactAutomationRequest must define TrialRequest (null not allowed). -->
-            <Field Name="TrialRequest" Type="AutomationRequest" Series="CMASI" Optional="false" />
+            <!-- Standard CMASI Automation request -->
+            <Field Name="TrialRequest" Type="AutomationRequest" Series="CMASI" />
             <!-- Override nominal speed/alt. If a vehicle is not in list, its nominal speed/alt is used -->
-            <Field Name="OverridePlanningConditions" Type="SpeedAltPair[]" MaxArrayLength="16" />
+            <Field Name="OverridePlanningConditions" Type="SpeedAltPair[]" />
             <!-- Associated play ID -->
             <Field Name="PlayID" Type="int64" />
             <!-- Associated solution ID -->
@@ -333,8 +377,8 @@
         <Struct Name="ImpactAutomationResponse" >
             <!-- Response ID matching request from ({@link ImpactAutomationRequest}) -->
             <Field Name="ResponseID" Type="int64" />
-            <!-- Automation response from the request. A valid ImpactAutomationResponse must define TrialResponse (null not allowed). -->
-            <Field Name="TrialResponse" Type="AutomationResponse" Series="CMASI" Optional="false" />
+            <!-- Automation response from the request -->
+            <Field Name="TrialResponse" Type="AutomationResponse" Series="CMASI" />
             <!-- Associated play ID -->
             <Field Name="PlayID" Type="int64" />
             <!-- Associated solution ID -->
@@ -342,16 +386,21 @@
             <!-- Flag indicating 'sandbox', i.e. not to be implemented -->
             <Field Name="Sandbox" Type="bool" Default="false" />
             <!-- Set of vehicle-to-task summaries that will be implemented by this automation response. Including timing, communication, and remaining energy -->
-            <Field Name="Summaries" Type="TaskSummary[]" MaxArrayLength="512" />
+            <Field Name="Summaries" Type="TaskSummary[]" />
         </Struct>
         
         <!-- Point of interest -->
         <Struct Name="PointOfInterest" >
             <!-- ID for points of interest -->
             <Field Name="PointID" Type="int64" />
-            
-            <!-- Point of interest location. A valid PointOfInterest must define Location (null not allowed). -->
-            <Field Name="Location" Type="Location3D" Series="CMASI" Optional="false" />
+            <!-- Point of interest location -->
+            <Field Name="Location" Type="Location3D" Series="CMASI" />
+			<!-- POI action -->
+			<Field Name="PointAction" Type="AreaActionOptions" Default="Created" />
+			<!-- POI label -->
+			<Field Name="PointLabel" Type="string" /> 
+			<!-- Background Behavior point is true if point is for background behavior -->
+			<Field Name="BackgroundBehaviorPoint" Type="bool" Default="false" />
             
         </Struct>
         
@@ -359,45 +408,50 @@
         <Struct Name="LineOfInterest" >
             <!-- ID for lines of interest -->
             <Field Name="LineID" Type="int64" />
-            
             <!-- List of points to search -->
-            <Field Name="Line" Type="Location3D[]" MaxArrayLength="1024" Series="CMASI" />
+            <Field Name="Line" Type="Location3D[]" Series="CMASI" />
+			<!-- LOI action -->
+			<Field Name="LineAction" Type="AreaActionOptions" Default="Created" />
+			<!-- LOI label -->
+			<Field Name="LineLabel" Type="string" />  
+			<!-- Background Behavior line is true if point is for background behavior  -->
+			<Field Name="BackgroundBehaviorLine" Type="bool" Default="false" />
         </Struct>
         
         <!-- Area of interest -->
         <Struct Name="AreaOfInterest" >
             <!-- ID for area of interest -->
             <Field Name="AreaID" Type="int64" />
-            
-            <!-- Geometry describing the area. A valid AreaOfInterest must define Area (null not allowed). -->
-            <Field Name="Area" Type="AbstractGeometry" Series="CMASI" Optional="false" />
-            
+            <!-- Geometry describing the area -->
+            <Field Name="Area" Type="AbstractGeometry" Series="CMASI" />
+			<!-- AOI action -->
+			<Field Name="AreaAction" Type="AreaActionOptions" Default="Created" />
+			<!-- AOI label -->
+			<Field Name="AreaLabel" Type="string" />  
+			<!-- AOI label -->
+			<Field Name="BackgroundBehaviorArea" Type="bool" Default="false" />
         </Struct>
         
         <!-- Impact Point Search Task -->
         <Struct Name="ImpactPointSearchTask" Extends="SearchTask" Series="CMASI" >
             <!-- Point to search (from available points of interest). Only valid if ID is non-zero -->
             <Field Name="SearchLocationID" Type="int64" />
-
-            <!-- Defines coordinates directly, only used when SearchLocationID is non-zero -->
-            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
-
+            <!-- If search location ID is zero, then use direct coordinates -->
+            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" />
             <!--Minimum distance that an aircraft must maintain from the point of interest. -->
             <Field Name="StandoffDistance" Type="real32" Units="meter" Default="0" />
-
             <!-- A list of acceptable look-angles for this task.  Each wedge is defined relative to true North. To be a valid look angle, a sensor must be looking from a direction within the bounds of the wedge. -->
-            <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" Series="CMASI" />
-			
+            <Field Name="ViewAngleList" Type="Wedge[]" Series="CMASI" />
             <!-- Loiter action to complete to fulfill task. If null, then simply points camera but main trajectory does not change. Otherwise, completes the specified loiter action. -->
-            <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Default="null" Optional="true" />
+            <Field Name="DesiredAction" Type="LoiterAction" Series="CMASI" Default="null"/>
         </Struct>
         
         <!-- Search task with specified search pattern -->
         <Struct Name="PatternSearchTask" Extends="SearchTask" Series="CMASI" >
             <!-- Point at which to search is centered (from available points of interest) -->
             <Field Name="SearchLocationID" Type="int64" />
-            <!-- Defines coordinates directly, only used when SearchLocationID is non-zero -->
-            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
+            <!-- If search search location ID is zero, then use direct coordinates -->
+            <Field Name="SearchLocation" Type="Location3D" Series="CMASI" />
             <!-- Search pattern to use -->
             <Field Name="Pattern" Type="AreaSearchPattern" Default="Spiral" />
             <!-- Pattern extent -->
@@ -408,12 +462,10 @@
         <Struct Name="AngledAreaSearchTask" Extends="SearchTask" Series="CMASI" >
             <!-- Area to search (from available areas of interest) -->
             <Field Name="SearchAreaID" Type="int64" />
-
             <!-- Sweep angle defined from true North in clockwise manner -->
             <Field Name="SweepAngle" Type="real32" Units="degrees" />
-            
-            <!-- Optional start point that must be reached before beginning search -->
-            <Field Name="StartPoint" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
+            <!-- Start point for this search -->
+            <Field Name="StartPoint" Type="Location3D" Series="CMASI" />
         </Struct>
         
         <!-- Defines a line search task.
@@ -424,13 +476,10 @@
             To be a valid look angle, the line segment must be viewed from an angle within the bounds of the wedge.
         -->
         <Struct Name="ImpactLineSearchTask" Extends="SearchTask" Series="CMASI" >
-
             <!-- ID of line to search (from available lines of interest) -->
             <Field Name="LineID" Type="int64" />
-
             <!-- Defines a list of acceptable look-angles for this task.  See the documentation above for details. -->
-            <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" Series="CMASI" />
-
+            <Field Name="ViewAngleList" Type="Wedge[]" Series="CMASI" />
             <!-- If true, the ViewAngleList specifies inertial (North-East) angles. See documentation above. -->
             <Field Name="UseInertialViewAngles" Type="bool" Default="false"/>
         </Struct>
@@ -453,10 +502,8 @@
         <Struct Name="CommRelayTask" Extends="Task" Series="CMASI" >
             <!-- ID of entity which requires comm relay support -->
             <Field Name="SupportedEntityID" Type="int64" />
-			
-            <!-- Destination location for supported entity, if known. -->
-            <Field Name="DestinationLocation" Type="CMASI/Location3D" Default="null" Optional="true" />
-			
+            <!-- Destination location for supported entity -->
+            <Field Name="DestinationLocation" Type="CMASI/Location3D" />
             <!-- ID of entity to which communication will be delivered (i.e. Tower ID) -->
             <Field Name="TowerID" Type="int64" />
         </Struct>
@@ -467,9 +514,8 @@
         vehicles, then this task will use the maximum number of eligible vehicles in a best
         effort strategy which attempts to maximize radial coverage. -->
         <Struct Name="CordonTask" Extends="Task" Series="CMASI" >
-            <!-- Block road access to this location. A valid CordonTask must define CordonLocation (null not allowed) -->
-            <Field Name="CordonLocation" Type="CMASI/Location3D" Optional="false" />
-			
+            <!-- Block road access to this location -->
+            <Field Name="CordonLocation" Type="CMASI/Location3D" />
             <!-- Distance away from 'CordonLocation' that access should be blocked -->
             <Field Name="StandoffDistance" Type="real32" Units="meters" Default="100" />
         </Struct>
@@ -484,9 +530,9 @@
             <!-- Number of vehicles to simultaneously block the target -->
             <Field Name="NumberVehicles" Type="byte" Default="1" />
             <!-- Biases the blockade so that more vehicles are between enemy and protected
-            location. If null location is given, then blockade attempts to block in direction
+            location. If no location is given, then blockade attempts to block in direction
             of enemy travel -->
-            <Field Name="ProtectedLocation" Type="CMASI/Location3D" Default="null" Optional="true" />
+            <Field Name="ProtectedLocation" Type="CMASI/Location3D" Default="NULL" />
         </Struct>
         
 		<!-- Task for targeting surveillance at an offset of a moving entity, for example to
@@ -495,16 +541,13 @@
             <!-- ID of entity which will provide the basis for the escort. Tasked vehicle
             will attempt to stay 'StandoffDistance' ahead of this entity on its route. -->
             <Field Name="SupportedEntityID" Type="int64" />
-			
             <!-- ID of line which describes the route that the 'SupportedEntityID' is following.
             If the 'SupportedEntityID' is one of the controlled entities, such as a taskable ground
             vehicle, then 'RouteID' can be zero and this task will use current, known route for that
             vehicle. Otherwise, 'RouteID' must be an ID for a previously described '{@link LineOfInterest}'. -->
             <Field Name="RouteID" Type="int64" />
-			
             <!-- Waypoints that the supported entity is presumed to be following if 'RouteID' is zero -->
-            <Field Name="PrescribedWaypoints" Type="CMASI/Waypoint[]" MaxArrayLength="1024" />
-            
+            <Field Name="PrescribedWaypoints" Type="CMASI/Waypoint[]" />
             <!-- Distance ahead (positive) or behind (negative) that the vehicle will provide
             surveillance relative to 'SupportedEntityID's location on route 'RouteID' -->
             <Field Name="StandoffDistance" Type="real32" Units="meters" Default="100" />
@@ -513,38 +556,13 @@
         <!-- Requests the latest configurations for vehicles in the system -->
         <Struct Name="ConfigurationRequest">
             <!-- Vehicle IDs for which the corresponding configuration should be sent. If the list is empty, all available configurations should be sent in response. -->
-            <Field Name="VehicleID" Type="int64[]" MaxArrayLength="16" />
+            <Field Name="VehicleID" Type="int64[]" />
         </Struct>
         
-        <!-- Provides information regarding a vehicle's configuration items. -->
-        <Struct Name="GroundVehicleConfiguration" Extends="CMASI/EntityConfiguration">
-            
-            <!-- Valid operational road network. UGV adheres to positions defined in this graph. Indicated by previously sent GraphRegion's ID -->
-            <Field Name="RoadGraphID" Type="int64" />
-
-            <!-- The minimum speed that should be commanded for this vehicle -->
-            <Field Name="MinimumSpeed" Type="real32" Units="meter/sec" />
-
-            <!-- The maximum speed that should be commanded for this vehicle -->
-            <Field Name="MaximumSpeed" Type="real32" Units="meter/sec" />
-            
-            <!--
-                The consumption rate of available energy at nominal speed, expressed in terms of the percentage of maximum capacity used per second.
-            -->
-            <Field Name="EnergyRate" Type="real32" Units="%/sec" />
-
-        </Struct>
-        
-        <!--Provides basic state information regarding entity position, orientation, and velocity.
-        -->
-        <Struct Name="GroundVehicleState" Extends="CMASI/EntityState">
-
-        </Struct>
-         
         <!-- Reports on navigability of the water in the "Area".  Based on the WeatherReport CMASI message, designed to allow changes during execution. -->
         <Struct Name="WaterReport">
-            <!-- Area for which this report is valid. A valid WaterReport must define Area (null not allowed) -->
-            <Field Name="Area" Type="AbstractGeometry" Series="CMASI" Optional="false" />
+            <!-- Area for which this report is valid -->
+            <Field Name="Area" Type="AbstractGeometry" Series="CMASI"/>
             <!-- Speed of the current, e.g. due to tides or river flow -->
             <Field Name="CurrentSpeed" Type="real32" Units="meters/sec"/>
             <!-- Direction of the current -->
@@ -559,41 +577,5 @@
         should not enter this zone. -->
         <Struct Name="WaterZone" Extends="CMASI/AbstractZone" />
         
-        <!-- Provides information regarding a vehicle's configuration items. -->
-        <Struct Name="SurfaceVehicleConfiguration" Extends="CMASI/EntityConfiguration">
-            
-            <!-- Valid operational water zone (by ID). USV adheres to this area  -->
-            <Field Name="WaterArea" Type="int64" />
-
-            <!-- The minimum speed that should be commanded for this vehicle -->
-            <Field Name="MinimumSpeed" Type="real32" Units="meter/sec" />
-
-            <!-- The maximum speed that should be commanded for this vehicle -->
-            <Field Name="MaximumSpeed" Type="real32" Units="meter/sec" />
-            
-            <!--
-                The consumption rate of available energy at nominal speed, expressed in terms of the percentage of maximum capacity used per second.
-            -->
-            <Field Name="EnergyRate" Type="real32" Units="%/sec" />
-            
-            <!-- The maximum angle that this vehicle will bank -->
-            <Field Name="MaxBankAngle" Type="real32" Units="degree" />
-            
-            <!-- The maximum angular rate that this vehicle will bank -->
-            <Field Name="MaxBankRate" Type="real32" Units="degree/sec" />
-
-        </Struct>
-        
-        <!--Provides basic state information regarding entity position, orientation, and velocity.
-        -->
-        <Struct Name="SurfaceVehicleState" Extends="CMASI/EntityState">
-
-            <!-- Current bank angle of the surface vehicle -->
-            <Field Name="BankAngle" Type="real32" Units="degree" />
-
-            <!-- Forward speed of the vehicle relative to the mass of water -->
-            <Field Name="Speed" Type="real32" Units="meter/sec" />
-
-        </Struct>
  </StructList>
 </MDM>

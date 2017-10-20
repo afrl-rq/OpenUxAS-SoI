@@ -19,11 +19,11 @@
 #include "TaskServiceBase.h"
 
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "afrl/cmasi/AutomationRequest.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
@@ -136,16 +136,14 @@ TaskManagerService::configure(const pugi::xml_node& ndComponent)
 
     addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
 
+
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+	for (auto descendant : afrl::cmasi::EntityStateDescendants())
+		addSubscriptionAddress(descendant);
+
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
-
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+	for (auto descendant : afrl::cmasi::EntityConfigurationDescendants())
+		addSubscriptionAddress(descendant);
 
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);

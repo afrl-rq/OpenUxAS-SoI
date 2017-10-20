@@ -28,10 +28,10 @@
 #include "afrl/cmasi/LoiterAction.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/FollowPathCommand.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
 #include "uxas/messages/task/TaskOption.h"
 #include "uxas/messages/route/RouteRequest.h"
@@ -65,6 +65,7 @@ EscortTaskService::s_registrar(EscortTaskService::s_registryServiceTypeNames());
 EscortTaskService::EscortTaskService()
 : TaskServiceBase(EscortTaskService::s_typeName(), EscortTaskService::s_directoryName())
 {
+	m_isMakeTransitionWaypointsActive = true;
 };
 
 EscortTaskService::~EscortTaskService()
@@ -101,29 +102,10 @@ EscortTaskService::configureTask(const pugi::xml_node& ndComponent)
     } //isSuccessful
     if (isSuccessful)
     {
-        pugi::xml_node entityStates = ndComponent.child(STRING_XML_ENTITY_STATES);
-        if (entityStates)
-        {
-            for (auto ndEntityState = entityStates.first_child(); ndEntityState; ndEntityState = ndEntityState.next_sibling())
-            {
-
-                std::shared_ptr<afrl::cmasi::EntityState> entityState;
-                std::stringstream stringStream;
-                ndEntityState.print(stringStream);
-                avtas::lmcp::Object* object = avtas::lmcp::xml::readXML(stringStream.str());
-                if (object != nullptr)
-                {
-                    entityState.reset(static_cast<afrl::cmasi::EntityState*> (object));
-                    object = nullptr;
-
-                    if (entityState->getID() == m_escortTask->getSupportedEntityID())
-                    {
-                        m_supportedEntityStateLast = entityState;
-                        break;
-                    }
-                }
-            }
-        }
+		if (m_entityStates.find(m_escortTask->getSupportedEntityID()) != m_entityStates.end())
+		{
+			m_supportedEntityStateLast = m_entityStates[m_escortTask->getSupportedEntityID()];
+		}
     } //if(isSuccessful)
 
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
@@ -276,7 +258,7 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
         }
 
         // only send out every 2 seconds (even on fast simulation mode)
-        if (!afrl::impact::isGroundVehicleState(entityState.get()) || m_throttle[entityState->getID()] + 2000 <= uxas::common::utilities::c_TimeUtilities::getTimeNow_ms())
+        if (!afrl::vehicles::isGroundVehicleState(entityState.get()) || m_throttle[entityState->getID()] + 2000 <= uxas::common::utilities::c_TimeUtilities::getTimeNow_ms())
         {
             m_throttle[entityState->getID()] = uxas::common::utilities::c_TimeUtilities::getTimeNow_ms();
         }
@@ -321,7 +303,7 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
         missionCommand->getWaypointList().push_back(wp);
 
         // check if surface or ground vehicle
-        if ((afrl::impact::isSurfaceVehicleState(entityState.get()) || afrl::impact::isGroundVehicleState(entityState.get())) && !missionCommand->getWaypointList().empty())
+        if ((afrl::vehicles::isSurfaceVehicleState(entityState.get()) || afrl::vehicles::isGroundVehicleState(entityState.get())) && !missionCommand->getWaypointList().empty())
         {
             afrl::cmasi::Waypoint* hwp = wp->clone();
             hwp->setNumber(2);
@@ -367,6 +349,7 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
 std::shared_ptr<afrl::cmasi::VehicleActionCommand> EscortTaskService::CalculateGimbalActions(const std::shared_ptr<afrl::cmasi::EntityState>& entityState, double lat, double lon)
 {
     std::shared_ptr<afrl::cmasi::VehicleActionCommand> caction(new afrl::cmasi::VehicleActionCommand);
+	caction->setVehicleID(entityState->getID());
 
     double surveyRadius = m_loiterRadius_m;
     double surveySpeed = entityState->getGroundspeed();
@@ -387,8 +370,8 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> EscortTaskService::CalculateG
         }
 
         // calculate proper radius
-        if (afrl::impact::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
+        if (afrl::vehicles::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
+                afrl::vehicles::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
             surveyRadius = 0.0;
             surveyType = afrl::cmasi::LoiterType::Hover;

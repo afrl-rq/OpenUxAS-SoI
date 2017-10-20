@@ -412,7 +412,7 @@ bool CmasiAreaSearchTaskService::isCalculateRasterScanRoute(std::shared_ptr<Task
             {
                 northMax_m = boundaryPosition.m_north_m;
             }
-            else if (boundaryPosition.m_north_m < northMin_m)
+            if (boundaryPosition.m_north_m < northMin_m)
             {
                 northMin_m = boundaryPosition.m_north_m;
             }
@@ -420,7 +420,7 @@ bool CmasiAreaSearchTaskService::isCalculateRasterScanRoute(std::shared_ptr<Task
             {
                 eastMax_m = boundaryPosition.m_east_m;
             }
-            else if (boundaryPosition.m_east_m < eastMin_m)
+            if (boundaryPosition.m_east_m < eastMin_m)
             {
                 eastMin_m = boundaryPosition.m_east_m;
             }
@@ -482,7 +482,7 @@ bool CmasiAreaSearchTaskService::isCalculateRasterScanRoute(std::shared_ptr<Task
             {
                 northMax_m = itPoint->m_north_m;
             }
-            else if (itPoint->m_north_m < northMin_m)
+            if (itPoint->m_north_m < northMin_m)
             {
                 northMin_m = itPoint->m_north_m;
             }
@@ -490,7 +490,7 @@ bool CmasiAreaSearchTaskService::isCalculateRasterScanRoute(std::shared_ptr<Task
             {
                 eastMax_m = itPoint->m_east_m;
             }
-            else if (itPoint->m_east_m < eastMin_m)
+            if (itPoint->m_east_m < eastMin_m)
             {
                 eastMin_m = itPoint->m_east_m;
             }
