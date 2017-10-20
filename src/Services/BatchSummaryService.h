@@ -22,6 +22,7 @@
 #include "ServiceBase.h"
 #include "afrl/cmasi/CMASI.h"
 #include "afrl/impact/IMPACT.h"
+#include "afrl/vehicles/VEHICLES.h"
 #include "uxas/messages/route/ROUTE.h"
 
 #include "visilibity.h"
@@ -52,13 +53,13 @@ namespace service
  *  - afrl::cmasi::EntityConfiguration
  *  - afrl::impact::RadioTowerConfiguration
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - afrl::cmasi::EntityState
  *  - afrl::impact::RadioTowerState
  *  - afrl::cmasi::AirVehicleState
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::SurfaceVehicleState
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::SurfaceVehicleState
  * 
  * Sent Messages:
  *  - afrl::impact::BatchSummaryResponse

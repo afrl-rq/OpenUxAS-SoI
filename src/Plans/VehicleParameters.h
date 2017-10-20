@@ -33,8 +33,8 @@
 //#include "IncludeLMCP.h"
 
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
 #include "afrl/cmasi/WavelengthBand.h"
 
 #include <iostream>
@@ -304,8 +304,8 @@ namespace n_FrameworkLib
         
         void operator=(const CVehicleParameters& rhs);
         void operator=(const afrl::cmasi::AirVehicleConfiguration& rhs);
-        void operator=(const afrl::impact::SurfaceVehicleConfiguration& rhs);
-        void operator=(const afrl::impact::GroundVehicleConfiguration& rhs);
+        void operator=(const afrl::vehicles::SurfaceVehicleConfiguration& rhs);
+        void operator=(const afrl::vehicles::GroundVehicleConfiguration& rhs);
 
     public:
 

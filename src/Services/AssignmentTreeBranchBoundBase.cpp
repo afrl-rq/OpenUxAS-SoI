@@ -22,6 +22,7 @@
 
 #include "afrl/cmasi/ServiceStatus.h"
 #include "uxas/messages/task/TaskAssignmentSummary.h"
+#include "uxas/messages/task/UniqueAutomationResponse.h"
 #ifdef AFRL_INTERNAL_ENABLED
 #include "uxas/project/pisr/PSIR_AssignmentType.h"
 #endif
@@ -263,6 +264,17 @@ bool AssignmentTreeBranchBoundBase::AssigmentPrerequisites::isAssignmentReady(co
     return (isHavePrerequisites);
 }
 
+void AssignmentTreeBranchBoundBase::sendErrorMsg(std::string& errStr)
+{
+    auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
+    serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Error);
+    auto keyValuePair = new afrl::cmasi::KeyValuePair;
+    keyValuePair->setKey(std::string("No UniqueAutomationResponse"));
+    keyValuePair->setValue("AssignmentTree: " + errStr);
+    serviceStatus->getInfo().push_back(keyValuePair);
+    sendSharedLmcpObjectBroadcastMessage(serviceStatus);
+}
+
 bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites)
 {
     bool isSuccess(true);
@@ -319,8 +331,9 @@ bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<As
                     }
                     catch (std::exception& e)
                     {
-                        //TODO:: ERROR MESSAGE
-                        CERR_FILE_LINE_MSG("ERROR:: Exception Encountered while converting the string [" << compositionString.substr(position, positionAfterId) << "] to a number!")
+                        std::string errMsg = "Exception Encountered while converting the string [" + compositionString.substr(position, positionAfterId) + "] to a number!";
+                        UXAS_LOG_ERROR(errMsg);
+                        sendErrorMsg(errMsg);
                         isFinished = true;
                         isSuccess = false;
                     }
@@ -389,7 +402,9 @@ bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<As
                     }
                     else
                     {
-                        CERR_FILE_LINE_MSG("ERROR:: Composition not found for Task Id[!" << taskId << "]")
+                        std::string errMsg = "Composition not found for Task Id[!" + std::to_string(taskId) + "]";
+                        UXAS_LOG_ERROR(errMsg);
+                        sendErrorMsg(errMsg);
                         isSuccess = false;
                         isFinished = true;
                     }
@@ -420,7 +435,9 @@ bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<As
             }
             else
             {
-                CERR_FILE_LINE_MSG("ERROR:: Composition not found for Task Id[!" << itOptions->first << "]")
+                std::string errMsg = "Composition not found for Task Id[!" + std::to_string(itOptions->first) + "]";
+                UXAS_LOG_ERROR(errMsg);
+                sendErrorMsg(errMsg);
                 isSuccess = false;
             }
         }
@@ -451,12 +468,16 @@ bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<As
             {
                 //sstreamErrors << "Error:: error encountered while initializing algebra objectives.]\n";
                 //errReturn = static_cast<enReturnErrorAssignment> (errReturn | eassignFailed);
+                std::string errStr = "Error:: error encountered while initializing algebra objectives.";
+                sendErrorMsg(errStr);
                 isSuccess = false;
             }
             else if (!c_Node_Base::m_staticAssignmentParameters->algebra.initAlgebraString(algebraString))
             {
                 //sstreamErrors << "Error:: error encountered while parsing the algebra string:\n [" << algebraString << "]\n";
                 //errReturn = static_cast<enReturnErrorAssignment> (errReturn | eassignFailed);
+                std::string errStr = "Error:: error encountered while parsing the algebra string";
+                sendErrorMsg(errStr);
                 isSuccess = false;
             }
         }
@@ -554,10 +575,10 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
         if (nodeAssignment->m_staticAssignmentParameters->m_numberCompleteAssignments <= 0)
         {
             auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
-            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Information);
+            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Warning);
             auto keyValuePair = new afrl::cmasi::KeyValuePair;
-            keyValuePair->setKey(std::string("AssignmentNotFound"));
-            keyValuePair->setValue(nodeAssignment->m_staticAssignmentParameters->m_reasonsForNoAssignment.str());
+            keyValuePair->setKey(std::string("No UniqueAutomationResponse"));
+            keyValuePair->setValue(std::string("Assignment not found: ") + nodeAssignment->m_staticAssignmentParameters->m_reasonsForNoAssignment.str());
             serviceStatus->getInfo().push_back(keyValuePair);
             keyValuePair = nullptr;
             sendSharedLmcpObjectBroadcastMessage(serviceStatus);
@@ -598,9 +619,21 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
             }
             auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(taskAssignmentSummary);
             sendSharedLmcpObjectBroadcastMessage(newMessage);
-            COUT_INFO_MSG("ASSIGNMENT COMPLETE!")
+			UXAS_LOG_INFORM("ASSIGNMENT COMPLETE!");
         }
-        //TODO:: what about errors!!!!!!    
+        else
+        {
+            auto failedAutomationRequest = assigmentPrerequisites->m_uniqueAutomationRequest;
+            //make a UniqueAutomationResponse with time -1
+            auto ures = std::make_shared<messages::task::UniqueAutomationResponse>();
+            ures->setResponseID(failedAutomationRequest->getRequestID());
+
+            sendSharedLmcpObjectBroadcastMessage(ures);
+            std::string errMsg = "ASSIGNMENT FAILED!";
+            UXAS_LOG_INFORM(errMsg);
+            sendErrorMsg(errMsg);
+        }    
+
     } //if(!isError)
     nodeAssignment.reset();
 } //void AssignmentTreeBranchBoundBase::CalculateAssignment()
@@ -718,7 +751,7 @@ void c_Node_Base::printStatus(const std::string& Message)
 {
     double timeSinceStart_s = static_cast<double> (uxas::common::utilities::c_TimeUtilities::getTimeNow_ms() -
             m_staticAssignmentParameters->m_assignmentStartTime_ms) / 1000.0;
-    COUT_INFO_MSG(Message
+    UXAS_LOG_INFORM(Message
                   << "timeSinceStart_s[" << timeSinceStart_s
                   << "] m_vehicleID[" << m_vehicleID
                   << "] cost[" << m_staticAssignmentParameters->m_minimumAssignmentCostCandidate
@@ -739,7 +772,6 @@ void c_Node_Base::ExpandNode()
     //////////////////////////////////////////////////////////////////////////////////
     // check assignment viability and find lower bound on costs of child nodes
     //////////////////////////////////////////////////////////////////////////////////
-    //bool bVehicleAvailable = false; //if all of the vehicles are dead then this is the final assignment node
     bool bTaskAvailable = false; //if there are no tasks to do then this is the final assignment node
 
     // investigate child nodes
@@ -757,18 +789,10 @@ void c_Node_Base::ExpandNode()
         for (auto itVehicleAssignmentState = m_vehicleIdVsAssignmentState.begin(); itVehicleAssignmentState != m_vehicleIdVsAssignmentState.end(); itVehicleAssignmentState++)
         {
             NodeAssignment(itVehicleAssignmentState->second, *itObjectiveID, prerequisiteTaskOptionId);
-            /*if (itVehicleAssignmentState->second->m_isAcceptingNewAssignments)
-            {
-                bVehicleAvailable = true;
-            }
-            else
-            {
-                COUT_INFO_MSG("Vehicle ID[" << itVehicleAssignmentState->first << "] is finished!")
-            }*/
             if (!itVehicleAssignmentState->second->m_isAcceptingNewAssignments)
-			{
-				COUT_INFO_MSG("Vehicle ID[" << itVehicleAssignmentState->first << "] is finished!")
-			}
+            {
+                UXAS_LOG_INFORM("Vehicle ID[" + std::to_string(itVehicleAssignmentState->first) + "] is finished!");
+            }
         }
     } //for(V_INT_IT_t itObjectiveID = vectorOfNextObjectiveIDs.begin(); itObjectiveID != vectorOfNextObjectiveIDs.end(); itObjectiveID++)
 

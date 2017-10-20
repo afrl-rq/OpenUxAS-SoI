@@ -8,7 +8,7 @@
 // ===============================================================================
 
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
+#include "afrl/impact/AreaOfInterest.h"
 
 #include "LmcpObjectNetworkBridgeManager.h"
 #include "LmcpObjectNetworkServer.h"
@@ -41,7 +41,7 @@
 #define ARG_RUN_UNTIL "-runUntil"
 
 #define MAJOR_VERSION "3"
-#define MINOR_VERSION "1"
+#define MINOR_VERSION "2"
 #define PATCH_VERSION "0"
 
 #define BEFORE_LOG_MANAGER_INITIALIZATION_LOG_MESSAGE(message) std::cout << message << std::endl; std::cout.flush();
@@ -84,7 +84,7 @@ main(int argc, char** argv)
         else if (strcmp((const char *) argv[i], ARG_VERSION) == 0)
         {
             auto o = new afrl::cmasi::AirVehicleState;
-            auto p = new afrl::impact::GroundVehicleState;
+            auto p = new afrl::impact::AreaOfInterest;
             std::cout << std::endl << "#######################" << std::endl;
             std::cout << "   VERSION: " << MAJOR_VERSION << "." << MINOR_VERSION << "." << PATCH_VERSION << std::endl;
             std::cout << "     CMASI:  " << o->getSeriesVersion() << std::endl;

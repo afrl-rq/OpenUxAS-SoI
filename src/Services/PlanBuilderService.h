@@ -65,8 +65,8 @@ namespace service
  *  - uxas::messages::task::TaskAssignmentSummary
  *  - uxas::messages::task::TaskImplementationResponse
  *  - afrl::cmasi::AirVehicleState
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::SurfaceVehicleState
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::SurfaceVehicleState
  * 
  * Sent Messages:
  *  - afrl::cmasi::ServiceStatus

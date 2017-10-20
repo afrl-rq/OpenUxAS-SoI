@@ -34,11 +34,11 @@
 
 #include "afrl/cmasi/ServiceStatus.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "afrl/cmasi/RemoveTasks.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -107,12 +107,12 @@ AutomationRequestValidatorService::configure(const pugi::xml_node & ndComponent)
 
     //ENTITY CONFIGURATIONS
     addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
     // ENTITY STATES
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
     // TASKS
     addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskInitialized::Subscription);
@@ -144,15 +144,15 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
         m_availableStateEntityIds.insert(airVehicleState->getID());
         isMessageHandled = true;
     }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
     {
-        auto groundVehicleState = std::static_pointer_cast<afrl::impact::GroundVehicleState>(receivedLmcpMessage->m_object);
+        auto groundVehicleState = std::static_pointer_cast<afrl::vehicles::GroundVehicleState>(receivedLmcpMessage->m_object);
         m_availableStateEntityIds.insert(groundVehicleState->getID());
         isMessageHandled = true;
     }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
     {
-        auto surfaceVehicleState = std::static_pointer_cast<afrl::impact::SurfaceVehicleState>(receivedLmcpMessage->m_object);
+        auto surfaceVehicleState = std::static_pointer_cast<afrl::vehicles::SurfaceVehicleState>(receivedLmcpMessage->m_object);
         m_availableStateEntityIds.insert(surfaceVehicleState->getID());
         isMessageHandled = true;
     }
@@ -168,15 +168,15 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
         m_availableConfigurationEntityIds.insert(airVehicleConfiguration->getID());
         isMessageHandled = true;
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
-        auto groundVehicleConfiguration = std::static_pointer_cast<afrl::impact::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
+        auto groundVehicleConfiguration = std::static_pointer_cast<afrl::vehicles::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
         m_availableConfigurationEntityIds.insert(groundVehicleConfiguration->getID());
         isMessageHandled = true;
     }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
-        auto surfaceVehicleConfiguration = std::static_pointer_cast<afrl::impact::SurfaceVehicleConfiguration>(receivedLmcpMessage->m_object);
+        auto surfaceVehicleConfiguration = std::static_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(receivedLmcpMessage->m_object);
         m_availableConfigurationEntityIds.insert(surfaceVehicleConfiguration->getID());
         isMessageHandled = true;
     }
