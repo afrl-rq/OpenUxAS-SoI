@@ -68,15 +68,12 @@ private:
 class c_TaskInformationStatic
 {
 public:
-    c_TaskInformationStatic(const int64_t& taskId);
+    c_TaskInformationStatic();
     virtual ~c_TaskInformationStatic() { };
 public:
     int64_t getTravelTime_ms(const int64_t& VehicleId);
     /*! \brief  the task cost for each vehicle*/
     std::unordered_map<int64_t, int64_t> m_VehicleIdVsTaskTravelTime;
-private:
-    /*! \brief  task and option ID*/
-    int64_t m_taskOptionId;
 private:
     /*! @name Private: No Copying*/
     c_TaskInformationStatic(const c_TaskInformationStatic& rhs) = delete; //no copying

@@ -202,8 +202,7 @@ private:
     std::shared_ptr<afrl::impact::MultiVehicleWatchTask> m_MultiVehicleWatchTask;
     std::shared_ptr<afrl::cmasi::EntityState> m_watchedEntityStateLast;
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_idVsEntityState;
-    double m_loiterRadius_m = {200.0};
-    int64_t m_commandId{10000};
+
 public:
 
 private:

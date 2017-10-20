@@ -167,11 +167,6 @@ private:
     /*! \brief  buffer for partial strings while converting streams to lmcp messages*/
     std::string m_streamBuffer;
 
-    /*! \brief  number of messages received*/
-    uint32_t m_ui32MessageCount_Receive{0};
-    /*! \brief  number of messages received*/
-    uint32_t m_ui32MessageCount_Receive_0{0};
-
     std::deque<std::shared_ptr<avtas::lmcp::Object> > m_messagesToSend;
     
     /*! \brief  mutex to protect the TCP-IP socket */
