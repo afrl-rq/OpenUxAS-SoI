@@ -1359,8 +1359,8 @@ bool OsmPlannerService::isBuildFullPlot(const std::vector<int64_t>& highWayIds)
             plotStream.close();
             savePythonPlotCode();
         } //if(uxas::common::utilities::c_FileSystemUtilities::bFindUniqueFileName(m_mapEdgesFileNam ...
-        return (isSuccess);
     }
+    return (isSuccess);
 }
 
 bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planningNodeIds,
@@ -1381,7 +1381,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
         auto nodeIds = m_wayIdVsNodeId.equal_range(*itWayId);
         double runningLength_m(0.0);
         auto itLastNode(m_idVsNode->end());
-        bool ifFoundFirstNode(false);
         for (auto itNode = nodeIds.first; itNode != nodeIds.second; itNode++)
         {
             auto itPlanning = planningNodeIds.find(itNode->second);
@@ -1391,7 +1390,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                 if (*itWayId != currentWayId)
                 {
                     itStartId = m_idVsNode->find(itNode->second);
-                    auto itStartIndex = m_nodeIdVsPlanningIndex.find(itNode->second);
                     if (itStartId != m_idVsNode->end())
                     {
                         auto itStartIndex = m_nodeIdVsPlanningIndex.find(itNode->second);
@@ -1399,7 +1397,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                         {
                             currentWayId = *itWayId;
                             startIndex = itStartIndex->second;
-                            ifFoundFirstNode = true;
                             itLastNode = itStartId;
                         }
                         else
