@@ -672,10 +672,10 @@ bool RoutePlannerService::LinearizeBoundary(afrl::cmasi::AbstractGeometry* bound
         double w = rectangle->getWidth();
         double h = rectangle->getHeight();
 
-        poly.push_back(VisiLibity::Point(east + w, north + h).rotate(c, a));
-        poly.push_back(VisiLibity::Point(east - w, north + h).rotate(c, a));
-        poly.push_back(VisiLibity::Point(east - w, north - h).rotate(c, a));
-        poly.push_back(VisiLibity::Point(east + w, north - h).rotate(c, a));
+        poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w/2.0, north + h/2.0) - c, a) + c);
+        poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w/2.0, north + h/2.0) - c, a) + c);
+        poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w/2.0, north - h/2.0) - c, a) + c);
+        poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w/2.0, north - h/2.0) - c, a) + c);
 
         isValid = true;
     }

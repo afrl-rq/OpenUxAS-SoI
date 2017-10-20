@@ -367,6 +367,7 @@ protected: //virtual
     virtual void runCalculateAssignment(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
     /** brief starts the branch and bound assignment. */
     virtual void calculateAssignment(std::unique_ptr<c_Node_Base> nodeAssignment,const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
+    void sendErrorMsg(std::string& errStr);
 
 
 protected:
