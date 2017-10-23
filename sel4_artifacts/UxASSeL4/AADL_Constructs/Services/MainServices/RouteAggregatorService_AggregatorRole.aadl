@@ -57,6 +57,8 @@ thread RouteAggregatorService_AggregatorRole
         ServiceStatus_out: out event data port cmasi::ServiceStatus.i; --This port is not mentioned in the Wiki. Per Derek, it is used for error reporting (or at least can be used for that.)
         RoutePlanRequest_out: out event data port route::RoutePlanRequest.i;
         RouteResponse_out: out event data port route::RouteResponse.i;
+	properties
+		Dispatch_Protocol => Sporadic;
    	annex agree{**
   		-------------------------------------------------------------
   		-- BEGIN STATE MACHINE LOGIC

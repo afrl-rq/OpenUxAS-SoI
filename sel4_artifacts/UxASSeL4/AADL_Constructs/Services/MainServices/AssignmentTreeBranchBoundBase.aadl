@@ -94,7 +94,6 @@ public
             UniqueAutomationRequest_in: in event data port uxtask::UniqueAutomationRequest.i;
             ServiceStatus_out: out event data port cmasi::ServiceStatus.i;
             TaskAssignmentSummary_out: out event data port uxtask::TaskAssignmentSummary.i;
-            
       	annex agree
       	{**
       		

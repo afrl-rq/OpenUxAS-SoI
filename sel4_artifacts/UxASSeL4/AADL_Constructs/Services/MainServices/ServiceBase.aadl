@@ -1,8 +1,8 @@
 package ServiceBase_Pkg
 public
-    
-    thread ServiceBase
-    -- This is the basis of all the services. This inherits from LmcpObjectNetworkClientBase.
-    end ServiceBase;
-    
+	thread ServiceBase
+		-- This is the basis of all the services. This inherits from LmcpObjectNetworkClientBase.
+		properties
+			Dispatch_Protocol => Sporadic;
+	end ServiceBase;
 end ServiceBase_Pkg;

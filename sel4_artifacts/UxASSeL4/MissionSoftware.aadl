@@ -53,16 +53,16 @@ public
 			virtual_machine: thread Virtual_Machine;
 			mission : data mission_command.impl{
 				--TODO this should be a subcomponent reference
-				TB_SYS::CAmkES_Owner_Thread => "Virtual_Machine";
+				TB_SYS::CAmkES_Owner_Thread => "virtual_machine";
 			};
 			waypoint : data mission_command.impl{
 				--TODO this should be a subcomponent reference
-				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
+				TB_SYS::CAmkES_Owner_Thread => "asset_waypoint_manager";
 			};
 			
 			vm_waypoint : data mission_command.impl{
 				--TODO this should be a subcomponent reference
-				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
+				TB_SYS::CAmkES_Owner_Thread => "asset_waypoint_manager";
 			};
 		connections
 			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;

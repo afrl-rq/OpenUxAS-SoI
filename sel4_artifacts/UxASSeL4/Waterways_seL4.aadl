@@ -50,16 +50,34 @@ public
 
 	system implementation top.i
 		subcomponents
-			software: process Mission_Software.i;
+			sel4_software: process Mission_Software.i;
+			vm_software: process Virtual_Machine.i;
 			soi_tk1: processor tk1_som.camkes;
+			
+		connections
+			c1: port vm_software.mission_write -> sel4_software.vm_mission_write;
+			c2: port sel4_software.vm_mission_read -> vm_software.mission_read;
+			c3: port sel4_software.vm_waypoint_write -> vm_software.waypoint_write;
+			c4: port vm_software.waypoint_read -> sel4_software.vm_waypoint_read;
+			
+			c5: subprogram group access sel4_software.clkcarfwd -> vm_software.clkcarfwd;
+			c6: subprogram group access sel4_software.uartfwd -> vm_software.uartfwd;
+			
+			d1: data access vm_software.mission -> sel4_software.mission;
+			d2: data access sel4_software.waypoint_data -> vm_software.waypoint;
+			
 		properties
-			actual_processor_binding => (reference (soi_tk1)) applies to software;   
+			actual_processor_binding => (reference (soi_tk1)) applies to sel4_software;
+			actual_processor_binding => (reference (soi_tk1.linux_vm)) applies to vm_software;
+
 	end top.i;
 
 	processor tk1_som
 	end tk1_som;
 
 	processor implementation tk1_som.camkes
+		subcomponents
+			linux_vm : virtual processor linux_vm.impl;
 	   properties
 	      TB_SYS::OS => CAmkES;
 	      TB_SYS::HW => TK1;
@@ -67,6 +85,19 @@ public
 	end tk1_som.camkes;
 
 	process Mission_Software
+		features
+			vm_mission_write: in event data port Base_Types::Boolean;
+			vm_mission_read : out event data port Base_Types::Boolean;
+			vm_waypoint_write: out event data port Base_Types::Unsigned_32;
+			vm_waypoint_read : in event data port Base_Types::Boolean;
+			mission: requires data access mission_command.impl {
+				Access_Right => READ_WRITE;
+			};
+			waypoint_data: provides data access mission_command.impl {
+						Access_Right => READ_WRITE;
+			};
+			clkcarfwd: provides subprogram group access gen_fwd_inf;
+			uartfwd: provides subprogram group access gen_fwd_inf;
 	end Mission_Software;
 
 	data mission_command
@@ -90,19 +121,15 @@ public
 			uart_driver: thread UART_Driver;
 			asset_waypoint_manager: thread Asset_Waypoint_Manager;
 			waypoint_manager: thread Waypoint_Manager;
-			virtual_machine: thread group Virtual_Machine;
-			mission : data mission_command.impl{
-				--TODO this should be a subcomponent reference
-				TB_SYS::CAmkES_Owner_Thread => "Virtual_Machine";
-			};
+
 			waypoint : data mission_command.impl{
 				--TODO this should be a subcomponent reference
-				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
+				TB_SYS::CAmkES_Owner_Thread => "asset_waypoint_manager";
 			};
 			
 			vm_waypoint : data mission_command.impl{
 				--TODO this should be a subcomponent reference
-				TB_SYS::CAmkES_Owner_Thread => "Asset_Waypoint_Manager";
+				TB_SYS::CAmkES_Owner_Thread => "asset_waypoint_manager";
 			};
 		connections
 			wm2uart: port waypoint_manager.out_uart_packet -> uart_driver.in_uart_packet;
@@ -111,28 +138,24 @@ public
 			
 			-- TODO: Give ports sensible names.
 			
-			e1: port virtual_machine.mission_write -> waypoint_manager.mission_write;
-			e2: port waypoint_manager.mission_read -> virtual_machine.mission_read;
-			e3: port virtual_machine.waypoint_read -> asset_waypoint_manager.waypoint_read_vm;
+			e1: port vm_mission_write -> waypoint_manager.mission_write;
+			e2: port waypoint_manager.mission_read -> vm_mission_read;
+			e3: port vm_waypoint_read -> asset_waypoint_manager.waypoint_read_vm;
 			e4: port waypoint_manager.waypoint_read -> asset_waypoint_manager.waypoint_read_wm;
 			e5: port asset_waypoint_manager.waypoint_write_wm -> waypoint_manager.waypoint_write;
-			e6: port asset_waypoint_manager.waypoint_write_vm -> virtual_machine.waypoint_write;
+			e6: port asset_waypoint_manager.waypoint_write_vm -> vm_waypoint_write;
 			
 			uart_clkcar: subprogram group access uart_driver.clkcar -> clock_driver.clkcar;
-			vm_clk_fwd: subprogram group access virtual_machine.clkcarfwd -> clock_driver.clkcarfwd;
-			vm_uart_fwd: subprogram group access virtual_machine.uartfwd -> uart_driver.uartfwd;
+			vm_clk_fwd: subprogram group access clkcarfwd -> clock_driver.clkcarfwd;
+			vm_uart_fwd: subprogram group access uartfwd -> uart_driver.uartfwd;
 			
 			-- TODO: Give data access sensible names.
-			d1: data access mission -> virtual_machine.mission;
 			d2: data access mission -> waypoint_manager.mission;
 			d3: data access waypoint -> waypoint_manager.waypoint;
 			d5: data access waypoint -> asset_waypoint_manager.waypoint;
-			d6: data access vm_waypoint -> virtual_machine.waypoint;
+			d6: data access vm_waypoint -> waypoint_data;
 			d7: data access vm_waypoint -> asset_waypoint_manager.vm_waypoint;
-			
 
-			
-			
 	end Mission_Software.i;
 
 	thread Clock_Driver
@@ -178,8 +201,22 @@ public
 			TB_SYS::Is_External => true;
 			TB_SYS::CommPrim_Source_Header => "clkcar.idl4";
 	end clkcar_inf;
+	
+	virtual processor linux_vm
+	end linux_vm;
+	
+	virtual processor implementation linux_vm.impl
+		properties
+			TB_SYS::OS => linux;
+			TB_SYS::HW => QEMU;
+					-- Frame_Period => 500 ms;
+					-- Slot_Time => 100 us; 
+					-- Need to add priority to TB_SYS.  TB_SYS::Priority => 7;
+--			Deployment::Execution_Platform => linux32;
+			TB_SYS::Vm_Config_File => "user_code/linux_vm_config.stg";
+	end linux_vm.impl;
 
-	thread group Virtual_Machine
+	process Virtual_Machine
 		features
 			mission_write: out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "mission_write";
@@ -193,7 +230,7 @@ public
 			waypoint_read : out event data port Base_Types::Boolean {
 				TB_SYS::CommPrim_Source_Text => "waypoint_read";
 			};
-			mission: requires data access mission_command.impl {
+			mission: provides data access mission_command.impl {
 				Access_Right => READ_WRITE;
 			};
 			waypoint: requires data access mission_command.impl {
@@ -207,13 +244,7 @@ public
             AirVehicleConfiguration_in: in event data port cmasi::AirVehicleConfiguration.i;
             AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
     		AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
-    		        
-		properties
-			TB_SYS::Is_External => true;
-			Priority => 100;
-			TB_SYS::Thread_Type => Active;
-			TB_SYS::Sends_Events_To => "{{}}";
-			
+
 		annex agree {**
         
        		--Note: We do not accept a new request until the previous request has been responded to.    		
@@ -260,38 +291,45 @@ public
 
 	end Virtual_Machine;
 	
-	thread group implementation Virtual_Machine.i
+	process implementation Virtual_Machine.i
         subcomponents
-            TaskManagerService: thread TaskManagerService_Pkg::TaskManagerService;
-            AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService;
-            RoutePlannerVisibilityService: thread RoutePlannerVisibilityService_Pkg::RoutePlannerVisibilityService;
-            AssignmentTreeBranchBoundService: thread AssignmentTreeBranchBoundService_Pkg::AssignmentTreeBranchBoundService;
-            AutomationDiagramDataService: thread AutomationDiagramDataService_Pkg::AutomationDiagramDataService;
-            WaypointPlanManagerService1: thread WaypointPlanManagerService_Pkg::Sel4WaypointPlanManagerService;
-            PlanBuilderService: thread PlanBuilderService_Pkg::PlanBuilderService;
-            SendMessagesService: thread SendMessagesService_Pkg::SendMessagesService;
-            MessageLoggerDataService: thread MessageLoggerDataService_Pkg::MessageLoggerDataService;
-            AngledAreaSearchTask: thread AngledAreaSearchTask_Package::AngledAreaSearchTask;
-            AssignmentCoordinatorTask: thread AssignmentCoordinatorTask_Package::AssignmentCoordinatorTask;
-            BlockadeTask: thread BlockadeTask_Package::BlockadeTask;
-            CmasiAreaSearchTask: thread CmasiAreaSearchTask_Package::CmasiAreaSearchTask;
-            CmasiLineSearchTask: thread CmasiLineSearchTask_Package::CmasiLineSearchTask;
-            CmasiPointSearchTask: thread CmasiPointSearchTask_Package::CmasiPointSearchTask;
-            CommRelayTask: thread CommRelayTask_Package::CommRelayTask;
-            CordonTask: thread CordonTask_Package::CordonTask;
-            EscortTask: thread EscortTask_Package::EscortTask;
-            ImpactLineSearchTask: thread ImpactLineSearchTask_Package::ImpactLineSearchTask;
-            ImpactPointSearchTask: thread ImpactPointSearchTask_Package::ImpactPointSearchTask;
-            MultiVehicleWatchTask: thread MultiVehicleWatchTask_Package::MultiVehicleWatchTask;
-            OverwatchTask: thread OverwatchTask_Package::OverwatchTask;
-            PatternSearchTask: thread PatternSearchTask_Package::PatternSearchTask;
-            TaskTracker: thread TaskTrackerService_Pkg::TaskTrackerService;
+            TaskManagerService: thread TaskManagerService_Pkg::TaskManagerService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            RoutePlannerVisibilityService: thread RoutePlannerVisibilityService_Pkg::RoutePlannerVisibilityService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            AssignmentTreeBranchBoundService: thread AssignmentTreeBranchBoundService_Pkg::AssignmentTreeBranchBoundService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            AutomationDiagramDataService: thread AutomationDiagramDataService_Pkg::AutomationDiagramDataService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            WaypointPlanManagerService1: thread WaypointPlanManagerService_Pkg::Sel4WaypointPlanManagerService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            PlanBuilderService: thread PlanBuilderService_Pkg::PlanBuilderService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            SendMessagesService: thread SendMessagesService_Pkg::SendMessagesService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            MessageLoggerDataService: thread MessageLoggerDataService_Pkg::MessageLoggerDataService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            AngledAreaSearchTask: thread AngledAreaSearchTask_Package::AngledAreaSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            AssignmentCoordinatorTask: thread AssignmentCoordinatorTask_Package::AssignmentCoordinatorTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            BlockadeTask: thread BlockadeTask_Package::BlockadeTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            CmasiAreaSearchTask: thread CmasiAreaSearchTask_Package::CmasiAreaSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            CmasiLineSearchTask: thread CmasiLineSearchTask_Package::CmasiLineSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            CmasiPointSearchTask: thread CmasiPointSearchTask_Package::CmasiPointSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            CommRelayTask: thread CommRelayTask_Package::CommRelayTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            CordonTask: thread CordonTask_Package::CordonTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            EscortTask: thread EscortTask_Package::EscortTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            ImpactLineSearchTask: thread ImpactLineSearchTask_Package::ImpactLineSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            ImpactPointSearchTask: thread ImpactPointSearchTask_Package::ImpactPointSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            MultiVehicleWatchTask: thread MultiVehicleWatchTask_Package::MultiVehicleWatchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            OverwatchTask: thread OverwatchTask_Package::OverwatchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            PatternSearchTask: thread PatternSearchTask_Package::PatternSearchTask {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            TaskTracker: thread TaskTrackerService_Pkg::TaskTrackerService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
             
---            RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService;
-            RouteAggregatorService_Collector: thread RouteAggregatorService_CollectorRole_Pkg::RouteAggregatorService_CollectorRole;
-            RouteAggregatorService_Aggregator : thread RouteAggregatorService_AggregatorRole_Pkg::RouteAggregatorService_AggregatorRole;
+--            RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            RouteAggregatorService_Collector: thread RouteAggregatorService_CollectorRole_Pkg::RouteAggregatorService_CollectorRole {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
+            RouteAggregatorService_Aggregator : thread RouteAggregatorService_AggregatorRole_Pkg::RouteAggregatorService_AggregatorRole {Priority => 100; Stack_Size => 1024 Bytes; Compute_Execution_Time => 10us .. 50us; TB_SYS::Is_External => true;};
             
-    	connections
+            mission_data : data mission_command.impl{
+				--TODO this should be a subcomponent reference
+				TB_SYS::CAmkES_Owner_Thread => "Virtual_Machine.i";
+			};
+		connections
+			
+			dataconn : data access mission_data -> mission;
+			
     		--New connections
     		conn001: port AutomationRequest_in -> AutomationRequestValidatorService.AutomationRequest_in;
     		conn002: port AutomationRequestValidatorService.AutomationResponse_out -> AutomationResponse_out;
