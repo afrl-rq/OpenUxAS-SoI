@@ -662,10 +662,10 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                     else //if(isSameEdge)
                     {
                         // 4) find distance from start/end points to edge point 
-                        double distanceStartToStart_01(numeric_limits<double>::max());
-                        double distanceStartToStart_02(numeric_limits<double>::max());
-                        double distanceEndToEnd_01(numeric_limits<double>::max());
-                        double distanceEndToEnd_02(numeric_limits<double>::max());
+                        double distanceStartToStart_01((std::numeric_limits<double>::max)());
+                        double distanceStartToStart_02((std::numeric_limits<double>::max)());
+                        double distanceEndToEnd_01((std::numeric_limits<double>::max)());
+                        double distanceEndToEnd_02((std::numeric_limits<double>::max)());
 
                         auto startSegmentNodeId_01 = itSegmentsStart.first->second.first;
                         auto startSegmentNodeId_02 = itSegmentsStart.first->second.second;

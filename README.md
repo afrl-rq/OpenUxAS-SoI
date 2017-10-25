@@ -305,8 +305,8 @@ in the `/3rd` directory by `./prepare`.
    * Verify installation by: `python --version` in `cmd` prompt
    * Verify *pip* is also installed: `pip --version` in `cmd` prompt
    * If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
-1. Install *meson*
-   * In `cmd` prompt **with admin priviledges**: `pip install meson==0.42.1`
+1. Install *meson* (only version 0.41.0 is compatible with Windows build)
+   * In `cmd` prompt **with admin priviledges**: `pip install meson==0.41.0`
 1. Install [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download)
    * Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
 1. Pull UxAS repositories (from Git Bash shell)
