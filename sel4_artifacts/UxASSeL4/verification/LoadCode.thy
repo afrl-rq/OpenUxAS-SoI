@@ -57,6 +57,15 @@ definition is_valid_MissionCommand where
         is_valid_Waypoint_struct_C'ptr s (get_waypoint_ptr_ptr s mcp j)
         \<and> is_valid_Waypoint_struct_C s (get_waypoint_ptr s mcp j)
         \<and> get_waypoint_ptr s mcp j \<noteq> NULL)"
+  
+definition is_valid_MissionCommandExt where 
+  "is_valid_MissionCommandExt s mcep \<equiv> 
+    is_valid_MissionCommandExt_struct_C s mcep
+    \<and> is_valid_MissionCommand s (Ptr &(mcep\<rightarrow>[''missioncommand_C'']))
+    \<and> waypoints_C (heap_MissionCommandExt_struct_C s mcep) \<noteq> NULL
+    \<and> (\<forall> mc. mc = missioncommand_C (heap_MissionCommandExt_struct_C s mcep)
+      \<and> (\<forall> j < unat (waypointslen_C (heap_MissionCommandExt_struct_C s mcep)). 
+        heap_Waypoint_struct_C'ptr s (waypointlist_C mc +\<^sub>p j) = (waypoints_C (heap_MissionCommandExt_struct_C s mcep))  +\<^sub>p j))"  
 
 (* Generally useful lemma." *)
   
@@ -70,7 +79,13 @@ proof -
 qed
 
 lemma [simp]: "j < i \<Longrightarrow> int (unat j) = uint j" by (simp add: uint_nat)
+    
+    
+lemma [simp]: "is_valid_MissionCommand s mcp \<Longrightarrow> is_valid_MissionCommand_struct_C s mcp"
+  using is_valid_MissionCommand_def by auto
 
+lemma [simp]: "is_valid_MissionCommandExt s mcep \<Longrightarrow> is_valid_MissionCommandExt_struct_C s mcep"
+  using is_valid_MissionCommandExt_def by auto
 
 
 end

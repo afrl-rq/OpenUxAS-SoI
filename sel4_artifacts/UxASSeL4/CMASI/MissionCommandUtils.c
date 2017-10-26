@@ -51,50 +51,29 @@ Waypoint * FindWP(const MissionCommand * mcp, const int64_t id) {
   return NULL;
 }
 
-bool MCWaypointSubSequence(const MissionCommand * omcp,
+/* NB: This code will unroll cycles in omcp when creating wmcep. */
+/* ASM: id can be found in omcp. */
+/* ASM: All next ids in the ocmp waypoint list can be found in ocmp. */
+/* ASM: len > 0 */
+/* ASM: waypoints points a valid contiguous chunk of memory. */
+/* ASM: ocmp points to a well-formed(?) mission command. */
+/* ASM: len is less than the number of waypoints that can be stored in waypoints. */
+void MCWaypointSubSequence(const MissionCommand * omcp,
               const int64_t id,
               const uint16_t len,
-              MissionCommandExt * wmcep) {
-  MissionCommand * wmcp = (MissionCommand*)wmcep;
-  uint16_t i = 0;
+              Waypoint * waypoints) {
+  uint16_t i;
   Waypoint * wp = NULL;
   int64_t idit = id;
-  bool loop = true;
-  /* assumption: omcp is not NULL. */
-  assert(omcp != NULL);
-  /* assumption: f is not NULL. */
-  assert(wmcp != NULL);
-  /* assumption: len is not 0. */
-  assert(len > 0)
-
-  /* Ensure that a bad id was not provided. */
-  wp = FindWP(omcp, idit);
-  if(wp == NULL) {
-    DEBUG("Waypoint %ld not found.\n",id);
-    return false;
-  }
-
-  Waypoint ** tmp = wmcp->waypointlist;
-  *wmcp = *omcp;
-  wmcp->waypointlist = tmp;
-  
-  for(i=0; i<len && loop == true; i++) {
-
-    /* assumption: all ids in the waypoint list can be found. */
+  for(i=0; i<len; i++) {
     wp = FindWP(omcp, idit);
-    assert(wp != NULL);
-    wmcep->waypoints[i] = *wp;
-    if(wp->number == wp->nextwaypoint) {
-      i++;
-      loop = false;
-    } else {
-      idit = wp->nextwaypoint;
+    waypoints[i] = *wp;
+    if(i == len - 1) {
+      waypoints[i].nextwaypoint = waypoints[i].number;
     }
+    idit = wp->nextwaypoint;
   }  
-  wmcp->waypointlist_ai.length = i;
-  wmcp->waypointlist[i - 1]->nextwaypoint = wmcp->waypointlist[i - 1]->number;
-  wmcp->firstwaypoint = id;
-  return true;
+  return;
 }
 
 bool GetMCWaypointSubSequence(const MissionCommand * omcp,
@@ -166,9 +145,10 @@ bool GetMCWaypointSubSequence(const MissionCommand * omcp,
     }
 
     if( wp->number == ap_id ) {
-      bool flag = MCWaypointSubSequence(omcp, it_id, len, wmcep);
+      MCWaypointSubSequence(omcp, it_id, len, wmcep->waypoints);
+      wmcep->missioncommand.waypointlist_ai.length = len;
       wmcep->missioncommand.firstwaypoint = ap_id;
-      return flag;
+      return true;
     }
     last_visited_id = it_id;
     it_id = wp->nextwaypoint;
@@ -341,12 +321,18 @@ bool ExhaustiveTest(MissionCommand * omcp) {
   for(uint16_t i = 2 ; i <= omcp->waypointlist_ai.length ; i++) {
     int64_t last_subseq_id = omcp->firstwaypoint;
     MCEInit(&smce,i);
-
+    Waypoint ** tmp = smce.missioncommand.waypointlist;
+    smce.missioncommand = *omcp;
+    smce.missioncommand.waypointlist = tmp;
+    
+    
     for(uint16_t j = 1 ; j < i ; j++) {
-      RETURNONFAIL(MCWaypointSubSequence(omcp,
-                                         omcp->firstwaypoint,
-                                         i,
-                                         & smce));
+      MCWaypointSubSequence(omcp,
+                            omcp->firstwaypoint,
+                            i,
+                            smce.waypoints);
+      smce.missioncommand.waypointlist_ai.length = i;
+      smce.missioncommand.firstwaypoint = omcp->firstwaypoint;
       RETURNONFAIL(CheckMCWaypointSubSequence(omcp,
                                               smcp,
                                               omcp->firstwaypoint,
@@ -355,11 +341,14 @@ bool ExhaustiveTest(MissionCommand * omcp) {
       last_subseq_id = omcp->firstwaypoint;
       wp = FindWP(omcp,last_subseq_id);
       RETURNONFAIL(wp != NULL);
-      RETURNONFAIL(GetMCWaypointSubSequence(omcp,
-                                            last_subseq_id,
-                                            wp->number,
-                                            i,
-                                            &smce) != true);
+      GetMCWaypointSubSequence(omcp,
+                               last_subseq_id,
+                               wp->number,
+                               i,
+                               &smce);
+      smce.missioncommand.waypointlist_ai.length = i;
+      smce.missioncommand.firstwaypoint = wp->number;
+      
 
       uint16_t c = 0;
       uint16_t n = 0;

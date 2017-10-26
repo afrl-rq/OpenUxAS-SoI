@@ -3,8 +3,16 @@ theory ImplToFunSpec imports
 "WaypointManagerFunSpec"
 begin
 
-interpretation WaypointManager get_waypoint_number nextwaypoint_C done
+definition nextwp_update where
+"nextwp_update w i \<equiv>   nextwaypoint_C_update (\<lambda> _. i) w"
 
+interpretation WaypointManager get_waypoint_number nextwaypoint_C nextwp_update
+  apply unfold_locales
+    apply (auto simp add: nextwp_update_def)
+  using Waypoint_struct_C_accupd_diff(131) get_waypoint_number_def nextwp_update_def apply presburger  
+  done
+    
+    
 (* Lift waypoints from a mission command into a list with the same order. *)
 fun lift_waypoints  where
   "lift_waypoints s mcp 0 = []"
@@ -67,7 +75,8 @@ lemma findwp_success:
   \<and> Some w = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i
   \<and> P s\<rbrace>
    LoadCode.MissionCommandUtils.FindWP' mcp i
-\<lbrace> \<lambda> r s. heap_Waypoint_struct_C s r = w \<and> P s\<rbrace>!"
+\<lbrace> \<lambda> r s.   is_valid_MissionCommand s mcp
+  \<and> Some w = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i \<and> P s \<and> heap_Waypoint_struct_C s r = w\<rbrace>!"
   apply (unfold LoadCode.MissionCommandUtils.FindWP'_def)
   apply (simp add: skipE_def)
   apply(subst whileLoopE_add_inv
@@ -120,16 +129,17 @@ lemma findwp_failure:
     
 lemma findwp_to_funspec:
 "\<lbrace> \<lambda> (s::lifted_globals).
-  P s
-  \<and> is_valid_MissionCommand s mcp\<rbrace>
+  is_valid_MissionCommand s mcp
+  \<and> P s \<rbrace>
   LoadCode.MissionCommandUtils.FindWP' mcp i
 \<lbrace> \<lambda> r s. 
-  P s 
-  \<and> r = NULL \<longrightarrow> None = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i
+  
+  r = NULL \<longrightarrow> None = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i
   \<and> r \<noteq> NULL 
     \<longrightarrow> is_valid_Waypoint_struct_C s r 
         \<and> Some (heap_Waypoint_struct_C s r) 
-          = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i \<rbrace>!"
+          = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i 
+  \<and> P s\<rbrace>!"
  apply (unfold LoadCode.MissionCommandUtils.FindWP'_def)
  apply (simp add: skipE_def)
  apply(subst whileLoopE_add_inv
@@ -148,42 +158,132 @@ lemma findwp_to_funspec:
     apply (metis find_waypoint_extend_failure get_waypoint_number_def inc_le)
     apply blast
   apply wp
-  using find_waypoint_def is_valid_MissionCommand_def by auto
+  using find_waypoint_def is_valid_MissionCommand_def by auto    
 
-lemma findwp_changes_nothing[wp]:
-"\<lbrace> \<lambda> (s::lifted_globals).
-  P s\<rbrace>
-  LoadCode.MissionCommandUtils.FindWP' mcp i
-\<lbrace> \<lambda> r s. P s \<rbrace>!"
-  sorry    
+lemma max_word16[simp]:"(max_word::16 word) = 65535"    
+  apply(unfold max_word_def) by auto
+
+lemma word16_leq_max_word16:"uint (a::16 word) \<le> 65535"
+  using word.uint[of a] by auto
+    
+lemma word16_leq_max_word32:"uint (a::16 word) \<le> 2147483648"
+  using word.uint[of a] by auto
+    
+theorem validNF_bind_return:"\<lbrace> A \<rbrace> g f \<lbrace>B\<rbrace>! \<Longrightarrow> \<lbrace>A\<rbrace> (return f) >>= g \<lbrace>B\<rbrace>!"   
+  apply (rule validNF_bind[ where B="\<lambda> r s. A s \<and> r = f"])
+   apply (simp add: triple_judgement_def validNF_is_triple)
+    by (smt hoare_return_simp no_fail_pre no_fail_return validNF)
+
+theorem validNF_bind_gets:"\<forall> r. \<lbrace> \<lambda> s. A s \<and> r = f s \<rbrace> g r \<lbrace>B\<rbrace>! \<Longrightarrow> \<lbrace>A\<rbrace> do x \<leftarrow> gets f; g x od\<lbrace>B\<rbrace>!"   
+  apply (rule validNF_bind[ where B="\<lambda> r s. A s \<and> r = f s"])
+   apply simp
+  by (simp add: hoare_gets validNF)
+
+theorem validNF_ignbind_modify:"\<forall> s. A (f s) = A s \<Longrightarrow> \<forall> r. \<lbrace> \<lambda> s. A (f s) \<rbrace> g \<lbrace>B\<rbrace>! \<Longrightarrow> \<lbrace>A\<rbrace> do x \<leftarrow> modify f; g od\<lbrace>B\<rbrace>!"   
+  apply (rule validNF_bind[ where B="\<lambda> r s. A (f s)"])
+   apply simp
+    by (metis hoare_modifyE_var no_fail_def no_fail_modify validNF)
+      
+      
+lemma validNF_nobind_guard:" \<forall> s. P s \<longrightarrow> Q s \<Longrightarrow> \<lbrace> P \<rbrace> S \<lbrace> R \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do guard Q; S od \<lbrace> R \<rbrace>!"
+  apply wp by (simp add: guard_def validNF_alt_def)
+    
+lemma validNF_bind_guard:" \<forall> s. P s \<longrightarrow> Q s \<Longrightarrow> \<lbrace> P \<rbrace> S  \<lbrace> R \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> guard Q; S od \<lbrace> R \<rbrace>!"
+  apply wp by (simp add: guard_def validNF_alt_def)
+    
+lemma validNF_bind_FindWP:
+"\<forall> r. \<lbrace>\<lambda> s. is_valid_MissionCommand s mcp \<and> Some w = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i \<and> P s \<and> heap_Waypoint_struct_C s r = w\<rbrace> S r \<lbrace> R \<rbrace>! 
+\<Longrightarrow> \<lbrace> \<lambda> s. is_valid_MissionCommand s mcp \<and> Some w = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i \<and> P s\<rbrace> do x  \<leftarrow> LoadCode.MissionCommandUtils.FindWP' mcp i; S x od \<lbrace> R \<rbrace>!"
+  apply (rule validNF_bind[where B="\<lambda> r s. is_valid_MissionCommand s mcp \<and> Some w = find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i \<and> P s \<and> heap_Waypoint_struct_C s r = w"])
+   apply auto
+  by (rule findwp_success)
+  
+lemma test:"(\<forall> s. P s \<longrightarrow> (\<exists> w. find_waypoint (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i = Some w))
+\<Longrightarrow> (\<forall> s. P s \<longrightarrow> (\<forall> r. (heap_Waypoint_struct_C s r) = w \<and> Q r s)) \<Longrightarrow>
+\<lbrace>  P \<rbrace> MissionCommandUtils.FindWP' mcp i \<lbrace> Q \<rbrace>!"
+  sorry
+        
+lemma validNF_bind_rev: "\<lbrace>A\<rbrace> f \<lbrace>B\<rbrace>! \<Longrightarrow> (\<And>x. \<lbrace>B x\<rbrace> g x \<lbrace>C\<rbrace>!) \<Longrightarrow> \<lbrace>A\<rbrace> f >>= g \<lbrace>C\<rbrace>!"
+  by (rule validNF_bind)
+
+(* Structures must be packed! *)
+lemma ac_bug_nextwaypoint_update[simp]:"P s[wsp +\<^sub>p j \<rightarrow>nextwaypoint :=  w] = P s[wsp +\<^sub>p j := LoadCode.Waypoint_struct_C.nextwaypoint_C_update (\<lambda> _. w) (heap_Waypoint_struct_C s (wsp +\<^sub>p j))]"
+  sorry
+    
+lemma ac_bug_number_fetch[simp]:"s[wsp +\<^sub>p (uint n - 1)]\<rightarrow>number = number_C (heap_Waypoint_struct_C s (wsp +\<^sub>p (uint n - 1)))"
+  sorry
+ 
+(*    
+lemma aux:
+  assumes asm1:"0 < n"
+  and asm2:"\<forall>s v j. j < unat (n::word16) \<longrightarrow> P s[(wsp::Waypoint_struct_C ptr) +\<^sub>p int j := v] = P s"
+  and asm3:"P s"
+  shows "P (LoadCode.MissionCommandUtils.update_Waypoint_struct s (wsp +\<^sub>p (uint n - 1)) w)"
+proof -
+  have y1:"unat (n - 1) < unat n" using asm1 measure_unat by force
+  then have y2:"P s[wsp +\<^sub>p int (unat n - 1) := w]" using asm3 asm1 asm2 unat_minus_one word_neq_0_conv by fastforce
+  then have "int (unat n - 1) = uint n - 1" 
+    by (metis (no_types, hide_lams) cancel_comm_monoid_add_class.diff_cancel nat_less_cases' not_less of_nat_1 of_nat_diff of_nat_less_iff semiring_1_class.of_nat_0 uint_nat uint_nonnegative y1)      
+  thus ?thesis using y2 by auto
+qed
+*)  
+lemma nextwp_update_rewrite[simp]:"nextwaypoint_C_update (\<lambda>_. get_waypoint_number s[wsp +\<^sub>p j]) s[wsp +\<^sub>p j] 
+              = nextwp_update s[wsp +\<^sub>p j] (get_waypoint_number s[wsp +\<^sub>p j])"
+  sorry
+  
+lemma aux2:"              0 < n \<Longrightarrow>
+              is_valid_MissionCommand s mcp \<Longrightarrow>
+              Some win = waypoints_window (lift_waypoints s mcp (unat (get_waypoints_length s mcp))) i (unat n) 
+\<Longrightarrow> nextwp_update sa[wsp +\<^sub>p (uint n - 1)] (get_waypoint_number sa[wsp +\<^sub>p (uint n - 1)]) = win ! j"    
+  sorry
+
+lemma aux3:" 0 < (n::word16) \<Longrightarrow> INT_MIN < uint n"
+  sorry
+
+lemma aux4:"uint (n::word16) \<le> 2147483648"
+  sorry
+
+lemma aux5:"-2147483648 < uint (n::word16) "
+  sorry
+    
+lemma aux6:"0 < n \<Longrightarrow> \<forall>k<unat n. is_valid_Waypoint_struct_C sa (wsp +\<^sub>p int k) \<Longrightarrow> is_valid_Waypoint_struct_C sa (wsp +\<^sub>p (uint n - 1))"
+  by (metis One_nat_def Suc_diff_1 le_less lessI neq0_conv of_nat_1 of_nat_diff uint_nat unat_0 word_less_nat_alt zero_less_diff)
     
 lemma MCWaypointSubSequence_to_funspec:
-"\<lbrace> \<lambda> (s::lifted_globals).
-  is_valid_MissionCommand s mcp
-  \<and> is_valid_MissionCommand s (ptr_coerce mcpe)
+"(\<forall> s v j. j < unat n \<longrightarrow> P (LoadCode.MissionCommandUtils.update_Waypoint_struct s (wsp +\<^sub>p j) v) = P s) \<Longrightarrow>
+  \<lbrace>\<lambda> (s::lifted_globals). 
+  n > 0
+  \<and> is_valid_MissionCommand s mcp
   \<and> ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))
-  \<and> Some w = find_waypoint ws i
-  \<and> waypoints_wf ws
-  \<and> n > 0
-\<rbrace>
-  LoadCode.MissionCommandUtils.MCWaypointSubSequence' mcp i n mcpe 
-\<lbrace> \<lambda> r s. r = r \<rbrace>!"    
- apply (unfold LoadCode.MissionCommandUtils.MCWaypointSubSequence'_def)
-     apply(subst validNF_whileLoop_inv_measure
-      [where 
-          M = "\<lambda> ((i,idit,wp),s). unat (n - i)"
-          and I = 
-            "\<lambda> (j,idit,wp) s. 
-j \<le> n
-\<and> j \<ge> 0
-\<and> is_valid_MissionCommand s mcp
-\<and> \<not> Option.is_none (find_waypoint ws (of_int idit))
-  \<and> ws = lift_waypoints s mcp (unat (get_waypoints_length s mcp))
-  \<and> Some w = find_waypoint ws i
-  \<and> waypoints_wf ws
-  \<and> n > 0
-"
-      ])
-  using findwp_changes_nothing apply wp
+  \<and> Some win = waypoints_window ws i (unat n)
+  \<and> is_valid_Waypoint_struct_C s wsp
+  \<and> (\<forall> j. j < unat n \<longrightarrow> is_valid_Waypoint_struct_C s (wsp +\<^sub>p j))
+  \<and> P s \<rbrace>
+  LoadCode.MissionCommandUtils.MCWaypointSubSequence' mcp i n wsp 
+\<lbrace> \<lambda> r s. 
+  P s 
+  \<and> (\<forall> j. j < unat n \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p j) = win ! j) \<rbrace>!"
+  apply (rule validNF_assume_pre)
+  apply (unfold LoadCode.MissionCommandUtils.MCWaypointSubSequence'_def)
+  apply (subst whileLoop_add_inv[
+        where I="\<lambda>(j, idit) s. 
+  j \<le> n
+  \<and> is_valid_MissionCommand s mcp
+  \<and> (\<exists> win'. Some win' = waypoints_window ws i (unat j) \<and> prefix win' win)
+  \<and> is_valid_Waypoint_struct_C s wsp
+  \<and> (\<forall> k. k < unat j \<longrightarrow> is_valid_Waypoint_struct_C s (wsp +\<^sub>p k))
+  \<and> P s" 
+          and M="\<lambda>((i, idit),s).  unat n - unat i"],clarsimp)
 
+      apply (rule validNF_bind[where B="\<lambda> (j,idit) s. P s 
+  \<and> j = n
+  \<and> is_valid_Waypoint_struct_C s wsp
+  \<and> (\<forall> k. k < unat n \<longrightarrow> is_valid_Waypoint_struct_C s (wsp +\<^sub>p k))
+  \<and> (\<forall> j. j < unat n \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p j) = win ! j)"])
+   apply wp
+   apply (simp add: Product_Type.prod.case_eq_if)
+   sorry
+    
+  (* Trying to work forward. *)
+    
 end

@@ -17,10 +17,10 @@ struct MissionCommandExt_struct{
 typedef struct MissionCommandExt_struct MissionCommandExt;
 
 void MCEInit(MissionCommandExt * mce, uint16_t waypoints);
-bool MCWaypointSubSequence(const MissionCommand * omcp,
+void MCWaypointSubSequence(const MissionCommand * omcp,
                            const int64_t id,
                            const uint16_t len,
-                           MissionCommandExt * wmcp);
+                            Waypoint * waypoints);
 bool GetMCWaypointSubSequence(const MissionCommand * omcp,
                               const int64_t last_prefix_start_id,
                               const int64_t ap_id,
