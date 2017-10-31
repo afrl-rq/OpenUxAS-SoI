@@ -69,12 +69,18 @@ RouteAggregatorService::configure(const pugi::xml_node& ndComponent)
     // track states and configurations for assignment cost matrix calculation
     // [EntityStates] are used to calculate costs from current position to first task
     // [EntityConfigurations] are used for nominal speed values (all costs are in terms of time to arrive)
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
+    
+    //ENTITY CONFIGURATIONS
+    addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     // track requests to kickoff matrix calculation
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -115,7 +121,7 @@ RouteAggregatorService::processReceivedLmcpMessage(std::unique_ptr<uxas::communi
         auto rreq = std::static_pointer_cast<uxas::messages::route::RouteRequest>(receivedLmcpMessage->m_object);
         HandleRouteRequest(rreq);
     }
-    else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
@@ -133,7 +139,7 @@ RouteAggregatorService::processReceivedLmcpMessage(std::unique_ptr<uxas::communi
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_surfaceVehicles.insert(id);
     }
-    else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);

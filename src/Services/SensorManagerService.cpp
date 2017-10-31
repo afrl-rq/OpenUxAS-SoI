@@ -17,9 +17,8 @@
 
 #include "SensorManagerService.h"
 
-#include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/vehicles/GroundVehicleConfiguration.h"
-#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityConfigurationDescendants.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/CameraConfiguration.h"
 #include "afrl/cmasi/RemoveTasks.h"
@@ -79,10 +78,12 @@ SensorManagerService::configure(const pugi::xml_node& ndComponent)
     std::string strComponentType = ndComponent.attribute(STRING_XML_TYPE).value();
     //assert(strComponentType==STRING_XML_COMPONENT_TYPE)
     addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
-
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
+    
+    //ENTITY CONFIGURATIONS
+    addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
 
     addSubscriptionAddress(uxas::messages::task::SensorFootprintRequests::Subscription);
 

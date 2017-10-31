@@ -125,18 +125,17 @@ BatchSummaryService::configure(const pugi::xml_node & ndComponent)
         }
     }
 
-
-    // track states for watch task location prediction
+    //ENTITY CONFIGURATIONS
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::RadioTowerConfiguration::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
-    addSubscriptionAddress(afrl::impact::RadioTowerState::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
     addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
@@ -205,7 +204,7 @@ BatchSummaryService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
             m_towerRanges[id].second = rs->getEnabled();
         }
     }
-    else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);

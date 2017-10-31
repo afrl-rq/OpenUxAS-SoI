@@ -62,14 +62,18 @@ RoutePlannerService::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
     addSubscriptionAddress(afrl::impact::WaterZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
+    
+    //ENTITY CONFIGURATIONS
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
     
     // service 'global' path planning requests (system assumes aircraft)
     addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
@@ -108,7 +112,7 @@ RoutePlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         // no region update for generic entities
     }
-    else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
@@ -139,13 +143,13 @@ RoutePlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicat
         }
         m_surfaceVehicles.insert(id);
     }
-    else if (afrl::cmasi::isEntityConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::cmasi::isEntityConfiguration(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
         // no region update for generic entities
     }
-    else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
@@ -282,7 +286,7 @@ void RoutePlannerService::BuildVisibilityRegion(std::shared_ptr<afrl::cmasi::Ope
 
 void RoutePlannerService::UpdateRegions(std::shared_ptr<avtas::lmcp::Object> msg)
 {
-    if (afrl::cmasi::isAirVehicleState(msg.get()))
+    if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(msg))
     {
         std::shared_ptr<afrl::cmasi::AirVehicleState> avstate = std::static_pointer_cast<afrl::cmasi::AirVehicleState>(msg);
         for (auto r = m_operatingRegions.begin(); r != m_operatingRegions.end(); r++)

@@ -20,9 +20,7 @@
 #include "FileSystemUtilities.h"
 
 #include "afrl/cmasi/EntityState.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/vehicles/GroundVehicleState.h"
-#include "afrl/vehicles/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -94,10 +92,12 @@ AutomationDiagramDataService::configure(const pugi::xml_node& ndComponent)
 
     std::string strComponentType = ndComponent.attribute(STRING_XML_TYPE).value();
     //assert(strComponentType==STRING_XML_COMPONENT_TYPE)
-    //STATES
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     //AUTOMATION
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
