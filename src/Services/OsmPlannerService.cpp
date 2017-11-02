@@ -145,7 +145,7 @@ OsmPlannerService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(uxas::common::MessageGroup::GroundPathPlanner());
 
     // need to keep track of all ground vehicles and their configurations for proper speed setting
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
 
     // only the ground planner can fulfill this request, response (as typical) will be limited-cast back
     addSubscriptionAddress(uxas::messages::route::EgressRouteRequest::Subscription);
@@ -221,9 +221,10 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
                                                    newResponse);
         }
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object))
+
+    else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
-        auto config = std::static_pointer_cast<afrl::impact::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
+        auto config = std::static_pointer_cast<afrl::vehicles::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
         m_entityConfigurations[config->getID()] = config;
     }
     else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object))
@@ -1358,8 +1359,8 @@ bool OsmPlannerService::isBuildFullPlot(const std::vector<int64_t>& highWayIds)
             plotStream.close();
             savePythonPlotCode();
         } //if(uxas::common::utilities::c_FileSystemUtilities::bFindUniqueFileName(m_mapEdgesFileNam ...
-        return (isSuccess);
     }
+    return (isSuccess);
 }
 
 bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planningNodeIds,
@@ -1380,7 +1381,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
         auto nodeIds = m_wayIdVsNodeId.equal_range(*itWayId);
         double runningLength_m(0.0);
         auto itLastNode(m_idVsNode->end());
-        bool ifFoundFirstNode(false);
         for (auto itNode = nodeIds.first; itNode != nodeIds.second; itNode++)
         {
             auto itPlanning = planningNodeIds.find(itNode->second);
@@ -1390,7 +1390,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                 if (*itWayId != currentWayId)
                 {
                     itStartId = m_idVsNode->find(itNode->second);
-                    auto itStartIndex = m_nodeIdVsPlanningIndex.find(itNode->second);
                     if (itStartId != m_idVsNode->end())
                     {
                         auto itStartIndex = m_nodeIdVsPlanningIndex.find(itNode->second);
@@ -1398,7 +1397,6 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                         {
                             currentWayId = *itWayId;
                             startIndex = itStartIndex->second;
-                            ifFoundFirstNode = true;
                             itLastNode = itStartId;
                         }
                         else

@@ -1,3 +1,505 @@
-\section{Dependencies}
-\section{Supported platforms}
-\section{Compilation guide}
+\section{Dependencies}\label{dependencies}
+
+The primary tools and dependencies to obtain, build, document, and
+simulate UxAS are:
+
+\begin{itemize}
+\item
+  Git
+\item
+  OpenGL
+\item
+  UUID library
+\item
+  Boost
+\item
+  Python 3
+\item
+  Meson
+\item
+  Ninja
+\item
+  LmcpGen
+\item
+  OpenAMASE (optional, simulation)
+\item
+  NetBeans with Java JDK (optional, simulation)
+\item
+  Doxygen (optional, documentation)
+\item
+  LaTeX (optional, documentation)
+\end{itemize}
+
+The UxAS build system will download and compile the following external
+libraries
+
+\begin{itemize}
+\item
+  Google Test (gTest)
+\item
+  ZeroMQ (zeromq, czmq, cppzmq, zyre)
+\item
+  SQLite
+\item
+  Zlib
+\item
+  Minizip
+\item
+  Serial
+\end{itemize}
+
+Libraries for XML and GPS message parsing have numerous forks without
+centralized repository control. Code to build the following libraries is
+included with UxAS.
+
+\begin{itemize}
+\item
+  PugiXML
+\item
+  TinyGPS
+\end{itemize}
+
+\section{Supported platforms}\label{supported-platforms}
+
+For an Ubuntu 16.04 or Mac OS X system with the listed prerequisite
+tools installed, UxAS should build from source without issue. Support
+for Windows is available on Windows 7 and 10 using Visual Studio.
+
+\subsection{Installing Prerequisite Tools on Ubuntu Linux -or- Mac OS X
+(Partially-Automated)}\label{installing-prerequisite-tools-on-ubuntu-linux--or--mac-os-x-partially-automated}
+
+The following is a bash script that helps to partially-automation the
+``installing prerequisite tools'' processes that are documented in this
+README.md file below.
+
+This has been tested-working on Ubuntu 16.04, as of 2017-05-23
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Download the script from the OpenUxAS repository
+  (install\_most\_deps.sh) OR cd to your git clone d OpenUxAS directory
+\item
+  Run the script at the terminal: ./install\_most\_deps.sh
+\item
+  Follow the on-screen instructions
+\end{enumerate}
+
+Note that the most up-to-date instructions on the dependencies-needed
+for UxAS are available below.
+
+\subsection{Installing Prerequisite Tools on Ubuntu
+Linux}\label{installing-prerequisite-tools-on-ubuntu-linux}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Install git: in terminal
+
+  \begin{itemize}
+  \item
+    sudo apt-get install git
+  \item
+    sudo apt-get install gitk
+  \end{itemize}
+\item
+  Install OpenGL development headers: in terminal
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo apt-get install libglu1-mesa-dev
+  \end{itemize}
+\item
+  Install unique ID creation library: in terminal
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo apt-get install uuid-dev
+  \end{itemize}
+\item
+  Install Boostlibraries (\textbf{optional but recommended}; see
+  external dependencies section): in terminal
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo apt-get install libboost-filesystem-dev libboost-regex-dev
+    libboost-system-dev
+  \end{itemize}
+\item
+  Install doxygen and related packages \textbf{optional}: in terminal
+
+  \begin{itemize}
+  \item
+    sudo apt-get install doxygen
+  \item
+    sudo apt-get install graphviz
+  \item
+    sudo apt-get install texlive
+  \item
+    sudo apt-get install texlive-latex-extra
+  \end{itemize}
+\item
+  Install pip3: in terminal
+
+  \begin{itemize}
+  \item
+    sudo apt install python3-pip
+  \item
+    sudo -H pip3 install --upgrade pip
+  \end{itemize}
+\item
+  Install ninja build system: in terminal
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo -H pip3 install ninja
+  \end{itemize}
+\item
+  Install meson build configuration: in terminal
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo -H pip3 install meson
+  \end{itemize}
+\item
+  Ensure dependency search for meson is supported: in terminal
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo apt-get install pkg-config
+  \end{itemize}
+\item
+  Install python plotting capabilities (\textbf{optional}): in terminal
+
+  \begin{itemize}
+  \item
+    sudo apt install python3-tk
+  \item
+    sudo -H pip3 install matplotlib
+  \item
+    sudo -H pip3 install pandas
+  \end{itemize}
+\item
+  Install NetBeans and Oracle Java JDK (\textbf{optional})
+
+  \begin{itemize}
+  \item
+    Download the Linux x64 version
+  \item
+    Run downloaded install script. In terminal: cd ~Downloads; sh
+    jdk-9u131-nb-8\_w-linux-x64.sh
+  \item
+    Click Next three times, then Install
+  \end{itemize}
+\item
+  Enable C/C++ plug-in in NetBeans (\textbf{optional})
+
+  \begin{itemize}
+  \item
+    Open NetBeans (in Ubuntu search, type NetBeans)
+  \item
+    Choose Tools-\textgreater{}Plugins from the top menu
+  \item
+    In the Available Plugins tab, search for C++
+  \item
+    Select C/C++ and click Install
+  \end{itemize}
+\item
+  Install Oracle Java run-time (required from LmcpGen): in terminal
+
+  \begin{itemize}
+  \item
+    sudo add-apt-repository ppa:webupd8team/java
+  \item
+    sudo apt update; sudo apt install oracle-java8-installer
+  \item
+    sudo apt install oracle-java8-set-default
+  \end{itemize}
+\end{enumerate}
+
+\subsection{Installing Prerequisites on Mac OS
+X}\label{installing-prerequisites-on-mac-os-x}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Install XCode
+\item
+  Enable commandline tools. In terminal: xcode-select --install
+\item
+  Install homebrew (must be administrator). In terminal: sudo ruby -e
+  ``\$(curl5 -fsSL
+  https://raw.githubusercontent.com/Homebrew/install/master/install)''
+\item
+  Add homebrew to path. In terminal: echo \$(export
+  Path=``/usr/local/bin:\$PATH'') \textgreater{}\textgreater{}
+  ~/.bash\_profile
+\item
+  Install git. In termin0al: brew install git
+\item
+  Install unique ID library. In terminal: brew install ossp-uuid
+\item
+  Install Boost library and configure it in a fresh shell. In terminal:
+
+  \begin{itemize}
+  \item
+    brew install boost
+  \item
+    echo 'export BOOST\_ROOT=/usr/local' \textgreater{}\textgreater{}
+    ~/.bash\_profile
+  \item
+    bash
+  \end{itemize}
+\item
+  Install doxygen and related packages (\textbf{optional}). In terminal:
+
+  \begin{itemize}
+  \item
+    brew install doxygen
+  \item
+    brew install graphviz
+  \item
+    brew cask install mactex
+  \end{itemize}
+\item
+  Install pip3. In terminal:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    brew install python3
+  \end{itemize}
+\item
+  Install nonja build system. In terminal:
+
+  \begin{itemize}
+  \item
+    brew install cmake
+  \item
+    brew install pkg-config
+  \item
+    sudo -H pip3 install scikit-build
+  \item
+    sudo -H pip3 install ninja
+  \end{itemize}
+\item
+  Install meson build configuration. In terminal:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sudo -H pip3 install meson
+  \end{itemize}
+\item
+  Install python plotting capabilities (\textbf{optional}). In terminal:
+
+  \begin{itemize}
+  \item
+    sudo -H pip3 install matplotlib
+  \item
+    sudo -H pip3 install pandas
+  \end{itemize}
+\item
+  Install Oracle Java run-time(required for LmcpGen)
+\item
+  Install NetBeans and Oracle JAva JDK (\textbf{optional})
+
+  \begin{itemize}
+  \item
+    Download the Mac OSX version
+  \item
+    Install .dmg
+  \end{itemize}
+\item
+  Enable C++ plug-in in NetBeans (\textbf{optional})
+
+  \begin{itemize}
+  \item
+    Open NetBeans
+  \item
+    Choose Tools-\textgreater{}Plugins from the top menu
+  \item
+    In the Available Plugins tab, search for C++
+  \item
+    Select C/C++ and click Install
+  \end{itemize}
+\end{enumerate}
+
+\subsection{Prep and Build on Native
+Windows}\label{prep-and-build-on-native-windows}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Install \href{https://www.visualstudio.com/downloads/}{Visual Studio
+  2017 Community Edition}
+
+  \begin{itemize}
+  \item
+    Ensure C++ selected in \texttt{Workloads} tab
+  \item
+    Ensure \texttt{Git\ for\ Windows} is selected in
+    \texttt{Individual\ components} tab
+  \end{itemize}
+\item
+  Install \href{https://git-scm.com/download/win}{Git} with Bash shell
+\item
+  Install
+  \href{https://www.python.org/ftp/python/3.6.1/python-3.6.1.exe}{Python
+  3}
+
+  \begin{itemize}
+  \item
+    Make sure to check \texttt{Add\ Python\ 3.6\ to\ PATH}
+  \item
+    Choose standard install (\texttt{Install\ Now}, requires admin)
+  \item
+    Verify installation by: \texttt{python\ \ \ \ -\/-version} in
+    \texttt{cmd} prompt
+  \item
+    Verify \emph{pip} is also installed: \texttt{pip\ -\/-version} in
+    \texttt{cmd} prompt
+  \item
+    If unable to get python on path, follow
+    \href{https://stackoverflow.com/questions/23400030/windows-7-add-path}{this
+    answer} using location
+    \texttt{C:\textbackslash{}Users\textbackslash{}{[}user{]}\textbackslash{}AppData\textbackslash{}Local\textbackslash{}Programs\textbackslash{}Python\textbackslash{}Python36-32\textbackslash{}}
+  \end{itemize}
+\item
+  Install \emph{meson}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    In \texttt{cmd} prompt \textbf{with admin priviledges}:
+    \texttt{pip\ install\ meson}
+  \end{itemize}
+\item
+  Install
+  \href{https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download}{Boost}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Note: the above link is for VS2017 pre-compiled libraries. To
+    compile from source, you must install at the location:
+    \texttt{C:\textbackslash{}local\textbackslash{}boost\_1\_64\_0}
+  \end{itemize}
+\item
+  Pull UxAS repositories (from Git Bash shell)
+
+  \begin{itemize}
+  \item
+    \texttt{git\ -c\ http.sslVerify=false\ clone\ https://github.com/afrl-rq/OpenUxAS.git}
+  \item
+    \texttt{git\ -c\ http.sslVerify=false\ clone\ https://github.com/afrl-rq/LmcpGen.git}
+  \item
+    \texttt{git\ -c\ https://github.com/afrl-rq/OpenAMASE.git}
+  \end{itemize}
+\item
+  Build OpenAMASE
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Load the OpenAMASE project in NetBeans and click \texttt{Build}
+  \end{itemize}
+\item
+  Auto-create the UxAS messaging library
+
+  \begin{itemize}
+  \item
+    Download released executable from
+    \href{https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar}{GitHub}
+  \item
+    Place \texttt{LmcpGen.jar} in \texttt{LmcpGen/dist} folder
+  \item
+    From the Git Bash shell in the root UxAS directory, run
+    \texttt{sh\ RunLmcpGen.sh}
+  \item
+    Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE
+    repositories follow the folder structure labeled in the
+    \protect\hyperlink{configure-uxas-and-related-projects}{Configure
+    UxAS and Related Projects} section.
+  \end{itemize}
+\item
+  Prepare build
+
+  \begin{itemize}
+  \item
+    Open VS command prompt (Tools -\textgreater{} Visual Studio Command
+    Prompt)
+  \item
+    Note: If the Visual Studio Command Prompt is absent from Visual
+    Studio, it is also possible to perform the following actions by
+    searching for the \texttt{Developer\ Command\ Prompt\ for\ VS\ 2017}
+    application and switching the working directory to the root OpenUxAS
+    directory
+  \item
+    \texttt{python\ prepare}
+  \item
+    \texttt{meson.py\ build\ -\/-backend=vs} This should create a Visual
+    Studio solution in the build folder.
+  \end{itemize}
+\item
+  Set UxAS as the Startup Project
+
+  \begin{itemize}
+  \item
+    Open the OpenUxAS.sln with Visual Studio, right-click the UxAS
+    project found in the Solution Explorer
+  \item
+    Select Set as StartUp Project
+  \end{itemize}
+\item
+  Add the boost library to the Library Directories for the dependent
+  projects
+
+  \begin{itemize}
+  \item
+    With the OpenUxAS solution open in Visaul Studio, right-click the
+    uxas project from the Solution Explorer and select
+    \texttt{Properties} from the context menu.
+  \item
+    Select \texttt{VC++\ Directories} located within the
+    \texttt{Configuration\ Properties} node in the
+    \texttt{uxas\ Properties\ Pages} Pop Up
+  \item
+    In under the general tab, there will be a
+    \texttt{Library\ Directories} option. Add the absolute path of the
+    boost libraries here. Given boost was setup with the instruction
+    above, this path should be
+    \texttt{C:\textbackslash{}local\textbackslash{}boost\_1\_64\_0\textbackslash{}lib32-msvc-14.1}
+  \end{itemize}
+\item
+  Build project with Visual Studio
+
+  \begin{itemize}
+  \item
+    Open project file \texttt{OpenUxAS.sln} in the
+    \texttt{OpenUxAS/build} directory
+  \item
+    In the \texttt{Solution\ Explorer}, right-click the \texttt{uxas}
+    project, and select \texttt{Build} from the context menu
+  \end{itemize}
+\end{enumerate}
+
+\paragraph{Caveats}\label{caveats}
+
+\begin{itemize}
+\item
+  The Visual Studio backend for Meson mostly works, but will fail when
+  regenerating build files. If you modify one of the
+  \texttt{meson.build} files, delete the \texttt{build} directory and
+  run \texttt{meson.py\ build\ -\/-backend=vs} again. The steps
+  following the \texttt{meson.build} command must also be performed.
+\item
+  The UxAS test suite uses some hardcoded POSIX-style paths, and so does
+  not currently work on Windows.
+\end{itemize}

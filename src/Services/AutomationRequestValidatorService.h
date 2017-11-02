@@ -51,11 +51,11 @@ namespace service
  *  - uxas::messages::task::UniqueAutomationResponse
  *  - uxas::messages::task::TaskAutomationRequest
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - afrl::cmasi::AirVehicleState
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::SurfaceVehicleState
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::SurfaceVehicleState
  *  - afrl::cmasi::RemoveTasks
  *  - uxas::messages::task::TaskInitialized
  *  - afrl::cmasi::OperatingRegion

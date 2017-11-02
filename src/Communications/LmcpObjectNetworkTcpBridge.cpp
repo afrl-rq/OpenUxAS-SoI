@@ -234,8 +234,8 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
             // When AMASE is fixed to not spam configurations, this will no longer be necessary
             static std::unordered_set<int64_t> s_entityConfiguration;
             if (receivedTcpMessage->getDescriptor() == afrl::cmasi::AirVehicleConfiguration::Subscription ||
-                    receivedTcpMessage->getDescriptor() == afrl::impact::GroundVehicleConfiguration::Subscription ||
-                    receivedTcpMessage->getDescriptor() == afrl::impact::SurfaceVehicleConfiguration::Subscription)
+                    receivedTcpMessage->getDescriptor() == afrl::vehicles::GroundVehicleConfiguration::Subscription ||
+                    receivedTcpMessage->getDescriptor() == afrl::vehicles::SurfaceVehicleConfiguration::Subscription)
             {
                 // deserialize and create throw-away EntityConfiguration
                 std::unique_ptr<avtas::lmcp::Object> lmcpObject = m_externalLmcpObjectMessageReceiverPipe.deserializeMessage(receivedTcpMessage->getPayload());
