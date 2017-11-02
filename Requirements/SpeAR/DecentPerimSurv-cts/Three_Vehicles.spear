@@ -173,7 +173,7 @@ r22 : pos_UAV2 == (initial_pos_UAV2 ->
 						else //direction == -1
 							pre_pos_UAV2 - V*deltaT)
 
-r23 : pos_UAV2 == (initial_pos_UAV3 ->
+r23 : pos_UAV3 == (initial_pos_UAV3 ->
 						if pre_direction_UAV3 == 1 
 						then 
 							pre_pos_UAV3 + V*deltaT
