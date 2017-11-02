@@ -1,0 +1,239 @@
+Specification Three_Vehicles
+
+Imports:
+import "DecentPerimSurvDefs.spear"
+
+Constants:
+N : int = 3 //number of vehicles in this case
+
+Inputs:
+initial_pos_UAV1 : positionT
+initial_direction_UAV1 : signT
+initial_pos_UAV2 : positionT
+initial_direction_UAV2 : signT
+initial_pos_UAV3 : positionT
+initial_direction_UAV3 : signT
+
+Outputs:
+pos_UAV1 : positionT 
+pos_UAV2 : positionT
+pos_UAV3 : positionT  
+
+State:
+direction_UAV1 : signT
+direction_UAV2 : signT
+direction_UAV3 : signT
+time : timeT
+
+Macros:
+//Shared border positions
+//S_1_L : positionT = real(0)*P_global/real(N) // not used in this version
+S_1_R : positionT = real(1)*P_global/real(N)  
+S_2_L : positionT = real(1)*P_global/real(N) 
+S_2_R : positionT = real(2)*P_global/real(N)
+S_3_L : positionT = real(2)*P_global/real(N) 
+//S_3_R : positionT = real(3)*P_global/real(N) //not used in this version
+ 
+//Previous positions
+pre_pos_UAV1 : positionT = previous pos_UAV1 with initial value initial_pos_UAV1
+pre_pos_UAV2 : positionT = previous pos_UAV2 with initial value initial_pos_UAV2
+pre_pos_UAV3 : positionT = previous pos_UAV2 with initial value initial_pos_UAV3
+
+//Previous directions
+pre_direction_UAV1 : signT = previous direction_UAV1 with initial value initial_direction_UAV1
+pre_direction_UAV2 : signT = previous direction_UAV2 with initial value initial_direction_UAV2
+pre_direction_UAV3 : signT = previous direction_UAV3 with initial value initial_direction_UAV3
+
+//Times to reach neighbors
+time_to_reach_neighbor_12 : timeT = time_to_reach_neighbor(pre_direction_UAV1,
+															pre_direction_UAV2,
+															pre_pos_UAV1,
+															pre_pos_UAV2
+															)
+															
+time_to_reach_neighbor_23 : timeT = time_to_reach_neighbor(pre_direction_UAV3,
+															pre_direction_UAV2,
+															pre_pos_UAV3,
+															pre_pos_UAV2
+															)
+//Times to reach endpoints and shared borders
+time_until_UAV1_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV1, pre_pos_UAV1)
+time_until_UAV1_reaches_shared_right_border : timeT = time_to_reach_target_position(pre_direction_UAV1, pre_pos_UAV1, S_1_R)
+time_until_UAV2_reaches_shared_left_border : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV3, S_2_L)
+time_until_UAV2_reaches_shared_right_border : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV3, S_2_R)
+time_until_UAV3_reaches_shared_left_border : timeT = time_to_reach_target_position(pre_direction_UAV3, pre_pos_UAV3, S_3_L)
+time_until_UAV3_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV3, pre_pos_UAV3)
+
+deltaT : timeT = if met_neighbor_12 and met_neighbor_23
+					then min_time(time_until_UAV1_reaches_endpoint,
+							min_time(time_until_UAV3_reaches_endpoint,
+									min_time(time_until_UAV1_reaches_shared_right_border,
+										min_time(time_until_UAV2_reaches_shared_left_border,
+											min_time(time_until_UAV2_reaches_shared_right_border,
+												time_until_UAV3_reaches_shared_left_border	
+											)))))
+					else if met_neighbor_12 and not met_neighbor_23
+						then min_time(time_until_UAV1_reaches_endpoint,
+								min_time(time_until_UAV3_reaches_endpoint,
+										min_time(time_until_UAV1_reaches_shared_right_border,
+											min_time(time_until_UAV2_reaches_shared_left_border,
+												time_to_reach_neighbor_23
+													))))
+						else if not met_neighbor_12 and met_neighbor_23
+							then min_time(time_until_UAV1_reaches_endpoint,
+									min_time(time_until_UAV3_reaches_endpoint,
+											min_time(time_until_UAV2_reaches_shared_right_border,
+												min_time(time_until_UAV3_reaches_shared_left_border,	
+													time_to_reach_neighbor_12
+														))))
+							else //neighbors have yet to meet, no need to to check shared borders yet
+								min_time(time_until_UAV1_reaches_endpoint,
+									min_time(time_until_UAV3_reaches_endpoint,
+										min_time(time_to_reach_neighbor_12,
+											time_to_reach_neighbor_23)))
+
+//These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep.
+meet_neighbor_12 : bool = (pos_UAV1 == pos_UAV2) and (previous (pos_UAV1 <> pos_UAV2) with initial value true)
+meet_neighbor_23 : bool = (pos_UAV2 == pos_UAV3) and (previous (pos_UAV2 <> pos_UAV3) with initial value true)
+
+//These Booleans are true iff the neighbors met before this timestep.
+met_neighbor_12 : bool = false -> if previous meet_neighbor_12 then true else previous met_neighbor_12
+met_neighbor_23 : bool = false -> if previous meet_neighbor_23 then true else previous met_neighbor_23
+
+Assumptions:
+//Assume UAVs are numbered according to position (by definition)
+a00 : initial_pos_UAV1 <= initial_pos_UAV2
+a01 : initial_pos_UAV2 <= initial_pos_UAV3  
+
+//Assume initial positions don't change
+a11 : true -> initial_pos_UAV1 == previous initial_pos_UAV1
+a12 : true -> initial_pos_UAV2 == previous initial_pos_UAV2
+a13 : true -> initial_pos_UAV3 == previous initial_pos_UAV3
+
+//Assume initial directions don't change
+a21 : true -> initial_direction_UAV1 == previous initial_direction_UAV1
+a22 : true -> initial_direction_UAV2 == previous initial_direction_UAV2
+a23 : true -> initial_direction_UAV3 == previous initial_direction_UAV3
+
+Requirements:
+//The next time is the previous time plus the minimum time until a decision/change is made.
+// In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
+r0 : time == (0.0 s -> previous time + deltaT)
+
+//TODO: These four items need significant work
+r11 : direction_UAV1 == 
+					if meet_neighbor_12 and pos_UAV1 < S_1_R
+						then 1
+						else if (meet_neighbor_12 or met_neighbor_12) and pos_UAV1 >= S_1_R
+								then -1
+								else if pos_UAV1 <= 0.0 m
+										then 1
+										else if pos_UAV1 >= P_global 
+												then -1
+												else pre_direction_UAV1
+
+r12 : direction_UAV2 == 
+					if meet_neighbor_12 and pos_UAV2 > S_2_L
+						then -1
+						else if meet_neighbor_23 and pos_UAV3 < S_2_R
+							then 1
+							else if (meet_neighbor_12 or met_neighbor_12) and pos_UAV2 <= S_2_L
+								then 1
+								else if (meet_neighbor_23 or met_neighbor_23) and pos_UAV2 >= S_2_R
+									then -1	
+									else if pos_UAV2 <= 0.0 m
+											then 1
+											else if pos_UAV2 >= P_global
+													then -1
+													else pre_direction_UAV2
+
+
+r13 : direction_UAV3 == 
+					if meet_neighbor_23 and pos_UAV3 > S_3_L
+						then -1
+						else if (meet_neighbor_23 or met_neighbor_23) and pos_UAV2 <= S_3_L
+								then 1
+								else if pos_UAV3 <= 0.0 m 
+										then 1
+										else if pos_UAV3 >= P_global
+												then -1
+												else pre_direction_UAV3
+
+r21 : pos_UAV1 == (initial_pos_UAV1 ->
+						if pre_direction_UAV1 == 1 
+						then 
+							pre_pos_UAV1 + V*deltaT
+						else //direction == -1
+							pre_pos_UAV1 - V*deltaT)
+	
+r22 : pos_UAV2 == (initial_pos_UAV2 ->
+						if pre_direction_UAV2 == 1 
+						then 
+							pre_pos_UAV2 + V*deltaT
+						else //direction == -1
+							pre_pos_UAV2 - V*deltaT)
+
+r23 : pos_UAV2 == (initial_pos_UAV3 ->
+						if pre_direction_UAV3 == 1 
+						then 
+							pre_pos_UAV3 + V*deltaT
+						else //direction == -1
+							pre_pos_UAV3 - V*deltaT)
+ 
+Properties:
+o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
+				and initial_direction_UAV2 == -1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+
+o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
+				and initial_direction_UAV2 == -1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+
+o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
+				and initial_direction_UAV2 == 1
+				and initial_pos_UAV1 == 3.1 m
+				and initial_pos_UAV2 == 8.4 m
+				and time > 20.0 s
+//
+////Note, the value of the counter on Step 1 is 0.
+//o4_still_converging_at_4_steps observe: counter == 3 and 
+//	not	((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)) 
+//
+//o5_start_in_same_location observe : initial_pos_UAV1 == initial_pos_UAV1 and time > 20.0 s 
+//
+//o6_start_at_shared_border_position observe : initial_pos_UAV1 == initial_pos_UAV1 
+//	and initial_pos_UAV1 == S_1_R
+//	and initial_direction_UAV1 == 1
+//	and time > 20.0 s
+//
+//p_shared_border_calc_matches : S_1_R == S_2_L
+//
+//p_lemma_stay_stable : true -> previous ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+//					) 
+//					implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+//					)
+//
+//p_lemma_get_stable_in_5_steps: counter == 4 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L))
+//
+//p_lemma_stable_after_5_steps: counter > 4 implies 
+//					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+//					)
+//
+//p_lemma_5_steps_leq_2T : counter == 4 implies time <= 2.0*Time_to_travel_full_length
+//
+//		
+//Theorem_Alg_A_Two_Vehicles : time > 2.0*Time_to_travel_full_length implies
+//					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+//					)
+//					
+//					 
