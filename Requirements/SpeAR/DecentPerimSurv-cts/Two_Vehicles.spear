@@ -85,9 +85,9 @@ r1 : direction_UAV1 ==
 r2 : pos_UAV1 == (initial_pos_UAV1 ->
 						if pre_direction_UAV1 == 1 
 						then 
-							pre_pos_UAV1 + V*(time - previous time)
+							pre_pos_UAV1 + V*deltaT
 						else //direction == -1
-							pre_pos_UAV1 - V*(time - previous time))
+							pre_pos_UAV1 - V*deltaT)
 
 r3 : direction_UAV2 == 
 					if meet_neighbor and pos_UAV2 > S_2_L
@@ -103,9 +103,9 @@ r3 : direction_UAV2 ==
 r4 : pos_UAV2 == (initial_pos_UAV2 ->
 						if pre_direction_UAV2 == 1 
 						then 
-							pre_pos_UAV2 + V*(time - previous time)
+							pre_pos_UAV2 + V*deltaT
 						else //direction == -1
-							pre_pos_UAV2 - V*(time - previous time))
+							pre_pos_UAV2 - V*deltaT)
  
 Properties:
 o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
