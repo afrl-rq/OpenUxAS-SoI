@@ -48,9 +48,8 @@ time_until_UAV2_reaches_shared_border : timeT = time_to_reach_target_position(pr
 deltaT : timeT = if met_neighbor 
 					then min_time(time_until_UAV1_reaches_endpoint,
 							min_time(time_until_UAV2_reaches_endpoint,
-								min_time(time_to_reach_neighbor,
 									min_time(time_until_UAV1_reaches_shared_border,
-										time_until_UAV2_reaches_shared_border))))
+										time_until_UAV2_reaches_shared_border)))
 					else //have yet to meet neighbor, no need to to check shared border yet
 						min_time(time_until_UAV1_reaches_endpoint,
 							min_time(time_until_UAV2_reaches_endpoint,
