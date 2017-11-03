@@ -44,17 +44,17 @@ pre_direction_UAV1 : signT = previous direction_UAV1 with initial value initial_
 pre_direction_UAV2 : signT = previous direction_UAV2 with initial value initial_direction_UAV2
 pre_direction_UAV3 : signT = previous direction_UAV3 with initial value initial_direction_UAV3
 
-//Times to reach neighbors
+//Times to reach neighbors													)
 time_to_reach_neighbor_12 : timeT = time_to_reach_neighbor(pre_direction_UAV1,
 															pre_direction_UAV2,
 															pre_pos_UAV1,
 															pre_pos_UAV2
 															)
 															
-time_to_reach_neighbor_23 : timeT = time_to_reach_neighbor(pre_direction_UAV3,
-															pre_direction_UAV2,
-															pre_pos_UAV3,
-															pre_pos_UAV2
+time_to_reach_neighbor_23 : timeT = time_to_reach_neighbor(pre_direction_UAV2,
+															pre_direction_UAV3,
+															pre_pos_UAV2,
+															pre_pos_UAV3
 															)
 //Times to reach endpoints and shared borders
 time_until_UAV1_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV1, pre_pos_UAV1)
