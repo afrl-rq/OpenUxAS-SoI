@@ -50,16 +50,14 @@ pattern time_to_reach_neighbor( direction_UAV1: signT,
 								position_UAV2 : positionT) 
 								returns (out : timeT)
 	let	
-		out = if position_UAV2 == position_UAV1
-				then 0.0 s
-				else if position_UAV2 > position_UAV1 
-						then if direction_UAV1 == 1 and direction_UAV2 == -1
-								then 0.5*(position_UAV2 - position_UAV1)/V
-								else Time_to_travel_full_length //we'll reach an endpoint first, so just use the max time to reach an endpoint
-						else // position_UAV2 < position_UAV1 
-							if direction_UAV1 == -1 and direction_UAV2 == 1
-								then 0.5*(position_UAV1 - position_UAV2)/V
-								else Time_to_travel_full_length //we'll reach an endpoint first, so just use the max time to reach an endpoint 
+		out = if position_UAV2 > position_UAV1 
+				then if direction_UAV1 == 1 and direction_UAV2 == -1
+						then 0.5*(position_UAV2 - position_UAV1)/V
+						else Time_to_travel_full_length //we'll reach an endpoint first, so just use the max time to reach an endpoint
+				else // position_UAV2 < position_UAV1 
+					if direction_UAV1 == -1 and direction_UAV2 == 1
+						then 0.5*(position_UAV1 - position_UAV2)/V
+						else Time_to_travel_full_length //we'll reach an endpoint first, so just use the max time to reach an endpoint 
 		
 	tel	
 	
