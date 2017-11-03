@@ -23,10 +23,7 @@ time : timeT
 
 Macros:
 //Shared border positions
-//S_1_L : positionT = real(floor(real(1) + 0.5*real(sign(1))))*P_global/real(N) //This is just the left endpoint.
-S_1_R : positionT = real(1)*P_global/real(N)  
-S_2_L : positionT = real(1)*P_global/real(N) 
-//S_2_R : positionT = real(2)*P_global/real(N) //This is just the right endpoint (P_global).
+S_12 : positionT = 1.0*P_global/real(N)  
 
 //Previous positions
 pre_pos_UAV1 : positionT = previous pos_UAV1 with initial value initial_pos_UAV1
@@ -45,15 +42,15 @@ time_to_reach_neighbor_12 : timeT = time_to_reach_neighbor(pre_direction_UAV1,
 
 //Times to reach endpoints and shared borders
 time_until_UAV1_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV1, pre_pos_UAV1)
-time_until_UAV1_reaches_S_1_R : timeT = time_to_reach_target_position(pre_direction_UAV1, pre_pos_UAV1, S_1_R)
-time_until_UAV2_reaches_S_2_L : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV2, S_2_L)
+time_until_UAV1_reaches_S_12 : timeT = time_to_reach_target_position(pre_direction_UAV1, pre_pos_UAV1, S_12)
+time_until_UAV2_reaches_S_12 : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV2, S_12)
 time_until_UAV2_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV2, pre_pos_UAV2)
 
 deltaT : timeT = if met_neighbor 
 					then min_time(time_until_UAV1_reaches_endpoint,
 							min_time(time_until_UAV2_reaches_endpoint,
-									min_time(time_until_UAV1_reaches_S_1_R, //Can eliminate one of these
-										time_until_UAV2_reaches_S_2_L)))
+									min_time(time_until_UAV1_reaches_S_12, //Can eliminate one of these
+										time_until_UAV2_reaches_S_12)))
 					else //not traveling together, no need to to check shared border
 						min_time(time_until_UAV1_reaches_endpoint,
 							min_time(time_until_UAV2_reaches_endpoint,
@@ -89,9 +86,9 @@ r0 : time == (0.0 s -> previous time + deltaT)
 
 r11 : direction_UAV1 == 
 					if meet_neighbor_12 
-						then if pos_UAV1 < S_1_R
+						then if pos_UAV1 < S_12
 								then 1
-								else //pos_UAV1 >= S_1_R
+								else //pos_UAV1 >= S_12
 									-1
 						else if pos_UAV1 <= 0.0 m
 								then 1
@@ -101,9 +98,9 @@ r11 : direction_UAV1 ==
 
 r12 : direction_UAV2 == 
 					if meet_neighbor_12 
-						then if pos_UAV2 > S_2_L
+						then if pos_UAV2 > S_12
 							then -1
-							else // pos_UAV2 <= S_2_L
+							else // pos_UAV2 <= S_12
 								1
 						else if pos_UAV2 <= 0.0 m
 								then 1
@@ -149,30 +146,28 @@ o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1
 //Note, the value of the counter on Step 1 is 0.
 o4_still_converging_at_4_steps observe: counter == 3 and 
 	not	((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)) 
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)) 
 
 o5_start_in_same_location observe : initial_pos_UAV1 == initial_pos_UAV1 and time > 20.0 s 
 
 o6_start_at_shared_border_position observe : initial_pos_UAV1 == initial_pos_UAV1 
-	and initial_pos_UAV1 == S_1_R
+	and initial_pos_UAV1 == S_12
 	and initial_direction_UAV1 == 1
 	and time > 20.0 s
 
-p_shared_border_calc_matches : S_1_R == S_2_L
-
 p_lemma_stay_stable : true -> previous ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
 					) 
 					implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
 					)
 
 p_lemma_get_stable_in_5_steps: counter == 4 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L))
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12))
 
 p_lemma_stable_after_5_steps: counter > 4 implies 
 					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
 					)
 
 p_lemma_5_steps_leq_2T : counter == 4 implies time <= 2.0*Time_to_travel_full_length
@@ -180,7 +175,7 @@ p_lemma_5_steps_leq_2T : counter == 4 implies time <= 2.0*Time_to_travel_full_le
 		
 Theorem_Alg_A_Two_Vehicles : time > 2.0*Time_to_travel_full_length implies
 					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_1_R and pos_UAV2 == S_2_L)
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
 					)
 					
 					 
