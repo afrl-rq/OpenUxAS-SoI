@@ -8,7 +8,7 @@
 // ===============================================================================
 
 /* 
- * File:   c00_ServiceTemplate.h
+ * File:   ServiceTemplate.h
  * Author: steve
  *
  * Created on March 17, 2017, 5:55 PM
@@ -28,7 +28,7 @@ namespace uxas
 namespace service
 {
 
-/*! \class c00_ServiceTemplate
+/*! \class ServiceTemplate
     \brief This is a basic service that can be used as a template when 
  * constructing new services.
 
@@ -37,7 +37,7 @@ namespace service
  *  @par To add a new service:
  * <ul style="padding-left:1em;margin-left:0">
  * <li>Make copies of the source and header files of this template.</li>
- * <li>Search for the string c00_ServiceTemplate and Replace it with the new 
+ * <li>Search for the string ServiceTemplate and Replace it with the new 
  * service name.</li>
  * <li>Change the unique include guard entries, in the header file, i.e. 
  * "UXAS_00_SERVICE_TEMPLATE_H" to match the new service name</li>
@@ -48,7 +48,7 @@ namespace service
  *  
  * </ul> @n
  * 
- * Configuration String: <Service Type="c00_ServiceTemplate" OptionString="Option_01" OptionInt="36" />
+ * Configuration String: <Service Type="ServiceTemplate" OptionString="Option_01" OptionInt="36" />
  * 
  * Options:
  *  - OptionString - sample string option
@@ -63,17 +63,17 @@ namespace service
  * 
  */
 
-class c00_ServiceTemplate : public ServiceBase
+class ServiceTemplate : public ServiceBase
 {
 public:
 
     /** \brief This string is used to identify this service in XML configuration
-     * files, i.e. Service Type="c00_ServiceTemplate". It is also entered into
+     * files, i.e. Service Type="ServiceTemplate". It is also entered into
      * service registry and used to create new instances of this service. */
     static const std::string&
     s_typeName()
     {
-        static std::string s_string("c00_ServiceTemplate");
+        static std::string s_string("ServiceTemplate");
         return (s_string);
     };
 
@@ -93,24 +93,24 @@ public:
     static ServiceBase*
     create()
     {
-        return new c00_ServiceTemplate;
+        return new ServiceTemplate;
     };
 
-    c00_ServiceTemplate();
+    ServiceTemplate();
 
     virtual
-    ~c00_ServiceTemplate();
+    ~ServiceTemplate();
 
 private:
 
     static
-    ServiceBase::CreationRegistrar<c00_ServiceTemplate> s_registrar;
+    ServiceBase::CreationRegistrar<ServiceTemplate> s_registrar;
 
     /** brief Copy construction not permitted */
-    c00_ServiceTemplate(c00_ServiceTemplate const&) = delete;
+    ServiceTemplate(ServiceTemplate const&) = delete;
 
     /** brief Copy assignment operation not permitted */
-    void operator=(c00_ServiceTemplate const&) = delete;
+    void operator=(ServiceTemplate const&) = delete;
 
     bool
     configure(const pugi::xml_node& serviceXmlNode) override;
