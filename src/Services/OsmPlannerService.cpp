@@ -395,7 +395,7 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                                         }
                                         else
                                         {
-                                            UXAS_LOG_ERROR("bProcessRoutePlanRequest:: while building plan:: could not find node with the Id[" << *itNodeId << "]");
+                                            UXAS_LOG_ERROR("bProcessRoutePlanRequest:: while building plan:: could not find node with the Id[", *itNodeId, "]");
                                             isSuccess = false;
                                             break;
                                         }
@@ -403,7 +403,7 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                                 }
                                 else
                                 {
-                                    UXAS_LOG_ERROR("bProcessRoutePlanRequest:: while building plan:: could not find the planning edge for node Id's [" << *itPathNodeId << "] and [" << *itNextPathNodeId << "]");
+                                    UXAS_LOG_ERROR("bProcessRoutePlanRequest:: while building plan:: could not find the planning edge for node Id's [", *itPathNodeId, "] and [", *itNextPathNodeId, "]");
                                     isSuccess = false;
                                     //break;
                                 }
@@ -432,7 +432,7 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                                 }
                                 else
                                 {
-                                    UXAS_LOG_ERROR("bProcessRoutePlanRequest:: while building plan:: could not find node with the Id[" << *itPathNodeId << "]");
+                                    UXAS_LOG_ERROR("bProcessRoutePlanRequest:: while building plan:: could not find node with the Id[", *itPathNodeId, "]");
                                     isSuccess = false;
                                     break;
                                 }
@@ -462,7 +462,7 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("Error:: could not find route for RouteRequestId[" << (*itRequest)->getRouteID() << "].");
+                    UXAS_LOG_ERROR("Error:: could not find route for RouteRequestId[", (*itRequest)->getRouteID(), "].");
                     isSuccess = false;
                 }
 
@@ -528,7 +528,7 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
             }
             else //if(isFindClosestIndices(positionStart,positionEnd,indexIdStart,index ...
             {
-                UXAS_LOG_ERROR("bProcessRoutePlanRequest:: could not find graph indices for RouteRequestId[" << (*itRequest)->getRouteID() << "].");
+                UXAS_LOG_ERROR("bProcessRoutePlanRequest:: could not find graph indices for RouteRequestId[", (*itRequest)->getRouteID(), "].");
                 isSuccess = false;
             } //if(isFindClosestIndices(positionStart,positionEnd,indexIdStart,index  ...
         } //for (auto itRequest = routePlanRequest->getRouteRequests()
@@ -783,7 +783,7 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                                         }
                                         else
                                         {
-                                            CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << *itPathNodeIdLast << "," << *itPathNodeId << "] start/end IDs [" << *itPathNodeIdLast << "," << *itPathNodeId << "]")
+                                            UXAS_LOG_ERROR("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[", *itPathNodeIdLast, ",", *itPathNodeId, "] start/end IDs [", *itPathNodeIdLast, ",", *itPathNodeId, "]");
                                             isSuccess = false;
                                         }
                                     }
@@ -805,7 +805,7 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                                 }
                                 else
                                 {
-                                    UXAS_LOG_ERROR("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << edgeBeginNodeId << "," << edgeEndNodeId << "] start/end IDs [" << edgeBeginNodeId << "," << edgeEndNodeId << "]");
+                                    UXAS_LOG_ERROR("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[", edgeBeginNodeId, ",", edgeEndNodeId, "] start/end IDs [", edgeBeginNodeId, ",", edgeEndNodeId, "]");
                                     isSuccess = false;
                                 }
 
@@ -845,7 +845,7 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
                             }
                             else
                             {
-                                CERR_FILE_LINE_MSG("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << edgeBeginNodeId << "," << edgeEndNodeId << "] start/end IDs [" << nodeIdStart << "," << edgeEndNodeId << "]")
+                                UXAS_LOG_ERROR("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[", edgeBeginNodeId, ",", edgeEndNodeId, "] start/end IDs [", nodeIdStart, ",", edgeEndNodeId, "]");
                                 isSuccess = false;
                             }
                         } //if(pathNodeIds.size() > 1)
@@ -916,7 +916,7 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
             }
             else //if (isSuccess)
             {
-                UXAS_LOG_ERROR("Error:: could not find route for RouteRequestId[" << (*itRequest)->getRoadPointsID() << "].");
+                UXAS_LOG_ERROR("Error:: could not find route for RouteRequestId[", (*itRequest)->getRoadPointsID(), "].");
                 isSuccess = false;
             }
         } //for (auto itRequest = roadPoints
@@ -938,7 +938,7 @@ bool OsmPlannerService::isGetRoadPoints(const int64_t& startNodeId,const int64_t
     {
         if (!isFindShortestRoute(startNodeId, endNodeId, pathCost, pathNodeIds))
         {
-            UXAS_LOG_ERROR("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[" << startNodeId << "," << endNodeId << "]");
+            UXAS_LOG_ERROR("ERROR::isProcessRoadPointsRequest nodes on segment not found for edge Node IDs[", startNodeId, ",", endNodeId, "]");
             isSuccess = false;
         }
     }
@@ -1059,7 +1059,7 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
                 }
                 else //if (!ndCurrent.attribute("id").empty())
                 {
-                    UXAS_LOG_ERROR("OSM FILE:: parse XML string failed for osmFile[" << osmFile << "] :: could not find a 'way id'");
+                    UXAS_LOG_ERROR("OSM FILE:: parse XML string failed for osmFile[", osmFile, "] :: could not find a 'way id'");
                 }
             }
 
@@ -1114,19 +1114,19 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
                                 }
                                 else //if (!ndCurrent.attribute("lon").empty())
                                 {
-                                    UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find longitude for node id[" << nodeId << "]");
+                                    UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find longitude for node id[", nodeId, "]");
                                 } //if (!ndCurrent.attribute("lon").empty())
                             } //if (!ndCurrent.attribute("lat").empty())
                             else
                             {
-                                UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find longitude for node id[" << nodeId << "]");
+                                UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find longitude for node id[", nodeId, "]");
                             } //if (!ndCurrent.attribute("lat").empty())
                         } //if (itIdNode == m_idVsNode->end())
                     } //if(itIdVsPlanning != nodeIdVs_isPlanningNode.end())
                 }
                 else //if (!ndCurrent.attribute("id").empty())
                 {
-                    UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find node id[" << nodeId << "] ");
+                    UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find node id[", nodeId, "] ");
                 } //if (!ndCurrent.attribute("id").empty())
             } //ffor (pugi::xml_node ndCurrent = osmMap.child("node"); ndCurrent; ndCurrent = ndCurr ... 
 
@@ -1190,12 +1190,12 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
         }
         else //if (osmMap)
         {
-            UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find 'osm' section in osmFile[" << osmFile << "] ");
+            UXAS_LOG_ERROR("OSM FILE:: parse XML string failed, could not find 'osm' section in osmFile[", osmFile, "] ");
         } //if (osmMap)
     } //if (result)
     else //if (osmMap)
     {
-        UXAS_LOG_ERROR("OSM FILE:: parse XML string failed for osmFile[" << osmFile << "]");
+        UXAS_LOG_ERROR("OSM FILE:: parse XML string failed for osmFile[", osmFile, "]");
     }
     return (isSuccess);
 }
@@ -1279,7 +1279,7 @@ bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, 
             }
             else //if(itIsPlanningNode != nodeIdVs_isPlanningNode.end())
             {
-                UXAS_LOG_ERROR("OSM FILE:: while saving highway waypoints, could not find [" << itHighwayNode->second << "] in nodeIdVs_isPlanningNode.");
+                UXAS_LOG_ERROR("OSM FILE:: while saving highway waypoints, could not find [", itHighwayNode->second, "] in nodeIdVs_isPlanningNode.");
                 isSuccess = false;
                 break;
             }
@@ -1405,7 +1405,7 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                     else
                     {
                         currentWayId = -1; //need to find a valid start point before proceeding
-                        UXAS_LOG_ERROR("OSM FILE:: while building edges:: could not find node[" << itNode->second << "]");
+                        UXAS_LOG_ERROR("OSM FILE:: while building edges:: could not find node[", itNode->second, "]");
                     }
                 }
                 else //if(itWayNodeIds->first != currentWayId)
@@ -1430,7 +1430,7 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                         }
                         else
                         {
-                            UXAS_LOG_ERROR("OSM FILE:: while building edges:: could not find index for node[" << itNode->second << "]");
+                            UXAS_LOG_ERROR("OSM FILE:: while building edges:: could not find index for node[", itNode->second, "]");
                             isSuccess = false;
                         }
                     }
@@ -1447,7 +1447,7 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("OSM FILE:: while building edges:: could not find node for node ID[" << itNode->second << "]");
+                    UXAS_LOG_ERROR("OSM FILE:: while building edges:: could not find node for node ID[", itNode->second, "]");
                 }
             } //if(itPlanning != m_planningNodes.end())
         }
@@ -1556,7 +1556,7 @@ bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const in
                 }
                 else
                 {
-                    UXAS_LOG_ERROR("OSM FILE:: while constructing shortest route from index[ " << static_cast<int64_t> (v) << "], could not find corresponding node Id.");
+                    UXAS_LOG_ERROR("OSM FILE:: while constructing shortest route from index[ ", static_cast<int64_t> (v), "], could not find corresponding node Id.");
                     isSuccess = false;
                     break;
                 }
@@ -1582,7 +1582,7 @@ bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const in
 
     if (!isSuccess)
     {
-        UXAS_LOG_ERROR("Didn't find a path from startNodeId[" << startNodeId << "] to endNodeId[" << endNodeId << "] !");
+        UXAS_LOG_ERROR("Didn't find a path from startNodeId[", startNodeId, "] to endNodeId[", endNodeId, "] !");
     }
 
 
@@ -1691,7 +1691,7 @@ bool OsmPlannerService::isExamineCell(const n_FrameworkLib::CPosition& position,
         }
         else
         {
-            UXAS_LOG_ERROR("isFindClosestIndices:: could not find Node based on the planning node Id[ " << itNodeId->second << "].");
+            UXAS_LOG_ERROR("isFindClosestIndices:: could not find Node based on the planning node Id[ ", itNodeId->second, "].");
             isFoundNewNode = false;
             break;
         }
@@ -1805,7 +1805,7 @@ void OsmPlannerService::findRoadIntersectionsOfCircle(const n_FrameworkLib::CPos
                             }
                             else
                             {
-                                UXAS_LOG_ERROR("OSM FILE:: findRoadIntersectionsOfCircle:: could not find node for either Id[" << *itNodeIdFirst << "] or Id[" << *itNodeIdSecond << "]");
+                                UXAS_LOG_ERROR("OSM FILE:: findRoadIntersectionsOfCircle:: could not find node for either Id[", *itNodeIdFirst, "] or Id[", *itNodeIdSecond, "]");
                             }
                         }
                     }
@@ -1863,7 +1863,7 @@ bool OsmPlannerService::isGetNodesOnSegment(const std::pair<int64_t, int64_t>& s
     }
     else
     {
-        UXAS_LOG_ERROR("OSM FILE:: isGetNodesOnSegment:: could not find edge for node pair [" << segmentNodeIds.first << ", " << segmentNodeIds.second << "]");
+        UXAS_LOG_ERROR("OSM FILE:: isGetNodesOnSegment:: could not find edge for node pair [", segmentNodeIds.first, ", ", segmentNodeIds.second, "]");
     }
     return (isSuccess);
 }

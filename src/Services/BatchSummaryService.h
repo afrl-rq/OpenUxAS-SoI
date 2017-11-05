@@ -33,7 +33,6 @@
 #include <cstdint>
 #include "uxas/messages/task/TaskAutomationResponse.h"
 #include "uxas/messages/task/TaskAutomationRequest.h"
-#include "gsim/gs_polygon.h"
 
 namespace uxas
 {
@@ -78,7 +77,7 @@ namespace uxas
             virtual
                 ~BatchSummaryService();
 
-            static void BatchSummaryService::UpdateSummaryUtil(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
+            static void UpdateSummaryUtil(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
 
 
         private:
@@ -108,12 +107,12 @@ namespace uxas
 
             void HandleBatchSummaryRequest(std::shared_ptr<afrl::impact::BatchSummaryRequest>);
             void HandleEgressRouteResponse(std::shared_ptr<uxas::messages::route::EgressRouteResponse>);
-            void BatchSummaryService::UpdateSummary(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
+            void UpdateSummary(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
             bool FinalizeBatchRequest(int64_t);
             void BuildSummaryOptions(int64_t, std::shared_ptr<afrl::impact::BatchSummaryResponse>&, std::vector<std::shared_ptr<afrl::impact::VehicleSummary> >&, int64_t);
             void HandleTaskAutomationResponse(const std::shared_ptr<messages::task::TaskAutomationResponse>& object);
-            std::shared_ptr<GsPolygon> FromAbstractGeometry(afrl::cmasi::AbstractGeometry* geom);
-            bool LinearizeBoundary(afrl::cmasi::AbstractGeometry* boundary, VisiLibity::Polygon& poly);
+            std::shared_ptr<VisiLibity::Polygon> FromAbstractGeometry(afrl::cmasi::AbstractGeometry* geom);
+            bool LinearizeBoundary(afrl::cmasi::AbstractGeometry* boundary, std::shared_ptr<VisiLibity::Polygon>& poly);
 
             // parameters
             bool m_fastPlan{ false };
@@ -143,7 +142,7 @@ namespace uxas
 
             //                route id, response id
             std::unordered_map<int64_t, int64_t> m_pendingRouteResponses;
-            std::unordered_map<int64_t, std::shared_ptr<GsPolygon> > m_keepOutZones;
+            std::unordered_map<int64_t, std::shared_ptr<VisiLibity::Polygon> > m_keepOutZones;
 
 
         };

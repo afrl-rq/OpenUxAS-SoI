@@ -41,8 +41,8 @@ class f
 {
     afrl::impact::TaskSummary* tsum;
     afrl::impact::TaskSummary* orig;
-    std::shared_ptr<afrl::impact::BatchSummaryResponse>& response;
     std::vector<std::shared_ptr<afrl::impact::VehicleSummary> >& vehicles;
+    std::shared_ptr<afrl::impact::BatchSummaryResponse>& response;
 public:
 
     explicit f(afrl::impact::TaskSummary* t,
@@ -569,7 +569,7 @@ namespace uxas
                     if (isLoiterAction(action))
                     {
                         afrl::cmasi::LoiterAction* loiter = dynamic_cast<afrl::cmasi::LoiterAction*>(action);
-                        GsPnt2 p;
+                        VisiLibity::Point p;
                         unitConversions.ConvertLatLong_degToNorthEast_m(loiter->getLocation()->getLatitude(), loiter->getLocation()->getLongitude(), north, east);
                         auto length = loiter->getRadius();
                         //assume circular
@@ -577,9 +577,9 @@ namespace uxas
                         {
                             for (double rad = 0; rad < n_Const::c_Convert::dTwoPi(); rad += n_Const::c_Convert::dPiO10())
                             {
-                                p.x = east + length * cos(rad);
-                                p.y = north + length * sin(rad);
-                                if (koz.second->contains(p))
+                                p.set_x(east + length * cos(rad));
+                                p.set_y(north + length * sin(rad));
+                                if (p.in(*koz.second, 1e-4))
                                 {
                                     sum->setConflictsWithROZ(true);
                                     break;
@@ -685,11 +685,11 @@ namespace uxas
         }
 
 
-        bool BatchSummaryService::LinearizeBoundary(afrl::cmasi::AbstractGeometry* boundary, VisiLibity::Polygon& poly)
+        bool BatchSummaryService::LinearizeBoundary(afrl::cmasi::AbstractGeometry* boundary, std::shared_ptr<VisiLibity::Polygon>& poly)
         {
             uxas::common::utilities::CUnitConversions flatEarth;
             bool isValid = false;
-            poly.clear();
+            poly->clear();
 
             if (afrl::cmasi::isPolygon(boundary))
             {
@@ -701,7 +701,7 @@ namespace uxas
                     flatEarth.ConvertLatLong_degToNorthEast_m(boundaryPolygon->getBoundaryPoints()[k]->getLatitude(), boundaryPolygon->getBoundaryPoints()[k]->getLongitude(), north, east);
                     pt.set_x(east);
                     pt.set_y(north);
-                    poly.push_back(pt);
+                    poly->push_back(pt);
                 }
                 isValid = true;
             }
@@ -720,10 +720,10 @@ namespace uxas
                 double w = rectangle->getWidth() / 2;
                 double h = rectangle->getHeight() / 2;
 
-				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w, north + h) - c, a) + c);
-				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w, north + h) - c, a) + c);
-				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w, north - h) - c, a) + c);
-				poly.push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w, north - h) - c, a) + c);
+                poly->push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w, north + h) - c, a) + c);
+                poly->push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w, north + h) - c, a) + c);
+                poly->push_back(VisiLibity::Point::rotate(VisiLibity::Point(east - w, north - h) - c, a) + c);
+                poly->push_back(VisiLibity::Point::rotate(VisiLibity::Point(east + w, north - h) - c, a) + c);
 
                 isValid = true;
             }
@@ -742,7 +742,7 @@ namespace uxas
                     VisiLibity::Point pt;
                     pt.set_x(c.x() + r * cos(n_Const::c_Convert::dTwoPi() * k / 18.0));
                     pt.set_y(c.y() + r * sin(n_Const::c_Convert::dTwoPi() * k / 18.0));
-                    poly.push_back(pt);
+                    poly->push_back(pt);
                 }
 
                 isValid = true;
@@ -752,21 +752,17 @@ namespace uxas
         }
 
 
-        std::shared_ptr<GsPolygon> BatchSummaryService::FromAbstractGeometry(afrl::cmasi::AbstractGeometry *geom)
+        std::shared_ptr<VisiLibity::Polygon> BatchSummaryService::FromAbstractGeometry(afrl::cmasi::AbstractGeometry *geom)
         {
-            VisiLibity::Polygon poly;
+            auto poly = std::shared_ptr<VisiLibity::Polygon>(new VisiLibity::Polygon);
             LinearizeBoundary(geom, poly);
-            poly.eliminate_redundant_vertices(1.0);
-            if (poly.area() < 0)
+            poly->eliminate_redundant_vertices(1.0);
+            if (poly->area() < 0)
             {
-                poly.reverse();
+                poly->reverse();
             }
-            auto ret = std::make_shared<GsPolygon>();
-            for (int i = 0; i < poly.n(); i++)
-            {
-                ret->push().set((float)poly[i].x(), (float)poly[i].y());
-            }
-            return ret;
+            
+            return poly;
         }
     }; //namespace service
 }; //namespace uxas
