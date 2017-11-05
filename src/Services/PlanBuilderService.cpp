@@ -132,6 +132,13 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
         return;
     }
     
+    if (taskAssignmentSummary->getTaskList().empty())
+    {
+        std::string message = "No assignments found for request " + std::to_string(taskAssignmentSummary->getCorrespondingAutomationRequestID());
+        sendError(message);
+        return;
+    }
+    
     // ensure that a valid state for each vehicle in the request has been received
     for(auto v : correspondingAutomationRequest->getOriginalRequest()->getEntityList())
     {

@@ -210,19 +210,6 @@ main(int argc, char** argv)
     }
 
     //
-    // build bridges
-    //
-    if (uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().initialize())
-    {
-        UXAS_LOG_INFORM("UxAS_Main initialized bridge manager");
-    }
-    else
-    {
-        UXAS_LOG_ERROR("UxAS_Main failed to initialize bridge manager");
-        return (300);
-    }
-
-    //
     // service manager and services
     //
     if (uxas::service::ServiceManager::getInstance().configureServiceManager())
@@ -243,6 +230,19 @@ main(int argc, char** argv)
     {
         UXAS_LOG_ERROR("UxAS_Main failed to initialize and start ServiceManager");
         return (410);
+    }
+
+    //
+    // build bridges
+    //
+    if (uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().initialize())
+    {
+        UXAS_LOG_INFORM("UxAS_Main initialized bridge manager");
+    }
+    else
+    {
+        UXAS_LOG_ERROR("UxAS_Main failed to initialize bridge manager");
+        return (300);
     }
 
     UXAS_LOG_INFORM("UxAS_Main running ServiceManager");

@@ -17,7 +17,7 @@
 <MDM>
     <SeriesName>ROUTE</SeriesName>
     <Namespace>uxas/messages/route</Namespace>
-    <Version>3</Version>
+    <Version>4</Version>
 
     <StructList>
 
