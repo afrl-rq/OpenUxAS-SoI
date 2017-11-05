@@ -22,9 +22,8 @@
 
 #include "uxas/messages/task/UniqueAutomationResponse.h"
 #include "afrl/cmasi/MissionCommand.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/vehicles/GroundVehicleState.h"
-#include "afrl/vehicles/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "afrl/cmasi/ServiceStatus.h"
 #include "pugixml.hpp"
 
@@ -57,37 +56,30 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskImplementationResponse::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
     return true;
 }
 
 bool
 PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    if(uxas::messages::task::isTaskAssignmentSummary(receivedLmcpMessage->m_object))
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
+    if(entityState)
+    {
+        m_currentEntityStates[entityState->getID()] = entityState;
+    }
+    else if(uxas::messages::task::isTaskAssignmentSummary(receivedLmcpMessage->m_object))
     {
         processTaskAssignmentSummary(std::static_pointer_cast<uxas::messages::task::TaskAssignmentSummary>(receivedLmcpMessage->m_object));
     }
     else if(uxas::messages::task::isTaskImplementationResponse(receivedLmcpMessage->m_object))
     {
         processTaskImplementationResponse(std::static_pointer_cast<uxas::messages::task::TaskImplementationResponse>(receivedLmcpMessage->m_object));
-    }
-    else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_currentEntityStates[entityState->getID()] = entityState;
-    }
-    else if(afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_currentEntityStates[entityState->getID()] = entityState;
-    }
-    else if(afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_currentEntityStates[entityState->getID()] = entityState;
     }
     else if(uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object))
     {

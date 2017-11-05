@@ -19,12 +19,10 @@
 
 #include "FileSystemUtilities.h"
 
-#include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/vehicles/GroundVehicleConfiguration.h"
-#include "afrl/vehicles/GroundVehicleState.h"
-#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
-#include "afrl/vehicles/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityConfigurationDescendants.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "avtas/lmcp/LmcpXMLReader.h"
 #include "uxas/messages/task/TaskComplete.h"
 #include "uxas/messages/task/TaskInitialized.h"
@@ -158,14 +156,18 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
     if(m_uniqueRouteRequestId < 0)
         m_uniqueRouteRequestId = -m_uniqueRouteRequestId;
 
-    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    //ENTITY CONFIGURATIONS
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
+    
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationResponse::Subscription);
     addSubscriptionAddress(uxas::messages::route::RoutePlanResponse::Subscription);
