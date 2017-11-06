@@ -159,7 +159,7 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
     let msg_buf_slice = unsafe { slice::from_raw_parts(msg_buf, msg_len as usize) };
     if let Ok(Some(msg)) = lmcp_msg_deser(msg_buf_slice) {
         match msg {
-            LmcpType::TaskAssignmentSummary(tas) => {
+            LmcpType::UxasMessagesTaskTaskAssignmentSummary(tas) => {
                 match pb.process_task_assignment_summary(tas) {
                     Ok(msgs) => {
                         for msg in &msgs {
@@ -172,7 +172,7 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
                     },
                 };
             }
-            LmcpType::TaskImplementationResponse(tir) => {
+            LmcpType::UxasMessagesTaskTaskImplementationResponse(tir) => {
                 match pb.process_task_implementation_response(tir) {
                     Ok(msgs) => {
                         for msg in &msgs {
@@ -185,16 +185,16 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
                     },
                 };
             }
-            LmcpType::AirVehicleState(vs) => {
+            LmcpType::AfrlCmasiAirVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::GroundVehicleState(vs) => {
+            LmcpType::AfrlImpactGroundVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::SurfaceVehicleState(vs) => {
+            LmcpType::AfrlImpactSurfaceVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::UniqueAutomationRequest(uar) => {
+            LmcpType::UxasMessagesTaskUniqueAutomationRequest(uar) => {
                 let id = uar.request_id;
                 pb.unique_automation_requests.insert(id, uar);
                 // re-initialize state maps, possibly halting completion of an overridden
@@ -279,7 +279,7 @@ impl PlanBuilder {
                 let entity_state = oes.expect("ensured to exist by above validation");
                 let ps_state =
                     if let Some(ps) = car.planning_states.iter().find(|&ps| v == &ps.entity_id()) {
-                        ps.as_planning_state().expect("no subtypes of PlanningState").clone()
+                        ps.as_uxas_messages_task_planning_state().expect("no subtypes of PlanningState").clone()
                     } else {
                         // add in the assignment start point lead distance
                         let pos0 = entity_state.location();
@@ -358,7 +358,7 @@ impl PlanBuilder {
         self.next_implementation_id();
 
         // send the message
-        Ok(vec![LmcpType::TaskImplementationRequest(tir)])
+        Ok(vec![LmcpType::UxasMessagesTaskTaskImplementationRequest(tir)])
     }
 }
 
@@ -391,7 +391,7 @@ impl PlanBuilder {
 
         let next_wp = tiresp.task_waypoints.first().ok_or(())?.number();
 
-        for mut mish in ipr.original_response.mission_command_list_mut() {
+        for mish in ipr.original_response.mission_command_list_mut() {
             if mish.vehicle_id() == tiresp.vehicle_id {
                 found_mish = true;
                 if let Some(back) = mish.waypoint_list_mut().last_mut() {
@@ -448,7 +448,7 @@ impl PlanBuilder {
                         for e in pes {
                             ipr.final_states.push(Box::new(e.state.clone()));
                         }
-                        msgs.push(LmcpType::UniqueAutomationResponse(ipr));
+                        msgs.push(LmcpType::UxasMessagesTaskUniqueAutomationResponse(ipr));
 
                         let kv = KeyValuePair {
                             key: format!(
@@ -461,7 +461,7 @@ impl PlanBuilder {
                             info: vec![Box::new(kv)],
                             ..Default::default()
                         };
-                        msgs.push(LmcpType::ServiceStatus(ss));
+                        msgs.push(LmcpType::AfrlCmasiServiceStatus(ss));
                     }
                 }
                 return msgs;
@@ -528,7 +528,7 @@ fn mk_error(mut msg: String) -> LmcpType {
         info: vec![Box::new(kv)],
         percent_complete: 0.0,
     };
-    LmcpType::ServiceStatus(ss)
+    LmcpType::AfrlCmasiServiceStatus(ss)
 }
 
 fn convert_latlong_deg_to_northeast_m(lat_deg: f64, long_deg: f64) -> (f64, f64) {

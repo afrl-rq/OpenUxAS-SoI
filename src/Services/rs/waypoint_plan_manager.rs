@@ -140,7 +140,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
     if let Ok(Some(msg)) = lmcp::lmcp_msg_deser(msg_buf_slice) {
         match msg {
 
-            lmcp::LmcpType::AirVehicleState(ref avs) => {
+            lmcp::LmcpType::AfrlCmasiAirVehicleState(ref avs) => {
                 if avs.id() == manager.vehicle_id {
                     if manager.is_move_to_next_waypoint {
                         if let Some(waypoint_id_next) = manager.get_next_waypoint_id(avs.current_waypoint()) {
@@ -153,7 +153,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
                 }
             },
 
-            lmcp::LmcpType::AutomationResponse(ref rsp) => {
+            lmcp::LmcpType::AfrlCmasiAutomationResponse(ref rsp) => {
                 if let Some(mission) = rsp.mission_command_list.iter()
                     .find(|m| m.vehicle_id() == manager.vehicle_id)
                 {
@@ -166,7 +166,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
 
             // If we get a MissionCommand, we want to initialize
             // our internal state from that message
-            lmcp::LmcpType::MissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
+            lmcp::LmcpType::AfrlCmasiMissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
                 if manager.initialize_plan(cmd, wps) {
                     let waypoint_id_current = cmd.waypoint_list[0].number();
                     if let Some(segment) = manager.get_current_segment(waypoint_id_current) {
@@ -175,7 +175,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
                 }
             },
 
-            lmcp::LmcpType::MissionCommand(_) => (),
+            lmcp::LmcpType::AfrlCmasiMissionCommand(_) => (),
 
             _ => debug_println!("Unhandled LMCP message {:?}", msg),
         }
@@ -411,7 +411,7 @@ impl WaypointPlanManager {
     ) {
         if let Some(ref payload) = self.next_mission_command_to_send {
             raw_wpm.send_shared_lmcp_object_broadcast_message(
-                &lmcp::LmcpType::MissionCommand(payload.clone())
+                &lmcp::LmcpType::AfrlCmasiMissionCommand(payload.clone())
             );
         }
         self.next_mission_command_to_send = None;

@@ -79,9 +79,8 @@ subdir('src/VisilibityLib')
 
 if not get_option('afrl_internal')
   subdir('src/LMCP')
+  subdir('src/LMCP/rs')
 endif
-
-subdir('src/LMCP/rs')
 
 subdir('src/Communications')
 

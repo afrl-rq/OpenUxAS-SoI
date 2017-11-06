@@ -50,8 +50,15 @@ incs_services = [
   incs_lmcp,
 ]
 
+subdir('rs')
+
+lib_services_link_with = [
+  lib_services_rs,
+]
+
 if get_option('afrl_internal')
   incs_services += [incs_services_internal]
+  lib_services_link_with += [lib_services_rs_internal]
 else
   srcs_services_internal = files()
 endif
@@ -74,8 +81,6 @@ else
   ]
 endif
 
-subdir('rs')
-
 lib_services = static_library(
   'services',
   srcs_services,
@@ -83,9 +88,7 @@ lib_services = static_library(
   dependencies: [
     dep_boost,
   ],
-  link_with: [
-    lib_services_rs,
-  ],
+  link_with: lib_services_link_with,
   cpp_args: cpp_args,
   include_directories: incs_services,
 )
