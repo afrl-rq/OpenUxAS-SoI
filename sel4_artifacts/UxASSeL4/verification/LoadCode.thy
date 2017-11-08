@@ -3,72 +3,28 @@ theory LoadCode imports
 begin
   
 install_C_file "../CMASI/MissionCommandUtils.c"
-autocorres[ts_rules = nondet, heap_abs_syntax] "../CMASI/MissionCommandUtils.c"  
   
-(* Various simplifying definitions to make working with waypoints through a mission command 
- * pointer less tedious.  
- *)
-definition get_waypoint_ptr_ptr where
-  "get_waypoint_ptr_ptr s mcp n \<equiv> (waypointlist_C (heap_MissionCommand_struct_C s mcp)) +\<^sub>p n"
-
-definition get_waypoint_ptr where
-  "get_waypoint_ptr s mcp n \<equiv> heap_Waypoint_struct_C'ptr s (get_waypoint_ptr_ptr s mcp n)"
+autocorres[ts_rules = nondet, heap_abs_syntax, unsigned_word_abs = MCWaypointSubSequence FindWP] "../CMASI/MissionCommandUtils.c"  
   
-definition get_waypoint where
-  "get_waypoint s mcp n \<equiv> heap_Waypoint_struct_C s (get_waypoint_ptr s mcp n)"
 
-definition get_waypoints_length where
-  "get_waypoints_length s mcp \<equiv> length_C (waypointlist_ai_C (heap_MissionCommand_struct_C s mcp))"
-  
-definition get_waypoint_number where
-  "get_waypoint_number = number_C"
-
-(* The abreviations used by Autocorress are confusing and give the type inferencing engine a lot 
- * of trouble so lets rewrite the ones we will be working with.  
- *)
-  
-lemma [simp]: "length_C s[mcp]\<rightarrow>waypointlist_ai = get_waypoints_length s mcp"
-  by (simp add: 
-      MissionCommandUtils.get_MissionCommand_struct_waypointlist_ai_def 
-      get_waypoints_length_def)
-
-lemma [simp]: "s[mcp]\<rightarrow>waypointlist +\<^sub>p uint n = get_waypoint_ptr_ptr s mcp (uint n)" 
-  by (simp add: MissionCommandUtils.get_MissionCommand_struct_waypointlist_def get_waypoint_ptr_ptr_def)
-    
-lemma [simp]: "s[get_waypoint_ptr_ptr s mcp (uint n)] = get_waypoint_ptr s mcp (uint n)"
-  by (simp add: get_waypoint_ptr_def)
-
-lemma [simp]: "s[get_waypoint_ptr s mcp (uint n)] = get_waypoint s mcp (uint n)"
-  by (simp add: get_waypoint_def)
-    
-lemma [simp]: " s[get_waypoint_ptr s mcp (uint j)]\<rightarrow>number = number_C (get_waypoint s mcp (uint j))"
-  using MissionCommandUtils.get_Waypoint_struct_number_def by auto   
-
-lemma [simp]: "number_C = get_waypoint_number" using get_waypoint_number_def by auto
-    
 (* A subset of what we expect a valid mission command to entail. I.E, the ptr to the front
  * of the waypoint pointer array is valid, all elements in that array are valid and all pointers
  * to waypoints are valid. 
  *)     
-definition is_valid_MissionCommand where 
-  "is_valid_MissionCommand s mcp \<equiv> 
-    is_valid_MissionCommand_struct_C s mcp
-    \<and> (\<forall> j < unat (get_waypoints_length s mcp).
-        is_valid_Waypoint_struct_C'ptr s (get_waypoint_ptr_ptr s mcp j)
-        \<and> is_valid_Waypoint_struct_C s (get_waypoint_ptr s mcp j)
-        \<and> get_waypoint_ptr s mcp j \<noteq> NULL)"
-  
-definition is_valid_MissionCommandExt where 
-  "is_valid_MissionCommandExt s mcep \<equiv> 
-    is_valid_MissionCommandExt_struct_C s mcep
-    \<and> is_valid_MissionCommand s (Ptr &(mcep\<rightarrow>[''missioncommand_C'']))
-    \<and> waypoints_C (heap_MissionCommandExt_struct_C s mcep) \<noteq> NULL
-    \<and> (\<forall> mc. mc = missioncommand_C (heap_MissionCommandExt_struct_C s mcep)
-      \<and> (\<forall> j < unat (waypointslen_C (heap_MissionCommandExt_struct_C s mcep)). 
-        heap_Waypoint_struct_C'ptr s (waypointlist_C mc +\<^sub>p j) = (waypoints_C (heap_MissionCommandExt_struct_C s mcep))  +\<^sub>p j))"  
+definition are_valid_Waypoints where 
+  "are_valid_Waypoints s wsp (len::nat) \<equiv> 
+    is_valid_Waypoint_struct_C s wsp
+    \<and> wsp \<noteq> NULL
+    \<and> (\<forall> j < len. is_valid_Waypoint_struct_C s (wsp +\<^sub>p j)) "
 
-(* Generally useful lemma." *)
-  
+lemma valid_mission_command[simp]:
+"are_valid_Waypoints s wsp len 
+\<Longrightarrow> j < len
+\<Longrightarrow> is_valid_Waypoint_struct_C s wsp 
+  \<and> is_valid_Waypoint_struct_C s (wsp +\<^sub>p j)"
+  by (simp add: are_valid_Waypoints_def uint_nat word_less_nat_alt)
+    
+(* Generally useful lemma." *)  
 lemma [simp]: "(a::32 word) < n \<Longrightarrow> unat (n - (a + 1)) < unat (n - a)"
 proof -
   assume "a < n"
@@ -77,15 +33,76 @@ proof -
   then show ?thesis
     by (simp add: add.commute diff_add_eq_diff_diff_swap measure_unat)
 qed
+  
+lemma [simp]: "(a::16 word) < n \<Longrightarrow> unat (n - (a + 1)) < unat (n - a)"
+proof -
+  assume "a < n"
+  then have "0 \<noteq> n - a"
+    by force
+  then show ?thesis
+    by (simp add: add.commute diff_add_eq_diff_diff_swap measure_unat)
+qed
 
+lemma [simp]: "uint (a::16 word) < uint n \<Longrightarrow> unat (n - (a + 1)) < unat (n - a)"
+proof -
+  assume "uint a < uint n"
+  then have "0 \<noteq> n - a"
+    by force
+  then show ?thesis
+    by (simp add: add.commute diff_add_eq_diff_diff_swap measure_unat)
+qed
+  
 lemma [simp]: "j < i \<Longrightarrow> int (unat j) = uint j" by (simp add: uint_nat)
     
+lemma word16_leq_max_word16_as_int[simp]:"65535 \<le> x \<Longrightarrow> uint (a::16 word) \<le> x = True"
+  using word.uint[of a] by auto
     
-lemma [simp]: "is_valid_MissionCommand s mcp \<Longrightarrow> is_valid_MissionCommand_struct_C s mcp"
-  using is_valid_MissionCommand_def by auto
+lemma [simp]:"i < 0 \<Longrightarrow> i < uint (j::16 word)"
+  by (metis less_trans neq_iff uint_lt_0)
+    
+lemma [simp]:"INT_MIN < uint (len_ws_win::16 word)"
+  using INT_MIN_def by fastforce
+    
+lemma [simp]:"uint j < uint (x::16 word) - 1 \<Longrightarrow> j + 1 \<le> x"
+  by (meson inc_le le_less word_less_def zle_diff1_eq)
+    
 
-lemma [simp]: "is_valid_MissionCommandExt s mcep \<Longrightarrow> is_valid_MissionCommandExt_struct_C s mcep"
-  using is_valid_MissionCommandExt_def by auto
+lemma [simp]:"int USHORT_MAX \<le> 2147483646"
+proof -
+  have "int USHORT_MAX = 65535" using USHORT_MAX_def by auto
+  thus ?thesis by auto
+qed    
 
+lemma [simp]:"uint (j::16 word) < uint (x::16 word) - 1 \<Longrightarrow> 0 < (j + 1)"
+  by (metis (mono_tags, hide_lams) add.commute add_left_cancel le_less max_word_max not_less word_less_def word_neq_0_conv word_overflow zle_diff1_eq)
 
+lemma [simp]:"i \<le> 2147483645  \<Longrightarrow> int i < 2147483646"
+  apply (induct i) by auto
+  
+lemma max_short_fix:"i \<le> USHORT_MAX \<Longrightarrow> int i < 2147483646"  
+sorry
+   
+lemma [simp]:"i \<le> USHORT_MAX \<Longrightarrow> uint ((of_nat i)::16 word) = int i"
+  sorry
+    
+lemma [simp]:"int len_ws_win \<le> 2147483648 \<Longrightarrow> 0 < len_ws_win \<Longrightarrow> int len_ws_win - 1 \<le> INT_MAX"
+  sorry
+
+lemma rename1[simp]:"int len_ws_win \<le> 2147483648 \<Longrightarrow> 0 < len_ws_win \<Longrightarrow> uint (of_nat len_ws_win) - 1 \<le> INT_MAX"
+  sorry
+    
+lemma rename2[simp]:"0 < len_ws_win \<Longrightarrow> a \<le> USHORT_MAX \<Longrightarrow> uint (of_nat len_ws_win) - 1 \<le> INT_MAX"
+  sorry 
+    
+lemma rename3[simp]:"len_ws \<le> USHORT_MAX \<Longrightarrow> len_ws_win \<le> len_ws \<Longrightarrow> int len_ws_win \<le> 2147483648"
+  sorry
+    
+lemma [simp]:"0 < len_ws_win \<Longrightarrow> INT_MIN < int len_ws_win"
+  sorry
+    
+lemma ushort_max_2to32[simp]:"a \<le> USHORT_MAX \<Longrightarrow> int a < 2147483648"
+  sorry
+    
+lemma [simp]:"p +\<^sub>p int 0 = p"    
+  sorry
 end

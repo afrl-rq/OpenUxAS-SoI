@@ -25,7 +25,7 @@ definition find_waypoint :: "'w list \<Rightarrow> 'id \<Rightarrow> 'w option" 
 (* Extending the waypoint list by an uninteresting waypoint preserve find_waypoint failure. *)
 lemma find_waypoint_none_extend: 
 "None = find_waypoint ws i \<Longrightarrow> get_number w \<noteq> i  \<Longrightarrow> None = find_waypoint (ws @[w]) i"
-apply(induct ws) using find_waypoint_def by auto
+  apply(induct ws) using find_waypoint_def by auto
   
 (* Extending the waypoint list by any waypoint preserves find_waypoint success. *)
 lemma find_waypoint_none_extend_some: 
@@ -321,8 +321,40 @@ next
   then have y6:" set (map get_number win') \<subseteq> set (map get_number ws)" using 3 y1 by auto
   thus ?case using y3 y5 by auto
 qed
-  
-  
+
+lemma foo:"waypoints_window ws i len = Some win \<Longrightarrow> 0 < len \<Longrightarrow> \<forall> j < len. Some (win ! j) = find_waypoint win (get_nextwp (win ! j))"
+  proof(induct arbitrary: win rule:waypoints_window.induct)
+    case (1 ws i)
+  then show ?case by auto
+next
+  case (2 ws i)
+  then show ?case
+    using find_waypoint_def waypoints_window_length_one by fastforce
+next
+  case (3 ws i n)
+  then show ?case sorry
+qed
+(*  
+lemma waypoints_window_all_found:"waypoints_window ws i len = Some win \<Longrightarrow> List.member win w \<Longrightarrow> (\<exists> w'. Some w' = find_waypoint ws (get_nextwp w))"
+proof(induct arbitrary: win rule:waypoints_window.induct)
+  case (1 ws i)
+  then show ?case by auto
+next
+  case (2 ws i)
+  thus ?case sledgehammer[z3 e spass]
+  (*then obtain w w' where y1:"win = [w] \<and> get_number w = get_nextwp w \<and> Some w' = find_waypoint ws i \<and> w = update_nextwp w' (get_number w')"
+    sledgehammer[z3 e spass]
+    (*by (metis correct_update1 correct_update2 find_waypoint_succuss waypoints_window_elim7)*)
+  then have "Some w' = find_waypoint ws (get_nextwp w)" 
+      by (simp add: find_waypoint_correct)
+  thus ?case using y1 by (metis member_rec(1) member_rec(2))   *)
+next
+  case (3 ws i n)
+  then obtain w win' where "waypoints_window ws (get_nextwp w) (Suc n) = Some win' \<and> find_waypoint ws i = Some w \<and> win = w # win'"
+  by (meson waypoints_window_elim10 waypoints_window_elim9)
+  then show ?case using 3  by (metis member_rec(1) waypoints_window_elim8)
+qed
+*)  
 end
   
 end
