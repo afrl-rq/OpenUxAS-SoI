@@ -17,8 +17,6 @@ time : timeT
 Macros:
 
 Assumptions:
-a2 : true -> initial_pos == previous initial_pos
-a3 : true -> initial_direction == previous initial_direction
 
 Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
@@ -44,8 +42,8 @@ p1 : pos <= P_global
 p2 : pos >= 0.0 m
 
 //Observe a trace with a starting location other than 0
-o1 observe : (initial_pos == 2.4 m) and (time > 20.0 s)
+o1 observe : initial_value_true(pos == 2.4 m) and (time > 20.0 s)
 
 //Observe a trace starting in the positive direction (heading toward P_global)
-o2 observe : (initial_direction == 1) and (time > 20.0 s)
+o2 observe : initial_value_true(direction == 1) and (time > 20.0 s)
 
