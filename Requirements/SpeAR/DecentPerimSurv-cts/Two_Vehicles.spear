@@ -69,7 +69,6 @@ a0 : initial_pos_UAV1 <= initial_pos_UAV2
 
 Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
-// In the case of the solo vehicle, that is reaching an endpoint of the perimeter.
 r0 : time == (0.0 s -> previous time + deltaT)
 
 r11 : direction_UAV1 == 
@@ -83,18 +82,19 @@ r11 : direction_UAV1 ==
 								else if pos_UAV1 >= P_global
 										then -1
 										else pre_direction_UAV1
-
+										
+//TODO: Jen--think about indentation later. (Tony's proposed indentation is shown below.)
 r12 : direction_UAV2 == 
 					if meet_neighbor_12 
 						then if pos_UAV2 > S_12
-							then -1
+								then -1
 							else // pos_UAV2 <= S_12
 								1
-						else if pos_UAV2 <= 0.0 m
-								then 1
-								else if pos_UAV2 >= P_global
-										then -1
-										else pre_direction_UAV2
+					else if pos_UAV2 <= 0.0 m
+							then 1
+					else if pos_UAV2 >= P_global
+									then -1
+					else pre_direction_UAV2
 
 r21 : pos_UAV1 == (initial_pos_UAV1 ->
 						if pre_direction_UAV1 == 1 
@@ -167,11 +167,32 @@ o_still_converging_at_less_than_1pt5T observe:
 
 
 //Note that we prove a stricter bound than in the paper. We can prove convergence within 1.5T.		
-Theorem_Alg_A_Two_Vehicles : time >= 1.5*Time_to_travel_full_length implies
-					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
-					)
+//Theorem_Alg_A_Two_Vehicles_snapshot : time >= 1.5*Time_to_travel_full_length implies
+//					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
+//					)
+//
+//Theorem_Alg_A_Two_Vehicles_time : time >= 1.5*Time_to_travel_full_length	implies
+//					deltaT == Time_to_travel_full_length/2.0			
 
-Theorem_Alg_A_Two_Vehicles_time : time >= 1.5*Time_to_travel_full_length	implies
-					deltaT == Time_to_travel_full_length/2.0			
+Theorem_Alg_A_Two_Vehicles : time >= 1.5*Time_to_travel_full_length implies
+					((((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+							and (pre_pos_UAV1 == S_12 and pre_pos_UAV2 == S_12))
+						or ((pos_UAV1 == S_12 and pos_UAV2 == S_12)
+							and (pre_pos_UAV1 == 0.0 m and pre_pos_UAV2 == P_global)
+						))
+					and 
+						(deltaT == Time_to_travel_full_length/2.0)
+					)			
+					 
+myObs observe: time <2.0*Time_to_travel_full_length
+		and (((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						and (pre_pos_UAV1 == S_12 and pre_pos_UAV2 == S_12))
+					or ((pos_UAV1 == S_12 and pos_UAV2 == S_12)
+						and (pre_pos_UAV1 == 0.0 m and pre_pos_UAV2 == P_global)
+					))
+		and initial_value_true(direction_UAV2 == 1)
+		and initial_value_true(direction_UAV1 == 1)
+		and initial_value_true(pos_UAV1 == 0.0 m)
+		and initial_value_true(pos_UAV2 == 0.01 m)
 					 
