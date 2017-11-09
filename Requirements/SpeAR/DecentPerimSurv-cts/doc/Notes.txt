@@ -1,0 +1,25 @@
+Notes:
+
+x = pos
+p = goal
+
+(Goal) Algorithm:
+* If I meet a neighbor:
+*  If I'm to the left of my segment (x< pl), go to the left endpoint of my segment (p = pl).
+*  If I'm to the right of my segment (x > pr), go to the right endpoint of my segment (p = pr).
+*  If I'm inside my segment (pl <= x <= pr),
+		If I'm meeting my left neighbor, p = pl
+		If I'm meeting my right neighbor, p = pl
+		If I'm meeting both neighbors, p = pl (go with left).
+
+Events that can happen:		
+For all i, u_i.x = u_i.p (somebody hit their goal)
+Or
+	0: u1.x = 0 (hit left endpoint)
+	1: u1.x = u2.x
+	2: u2.x = u3.x
+	...
+	   u(n-1).x = un.x
+	   un.x = P
+	   
+ 
