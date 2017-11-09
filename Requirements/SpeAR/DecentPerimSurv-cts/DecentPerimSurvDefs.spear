@@ -6,13 +6,12 @@ m "meters"
 mps : m/s "meters per second"
 
 Types:
-nonnegIntT : {i : int | i >=0}
 timeT: real s
-lengthT: real m
-nonnegLengthT : {l : lengthT | l >= 0.0 m}
 velocityT : real mps
+lengthT: real m
 signT : {i : int | i == -1 or i == 1 }
-positionT : {l : nonnegLengthT | l <= P_global }
+nonnegLengthT : {l : lengthT | l >= 0.0 m}
+positionT : {l : nonnegLengthT | l <= P_global}
 
 Constants:
 V : velocityT = 1.0 mps
@@ -21,11 +20,6 @@ Time_to_travel_full_length : timeT = P_global/V
 
 Patterns:
 	
-pattern sign(i: int) returns (output : signT)
-	let
-		output = if i mod 2 == 0 then 1 else -1
-	tel
-
 //Returns the minimum of two timeTs
 pattern min_time(a: timeT, b : timeT) returns (out: timeT)
 	let
@@ -78,3 +72,30 @@ pattern time_to_reach_target_position(direction: signT,
 							Time_to_travel_full_length //we'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
 				
 	tel
+
+pattern initial_value_true(a : bool) returns (holds : bool)
+	var
+	  pre_state : int
+	  state : int
+	let
+	  pre_state = previous state with initial value 0
+	
+	  state = 
+	  if (pre_state == 0) 
+	  then 
+	    if a 
+	    then 1 
+	    else 2
+	  else pre_state
+
+	  holds = ((state == 0) or (state == 1))
+	
+	tel
+
+//I don't think this is used anymore.	
+pattern sign(i: int) returns (output : signT)
+	let
+		output = if i mod 2 == 0 then 1 else -1
+	tel
+
+	
