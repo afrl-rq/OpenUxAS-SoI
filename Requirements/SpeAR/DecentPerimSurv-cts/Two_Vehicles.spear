@@ -43,7 +43,7 @@ time_to_reach_neighbor_12 : timeT = time_to_reach_neighbor(pre_direction_UAV1,
 //Times to reach endpoints and shared borders
 time_until_UAV1_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV1, pre_pos_UAV1)
 time_until_UAV1_reaches_S_12 : timeT = time_to_reach_target_position(pre_direction_UAV1, pre_pos_UAV1, S_12)
-time_until_UAV2_reaches_S_12 : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV2, S_12)
+//time_until_UAV2_reaches_S_12 : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV2, S_12) //unused
 time_until_UAV2_reaches_endpoint : timeT = time_to_reach_endpoint(pre_direction_UAV2, pre_pos_UAV2)
 
 deltaT : timeT = if traveling_together_12 
@@ -66,14 +66,6 @@ traveling_together_12 : bool = (previous ((pos_UAV1 == pos_UAV2)
 Assumptions:
 //Assume UAVs are numbered according to position (by definition)
 a0 : initial_pos_UAV1 <= initial_pos_UAV2 
-
-//Assume initial positions don't change
-a11 : true -> initial_pos_UAV1 == previous initial_pos_UAV1
-a12 : true -> initial_pos_UAV2 == previous initial_pos_UAV2
-
-//Assume initial directions don't change
-a21 : true -> initial_direction_UAV1 == previous initial_direction_UAV1
-a22 : true -> initial_direction_UAV2 == previous initial_direction_UAV2
 
 Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
@@ -111,7 +103,6 @@ r21 : pos_UAV1 == (initial_pos_UAV1 ->
 						else //direction == -1
 							pre_pos_UAV1 - V*deltaT)
 
-
 	
 r22 : pos_UAV2 == (initial_pos_UAV2 ->
 						if pre_direction_UAV2 == 1 
@@ -121,22 +112,22 @@ r22 : pos_UAV2 == (initial_pos_UAV2 ->
 							pre_pos_UAV2 - V*deltaT)
  
 Properties:
-o1_travelling_toward_eo observe : initial_direction_UAV1 == 1 
-				and initial_direction_UAV2 == -1
-				and initial_pos_UAV1 == 3.1 m
-				and initial_pos_UAV2 == 8.4 m
+o1_travelling_toward_eo observe : initial_value_true(direction_UAV1 == 1) 
+				and initial_value_true(direction_UAV2 == -1)
+				and initial_value_true(pos_UAV1 == 3.1 m)
+				and initial_value_true(pos_UAV2 == 8.4 m)
 				and time > 20.0 s
 
-o2_travelling_toward_0 observe : initial_direction_UAV1 == -1 
-				and initial_direction_UAV2 == -1
-				and initial_pos_UAV1 == 3.1 m
-				and initial_pos_UAV2 == 8.4 m
+o2_travelling_toward_0 observe : initial_value_true(direction_UAV1 == -1) 
+				and initial_value_true(direction_UAV2 == -1)
+				and initial_value_true(pos_UAV1 == 3.1 m)
+				and initial_value_true(pos_UAV2 == 8.4 m)
 				and time > 20.0 s
 
 o3_travelling_away_from_eo observe : initial_direction_UAV1 == -1 
-				and initial_direction_UAV2 == 1
-				and initial_pos_UAV1 == 3.1 m
-				and initial_pos_UAV2 == 8.4 m
+				and initial_value_true(direction_UAV2 == 1)
+				and initial_value_true(pos_UAV1 == 3.1 m)
+				and initial_value_true(pos_UAV2 == 8.4 m)
 				and time > 20.0 s
 
 //Note, the value of the counter on Step 1 is 0.
@@ -144,34 +135,43 @@ o4_still_converging_at_4_steps observe: counter == 3 and
 	not	((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
 						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)) 
 
-o5_start_in_same_location observe : initial_pos_UAV1 == initial_pos_UAV1 and time > 20.0 s 
+o_still_converging_at_less_than_1pt5T observe: 
+	time > 0.9*Time_to_travel_full_length and
+	time < 1.5*Time_to_travel_full_length
+	and not	((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)) 
 
-o6_start_at_shared_border_position observe : initial_pos_UAV1 == initial_pos_UAV1 
-	and initial_pos_UAV1 == S_12
-	and initial_direction_UAV1 == 1
-	and time > 20.0 s
+//o5_start_in_same_location observe : initial_pos_UAV1 == initial_pos_UAV1 and time > 20.0 s 
+//
+//o6_start_at_shared_border_position observe : initial_pos_UAV1 == initial_pos_UAV1 
+//	and initial_pos_UAV1 == S_12
+//	and initial_direction_UAV1 == 1
+//	and time > 20.0 s
+//
+//p_lemma_stay_stable : true -> previous ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
+//					) 
+//					implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
+//					)
+//
+//p_lemma_get_stable_in_5_steps: counter == 4 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_12 and pos_UAV2 == S_12))
+//
+//p_lemma_stable_after_5_steps: counter > 4 implies 
+//					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
+//						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
+//					)
+//
+//p_lemma_5_steps_leq_2T : counter == 4 implies time <= 2.0*Time_to_travel_full_length
 
-p_lemma_stay_stable : true -> previous ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
-					) 
-					implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
-					)
 
-p_lemma_get_stable_in_5_steps: counter == 4 implies ((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_12 and pos_UAV2 == S_12))
-
-p_lemma_stable_after_5_steps: counter > 4 implies 
+//Note that we prove a stricter bound than in the paper. We can prove convergence within 1.5T.		
+Theorem_Alg_A_Two_Vehicles : time >= 1.5*Time_to_travel_full_length implies
 					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
 						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
 					)
 
-p_lemma_5_steps_leq_2T : counter == 4 implies time <= 2.0*Time_to_travel_full_length
-
-		
-Theorem_Alg_A_Two_Vehicles : time > 2.0*Time_to_travel_full_length implies
-					((pos_UAV1 == 0.0 m and pos_UAV2 == P_global)
-						or (pos_UAV1 == S_12 and pos_UAV2 == S_12)
-					)
-					
+Theorem_Alg_A_Two_Vehicles_time : time >= 1.5*Time_to_travel_full_length	implies
+					deltaT == Time_to_travel_full_length/2.0			
 					 
