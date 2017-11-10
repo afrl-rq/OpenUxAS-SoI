@@ -6,13 +6,11 @@ import "../DecentPerimSurvDefs.spear"
 Constants:
 
 Inputs:
-initial_pos : positionT
 suggested_initial_direction : signT //The UAV may choose a different direction for the initial timestep, depending on the circumstances.
 meet_LN : bool //True iff this UAV is co-located with it's left neighbor
 meet_RN : bool
-id : nonnegIntT //make this nonneg and between 1 and N
-N : nonnegIntT //make this nonneg
-deltaT : timeT
+id : posIntT //a positive integer between 1 and N
+N : posIntT //a positive integer
 pos : positionT 
 
 Outputs:
@@ -30,11 +28,11 @@ S_R : positionT = real(id)*P_global/real(N)
 pre_direction : signT = previous direction with initial value suggested_initial_direction
 
 Assumptions:
-id_in_range : 0 <= id and id <= N
+id_in_range : id <= N //id > 0 is guaranteed by the posIntT type
 
 Requirements:
 r_dir : direction == (
-			if id == 0 then //leftmost UAV
+			if id == 1 then //leftmost UAV
 				if meet_RN then
 					if pos < S_R then
 						1
@@ -67,7 +65,7 @@ r_dir : direction == (
 		)  
 
 r_goal : goal == (
-			if id == 0 then //leftmost UAV
+			if id == 1 then //leftmost UAV
 				if meet_RN then
 					if pos < S_R then
 						S_R
