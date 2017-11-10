@@ -105,13 +105,13 @@ r12 : |direction_UAV2, goal_UAV2| ==
 					N,
 					pos_UAV2)	
 
-r13 : |direction_UAV1, goal_UAV1| == 
-		spec UAV(suggested_initial_direction_UAV1, 
+r13 : |direction_UAV3, goal_UAV3| == 
+		spec UAV(suggested_initial_direction_UAV3, 
 					meet_neighbor_23, 
 					false, 
-					1,
+					3,
 					N,
-					pos_UAV1)	
+					pos_UAV3)	
 						
 r21 : pos_UAV1 == (initial_pos_UAV1 ->
 						if pre_direction_UAV1 == 1 
