@@ -6,6 +6,7 @@ m "meters"
 mps : m/s "meters per second"
 
 Types:
+nonnegIntT : {i: int | i >= 0}
 timeT: real s
 velocityT : real mps
 lengthT: real m

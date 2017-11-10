@@ -62,7 +62,7 @@ time_to_reach_neighbor_23 : timeT = time_to_reach_neighbor(pre_direction_UAV2,
 															pre_pos_UAV2,
 															pre_pos_UAV3
 															)
-//Times to reach endpoints and shared borders
+//Times to reach goals
 time_until_UAV1_reaches_goal : timeT = time_to_reach_target_position(pre_direction_UAV1, pre_pos_UAV1, pre_goal_UAV1)
 time_until_UAV2_reaches_goal : timeT = time_to_reach_target_position(pre_direction_UAV2, pre_pos_UAV2, pre_goal_UAV2)
 time_until_UAV3_reaches_goal : timeT = time_to_reach_target_position(pre_direction_UAV3, pre_pos_UAV3, pre_goal_UAV3)
@@ -80,8 +80,8 @@ deltaT : timeT = min_time(time_until_UAV1_reaches_goal,
 
 Assumptions:
 //Assume UAVs are numbered according to position (by definition)
-a00 : initial_pos_UAV1 <= initial_pos_UAV2
-a01 : initial_pos_UAV2 <= initial_pos_UAV3  
+a00 : initial_value_true(initial_pos_UAV1 <= initial_pos_UAV2)
+a01 : initial_value_true(initial_pos_UAV2 <= initial_pos_UAV3)  
 
 Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
@@ -169,7 +169,7 @@ r33 : goal_UAV3 == if meet_neighbor_23
 									0.0 m 
 
 Properties:
-Theorem_Alg_A_Three_Vehicles : time >= 2.0*Time_to_travel_full_length implies
+Theorem_Alg_A_Three_Vehicles : time >= 1.67*Time_to_travel_full_length implies
 					((((pos_UAV1 == 0.0 m and pos_UAV2 == S_23 and pos_UAV3 == S_23)
 							and (pre_pos_UAV1 == S_12 and pre_pos_UAV2 == S_12 and pre_pos_UAV3 == P_global))
 						or ((pos_UAV1 == S_12 and pos_UAV2 == S_12 and pos_UAV3 == P_global)
