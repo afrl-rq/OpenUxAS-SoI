@@ -54,11 +54,11 @@ namespace task
  *  - afrl::cmasi::EntityState
  *  - afrl::cmasi::EntityConfiguration
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - afrl::cmasi::AirVehicleState
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::SurfaceVehicleState
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::SurfaceVehicleState
  *  - afrl::cmasi::MissionCommand
  *  - afrl::cmasi::AutomationResponse
  *  - afrl::cmasi::FollowPathCommand

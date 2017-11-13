@@ -19,12 +19,10 @@
 
 #include "FileSystemUtilities.h"
 
-#include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityConfigurationDescendants.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "avtas/lmcp/LmcpXMLReader.h"
 #include "uxas/messages/task/TaskComplete.h"
 #include "uxas/messages/task/TaskInitialized.h"
@@ -158,14 +156,18 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
     if(m_uniqueRouteRequestId < 0)
         m_uniqueRouteRequestId = -m_uniqueRouteRequestId;
 
-    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    //ENTITY CONFIGURATIONS
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
+    
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationResponse::Subscription);
     addSubscriptionAddress(uxas::messages::route::RoutePlanResponse::Subscription);
@@ -241,11 +243,12 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
             {
                 if (m_activeEntities.find(entityState->getID()) != m_activeEntities.end())
                 {
+                    taskComplete(); // allow task to perform functions required at taskcomplete
                     // was active last state update, send taskcomplete message for this vehicle
                     m_activeEntities.erase(entityState->getID());
                     COUT_INFO_MSG("Sending TaskComplete !!!!")
-                            // send out task complete - uxas
-                            auto taskCompleteUxas = std::make_shared<uxas::messages::task::TaskComplete>();
+                    // send out task complete - uxas
+                    auto taskCompleteUxas = std::make_shared<uxas::messages::task::TaskComplete>();
                     for (auto& assignedVehicleId : m_assignedVehicleIds)
                     {
                         taskCompleteUxas->getEntitiesInvolved().push_back(assignedVehicleId);

@@ -84,8 +84,8 @@ void Dpss::SmoothPath(DpssWaypoint pathPoints[], int numPoints, SmoothPathInput*
         if(spi->roughPlan)
             PlanQuickly(xyPoints, (spi->maxWaypoints)/2);
 #ifdef AFRL_INTERNAL_ENABLED
-        else
-            PlanPrecisely(xyPoints, (spi->maxWaypoints)/2);
+//        else
+//            PlanPrecisely(xyPoints, (spi->maxWaypoints)/2);
 #endif
     }
     

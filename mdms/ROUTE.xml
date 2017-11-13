@@ -4,12 +4,20 @@
 <!--
         <h2>Introduction</h2>
         This MDM defines the interface to a route planning service. It includes geometric constructs defining road networks to support the routing of ground vehicles.
+
+        <h2>Changes</h2>
+        
+        <h3>27 August 2017</h3>
+        <ul>
+            <li>Added {@link RoadPointsConstraints}, {@link RoadPointsRequest} , and {@link RoadPointsResponse} messages. These messages manage route request/responses for road search tasks</li>
+        </ul>
+        
 -->
 
 <MDM>
     <SeriesName>ROUTE</SeriesName>
     <Namespace>uxas/messages/route</Namespace>
-    <Version>3</Version>
+    <Version>4</Version>
 
     <StructList>
 
@@ -161,6 +169,33 @@
             <!-- The orientations -->
             <Field Name="Headings" Type="real32[]" MaxArrayLength="32" Units="degrees" />
         </Struct>
+
+         <!-- Start/end points for a road points request -->
+         <Struct Name="RoadPointsConstraints" >
+            <!-- ID denoting this set of road points constraints -->
+            <Field Name="RoadPointsID" Type="int64" />           
+            <!-- Location from which the road points will start -->
+            <Field Name="StartLocation" Type="CMASI/Location3D" />
+            <!-- Location to which theroad points will end -->
+            <Field Name="EndLocation" Type="CMASI/Location3D" />
+        </Struct>
+
+        <!-- Route plan request: find route from the current vehicle position to a point of interest or world location -->
+        <Struct Name="RoadPointsRequest" >
+            <!-- Request ID for correlating with response -->
+            <Field Name="RequestID" Type="int64" />
+            <!-- List of all requests for this vehicle + operating region situation -->
+            <Field Name="RoadPointsRequests" Type="RoadPointsConstraints[]" />
+        </Struct>
+
+        <!-- Resonse to RoadPointsRequest: list of all fulfilled road points requests -->
+        <Struct Name="RoadPointsResponse" >
+            <!-- Response ID matching ID from request ({@link RoadPointsRequest}) -->
+            <Field Name="ResponseID" Type="int64" />
+            <!-- Corresponding road points respones, returned as LineOfInterest messages -->
+            <Field Name="RoadPointsResponses" Type="IMPACT/LineOfInterest[]" />
+        </Struct>
+        
         
     </StructList>
 </MDM>

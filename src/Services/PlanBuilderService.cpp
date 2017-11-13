@@ -22,9 +22,8 @@
 
 #include "uxas/messages/task/UniqueAutomationResponse.h"
 #include "afrl/cmasi/MissionCommand.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "afrl/cmasi/ServiceStatus.h"
 #include "pugixml.hpp"
 
@@ -57,37 +56,30 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskImplementationResponse::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
     return true;
 }
 
 bool
 PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    if(uxas::messages::task::isTaskAssignmentSummary(receivedLmcpMessage->m_object))
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
+    if(entityState)
+    {
+        m_currentEntityStates[entityState->getID()] = entityState;
+    }
+    else if(uxas::messages::task::isTaskAssignmentSummary(receivedLmcpMessage->m_object))
     {
         processTaskAssignmentSummary(std::static_pointer_cast<uxas::messages::task::TaskAssignmentSummary>(receivedLmcpMessage->m_object));
     }
     else if(uxas::messages::task::isTaskImplementationResponse(receivedLmcpMessage->m_object))
     {
         processTaskImplementationResponse(std::static_pointer_cast<uxas::messages::task::TaskImplementationResponse>(receivedLmcpMessage->m_object));
-    }
-    else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_currentEntityStates[entityState->getID()] = entityState;
-    }
-    else if(afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_currentEntityStates[entityState->getID()] = entityState;
-    }
-    else if(afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_currentEntityStates[entityState->getID()] = entityState;
     }
     else if(uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object))
     {
@@ -128,6 +120,13 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
     {
         std::string message = "ERROR::processTaskAssignmentSummary: Corresponding Unique Automation Request ID [";
         message += std::to_string(taskAssignmentSummary->getCorrespondingAutomationRequestID()) + "] not found!";
+        sendError(message);
+        return;
+    }
+    
+    if (taskAssignmentSummary->getTaskList().empty())
+    {
+        std::string message = "No assignments found for request " + std::to_string(taskAssignmentSummary->getCorrespondingAutomationRequestID());
         sendError(message);
         return;
     }

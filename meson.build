@@ -16,6 +16,7 @@ elif os == 'windows'
 endif
 
 if get_option('afrl_internal')
+  add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
 endif
 
@@ -126,7 +127,9 @@ subdir('src/Includes')
 deps = []
 
 # OpenGL, specifically the GLU library
-deps += [dependency('gl')]
+if not (target_machine.cpu_family() == 'arm')
+  deps += [dependency('gl')]
+endif
 if os == 'darwin'
   # newer MacOS splits out GLU into a separate framework, but we can't
   # ask Meson for the version in order to handle things differently
@@ -138,7 +141,9 @@ if os == 'darwin'
     endif
   endforeach
 elif os.startswith('linux')
-  deps += [dependency('glu')]
+  if not (target_machine.cpu_family() == 'arm')
+    deps += [dependency('glu')]
+  endif
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
@@ -147,6 +152,10 @@ deps += [
   dep_thread,
   dep_boost,
 ]
+
+if get_option('afrl_internal')
+  deps += deps_internal
+endif
 
 cpp_args = []
 if cpp.get_id() == 'msvc'
@@ -180,3 +189,8 @@ executable(
 )
 
 subdir('tests')
+
+if get_option('afrl_internal')
+  subdir('UxAS-afrl_internal/tests')
+endif
+

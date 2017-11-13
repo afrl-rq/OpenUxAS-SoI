@@ -13,7 +13,7 @@
  *
  * Created on March 22, 2017, 5:55 PM
  *
- * <Service Type="c00_TaskTemplate" OptionString="Option_01" OptionInt="36" />
+ * <Service Type="TaskTemplate" OptionString="Option_01" OptionInt="36" />
  * 
  */
 
@@ -38,21 +38,21 @@ namespace task
 {
 
 // this entry registers the service in the service creation registry
-c00_TaskTemplate::ServiceBase::CreationRegistrar<c00_TaskTemplate>
-c00_TaskTemplate::s_registrar(c00_TaskTemplate::s_registryServiceTypeNames());
+TaskTemplate::ServiceBase::CreationRegistrar<TaskTemplate>
+TaskTemplate::s_registrar(TaskTemplate::s_registryServiceTypeNames());
 
 // service constructor
-c00_TaskTemplate::c00_TaskTemplate()
-: TaskServiceBase(c00_TaskTemplate::s_typeName(), c00_TaskTemplate::s_directoryName()) { };
+TaskTemplate::TaskTemplate()
+: TaskServiceBase(TaskTemplate::s_typeName(), TaskTemplate::s_directoryName()) { };
 
-c00_TaskTemplate::~c00_TaskTemplate()
+TaskTemplate::~TaskTemplate()
 {
-    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~c00_TaskTemplate()");
+    UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~TaskTemplate()");
 };
 
 
 bool
-c00_TaskTemplate::configureTask(const pugi::xml_node& ndComponent)
+TaskTemplate::configureTask(const pugi::xml_node& ndComponent)
 
 {
     bool isSuccess(true);
@@ -62,7 +62,7 @@ c00_TaskTemplate::configureTask(const pugi::xml_node& ndComponent)
 //            m_pisrTask = std::static_pointer_cast<uxas::project::pisr::PISR_Task>(m_task);
 //            if (!m_pisrTask)
 //            {
-//                sstrErrors << "ERROR:: **c00_TaskTemplate::bConfigure failed to cast a PISR_Task from the task pointer." << std::endl;
+//                sstrErrors << "ERROR:: **TaskTemplate::bConfigure failed to cast a PISR_Task from the task pointer." << std::endl;
 //                isSuccessful = false;
 //            }
 //            else
@@ -89,7 +89,7 @@ c00_TaskTemplate::configureTask(const pugi::xml_node& ndComponent)
 //        }
 //        else
 //        {
-//            sstrErrors << "ERROR:: **c00_TaskTemplate::bConfigure failed: taskObject[" << m_task->getFullLmcpTypeName() << "] is not a c00_TaskTemplate_Task." << std::endl;
+//            sstrErrors << "ERROR:: **TaskTemplate::bConfigure failed: taskObject[" << m_task->getFullLmcpTypeName() << "] is not a TaskTemplate_Task." << std::endl;
 //            isSuccessful = false;
 //        }
 
@@ -99,7 +99,7 @@ c00_TaskTemplate::configureTask(const pugi::xml_node& ndComponent)
     return (isSuccess);
 }
 
-bool c00_TaskTemplate::initializeTask()
+bool TaskTemplate::initializeTask()
 {
     // perform any required initialization before the service is started
     std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -107,7 +107,7 @@ bool c00_TaskTemplate::initializeTask()
     return (true);
 }
 
-bool c00_TaskTemplate::startTask()
+bool TaskTemplate::startTask()
 {
     // perform any actions required at the time the service starts
     std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -115,7 +115,7 @@ bool c00_TaskTemplate::startTask()
     return (true);
 };
 
-bool c00_TaskTemplate::terminateTask()
+bool TaskTemplate::terminateTask()
 {
     // perform any action required during service termination, before destructor is called.
     std::cout << "*** TERMINATING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -123,7 +123,7 @@ bool c00_TaskTemplate::terminateTask()
     return (true);
 }
 
-bool c00_TaskTemplate::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject)
+bool TaskTemplate::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject)
 {
 //    if (afrl::cmasi::isKeyValuePair(receivedLmcpObject))
 //    {

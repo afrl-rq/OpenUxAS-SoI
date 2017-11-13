@@ -58,6 +58,7 @@
 #ifndef UXAS_SERVICE_LIST_CODE_HEADERS  // only allow one-time definition
 #define UXAS_SERVICE_LIST_CODE_HEADERS
 
+
 // examples
 #include "01_HelloWorld.h"
 
@@ -85,6 +86,11 @@
 #include "PatternSearchTaskService.h"
 #include "TaskManagerService.h"
 #include "TaskTrackerService.h"
+#include "MustFlyTaskService.h"
+#include "LoiterTaskService.h"
+
+// DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW TASK HEADERS
+
 
 // test
 #include "SendMessagesService.h"
@@ -105,6 +111,9 @@
 #include "WaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
 
+// DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE HEADERS
+
+
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
 #endif  //INCLUDE_SERVICE_HEADERS
 
@@ -122,6 +131,8 @@
 
 #if defined REGISTER_SERVICE_CODE   // define this to register the services
 #undef REGISTER_SERVICE_CODE
+
+
 
 // examples
 {auto svc = uxas::stduxas::make_unique<uxas::service::HelloWorld>();}
@@ -150,6 +161,11 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::PatternSearchTaskService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskTrackerService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::MustFlyTaskService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::LoiterTaskService>();}
+
+// DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW TASK DUMMY INSTANCES
+
 
 // test
 {auto svc = uxas::stduxas::make_unique<uxas::service::test::SendMessagesService>();}
@@ -168,6 +184,9 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
+
+// DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE DUMMY INSTANCES
+
 
 #endif  //REGISTER_SERVICE_CODE
 //////////////////////////////////////////////////////////

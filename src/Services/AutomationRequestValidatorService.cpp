@@ -33,12 +33,10 @@
 #include "afrl/impact/AreaOfInterest.h"
 
 #include "afrl/cmasi/ServiceStatus.h"
-#include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityConfigurationDescendants.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "afrl/cmasi/RemoveTasks.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -106,13 +104,17 @@ AutomationRequestValidatorService::configure(const pugi::xml_node & ndComponent)
     addSubscriptionAddress(uxas::messages::task::TaskAutomationRequest::Subscription);
 
     //ENTITY CONFIGURATIONS
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
     // ENTITY STATES
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
+    
     // TASKS
     addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskInitialized::Subscription);
@@ -138,46 +140,22 @@ bool
 AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
     bool isMessageHandled{false};
-    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
+    auto entityConfig = std::dynamic_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
+    if ( entityConfig )
     {
-        auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
-        m_availableStateEntityIds.insert(airVehicleState->getID());
+        m_availableConfigurationEntityIds.insert(entityConfig->getID());
         isMessageHandled = true;
     }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+    else if ( entityState )
     {
-        auto groundVehicleState = std::static_pointer_cast<afrl::impact::GroundVehicleState>(receivedLmcpMessage->m_object);
-        m_availableStateEntityIds.insert(groundVehicleState->getID());
-        isMessageHandled = true;
-    }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
-    {
-        auto surfaceVehicleState = std::static_pointer_cast<afrl::impact::SurfaceVehicleState>(receivedLmcpMessage->m_object);
-        m_availableStateEntityIds.insert(surfaceVehicleState->getID());
+        m_availableStateEntityIds.insert(entityState->getID());
         isMessageHandled = true;
     }
     else if (uxas::messages::task::isTaskInitialized(receivedLmcpMessage->m_object.get()))
     {
         auto taskInitialized = std::static_pointer_cast<uxas::messages::task::TaskInitialized>(receivedLmcpMessage->m_object);
         m_availableStartedTaskIds.insert(taskInitialized->getTaskID());
-        isMessageHandled = true;
-    }
-    else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object.get()))
-    {
-        auto airVehicleConfiguration = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object);
-        m_availableConfigurationEntityIds.insert(airVehicleConfiguration->getID());
-        isMessageHandled = true;
-    }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
-    {
-        auto groundVehicleConfiguration = std::static_pointer_cast<afrl::impact::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
-        m_availableConfigurationEntityIds.insert(groundVehicleConfiguration->getID());
-        isMessageHandled = true;
-    }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
-    {
-        auto surfaceVehicleConfiguration = std::static_pointer_cast<afrl::impact::SurfaceVehicleConfiguration>(receivedLmcpMessage->m_object);
-        m_availableConfigurationEntityIds.insert(surfaceVehicleConfiguration->getID());
         isMessageHandled = true;
     }
     else if (afrl::impact::isAreaOfInterest(receivedLmcpMessage->m_object.get()))
