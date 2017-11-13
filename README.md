@@ -313,7 +313,7 @@ in the `/3rd` directory by `./prepare`.
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
    * `git -c https://github.com/afrl-rq/OpenAMASE.git`
-1. (**optionall**) Build OpenAMASE
+1. (**optional**) Build OpenAMASE
    * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
    * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
@@ -341,4 +341,3 @@ in the `/3rd` directory by `./prepare`.
 
 - The Visual Studio backend for Meson mostly works, but will fail when regenerating build files. If you modify one of the `meson.build` files, delete the `build` directory and run `meson.py build --backend=vs` again. The steps following the `meson.build` command must also be performed.
 - The UxAS test suite uses some hardcoded POSIX-style paths, and so does not currently work on Windows.
-
