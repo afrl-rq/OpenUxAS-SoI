@@ -68,7 +68,7 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
 bool
 PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
     if(entityState)
     {
         m_currentEntityStates[entityState->getID()] = entityState;
