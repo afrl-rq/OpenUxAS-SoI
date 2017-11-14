@@ -21,7 +21,7 @@ TEST(WaterwaySearch_Test01, CorrectNumberMessages)
 	#endif
 	#ifndef _WIN32
 		testPath = "../tests/Test_Services/00_ExampleTests/02_Test_Example_WaterwaySearch/";
-		configFileNAme = "cfg_WaterwaySearch.xml";
+		configFileName = "cfg_WaterwaySearch.xml";
 	#endif // !_WIN32
 	// uxasConfigurationFile - path and file name of the UxAS configuration file
 	std::string uxasConfigurationFile = testPath + configFileName;

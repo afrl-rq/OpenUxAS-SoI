@@ -21,7 +21,7 @@ TEST(ImpactPlayAirExpandSqPointTest01, InitialTest)
 	#endif
 	#ifndef _WIN32
 		testPath = "../tests/Test_Services/ImpactPlayAirExpandSqPointTest01/";
-		configFileNAme = "cfg_Test01.xml";
+		configFileName = "cfg_Test01.xml";
 	#endif // !_WIN32
 	// uxasConfigurationFile - path and file name of the UxAS configuration file
 	std::string uxasConfigurationFile = testPath + configFileName;
