@@ -168,7 +168,7 @@ protected:
 
         m_messageAttributes = uxas::stduxas::make_unique<MessageAttributes>();
         if (!m_messageAttributes->setAttributesFromDelimitedString(
-            std::move(delimitedString.substr(endOfAddressDelimIndex + 1, endOfMessageAttributesDelimIndex - (endOfAddressDelimIndex + 1)))))
+            delimitedString.substr(endOfAddressDelimIndex + 1, endOfMessageAttributesDelimIndex - (endOfAddressDelimIndex + 1))))
         {
             UXAS_LOG_ERROR(s_typeName(), "::setAddressAttributesAndPayload failed to initialize message attributes");
             m_isValid = false;

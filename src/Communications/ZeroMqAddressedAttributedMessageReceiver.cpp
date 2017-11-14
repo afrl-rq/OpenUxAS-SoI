@@ -139,7 +139,7 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
                 {
                     std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdSinglepartAddAttMsg
                             = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
-                    if (recvdSinglepartAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(n_ZMQ::s_recv(*m_zmqSocket))))
+                    if (recvdSinglepartAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(n_ZMQ::s_recv(*m_zmqSocket)))
                     {
                         if (m_entityIdString != recvdSinglepartAddAttMsg->getMessageAttributesReference()->getSourceEntityId()
                                 || m_serviceIdString != recvdSinglepartAddAttMsg->getMessageAttributesReference()->getSourceServiceId())

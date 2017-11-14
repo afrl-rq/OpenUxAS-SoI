@@ -24,6 +24,9 @@
 #include "afrl/cmasi/Task.h"
 #include "afrl/cmasi/TaskDescendants.h"
 
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
+
 #include "afrl/impact/PointOfInterest.h"
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/AreaOfInterest.h"
@@ -49,9 +52,10 @@ bool
 TaskTrackerService::configure(const pugi::xml_node& serviceXmlNode)
 {
     // track all vehicles
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     addSubscriptionAddress(afrl::impact::AreaOfInterest::Subscription);
     addSubscriptionAddress(afrl::impact::LineOfInterest::Subscription);
@@ -75,7 +79,13 @@ TaskTrackerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
 //example: if (afrl::cmasi::isServiceStatus(receivedLmcpMessage->m_object.get()))
 {
     std::shared_ptr<avtas::lmcp::Object> msg = receivedLmcpMessage->m_object;
-    if (afrl::cmasi::isAutomationResponse(msg.get()))
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::EntityState>(msg);
+    if (entityState)
+    {
+        m_states[entityState->getID()] = entityState;
+        HandleVehicleState(entityState);
+    }
+    else if (afrl::cmasi::isAutomationResponse(msg.get()))
     {
         auto request = std::static_pointer_cast<afrl::cmasi::AutomationResponse>(msg);
         for (size_t k = 0; k < request->getMissionCommandList().size(); k++)
@@ -88,14 +98,6 @@ TaskTrackerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
     {
         std::shared_ptr<afrl::cmasi::MissionCommand> mish(static_cast<afrl::cmasi::MissionCommand*> (msg->clone()));
         HandleMissionCommand(mish);
-    }
-    else if (afrl::cmasi::isAirVehicleState(msg.get()) ||
-            afrl::impact::isGroundVehicleState(msg.get()) ||
-            afrl::impact::isSurfaceVehicleState(msg.get()))
-    {
-        auto state = std::static_pointer_cast<afrl::cmasi::EntityState>(msg);
-        m_states[state->getID()] = state;
-        HandleVehicleState(state);
     }
     else if (afrl::cmasi::isLoiterTask(msg.get()) ||
             afrl::cmasi::isMustFlyTask(msg.get()) ||

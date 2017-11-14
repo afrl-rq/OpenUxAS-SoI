@@ -3,11 +3,11 @@ cpp = meson.get_compiler('cpp')
 
 if cpp.get_id() == 'msvc'
   cpp_args += [
-  	'/std:c++14',
-	'-DZMQ_DEFINED_STDINT',
-	'-DZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
-	'-DLIBZYRE_STATIC',
+    '/std:c++14',
+    '-DZMQ_DEFINED_STDINT',
+    '-DZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+    '-DLIBZYRE_STATIC',
   ]
 else
   cpp_args += [
@@ -20,8 +20,6 @@ endif
 lib_uxas_communications = static_library(
   'uxas_messages',
   [
-    'AddressStringMessageReceiverPipe.cpp',
-    'AddressStringMessageSenderPipe.cpp',
     'AddressedAttributedMessage.cpp',
     'ImpactSubscribePushBridge.cpp',
     'LmcpObjectMessageReceiverPipe.cpp',

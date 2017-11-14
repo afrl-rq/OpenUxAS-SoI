@@ -82,10 +82,6 @@ private:
 
 public:
 
-    virtual
-    void
-    initialize(uint32_t entityId, uint32_t serviceId, SocketConfiguration& socketConfiguration) { };
-
     uint32_t m_entityId;
     uint32_t m_serviceId;
 

@@ -213,7 +213,7 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                                         std::string value;
                                         n_ZMQ::ZhashLookup(headers, hdrKeysIt->substr(), value);
                                         UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing received ZYRE_EVENT_ENTER header key/value pair KEY [", hdrKeysIt->substr(), "] VALUE [", value, "]");
-                                        headerKeyValuePairs.emplace(std::move(hdrKeysIt->substr()), std::move(value));
+                                        headerKeyValuePairs.emplace(hdrKeysIt->substr(), std::move(value));
                                     }
                                 }
                                 headers = nullptr; // release borrowed headers (hash) object

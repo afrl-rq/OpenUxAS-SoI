@@ -27,8 +27,8 @@
 #include "afrl/cmasi/MissionCommand.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
 #include "uxas/messages/task/TaskOption.h"
 #include "uxas/messages/route/RouteRequest.h"
@@ -266,8 +266,8 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> MultiVehicleWatchTaskService:
         }
 
         // calculate proper radius
-        if (afrl::impact::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
+        if (afrl::vehicles::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
+                afrl::vehicles::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
             surveyRadius = 0.0;
             surveyType = afrl::cmasi::LoiterType::Hover;

@@ -14,8 +14,8 @@
  * Created on March 22, 2017, 5:55 PM
  */
 
-#ifndef UXAS_00_SERVICE_TEMPLATE_H
-#define UXAS_00_SERVICE_TEMPLATE_H
+#ifndef UXAS_00_TASK_TEMPLATE_H
+#define UXAS_00_TASK_TEMPLATE_H
 
 #include "TaskServiceBase.h"
 
@@ -27,7 +27,7 @@ namespace task
 {
 
 
-/*! \class c00_TaskTemplate
+/*! \class TaskTemplate
     \brief This is a basic task that can be used as a template when 
  * constructing new tasks.
 
@@ -36,7 +36,7 @@ namespace task
  *  @par To add a new task:
  * <ul style="padding-left:1em;margin-left:0">
  * <li>Make copies of the source and header files of this template.</li>
- * <li>Search for the string c00_TaskTemplate and Replace it with the new 
+ * <li>Search for the string TaskTemplate and Replace it with the new 
  * service name.</li>
  * <li>Change the unique include guard entries, in the header file, i.e. 
  * "UXAS_00_SERVICE_TEMPLATE_H" to match the new service name</li>
@@ -65,10 +65,10 @@ namespace task
  *  - afrl::cmasi::EntityConfiguration
  *  - afrl::cmasi::AirVehicleState
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleState
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleState
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - uxas::messages::task::UniqueAutomationRequest
  *  - uxas::messages::task::UniqueAutomationResponse
  *  - uxas::messages::route::RoutePlanResponse
@@ -83,7 +83,7 @@ namespace task
  *  - uxas::messages::task::TaskImplementationResponse
  */
 
-class c00_TaskTemplate : public TaskServiceBase
+class TaskTemplate : public TaskServiceBase
 {
 public:
 
@@ -93,7 +93,7 @@ public:
     static const std::string&
     s_typeName()
     {
-        static std::string s_string("c00_TaskTemplate");
+        static std::string s_string("TaskTemplate");
         return (s_string);
     };
 
@@ -113,24 +113,24 @@ public:
     static ServiceBase*
     create()
     {
-        return new c00_TaskTemplate;
+        return new TaskTemplate;
     };
 
-    c00_TaskTemplate();
+    TaskTemplate();
 
     virtual
-    ~c00_TaskTemplate();
+    ~TaskTemplate();
 
 private:
 
     static
-    ServiceBase::CreationRegistrar<c00_TaskTemplate> s_registrar;
+    ServiceBase::CreationRegistrar<TaskTemplate> s_registrar;
 
     /** brief Copy construction not permitted */
-    c00_TaskTemplate(c00_TaskTemplate const&) = delete;
+    TaskTemplate(TaskTemplate const&) = delete;
 
     /** brief Copy assignment operation not permitted */
-    void operator=(c00_TaskTemplate const&) = delete;
+    void operator=(TaskTemplate const&) = delete;
 
     bool configureTask(const pugi::xml_node& serviceXmlNode) override;
     
@@ -148,8 +148,8 @@ private:
 
 private:
     // storage for the option entries
-    std::string m_option01{std::string("No Option 1")};
-    int32_t m_option02{0};
+    // std::string m_option01{std::string("No Option 1")};
+    // int32_t m_option02{0};
 };
 
 
@@ -157,5 +157,5 @@ private:
 }; //namespace service
 }; //namespace uxas
 
-#endif /* UXAS_00_SERVICE_TEMPLATE_H */
+#endif /* UXAS_00_TASK_TEMPLATE_H */
 

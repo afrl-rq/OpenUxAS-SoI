@@ -20,9 +20,7 @@
 #include "FileSystemUtilities.h"
 
 #include "afrl/cmasi/EntityState.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
@@ -94,10 +92,12 @@ AutomationDiagramDataService::configure(const pugi::xml_node& ndComponent)
 
     std::string strComponentType = ndComponent.attribute(STRING_XML_TYPE).value();
     //assert(strComponentType==STRING_XML_COMPONENT_TYPE)
-    //STATES
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     //AUTOMATION
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -279,7 +279,7 @@ void AutomationDiagramDataService::ProcessUniqueAutomationResponse(std::shared_p
                         entityState->setLocation(planningState->getPlanningPosition()->clone());
                         entityState->setHeading(planningState->getPlanningHeading());
 
-                        std::string fileName = savePath + "EnityState_Id_" + std::to_string(entityId) + ".xml";
+                        std::string fileName = savePath + "EntityState_Id_" + std::to_string(entityId) + ".xml";
                         std::ofstream file(fileName);
                         file << entityState->toXML();
                         file.close();
@@ -294,7 +294,7 @@ void AutomationDiagramDataService::ProcessUniqueAutomationResponse(std::shared_p
                     if (itEntity != m_idVsLastEntityState.end())
                     {
                         isFoundEntityState = true;
-                        std::string fileName = savePath + "EnityState_Id_" + std::to_string(itEntity->second->getID()) + ".xml";
+                        std::string fileName = savePath + "EntityState_Id_" + std::to_string(itEntity->second->getID()) + ".xml";
                         std::ofstream file(fileName);
                         file << itEntity->second->toXML();
                         file.close();

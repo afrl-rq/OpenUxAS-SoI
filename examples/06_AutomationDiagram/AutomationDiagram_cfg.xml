@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS EntityID="100" FormatVersion="1.0" EntityType="Aircraft">
+    <!-- Enable AMASE simulation by uncommenting this Bridge -->
+    <!-- <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.LineSearchTask" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+    </Bridge> -->
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="SensorManagerService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="PlanBuilderService"/>
+    <Service Type="AutomationDiagramDataService"/>
+    
+    <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="3" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="4" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="5" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="6" NumberWaypointsToServe="15" NumberWaypointsOverlap="5"/>
+    
+    <!-- Inserted from SendMessagesService_cfg.xml, which is produced by running
+         amase2uxas.py on AutomationDiagramScenario.xml -->
+    <Service PathToMessageFiles="../MessagesToSend" Type="SendMessagesService">
+        <Message MessageFileName="EntityConfiguration_Id_1.xml" SendTime_ms="110"/>
+        <Message MessageFileName="EntityState_Id_1.xml" SendTime_ms="120"/>
+        <Message MessageFileName="EntityConfiguration_Id_2.xml" SendTime_ms="130"/>
+        <Message MessageFileName="EntityState_Id_2.xml" SendTime_ms="140"/>
+        <Message MessageFileName="AirVehicleConfiguration_Id_3.xml" SendTime_ms="150"/>
+        <Message MessageFileName="AirVehicleState_Id_3.xml" SendTime_ms="160"/>
+        <Message MessageFileName="AirVehicleConfiguration_Id_4.xml" SendTime_ms="170"/>
+        <Message MessageFileName="AirVehicleState_Id_4.xml" SendTime_ms="180"/>
+        <Message MessageFileName="AirVehicleConfiguration_Id_5.xml" SendTime_ms="190"/>
+        <Message MessageFileName="AirVehicleState_Id_5.xml" SendTime_ms="200"/>
+        <Message MessageFileName="AirVehicleConfiguration_Id_6.xml" SendTime_ms="210"/>
+        <Message MessageFileName="AirVehicleState_Id_6.xml" SendTime_ms="220"/>
+        <Message MessageFileName="KeepInZone_Id_11.xml" SendTime_ms="230"/>
+        <Message MessageFileName="KeepInZone_Id_12.xml" SendTime_ms="240"/>
+        <Message MessageFileName="KeepInZone_Id_13.xml" SendTime_ms="250"/>
+        <Message MessageFileName="KeepOutZone_Id_14.xml" SendTime_ms="260"/>
+        <Message MessageFileName="KeepOutZone_Id_15.xml" SendTime_ms="270"/>
+        <Message MessageFileName="KeepOutZone_Id_16.xml" SendTime_ms="280"/>
+        <Message MessageFileName="OperatingRegion_Id_17.xml" SendTime_ms="290"/>
+        <Message MessageFileName="AreaSearchTask_Id_21.xml" SendTime_ms="300"/>
+        <Message MessageFileName="AreaSearchTask_Id_22.xml" SendTime_ms="310"/>
+        <Message MessageFileName="AreaSearchTask_Id_23.xml" SendTime_ms="320"/>
+        <Message MessageFileName="AreaOfInterest_Id_124.xml" SendTime_ms="330"/>
+        <Message MessageFileName="AngledAreaSearchTask_Id_24.xml" SendTime_ms="340"/>
+        <Message MessageFileName="AreaOfInterest_Id_125.xml" SendTime_ms="350"/>
+        <Message MessageFileName="AngledAreaSearchTask_Id_25.xml" SendTime_ms="360"/>
+        <Message MessageFileName="AreaOfInterest_Id_126.xml" SendTime_ms="370"/>
+        <Message MessageFileName="AngledAreaSearchTask_Id_26.xml" SendTime_ms="380"/>
+        <Message MessageFileName="LineSearchTask_Id_27.xml" SendTime_ms="390"/>
+        <Message MessageFileName="LineSearchTask_Id_28.xml" SendTime_ms="400"/>
+        <Message MessageFileName="LineOfInterest_Id_129.xml" SendTime_ms="410"/>
+        <Message MessageFileName="ImpactLineSearchTask_Id_29.xml" SendTime_ms="420"/>
+        <Message MessageFileName="LineOfInterest_Id_130.xml" SendTime_ms="430"/>
+        <Message MessageFileName="ImpactLineSearchTask_Id_30.xml" SendTime_ms="440"/>
+        <Message MessageFileName="PointSearchTask_Id_31.xml" SendTime_ms="450"/>
+        <Message MessageFileName="PointSearchTask_Id_32.xml" SendTime_ms="460"/>
+        <Message MessageFileName="PointOfInterest_Id_133.xml" SendTime_ms="470"/>
+        <Message MessageFileName="ImpactPointSearchTask_Id_33.xml" SendTime_ms="480"/>
+        <Message MessageFileName="PointOfInterest_Id_134.xml" SendTime_ms="490"/>
+        <Message MessageFileName="ImpactPointSearchTask_Id_34.xml" SendTime_ms="500"/>
+        <Message MessageFileName="ImpactPointSearchTask_Id_35.xml" SendTime_ms="510"/>
+        <Message MessageFileName="PatternSearchTask_Id_36.xml" SendTime_ms="520"/>
+        <Message MessageFileName="PointOfInterest_Id_137.xml" SendTime_ms="530"/>
+        <Message MessageFileName="PatternSearchTask_Id_37.xml" SendTime_ms="540"/>
+        <Message MessageFileName="PointOfInterest_Id_138.xml" SendTime_ms="550"/>
+        <Message MessageFileName="PatternSearchTask_Id_38.xml" SendTime_ms="560"/>
+        <Message MessageFileName="WatchTask_Id_39.xml" SendTime_ms="570"/>
+        <Message MessageFileName="WatchTask_Id_40.xml" SendTime_ms="580"/>
+        <Message MessageFileName="AutomationRequest_a.xml" SendTime_ms="2080"/>
+    </Service>
+    
+    <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="uxas.messages.task.AssignmentCostMatrix" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="AircraftPathPlanner" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="RoutePlanner" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>
+
+

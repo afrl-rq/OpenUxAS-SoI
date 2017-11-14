@@ -5,6 +5,7 @@ conf = configuration_data()
 link_args = []
 
 os = target_machine.system()
+
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
   link_args += ['-lrt', '-ldl']
@@ -15,6 +16,7 @@ elif os == 'windows'
 endif
 
 if get_option('afrl_internal')
+  add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
 endif
 
@@ -123,17 +125,37 @@ endif
 # creates src/Includes/config.h
 subdir('src/Includes')
 
-deps = [
+deps = []
+
+# OpenGL, specifically the GLU library
+if not (target_machine.cpu_family() == 'arm')
+  deps += [dependency('gl')]
+endif
+if os == 'darwin'
+  # newer MacOS splits out GLU into a separate framework, but we can't
+  # ask Meson for the version in order to handle things differently
+  deps += [dependency('glu', required: false)]
+  glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
+  foreach fn : glu_functions
+    if not cpp.has_function(fn, dependencies: deps)
+      error('GLU library functions not found')
+    endif
+  endforeach
+elif os.startswith('linux')
+  if not (target_machine.cpu_family() == 'arm')
+    deps += [dependency('glu')]
+  endif
+elif os == 'windows'
+  deps += [cpp.find_library('glu32')]
+endif
+
+deps += [
   dep_thread,
   dep_boost,
 ]
 
-# OpenGL, specifically the GLU library
-deps += [dependency('gl')]
-if os.startswith('linux')
-  deps += [dependency('glu')]
-elif os == 'windows'
-  deps += [cpp.find_library('glu32')]
+if get_option('afrl_internal')
+  deps += deps_internal
 endif
 
 cpp_args = []
@@ -168,3 +190,8 @@ executable(
 )
 
 subdir('tests')
+
+if get_option('afrl_internal')
+  subdir('UxAS-afrl_internal/tests')
+endif
+

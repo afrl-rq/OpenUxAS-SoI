@@ -47,8 +47,8 @@ namespace service
  * Subscribed Messages:
  *  - afrl::cmasi::RemoveTasks
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - uxas::messages::task::SensorFootprintRequests
  * 
  * Sent Messages:
