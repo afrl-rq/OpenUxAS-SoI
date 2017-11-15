@@ -70,7 +70,7 @@ pattern time_to_reach_target_position(direction: signT,
 				else if target_pos < UAV_pos and direction == -1
 						then 
 							(UAV_pos - target_pos)/V
-						else //we're traveling away from the target position
+						else //We're traveling away from the target position, or we're at it but are only interested in the NEXT time we reach the target position
 							Time_to_travel_full_length //we'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
 				
 	tel
