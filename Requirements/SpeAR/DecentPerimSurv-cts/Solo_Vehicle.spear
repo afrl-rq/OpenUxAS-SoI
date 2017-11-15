@@ -24,15 +24,15 @@ Requirements:
 r0 : time == (0.0 s -> previous time + time_to_reach_endpoint(previous direction, previous pos))
 
 r1 : direction == (initial_direction ->
-					if pos <= 0.0 m
-					then 1
-					else if pos >= P_global
-							then -1
-							else previous direction)
+					if pos <= 0.0 m then 
+						1
+					else if pos >= P_global then
+							-1
+						 else
+						 	previous direction)
 	
 r2 : pos == (initial_pos ->
-						if previous direction == 1 
-						then 
+						if previous direction == 1 then
 							previous pos + V*(time - previous time)
 						else //direction == -1
 							previous pos - V*(time - previous time))
