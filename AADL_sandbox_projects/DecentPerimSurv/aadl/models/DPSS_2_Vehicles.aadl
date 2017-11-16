@@ -1,0 +1,193 @@
+package DPSS_2_Vehicles_Pkg
+public
+	with Base_Types;
+	with DPSS_Data_Types;
+	with DPSS_Node_Lib;
+	with DPSS_Constants;
+	with UAV_Pkg;
+	
+	system DecentPerimSurv_2
+		features
+			--Inputs:
+			initial_pos_UAV1 : in data port DPSS_Data_Types::Position_Type;
+			suggested_initial_direction_UAV1 : in data port DPSS_Data_Types::Direction_Type;
+			initial_pos_UAV2 : in data port DPSS_Data_Types::Position_Type;
+			suggested_initial_direction_UAV2 : in data port DPSS_Data_Types::Direction_Type;
+			
+			--Outputs:
+			pos_UAV1 : out data port DPSS_Data_Types::Position_Type;
+			pos_UAV2 : out data port DPSS_Data_Types::Position_Type;
+			 
+		annex agree {**
+			const N : Base_Types::Integer = 2; --Number of vehicles
+			eq direction_UAV1 : DPSS_Data_Types::Direction_Type;
+			eq direction_UAV2 : DPSS_Data_Types::Direction_Type;
+			
+			assume "time update": time = (0.0 -> pre(time) + deltaT);
+			
+			eq goal_UAV1 : DPSS_Data_Types::Position_Type;
+			eq goal_UAV2 : DPSS_Data_Types::Position_Type;
+			
+			--Shared border positions
+			eq S_12 : DPSS_Data_Types::Position_Type = 
+				1.0*DPSS_Constants.P_GLOBAL/2.0;  
+			
+			--Previous positions
+			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = 
+				prev(pos_UAV1, initial_pos_UAV1);
+			eq pre_pos_UAV2 : DPSS_Data_Types::Position_Type = 
+				prev(pos_UAV2, initial_pos_UAV2);
+			
+			--Previous directions
+			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = 
+				prev(direction_UAV1, suggested_initial_direction_UAV1);
+			eq pre_direction_UAV2 : DPSS_Data_Types::Direction_Type = 
+				prev(direction_UAV2, suggested_initial_direction_UAV2);
+			
+			--Previous goals
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = 
+				prev(goal_UAV1, (if direction_UAV1 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV2 : DPSS_Data_Types::Position_Type = 
+				prev(goal_UAV2, (if direction_UAV2 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+						
+			--Times to reach neighbors													)
+			eq time_to_reach_neighbor_12 : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_neighbor(pre_direction_UAV1,
+														pre_direction_UAV2,
+														pre_pos_UAV1,
+														pre_pos_UAV2
+														);
+																		
+			--Times to reach goals
+			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1, 
+					pre_pos_UAV1, 
+					pre_goal_UAV1
+				);
+				
+			eq time_until_UAV2_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV2, 
+					pre_pos_UAV2, 
+					pre_goal_UAV2
+				);
+							
+			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep.
+			eq meet_neighbor_12 : bool = (pos_UAV1 = pos_UAV2); 
+			
+			eq deltaT : DPSS_Data_Types::Time_Type = DPSS_Node_Lib.min_time(time_until_UAV1_reaches_goal,
+								DPSS_Node_Lib.min_time(time_until_UAV2_reaches_goal,
+									time_to_reach_neighbor_12));
+			
+			assume "UAVs are numbered according to their position from left to right":
+				initial_pos_UAV1 <= initial_pos_UAV2;
+				
+			assume "Initial positions are between 0 and P_GLOBAL":
+				0.0 <= initial_pos_UAV1 
+				and initial_pos_UAV1 <= DPSS_Constants.P_GLOBAL
+				and 0.0 <= initial_pos_UAV2 
+				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+				
+			assume "Suggested initial directions are LEFT or RIGHT":
+				(suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+					or suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
+				and (suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
+					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT);
+			
+			guarantee "Theorem 1 for Algorithm A for Three Vehicles":
+				(time >= 1.5*DPSS_Constants.Time_to_travel_full_length) =>
+					((((pos_UAV1 = 0.0 and pos_UAV2 = DPSS_Constants.P_GLOBAL)
+							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12))
+						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
+							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
+						))
+					and 
+						(deltaT = DPSS_Constants.Time_to_travel_full_length/2.0)
+					);
+					
+		**};
+		
+	end DecentPerimSurv_2;
+
+	system implementation DecentPerimSurv_2.Impl
+		subcomponents
+			UAV1: system UAV_Pkg::UAV;
+			UAV2: system UAV_Pkg::UAV;
+
+		connections
+			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
+			sug_init_dir_UAV2: port	suggested_initial_direction_UAV2 -> UAV2.suggested_initial_direction;
+						
+		annex agree {**
+			--UAV1 outputs
+			assign direction_UAV1 = UAV1.direction;
+			assign goal_UAV1 = UAV1.goal;
+			
+			--UAV1 inputs
+			assert UAV1.meet_LN = false;
+			assert UAV1.meet_RN = meet_neighbor_12;
+			assert UAV1.id = 1;
+			assert UAV1.N = N;
+			assert UAV1.pos = pos_UAV1;
+						
+			--UAV2 outputs
+			assign direction_UAV2 = UAV2.direction;
+			assign goal_UAV2 = UAV2.goal;
+			
+			--UAV2 inputs
+			assert UAV2.meet_LN = meet_neighbor_12;
+			assert UAV2.meet_RN = false;
+			assert UAV2.id = 2;
+			assert UAV2.N = N;
+			assert UAV2.pos = pos_UAV2;				
+			
+			--Update positions
+			assign pos_UAV1 = (initial_pos_UAV1 ->
+						if pre_direction_UAV1 = 1 then
+							pre_pos_UAV1 + DPSS_Constants.V*deltaT
+						else --direction = -1
+							pre_pos_UAV1 - DPSS_Constants.V*deltaT);
+			
+			assign pos_UAV2 = (initial_pos_UAV2 ->
+						if pre_direction_UAV2 = 1 then
+							pre_pos_UAV2 + DPSS_Constants.V*deltaT
+						else --direction = -1
+							pre_pos_UAV2 - DPSS_Constants.V*deltaT);
+			
+			lemma "Observer: Traveling toward each other":
+				not (
+					((direction_UAV1 = 1) -> true) 
+				and ((direction_UAV2 = -1) -> true)
+				and ((pos_UAV1 = 3.0) -> true)
+				and ((pos_UAV2 = 8.0) -> true)
+				and (time > 20.0)
+				);
+						
+			lemma "Observer: Slow to Converge":
+				not (
+				time <2.0*DPSS_Constants.Time_to_travel_full_length
+				and (((pos_UAV1 = 0.0 and pos_UAV2 = DPSS_Constants.P_GLOBAL)
+						and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12))
+					or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
+						and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
+					))
+				);
+				
+			lemma "Goals are in bounds":
+				0.0 <= goal_UAV1
+				and goal_UAV1 <= DPSS_Constants.P_GLOBAL
+				and 0.0 <= goal_UAV2
+				and goal_UAV2 <= DPSS_Constants.P_GLOBAL;	
+			
+			lemma "Positions are in bounds":
+				0.0 <= pos_UAV1 
+				and pos_UAV1 <= DPSS_Constants.P_GLOBAL
+				and 0.0 <= pos_UAV2 
+				and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+					
+		**};
+		
+	end DecentPerimSurv_2.Impl;
+
+end DPSS_2_Vehicles_Pkg;

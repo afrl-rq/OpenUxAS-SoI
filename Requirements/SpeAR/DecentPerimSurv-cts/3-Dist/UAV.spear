@@ -24,7 +24,7 @@ Macros:
 S_L : positionT = real(id-1)*P_global/real(N)  
 S_R : positionT = real(id)*P_global/real(N)
  
-//Previous directions
+//Previous direction
 pre_direction : signT = previous direction with initial value suggested_initial_direction
 
 Assumptions:
