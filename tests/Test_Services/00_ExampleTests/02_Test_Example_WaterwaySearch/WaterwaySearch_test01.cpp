@@ -52,7 +52,6 @@ TEST(WaterwaySearch_Test01, CorrectNumberMessages)
     */
 
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.StartupComplete")));
-    EXPECT_EQ(9,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService"))); //was 1
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
