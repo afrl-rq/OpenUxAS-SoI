@@ -182,11 +182,11 @@ public
 			
 			lemma "Observer: Traveling toward each other":
 				not (
-					((direction_UAV1 = 1) -> true) 
-				and ((direction_UAV2 = -1) -> true)
-				and ((pos_UAV1 = 3.0) -> true)
-				and ((pos_UAV2 = 8.0) -> true)
-				and (time > 20.0)
+					DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1) 
+				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
+				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 3.0)
+				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 8.0)
+				and time > 20.0
 				);
 						
 			lemma "Observer: Slow to Converge":
@@ -197,9 +197,11 @@ public
 					or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
 						and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
 					))
+				and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
+				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
+				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 				);
-				
-
 					
 		**};
 		

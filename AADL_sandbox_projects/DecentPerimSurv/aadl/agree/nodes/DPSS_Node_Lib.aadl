@@ -62,5 +62,24 @@ public
 							DPSS_Constants.Time_to_travel_full_length; --We'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
 		tel;
 	
+	node initial_value_true(a : bool) returns (out : bool);
+	var
+	  pre_state : int;
+	  state : int;
+	let
+	  pre_state = prev(state, 0);
+	
+	  state = 
+	  if (pre_state = 0) 
+	  then 
+	    if a 
+	    then 1 
+	    else 2
+	  else pre_state;
+
+	  out = ((state = 0) or (state = 1));
+	
+	tel;
+	
 	**};
 end DPSS_Node_Lib;
