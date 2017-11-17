@@ -1,7 +1,7 @@
 project('minizip', 'c')
 
 lib = static_library('minizip', [
-        'crypt.c'
+        'crypt.c',
 	'ioapi.c',
 	'ioapi_buf.c',
 	'ioapi_mem.c',
@@ -27,7 +27,6 @@ lib = static_library('minizip', [
         '-D_LARGEFILE64_SOURCE',
         '-D_FILE_OFFSET_BIT=64',
         '-DHAVE_AES',
-        '
 	],
 	include_directories: include_directories(
 	        '../zlib-1.2.8',
