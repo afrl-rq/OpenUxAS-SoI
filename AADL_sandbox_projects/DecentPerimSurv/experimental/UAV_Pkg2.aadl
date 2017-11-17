@@ -87,8 +87,8 @@ public
 									1
 								else --pos >= S_R
 									-1 
-						else 
-							pre_direction
+							 else 
+								pre_direction
 				);  
 
 			guarantee "Goal formula":

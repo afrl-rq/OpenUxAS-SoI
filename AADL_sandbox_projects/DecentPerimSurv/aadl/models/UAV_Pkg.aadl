@@ -48,8 +48,11 @@ public
 								-1
 						else if pos <= 0.0 then
 								1
-							 else 
-							 	pre_direction
+							 --This case is possible if N = 1
+							 else if pos >= DPSS_Constants.P_GLOBAL then
+							 		-1
+							 	  else
+							 		pre_direction
 					else if id = N then --rightmost UAV
 						if meet_LN then
 							if pos > S_L then
@@ -71,8 +74,8 @@ public
 									1
 								else --pos >= S_R
 									-1 
-						else 
-							pre_direction
+							 else 
+								pre_direction
 				);  
 
 			guarantee "goal formula":
