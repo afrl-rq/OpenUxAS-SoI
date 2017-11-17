@@ -1,8 +1,7 @@
 exe_AutomationRequestTest = executable(
   'AutomationRequestTest',
   'AutomationRequestTest.cpp',
-  srcs_test,
-  dependencies: deps_test,
+  dependencies: deps,
   cpp_args: cpp_args_test,
   include_directories: inc_test,
   link_with: libs_test,
