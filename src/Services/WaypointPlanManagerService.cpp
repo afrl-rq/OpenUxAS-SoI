@@ -22,6 +22,8 @@
 #include "UxAS_TimerManager.h"
 
 #include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/AirVehicleStateDescendants.h"
+
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
 #include "afrl/cmasi/LoiterAction.h"
@@ -140,7 +142,11 @@ WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
     }
 
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
+    // Air Vehicle States
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::AirVehicleStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
     addSubscriptionAddress(uxas::messages::uxnative::IncrementWaypoint::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription); // for direct implementation outside of automation response
     return (bSucceeded);
@@ -178,10 +184,9 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     //COUT_FILE_LINE_MSG("getLmcpTypeName()" << receivedLmcpMessage->m_object->getLmcpTypeName() << "]")
     std::shared_ptr<avtas::lmcp::Object> pMissionCommand_Out; // if a new mission command is generate it is saved in this variable
 
-    if (receivedLmcpMessage->m_object->getLmcpTypeName() == "AirVehicleState")
+    auto airVehicleState = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
+    if (airVehicleState)
     {
-        afrl::cmasi::AirVehicleState* airVehicleState = static_cast<afrl::cmasi::AirVehicleState*> (receivedLmcpMessage->m_object.get());
-
         if (airVehicleState->getID() == m_vehicleID)
         {
             if (m_isMoveToNextWaypoint)
@@ -221,12 +226,12 @@ WaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             }
         }
     }
-    else if (receivedLmcpMessage->m_object->getLmcpTypeName() == "MissionCommand")
+    else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
     {
-        if (static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->getVehicleID() == m_vehicleID)
+        auto ptr_MissionCommand = std::shared_ptr<afrl::cmasi::MissionCommand>((afrl::cmasi::MissionCommand*)receivedLmcpMessage->m_object->clone());
+        if (ptr_MissionCommand->getVehicleID() == m_vehicleID)
         {
             //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
-            std::shared_ptr<afrl::cmasi::MissionCommand> ptr_MissionCommand(static_cast<afrl::cmasi::MissionCommand*> (receivedLmcpMessage->m_object.get())->clone());
             if (isInitializePlan(ptr_MissionCommand))
             {
                 int64_t waypointIdCurrent = {ptr_MissionCommand->getWaypointList().front()->getNumber()};

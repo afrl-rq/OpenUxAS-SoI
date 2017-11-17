@@ -194,15 +194,17 @@ namespace uxas
         {
           UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
 
-          //make header
-          std::string ClassName(receivedLmcpMessage->getAddress());
-          std::string last(ClassName.substr(ClassName.rfind(".") + 1));
+          //convert to LMCP to get series name
+          std::string message = receivedLmcpMessage->getPayload();
+          avtas::lmcp::ByteBuffer byteBuffer;
+          byteBuffer.allocate(message.size());
+          byteBuffer.put(reinterpret_cast<const uint8_t*>(message.c_str()), message.size());
+          byteBuffer.rewind();
 
+          std::shared_ptr<avtas::lmcp::Object> ptr_Object;
+          ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
 
-          std::stringstream ss(receivedLmcpMessage->getMessageAttributesReference()->getDescriptor());
-          std::string seriesName;
-          std::getline(ss, seriesName, '.');
-          std::getline(ss, seriesName, '.');
+          std::string seriesName = ptr_Object->getSeriesName();
 
           std::locale loc;
           //convert seriesName to uppercase
@@ -211,8 +213,7 @@ namespace uxas
             seriesName[i] = std::toupper(seriesName[i], loc);
           }
 
-          std::string header = "lmcp:" + seriesName + ":" + last;
-
+          std::string header = "lmcp:" + seriesName + ":" + ptr_Object->getLmcpTypeName();
           n_ZMQ::s_sendmore(*sender, header);
           n_ZMQ::s_send(*sender, receivedLmcpMessage->getPayload());
 
@@ -244,24 +245,7 @@ namespace uxas
           std::string key = n_ZMQ::s_recv(*subscriber);
           std::string message = n_ZMQ::s_recv(*subscriber);
 
-
-          std::stringstream ss(key);
-          std::string LMCPHeader, seriesName, className;
-
-          //parse out the header from the two-part message.
-          std::getline(ss, LMCPHeader, ':');
-          std::getline(ss, seriesName, ':');
-          std::getline(ss, className, ':');
-
-          std::locale loc;
-          //convert seriesName to lowercase
-          for (std::string::size_type i = 0; i < seriesName.length(); i++)
-          {
-            seriesName[i] = std::tolower(seriesName[i], loc);
-          }
-
-          //build back to the LMCP_FULL_NAME 
-          std::string fullName = "afrl." + seriesName + "." + className;
+          //don't care about key. Construct header from valid LMCP.
 
           avtas::lmcp::ByteBuffer byteBuffer;
           byteBuffer.allocate(message.size());
@@ -271,10 +255,10 @@ namespace uxas
           std::shared_ptr<avtas::lmcp::Object> ptr_Object;
           ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
 
+          auto header = ptr_Object->getFullLmcpTypeName();
           std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
 
-          recvdAddAttMsg->setAddressAttributesAndPayload(fullName, "lmcp", fullName, "fusion", externalID, "1", message);
-
+          recvdAddAttMsg->setAddressAttributesAndPayload(header, "lmcp", header, "fusion", externalID, "1", message);
 
           // send message to the external entity
           if (recvdAddAttMsg->isValid())

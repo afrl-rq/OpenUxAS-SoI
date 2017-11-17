@@ -24,6 +24,7 @@
 
 
 #include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/AirVehicleStateDescendants.h"
 #include "uxas/messages/task/TaskAutomationRequest.h"
 #include "uxas/messages/task/TaskAutomationResponse.h"
 
@@ -84,7 +85,12 @@ AssignmentCoordinatorTaskService::configureTask(const pugi::xml_node& ndComponen
     // subscribe to messages::
     //TODO:: add entities
     //    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    
+    // Air Vehicle States
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::AirVehicleStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
     addSubscriptionAddress(uxas::messages::task::CoordinatedAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskAutomationResponse::Subscription);
     addSubscriptionAddress(uxas::messages::task::AssignmentCoordination::Subscription);
@@ -121,7 +127,7 @@ bool AssignmentCoordinatorTaskService::terminateTask()
 
 bool AssignmentCoordinatorTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject)
 {
-    if (afrl::cmasi::isAirVehicleState(receivedLmcpObject))
+    if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpObject))
     {
         auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpObject);
         if(airVehicleState->getID() == m_entityId)

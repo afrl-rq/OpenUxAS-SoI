@@ -21,6 +21,7 @@
 
 #include "ServiceBase.h"
 #include "afrl/cmasi/CMASI.h"
+#include "afrl/impact/WaterZone.h"
 #include <cstdint>
 
 namespace uxas

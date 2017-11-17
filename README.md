@@ -305,15 +305,15 @@ in the `/3rd` directory by `./prepare`.
    * Verify installation by: `python --version` in `cmd` prompt
    * Verify *pip* is also installed: `pip --version` in `cmd` prompt
    * If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
-1. Install *meson*
-   * In `cmd` prompt **with admin priviledges**: `pip install meson==0.42.1`
+1. Install *meson* (only version 0.41.0 is compatible with Windows build)
+   * In `cmd` prompt **with admin priviledges**: `pip install meson==0.41.0`
 1. Install [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download)
    * Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
 1. Pull UxAS repositories (from Git Bash shell)
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
    * `git -c https://github.com/afrl-rq/OpenAMASE.git`
-1. (**optionall**) Build OpenAMASE
+1. (**optional**) Build OpenAMASE
    * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
    * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
@@ -341,4 +341,3 @@ in the `/3rd` directory by `./prepare`.
 
 - The Visual Studio backend for Meson mostly works, but will fail when regenerating build files. If you modify one of the `meson.build` files, delete the `build` directory and run `meson.py build --backend=vs` again. The steps following the `meson.build` command must also be performed.
 - The UxAS test suite uses some hardcoded POSIX-style paths, and so does not currently work on Windows.
-

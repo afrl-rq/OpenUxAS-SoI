@@ -18,12 +18,11 @@
 #include "TaskManagerService.h"
 #include "TaskServiceBase.h"
 
-#include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/vehicles/GroundVehicleConfiguration.h"
-#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/vehicles/GroundVehicleState.h"
-#include "afrl/vehicles/SurfaceVehicleState.h"
+
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityConfigurationDescendants.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 #include "afrl/cmasi/AutomationRequest.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
@@ -135,17 +134,18 @@ TaskManagerService::configure(const pugi::xml_node& ndComponent)
     } //for (pugi::xml_node ndCurrent = ndConfigurationEntries.first_child(); ndCurrent; ndCurrent = ndCurrent.next_sibling())
 
     addSubscriptionAddress(afrl::cmasi::RemoveTasks::Subscription);
-
-    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    
+    //ENTITY CONFIGURATIONS
     addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
-
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleConfiguration::Subscription);
-
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);

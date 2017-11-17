@@ -10,6 +10,8 @@ srcs_tasks = [
   'CordonTaskService.cpp',
   'EscortTaskService.cpp',
   'ImpactLineSearchTaskService.cpp',
+  'MustFlyTaskService.cpp',
+  'LoiterTaskService.cpp',
   'ImpactPointSearchTaskService.cpp',
   'MultiVehicleWatchTaskService.cpp',
   'OverwatchTaskService.cpp',

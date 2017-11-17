@@ -86,6 +86,8 @@
 #include "PatternSearchTaskService.h"
 #include "TaskManagerService.h"
 #include "TaskTrackerService.h"
+#include "MustFlyTaskService.h"
+#include "LoiterTaskService.h"
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW TASK HEADERS
 
@@ -159,6 +161,8 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::PatternSearchTaskService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::TaskTrackerService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::MustFlyTaskService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::LoiterTaskService>();}
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW TASK DUMMY INSTANCES
 
