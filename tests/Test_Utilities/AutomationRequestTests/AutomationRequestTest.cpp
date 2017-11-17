@@ -14,11 +14,21 @@ TEST(AutomationRequestTest, Test01_GoodRequest)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{3};
+    uint32_t duration_s{5};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/AutomationRequestTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_AutomationRequest_Test01.xml";
+	std::string testPath;
+	// configFileName - file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		testPath = "../../../../tests/Test_Utilities/AutomationRequestTests/";
+		configFileName = "cfg_AutomationRequest_Test01_Windows.xml";
+	#endif
+	#ifndef _WIN32
+		testPath = "../tests/Test_Utilities/AutomationRequestTests/";
+		configFileName = "cfg_AutomationRequest_Test01.xml";
+	#endif // !_WIN32
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
@@ -80,9 +90,19 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     // duration_s - number of second to run UxAS
     uint32_t duration_s{3};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/AutomationRequestTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_AutomationRequest_Test02.xml";
+	std::string testPath;
+	// configFileName - file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		testPath = "../../../../tests/Test_Utilities/AutomationRequestTests/";
+		configFileName = "cfg_AutomationRequest_Test02_Windows.xml";
+	#endif
+	#ifndef _WIN32
+		testPath = "../tests/Test_Utilities/AutomationRequestTests/";
+		configFileName = "cfg_AutomationRequest_Test02.xml";
+	#endif // !_WIN32
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
@@ -142,11 +162,21 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{3};
+    uint32_t duration_s{5};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/AutomationRequestTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_AutomationRequest_Test03.xml";
+	std::string testPath;
+	//configFileName - file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		testPath = "../../../../tests/Test_Utilities/AutomationRequestTests/";
+		configFileName = "cfg_AutomationRequest_Test03_Windows.xml";
+	#endif
+	#ifndef _WIN32
+		testPath = "../tests/Test_Utilities/AutomationRequestTests/";
+		configFileName = "cfg_AutomationRequest_Test03.xml";
+	#endif // !_WIN32
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
