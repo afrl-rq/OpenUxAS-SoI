@@ -1,0 +1,135 @@
+package UAV_Pkg2
+public
+	with DPSS_Data_Types;
+	with Base_Types;
+	
+	system UAV_computes_pos
+		features
+			--inputs
+			suggested_initial_direction : in data port DPSS_Data_Types::Direction_Type; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
+			initial_position : in data port DPSS_Data_Types::Position_Type;
+			meet_LN : in data port Base_Types::Boolean; --True iff this UAV is co-located with it's left neighbor
+			meet_RN : in data port Base_Types::Boolean;
+			id : in data port Base_Types::Integer; --a positive integer between 1 and N
+			N : in data port Base_Types::Integer; --a positive integer
+			
+			--outputs
+			direction: out data port DPSS_Data_Types::Direction_Type;
+			goal : out data port DPSS_Data_Types::Position_Type;
+			pos : in data port DPSS_Data_Types::Position_Type;
+					
+		annex agree {**
+			--Shared border positions
+			eq S_L : DPSS_Data_Types::Position_Type = 
+				real(id-1)*DPSS_Constants.P_GLOBAL/real(N);  
+			eq S_R : DPSS_Data_Types::Position_Type = 
+				real(id)*DPSS_Constants.P_GLOBAL/real(N);	
+				
+			--Previous direction
+			eq pre_direction : DPSS_Data_Types::Direction_Type = 
+				prev(direction, suggested_initial_direction);
+				
+			--Previou position
+			eq pre_pos : DPSS_Data_Types::Position_Type =
+				prev(pos, initial_position);
+				
+			--Assumptions
+			assume "ID in range":
+				id >= 1 and id <= N;
+			
+			assume "N is fixed":
+				true -> (N = pre(N));
+			
+			assume "ID is fixed":
+				true -> (id = pre(id));
+			
+			assume "Input initial position is between 0 and P_GLOBAL":
+				0.0 <= initial_position
+				and initial_position <= DPSS_Constants.P_GLOBAL;
+							
+			assume "Suggested initial direction is LEFT or RIGHT":
+				(suggested_initial_direction = DPSS_Constants.LEFT
+					or suggested_initial_direction = DPSS_Constants.RIGHT);
+			
+			guarantee "Direction formula":
+				direction = (
+					if id = 1 then --leftmost UAV
+						if meet_RN then
+							if pos < S_R then
+								1
+							else --pos >= S_R
+								-1
+						else if pos <= 0.0 then
+								1
+							 else 
+							 	pre_direction
+					else if id = N then --rightmost UAV
+						if meet_LN then
+							if pos > S_L then
+								-1
+							else --pos_UAV3 <= S_L 
+								1
+						else if pos >= DPSS_Constants.P_GLOBAL then
+								-1
+							else 
+								pre_direction
+					else --a middle UAV
+						if meet_LN then
+							if pos <= S_L then
+								1
+							else --pos_UAV2 > S_L
+								-1						
+						else if meet_RN then
+								if pos < S_R then
+									1
+								else --pos >= S_R
+									-1 
+						else 
+							pre_direction
+				);  
+
+			guarantee "Goal formula":
+				goal = (
+					if id = 1 then --leftmost UAV
+						if meet_RN then
+							if pos < S_R then
+								S_R
+							else --pos >= S_R 
+								0.0
+						else if direction = 1 then
+								DPSS_Constants.P_GLOBAL
+							else --direction = -1 
+								0.0 
+					else if id = N then --rightmost UAV
+						if meet_LN then
+							if pos > S_L then
+								S_L
+							else --pos <= S_L 
+								DPSS_Constants.P_GLOBAL
+						else if direction = 1 then
+								DPSS_Constants.P_GLOBAL
+							 else --direction = -1 
+								0.0 
+					else --a middle UAV
+						if meet_LN then
+							S_L
+						else if meet_RN then
+								S_R
+							 else if direction = 1 then
+									DPSS_Constants.P_GLOBAL
+								  else --direction = -1 
+									0.0 
+				); 
+
+			guarantee "Position formula":
+				pos = (initial_position ->
+						if pre_direction = 1 then
+							pre_pos + DPSS_Constants.V*(time - pre(time))
+						else --pre_direction = -1
+							pre_pos - DPSS_Constants.V*(time - pre(time)));
+			
+
+		**};
+		
+	end UAV_computes_pos;
+end UAV_Pkg2;
