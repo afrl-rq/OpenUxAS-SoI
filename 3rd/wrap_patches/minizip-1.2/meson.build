@@ -1,6 +1,7 @@
 project('minizip', 'c')
 
 lib = static_library('minizip', [
+	'crypt.c',
 	'ioapi.c',
 	'ioapi_buf.c',
 	'ioapi_mem.c',
@@ -15,3 +16,4 @@ lib = static_library('minizip', [
 	        '../zlib-1.2.8'
 	),
 )
+
