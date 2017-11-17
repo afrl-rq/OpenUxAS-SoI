@@ -68,8 +68,8 @@ r_dir : direction == (
 							1
 						else //pos >= S_R
 							-1 
-				else 
-					pre_direction
+					 else 
+						pre_direction
 		)  
 
 r_goal : goal == (
