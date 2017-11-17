@@ -180,13 +180,13 @@ public
 			assign pos_UAV1 = (initial_pos_UAV1 ->
 						if pre_direction_UAV1 = 1 then
 							pre_pos_UAV1 + DPSS_Constants.V*deltaT
-						else --direction = -1
+						else --pre_direction_UAV1 = -1
 							pre_pos_UAV1 - DPSS_Constants.V*deltaT);
 			
 			assign pos_UAV2 = (initial_pos_UAV2 ->
 						if pre_direction_UAV2 = 1 then
 							pre_pos_UAV2 + DPSS_Constants.V*deltaT
-						else --direction = -1
+						else --pre_direction_UAV2 = -1
 							pre_pos_UAV2 - DPSS_Constants.V*deltaT);
 			
 			lemma "Observer: Traveling toward each other":
