@@ -56,9 +56,14 @@ lib_services_link_with = [
   lib_services_rs,
 ]
 
+deps_services = [
+  dep_boost,
+]
+
 if get_option('afrl_internal')
   incs_services += [incs_services_internal]
   lib_services_link_with += [lib_services_rs_internal]
+  deps_services += deps_services_internal
 else
   srcs_services_internal = files()
 endif
@@ -85,9 +90,7 @@ lib_services = static_library(
   'services',
   srcs_services,
   srcs_services_internal,
-  dependencies: [
-    dep_boost,
-  ],
+  dependencies: deps_services,
   link_with: lib_services_link_with,
   cpp_args: cpp_args,
   include_directories: incs_services,

@@ -1,0 +1,5 @@
+[wrap-git]
+directory=fixedbitset
+url=https://github.com/GaloisInc/fixedbitset.git
+revision=alloc
+push-url=git@github.com:GaloisInc/fixedbitset.git

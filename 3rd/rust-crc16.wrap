@@ -1,0 +1,5 @@
+[wrap-git]
+directory=rust-crc16
+url=https://github.com/GaloisInc/rust-crc16.git
+revision=head
+push-url=git@github.com:GaloisInc/rust-crc16.git

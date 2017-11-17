@@ -22,8 +22,8 @@
 
 #include "uxas/messages/task/UniqueAutomationResponse.h"
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 
 #include "avtas/lmcp/ByteBuffer.h"
 #include "avtas/lmcp/Factory.h"
@@ -39,7 +39,7 @@
 extern "C" {
 void* plan_builder_new();
 void plan_builder_delete(void* raw_pb);
-void* plan_builder_configure(void* raw_pb, double assignment_start_point_lead_m);
+void plan_builder_configure(void* raw_pb, double assignment_start_point_lead_m);
 void plan_builder_process_received_lmcp_message(uxas::service::PlanBuilderService *pbs, void* raw_pb, uint8_t *msg_buf, uint32_t msg_len);
 }
 
@@ -72,8 +72,8 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
   addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
   addSubscriptionAddress(uxas::messages::task::TaskImplementationResponse::Subscription);
   addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-  addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-  addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+  addSubscriptionAddress(afrl::vehicles::GroundVehicleState::Subscription);
+  addSubscriptionAddress(afrl::vehicles::SurfaceVehicleState::Subscription);
 
   plan_builder_configure(m_PlanBuilder, assignmentStartPointLead_m);
 

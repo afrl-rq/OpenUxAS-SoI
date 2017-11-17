@@ -15,6 +15,15 @@ elif os == 'windows'
   link_args += []
 endif
 
+sub_fixedbitset = subproject('fixedbitset')
+lib_fixedbitset = sub_fixedbitset.get_variable('lib')
+
+sub_byteorder = subproject('byteorder')
+lib_byteorder = sub_byteorder.get_variable('lib')
+
+sub_crc16 = subproject('rust-crc16')
+lib_crc16 = sub_crc16.get_variable('lib')
+
 if get_option('afrl_internal')
   add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')

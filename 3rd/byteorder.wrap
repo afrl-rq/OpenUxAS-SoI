@@ -1,0 +1,5 @@
+[wrap-git]
+directory=byteorder
+url=https://github.com/GaloisInc/byteorder.git
+revision=head
+push-url=git@github.com:GaloisInc/byteorder.git

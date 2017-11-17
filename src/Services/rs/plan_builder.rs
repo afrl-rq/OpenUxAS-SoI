@@ -188,10 +188,10 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
             LmcpType::AfrlCmasiAirVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::AfrlImpactGroundVehicleState(vs) => {
+            LmcpType::AfrlVehiclesGroundVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::AfrlImpactSurfaceVehicleState(vs) => {
+            LmcpType::AfrlVehiclesSurfaceVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
             LmcpType::UxasMessagesTaskUniqueAutomationRequest(uar) => {
