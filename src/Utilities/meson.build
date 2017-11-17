@@ -18,15 +18,23 @@ srcs_utilities = [
   'UxAS_ZeroMQ.cpp',
 ]
 
+inc_3rd = include_directories('.')
+if get_option('internal_3rd_libraries')
+  inc_3rd = include_directories(
+      '../../3rd/cppzmq-4.2.1',
+      '../../3rd/zeromq-4.1.6/include',
+      '../../3rd/zyre-1.1.0/include',
+      '../../3rd/sqlite-amalgamation-3120200',
+      '../../3rd/SQLiteCpp-1.3.1/include',
+    )
+endif
+
 incs_utilities = [
   include_directories(
     '../../src/Includes',
-    '../../3rd/cppzmq-4.2.1',
     '../../3rd/PugiXML/src',
-    '../../3rd/sqlite-amalgamation-3120200',
-    '../../3rd/SQLiteCpp-1.3.1/include',
-    '../../3rd/zeromq-4.1.6/include',
   ),
+  inc_3rd,
 ]
 
 if get_option('afrl_internal')
@@ -46,13 +54,16 @@ if cpp.get_id() != 'msvc'
   ]
 endif
 
+dep_3rd = []
+if get_option('internal_3rd_libraries')
+  dep_3rd = [dep_boost]
+endif
+
 lib_utilities = static_library(
   'utilities',
   srcs_utilities,
   srcs_utilities_internal,
-  dependencies: [
-    dep_boost,
-  ],
+  dependencies: dep_3rd,
   cpp_args: cpp_args,
   include_directories: incs_utilities,
 )

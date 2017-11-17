@@ -8,7 +8,18 @@ os = target_machine.system()
 
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-  link_args += ['-lrt', '-ldl']
+	if get_option('internal_3rd_libraries')
+message('@@@@@ internal_3rd_libraries @@@@@')
+		link_args += ['-lrt', '-ldl']
+  	else
+message('@@@@@ extwernal_3rd_libraries @@@@@')
+  		link_args += [
+          '-lboost_filesystem','-lboost_regex', '-lboost_system', 
+  				'-lzmq','-lczmq','-lzyre',
+          '-lSQLiteCpp','-lsqlite3',
+          '-lgtest',
+  				'-lrt', '-ldl']
+	endif
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
@@ -20,50 +31,63 @@ if get_option('afrl_internal')
   subdir('UxAS-afrl_internal')
 endif
 
-# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
-sub_zeromq              = subproject('zeromq')
-lib_zeromq              = sub_zeromq.get_variable('lib')
+if get_option('internal_3rd_libraries')
+	# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
+	sub_zeromq              = subproject('zeromq')
+	lib_zeromq              = sub_zeromq.get_variable('lib')
 
-sub_czmq                = subproject('czmq')
-lib_czmq                = sub_czmq.get_variable('lib')
+	sub_czmq                = subproject('czmq')
+	lib_czmq                = sub_czmq.get_variable('lib')
 
-sub_cppzmq              = subproject('cppzmq')
-lib_cppzmq              = sub_cppzmq.get_variable('lib')
+	sub_cppzmq              = subproject('cppzmq')
+	lib_cppzmq              = sub_cppzmq.get_variable('lib')
 
-sub_zyre                = subproject('zyre')
-lib_zyre                = sub_zyre.get_variable('lib')
+	sub_zyre                = subproject('zyre')
+	lib_zyre                = sub_zyre.get_variable('lib')
 
-# Windows-only:
-# https://github.com/jedisct1/libsodium
+	# Windows-only:
+	# https://github.com/jedisct1/libsodium
 
-# https://www.sqlite.org/src
-sub_sqlite3             = subproject('sqlite3')
-lib_sqlite3             = sub_sqlite3.get_variable('lib')
+	# https://www.sqlite.org/src
+	sub_sqlite3             = subproject('sqlite3')
+	lib_sqlite3             = sub_sqlite3.get_variable('lib')
 
-# https://github.com/SRombauts/SQLiteCpp
-sub_sqlitecpp           = subproject('sqlitecpp')
-lib_sqlitecpp           = sub_sqlitecpp.get_variable('lib')
+	# https://github.com/SRombauts/SQLiteCpp
+	sub_sqlitecpp           = subproject('sqlitecpp')
+	lib_sqlitecpp           = sub_sqlitecpp.get_variable('lib')
 
-# https://github.com/madler/zlib
-sub_zlib                = subproject('zlib')
-lib_zlib                = sub_zlib.get_variable('lib')
+	# https://github.com/madler/zlib
+	sub_zlib                = subproject('zlib')
+	lib_zlib                = sub_zlib.get_variable('lib')
 
-# https://github.com/nmoinvaz/minizip
-sub_minizip             = subproject('minizip')
-lib_minizip             = sub_minizip.get_variable('lib')
+  # https://github.com/nmoinvaz/minizip
+  sub_minizip             = subproject('minizip')
+  lib_minizip             = sub_minizip.get_variable('lib')
 
-dep_boost = dependency(
-  'boost',
-  modules: ['filesystem', 'regex', 'system'],
-  static: true,
-  fallback: ['boost', 'dep_boost'],
-)
+  # https://github.com/nmoinvaz/minizip
+  sub_gtest             = subproject('gtest')
+  lib_gtest             = sub_gtest.get_variable('lib')
+
+	dep_boost = dependency(
+	  'boost',
+	  modules: ['filesystem', 'regex', 'system'],
+	  static: true,
+	  fallback: ['boost', 'dep_boost'],
+	)
+
+endif
+
 
 # https://github.com/mikalhart/TinyGPS
 # The TinyGPS repo captured by UxAS does not seem to be available.
 # The repo contains *only* version 13, while UxAS uses what appears
 # to be version 12. Perhaps contact the author...?
-sub_tinygps             = subproject('TinyGPS')
+sub_tinygps = []
+if get_option('internal_3rd_libraries')
+  sub_tinygps             = subproject('TinyGPS')
+else
+  sub_tinygps             = subproject('TinyGPS_NoBoost')
+endif
 lib_tinygps             = sub_tinygps.get_variable('lib')
 
 # https://github.com/wjwwood/serial
@@ -100,22 +124,28 @@ libs = [
   lib_tasks,
   lib_lmcp,
   lib_uxas_communications,
-  lib_zeromq,
-  lib_zyre,
-  lib_czmq,
-  lib_cppzmq,
   lib_utilities,
-  lib_sqlitecpp,
-  lib_sqlite3,
   lib_pugixml,
   lib_visilibity,
   lib_serial,
   lib_plans,
   lib_tinygps,
-  lib_minizip,
-  lib_zlib,
   lib_dpss,
 ]
+
+if get_option('internal_3rd_libraries')
+	libs_3rd = [  
+		lib_sqlitecpp,
+		lib_sqlite3,
+		lib_zeromq,
+		lib_zyre,
+		lib_czmq,
+		lib_cppzmq,
+		lib_minizip,
+		lib_zlib,
+	]
+	libs += libs_3rd
+endif
 
 if get_option('afrl_internal')
   libs += libs_internal
@@ -150,11 +180,16 @@ endif
 
 deps += [
   dep_thread,
-  dep_boost,
 ]
 
+if get_option('internal_3rd_libraries')
+	deps += [
+	  dep_boost,
+	]
+endif
+
 if get_option('afrl_internal')
-  deps += deps_internal
+	deps += deps_internal
 endif
 
 cpp_args = []
@@ -162,6 +197,17 @@ if cpp.get_id() == 'msvc'
   cpp_args += ['/std:c++14']
 else
   cpp_args += ['-std=c++11']
+endif
+
+inc_3rd = include_directories('.')
+if get_option('internal_3rd_libraries')
+  inc_3rd = include_directories(
+      '3rd/cppzmq-4.2.1',
+      '3rd/zeromq-4.1.6/include',
+      '3rd/zyre-1.1.0/include',
+      '3rd/sqlite-amalgamation-3120200',
+      '3rd/SQLiteCpp-1.3.1/include',
+    )
 endif
 
 executable(
@@ -176,12 +222,9 @@ executable(
       'src/Communications',
       'src/Includes',
       'src/Services',
-      '3rd/cppzmq-4.2.1',
-      '3rd/zeromq-4.1.6/include',
       '3rd/PugiXML/src',
-      '3rd/sqlite-amalgamation-3120200',
-      '3rd/SQLiteCpp-1.3.1/include',
     ),
+    inc_3rd,
     incs_lmcp,
   ],
   link_with: libs,
@@ -189,8 +232,6 @@ executable(
 )
 
 subdir('tests')
-
 if get_option('afrl_internal')
   subdir('UxAS-afrl_internal/tests')
 endif
-

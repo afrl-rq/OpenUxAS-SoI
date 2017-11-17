@@ -2,5 +2,11 @@ option(
   'afrl_internal',
   description: 'build with internal AFRL modules',
   type: 'boolean',
-  value: false,
+  value: true,
+)
+option(
+    'internal_3rd_libraries',
+    description: 'build with internal 3rd party libraries',
+    type : 'boolean',
+    value : false,
 )
