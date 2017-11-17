@@ -8,7 +8,7 @@ os = target_machine.system()
 
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-  link_args += ['-lrt', '-ldl']
+  link_args += ['-lrt', '-ldl', '-lbsd']
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
