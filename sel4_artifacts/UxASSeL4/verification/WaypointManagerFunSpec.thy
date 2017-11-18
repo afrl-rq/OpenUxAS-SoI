@@ -133,7 +133,12 @@ lemma find_waypoint_extend:"find_waypoint ws i = Some w \<Longrightarrow> \<exis
 definition waypoints_wf where
   "waypoints_wf ws \<equiv> 
   (\<forall> w'. List.member ws w' \<longrightarrow> (\<exists> w. Some w = find_waypoint ws (get_nextwp w'))) 
-  \<and> (\<forall> w'. List.member (tl ws) w' \<longrightarrow>  (\<exists> w w''. Some w'' = find_waypoint ws (get_nextwp w) \<and> get_number w = get_number w''))"
+  (*\<and> (\<forall> w'. List.member (tl ws) w' \<longrightarrow>  (\<exists> w w''. List.member ws w 
+         \<and> Some w'' = find_waypoint ws (get_nextwp w) 
+         \<and> get_number w' = get_number w''))*)"
+  
+lemma waypoints_wf_result:"waypoints_wf ws \<Longrightarrow> List.member ws w' \<Longrightarrow> (\<exists> w. Some w = find_waypoint ws (get_nextwp w'))"
+  using waypoints_wf_def by auto
      
 (* Some odd behavior:
   - By definition of this function, cycles in the incoming 'w list will be unrolled in the output
@@ -141,20 +146,91 @@ definition waypoints_wf where
     Thus we cannot demand wellformed windows have the property:
       (\<forall> w'. List.member (tl ws) w' \<longrightarrow>  (\<exists> w. Some w' = find_waypoint ws (get_nextwp w)))
 *)
+  
+  
+fun waypoints_window_aux :: "'w list \<Rightarrow> 'id \<Rightarrow> nat \<Rightarrow> ('w list) option" where
+"waypoints_window_aux ws i 0 = None"
+|"waypoints_window_aux ws i (Suc 0) = 
+  (case find_waypoint ws i of 
+    None \<Rightarrow> None 
+    | Some w \<Rightarrow> Some [w])"
+|"waypoints_window_aux ws i (Suc (Suc n)) = 
+  (case find_waypoint ws i of 
+    None \<Rightarrow> None 
+    | Some w \<Rightarrow> 
+          (case waypoints_window_aux ws (get_nextwp w) (Suc n) of
+            None \<Rightarrow> None
+            | Some win \<Rightarrow> Some (w # win)))"    
+
+lemma waypoint_window_aux_find_waypoint_hd:"waypoints_window_aux ws i len = Some win \<Longrightarrow> Some (hd (win)) = find_waypoint ws i"
+  apply (induct rule:waypoints_window_aux.induct)
+    by (auto split: option.splits)
+
+lemma  waypoint_window_aux_success_len_nonzero:"waypoints_window_aux ws i len = Some win \<Longrightarrow> 0 < len"
+  apply (induct len)
+  by (auto split: option.splits)
+    
+lemma waypoint_window_aux_success_len_nonempty: assumes a:"waypoints_window_aux ws i len = Some []" shows " False"
+  apply(cases rule:waypoints_window_aux.elims[OF a])
+  by (auto split: option.splits)
+    
+lemma waypoints_window_aux_success_more_than_one:
+  "waypoints_window_aux ws i (Suc (Suc n)) = Some win \<Longrightarrow> find_waypoint ws i = Some (hd win) \<and> waypoints_window_aux ws (get_nextwp (hd win)) (Suc n) = Some (tl win)"
+  apply(cases rule:waypoints_window_aux.elims)
+  by (auto split:option.splits)
+    
+lemma waypoint_window_aux_nextwp:
+"waypoints_window_aux ws i len = Some win \<Longrightarrow>
+  \<forall> j < len.  (0 < j \<longrightarrow> Some (win ! j) = find_waypoint ws (get_nextwp (win ! (j - 1))))
+   \<and> (j = 0 \<longrightarrow> Some (win ! j) = find_waypoint ws i)"
+proof (induct len arbitrary: i win)
+  case 0
+  then show ?case by auto
+next
+  case (Suc len)
+  then have "len = 0 \<or> 0 < len" by auto
+  thus ?case
+  proof
+    assume "len = 0"
+    thus ?case using Suc
+      by (metis One_nat_def hd_conv_nth less_numeral_extra(3) less_one waypoint_window_aux_find_waypoint_hd waypoint_window_aux_success_len_nonempty) 
+  next
+    assume y1:"0 < len"
+    then obtain n where y2:"Suc len = Suc (Suc n)"  using gr0_conv_Suc by auto
+    then have y3:"find_waypoint ws i = Some (hd win) \<and> waypoints_window_aux ws (get_nextwp (hd win)) len = Some (tl win)" 
+      using Suc waypoints_window_aux_success_more_than_one by blast
+    then have y4:"find_waypoint ws i = Some (hd win)" and y5:"waypoints_window_aux ws (get_nextwp (hd win)) len = Some (tl win)"  by auto
+    then have y6:" \<forall>j<len. (0 < j \<longrightarrow> Some (tl win ! j) = find_waypoint ws (get_nextwp (tl win ! (j - 1)))) \<and> (j = 0 \<longrightarrow> Some (tl win ! j) = find_waypoint ws (get_nextwp (hd win)))" using Suc(1)[OF y5] by auto
+    then have y7:"\<forall>j< Suc len. (j = 0 \<longrightarrow> Some (win ! j) = find_waypoint ws i)"
+      by (metis Suc.prems WaypointManager.waypoint_window_aux_success_len_nonempty WaypointManager_axioms hd_conv_nth y4)
+    then have y8:"\<forall>j<Suc len. (j = 0 \<longrightarrow> Some (win ! j) = find_waypoint ws i) \<and> (j = 1 \<longrightarrow> Some (win ! j) = find_waypoint ws (get_nextwp (hd win)))" using y6 y4
+      by (metis One_nat_def Suc.prems hd_Cons_tl nth_Cons_Suc waypoint_window_aux_success_len_nonempty y1)
+    then have "\<forall>j<len. (0 < j \<longrightarrow> Some (tl win ! j) = find_waypoint ws (get_nextwp (tl win ! (j - 1))))" using y6 y7 by auto
+    then have "\<forall>j<len. (0 < j \<longrightarrow> Some (win ! (j + 1)) = find_waypoint ws (get_nextwp (win ! j )))"
+      by (metis (no_types, hide_lams) One_nat_def Suc(2) Suc_pred' add.right_neutral add_Suc_right hd_Cons_tl nth_Cons_Suc waypoint_window_aux_success_len_nonempty)
+    then have "\<forall>j<Suc len. (1 < j \<longrightarrow> Some (win ! j ) = find_waypoint ws (get_nextwp (win ! (j - 1) )))"
+      by (metis One_nat_def Suc_lessE Suc_less_eq add.right_neutral add_Suc_right diff_Suc_Suc diff_zero)
+    thus ?case using y8 
+      by (metis Suc_diff_1 Suc_eq_plus1_left diff_self_eq_0 linorder_neqE_nat not_add_less1 option.inject plus_nat.add_0 y4)
+  qed
+qed
+  
+
+    
 fun waypoints_window :: "'w list \<Rightarrow> 'id \<Rightarrow> nat \<Rightarrow> ('w list) option" where
-case1:"waypoints_window ws i 0 = None"
-|case2:"waypoints_window ws i (Suc 0) = 
+"waypoints_window ws i 0 = None"
+|"waypoints_window ws i (Suc 0) = 
   (case find_waypoint ws i of 
     None \<Rightarrow> None 
     | Some w \<Rightarrow> Some [update_nextwp w i])"
-|case3:"waypoints_window ws i (Suc (Suc n)) = 
+|"waypoints_window ws i (Suc (Suc n)) = 
   (case find_waypoint ws i of 
     None \<Rightarrow> None 
     | Some w \<Rightarrow> 
           (case waypoints_window ws (get_nextwp w) (Suc n) of
             None \<Rightarrow> None
             | Some win \<Rightarrow> Some (w # win)))"
-
+  
 lemma waypoints_window_elim1:"waypoints_window ws i 0 = x \<Longrightarrow> x = None"
   apply(cases rule:waypoints_window.cases) by auto
     
@@ -191,8 +267,23 @@ lemma waypoints_window_elim10:
   assumes assm1:"waypoints_window ws i (Suc (Suc n)) = Some win"
   shows "(\<exists> w. find_waypoint ws i = Some w \<and> (win = [w] \<or> (\<exists> win'. win = w # win')))"
   apply(cases rule:waypoints_window.elims[OF assm1])
-    by (auto split:option.splits)
+  by (auto split:option.splits)
 
+lemma option_non_none:"((case option of None \<Rightarrow> None | Some x \<Rightarrow> f x) = Some g) = (\<exists> x. option = Some x \<and> f x = Some g )"
+  by (auto split: option.split)
+        
+lemma waypoints_window_elim11:
+  "waypoints_window ws i (Suc 0) = Some win \<Longrightarrow> \<exists> w. find_waypoint ws i = Some w \<and> win = [update_nextwp w i]"
+  by (auto simp add: option_non_none)
+
+lemma waypoints_window_elim12:
+  "waypoints_window ws i (Suc (Suc n)) = Some win \<Longrightarrow> find_waypoint ws i = Some (hd win) \<and> waypoints_window ws (get_nextwp (hd win)) (Suc n) = Some (tl win)"
+  apply(cases rule:waypoints_window.elims)
+  by (auto split:option.splits)
+    
+lemma waypoints_window_elim12:"waypoints_window ws i len = Some win \<Longrightarrow> 1 \<le> len"
+  apply(induct rule:waypoints_window.induct) by auto
+    
 lemma waypoints_window_intro1:"waypoints_window ws i 0 = None"
   apply(cases rule:waypoints_window.elims) by auto
  
@@ -217,7 +308,6 @@ lemma waypoints_window_success_find_waypoint_success:"waypoints_window ws i (Suc
 lemma waypoints_window_size_one_success_is_size_one:
   "waypoints_window ws i (Suc 0) = Some win \<Longrightarrow> length win = (Suc 0)" using waypoints_window_elim7 by force
 
-    
 lemma waypoints_window_lteq_len:"waypoints_window ws i len = Some win \<Longrightarrow> length win = len"
   apply(induct arbitrary: win rule:waypoints_window.induct)  
     by (auto split: option.splits)
@@ -274,8 +364,7 @@ lemma mset_extend_submultiset:"x \<notin># Multiset.mset xs' \<Longrightarrow> x
     then have y1:"x \<notin># mset xs'" by auto
     then have y2:"mset xs' \<subseteq># mset xs" using Cons shrink_submultiset by auto
     then show ?case using Cons y1 y2 by (meson grow_submultiset)
-  qed    
-     
+  qed         
       
 lemma waypoints_window_wf:"waypoints_window ws i len = Some win \<Longrightarrow> waypoints_wf win"
 proof(induct arbitrary: win rule:waypoints_window.induct)
@@ -290,16 +379,13 @@ next
   then obtain win' where y2:"waypoints_window ws (get_nextwp w) (Suc n) = Some win'" and y3:"win = w # win'"  using 3 waypoints_window_elim9 y1 by blast
   then have y4:"waypoints_wf win'" using 3 y1 by blast
   then have y5:"\<forall> w'. List.member win' w' \<longrightarrow> (\<exists> w. Some w = find_waypoint win' (get_nextwp w'))" 
-      and y6:"\<forall> w'. List.member (tl win') w' \<longrightarrow>  (\<exists> w w''. Some w'' = find_waypoint win' (get_nextwp w) \<and> get_number w = get_number w'')"
       using waypoints_wf_def by auto
   then have y7:"get_nextwp w = get_number (hd win')"  using find_waypoint_correct waypoints_window_elim8 y2 by fastforce
   then have y8:"\<forall> w'. List.member win w' \<longrightarrow> (\<exists> w''. Some w'' = find_waypoint win (get_nextwp w'))" 
     by (metis (mono_tags, lifting) WaypointManager.waypoints_wf_def WaypointManager.waypoints_window_not_empty y3 WaypointManager_axioms find.simps(2) find_waypoint_def list.collapse member_rec(1) y2 y4)
-  then have y9:"\<forall> w'. List.member (tl win) w' \<longrightarrow>  (\<exists> w' w''. Some w'' = find_waypoint win (get_nextwp w') \<and> get_number w = get_number w'')"
-    by (metis (mono_tags, lifting) correct_update1 correct_update2 find.simps(2) find_waypoint_def y3)
-  thus ?case using y8 y9 waypoints_wf_def[of win] by (metis correct_update1 correct_update2)
+  thus ?case using y8  waypoints_wf_def[of win] by auto
 qed
-
+      
 lemma waypoints_window_sensible_numbers:"waypoints_window ws i len = Some win \<Longrightarrow> set (map get_number win) \<subseteq> set (map get_number ws)"
 proof(induct arbitrary: win rule:waypoints_window.induct)
   case (1 ws i)
@@ -322,39 +408,52 @@ next
   thus ?case using y3 y5 by auto
 qed
 
-lemma foo:"waypoints_window ws i len = Some win \<Longrightarrow> 0 < len \<Longrightarrow> \<forall> j < len. Some (win ! j) = find_waypoint win (get_nextwp (win ! j))"
-  proof(induct arbitrary: win rule:waypoints_window.induct)
-    case (1 ws i)
+lemma waypoint_window_all_but_last_found_aux:"waypoints_window ws i len = Some win \<Longrightarrow> \<forall> j. j < len - 1 \<longrightarrow> Some (win ! j) = find_waypoint ws (get_number (win ! j))"
+proof(induct len arbitrary: i win)
+  case 0
   then show ?case by auto
 next
-  case (2 ws i)
-  then show ?case
-    using find_waypoint_def waypoints_window_length_one by fastforce
+  case (Suc len)
+  then have "len = 0 \<or> 0 < len" by auto
+  thus ?case 
+  proof 
+    assume "len = 0"
+    thus ?case by auto
+  next
+    assume a:"len > 0"
+    then obtain win' w where y1:"Some w = find_waypoint ws i" and y2:"waypoints_window ws (get_nextwp w) len = Some win'" and y3:"w # win' = win" using Suc
+      by (metis Suc_pred WaypointManager.waypoints_window_elim9 WaypointManager_axioms waypoints_window_elim8)
+    then have y4:"\<forall>j<len - 1. Some (win' ! j) = find_waypoint ws (get_number (win' ! j))" using Suc by auto
+    thus ?case using a y1 y2 y3 
+      by (metis Suc_less_eq Suc_pred' find_waypoint_correct neq0_conv nth_Cons_0 nth_Cons_Suc)
+  qed
+qed    
+
+lemma waypoint_window_all_but_last_found:"waypoints_window ws i len = Some win \<Longrightarrow> j < len - 1 \<Longrightarrow> Some (win ! j) = find_waypoint ws (get_number (win ! j))"
+  using waypoint_window_all_but_last_found_aux by blast
+    
+lemma waypoints_window_success_all_nextwp_in_source:"waypoints_window ws i len = Some win \<Longrightarrow> a < len \<Longrightarrow> \<exists> w. Some w = find_waypoint ws (get_nextwp (win ! a))"
+proof (induct win arbitrary: i len a)
+  case Nil
+  then show ?case by (meson WaypointManager.waypoints_window_not_empty WaypointManager_axioms)
 next
-  case (3 ws i n)
-  then show ?case sorry
-qed
-(*  
-lemma waypoints_window_all_found:"waypoints_window ws i len = Some win \<Longrightarrow> List.member win w \<Longrightarrow> (\<exists> w'. Some w' = find_waypoint ws (get_nextwp w))"
-proof(induct arbitrary: win rule:waypoints_window.induct)
-  case (1 ws i)
-  then show ?case by auto
-next
-  case (2 ws i)
-  thus ?case sledgehammer[z3 e spass]
-  (*then obtain w w' where y1:"win = [w] \<and> get_number w = get_nextwp w \<and> Some w' = find_waypoint ws i \<and> w = update_nextwp w' (get_number w')"
-    sledgehammer[z3 e spass]
-    (*by (metis correct_update1 correct_update2 find_waypoint_succuss waypoints_window_elim7)*)
-  then have "Some w' = find_waypoint ws (get_nextwp w)" 
-      by (simp add: find_waypoint_correct)
-  thus ?case using y1 by (metis member_rec(1) member_rec(2))   *)
-next
-  case (3 ws i n)
-  then obtain w win' where "waypoints_window ws (get_nextwp w) (Suc n) = Some win' \<and> find_waypoint ws i = Some w \<and> win = w # win'"
-  by (meson waypoints_window_elim10 waypoints_window_elim9)
-  then show ?case using 3  by (metis member_rec(1) waypoints_window_elim8)
-qed
-*)  
+  case (Cons w win)
+  then have "1 = len \<or> 1 < len" using waypoints_window_elim12 by auto
+  thus ?case
+  proof
+    assume "1 = len"
+    thus ?case using waypoints_window_elim11
+      by (metis (no_types, lifting) Cons.prems(1) Cons.prems(2) One_nat_def correct_update1 less_numeral_extra(4) less_trans_Suc linorder_neqE_nat not_less_zero nth_Cons_0)
+  next
+    assume "1 < len"
+    then obtain n where y1:"len = Suc (Suc n)" by (metis One_nat_def lessE)
+    then have y2:"waypoints_window ws i (Suc (Suc n)) = Some (w # win)" using Cons by auto
+    then have y3:"Some w = find_waypoint ws i" and y4:"waypoints_window ws (get_nextwp w) (Suc n) = Some win" using Cons waypoints_window_elim12[OF y2] by auto
+    then have y5:"(a - 1) < Suc n"  using Cons.prems(2) y1 by linarith
+    thus ?case using Cons(1)[OF y4 y5] y3 Cons(2) by (metis not_None_eq nth_Cons' waypoints_window_intro3 y4)
+  qed
+qed  
+
 end
   
 end

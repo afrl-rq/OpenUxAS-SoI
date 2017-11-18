@@ -59,6 +59,7 @@ Waypoint * FindWP(Waypoint * ws, uint16_t len, int64_t id) {
 /* ASM: len_ws_win > 0 */
 /* ASM: len_ws_win is less than the number of waypoints that can be
    stored in ws_win. */
+/* ASM: Last waypoint starts a cycle. */
 void MCWaypointSubSequence(  Waypoint * ws
                            , uint16_t len_ws
                            , int64_t id
@@ -66,13 +67,13 @@ void MCWaypointSubSequence(  Waypoint * ws
                            , Waypoint * ws_win /* out */) {
   uint16_t i;
   int64_t nid = id;
-  for(i=0; i<len_ws_win; i++) {
-    ws_win[i] = *(FindWP(ws, len_ws,nid));
-    nid = ws_win[i].nextwaypoint;
-    if(i == len_ws_win - 1) {
-      ws_win[i].nextwaypoint = ws_win[i].nextwaypoint;
-    }
+  Waypoint * wp = NULL;
+  for(i=0; i < len_ws_win; i++) {
+    wp = FindWP(ws, len_ws, nid);
+    ws_win[i] = *wp;
+    nid = ws_win[i].nextwaypoint;    
   }
+  /*ws_win[i].nextwaypoint = ws_win[i].number; */
   return;
 }
 

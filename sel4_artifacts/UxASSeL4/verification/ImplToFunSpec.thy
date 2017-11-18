@@ -71,11 +71,11 @@ assumes a1:"ws = (lift_waypoints s wsp len)"
 and a2:"Some w = find_waypoint ws i"
 and a3:"None = find_waypoint (take j ws)  i"
 and a4:"j < len"
-and a5:"i = s[wsp +\<^sub>p j]\<rightarrow>number"
-shows "Some s[wsp +\<^sub>p j] = find_waypoint ws s[wsp +\<^sub>p j]\<rightarrow>number"
+and a5:"i = number_C (heap_Waypoint_struct_C s (wsp +\<^sub>p j))"
+shows "Some (heap_Waypoint_struct_C s (wsp +\<^sub>p j)) = find_waypoint ws (number_C (heap_Waypoint_struct_C s (wsp +\<^sub>p j)))"
 proof -
   have y1:"i = number_C (ws !  j)" 
-    by (metis MissionCommandUtils.get_Waypoint_struct_number_def a1 a4 a5 lift_waypoints_to_get_waypoint uint_nat word_less_nat_alt)
+    by (metis a1 a4 a5 lift_waypoints_to_get_waypoint uint_nat word_less_nat_alt)
   then have y2:"Some w = find_waypoint ws (number_C (ws ! j))" using a2 y1 by auto
   then have y3:"j < length ws" using a2 a3 not_less by fastforce
   then have "ws ! j = w" using find_waypoint_next_is_match[OF y2 _ y3] a3 y1 by auto
@@ -95,17 +95,16 @@ None = find_waypoint (take j (lift_waypoints s wsp len)) i
 \<Longrightarrow>
 j < len 
 \<Longrightarrow> 
-s[wsp +\<^sub>p int j]\<rightarrow>number \<noteq> i 
+ (number_C (heap_Waypoint_struct_C s(wsp +\<^sub>p int j))) \<noteq> i 
 \<Longrightarrow> None = find_waypoint (take (Suc j) (lift_waypoints s wsp len)) i"
-  by (metis MissionCommandUtils.get_Waypoint_struct_number_def find_waypoint_none_extend 
+  by (metis find_waypoint_none_extend 
       lift_waypoints_length lift_waypoints_to_get_waypoint take_Suc_conv_app_nth)
       
-lemma findwp_success_aux:
+lemma findwp_success_aux[wp]:
 "
-len \<le> USHORT_MAX 
-\<Longrightarrow> 
 \<lbrace> \<lambda> (s::lifted_globals).
-  are_valid_Waypoints s wsp len
+  len \<le> USHORT_MAX 
+  \<and> are_valid_Waypoints s wsp len
   \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i)
   \<and> P s\<rbrace>
    LoadCode.MissionCommandUtils.FindWP' wsp len i
@@ -113,6 +112,7 @@ len \<le> USHORT_MAX
   \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i 
   \<and> is_valid_Waypoint_struct_C s r 
   \<and> P s \<rbrace>!"
+  apply (rule validNF_assume_pre)
   apply (unfold LoadCode.MissionCommandUtils.FindWP'_def)
   apply (unfold skipE_def)
   apply wp
@@ -134,88 +134,221 @@ len \<le> USHORT_MAX
  
 lemma findwp_success[wp]: 
 " 
-len \<le> USHORT_MAX 
-\<Longrightarrow> 
-(\<forall> s. P s \<longrightarrow>  (are_valid_Waypoints s wsp len \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i))) 
-\<Longrightarrow>
 \<forall> r. 
-\<lbrace>\<lambda> s::lifted_globals. 
-  are_valid_Waypoints s wsp len 
+\<lbrace> \<lambda> s.  are_valid_Waypoints s wsp len
   \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i 
-  \<and> is_valid_Waypoint_struct_C s r \<and> P s\<rbrace> 
+  \<and> is_valid_Waypoint_struct_C s r 
+  \<and> P s\<rbrace> 
 g r 
 \<lbrace> Q \<rbrace>!
+\<Longrightarrow>
+(\<forall> s. P s \<longrightarrow>  len \<le> USHORT_MAX  \<and> are_valid_Waypoints s wsp len \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i)) 
 \<Longrightarrow>
 \<lbrace> P \<rbrace> 
 do x \<leftarrow> MissionCommandUtils.FindWP' wsp len i; 
         g x 
 od 
-\<lbrace> Q \<rbrace>!"
+\<lbrace> Q \<rbrace>!"    
   apply (rule validNF_bind[where B="\<lambda> r s. are_valid_Waypoints s wsp len \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i \<and> is_valid_Waypoint_struct_C s r \<and> P s"])
    apply simp
-  apply (rule validNF_weaken_pre[where Q="\<lambda> s. are_valid_Waypoints s wsp len \<and> (\<exists>w. Some w = find_waypoint (lift_waypoints s wsp len) i) \<and> P s"])
-    apply (rule findwp_success_aux)
-  by auto
-
-lemma forward_validNF_guard_nobind[wp]:"\<lbrace> \<lambda> s. P s \<and> f s\<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> (\<forall> s. P s \<longrightarrow> f s) \<Longrightarrow> \<lbrace> P \<rbrace> do guard f; g od \<lbrace> Q \<rbrace>!"
-  apply (rule validNF_bind[where B = "\<lambda> r s. P s \<and> f s"])
-   apply simp
-  apply wp
-  by auto
-   
-lemma forward_validNF_guard_bind:"\<lbrace> \<lambda> s. P s \<and> f s\<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> (\<forall> s. P s \<longrightarrow> f s) \<Longrightarrow> \<lbrace> P \<rbrace> do  x \<leftarrow> guard f; g od \<lbrace> Q \<rbrace>!"
-  apply (rule validNF_bind[where B = "\<lambda> r s. P s \<and> f s"])
-   apply simp
-  apply wp
-  by auto    
+     apply (rule validNF_weaken_pre)
+   apply (rule validNF_weaken_pre[where Q="\<lambda> s. len \<le> USHORT_MAX  \<and> are_valid_Waypoints s wsp len \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i) \<and> P s"])
+   apply (rule findwp_success_aux)
+  by blast+
     
-lemma forward_validNF_modify[wp]:"\<lbrace> P \<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> (\<forall> s. P s \<longrightarrow> P (f s)) \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> modify f; g od \<lbrace> Q \<rbrace>!"
-  apply wp
-  by (simp add: hoare_modifyE_var no_fail_def snd_modify validNF_def)    
+lemma validNF_guard_bind[wp]:"\<lbrace>\<lambda> s. A s \<and> f s\<rbrace> g () \<lbrace> B \<rbrace>! \<Longrightarrow> \<forall> s. A s \<longrightarrow> f s \<Longrightarrow> \<lbrace>A\<rbrace> guard f >>= g \<lbrace>B\<rbrace>!"
+  apply (rule validNF_bind[where B="\<lambda> _ s. A s \<and> f s"])
+  by (wp | auto)+
     
-lemma forward_validNF_whileloop_inv:" \<lbrace> P \<rbrace> whileLoop_inv c s v i m\<lbrace> \<lambda> r s. P s \<and> i r s \<and> \<not>(c r s) \<rbrace>! \<Longrightarrow> \<forall> r. \<lbrace> \<lambda> s. P s \<and> i r s \<and> \<not>(c r s) \<rbrace> g r \<lbrace> Q \<rbrace>!  \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> whileLoop_inv c s v i m; g x od \<lbrace> Q \<rbrace>!"
-  apply (rule validNF_bind[where B = " \<lambda> r s. P s \<and> i r s \<and> \<not>(c r s)"])
-    by auto
+lemma validNF_whileloop_inv[wp]:"\<forall> r. \<lbrace> \<lambda> s. P s \<and> i r s \<and> \<not> (c r s) \<rbrace> g r \<lbrace> Q \<rbrace>!
+\<Longrightarrow> \<lbrace> P \<rbrace> whileLoop_inv c s v i m \<lbrace> \<lambda> r s. P s \<and> i r s \<and> \<not>(c r s) \<rbrace>!  
+\<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> whileLoop_inv c s v i m; g x od \<lbrace> Q \<rbrace>!"
+  apply (rule validNF_bind[where B = "\<lambda> r s. P s \<and> i r s \<and> \<not>(c r s)"])
+  by auto
+    
+lemma validNF_modify[wp]:"\<forall> s'. \<lbrace> \<lambda> s. P s \<and> s = f s' \<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> \<lambda> s. P s\<rbrace> do x \<leftarrow> modify f; g od \<lbrace> Q \<rbrace>!"
+  sorry
 
 lemma forward_validNF_gets[wp]:"\<forall> x. \<lbrace> \<lambda> s. P s \<and> x = f s \<rbrace> g x \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> gets f; g x od \<lbrace> Q \<rbrace>!"
   apply (rule validNF_bind[where B="\<lambda> x s. P s \<and> x = f s"])
    apply blast
   apply wp
     by auto
-   
-lemma are_valid_waypoints_noninter1:" ws1p +\<^sub>p len = ws2p \<Longrightarrow>  are_valid_Waypoints s ws1p len \<Longrightarrow> are_valid_Waypoints s[(ws2p::Waypoint_struct_C ptr) +\<^sub>p (k::nat) := v] ws1p len"
+
+lemma are_valid_waypoints_noninter[simp]:"are_valid_Waypoints (heap_Waypoint_struct_C_update f s) p2 len = are_valid_Waypoints s p2 len"
   apply (unfold are_valid_Waypoints_def) by auto
-    
-lemma are_valid_waypoints_noninter2:"ws1p +\<^sub>p len = ws2p \<Longrightarrow>  are_valid_Waypoints s[((ws2p::Waypoint_struct_C ptr) +\<^sub>p (k::nat))\<rightarrow>nextwaypoint := v] ws1p len =  are_valid_Waypoints s ws1p len"
-     apply (unfold are_valid_Waypoints_def) by auto
-    
-lemma lift_waypoints_noninter1:"ws1p +\<^sub>p len = ws2p \<Longrightarrow>  lift_waypoints s[(ws2p::Waypoint_struct_C ptr) +\<^sub>p (k::nat) := v] ws1p len = lift_waypoints s ws1p len"
-  sorry
-    
-lemma lift_waypoints_noninter2:"ws1p +\<^sub>p len = ws2p \<Longrightarrow>  lift_waypoints s[((ws2p::Waypoint_struct_C ptr) +\<^sub>p k)\<rightarrow>nextwaypoint := v] ws1p len =  lift_waypoints s ws1p len"
-  sorry
-    
-lemma update_with_valid[simp]:"are_valid_Waypoints s p l \<Longrightarrow>
-           is_valid_Waypoint_struct_C s r \<Longrightarrow>
-           are_valid_Waypoints s[p := s[r]] p l"
-  apply (unfold are_valid_Waypoints_def)
+
+lemma rename8[simp]:"x \<noteq> y \<Longrightarrow> heap_Waypoint_struct_C (heap_Waypoint_struct_C_update (\<lambda>b c. if c = x then v else b c) s') y = heap_Waypoint_struct_C s' y"
   by auto
+    
+(* TODO: How do I prove this *)
+lemma fail:"(p::32 word ptr) +\<^sub>p 1 \<noteq> p" 
+ oops
+(* TODO: How do I prove this *)
+lemma fail:"0<x \<Longrightarrow> x \<le> UINT_MAX \<Longrightarrow> (p::Waypoint_struct_C ptr) +\<^sub>p  x  \<noteq> p "   
+  oops
+        
+lemma MCWaypointSubSequence_to_funspec_supp1:
+assumes a1:"waypoints_wf ws"
+and a2:"Some win  = waypoints_window_aux ws i len"
+and a3:"int a < int len"
+and a4:"a = 0 \<longrightarrow> b = sint i"
+and a5:"0 < a \<longrightarrow> b = sint (nextwaypoint_C (win ! (a - Suc 0)))"
+shows "\<exists>w. Some w = find_waypoint ws (of_int b)"
+  sorry
+    
+lemma MCWaypointSubSequence_to_funspec_supp2:
+assumes a1:"Some win = waypoints_window_aux (lift_waypoints s' wsp len_ws) i len_ws_win" 
+and a2:"Some (heap_Waypoint_struct_C s' r) = find_waypoint (lift_waypoints s' wsp len_ws) (of_int b)"
+and a3:"a = 0 \<longrightarrow> b = sint i"
+and a4:"0 < a \<longrightarrow> b = sint (nextwaypoint_C (win ! (a - Suc 0)))"
+and a5:"a < len_ws_win"
+shows "nextwaypoint_C (heap_Waypoint_struct_C s' r) = nextwaypoint_C (win ! a)"
+proof -
+  have y1:"(\<forall>j<len_ws_win. 0 < j \<longrightarrow> Some (win ! j) = find_waypoint (lift_waypoints s' wsp len_ws) (nextwaypoint_C (win ! (j - 1))))" and 
+  y2:"Some (win ! 0) = find_waypoint (lift_waypoints s' wsp len_ws) i" using waypoint_window_aux_nextwp[OF sym[OF a1]] by auto
+  have "a = 0 \<or> 0 < a" by auto
+  thus ?thesis
+  proof
+    assume "a = 0"
+    thus ?thesis using y2 a3 a2 by (metis of_int_sint option.inject)
+  next 
+    assume "0 < a"
+    thus ?thesis using y1 a4 a2 a5 by (metis One_nat_def of_int_sint option.inject)
+   qed
+qed
+
+lemma MCWaypointSubSequence_to_funspec_supp3:
+assumes a1:"len_ws \<le> USHORT_MAX"
+and a2:"Some win = waypoints_window_aux (lift_waypoints s' wsp len_ws) i len_ws_win"
+and a3:"len_ws_win < len_ws"
+and a4:"Some (heap_Waypoint_struct_C s' r) = find_waypoint (lift_waypoints s' wsp len_ws) (of_int b)"
+and a5:"a = 0 \<longrightarrow> b = sint i"
+and a6:"0 < a \<longrightarrow> b = sint (nextwaypoint_C (win ! (a - Suc 0)))"
+and a7:"a < len_ws_win"
+and a8:"wsp +\<^sub>p int len_ws +\<^sub>p int k = wsp +\<^sub>p int len_ws +\<^sub>p int a"
+and a9:"k \<le> a"
+shows "heap_Waypoint_struct_C s' r = win ! k"
+proof -
+  have y1:"k = a" sorry
+  have y2:"(\<forall>j<len_ws_win. 0 < j \<longrightarrow> Some (win ! j) = find_waypoint (lift_waypoints s' wsp len_ws) (nextwaypoint_C (win ! (j - 1))))" and 
+  y3:"Some (win ! 0) = find_waypoint (lift_waypoints s' wsp len_ws) i" using waypoint_window_aux_nextwp[OF sym[OF a2]] by auto
+  have "a = 0 \<or> 0 < a" by auto
+    thus ?thesis
+  proof
+    assume "a = 0"
+    thus ?thesis using y1 y3 a5 a4 by (metis of_int_sint option.inject)
+  next 
+    assume "0 < a"
+    thus ?thesis using y1 y2 a6 a4 a7 by (metis One_nat_def of_int_sint option.inject)
+   qed
+qed
       
+lemma MCWaypointSubSequence_to_funspec_supp4:
+assumes a1:"len_ws \<le> USHORT_MAX"
+and a2:"Some win = waypoints_window_aux (lift_waypoints s' wsp len_ws) i len_ws_win"
+and a3:"len_ws_win < len_ws"
+and a4:"Some (heap_Waypoint_struct_C s' r) = find_waypoint (lift_waypoints s' wsp len_ws) (of_int b)"
+and a5:"a = 0 \<longrightarrow> b = sint i"
+and a6:"0 < a \<longrightarrow> b = sint (nextwaypoint_C (win ! (a - Suc 0)))"
+and a7:"a < len_ws_win"
+and a8:"wsp +\<^sub>p int len_ws +\<^sub>p int k = wsp +\<^sub>p int len_ws +\<^sub>p int a"
+and a9:"k \<le> a"
+and a10:"\<forall>k\<le>a - Suc 0.
+          0 < a \<longrightarrow>
+          (if wsp +\<^sub>p int len_ws +\<^sub>p int k = wsp +\<^sub>p int len_ws +\<^sub>p int a then heap_Waypoint_struct_C s' r else heap_Waypoint_struct_C s' (wsp +\<^sub>p int len_ws +\<^sub>p int k)) =
+          win ! k"
+shows "wsp +\<^sub>p int len_ws +\<^sub>p int k \<noteq> wsp +\<^sub>p int len_ws +\<^sub>p int a \<Longrightarrow> k \<le> a \<Longrightarrow> heap_Waypoint_struct_C s' r = win ! k"
+proof -
+  have y1:"k \<le> a - 1" sorry
+  have y2:"(\<forall>j<len_ws_win. 0 < j \<longrightarrow> Some (win ! j) = find_waypoint (lift_waypoints s' wsp len_ws) (nextwaypoint_C (win ! (j - 1))))" and 
+  y3:"Some (win ! 0) = find_waypoint (lift_waypoints s' wsp len_ws) i" using waypoint_window_aux_nextwp[OF sym[OF a2]] by auto
+  then have "a = 0 \<or> 0 < a" by auto
+  thus ?thesis
+  proof
+    assume "a = 0"
+    thus ?thesis  by (metis y3 a4 a5 a9 le_zero_eq of_int_sint option.inject)
+  next
+    assume "0 < a"
+    thus ?thesis  using a10 a8 y1 by auto
+    
+lemma MCWaypointSubSequence_to_funspec_supp5:"len_ws \<le> USHORT_MAX \<Longrightarrow>
+       ws_winp = wsp +\<^sub>p int len_ws \<Longrightarrow>
+       waypoints_wf (lift_waypoints s' wsp len_ws) \<Longrightarrow>
+       Some win = waypoints_window_aux (lift_waypoints s' wsp len_ws) i len_ws_win \<Longrightarrow>
+       len_ws_win < len_ws \<Longrightarrow>
+       \<forall>s v a. a < len_ws_win \<longrightarrow>
+               lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c = wsp +\<^sub>p int len_ws +\<^sub>p int a then v else b c) s) wsp len_ws = lift_waypoints s wsp len_ws \<Longrightarrow>
+       are_valid_Waypoints s' wsp len_ws \<Longrightarrow>
+       Some (heap_Waypoint_struct_C s' r) = find_waypoint (lift_waypoints s' wsp len_ws) (of_int b) \<Longrightarrow>
+       is_valid_Waypoint_struct_C s' r \<Longrightarrow>
+       are_valid_Waypoints s' (wsp +\<^sub>p int len_ws) len_ws_win \<Longrightarrow>
+       ws = lift_waypoints s' wsp len_ws \<Longrightarrow>
+       a = 0 \<longrightarrow> b = sint i \<Longrightarrow>
+       0 < a \<longrightarrow> b = sint (nextwaypoint_C (win ! (a - Suc 0))) \<Longrightarrow>
+       \<forall>k\<le>a - Suc 0.
+          0 < a \<longrightarrow>
+          (if wsp +\<^sub>p int len_ws +\<^sub>p int k = wsp +\<^sub>p int len_ws +\<^sub>p int a then heap_Waypoint_struct_C s' r else heap_Waypoint_struct_C s' (wsp +\<^sub>p int len_ws +\<^sub>p int k)) =
+          win ! k \<Longrightarrow>
+       a < len_ws_win \<Longrightarrow>
+       wsp +\<^sub>p int len_ws +\<^sub>p int k \<noteq> wsp +\<^sub>p int len_ws +\<^sub>p int a \<Longrightarrow>
+       k \<le> a \<Longrightarrow>
+       (wsp +\<^sub>p int len_ws +\<^sub>p int ka = wsp +\<^sub>p int len_ws +\<^sub>p int a \<longrightarrow> ka \<le> a - Suc 0 \<longrightarrow> 0 < a \<longrightarrow> heap_Waypoint_struct_C s' (wsp +\<^sub>p int len_ws +\<^sub>p int k) = win ! ka) \<and>
+       (wsp +\<^sub>p int len_ws +\<^sub>p int ka \<noteq> wsp +\<^sub>p int len_ws +\<^sub>p int a \<longrightarrow> ka \<le> a - Suc 0 \<longrightarrow> 0 < a \<longrightarrow> heap_Waypoint_struct_C s' (wsp +\<^sub>p int len_ws +\<^sub>p int ka) = win ! ka)"
+  sorry
+    
+lemma MCWaypointSubSequence_to_funspec_supp6:"len_ws \<le> USHORT_MAX \<Longrightarrow>
+                ws_winp = wsp +\<^sub>p int len_ws \<Longrightarrow>
+                waypoints_wf (lift_waypoints s' wsp len_ws) \<Longrightarrow>
+                Some win = waypoints_window_aux (lift_waypoints s' wsp len_ws) i len_ws_win \<Longrightarrow>
+                len_ws_win < len_ws \<Longrightarrow>
+                \<forall>s v a. a < len_ws_win \<longrightarrow>
+                        lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c = wsp +\<^sub>p int len_ws +\<^sub>p int a then v else b c) s) wsp len_ws = lift_waypoints s wsp len_ws \<Longrightarrow>
+                are_valid_Waypoints s' wsp len_ws \<Longrightarrow>
+                Some (heap_Waypoint_struct_C s' r) = find_waypoint (lift_waypoints s' wsp len_ws) (of_int b) \<Longrightarrow>
+                is_valid_Waypoint_struct_C s' r \<Longrightarrow>
+                are_valid_Waypoints s' (wsp +\<^sub>p int len_ws) len_ws_win \<Longrightarrow>
+                ws = lift_waypoints s' wsp len_ws \<Longrightarrow>
+                a = 0 \<longrightarrow> b = sint i \<Longrightarrow>
+                0 < a \<longrightarrow> b = sint (nextwaypoint_C (win ! (a - Suc 0))) \<Longrightarrow>
+                \<forall>k\<le>a - Suc 0.
+                   0 < a \<longrightarrow>
+                   (if wsp +\<^sub>p int len_ws +\<^sub>p int k = wsp +\<^sub>p int len_ws +\<^sub>p int a then heap_Waypoint_struct_C s' r else heap_Waypoint_struct_C s' (wsp +\<^sub>p int len_ws +\<^sub>p int k)) =
+                   win ! k \<Longrightarrow>
+                a < len_ws_win \<Longrightarrow> len_ws_win - Suc a < len_ws_win - a"
+  sorry
+  
+lemma lift_lift_waypoint_agnostic_prop:"
+a < len_ws_win
+\<Longrightarrow>
+ \<forall>s v a. a < len_ws_win \<longrightarrow>
+                        lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c = wsp +\<^sub>p int len_ws +\<^sub>p int a then v else b c) s) wsp len_ws = lift_waypoints s wsp len_ws
+\<Longrightarrow>
+lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c = wsp +\<^sub>p int len_ws +\<^sub>p int a then v else b c) s) wsp len_ws = lift_waypoints s wsp len_ws"
+    sorry
+(*
+theorem "size_td (typ_info_t TYPE(Waypoint_struct_C)) = x"
+  apply simp
+
+ *)  
 lemma MCWaypointSubSequence_to_funspec:
 "len_ws \<le> USHORT_MAX
-\<Longrightarrow> wsp +\<^sub>p len_ws = ws_winp
+\<Longrightarrow> ws_winp = wsp +\<^sub>p len_ws
 \<Longrightarrow> waypoints_wf ws
-\<Longrightarrow> Some win = waypoints_window ws i  len_ws_win
-\<Longrightarrow> len_ws_win \<le> len_ws 
-\<Longrightarrow> 0<len_ws
+\<Longrightarrow> Some win = waypoints_window_aux ws i  len_ws_win
+\<Longrightarrow> len_ws_win < len_ws 
 \<Longrightarrow> 0<len_ws_win
-\<Longrightarrow> \<lbrace>\<lambda> (s::lifted_globals). 
+\<Longrightarrow> (\<forall> s v a. a < len_ws_win  \<longrightarrow> lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c = ws_winp +\<^sub>p int a then v else b c) s) wsp len_ws = lift_waypoints s wsp len_ws)
+\<Longrightarrow> \<lbrace>\<lambda> (s::lifted_globals).
   are_valid_Waypoints s ws_winp len_ws_win
-  \<and>  are_valid_Waypoints s wsp len_ws
-  \<and> ws = lift_waypoints s wsp len_ws\<rbrace>
+  \<and> are_valid_Waypoints s wsp len_ws
+  \<and> ws = lift_waypoints s wsp len_ws \<rbrace>
   LoadCode.MissionCommandUtils.MCWaypointSubSequence' wsp len_ws i len_ws_win ws_winp
 \<lbrace> \<lambda> r s. 
- (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (ws_winp +\<^sub>p j) = win ! j) \<rbrace>!"
+  are_valid_Waypoints s ws_winp len_ws_win
+  \<and> are_valid_Waypoints s wsp len_ws
+  \<and> ws = lift_waypoints s wsp len_ws
+  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (ws_winp +\<^sub>p j) = win ! j) \<rbrace>!"
   apply (unfold LoadCode.MissionCommandUtils.MCWaypointSubSequence'_def)
       apply(subst whileLoop_add_inv
         [where 
@@ -225,18 +358,72 @@ lemma MCWaypointSubSequence_to_funspec:
   are_valid_Waypoints s ws_winp len_ws_win
   \<and>  are_valid_Waypoints s wsp len_ws
   \<and> ws = lift_waypoints s wsp len_ws
-            \<and> j < len_ws_win
+  \<and> j \<le> len_ws_win
 \<and> (j = 0 \<longrightarrow> nid = sint i)
 \<and> (0 < j \<longrightarrow> nid = sint (nextwaypoint_C (win ! (j - 1))))
-\<and>  (\<forall> k. k < j \<longrightarrow> heap_Waypoint_struct_C s (ws_winp +\<^sub>p k) = win ! k)
-"
-        ])
-  apply clarsimp
-     apply (rule forward_validNF_whileloop_inv)
-    apply (wp_once, clarsimp)
-     apply(rule forward_validNF_guard_nobind forward_validNF_gets forward_validNF_guard_bind forward_validNF_modify findwp_success | clarsimp)+
-  defer
+\<and> (\<forall> k \<le> j - 1. 0 < j \<longrightarrow> heap_Waypoint_struct_C s (ws_winp +\<^sub>p k) = win ! k)
+" ])
+  apply (clarsimp | wp_once | simp add: lift_lift_waypoint_agnostic_prop MCWaypointSubSequence_to_funspec_supp2)+
+         apply rule+
+           apply (rule MCWaypointSubSequence_to_funspec_supp3)
+                    apply (assumption | clarsimp)+
+          apply (rule MCWaypointSubSequence_to_funspec_supp4)
+                   apply (assumption | clarsimp)+
     defer
-      apply (wp | clarsimp )+ 
+                apply (simp)+
+    apply clarsimp
+              apply(rule MCWaypointSubSequence_to_funspec_supp5)
+  apply (assumption)+
+                  apply(rule MCWaypointSubSequence_to_funspec_supp6)
+    apply (assumption | simp add: MCWaypointSubSequence_to_funspec_supp1 | clarsimp)+
+   
+ 
     
+(*    
+lemma MCWaypointSubSequence_to_funspec:
+"len_ws \<le> USHORT_MAX
+\<Longrightarrow> ws_winp = wsp +\<^sub>p len_ws
+\<Longrightarrow> waypoints_wf ws
+\<Longrightarrow> Some win = waypoints_window ws i  len_ws_win
+\<Longrightarrow> len_ws_win < len_ws 
+\<Longrightarrow> 0<len_ws_win
+\<Longrightarrow> \<lbrace>\<lambda> (s::lifted_globals). 
+  are_valid_Waypoints s ws_winp len_ws_win
+  \<and> are_valid_Waypoints s wsp len_ws
+  \<and> ws = lift_waypoints s wsp len_ws \<rbrace>
+  LoadCode.MissionCommandUtils.MCWaypointSubSequence' wsp len_ws i len_ws_win ws_winp
+\<lbrace> \<lambda> r s. 
+  are_valid_Waypoints s ws_winp len_ws_win
+  \<and> are_valid_Waypoints s wsp len_ws
+  \<and> ws = lift_waypoints s wsp len_ws
+  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (ws_winp +\<^sub>p j) = win ! j) \<rbrace>!"
+  apply (unfold LoadCode.MissionCommandUtils.MCWaypointSubSequence'_def)
+      apply(subst whileLoop_add_inv
+        [where 
+          M = "\<lambda> ((j,nid),s). len_ws_win - j"
+          and I = 
+            "\<lambda> (j,nid) s.
+  are_valid_Waypoints s ws_winp len_ws_win
+  \<and>  are_valid_Waypoints s wsp len_ws
+  \<and> ws = lift_waypoints s wsp len_ws
+  \<and> j \<le> len_ws_win
+\<and> (j = 0 \<longrightarrow> nid = sint i)
+\<and> (0 < j \<longrightarrow> nid = sint (nextwaypoint_C (win ! (j - 1))))
+\<and> (\<forall> k. k < j \<longrightarrow> j < len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (ws_winp +\<^sub>p k) = win ! k)
+" ])  
+  apply (clarsimp | wp_once)+
+    defer (* lift waypoint unchanged, absurdity, and everything previous is as it should be *)
+    apply (clarsimp | wp_once)+
+    defer (* are_valid_waypoints property *)
+    apply (clarsimp | wp_once)+
+            defer (* ? ? ? *)
+    apply (clarsimp | simp)+
+    defer (* are_valid_waypoints property *)
+        apply (clarsimp | simp)+
+    defer (* waypoint is in there *)
+        apply (clarsimp | simp)+
+    
+    sorry
+ done
+*)
 end

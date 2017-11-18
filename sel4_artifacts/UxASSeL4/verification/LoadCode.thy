@@ -4,7 +4,7 @@ begin
   
 install_C_file "../CMASI/MissionCommandUtils.c"
   
-autocorres[ts_rules = nondet, heap_abs_syntax, unsigned_word_abs = MCWaypointSubSequence FindWP] "../CMASI/MissionCommandUtils.c"  
+autocorres[ts_rules = nondet, unsigned_word_abs = MCWaypointSubSequence FindWP] "../CMASI/MissionCommandUtils.c"  
   
 
 (* A subset of what we expect a valid mission command to entail. I.E, the ptr to the front
@@ -16,12 +16,11 @@ definition are_valid_Waypoints where
     is_valid_Waypoint_struct_C s wsp
     \<and> wsp \<noteq> NULL
     \<and> (\<forall> j < len. is_valid_Waypoint_struct_C s (wsp +\<^sub>p j)) "
-
-lemma valid_mission_command[simp]:
+  
+lemma valid_waypoints[simp]:
 "are_valid_Waypoints s wsp len 
 \<Longrightarrow> j < len
-\<Longrightarrow> is_valid_Waypoint_struct_C s wsp 
-  \<and> is_valid_Waypoint_struct_C s (wsp +\<^sub>p j)"
+\<Longrightarrow> is_valid_Waypoint_struct_C s (wsp +\<^sub>p j)"
   by (simp add: are_valid_Waypoints_def uint_nat word_less_nat_alt)
     
 (* Generally useful lemma." *)  
@@ -92,17 +91,36 @@ lemma rename1[simp]:"int len_ws_win \<le> 2147483648 \<Longrightarrow> 0 < len_w
   sorry
     
 lemma rename2[simp]:"0 < len_ws_win \<Longrightarrow> a \<le> USHORT_MAX \<Longrightarrow> uint (of_nat len_ws_win) - 1 \<le> INT_MAX"
-  sorry 
+  sorry
     
 lemma rename3[simp]:"len_ws \<le> USHORT_MAX \<Longrightarrow> len_ws_win \<le> len_ws \<Longrightarrow> int len_ws_win \<le> 2147483648"
-  sorry
+   using max_short_fix by fastforce
     
 lemma [simp]:"0 < len_ws_win \<Longrightarrow> INT_MIN < int len_ws_win"
   sorry
     
-lemma ushort_max_2to32[simp]:"a \<le> USHORT_MAX \<Longrightarrow> int a < 2147483648"
-  sorry
-    
 lemma [simp]:"p +\<^sub>p int 0 = p"    
   sorry
+
+lemma rename4[simp]:"(i::nat) < j \<Longrightarrow> \<not> int i < int j - 1 \<Longrightarrow> i = j - 1"
+  by linarith
+    
+lemma rename5[simp]:"a \<le> USHORT_MAX \<Longrightarrow> int a < 2147483648"
+  sorry
+
+lemma rename6[simp]:"a \<le> USHORT_MAX \<Longrightarrow> b \<le> a \<Longrightarrow> int b \<le> 2147483647"
+  sorry
+    
+lemma USHORT_MAX_LT_UINT_MAX[simp]:"x \<le> USHORT_MAX \<Longrightarrow> x \<le> UINT_MAX"
+  sorry
+    
+lemma noninter_pointer_add[simp]:"j \<le> USHORT_MAX \<Longrightarrow> 0 < j \<Longrightarrow> i < j \<Longrightarrow> ap +\<^sub>p i = ap +\<^sub>p j \<Longrightarrow> False"
+  sorry
+
+lemma rename7[simp,wp]:"a \<le> USHORT_MAX \<Longrightarrow> b < a  \<Longrightarrow> b \<le> 2147483648" 
+  sorry
+
+lemma rename8[simp,wp]:"a \<le> USHORT_MAX \<Longrightarrow> b < a - 1  \<Longrightarrow> int b \<le> 2147483646" 
+  sorry
+    
 end
