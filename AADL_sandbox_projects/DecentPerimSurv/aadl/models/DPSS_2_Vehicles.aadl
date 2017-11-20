@@ -83,19 +83,21 @@ public
 			assume "time update": time = (0.0 -> pre(time) + deltaT);
 			
 			assume "UAVs are numbered according to their position from left to right":
-				initial_pos_UAV1 <= initial_pos_UAV2;
+				(initial_pos_UAV1 <= initial_pos_UAV2) -> true;
 				
 			assume "Input initial positions are between 0 and P_GLOBAL":
-				0.0 <= initial_pos_UAV1 
+				(0.0 <= initial_pos_UAV1 
 				and initial_pos_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= initial_pos_UAV2 
-				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL)
+				-> true;
 							
 			assume "Suggested initial directions are LEFT or RIGHT":
-				(suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+				((suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
 					or suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
 				and (suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
-					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT);
+					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT))
+				-> true;
 			
 			-----------------------------------------------------
 			--GUARANTEES
