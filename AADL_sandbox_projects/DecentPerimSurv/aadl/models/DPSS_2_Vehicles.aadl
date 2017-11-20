@@ -4,7 +4,7 @@ public
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;
-	with UAV_Pkg2;
+	with UAV_Pkg;
 	
 	system DPSS_2_Vehicles
 		features
@@ -147,8 +147,8 @@ public
 
 	system implementation DPSS_2_Vehicles.Impl
 		subcomponents
-			UAV1: system UAV_Pkg2::UAV_computes_pos;
-			UAV2: system UAV_Pkg2::UAV_computes_pos;
+			UAV1: system UAV_Pkg::UAV;
+			UAV2: system UAV_Pkg::UAV;
 
 		connections
 			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
@@ -208,6 +208,14 @@ public
 				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
 				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 				);
+				
+			lemma "UAV1 stays in bounds":
+				0.0 <= pos_UAV1 
+				and pos_UAV1 <= DPSS_Constants.P_GLOBAL;
+			
+			lemma "UAV2 stays in bounds":
+				0.0 <= pos_UAV2 
+				and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
 					
 		**};
 		
