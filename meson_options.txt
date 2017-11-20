@@ -10,3 +10,9 @@ option(
     type : 'boolean',
     value : false,
 )
+option(
+    'use_geographic_libraries',
+    description: 'build using GDAL and GeographicLib libraries',
+    type : 'boolean',
+    value : false,
+)

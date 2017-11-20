@@ -10,7 +10,9 @@
 #include "UxAS_ConfigurationManager.h"
 
 #ifdef AFRL_INTERNAL_ENABLED
+#ifdef USE_GEO_LIBS
 #include "GroundHeight.h"   // utility function that needs dted configuration file names form the cfg file
+#endif   //#ifdef USE_GEO_LIBS
 #endif
 
 #include "UxAS_ConsoleLogger.h"
@@ -431,7 +433,9 @@ void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xm
                         if(!fileName.empty())
                         {
                             std::string pathFile = pathToFiles + fileName;
+#ifdef USE_GEO_LIBS
                             utilities::GroundHeight::getInstance().isLoadDtedFile(pathFile);
+#endif  //#ifdef USE_GEO_LIBS
                         }
                     }
                 }
