@@ -153,16 +153,12 @@ public
 			init_pos_UAV2: port initial_pos_UAV2 -> UAV2.initial_position;
 			pos_UAV1_to_UAV2 : port UAV1.pos -> UAV2.pos_LN;
 			pos_UAV2_to_UAV1 : port UAV2.pos -> UAV1.pos_RN;
+			pos_UAV1_output : port UAV1.pos -> pos_UAV1;
+			pos_UAV2_output : port UAV2.pos -> pos_UAV2;
 						
 		annex agree {**
-			--Extract positions
-			assign pos_UAV1 = UAV1.pos;		
-			assign pos_UAV2 = UAV2.pos;	
-				
-			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep.
-			eq meet_neighbor_12 : bool = (pos_UAV1 = pos_UAV2); 
 			
-			--UAV1 outputs
+			--UAV1 output
 			assign direction_UAV1 = UAV1.direction;
 			assign goal_UAV1 = UAV1.goal;
 			
@@ -181,6 +177,10 @@ public
 			assert UAV2.pos_RN = DPSS_Constants.P_GLOBAL + 1.0; 
 			assert UAV2.id = 2;
 			assert UAV2.N = N;						
+			
+			----------------------------------------------------------------------------
+			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
+			----------------------------------------------------------------------------
 			
 			lemma "Observer: Traveling toward each other":
 				not (
