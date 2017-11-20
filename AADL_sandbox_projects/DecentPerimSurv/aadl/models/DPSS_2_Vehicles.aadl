@@ -208,6 +208,9 @@ public
 				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
 				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 				);
+			
+			lemma "Observer: A long trace":
+				not (time > 5.0*DPSS_Constants.Time_to_travel_full_length);
 				
 			lemma "UAV1 stays in bounds":
 				0.0 <= pos_UAV1 
