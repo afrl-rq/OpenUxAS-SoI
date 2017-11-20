@@ -151,6 +151,8 @@ public
 			sug_init_dir_UAV2: port	suggested_initial_direction_UAV2 -> UAV2.suggested_initial_direction;
 			init_pos_UAV1: port initial_pos_UAV1 -> UAV1.initial_position;
 			init_pos_UAV2: port initial_pos_UAV2 -> UAV2.initial_position;
+			pos_UAV1_to_UAV2 : port UAV1.pos -> UAV2.pos_LN;
+			pos_UAV2_to_UAV1 : port UAV2.pos -> UAV1.pos_RN;
 						
 		annex agree {**
 			--Extract positions
@@ -165,8 +167,8 @@ public
 			assign goal_UAV1 = UAV1.goal;
 			
 			--UAV1 inputs
-			assert UAV1.meet_LN = false;
-			assert UAV1.meet_RN = meet_neighbor_12;
+			--Since the leftmost UAV has no left neighbor, set pos_LN to something to the left of the left endpoint (so UAV1 never meets its "phantom" neighbor).
+			assert UAV1.pos_LN = -1.0; 
 			assert UAV1.id = 1;
 			assert UAV1.N = N;	
 						
@@ -175,8 +177,8 @@ public
 			assign goal_UAV2 = UAV2.goal;
 			
 			--UAV2 inputs
-			assert UAV2.meet_LN = meet_neighbor_12;
-			assert UAV2.meet_RN = false;
+			--Since the rightmost UAV has no right neighbor, set pos_RN to something to the right of the right endpoint (so UAVN never meets its "phantom" neighbor).
+			assert UAV2.pos_RN = DPSS_Constants.P_GLOBAL + 1.0; 
 			assert UAV2.id = 2;
 			assert UAV2.N = N;						
 			
