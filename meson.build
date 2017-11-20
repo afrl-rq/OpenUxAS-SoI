@@ -9,10 +9,10 @@ os = target_machine.system()
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
 	if get_option('internal_3rd_libraries')
-message('@@@@@ internal_3rd_libraries @@@@@')
+    #message('@@@@@ internal_3rd_libraries @@@@@')
 		link_args += ['-lrt', '-ldl']
   	else
-message('@@@@@ extwernal_3rd_libraries @@@@@')
+      #message('@@@@@ external_3rd_libraries @@@@@')
   		link_args += [
           '-lboost_filesystem','-lboost_regex', '-lboost_system', 
   				'-lzmq','-lczmq','-lzyre',
@@ -26,7 +26,12 @@ elif os == 'windows'
   link_args += []
 endif
 
+if get_option('use_geographic_libraries')
+    add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
+endif
+
 if get_option('afrl_internal')
+  #message('@@@@@ afrl_internal @@@@@')
   add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
 endif
@@ -91,7 +96,7 @@ endif
 lib_tinygps             = sub_tinygps.get_variable('lib')
 
 # https://github.com/wjwwood/serial
-sub_serial              = subproject('serial')
+sub_serial              = subproject('serial-1.2.1')
 lib_serial              = sub_serial.get_variable('lib')
 
 # https://github.com/zeux/pugixml
