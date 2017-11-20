@@ -4,9 +4,9 @@ public
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;
-	with UAV_Pkg;
+	with UAV_Pkg2;
 	
-	system DecentPerimSurv_2
+	system DPSS_2_Vehicles
 		features
 			--Inputs:
 			initial_pos_UAV1 : in data port DPSS_Data_Types::Position_Type;
@@ -71,10 +71,7 @@ public
 					pre_pos_UAV2, 
 					pre_goal_UAV2
 				);
-							
-			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep.
-			eq meet_neighbor_12 : bool = (pos_UAV1 = pos_UAV2); 
-			
+										
 			eq deltaT : DPSS_Data_Types::Time_Type = DPSS_Node_Lib.min_time(time_until_UAV1_reaches_goal,
 								DPSS_Node_Lib.min_time(time_until_UAV2_reaches_goal,
 									time_to_reach_neighbor_12));
@@ -89,18 +86,16 @@ public
 				initial_pos_UAV1 <= initial_pos_UAV2;
 				
 			assume "Input initial positions are between 0 and P_GLOBAL":
-				(0.0 <= initial_pos_UAV1 
+				0.0 <= initial_pos_UAV1 
 				and initial_pos_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= initial_pos_UAV2 
-				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL)
-				-> true;
+				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL;
 							
 			assume "Suggested initial directions are LEFT or RIGHT":
-				((suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+				(suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
 					or suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
 				and (suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
-					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT))
-					-> true;
+					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT);
 			
 			-----------------------------------------------------
 			--GUARANTEES
@@ -144,52 +139,48 @@ public
 					
 		**};
 		
-	end DecentPerimSurv_2;
+	end DPSS_2_Vehicles;
 
-	system implementation DecentPerimSurv_2.Impl
+	system implementation DPSS_2_Vehicles.Impl
 		subcomponents
-			UAV1: system UAV_Pkg::UAV;
-			UAV2: system UAV_Pkg::UAV;
+			UAV1: system UAV_Pkg2::UAV_computes_pos;
+			UAV2: system UAV_Pkg2::UAV_computes_pos;
 
 		connections
 			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
 			sug_init_dir_UAV2: port	suggested_initial_direction_UAV2 -> UAV2.suggested_initial_direction;
+			init_pos_UAV1: port initial_pos_UAV1 -> UAV1.initial_position;
+			init_pos_UAV2: port initial_pos_UAV2 -> UAV2.initial_position;
+			pos_UAV1_to_UAV2 : port UAV1.pos -> UAV2.pos_LN;
+			pos_UAV2_to_UAV1 : port UAV2.pos -> UAV1.pos_RN;
+			pos_UAV1_output : port UAV1.pos -> pos_UAV1;
+			pos_UAV2_output : port UAV2.pos -> pos_UAV2;
 						
 		annex agree {**
-			--UAV1 outputs
+			
+			--UAV1 output
 			assign direction_UAV1 = UAV1.direction;
 			assign goal_UAV1 = UAV1.goal;
 			
 			--UAV1 inputs
-			assert UAV1.meet_LN = false;
-			assert UAV1.meet_RN = meet_neighbor_12;
+			--Since the leftmost UAV has no left neighbor, set pos_LN to something to the left of the left endpoint (so UAV1 never meets its "phantom" neighbor).
+			assert UAV1.pos_LN = -1.0; 
 			assert UAV1.id = 1;
-			assert UAV1.N = N;
-			assert UAV1.pos = pos_UAV1;
+			assert UAV1.N = N;	
 						
 			--UAV2 outputs
 			assign direction_UAV2 = UAV2.direction;
 			assign goal_UAV2 = UAV2.goal;
 			
 			--UAV2 inputs
-			assert UAV2.meet_LN = meet_neighbor_12;
-			assert UAV2.meet_RN = false;
+			--Since the rightmost UAV has no right neighbor, set pos_RN to something to the right of the right endpoint (so UAVN never meets its "phantom" neighbor).
+			assert UAV2.pos_RN = DPSS_Constants.P_GLOBAL + 1.0; 
 			assert UAV2.id = 2;
-			assert UAV2.N = N;
-			assert UAV2.pos = pos_UAV2;				
+			assert UAV2.N = N;						
 			
-			--Update positions
-			assign pos_UAV1 = (initial_pos_UAV1 ->
-						if pre_direction_UAV1 = 1 then
-							pre_pos_UAV1 + DPSS_Constants.V*deltaT
-						else --pre_direction_UAV1 = -1
-							pre_pos_UAV1 - DPSS_Constants.V*deltaT);
-			
-			assign pos_UAV2 = (initial_pos_UAV2 ->
-						if pre_direction_UAV2 = 1 then
-							pre_pos_UAV2 + DPSS_Constants.V*deltaT
-						else --pre_direction_UAV2 = -1
-							pre_pos_UAV2 - DPSS_Constants.V*deltaT);
+			----------------------------------------------------------------------------
+			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
+			----------------------------------------------------------------------------
 			
 			lemma "Observer: Traveling toward each other":
 				not (
@@ -216,6 +207,6 @@ public
 					
 		**};
 		
-	end DecentPerimSurv_2.Impl;
-
+	end DPSS_2_Vehicles.Impl;
+	
 end DPSS_2_Vehicles_Pkg;
