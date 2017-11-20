@@ -17,7 +17,7 @@ public
 			--outputs
 			direction: out data port DPSS_Data_Types::Direction_Type;
 			goal : out data port DPSS_Data_Types::Position_Type;
-			pos : in data port DPSS_Data_Types::Position_Type;
+			pos : out data port DPSS_Data_Types::Position_Type;
 					
 		annex agree {**
 			--Shared border positions
