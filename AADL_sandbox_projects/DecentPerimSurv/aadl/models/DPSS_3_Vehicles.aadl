@@ -263,6 +263,18 @@ public
 				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 				and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.02)
 				);
+			
+			lemma "UAV1 stays in bounds":
+				0.0 <= pos_UAV1 
+				and pos_UAV1 <= DPSS_Constants.P_GLOBAL;
+			
+			lemma "UAV2 stays in bounds":
+				0.0 <= pos_UAV2 
+				and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+					
+			lemma "UAV3 stays in bounds":
+				0.0 <= pos_UAV3 
+				and pos_UAV3 <= DPSS_Constants.P_GLOBAL;
 				
 		**};
 		
