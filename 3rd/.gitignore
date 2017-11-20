@@ -17,6 +17,7 @@ zyre-1.1.0
 boost.wrap
 cppzmq.wrap
 czmq.wrap
+gtest.wrap
 minizip.wrap
 serial.wrap
 sqlite3.wrap
