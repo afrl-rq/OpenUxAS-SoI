@@ -10,15 +10,16 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
 	// duration_s - number of second to run UxAS
-    uint32_t duration_s{13}; // this test seems to take ~14.9s to send 10 messages on bash Ubuntu instances; it's about 8-10 msgs for duration 13, depending; this test is a bit odd because it keeps sending msgs until UxAS stops but test is for a certain number of sent messages only...
+    uint32_t duration_s{6}; // this test seems to take ~14.9s to send 10 messages on bash Ubuntu instances; it's about 8-10 msgs for duration 13, depending; this test is a bit odd because it keeps sending msgs until UxAS stops but test is for a certain number of sent messages only...
     // testPath - relative path to the directory containing configration and other test files
 	std::string testPath;
 	#ifdef _WIN32
-		testPath = "../../../../../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/";
+		#include "windows.h"
+		SetCurrentDirectory("../../../../");
 	#endif
-	#ifndef _WIN32
-		testPath = "../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/";
-	#endif // !_WIN32
+
+	testPath = "../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/";
+
     // uxasConfigurationFile - path and file name of the UxAS configuration file
     std::string uxasConfigurationFile = testPath + "cfg_HelloWorld.xml";
     // outputPath - path for saving output files
