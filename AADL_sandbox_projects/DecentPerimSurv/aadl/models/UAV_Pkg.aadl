@@ -63,10 +63,6 @@ public
 				
 			assume "ID = N implies pos_RN > P_GLOBAL":
 				id = N => pos_RN > DPSS_Constants.P_GLOBAL;
-				
-			assume "Middle UAV implies pos_LN <= pos <= pos_RN":
-				(id > 1 and id < N) =>
-					((pos_LN <= pos) and (pos <= pos_RN));
 			
 			assume "Time marches on":
 				true -> (time >= pre(time));

@@ -133,6 +133,8 @@ public
 			
 			guarantee "UAVs turn around at the borders":
 				pos_UAV1 = 0.0 => direction_UAV1 = 1
+				and pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1
+				and pos_UAV2 = 0.0 => direction_UAV2 = 1
 				and pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1;
 				
 			guarantee "Directions are in bounds":
