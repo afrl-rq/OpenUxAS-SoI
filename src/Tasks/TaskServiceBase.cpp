@@ -114,7 +114,11 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
                 m_entityConfigurations.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
                 auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
                 auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-                m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+                auto targetEntityIds = m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)];
+                if (std::find(targetEntityIds.begin(), targetEntityIds.end(), entityConfiguration->getID()) == targetEntityIds.end())
+                {
+                    m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+                }
             }
         }
         else if ( dynamic_cast<afrl::cmasi::EntityState*>(object) )
@@ -269,7 +273,11 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
             m_entityConfigurations.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
             auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
             auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-            m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+            auto targetEntityIds = m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)];
+            if (std::find(targetEntityIds.begin(), targetEntityIds.end(), entityConfiguration->getID()) == targetEntityIds.end())
+            {
+                m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+            }
         }
     }
     else if (uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object))
