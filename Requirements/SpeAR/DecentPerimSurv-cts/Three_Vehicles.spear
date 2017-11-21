@@ -176,4 +176,10 @@ Theorem_Alg_A_Three_Vehicles : time >= 1.67*Time_to_travel_full_length implies
 						))
 					and 
 						(deltaT == Time_to_travel_full_length/real(N))
-					)	
+					)
+
+Not_yet_stable_after_10_steps observe: counter == 9 and not (((pos_UAV1 == 0.0 m and pos_UAV2 == S_23 and pos_UAV3 == S_23)
+							and (pre_pos_UAV1 == S_12 and pre_pos_UAV2 == S_12 and pre_pos_UAV3 == P_global))
+						or ((pos_UAV1 == S_12 and pos_UAV2 == S_12 and pos_UAV3 == P_global)
+							and (pre_pos_UAV1 == 0.0 m and pre_pos_UAV2 == S_23 and pre_pos_UAV3 == S_23)
+						))	
