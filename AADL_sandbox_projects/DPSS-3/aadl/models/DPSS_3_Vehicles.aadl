@@ -235,29 +235,40 @@ public
 			assert UAV3.pos_RN = DPSS_Constants.P_GLOBAL + 1.0;
 			assert UAV3.id = 3;
 			
-			lemma "Observer: UAV1 and UAV2 traveling toward each other":
-				not (
-					DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1) 
-				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 3.0)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 8.0)
-				and time > 20.0
-				);
-						
-			lemma "Observer: Slow to Converge":
-				not (
-				(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
-							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
-						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
-							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
-						))
-				and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
-				and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.02)
-				);
+			--Used in lemmas
+			eq steps : int = 1 -> pre(steps + 1);
+			
+--			lemma "Observer: UAV1 and UAV2 traveling toward each other":
+--				not (
+--					DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1) 
+--				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
+--				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 3.0)
+--				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 8.0)
+--				and time > 20.0
+--				);
+--						
+--			lemma "Observer: Slow to Converge":
+--				not (
+--				(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+--							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+--						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+--							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+--						))
+--				and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+--				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
+--				and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
+--				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
+--				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
+--				and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.02)
+--				);
+			
+--			lemma "Observer: Not yet stable after 10 steps (where 'stable' includes this step and the previous one)":
+--				steps = 10 => 
+--					(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+--							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+--						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+--							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+--						));
 			
 			lemma "UAV1 stays in bounds":
 				0.0 <= pos_UAV1 
@@ -270,7 +281,44 @@ public
 			lemma "UAV3 stays in bounds":
 				0.0 <= pos_UAV3 
 				and pos_UAV3 <= DPSS_Constants.P_GLOBAL;
-				
+							
+--			lemma "Gets stable in 11 steps":
+--				steps = 11 => 
+--					(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+--							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+--						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+--							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+--						));
+			
+			lemma "Once stable, stays stable":
+				true -> pre(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+						))
+					=>
+					(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+					));
+			
+--			lemma "Stable after 11 steps":
+--				steps > 11 => 
+--					(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+--							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+--						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+--							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+--						));
+			
+			lemma "Stable implies deltaT = T/N":
+				(((pos_UAV1 = 0.0 and pos_UAV2 = S_23 and pos_UAV3 = S_23)
+							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12 and pre_pos_UAV3 = DPSS_Constants.P_GLOBAL))
+						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12 and pos_UAV3 = DPSS_Constants.P_GLOBAL)
+							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = S_23 and pre_pos_UAV3 = S_23)
+						))
+				=> deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real;
+			
 		**};
 		
 	end DPSS_3_Vehicles.Impl;
