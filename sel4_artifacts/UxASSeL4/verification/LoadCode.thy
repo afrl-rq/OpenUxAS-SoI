@@ -4,7 +4,7 @@ begin
   
 install_C_file "../CMASI/MissionCommandUtils.c"
   
-autocorres[ts_rules = nondet, unsigned_word_abs = MCWaypointSubSequence FindWP] "../CMASI/MissionCommandUtils.c"  
+autocorres[ts_rules = nondet, unsigned_word_abs = FillWindow FindWP GroomWindow FillAndGroomWindow ] "../CMASI/MissionCommandUtils.c"  
   
 
 (* A subset of what we expect a valid mission command to entail. I.E, the ptr to the front

@@ -60,7 +60,7 @@ Waypoint * FindWP(Waypoint * ws, uint16_t len, int64_t id) {
 /* ASM: len_ws_win is less than the number of waypoints that can be
    stored in ws_win. */
 /* ASM: Last waypoint starts a cycle. */
-void MCWaypointSubSequence(  Waypoint * ws
+void FillWindow(  Waypoint * ws
                            , uint16_t len_ws
                            , int64_t id
                            , uint16_t len_ws_win
@@ -77,78 +77,30 @@ void MCWaypointSubSequence(  Waypoint * ws
   return;
 }
 
-/* ASM: ws != null */
+void GroomWindow(uint16_t len_ws_win
+                , Waypoint * ws_win /* out */) {
+  ws_win[len_ws_win-1].nextwaypoint = ws_win[len_ws_win-1].number;
+  return;
+}
+
+/* NB: Cycles in ws will be unrolled into win. */
+/* ASM: id can be found in ws. */
 /* ASM: All next ids in the ws waypoint list can be found in ws. */
+/* ASM: ws != null */
+/* ASM: len_ws > 0. */
 /* ASM: ws_win != null */
 /* ASM: len_ws_win > 0 */
-bool GetMCWaypointSubSequence( Waypoint * ws
-                             , uint16_t len_ws
-                             , int64_t last_start_id
-                             , int64_t approach_id
-                             , uint16_t len_ws_win
-                               , Waypoint * ws_win /* out */ ) {
-  uint16_t i;
-  Waypoint * wp;
-  int64_t it_id = last_start_id;
-  int64_t last_visited_id;
-  
-
-  /* Ensure that a bad last_prefix_start_id was not provided. */
-  wp = FindWP(ws, len_ws, it_id);
-  if(wp == NULL) {
-    return false;
-  }
-
-  /* Ensure that a bad approach_id was not provided. */
-  wp = FindWP(ws, len_ws, approach_id);
-  if(wp == NULL) {
-    return false;
-  }
-
-  /* Ensure that a 0 length prefix was not asked for. */
-  if(len_ws_win == 0) {
-    return false;
-  }
-
-  /* Check to see if the approach_id is in the first half of the auto-pilot
-     length. */
-  last_visited_id = it_id;
-  for(i = 0; i < len_ws_win/2 ; i++) {
-
-
-    wp = FindWP(ws, len_ws, it_id);
-
-    /* If we have found the end or found the nextwp then there is no
-       update to be sent to the auto-pilot. */
-    if(wp->number == wp->nextwaypoint || wp->number == approach_id) {
-      return false;
-    }
-
-    last_visited_id = it_id;
-    it_id = wp->nextwaypoint;
-  }
-
-  // XXX: Assume if we got a waypoint out somewhere in the entire list
-  // we will just pick up from there.
-  for( ; i < len_ws; i++) {
-
-    wp = FindWP(ws, len_ws, it_id);
-
-    /* If we have found the end then there is no update to be sent to
-       the auto-pilot. */
-    if(wp->number == wp->nextwaypoint) {
-      return false;
-    }
-
-    if( wp->number == approach_id ) {
-      MCWaypointSubSequence(ws, len_ws, it_id, len_ws_win, ws_win);
-      return true;
-    }
-    last_visited_id = it_id;
-    it_id = wp->nextwaypoint;
-  }
-
-  return false;
+/* ASM: len_ws_win is less than the number of waypoints that can be
+   stored in ws_win. */
+/* ASM: Last waypoint starts a cycle. */
+void FillAndGroomWindow(  Waypoint * ws
+                           , uint16_t len_ws
+                           , int64_t id
+                           , uint16_t len_ws_win
+                           , Waypoint * ws_win /* out */) {
+  FillWindow(ws, len_ws, id, len_ws_win, ws_win);
+  GroomWindow(len_ws_win, ws_win);
+  return;
 }
 
 #ifdef __MISSIONCOMMANDUTILS_TESTS__
