@@ -200,7 +200,7 @@ public
 					and time > 20.0
 				);
 						
-			lemma "Observer: Worst time convergence":
+			lemma "Observer: Worst time convergence (not yet stable after steps_to_converge - 1 steps)":
 				not (
 					stable
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
@@ -230,11 +230,11 @@ public
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;
 
---			lemma "Gets stable in steps_to_converge steps":
---				steps = steps_to_converge => stable;
---					
---			lemma "Stable after steps_to_converge steps":
---				steps > steps_to_converge => stable;
+			lemma "Gets stable in steps_to_converge steps":
+				steps = steps_to_converge => stable;
+					
+			lemma "Stable after steps_to_converge steps":
+				steps > steps_to_converge => stable;
 			
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real;
