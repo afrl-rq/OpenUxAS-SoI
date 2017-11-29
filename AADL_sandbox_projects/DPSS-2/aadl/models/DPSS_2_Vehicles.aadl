@@ -75,6 +75,12 @@ public
 								DPSS_Node_Lib.min_time(time_until_UAV2_reaches_goal,
 									time_to_reach_neighbor_12));
 			
+			eq stable : bool = ((pos_UAV1 = 0.0 and pos_UAV2 = DPSS_Constants.P_GLOBAL)
+							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12))
+						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
+							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
+						);
+			
 			-----------------------------------------------------
 			--ASSUMPTIONS
 			-----------------------------------------------------
@@ -105,14 +111,7 @@ public
 			--Main Theorem
 			guarantee "Theorem 1 for Algorithm A for Two Vehicles":
 				(time >= ((2.0*DPSS_Constants.N_real - 1.0)/DPSS_Constants.N_real)*DPSS_Constants.Time_to_travel_full_length) =>
-					((((pos_UAV1 = 0.0 and pos_UAV2 = DPSS_Constants.P_GLOBAL)
-							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12))
-						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
-							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
-						))
-					and 
-						(deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real)
-					);
+					(stable	and deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real);
 			
 			guarantee "Initial positions are the input initial positions":
 				(pos_UAV1 = initial_pos_UAV1
@@ -129,6 +128,9 @@ public
 				and pos_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= pos_UAV2 
 				and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+			
+			guarantee "UAVs stay in order":
+				pos_UAV1 <= pos_UAV2;
 			
 			guarantee "UAVs turn around at the borders":
 				pos_UAV1 = 0.0 => direction_UAV1 = 1
@@ -179,6 +181,12 @@ public
 			assert UAV2.pos_RN = DPSS_Constants.P_GLOBAL + 1.0; 
 			assert UAV2.id = 2;					
 			
+			--Used in lemmas
+			eq steps : int = 1 -> pre(steps + 1);
+			
+			--Expected number of steps it takes to converge to the stable configuration
+			eq steps_to_converge : int = 6;
+			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
 			----------------------------------------------------------------------------
@@ -186,27 +194,30 @@ public
 			lemma "Observer: Traveling toward each other":
 				not (
 					DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1) 
-				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 3.0)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 8.0)
-				and time > 20.0
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 3.0)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 8.0)
+					and time > 20.0
 				);
 						
-			lemma "Observer: Slow to Converge":
+			lemma "Observer: Worst time convergence":
 				not (
-				(((pos_UAV1 = 0.0 and pos_UAV2 = DPSS_Constants.P_GLOBAL)
-						and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12))
-					or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
-						and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
-					))
-				and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-				and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
-				and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
+					stable
+					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 				);
-			
+
+			lemma "Observer: Worst steps convergence":
+				steps = steps_to_converge - 1 => stable;
+							
 			lemma "Observer: A long trace":
 				not (time > 5.0*DPSS_Constants.Time_to_travel_full_length);
+			
+			----------------------------------------------------------------------------
+			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
+			----------------------------------------------------------------------------		
 				
 			lemma "UAV1 stays in bounds":
 				0.0 <= pos_UAV1 
@@ -215,6 +226,24 @@ public
 			lemma "UAV2 stays in bounds":
 				0.0 <= pos_UAV2 
 				and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+			
+			lemma "Once stable, stays stable":
+				true -> pre(stable)	=> stable;
+
+--			lemma "Gets stable in steps_to_converge steps":
+--				steps = steps_to_converge => stable;
+--					
+--			lemma "Stable after steps_to_converge steps":
+--				steps > steps_to_converge => stable;
+			
+			lemma "Stable implies deltaT = T/N":
+				stable => deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real;
+			
+			lemma "deltaT is strictly between 0 and T":
+				true -> (
+					deltaT > 0.0 
+					and deltaT < DPSS_Constants.Time_to_travel_full_length
+					);
 					
 		**};
 		
