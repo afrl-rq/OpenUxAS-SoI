@@ -1,0 +1,145 @@
+package UAV_Pkg
+public
+	with DPSS_Data_Types;
+	with Base_Types;
+	with DPSS_Constants;
+	with DPSS_Node_Lib;
+	 
+	system UAV
+		features
+			--inputs
+			suggested_initial_direction : in data port DPSS_Data_Types::Direction_Type; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
+			initial_position : in data port DPSS_Data_Types::Position_Type;
+			pos_LN : in data port DPSS_Data_Types::Position_Type; --Position of left neighbor (< 0  if there is no left neighbor)
+			pos_RN : in data port DPSS_Data_Types::Position_Type; --Position of right neighbor (> P_GLOBAL if there is no right neighbor)
+			id : in data port Base_Types::Integer; --a positive integer between 1 and N
+			
+			--outputs
+			direction: out data port DPSS_Data_Types::Direction_Type;
+			goal : out data port DPSS_Data_Types::Position_Type;
+			pos : out data port DPSS_Data_Types::Position_Type;
+					
+		annex agree {**
+			--Shared border positions
+			eq S_L : DPSS_Data_Types::Position_Type = 
+				real(id-1)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;  
+			eq S_R : DPSS_Data_Types::Position_Type = 
+				real(id)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;	
+				
+			--Previous direction
+			eq pre_direction : DPSS_Data_Types::Direction_Type = 
+				prev(direction, suggested_initial_direction);
+				
+			--Previous position
+			eq pre_pos : DPSS_Data_Types::Position_Type =
+				prev(pos, initial_position);
+				
+			--Previous goal
+			eq pre_goal : DPSS_Data_Types::Position_Type =
+				prev(goal, (if direction = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			
+			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep. 
+			eq meet_LN : bool = (pos_LN = pos); --Meet left neighbor?
+			eq meet_RN : bool = (pos_RN = pos); --Meet right neighbor?
+			
+			eq deltaT : real = 0.0 -> time - pre(time);
+			
+			eq time_until_UAV_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction, 
+					pre_pos, 
+					pre_goal
+				);
+							
+			--Assumptions
+			assume "ID in range":
+				id >= 1 and id <= DPSS_Constants.N_int;
+						
+			assume "ID is fixed":
+				true -> (id = pre(id));
+			
+			assume "Input initial position is between 0 and P_GLOBAL":
+				(0.0 <= initial_position
+				and initial_position <= DPSS_Constants.P_GLOBAL)
+				-> true;
+							
+			assume "Suggested initial direction is LEFT or RIGHT":
+				(suggested_initial_direction = DPSS_Constants.LEFT
+					or suggested_initial_direction = DPSS_Constants.RIGHT)
+				-> true;
+			
+			assume "ID = 1 implies pos_LN < 0":
+				id = 1 => pos_LN < 0.0;
+				
+			assume "ID = N implies pos_RN > P_GLOBAL":
+				id = DPSS_Constants.N_int => pos_RN > DPSS_Constants.P_GLOBAL;
+			
+			--This is needed to guarantee that this vehicle's output position stays in bounds
+			assume "deltaT is small enough that this vehicle won't pass by an endpoint":
+				true -> (deltaT <= time_until_UAV_reaches_goal);
+			
+			assume "Time marches on":
+				true -> (time >= pre(time));
+			
+			guarantee "Direction formula":
+				direction = (
+					-- Turn around at the left boundary
+					if pos <= 0.0 then
+						1
+					-- Turn around at the right boundary
+					else if pos >= DPSS_Constants.P_GLOBAL then
+							-1
+						 -- If meeting left neighbor, travel together to shared border
+						 else if meet_LN then
+								if pos <= S_L then
+									1
+								else --pos > S_L
+									-1						
+						 	  -- Else if meeting right neighbor, travel together to shared border
+							  else if meet_RN then
+										if pos < S_R then
+											1
+										else --pos >= S_R
+											-1 
+								   -- In all other cases, proceed in the same direction
+								   else 
+										pre_direction
+				);  
+
+			guarantee "Goal formula":
+				goal = (
+						-- If co-located with left neighbor,...
+						if meet_LN then
+							--...and at or to the left of the shared border, make goal the right endpoint
+							if pos <= S_L then
+								DPSS_Constants.P_GLOBAL
+							--...and to the right of the shared border, make goal the shared border
+							else -- pos > S_L
+								S_L
+						-- Else if co-located with right neighbor,...
+						else if meet_RN then
+								--...and at or to the right of the shared border, make goal the left endpoint
+								if pos >= S_R then
+									0.0
+								--...and to the left of the shared border, make goal the shared border
+								else -- pos < S_R
+									S_R
+							 -- Else if heading right, set goal to the right endpoint
+							 else if direction = 1 then
+									DPSS_Constants.P_GLOBAL
+								  -- Else if heading left, set goal to the left endpoint
+								  else --direction = -1 
+									0.0 
+				); 
+
+			guarantee "Position formula":
+				pos = (initial_position -> 
+						(if pre_direction = 1 then
+							pre_pos + DPSS_Constants.V*(time - pre(time))
+						else --pre_direction = -1
+							pre_pos - DPSS_Constants.V*(time - pre(time))));
+			
+		**};
+		
+	end UAV;
+end UAV_Pkg;
