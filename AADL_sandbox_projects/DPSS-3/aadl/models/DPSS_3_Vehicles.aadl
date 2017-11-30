@@ -280,12 +280,9 @@ public
 							
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;
-
-			lemma "Gets stable in steps_to_converge steps":
-				steps = steps_to_converge => stable;
 					
-			lemma "Stable after steps_to_converge steps":
-				steps > steps_to_converge => stable;
+			lemma "Stable on and after steps_to_converge steps":
+				steps >= steps_to_converge => stable;
 			
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real;
@@ -295,7 +292,14 @@ public
 					deltaT > 0.0 
 					and deltaT < DPSS_Constants.Time_to_travel_full_length
 					);
-			
+					
+			-- This is a good way to find the real time bound!
+ 			-- The lemma is valid for time < 2T but not for time < (2-1/N)T.
+ 			-- I believe it would be valid with (2-1/N)T if we only required one timestep of stability instead of two. 			
+--			lemma "Just became stable implies time is under the threshold":
+--				(stable and not (pre(stable))) => 
+--					(time < 2.0*DPSS_Constants.Time_to_travel_full_length);
+--			
 		**};
 		
 	end DPSS_3_Vehicles.Impl;
