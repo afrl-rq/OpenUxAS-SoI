@@ -10,19 +10,18 @@ minizip_src = [
 ]
 
 c_args = []
-	
+
+os = target_machine.system()
 if os == 'windows'
    minizip_src += 'iowin32.c'
    c_args += '-D_CRT_SECURE_NO_DEPRECATE'
 else
    c_args += [
-	'-fPIC',
-        '-O3',
 	'-D__USE_FILE_OFFSET64',
 	'-D__USE_LARGEFILE64',
 	'-D_LARGEFILE64_SOURCE',
-	'-D_FILE_OFFSET_BIT=64,
-	]
+	'-D_FILE_OFFSET_BIT=64',
+]
 endif
 
 lib = static_library('minizip',
