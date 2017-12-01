@@ -21,7 +21,7 @@ For an Ubuntu 16.04 or Mac OS X system with prerequisites installed, UxAS should
 
 ## Configure System for UxAS Build
 
-For Linux and Mac systems, the [install prerequisities script](https://github.com/afrl-rq/OpenUxAS/install_prerequisites.sh) automates the installation of all the necessary tools for compilation of *OpenUxAS*. Note, on Mac [XCode](https://developer.apple.com/xcode/) must first be installed before running the install script.
+For Linux and Mac systems, the [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) automates the installation of all the necessary tools for compilation of *OpenUxAS*. Note, on Mac [XCode](https://developer.apple.com/xcode/) must first be installed before running the install script.
 
 Complete manual step-by-step instructions for each operating system are included below:
 
@@ -107,7 +107,7 @@ The following is a bash script that helps to partially-automate the "building th
 
 This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
-1. Download the [script](https://github.com/afrl-rq/OpenUxAS/build_documentation.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
+1. Download the [script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/build_documentation.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
 1. Run the script at the terminal: `./build_documentation.sh`
 1. Follow the on-screen instructions
 
