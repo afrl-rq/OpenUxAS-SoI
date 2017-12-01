@@ -214,6 +214,8 @@ in the `/3rd` directory by `./prepare`.
    * `sudo apt-get install libglu1-mesa-dev`
 1. Install unique ID creation library: in terminal
    * `sudo apt-get install uuid-dev`
+1. Install BSD development library: in terminal
+   * `sudo apt-get install libbsd-dev`
 1. Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
    * `sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev`
 1. Install doxygen and related packages (**optional**): in terminal
@@ -249,7 +251,7 @@ in the `/3rd` directory by `./prepare`.
    * `sudo apt update; sudo apt install oracle-java8-installer`
    * `sudo apt install oracle-java8-set-default`
 1. Install `ant` for command line build of java programs: in terminal
-   * `brew install ant`
+   * `sudo apt install ant`
 1. [Build](#build-uxas)
 
 ## Install Prerequisites on Mac OS X
