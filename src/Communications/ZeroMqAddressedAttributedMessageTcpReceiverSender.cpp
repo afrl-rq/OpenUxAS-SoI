@@ -71,15 +71,7 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
                                 = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
                         if (recvdTcpAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdTcpDataSegment)))
                         {
-                            // process messages from an external service (only - since TCP stream is only used for bridging to other entities)
-                            if (m_entityIdString != recvdTcpAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
-                            {
-                                nextMsg = std::move(recvdTcpAddAttMsg);
-                            }
-                            else
-                            {
-                                UXAS_LOG_INFORM("ZeroMqAddressedAttributedMessageReceiver::getNextMessage ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                            }
+                            nextMsg = std::move(recvdTcpAddAttMsg);
                         }
                         else
                         {

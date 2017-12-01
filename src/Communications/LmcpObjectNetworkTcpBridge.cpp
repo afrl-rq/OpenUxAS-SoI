@@ -177,29 +177,21 @@ LmcpObjectNetworkTcpBridge::processReceivedSerializedLmcpMessage(std::unique_ptr
             "] before processing serialized message having address ", receivedLmcpMessage->getAddress(),
                   " and size ", receivedLmcpMessage->getPayload().size());
 
-    // process messages from a local service (only)
-    if (m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
+    if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
     {
-        if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+        try
         {
-            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
-            try
-            {
-                m_externalLmcpObjectMessageTcpReceiverSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
-            }
-            catch (std::exception& ex)
-            {
-                UXAS_LOG_ERROR(s_typeName(), "::processReceivedSerializedLmcpMessage failed to process serialized LMCP object; EXCEPTION: ", ex.what());
-            }
+            m_externalLmcpObjectMessageTcpReceiverSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
         }
-        else
+        catch (std::exception& ex)
         {
-            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+            UXAS_LOG_ERROR(s_typeName(), "::processReceivedSerializedLmcpMessage failed to process serialized LMCP object; EXCEPTION: ", ex.what());
         }
     }
     else
     {
-        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
     }
     
     return (false); // always false implies never terminating bridge from here
@@ -280,8 +272,7 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
                 }
             }
 #else
-            // process messages from an external service (only)
-            if (receivedTcpMessage && (m_entityIdString != receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId()))
+            if (receivedTcpMessage)
             {
                 if (m_nonImportForwardAddresses.find(receivedTcpMessage->getAddress()) == m_nonImportForwardAddresses.end())
                 {

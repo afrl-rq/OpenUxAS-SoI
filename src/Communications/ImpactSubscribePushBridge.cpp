@@ -26,6 +26,8 @@
 #define STRING_XML_ADDRESS_SUB "AddressSUB"
 #define STRING_XML_ADDRESS_PUSH "AddressPUSH"
 #define STRING_XML_EXTERNAL_ENTITY_ID "ExternalID"
+#define STRING_XML_PREVENT_LOOPBACK "PreventLoopBack"
+#define STRING_XML_THROTTLE_CONFIGURATION_FORWARDING "ThrottleConfigurationForwarding"
 
 namespace uxas
 {
@@ -81,6 +83,26 @@ namespace uxas
       if (!bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).empty())
       {
         externalID = bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).value();
+      }
+
+      if (!bridgeXmlNode.attribute(STRING_XML_PREVENT_LOOPBACK).empty())
+      {
+        m_preventLoopBack = bridgeXmlNode.attribute(STRING_XML_PREVENT_LOOPBACK).as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'prevent loopback' boolean to ", m_preventLoopBack, " from XML configuration");
+      }
+      else
+      {
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find 'prevent loopback' boolean in XML configuration; server boolean is ", m_preventLoopBack);
+      }
+
+      if (!bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).empty())
+      {
+        m_throttleConfigurationForwarding = bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'throttle configuration forwarding' boolean to ", m_throttleConfigurationForwarding, " from XML configuration");
+      }
+      else
+      {
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find 'throttle configuration forwarding' boolean in XML configuration; server boolean is ", m_throttleConfigurationForwarding);
       }
 
       // TODO review IMPACT messaging requirements (need to modify object before sending?)
@@ -188,7 +210,7 @@ namespace uxas
         " and size ", receivedLmcpMessage->getPayload().size());
 
       // process messages from a local service (only)
-      if (m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
+      if (m_preventLoopBack && m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
       {
         if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
         {
@@ -203,6 +225,20 @@ namespace uxas
 
           std::shared_ptr<avtas::lmcp::Object> ptr_Object;
           ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
+
+          if(m_throttleConfigurationForwarding && std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object))
+          {
+             auto config = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object);
+             if(m_configs.find(config->getID()) != m_configs.end())
+             {
+                if(m_configs[config->getID()]->toXML().compare(config->toXML()) == 0)
+                {
+                   std::cout << " ##ZeroMQ_Bridge: Blocking AirVehicleConfiguration, already sent" << std::endl;
+                   return false; // don't forward configs already forwarded
+                }
+             }
+             m_configs[config->getID()] = config;
+          }
 
           std::string seriesName = ptr_Object->getSeriesName();
 

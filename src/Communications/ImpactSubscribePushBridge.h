@@ -13,6 +13,7 @@
 #include "LmcpObjectMessageReceiverPipe.h"
 #include "LmcpObjectMessageSenderPipe.h"
 #include "LmcpObjectNetworkClientBase.h"
+#include "afrl/cmasi/AirVehicleConfiguration.h"
 
 #include <atomic>
 #include <cstdint>
@@ -35,6 +36,22 @@ namespace uxas
      * a PULL socket. The the <B>Subscribe/Push Bridge<B/> sends messages received from
      * the external entity to the local @ref c_CommunicationHub. Subscribed messages
      * received from the local @ref c_CommunicationHub are sent to the external entity.
+     *
+     * @par Example:
+     * <Bridge Type="ImpactSubscribePushBridge"
+     *    AddressSUB="tcp://localhost:6561"
+     *    AddressPUSH="tcp://localhost:6562"
+     *    ExternalID="100"
+     *    Server="false"
+     *    PreventLoopBack="true"
+     *    ThrottleConfigurationForwarding="false">
+     *
+     * AddressSUB: the address and port for the ZeroMQ subscription connection
+     * AddressPUSH: the address and port for the ZeroMQ push connection
+     * ExternalID: the entity ID for which this connection should report all traffic as originating from
+     * Server: boolean indicating connections as 'bind' or 'connect'
+     * PreventLoopBack: boolean that when true drops any messages that have the originating entity ID as the currently configured UxAS instance
+     * ThrottleConfigurationForwarding: boolean that when true prevents duplicate air vehicle configurations from being forwarded
      *
      * @par Details:
      * <ul style="padding-left:1em;margin-left:0">
@@ -128,6 +145,10 @@ namespace uxas
 
       std::unique_ptr<zmq::socket_t> sender;
       std::unique_ptr<zmq::socket_t> subscriber;
+
+      std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::AirVehicleConfiguration> > m_configs;
+      bool m_throttleConfigurationForwarding{ false };
+      bool m_preventLoopBack{ true };
 
       std::string externalID = "100";
 
