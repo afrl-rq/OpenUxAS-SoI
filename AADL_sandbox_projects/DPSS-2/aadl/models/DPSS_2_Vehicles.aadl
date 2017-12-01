@@ -200,7 +200,7 @@ public
 					and time > 20.0
 				);
 						
-			lemma "Observer: Worst time convergence (not yet stable after steps_to_converge - 1 steps)":
+			lemma "Observer: Worst time convergence":
 				not (
 					stable
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
@@ -209,7 +209,7 @@ public
 					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 				);
 
-			lemma "Observer: Worst steps convergence":
+			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 				steps = steps_to_converge - 1 => stable;
 							
 			lemma "Observer: A long trace":
