@@ -77,9 +77,6 @@ MessageLoggerDataService::configure(const pugi::xml_node& serviceXmlNode)
             }
         }
     }
-    
-    if(m_logFileMessageCountLimit > 0)
-        isFileLogger = true;
 
     return (true);
 };
