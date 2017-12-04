@@ -157,9 +157,9 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
     let pbs = unsafe { raw_pbs.as_mut().expect("raw_pbs should not be null") };
     let pb = unsafe { raw_pb.as_mut().expect("raw_pb should not be null") };
     let msg_buf_slice = unsafe { slice::from_raw_parts(msg_buf, msg_len as usize) };
-    if let Ok(Some(msg)) = lmcp_msg_deser(msg_buf_slice) {
+    if let Ok(Some(msg)) = Message::deser(msg_buf_slice) {
         match msg {
-            LmcpType::UxasMessagesTaskTaskAssignmentSummary(tas) => {
+            Message::UxasMessagesTaskTaskAssignmentSummary(tas) => {
                 match pb.process_task_assignment_summary(tas) {
                     Ok(msgs) => {
                         for msg in &msgs {
@@ -172,7 +172,7 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
                     },
                 };
             }
-            LmcpType::UxasMessagesTaskTaskImplementationResponse(tir) => {
+            Message::UxasMessagesTaskTaskImplementationResponse(tir) => {
                 match pb.process_task_implementation_response(tir) {
                     Ok(msgs) => {
                         for msg in &msgs {
@@ -185,16 +185,16 @@ pub extern "C" fn plan_builder_process_received_lmcp_message(
                     },
                 };
             }
-            LmcpType::AfrlCmasiAirVehicleState(vs) => {
+            Message::AfrlCmasiAirVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::AfrlVehiclesGroundVehicleState(vs) => {
+            Message::AfrlVehiclesGroundVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::AfrlVehiclesSurfaceVehicleState(vs) => {
+            Message::AfrlVehiclesSurfaceVehicleState(vs) => {
                 pb.entity_states.insert(vs.id, Box::new(vs));
             }
-            LmcpType::UxasMessagesTaskUniqueAutomationRequest(uar) => {
+            Message::UxasMessagesTaskUniqueAutomationRequest(uar) => {
                 let id = uar.request_id;
                 pb.unique_automation_requests.insert(id, uar);
                 // re-initialize state maps, possibly halting completion of an overridden
@@ -217,7 +217,7 @@ impl PlanBuilder {
     fn process_task_assignment_summary(
         &mut self,
         tas: TaskAssignmentSummary,
-    ) -> Result<Vec<LmcpType>, String> {
+    ) -> Result<Vec<Message>, String> {
         let err_pfx = "ERROR::process_task_assignment_summary:";
         let car_id = tas.corresponding_automation_request_id;
 
@@ -316,7 +316,7 @@ impl PlanBuilder {
     fn send_next_task_implementation_request(
         &mut self,
         id: i64,
-    ) -> Result<Vec<LmcpType>, ()> {
+    ) -> Result<Vec<Message>, ()> {
         debug_println!("entering send_next_task_implementation_request");
         let tir = {
             let uar = self.unique_automation_requests.get(&id).ok_or(())?;
@@ -358,7 +358,7 @@ impl PlanBuilder {
         self.next_implementation_id();
 
         // send the message
-        Ok(vec![LmcpType::UxasMessagesTaskTaskImplementationRequest(tir)])
+        Ok(vec![Message::UxasMessagesTaskTaskImplementationRequest(tir)])
     }
 }
 
@@ -366,7 +366,7 @@ impl PlanBuilder {
     fn process_task_implementation_response(
         &mut self,
         tiresp: TaskImplementationResponse,
-    ) -> Result<Vec<LmcpType>, ()> {
+    ) -> Result<Vec<Message>, ()> {
         debug_println!(
             "entering process_task_implementation_response with id {}", tiresp.response_id);
         // check response ID
@@ -434,7 +434,7 @@ impl PlanBuilder {
         Ok(self.check_next_task_implementation_request(unique_request_id))
     }
 
-    fn check_next_task_implementation_request(&mut self, unique_request_id: i64) -> Vec<LmcpType> {
+    fn check_next_task_implementation_request(&mut self, unique_request_id: i64) -> Vec<Message> {
         debug_println!("entering check_next_task_implementation_request");
         // check to see if there are any more in the queue
         //    yes --> send_next_task_implementation_request
@@ -448,7 +448,7 @@ impl PlanBuilder {
                         for e in pes {
                             ipr.final_states.push(Box::new(e.state.clone()));
                         }
-                        msgs.push(LmcpType::UxasMessagesTaskUniqueAutomationResponse(ipr));
+                        msgs.push(Message::UxasMessagesTaskUniqueAutomationResponse(ipr));
 
                         let kv = KeyValuePair {
                             key: format!(
@@ -461,7 +461,7 @@ impl PlanBuilder {
                             info: vec![Box::new(kv)],
                             ..Default::default()
                         };
-                        msgs.push(LmcpType::AfrlCmasiServiceStatus(ss));
+                        msgs.push(Message::AfrlCmasiServiceStatus(ss));
                     }
                 }
                 return msgs;
@@ -496,11 +496,11 @@ impl PlanBuilder {
 }
 
 impl PlanBuilderService {
-    fn send_shared_lmcp_object_broadcast_message(&mut self, obj: &LmcpType) {
+    fn send_shared_lmcp_object_broadcast_message(&mut self, obj: &Message) {
         debug_println!("plan_builder: sending LMCP message {:#?}", obj);
-        let size = lmcp_msg_size(obj);
+        let size = obj.size();
         let mut buf: Vec<u8> = vec![0; size];
-        let res = lmcp_msg_ser(obj, &mut buf);
+        let res = obj.ser(&mut buf);
         if res.is_ok() {
             unsafe {
                 send_shared_lmcp_object_broadcast_message_raw(self, buf.as_ptr(), size as u32);
@@ -517,7 +517,7 @@ impl PlanBuilderService {
     }
 }
 
-fn mk_error(mut msg: String) -> LmcpType {
+fn mk_error(mut msg: String) -> Message {
     msg.push('\0');
     let kv = KeyValuePair {
         key: String::from("No UniqueAutomationResponse\0").into_bytes(),
@@ -528,7 +528,7 @@ fn mk_error(mut msg: String) -> LmcpType {
         info: vec![Box::new(kv)],
         percent_complete: 0.0,
     };
-    LmcpType::AfrlCmasiServiceStatus(ss)
+    Message::AfrlCmasiServiceStatus(ss)
 }
 
 fn convert_latlong_deg_to_northeast_m(lat_deg: f64, long_deg: f64) -> (f64, f64) {

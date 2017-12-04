@@ -137,10 +137,10 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
         raw_wp.as_mut().expect("Rust waypoint_plan_manager passed as null pointer")
     };
     let msg_buf_slice = unsafe { slice::from_raw_parts(msg_buf, msg_len as usize) };
-    if let Ok(Some(msg)) = lmcp::lmcp_msg_deser(msg_buf_slice) {
+    if let Ok(Some(msg)) = lmcp::Message::deser(msg_buf_slice) {
         match msg {
 
-            lmcp::LmcpType::AfrlCmasiAirVehicleState(ref avs) => {
+            lmcp::Message::AfrlCmasiAirVehicleState(ref avs) => {
                 if avs.id() == manager.vehicle_id {
                     if manager.is_move_to_next_waypoint {
                         if let Some(waypoint_id_next) = manager.get_next_waypoint_id(avs.current_waypoint()) {
@@ -153,7 +153,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
                 }
             },
 
-            lmcp::LmcpType::AfrlCmasiAutomationResponse(ref rsp) => {
+            lmcp::Message::AfrlCmasiAutomationResponse(ref rsp) => {
                 if let Some(mission) = rsp.mission_command_list.iter()
                     .find(|m| m.vehicle_id() == manager.vehicle_id)
                 {
@@ -166,7 +166,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
 
             // If we get a MissionCommand, we want to initialize
             // our internal state from that message
-            lmcp::LmcpType::AfrlCmasiMissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
+            lmcp::Message::AfrlCmasiMissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
                 if manager.initialize_plan(cmd, wps) {
                     let waypoint_id_current = cmd.waypoint_list[0].number();
                     if let Some(segment) = manager.get_current_segment(waypoint_id_current) {
@@ -175,7 +175,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
                 }
             },
 
-            lmcp::LmcpType::AfrlCmasiMissionCommand(_) => (),
+            lmcp::Message::AfrlCmasiMissionCommand(_) => (),
 
             _ => debug_println!("Unhandled LMCP message {:?}", msg),
         }
@@ -411,7 +411,7 @@ impl WaypointPlanManager {
     ) {
         if let Some(ref payload) = self.next_mission_command_to_send {
             raw_wpm.send_shared_lmcp_object_broadcast_message(
-                &lmcp::LmcpType::AfrlCmasiMissionCommand(payload.clone())
+                &lmcp::Message::AfrlCmasiMissionCommand(payload.clone())
             );
         }
         self.next_mission_command_to_send = None;
@@ -428,12 +428,12 @@ impl WaypointPlanManagerService {
 
     pub fn send_shared_lmcp_object_broadcast_message(
         &mut self,
-        obj: &lmcp::LmcpType,
+        obj: &lmcp::Message,
     ) {
         debug_println!("sending LMCP message {:#?}", obj);
-        let size = lmcp::lmcp_msg_size(obj);
+        let size = obj.size();
         let mut buf: Vec<u8> = vec![0; size];
-        let res = lmcp::lmcp_msg_ser(obj, &mut buf);
+        let res = obj.ser(&mut buf);
         if res.is_ok() {
             unsafe {
                 send_shared_lmcp_object_broadcast_message_raw(

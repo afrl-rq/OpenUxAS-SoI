@@ -24,9 +24,9 @@ pub extern "C" fn hello_rust_process_received_lmcp_message(buf: *const u8, len: 
     println!("Hello, Rust!");
     println!("Got {} bytes!", buf_slice.len());
     println!("Raw bytes: {:?}", buf_slice);
-    let msg = lmcp_msg_deser(buf_slice).unwrap().unwrap();
+    let msg = Message::deser(buf_slice).unwrap().unwrap();
     println!("msg={:?}", msg);
-    if let LmcpType::AfrlCmasiKeyValuePair(kv) = msg {
+    if let Message::AfrlCmasiKeyValuePair(kv) = msg {
         let k = String::from_utf8(kv.key).unwrap();
         let v = String::from_utf8(kv.value).unwrap();
         println!("key= {}, value = {}", k, v);
