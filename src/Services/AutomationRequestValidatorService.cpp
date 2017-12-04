@@ -287,6 +287,7 @@ AutomationRequestValidatorService::processReceivedLmcpMessage(std::unique_ptr<ux
         auto baseTask = std::dynamic_pointer_cast<afrl::cmasi::Task>(receivedLmcpMessage->m_object);
         if (baseTask)
         {
+            m_availableStartedTaskIds.erase(baseTask->getTaskID());
             m_availableTasks[baseTask->getTaskID()] = baseTask;
         }
         isMessageHandled = true;
