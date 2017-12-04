@@ -210,7 +210,8 @@ in the `/3rd` directory by `./prepare`.
 # Detailed Prerequisite Steps
 
 ## Install Prerequisites on Ubuntu Linux
-
+1. Install pkg-config for finding link arguments: in terminal
+   * `sudo apt-get install pkg-config`
 1. Install `git`: in terminal
    * `sudo apt-get install git`
    * `sudo apt-get install gitk`

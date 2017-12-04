@@ -79,6 +79,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         echo "Done with apt update-upgrade!"
     fi
 
+    # Install pkg-config for finding link arguments: in terminal
+    sudo apt -y install pkg-config
     # Install git: in terminal
     sudo apt -y install git
     sudo apt -y install gitk
