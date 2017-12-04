@@ -21,6 +21,7 @@
 
 #include "afrl/cmasi/EntityConfiguration.h"
 #include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/MissionCommand.h"
 
 #include <unordered_map>
 #include <cstdint> // uint32_t
@@ -35,8 +36,8 @@ namespace service
  *  \brief A service that serves complete plans to a vehicle interface.
  *
  * 1) Receive AutomationResponse
- * 2) Find MissionCommand or VehicalActionCommand for configured ID 
- * 3) Send only the mission command for this vehicle
+ * 2) Find MissionCommand for the configured ID 
+ * 3) Send only that mission command for the configured vehicle
  * 
  * Configuration String: 
  *  <Service Type="SimpleWaypointPlanManagerService" VehicleID="100" />
@@ -118,9 +119,16 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-    /*! \brief  ID of the vehicle that this manager is working for*/
+    /*! \brief  special case handling for situations where plan consists of a single waypoint */
+    void handleSingleWaypointPlan(std::shared_ptr<afrl::cmasi::MissionCommand>& mish);
+
+    /*! \brief  ID of the vehicle that this manager is working for */
     int64_t m_vehicleID = {-1}; // need a vehicle ID or can't do anything
+
+    /*! \brief  local tracking of all entity configurations in the system (used for max-bank angle for min turn radius calculation) */
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_configs;
+
+    /*! \brief  local tracking of all entity states in the system (used for position for heading calculation) */
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_states;
 
 };

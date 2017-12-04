@@ -100,64 +100,7 @@ SimpleWaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 std::shared_ptr<afrl::cmasi::MissionCommand> mish(mission->clone());
                 if(mish->getWaypointList().size() == 1)
                 {
-                    double R = 30000;
-                    double heading = 0.0;
-
-                    // calculate turn radius
-                    if(m_configs.find(m_vehicleID) != m_configs.end())
-                    {
-                        // R = V^2/tan(phi)/g
-                        double V = m_configs[m_vehicleID]->getNominalSpeed();
-                        double phi = 45.0;
-                        auto avconfig = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(m_configs[m_vehicleID]);
-                        auto svconfig = std::dynamic_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(m_configs[m_vehicleID]);
-                        if(avconfig)
-                        {
-                            phi = avconfig->getNominalFlightProfile()->getMaxBankAngle();
-                        }
-                        if(svconfig)
-                        {
-                            phi = svconfig->getMaxBankAngle();
-                        }
-                        
-                        // make sure phi is a "reasonable" value (i.e. must be postive between 1 .. 89)
-                        phi = fabs(phi);
-                        if(phi < 1.0) phi = 1.0;
-                        if(phi > 89.0) phi = 89.0;
-
-                        // convert max bank angle to radians
-                        phi = phi*n_Const::c_Convert::dDegreesToRadians();
-
-                        // calculate minimum turn radius
-                        R = V*V/(9.80665*tan(phi));
-                    }
-
-                    // convert to local coordinates
-                    uxas::common::utilities::CUnitConversions flatEarth;
-                    double north, east;
-                    flatEarth.ConvertLatLong_degToNorthEast_m(mish->getWaypointList().front()->getLatitude(), mish->getWaypointList().front()->getLongitude(), north, east);
-
-                    // determine heading
-                    if(m_states.find(m_vehicleID) != m_states.end())
-                    {
-                        double pos_north, pos_east;
-                        flatEarth.ConvertLatLong_degToNorthEast_m(m_states[m_vehicleID]->getLocation()->getLatitude(), m_states[m_vehicleID]->getLocation()->getLongitude(), pos_north, pos_east);
-                        heading = atan2(east - pos_east, north - pos_north);
-                    }
-
-                    auto wp = mish->getWaypointList().front()->clone();
-                    mish->getWaypointList().front()->setNextWaypoint(mish->getWaypointList().front()->getNumber()+1);
-                    wp->setNumber(mish->getWaypointList().front()->getNumber()+1);
-
-                    // project next location out by a 2*R
-                    north += 2*R*cos(heading);
-                    east += 2*R*sin(heading);
-                    double lat, lon;
-                    flatEarth.ConvertNorthEast_mToLatLong_deg(north, east, lat, lon);
-                    wp->setLatitude(lat);
-                    wp->setLongitude(lon);
-
-                    mish->getWaypointList().push_back(wp);
+                    handleSingleWaypointPlan(mish);
                 }
                 sendSharedLmcpObjectBroadcastMessage(mish);
                 break;
@@ -167,6 +110,72 @@ SimpleWaypointPlanManagerService::processReceivedLmcpMessage(std::unique_ptr<uxa
     
     return (false); // always false implies never terminating service from here
 };
+
+void SimpleWaypointPlanManagerService::handleSingleWaypointPlan(std::shared_ptr<afrl::cmasi::MissionCommand>& mish)
+{
+    // pre-condition: at least one waypoint in the plan
+    if(mish->getWaypointList().empty()) return;
+
+    // default values of min turn radius and heading along path to waypoint
+    double R = 30000;
+    double heading = 0.0;
+
+    // calculate turn radius from configuration
+    if(m_configs.find(m_vehicleID) != m_configs.end())
+    {
+        // R = V^2/tan(phi)/g
+        double V = m_configs[m_vehicleID]->getNominalSpeed();
+        double phi = 45.0; // default assumption vehicles without bank angle considerations
+        auto avconfig = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(m_configs[m_vehicleID]);
+        auto svconfig = std::dynamic_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(m_configs[m_vehicleID]);
+        if(avconfig)
+        {
+            phi = avconfig->getNominalFlightProfile()->getMaxBankAngle();
+        }
+        if(svconfig)
+        {
+            phi = svconfig->getMaxBankAngle();
+        }
+        
+        // make sure max bank angle is reasonable (i.e. must be postive between 1 .. 89)
+        phi = fabs(phi);
+        if(phi < 1.0) phi = 1.0;
+        if(phi > 89.0) phi = 89.0;
+
+        // convert max bank angle to radians
+        phi = phi*n_Const::c_Convert::dDegreesToRadians();
+
+        // calculate minimum turn radius
+        R = V*V/(9.80665*tan(phi));
+    }
+
+    // convert to local coordinates
+    uxas::common::utilities::CUnitConversions flatEarth;
+    double north, east;
+    flatEarth.ConvertLatLong_degToNorthEast_m(mish->getWaypointList().back()->getLatitude(), mish->getWaypointList().back()->getLongitude(), north, east);
+
+    // determine heading
+    if(m_states.find(m_vehicleID) != m_states.end())
+    {
+        double pos_north, pos_east;
+        flatEarth.ConvertLatLong_degToNorthEast_m(m_states[m_vehicleID]->getLocation()->getLatitude(), m_states[m_vehicleID]->getLocation()->getLongitude(), pos_north, pos_east);
+        heading = atan2(east - pos_east, north - pos_north);
+    }
+
+    auto wp = mish->getWaypointList().back()->clone();
+    mish->getWaypointList().back()->setNextWaypoint(mish->getWaypointList().back()->getNumber()+1);
+    wp->setNumber(mish->getWaypointList().back()->getNumber()+1);
+
+    // project next location out by 2*R along vector from current position to destination
+    north += 2*R*cos(heading);
+    east += 2*R*sin(heading);
+    double lat, lon;
+    flatEarth.ConvertNorthEast_mToLatLong_deg(north, east, lat, lon);
+    wp->setLatitude(lat);
+    wp->setLongitude(lon);
+
+    mish->getWaypointList().push_back(wp);
+}
 
 }; //namespace service
 }; //namespace uxas
