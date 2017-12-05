@@ -212,6 +212,7 @@ in the `/3rd` directory by `./prepare`.
 
 
 # Detailed Prerequisite Steps
+The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) will automate the following steps.
 
 ## Install Prerequisites on Ubuntu Linux
 1. Ensure dependency search is supported: in terminal
@@ -262,6 +263,8 @@ in the `/3rd` directory by `./prepare`.
 1. [Build](#build-uxas)
 
 ## Install Prerequisites on Mac OS X
+The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) will automate the following steps.
+
 1. Install [XCode](https://developer.apple.com/xcode/)
 1. Enable commandline tools: in terminal `xcode-select --install`
 1. Install `homebrew` (must be administrator): in terminal
