@@ -214,7 +214,7 @@ in the `/3rd` directory by `./prepare`.
 # Detailed Prerequisite Steps
 
 ## Install Prerequisites on Ubuntu Linux
-1. Install pkg-config for finding link arguments: in terminal
+1. Ensure dependency search is supported: in terminal
    * `sudo apt-get install pkg-config`
 1. Install `git`: in terminal
    * `sudo apt-get install git`
@@ -239,8 +239,6 @@ in the `/3rd` directory by `./prepare`.
    * `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
    * `sudo -H pip3 install meson==0.42.1`
-1. Ensure dependency search for meson is supported: in terminal
-   * `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
    * `sudo apt install python3-tk`
    * `sudo -H pip3 install matplotlib`
@@ -257,8 +255,8 @@ in the `/3rd` directory by `./prepare`.
    * Select `C/C++` and click `Install`
 1. Install Oracle Java run-time (required for *LmcpGen*): in terminal
    * `sudo add-apt-repository ppa:webupd8team/java`
-   * `sudo apt update; sudo apt install oracle-java8-installer`
-   * `sudo apt install oracle-java8-set-default`
+   * `sudo apt update; sudo apt install oracle-java9-installer`
+   * `sudo apt install oracle-java9-set-default`
 1. Install `ant` for command line build of java programs: in terminal
    * `sudo apt install ant`
 1. [Build](#build-uxas)

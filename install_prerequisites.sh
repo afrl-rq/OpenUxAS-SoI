@@ -99,8 +99,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     sudo -H pip3 install ninja
     # Install meson build configuration: in terminal
     sudo -H pip3 install meson==0.42.1
-    # Ensure dependency search for meson is supported: in terminal
-    sudo apt-y install pkg-config
     # Install python plotting capabilities (optional): in terminal
     sudo apt -y install python3-tk
     sudo -H pip3 install matplotlib
