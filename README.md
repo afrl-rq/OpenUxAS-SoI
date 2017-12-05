@@ -76,11 +76,7 @@ command: `ninja -C build clean`
 ### Compiling using NetBeans (Debug Mode)
 
 1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html)
-   - Run downloaded install script: in terminal
-   - `cd ~/Downloads; sh jdk-8u131-nb-8_w-linux-x64.sh`
-   - Click `Next` three times, then `Install`
 1. Enable C/C++ plug-in in NetBeans
-   - Open NetBeans (in Ubuntu search, type `NetBeans`)
    - Choose Tools->Plugins from the top menu
    - In the `Available Plugins` tab, search for `C++`
    - Select `C/C++` and click `Install`
