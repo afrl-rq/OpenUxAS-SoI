@@ -95,7 +95,6 @@
 // test
 #include "SendMessagesService.h"
 #include "SerialAutomationRequestTestService.h"
-#include "TcpBridge.h"
 #include "Test_SimulationTime.h"
 
 // general services
@@ -137,9 +136,6 @@
 
 // examples
 {auto svc = uxas::stduxas::make_unique<uxas::service::HelloWorld>();}
-
-// adapter
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::TcpBridge>();}   //TEST ONLY
 
 // data
 {auto svc = uxas::stduxas::make_unique<uxas::service::data::MessageLoggerDataService>();}
