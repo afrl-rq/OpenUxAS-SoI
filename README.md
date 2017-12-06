@@ -21,7 +21,7 @@ For an Ubuntu 16.04 or Mac OS X system with prerequisites installed, UxAS should
 
 ## Configure System for UxAS Build
 
-For Linux and Mac systems, the [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (install_prerequisites.sh) automates the installation of all the necessary tools for compilation of *OpenUxAS*. Note, on Mac [XCode](https://developer.apple.com/xcode/) must first be installed before running the install script.
+For Linux and Mac systems, the [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (`bash install_prerequisites.sh`) automates the installation of all the necessary tools for compilation of *OpenUxAS*. Note, on Mac [XCode](https://developer.apple.com/xcode/) must first be installed before running the install script.
 
 Complete manual step-by-step instructions for each operating system are included below:
 
@@ -43,7 +43,7 @@ Expected file system layout:
 1. Checkout *OpenUxAS*: `git clone https://github.com/afrl-rq/OpenUxAS.git`
 1. Checkout *LmcpGen*: `git clone https://github.com/afrl-rq/LmcpGen.git`
 1. Build *LmcpGen*: `cd LmcpGen; ant jar; cd ..`
-1. Auto-generate source code for LMCP libraries: `cd OpenUxAS; sh RunLmcpGen.sh; cd ..`
+1. Auto-generate source code for LMCP libraries: `cd OpenUxAS; bash RunLmcpGen.sh; cd ..`
 1. Prepare UxAS specific patches to external libraries: `cd OpenUxAS; ./prepare; cd ..`
 1. (**optional**) Checkout *OpenAMASE*: `git clone https://github.com/afrl-rq/OpenAMASE.git`
 1. (**optional**) Build *OpenAMASE*: `cd OpenAMASE/OpenAMASE; ant jar; cd ../..`
@@ -111,8 +111,8 @@ The following is a bash script that helps to partially-automate the "building th
 
 This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
-1. Download the [script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/build_documentation.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
-1. Run the script at the terminal: `./build_documentation.sh`
+1. Download the [script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/build_documentation.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (`bash build_documentation.sh`) OR `cd` to your `git clone`d *OpenUxAS* directory
+1. Run the script at the terminal: `bash build_documentation.sh`
 1. Follow the on-screen instructions
 
 Note that this will pop open two html files in your webbrowser and also the pdf manual when run.
@@ -212,7 +212,7 @@ in the `/3rd` directory by `./prepare`.
 
 
 # Detailed Prerequisite Steps
-The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) will automate the following steps.
+The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) (`bash install_prerequisites.sh`) will automate the following steps.
 
 ## Install Prerequisites on Ubuntu Linux
 1. Ensure dependency search is supported: in terminal
@@ -330,7 +330,7 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
 1. Auto-create the UxAS messaging library
    * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
    * Place `LmcpGen.jar` in `LmcpGen/dist` folder
-   * From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
+   * From the Git Bash shell in the root UxAS directory, run `bash RunLmcpGen.sh`
    * Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE repositories follow the folder structure labeled in the [Build UxAS](#build-uxas) section.
 1. Prepare build
    * Open VS command prompt (Tools -> Visual Studio Command Prompt)
