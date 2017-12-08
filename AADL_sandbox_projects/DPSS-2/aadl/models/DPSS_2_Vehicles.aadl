@@ -244,6 +244,14 @@ public
 					deltaT > 0.0 
 					and deltaT < DPSS_Constants.Time_to_travel_full_length
 					);
+			
+			-- This is a good way to find the real time bound!
+ 			-- The lemma is valid for time < 2T but not for time < (2-1/N)T.
+ 			-- I believe it would be valid with (2-1/N)T if we only required one timestep of stability instead of two. 			
+			lemma "Time to become stable is less than 2T":
+				(stable and not (pre(stable))) => 
+					(time < 2.0*DPSS_Constants.Time_to_travel_full_length);
+			
 					
 		**};
 		
