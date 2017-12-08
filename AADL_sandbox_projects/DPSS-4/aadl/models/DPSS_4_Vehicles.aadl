@@ -175,14 +175,14 @@ public
 			assume "time update": time = (0.0 -> pre(time) + deltaT);
 			
 			assume "UAVs are numbered according to their position from left to right":
-				(initial_pos_UAV1 <= initial_pos_UAV2
+				(	initial_pos_UAV1 <= initial_pos_UAV2
 				and initial_pos_UAV2 <= initial_pos_UAV3
 				and initial_pos_UAV3 <= initial_pos_UAV4
 				)
 				-> true;
 				
 			assume "Initial positions are between 0 and P_GLOBAL":
-				(0.0 <= initial_pos_UAV1 
+				(	0.0 <= initial_pos_UAV1 
 				and initial_pos_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= initial_pos_UAV2 
 				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL
@@ -194,7 +194,7 @@ public
 				-> true;
 				
 			assume "Suggested initial directions are LEFT or RIGHT":
-				((suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+				((	suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
 					or suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
 				and (suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
 					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT)
@@ -215,14 +215,14 @@ public
 					(stable	and deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real);
 			
 			guarantee "Initial positions are the input initial positions":
-				(pos_UAV1 = initial_pos_UAV1
+				(	pos_UAV1 = initial_pos_UAV1
 				and pos_UAV2 = initial_pos_UAV2
 				and pos_UAV3 = initial_pos_UAV3
 				and pos_UAV4 = initial_pos_UAV4
 				) -> true;
 			
 			guarantee "Goals are in bounds":
-				0.0 <= goal_UAV1
+					0.0 <= goal_UAV1
 				and goal_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= goal_UAV2
 				and goal_UAV2 <= DPSS_Constants.P_GLOBAL
@@ -232,7 +232,7 @@ public
 				and goal_UAV4 <= DPSS_Constants.P_GLOBAL;	
 			
 			guarantee "Positions are in bounds":
-				0.0 <= pos_UAV1 
+					0.0 <= pos_UAV1 
 				and pos_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= pos_UAV2 
 				and pos_UAV2 <= DPSS_Constants.P_GLOBAL
@@ -242,12 +242,12 @@ public
 				and pos_UAV4 <= DPSS_Constants.P_GLOBAL;
 			
 			guarantee "UAVs stay in order":
-				pos_UAV1 <= pos_UAV2
+					pos_UAV1 <= pos_UAV2
 				and pos_UAV2 <= pos_UAV3
 				and pos_UAV3 <= pos_UAV4;
 			
 			guarantee "UAVs turn around at the borders":
-				pos_UAV1 = 0.0 => direction_UAV1 = 1
+					pos_UAV1 = 0.0 => direction_UAV1 = 1
 				and pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1
 				and pos_UAV2 = 0.0 => direction_UAV2 = 1
 				and pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1
@@ -257,7 +257,7 @@ public
 				and pos_UAV4 = DPSS_Constants.P_GLOBAL => direction_UAV4 = -1;
 				
 			guarantee "Directions are in bounds":
-				(direction_UAV1 = 1 or direction_UAV1 = -1)
+				(	 direction_UAV1 = 1 or direction_UAV1 = -1)
 				and (direction_UAV2 = 1 or direction_UAV2 = -1)
 				and (direction_UAV3 = 1 or direction_UAV3 = -1)
 				and (direction_UAV4 = 1 or direction_UAV4 = -1);
