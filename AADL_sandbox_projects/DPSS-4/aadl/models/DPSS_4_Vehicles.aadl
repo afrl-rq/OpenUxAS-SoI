@@ -302,38 +302,30 @@ public
 						
 		annex agree {**
 
-			--UAV1 output
+			--Assign direction variables (used at the system level)
 			assign direction_UAV1 = UAV1.direction;
-			assign goal_UAV1 = UAV1.goal;
-			
-			--UAV1 inputs
-			--Since the leftmost UAV has no left neighbor, set pos_LN to something to the left of the left endpoint (so UAV1 never meets its "phantom" neighbor).
-			assert UAV1.pos_LN = -1.0; 
-			assert UAV1.id = 1;
-						
-			--UAV2 outputs
-			assign direction_UAV2 = UAV2.direction;
-			assign goal_UAV2 = UAV2.goal;
-			
-			--UAV2 inputs
-			assert UAV2.id = 2;
-							
-			--UAV3 outputs
+			assign direction_UAV2 = UAV2.direction;			
 			assign direction_UAV3 = UAV3.direction;
-			assign goal_UAV3 = UAV3.goal;
-			
-			--UAV3 inputs
-			--Since the rightmost UAV has no right neighbor, set pos_RN to something to the right of the right endpoint (so UAVN never meets its "phantom" neighbor).
-			assert UAV3.id = 3;
-			
-			--UAV4 outputs
 			assign direction_UAV4 = UAV4.direction;
+												
+			--Assign goal variables (used at the system level)
+			assign goal_UAV1 = UAV1.goal;
+			assign goal_UAV2 = UAV2.goal;
+			assign goal_UAV3 = UAV3.goal;			
 			assign goal_UAV4 = UAV4.goal;
 			
-			--UAV4 inputs
+			--Set UAV IDs
+			--We use assertions since the IDs are not system-level inputs that we can pass through			
+			assert UAV1.id = 1;
+			assert UAV2.id = 2;			
+			assert UAV3.id = 3;
+			assert UAV4.id = 4;	
+															
+			--Since the leftmost UAV has no left neighbor, set pos_LN to something to the left of the left endpoint (so UAV1 never meets its "phantom" neighbor).
+			assert UAV1.pos_LN = -1.0; 
+
 			--Since the rightmost UAV has no right neighbor, set pos_RN to something to the right of the right endpoint (so UAVN never meets its "phantom" neighbor).
-			assert UAV4.pos_RN = DPSS_Constants.P_GLOBAL + 1.0;
-			assert UAV4.id = 4;		
+			assert UAV4.pos_RN = DPSS_Constants.P_GLOBAL + 1.0;	
 			
 			--Used in lemmas
 			eq steps : int = 1 -> pre(steps + 1);
