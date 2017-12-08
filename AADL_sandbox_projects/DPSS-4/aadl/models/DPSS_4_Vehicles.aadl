@@ -278,7 +278,7 @@ public
 			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
 			sug_init_dir_UAV2: port	suggested_initial_direction_UAV2 -> UAV2.suggested_initial_direction;
 			sug_init_dir_UAV3: port	suggested_initial_direction_UAV3 -> UAV3.suggested_initial_direction;
-			sug_init_dir_UAV4: port	suggested_initial_direction_UAV3 -> UAV4.suggested_initial_direction;
+			sug_init_dir_UAV4: port	suggested_initial_direction_UAV4 -> UAV4.suggested_initial_direction;
 			
 			--Initial positions
 			init_pos_UAV1: port initial_pos_UAV1 -> UAV1.initial_position;
