@@ -143,7 +143,7 @@ public
 						pos_UAV3 = S_23 and 
 						pos_UAV4 = DPSS_Constants.P_GLOBAL
 						)
-					--and were previously at S_12, S_12, S_34, S_34, respectively
+					--and were previously at S_12, S_12, S_34, and S_34, respectively
 					and (
 						pre_pos_UAV1 = S_12 and 
 						pre_pos_UAV2 = S_12 and 
@@ -152,7 +152,7 @@ public
 					)
 				)
 				--or
-				or (--the UAVs are at S_12, S_12, S_34, S_34, respectively
+				or (--the UAVs are at S_12, S_12, S_34, and S_34, respectively
 					(
 						pos_UAV1 = S_12 and 
 						pos_UAV2 = S_12 and 
