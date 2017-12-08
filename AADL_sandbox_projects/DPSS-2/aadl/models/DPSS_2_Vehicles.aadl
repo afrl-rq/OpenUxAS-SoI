@@ -71,14 +71,35 @@ public
 					pre_goal_UAV2
 				);
 										
-			eq deltaT : DPSS_Data_Types::Time_Type = DPSS_Node_Lib.min_time(time_until_UAV1_reaches_goal,
-								DPSS_Node_Lib.min_time(time_until_UAV2_reaches_goal,
-									time_to_reach_neighbor_12));
+			eq deltaT : DPSS_Data_Types::Time_Type = 
+							DPSS_Node_Lib.min_time(time_until_UAV1_reaches_goal,
+							DPSS_Node_Lib.min_time(time_until_UAV2_reaches_goal,
+												   time_to_reach_neighbor_12));
 			
-			eq stable : bool = ((pos_UAV1 = 0.0 and pos_UAV2 = DPSS_Constants.P_GLOBAL)
-							and (pre_pos_UAV1 = S_12 and pre_pos_UAV2 = S_12))
-						or ((pos_UAV1 = S_12 and pos_UAV2 = S_12)
-							and (pre_pos_UAV1 = 0.0 and pre_pos_UAV2 = DPSS_Constants.P_GLOBAL)
+			eq stable : bool = 
+								--Either
+								(	--UAVs are at 0 and P, respectively
+									(
+										pos_UAV1 = 0.0 and 
+										pos_UAV2 = DPSS_Constants.P_GLOBAL
+										)
+									--and were previously at S_12 and S_12, 
+									and (
+										pre_pos_UAV1 = S_12 and 
+										pre_pos_UAV2 = S_12 
+									)
+								)
+								--or
+								or (--UAVs are at S_12 and S_12, respectively
+									(
+										pos_UAV1 = S_12 and 
+										pos_UAV2 = S_12 
+									)
+									--and were previously at 0 and P, respectively
+									and (
+										pre_pos_UAV1 = 0.0 and 
+										pre_pos_UAV2 = DPSS_Constants.P_GLOBAL
+									)
 						);
 			
 			-----------------------------------------------------
