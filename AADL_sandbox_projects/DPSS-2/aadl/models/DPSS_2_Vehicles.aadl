@@ -77,30 +77,30 @@ public
 												   time_to_reach_neighbor_12));
 			
 			eq stable : bool = 
-								--Either
-								(	--UAVs are at 0 and P, respectively
-									(
-										pos_UAV1 = 0.0 and 
-										pos_UAV2 = DPSS_Constants.P_GLOBAL
-										)
-									--and were previously at S_12 and S_12, 
-									and (
-										pre_pos_UAV1 = S_12 and 
-										pre_pos_UAV2 = S_12 
-									)
-								)
-								--or
-								or (--UAVs are at S_12 and S_12, respectively
-									(
-										pos_UAV1 = S_12 and 
-										pos_UAV2 = S_12 
-									)
-									--and were previously at 0 and P, respectively
-									and (
-										pre_pos_UAV1 = 0.0 and 
-										pre_pos_UAV2 = DPSS_Constants.P_GLOBAL
-									)
-						);
+				--Either
+				(	--the UAVs are at 0 and P, respectively
+					(
+						pos_UAV1 = 0.0 and 
+						pos_UAV2 = DPSS_Constants.P_GLOBAL
+					)
+					--and were previously at S_12 and S_12, 
+					and (
+						pre_pos_UAV1 = S_12 and 
+						pre_pos_UAV2 = S_12 
+					)
+				)
+				--or
+				or (--the UAVs are at S_12 and S_12, respectively
+					(
+						pos_UAV1 = S_12 and 
+						pos_UAV2 = S_12 
+					)
+					--and were previously at 0 and P, respectively
+					and (
+						pre_pos_UAV1 = 0.0 and 
+						pre_pos_UAV2 = DPSS_Constants.P_GLOBAL
+					)
+				);
 			
 			-----------------------------------------------------
 			--ASSUMPTIONS

@@ -50,18 +50,18 @@ public
 			eq deltaT : DPSS_Data_Types::Time_Type = time_until_UAV1_reaches_goal;
 			
 			eq stable : bool = 
-								--Either
-								(	--UAV is at 0
-										pos_UAV1 = 0.0 
-									--and was previously at P 
-									and pre_pos_UAV1 = DPSS_Constants.P_GLOBAL
-								)
-								--or
-								or (--UAV is at P
-										pos_UAV1 = DPSS_Constants.P_GLOBAL
-									--and was previously at 0
-									and pre_pos_UAV1 = 0.0 
-						);
+				--Either
+				(	--the UAV is at 0
+						pos_UAV1 = 0.0 
+					--and was previously at P 
+					and pre_pos_UAV1 = DPSS_Constants.P_GLOBAL
+				)
+				--or
+				or (--the UAV is at P
+						pos_UAV1 = DPSS_Constants.P_GLOBAL
+					--and was previously at 0
+					and pre_pos_UAV1 = 0.0 
+				);
 			
 			-----------------------------------------------------
 			--ASSUMPTIONS
