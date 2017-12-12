@@ -7,19 +7,24 @@ public
 	 
 	system UAV
 		features
-			--inputs
+			--Inputs
 			suggested_initial_direction : in data port DPSS_Data_Types::Direction_Type; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
 			initial_position : in data port DPSS_Data_Types::Position_Type;
 			pos_LN : in data port DPSS_Data_Types::Position_Type; --Position of left neighbor (< 0  if there is no left neighbor)
 			pos_RN : in data port DPSS_Data_Types::Position_Type; --Position of right neighbor (> P_GLOBAL if there is no right neighbor)
 			id : in data port Base_Types::Integer; --a positive integer between 1 and N
 			
-			--outputs
+			--Outputs
 			direction: out data port DPSS_Data_Types::Direction_Type;
 			goal : out data port DPSS_Data_Types::Position_Type;
 			pos : out data port DPSS_Data_Types::Position_Type;
 					
 		annex agree {**
+			
+			-----------------------------------------------------
+			--STATE VARIABLES
+			-----------------------------------------------------		
+				
 			--Shared border positions
 			eq S_L : DPSS_Data_Types::Position_Type = 
 				real(id-1)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;  
@@ -51,7 +56,10 @@ public
 					pre_goal
 				);
 							
-			--Assumptions
+			-----------------------------------------------------
+			--ASSUMPTIONS
+			-----------------------------------------------------		
+			
 			assume "ID in range":
 				id >= 1 and id <= DPSS_Constants.N_int;
 						
@@ -73,14 +81,11 @@ public
 				
 			assume "ID = N implies pos_RN > P_GLOBAL":
 				id = DPSS_Constants.N_int => pos_RN > DPSS_Constants.P_GLOBAL;
-			
-			--This is needed to guarantee that this vehicle's output position stays in bounds
-			assume "deltaT is small enough that this vehicle won't pass by an endpoint":
-				true -> (deltaT <= time_until_UAV_reaches_goal);
-			
-			assume "Time marches on":
-				true -> (time >= pre(time));
-			
+						
+			-----------------------------------------------------
+			--GUARANTEES
+			-----------------------------------------------------		
+
 			guarantee "Direction formula":
 				direction = (
 					-- Turn around at the left boundary
