@@ -162,7 +162,8 @@ lemma validNF_guard_bind[wp]:"\<lbrace>\<lambda> s. A s \<and> f s\<rbrace> g ()
     
 
 lemma validNF_modify[wp]:"\<forall> s'. \<lbrace> \<lambda> s. P s' \<and> s = f s' \<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> modify f; g od \<lbrace> Q \<rbrace>!"
-sorry
+  apply (rule validNF_bind[where B="\<lambda> _ s. \<exists> s'. P s' \<and> s = f s'"])
+  sorry
   
 lemma forward_validNF_gets[wp]:"\<forall> x. \<lbrace> \<lambda> s. P s \<and> x = f s \<rbrace> g x \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> gets f; g x od \<lbrace> Q \<rbrace>!"
   apply (rule validNF_bind[where B="\<lambda> x s. P s \<and> x = f s"])
