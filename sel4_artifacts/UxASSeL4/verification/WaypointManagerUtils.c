@@ -1,16 +1,18 @@
-/******************************************************************************
-* Author: Dan DaCosta                                                         *
-*                                                                             *
-* Purposes: Implements a number of functions useful for mission               *
-* command manipulation.                                                       *
-*                                                                             *
-* Testing build:                                                              *
-*   $CC -g -I./ -I./common/ -D__MISSIONCOMMANDUTILS_TESTS__ *.c common/*.c    *
-******************************************************************************/
-
-//#include "lmcp.h"
-#include "MissionCommandUtils.h"
+/*
+ * Author: Dan DaCosta
+ * Company: Rockwell Collins
+ * License: Air Force Open Source Agreement Version 1.0
+ *
+ * Testing build:                                                          
+ *   gcc -g -I../CMASI -I../CMASI/common/ -D__WAYPOINTMANAGERUTILS_TESTS__ *.c ../CMASI/*.c ../CMASI/common/*.c -o tests
+ *   ./tests
+ *   
+ */
+#include "WaypointManagerUtils.h"
 #include <stdbool.h>
+
+int lmcp_process_msg(uint8_t** inb, size_t size, lmcp_object **o);
+int lmcp_unpack(uint8_t** inb, size_t size, lmcp_object **o);
 
 #define AUTOCORRES
 #ifdef AUTOCORRES
@@ -24,24 +26,9 @@ void free(void * p);
 #include <stdlib.h>
 #endif
 
-#define DEBUG(fmt,args...) \
-  printf("%s,%s,%i:"fmt,__FUNCTION__,"MissionCommandMtils.c",__LINE__,##args)
-
-
-/*void MCEInit(MissionCommandExt * mce, uint16_t waypoints) {
-  memset((uint8_t*)&(mce->missioncommand),0,sizeof(MissionCommand));
-  mce->missioncommand.waypointlist = calloc(sizeof(Waypoint*),waypoints);
-  mce->waypoints = calloc(sizeof(Waypoint),waypoints);
-  for(uint16_t i = 0; i < waypoints; i++) {
-    mce->missioncommand.waypointlist[i] = mce->waypoints + i;
-  }
-  mce->waypointslen = waypoints;
-  }*/
-
-
 /* ASM: ws != null */
 /* ASM: length > 0 */
-Waypoint * FindWP(Waypoint * ws, uint16_t len, int64_t id) {
+Waypoint * FindWaypoint(const Waypoint * ws, const uint16_t len, const int64_t id) {
   for(uint16_t i = 0 ; i < len; i++) {
     if(ws[i].number == id) {
      return ws + i;
@@ -61,15 +48,15 @@ Waypoint * FindWP(Waypoint * ws, uint16_t len, int64_t id) {
    stored in ws_win. */
 /* ASM: Last waypoint starts a cycle. */
 void FillWindow(  Waypoint * ws
-                           , uint16_t len_ws
-                           , int64_t id
-                           , uint16_t len_ws_win
-                           , Waypoint * ws_win /* out */) {
+                  , uint16_t len_ws
+                  , int64_t id
+                  , uint16_t len_ws_win
+                  , Waypoint * ws_win /* out */) {
   uint16_t i;
   int64_t nid = id;
   Waypoint * wp = NULL;
   for(i=0; i < len_ws_win; i++) {
-    wp = FindWP(ws, len_ws, nid);
+    wp = FindWaypoint(ws, len_ws, nid);
     ws_win[i] = *wp;
     nid = ws_win[i].nextwaypoint;    
   }
@@ -93,19 +80,24 @@ void GroomWindow(uint16_t len_ws_win
 /* ASM: len_ws_win is less than the number of waypoints that can be
    stored in ws_win. */
 /* ASM: Last waypoint starts a cycle. */
-void FillAndGroomWindow(  Waypoint * ws
-                           , uint16_t len_ws
-                           , int64_t id
-                           , uint16_t len_ws_win
-                           , Waypoint * ws_win /* out */) {
+void AutoPilotMissionCommandSegment(  Waypoint * ws
+                                      , uint16_t len_ws
+                                      , int64_t id
+                                      , Waypoint * ws_win /* out */
+                                      , uint16_t len_ws_win) {
   FillWindow(ws, len_ws, id, len_ws_win, ws_win);
   GroomWindow(len_ws_win, ws_win);
   return;
 }
 
-#ifdef __MISSIONCOMMANDUTILS_TESTS__
-
+#ifdef __WAYPOINTMANAGERUTILS_TESTS__
 #include <stdio.h>
+#include "MissionCommand.h"
+
+
+#define DEBUG(fmt,args...) \
+  printf("%s,%s,%i:"fmt,__FUNCTION__,"MissionCommandMtils.c",__LINE__,##args)
+
 
 #define RETURNONFAIL(X)                                 \
   if((X) != true) {                                     \
@@ -175,79 +167,64 @@ void missioncommandFromFile(FILE * f, MissionCommand ** mcpp) {
     return;
 }
 
-bool CheckMCWaypointSubSequence(const MissionCommand * omcp,
-                                const MissionCommand * smcp,
+bool MissionCommandSegmentCheck(const Waypoint * ws,
+                                const uint16_t ws_len,
                                 const int64_t start_waypoint_id,
-                                const uint16_t sslen) {
+                                const Waypoint * ws_seg,
+                                const uint16_t ws_seg_len) {
   Waypoint * owp;
   Waypoint * swp;
   Waypoint twp;
   int64_t it_id = start_waypoint_id;
 
-  /* Certain parts of a mission command subsequence should not change. */
-  RETURNONFAIL(omcp->super.commandid == smcp->super.commandid);
-  RETURNONFAIL(omcp->super.vehicleid == smcp->super.vehicleid);
-  RETURNONFAIL(omcp->super.vehicleactionlist_ai.length
-               == smcp->super.vehicleactionlist_ai.length);
-  for(uint16_t i = 0 ; i < smcp->super.vehicleactionlist_ai.length ; i ++) {
-    RETURNONFAIL(omcp->super.vehicleactionlist[i] == smcp->super.vehicleactionlist[i]);
-  }
-  
-  /* A subsequence could be shorter. */
-  RETURNONFAIL(smcp->super.vehicleactionlist_ai.length <= sslen );
-
-  /* The starting point we provided to the subsequence should be its
-     starting point. */
-  RETURNONFAIL(start_waypoint_id == smcp->firstwaypoint);
-
   /* Check that all non-last waypoints are identical up to the
      subsequence size. */
   uint16_t i = 0;
-  for(; i < smcp->waypointlist_ai.length - 1; i++) {
-    owp = FindWP(omcp,it_id);
+  for(; i < ws_seg_len - 1; i++) {
+    owp = FindWaypoint(ws,ws_len,it_id);
     RETURNONFAIL(owp != NULL);
-    swp = FindWP(smcp,it_id);
+    swp = FindWaypoint(ws_seg,ws_seg_len,it_id);
     RETURNONFAIL(swp != NULL);
-    RETURNONFAIL(owp->super.latitude == smcp->waypointlist[i]->super.latitude);
-    RETURNONFAIL(owp->super.longitude == smcp->waypointlist[i]->super.longitude);
-    RETURNONFAIL(owp->super.altitude == smcp->waypointlist[i]->super.altitude);
-    RETURNONFAIL(owp->super.altitudetype == smcp->waypointlist[i]->super.altitudetype);
-    RETURNONFAIL(owp->number == smcp->waypointlist[i]->number);
-    RETURNONFAIL(owp->nextwaypoint == smcp->waypointlist[i]->nextwaypoint);
-    RETURNONFAIL(owp->speed == smcp->waypointlist[i]->speed);
-    RETURNONFAIL(owp->speedtype == smcp->waypointlist[i]->speedtype);
-    RETURNONFAIL(owp->climbrate == smcp->waypointlist[i]->climbrate);
-    RETURNONFAIL(owp->turntype == smcp->waypointlist[i]->turntype);
-    RETURNONFAIL(owp->vehicleactionlist == smcp->waypointlist[i]->vehicleactionlist);
-    RETURNONFAIL(owp->vehicleactionlist_ai.length == smcp->waypointlist[i]->vehicleactionlist_ai.length);
-    RETURNONFAIL(owp->contingencywaypointa == smcp->waypointlist[i]->contingencywaypointa);
-    RETURNONFAIL(owp->contingencywaypointb == smcp->waypointlist[i]->contingencywaypointb);
-    RETURNONFAIL(owp->associatedtasks == smcp->waypointlist[i]->associatedtasks);
-    RETURNONFAIL(owp->associatedtasks_ai.length == smcp->waypointlist[i]->associatedtasks_ai.length);
+    RETURNONFAIL(owp->super.latitude == swp->super.latitude);
+    RETURNONFAIL(owp->super.longitude == swp->super.longitude);
+    RETURNONFAIL(owp->super.altitude == swp->super.altitude);
+    RETURNONFAIL(owp->super.altitudetype == swp->super.altitudetype);
+    RETURNONFAIL(owp->number == swp->number);
+    RETURNONFAIL(owp->nextwaypoint == swp->nextwaypoint);
+    RETURNONFAIL(owp->speed == swp->speed);
+    RETURNONFAIL(owp->speedtype == swp->speedtype);
+    RETURNONFAIL(owp->climbrate == swp->climbrate);
+    RETURNONFAIL(owp->turntype == swp->turntype);
+    RETURNONFAIL(owp->vehicleactionlist == swp->vehicleactionlist);
+    RETURNONFAIL(owp->vehicleactionlist_ai.length == swp->vehicleactionlist_ai.length);
+    RETURNONFAIL(owp->contingencywaypointa == swp->contingencywaypointa);
+    RETURNONFAIL(owp->contingencywaypointb == swp->contingencywaypointb);
+    RETURNONFAIL(owp->associatedtasks == swp->associatedtasks);
+    RETURNONFAIL(owp->associatedtasks_ai.length == swp->associatedtasks_ai.length);
     it_id = swp->nextwaypoint;
   }
   
   /* Check that the last waypoint is identical and that its nxid
      points to itself. */
-  owp = FindWP(omcp,it_id);
+  owp = FindWaypoint(ws,ws_len,it_id);
   RETURNONFAIL(owp != NULL);
-  swp = FindWP(smcp,it_id);
+  swp = FindWaypoint(ws_seg,ws_seg_len,it_id);
   RETURNONFAIL(swp != NULL);
-  RETURNONFAIL(owp->super.latitude == smcp->waypointlist[i]->super.latitude);
-  RETURNONFAIL(owp->super.longitude == smcp->waypointlist[i]->super.longitude);
-  RETURNONFAIL(owp->super.altitude == smcp->waypointlist[i]->super.altitude);
-  RETURNONFAIL(owp->super.altitudetype == smcp->waypointlist[i]->super.altitudetype);
-  RETURNONFAIL(owp->number == smcp->waypointlist[i]->number);
-  RETURNONFAIL(owp->speed == smcp->waypointlist[i]->speed);
-  RETURNONFAIL(owp->speedtype == smcp->waypointlist[i]->speedtype);
-  RETURNONFAIL(owp->climbrate == smcp->waypointlist[i]->climbrate);
-  RETURNONFAIL(owp->turntype == smcp->waypointlist[i]->turntype);
-  RETURNONFAIL(owp->vehicleactionlist == smcp->waypointlist[i]->vehicleactionlist);
-  RETURNONFAIL(owp->vehicleactionlist_ai.length == smcp->waypointlist[i]->vehicleactionlist_ai.length);
-  RETURNONFAIL(owp->contingencywaypointa == smcp->waypointlist[i]->contingencywaypointa);
-  RETURNONFAIL(owp->contingencywaypointb == smcp->waypointlist[i]->contingencywaypointb);
-  RETURNONFAIL(owp->associatedtasks == smcp->waypointlist[i]->associatedtasks);
-  RETURNONFAIL(owp->associatedtasks_ai.length == smcp->waypointlist[i]->associatedtasks_ai.length);
+  RETURNONFAIL(owp->super.latitude == swp->super.latitude);
+  RETURNONFAIL(owp->super.longitude == swp->super.longitude);
+  RETURNONFAIL(owp->super.altitude == swp->super.altitude);
+  RETURNONFAIL(owp->super.altitudetype == swp->super.altitudetype);
+  RETURNONFAIL(owp->number == swp->number);
+  RETURNONFAIL(owp->speed == swp->speed);
+  RETURNONFAIL(owp->speedtype == swp->speedtype);
+  RETURNONFAIL(owp->climbrate == swp->climbrate);
+  RETURNONFAIL(owp->turntype == swp->turntype);
+  RETURNONFAIL(owp->vehicleactionlist == swp->vehicleactionlist);
+  RETURNONFAIL(owp->vehicleactionlist_ai.length == swp->vehicleactionlist_ai.length);
+  RETURNONFAIL(owp->contingencywaypointa == swp->contingencywaypointa);
+  RETURNONFAIL(owp->contingencywaypointb == swp->contingencywaypointb);
+  RETURNONFAIL(owp->associatedtasks == swp->associatedtasks);
+  RETURNONFAIL(owp->associatedtasks_ai.length == swp->associatedtasks_ai.length);
   return true;
 }
 
@@ -257,83 +234,66 @@ bool ExhaustiveTest(MissionCommand * omcp) {
   uint64_t total_tests = (omcp->waypointlist_ai.length*(omcp->waypointlist_ai.length+1))/2;
   uint64_t ten_percent = total_tests/10;
   uint64_t tests_completed = 0;
-  MissionCommandExt smce = {};
-  MissionCommand * smcp = (MissionCommand*)&smce;
   Waypoint * ws = NULL;
-  Waypoint * len_ws = 0;
-  
-  len_ws = omcp->waypointlist_ai.length;
-  ws = calloc(sizeof(Waypoint),len_ws);
-  for(uint16_t i = 0; i < len_ws; i++) {
-    ws[i] = (omcp->waypointlist[i])*;
+  Waypoint * ws_seg = NULL;
+  uint16_t ws_len = 0;
+  /* Convert the mission command into an array of waypoints. */
+  ws_len = omcp->waypointlist_ai.length;
+  ws = calloc(sizeof(Waypoint),ws_len);
+  for(uint16_t i = 0; i < ws_len; i++) {
+    ws[i] = *(omcp->waypointlist[i]);
   }
+  
   
   /* For each subsequence length less than or equal to the total
      number of waypoints. */
   for(uint16_t i = 2 ; i <= omcp->waypointlist_ai.length ; i++) {
     int64_t last_subseq_id = omcp->firstwaypoint;
-    MCEInit(&smce,i);
-    Waypoint ** tmp = smce.missioncommand.waypointlist;
-    smce.missioncommand = *omcp;
-    smce.missioncommand.waypointlist = tmp;
-    
-    
+    ws_seg = calloc(sizeof(Waypoint),i);        
     for(uint16_t j = 1 ; j < i ; j++) {
-      MCWaypointSubSequence(ws,
-                            ws_len,
-                            omcp->firstwaypoint,
-                            i,
-                            smce.waypoints);
-      smce.missioncommand.waypointlist_ai.length = i;
-      smce.missioncommand.firstwaypoint = omcp->firstwaypoint;
-      RETURNONFAIL(CheckMCWaypointSubSequence(omcp,
-                                              smcp,
+      AutoPilotMissionCommandSegment(ws,
+                                     ws_len,
+                                     omcp->firstwaypoint,
+                                     ws_seg,
+                                     i);
+      RETURNONFAIL(MissionCommandSegmentCheck(ws,
+                                              ws_len,
                                               omcp->firstwaypoint,
+                                              ws_seg,
                                               i));
 
       last_subseq_id = omcp->firstwaypoint;
-      wp = FindWP(ws,ws_len,last_subseq_id);
+      wp = FindWaypoint(ws,ws_len,last_subseq_id);
       RETURNONFAIL(wp != NULL);
-      GetMCWaypointSubSequence(ws,
-                               len_ws,
-                               last_subseq_id,
+      AutoPilotMissionCommandSegment(ws,
+                               ws_len,
                                wp->number,
-                               i,
-                               smce.waypoints);
-      smce.missioncommand.waypointlist_ai.length = i;
-      smce.missioncommand.firstwaypoint = wp->number;
-      
+                               ws_seg,
+                               i);      
 
       uint16_t c = 0;
       uint16_t n = 0;
       for(uint16_t k = 0 ; k < j ; k++) {
         n++;
         c++;
-        wp = FindWP(ws,len_ws,wp->nextwaypoint);
+        wp = FindWaypoint(ws,ws_len,wp->nextwaypoint);
         RETURNONFAIL(wp != NULL);
       }
       while(wp->number != wp->nextwaypoint) {
-        bool flag = GetMCWaypointSubSequence(ws,
-                                             len_ws
-                                             last_subseq_id,
-                                             wp->number,
-                                             i,
-                                             smce.waypoints);
-        if(n < i/2) {
-          RETURNONFAIL(flag != true);
-        } else  {
-          n = 0;
-          last_subseq_id = wp->number;
-          RETURNONFAIL(flag == true);
-          RETURNONFAIL(CheckMCWaypointSubSequence(omcp,
-                                                  smcp,
-                                                  last_subseq_id,
-                                                  i));
-        }
+        AutoPilotMissionCommandSegment(ws,
+                                       ws_len,
+                                       wp->number,
+                                       ws_seg,
+                                       i);
+        RETURNONFAIL(MissionCommandSegmentCheck(ws,
+                                                ws_len,
+                                                wp->number,
+                                                ws_seg,
+                                                i));
         for(uint16_t k = 0 ; k < j ; k++) {
           c++;
           n++;
-          wp = FindWP(ws, len_ws,wp->nextwaypoint);
+          wp = FindWaypoint(ws, ws_len,wp->nextwaypoint);
           RETURNONFAIL(wp != NULL);
         }
       }
@@ -344,10 +304,8 @@ bool ExhaustiveTest(MissionCommand * omcp) {
         fflush(stdout);
       }
     }
-    free(smce.waypoints);
-    smce.waypoints = NULL;
-    free(smce.missioncommand.waypointlist);
-    smce.missioncommand.waypointlist = NULL;
+    free(ws_seg);
+    ws_seg = NULL;
   }
   free(ws);
   return true;
@@ -377,4 +335,4 @@ int main(void) {
     return 0;
 }
 
-#endif /* __MISSIONCOMMANDUTILS_TESTS__ */
+#endif /* __WAYPOINTMANAGERUTILS_TESTS__ */

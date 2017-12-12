@@ -181,6 +181,36 @@ lemma waypoints_window_aux_success_more_than_one:
   apply(cases rule:waypoints_window_aux.elims)
   by (auto split:option.splits)
     
+lemma waypoints_window_aux_success_just_one:
+  "waypoints_window_aux ws i (Suc 0) = Some win \<Longrightarrow> \<exists> w. find_waypoint ws i = Some w \<and> win = [w]"
+  apply(cases rule:waypoints_window_aux.elims)
+  by (auto split:option.splits)
+
+    
+lemma waypoints_window_aux_success_length:"waypoints_window_aux ws i len = Some win \<Longrightarrow> length win = len"
+proof (induct len arbitrary:i win)
+  case 0
+  then show ?case by auto
+next
+  case (Suc len)
+  have "0 = len \<or> 0 < len" by auto
+  thus ?case
+  proof
+    assume y1:"0 = len"
+    then have y2:"waypoints_window_aux ws i (Suc 0) = Some win" using Suc by auto
+    obtain w where "win = [w]" using waypoints_window_aux_success_just_one[OF y2] by auto
+    thus ?case using y1 by simp
+  next
+    assume y1:"0 < len"
+    then obtain len' where y2:"len = Suc len'"
+      using gr0_implies_Suc by blast
+    then have y3:"find_waypoint ws i = Some (hd win) \<and> waypoints_window_aux ws (get_nextwp (hd win)) (Suc len') = Some (tl win)" 
+      using waypoints_window_aux_success_more_than_one Suc by blast
+    then have "length (tl win) = len" using Suc y2 by blast
+    thus ?case using y3 y1 by auto
+  qed
+qed
+    
 lemma waypoint_window_aux_nextwp:
 "waypoints_window_aux ws i len = Some win \<Longrightarrow>
   \<forall> j < len.  (0 < j \<longrightarrow> Some (win ! j) = find_waypoint ws (get_nextwp (win ! (j - 1))))
@@ -221,7 +251,18 @@ fun waypoints_window :: "'w list \<Rightarrow> 'id \<Rightarrow> nat \<Rightarro
   "waypoints_window ws i len = 
     (case waypoints_window_aux ws i len of 
       None \<Rightarrow> None
-    | Some ws \<Rightarrow> Some (butlast ws @ [ update_nextwp (last ws) (get_nextwp (last ws)) ]))"
+    | Some ws \<Rightarrow> Some (butlast ws @ [ update_nextwp (last ws) (get_number (last ws)) ]))"
+  
+lemma waypoints_window_aux_to_waypoints_window_success_rel:
+"Some win' = waypoints_window_aux ws i len \<Longrightarrow> Some win = waypoints_window ws i len \<Longrightarrow> win = butlast win' @ [ update_nextwp (last win') (get_number (last win')) ]"
+  apply(cases rule:waypoints_window_aux.elims) by (auto split: option.splits)
+ 
+lemma waypoints_window_aux_to_waypoints_window_success:
+"Some win' = waypoints_window_aux ws i len \<Longrightarrow> \<exists> win. Some win = waypoints_window ws i len \<and> win = butlast win' @ [ update_nextwp (last win') (get_number (last win')) ]"
+  apply(cases rule:waypoints_window_aux.elims)
+     apply(auto split: option.splits)
+      by metis+
+
   
 end
   
