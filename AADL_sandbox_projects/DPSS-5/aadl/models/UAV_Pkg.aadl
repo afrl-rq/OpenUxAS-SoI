@@ -140,9 +140,9 @@ public
 			guarantee "Position formula":
 				pos = (initial_position -> 
 						(if pre_direction = 1 then
-							pre_pos + DPSS_Constants.V*(time - pre(time))
+							pre_pos + DPSS_Constants.V*deltaT
 						else --pre_direction = -1
-							pre_pos - DPSS_Constants.V*(time - pre(time))));
+							pre_pos - DPSS_Constants.V*deltaT));
 			
 		**};
 		
