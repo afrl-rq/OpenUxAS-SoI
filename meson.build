@@ -8,7 +8,7 @@ os = target_machine.system()
 
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-  link_args += ['-lrt', '-ldl', '-lbsd']
+  link_args += ['-lrt', '-ldl']
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
@@ -143,6 +143,7 @@ if os == 'darwin'
 elif os.startswith('linux')
   if not (target_machine.cpu_family() == 'arm')
     deps += [dependency('glu')]
+    deps += [dependency('libbsd')]
   endif
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]

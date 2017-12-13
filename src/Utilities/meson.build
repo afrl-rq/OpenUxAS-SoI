@@ -29,8 +29,13 @@ incs_utilities = [
   ),
 ]
 
+deps_utilities = [
+    dep_boost,
+]
+
 if get_option('afrl_internal')
   incs_utilities += incs_utilities_internal
+  deps_utilities += deps_utilities_internal
 else
   srcs_utilities_internal = files()
 endif
@@ -50,9 +55,7 @@ lib_utilities = static_library(
   'utilities',
   srcs_utilities,
   srcs_utilities_internal,
-  dependencies: [
-    dep_boost,
-  ],
+  dependencies: deps_utilities,
   cpp_args: cpp_args,
   include_directories: incs_utilities,
 )
