@@ -3,7 +3,6 @@ public
 	with DPSS_Data_Types;
 	with Base_Types;
 	with DPSS_Constants;
-	with DPSS_Node_Lib;
 	 
 	system UAV
 		features
@@ -69,19 +68,8 @@ public
 			--Previous position
 			eq pre_pos : DPSS_Data_Types::Position_Type =
 				prev(pos, initial_position);
-				
-			--Previous goal
-			eq pre_goal : DPSS_Data_Types::Position_Type =
-				prev(goal, (if direction = 1 then P else 0.0));
-			
+
 			eq deltaT : real = 0.0 -> time - pre(time);
-			
-			eq time_until_UAV_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction, 
-					pre_pos, 
-					pre_goal
-				);
 							
 			-----------------------------------------------------
 			--ASSUMPTIONS
