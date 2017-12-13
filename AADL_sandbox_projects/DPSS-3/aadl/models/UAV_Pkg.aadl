@@ -3,7 +3,6 @@ public
 	with DPSS_Data_Types;
 	with Base_Types;
 	with DPSS_Constants;
-	with DPSS_Node_Lib;
 	 
 	system UAV
 		features
@@ -38,24 +37,13 @@ public
 			--Previous position
 			eq pre_pos : DPSS_Data_Types::Position_Type =
 				prev(pos, initial_position);
-				
-			--Previous goal
-			eq pre_goal : DPSS_Data_Types::Position_Type =
-				prev(goal, (if direction = 1 then DPSS_Constants.P_GLOBAL else 0.0));
 			
 			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep. 
 			eq meet_LN : bool = (pos_LN = pos); --Meet left neighbor?
 			eq meet_RN : bool = (pos_RN = pos); --Meet right neighbor?
 			
 			eq deltaT : real = 0.0 -> time - pre(time);
-			
-			eq time_until_UAV_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction, 
-					pre_pos, 
-					pre_goal
-				);
-							
+					
 			-----------------------------------------------------
 			--ASSUMPTIONS
 			-----------------------------------------------------		
