@@ -1,7 +1,6 @@
 project('minizip', 'c')
 
 minizip_src = [
-        'crypt.c',
 	'ioapi.c',
 	'ioapi_buf.c',
 	'ioapi_mem.c',
@@ -9,7 +8,10 @@ minizip_src = [
 	'zip.c',
 ]
 
-c_args = []
+c_args = [
+  '-DNOCRYPT',
+  '-DNOUNCRYPT',
+]
 
 os = target_machine.system()
 if os == 'windows'

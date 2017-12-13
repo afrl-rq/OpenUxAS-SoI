@@ -143,7 +143,6 @@ if os == 'darwin'
 elif os.startswith('linux')
   if not (target_machine.cpu_family() == 'arm')
     deps += [dependency('glu')]
-    deps += [dependency('libbsd')]
   endif
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
