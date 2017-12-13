@@ -200,6 +200,7 @@ public
 				and 0.0 <= pos_UAV3 
 				and pos_UAV3 <= P_GLOBAL;
 			
+			--Commenting this one out results in unknown consistency for this component instead of known INconsistency. 
 			guarantee "UAVs stay in order":
 				pos_UAV1 <= pos_UAV2
 				and pos_UAV2 <= pos_UAV3;
