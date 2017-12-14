@@ -31,6 +31,7 @@ macro_rules! debug_println {
 pub enum WaypointPlanManagerService {}
 
 #[repr(C)]
+#[derive(Debug)]
 pub struct WaypointPlanManager {
     mission_segments: Vec<lmcp::MissionCommand>,
     id_mission_segment_current: i64,
@@ -142,23 +143,32 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
 
             lmcp::Message::AfrlCmasiAirVehicleState(ref avs) => {
                 if avs.id() == manager.vehicle_id {
-                    if manager.is_move_to_next_waypoint {
-                        if let Some(waypoint_id_next) = manager.get_next_waypoint_id(avs.current_waypoint()) {
-                            manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_next);
+                    debug_println!("AirVehicleState received for vehicle");
+                    // don't override a pending mission command to
+                    // send, otherwise state messages race with the
+                    // initial segment from the automation response
+                    if manager.next_mission_command_to_send.is_none() {
+                        if manager.is_move_to_next_waypoint {
+                            if let Some(waypoint_id_next) = manager.get_next_waypoint_id(avs.current_waypoint()) {
+                                manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_next);
+                            }
+                            manager.is_move_to_next_waypoint = false;
+                        } else {
+                            debug_println!("get_current_segment({})", avs.current_waypoint);
+                            manager.next_mission_command_to_send = manager.get_current_segment(avs.current_waypoint);
                         }
-                        manager.is_move_to_next_waypoint = false;
-                    } else {
-                        manager.next_mission_command_to_send = manager.get_current_segment(avs.current_waypoint);
                     }
                 }
             },
 
             lmcp::Message::AfrlCmasiAutomationResponse(ref rsp) => {
+                debug_println!("AutomationResponse received");
                 if let Some(mission) = rsp.mission_command_list.iter()
                     .find(|m| m.vehicle_id() == manager.vehicle_id)
                 {
                     if manager.initialize_plan(mission.as_ref(), wps) {
                         let waypoint_id_current = mission.waypoint_list()[0].number();
+                        debug_println!("initial waypoint_id_current = {}", waypoint_id_current);
                         manager.next_mission_command_to_send = manager.get_current_segment(waypoint_id_current);
                     }
                 }
@@ -167,6 +177,7 @@ pub extern "C" fn waypoint_plan_manager_process_received_lmcp_message(
             // If we get a MissionCommand, we want to initialize
             // our internal state from that message
             lmcp::Message::AfrlCmasiMissionCommand(ref cmd) if cmd.vehicle_id == manager.vehicle_id => {
+                debug_println!("MissionCommand received");
                 if manager.initialize_plan(cmd, wps) {
                     let waypoint_id_current = cmd.waypoint_list[0].number();
                     if let Some(segment) = manager.get_current_segment(waypoint_id_current) {
