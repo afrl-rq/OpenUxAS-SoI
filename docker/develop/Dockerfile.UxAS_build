@@ -1,0 +1,16 @@
+FROM ubuntu:xenial
+
+USER root
+WORKDIR /UxAS
+
+COPY InstallLibraries/ /UxAS/Installation/InstallLibraries/
+
+RUN apt-get update -y -q && apt-get install -y -q git-all build-essential  bash-completion unzip zip curl wget libtbb-dev \
+cmake-curses-gui gdb valgrind vim exuberant-ctags google-mock libgtest-dev libglu1-mesa-dev uuid-dev pkg-config python-dev python3-pip\
+ && apt-get clean \
+ && pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.42.1/meson-0.42.1.tar.gz \
+ && pip3 install ninja \
+ && chmod -R +x /UxAS/Installation/InstallLibraries/ \
+ && cd /UxAS/Installation/InstallLibraries/ \
+ && ./00_InstallDependencies.sh NO_SUDO
+
