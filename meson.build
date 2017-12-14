@@ -6,28 +6,30 @@ link_args = []
 
 os = target_machine.system()
 
+if get_option('use_geographic_libraries')
+    add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
+		link_args += [
+      	 '-l:libgdal.a','-l:libGeographic.a','-l:libexpat.a','-l:libz.a']
+endif
+
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
 	if get_option('internal_3rd_libraries')
     #message('@@@@@ internal_3rd_libraries @@@@@')
 		link_args += ['-lrt', '-ldl']
   	else
-      #message('@@@@@ external_3rd_libraries @@@@@')
+      message('@@@@@ external_3rd_libraries @@@@@')
   		link_args += [
-          '-lboost_filesystem','-lboost_regex', '-lboost_system', 
-  				'-lzmq','-lczmq','-lzyre',
-          '-lSQLiteCpp','-lsqlite3',
-          '-lgtest',
+          '-l:libboost_filesystem.a','-l:libboost_regex.a', '-l:libboost_system.a', 
+  				'-l:libzmq.a','-l:libczmq.a','-l:libzyre.a',
+          '-l:libSQLiteCpp.a','-l:libsqlite3.a',
+          '-l:libgtest.a',
   				'-lrt', '-ldl']
 	endif
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
-  link_args += []
-endif
-
-if get_option('use_geographic_libraries')
-    add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
+  #link_args += []
 endif
 
 if get_option('afrl_internal')
@@ -214,6 +216,11 @@ if get_option('internal_3rd_libraries')
       '3rd/SQLiteCpp-1.3.1/include',
     )
 endif
+
+      message('@@@@@ link_args [[ @@@@@')
+      message(link_args)
+      message('@@@@@ ]] link_args @@@@@')
+
 
 executable(
   'uxas',
