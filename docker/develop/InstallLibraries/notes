@@ -1,0 +1,6 @@
+
+AUTOTOOLS:
+- needs $_SUDO apt install libtool-bin
+
+BOOST:
+apt-get -y install build-essential g++ gcc libicu-dev libbz2-dev
