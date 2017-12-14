@@ -42,7 +42,7 @@ public
 			eq meet_LN : bool = (pos_LN = pos); --Meet left neighbor?
 			eq meet_RN : bool = (pos_RN = pos); --Meet right neighbor?
 			
-			eq deltaT : real = 0.0 -> time - pre(time);
+		--	eq deltaT : real = 0.0 -> time - pre(time);
 					
 			-----------------------------------------------------
 			--ASSUMPTIONS
@@ -128,9 +128,9 @@ public
 			guarantee "Position formula":
 				pos = (initial_position -> 
 						(if pre_direction = 1 then
-							pre_pos + DPSS_Constants.V*deltaT
+							pre_pos + DPSS_Constants.V*(time - pre(time))
 						else --pre_direction = -1
-							pre_pos - DPSS_Constants.V*deltaT));
+							pre_pos - DPSS_Constants.V*(time - pre(time))));
 			
 		**};
 		
