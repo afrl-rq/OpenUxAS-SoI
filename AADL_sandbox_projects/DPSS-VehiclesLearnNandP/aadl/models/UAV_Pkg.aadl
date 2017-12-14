@@ -68,9 +68,7 @@ public
 			--Previous position
 			eq pre_pos : DPSS_Data_Types::Position_Type =
 				prev(pos, initial_position);
-
-			eq deltaT : real = 0.0 -> time - pre(time);
-							
+						
 			-----------------------------------------------------
 			--ASSUMPTIONS
 			-----------------------------------------------------		
@@ -142,9 +140,9 @@ public
 			guarantee "Position formula":
 				pos = (initial_position -> 
 						(if pre_direction = 1 then
-							pre_pos + DPSS_Constants.V*deltaT
+							pre_pos + DPSS_Constants.V*(time - pre(time))
 						else --pre_direction = -1
-							pre_pos - DPSS_Constants.V*deltaT));
+							pre_pos - DPSS_Constants.V*(time - pre(time))));
 			
 			guarantee "numLeft formula":
 				numLeft = if meet_LN then numLeft_LN + 1 else pre_numLeft;
