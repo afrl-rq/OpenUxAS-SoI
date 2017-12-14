@@ -180,7 +180,7 @@ BEGIN
   % messages to Route Plan Response messages.
   route_request_and_route_plan_requests_to_route_plan_responses(route_requests: route_request_message_set,
                                                                 route_plan_requests: route_request_to_set_of_route_plan_requests(route_requests)): TYPE =
-    [(member?(route_requests)), (member?(route_plan_requests(route_requests))) -> (member?(route_plan_response_message_set(route_plan_requests(route_requests))))]
+    [rr: (member?(route_requests)), (member?(route_plan_requests(rr))) -> (member?(route_plan_response_message_set(route_plan_requests(rr))))]
 
 
   % RA3: The configuration shall correlate RoutePlanReponses with 
