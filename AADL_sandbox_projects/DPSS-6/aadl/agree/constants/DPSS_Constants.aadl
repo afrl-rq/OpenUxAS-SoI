@@ -1,0 +1,19 @@
+package DPSS_Constants
+public
+	
+	with Base_Types;
+	with DPSS_Data_Types;
+	
+	annex agree {**
+			
+		const P_GLOBAL : Base_Types::Float = 10.0;	
+		const V : Base_Types::Float = 1.0; --velocity
+		const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_GLOBAL/V;
+		const LEFT : int = -1;
+		const RIGHT : int = 1;
+		const N_int : int = 6; --Number of vehicles
+		const N_real : real = 6.0; --Number of vehicles
+		
+	**};
+	
+end DPSS_Constants;
