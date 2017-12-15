@@ -13,13 +13,230 @@ autocorres[ts_rules = nondet, unsigned_word_abs = FillWindow FindWaypoint GroomW
  * will not alter the original mission command.
  * NB: I am assuming that maximum array size for LCMP messages is 2^16-1
  *)
-lemma sanity_check_waypoint_size:"USHORT_MAX * size_of TYPE(Waypoint_struct_C) \<le> UINT_MAX"
+lemma sanity_check_waypoint_size:"USHORT_MAX * size_of TYPE(Waypoint_struct_C) < UINT_MAX"
   apply(unfold USHORT_MAX_def UINT_MAX_def) by simp
 
-(* If the above lemma holds then this lemma will be true. Though I am not sure how to prove it. *)
-lemma ptr_offset_equality:"a \<le> USHORT_MAX \<Longrightarrow> b \<le> USHORT_MAX  \<Longrightarrow> (p::Waypoint_struct_C ptr) +\<^sub>p a = p +\<^sub>p b \<Longrightarrow> a = b"
-  sorry   
+lemma uxas_array_length_lt_uint_max:"a \<le> USHORT_MAX \<Longrightarrow> a * size_of TYPE(Waypoint_struct_C) < UINT_MAX"
+  using sanity_check_waypoint_size by auto
 
+lemma word32_addition_ineq1:"(p1::32 word) \<noteq> p2 \<Longrightarrow> x < UINT_MAX \<Longrightarrow> (p1::32 word) + of_nat x \<noteq> p2 + of_nat x"
+ by simp    
+    
+lemma word32_identity1:"(p::32 word) = 0xffffffff \<or> p < 0xffffffff"
+  proof(induct p)
+    case 1
+    then show ?case by auto
+  next
+    case (2 p)
+    then have "p = 0xFFFFFFFF \<or> p < 0xFFFFFFFF" by auto
+    thus ?case
+    proof
+      assume "p = 0xFFFFFFFF"
+      then have "1 + p = 0" by auto
+      thus ?case using 2 by auto
+    next
+      assume "p < 0xFFFFFFFF"
+      then have "p + 1 \<le> 0xFFFFFFFF" using inc_le by blast
+      then have "1 + p \<le> 0xFFFFFFFF" by (simp add: add.commute)
+      thus ?case by auto
+    qed
+  qed
+
+    
+    
+lemma word32_identity2:"(p::32 word) = 0xffffffff \<Longrightarrow> p + 1 = 0" by simp
+
+lemma max_word32_to_nat:"unat (0xFFFFFFFF::32 word) = 4294967295"
+  by auto
+    
+lemma of_nat_eq_overflow_or_not:"(of_nat y::32 word)  = x \<Longrightarrow> (4294967295 < y \<or> y = unat x)"
+ proof(induct y arbitrary: x)
+   case 0
+   then show ?case by auto
+ next
+   case (Suc y)
+   then have "4294967295 < y \<or> y = unat (x - 1)"  by fastforce
+   thus ?case
+   proof
+     assume "4294967295 < y"
+     thus ?case by auto
+   next
+     assume a1:"y = unat (x - 1)"
+     then have "x < x - 1 \<or> x - 1 < x" using sub_wrap_lt by fastforce
+     thus ?case
+     proof
+       assume "x < x - 1" 
+       then have "x = 0" by (meson le_less measure_unat not_le word_less_nat_alt)
+       then have y1:"x - 1 = 0xFFFFFFFF" by auto
+       then have "unat (x - 1) = unat (0xFFFFFFFF::32 word)"  by (simp add: y1)
+       then have "y =  4294967295" using a1 max_word32_to_nat by auto
+       thus ?case by auto
+     next
+       assume "x - 1 < x"
+       thus ?case
+         by (metis a1 Suc.prems Suc_lessI less_irrefl unat_mono word_of_nat_less)
+     qed
+   qed
+ qed
+    
+lemma of_nat_ltword32max_zero_identity:"y \<le> 4294967295 ==> 0 = (of_nat y::32 word) \<Longrightarrow> 0 = y"
+  using of_nat_eq_overflow_or_not  by (metis not_le unat_0)
+    
+lemma no_overflow_of_nat_identity:"x \<le> 4294967295 \<Longrightarrow> y \<le> 4294967295 ==> of_nat x = (of_nat y::32 word) \<Longrightarrow> x = y"
+proof(induct x arbitrary: y)
+  case 0
+  then show ?case by (auto simp add: of_nat_ltword32max_zero_identity)
+next
+  case (Suc x)
+  then have "y = 0 \<or> 0 < y" by auto
+  thus ?case
+  proof
+    assume "y = 0"
+    thus ?case using Suc by (metis of_nat_ltword32max_zero_identity semiring_1_class.of_nat_0)
+  next
+    assume a1:"0 < y"
+    then obtain y' where y1:"y' = y - 1" by auto
+    then have y2:"x \<le> 4294967295" using Suc by auto
+    then have y3:"y' \<le> 4294967295" using Suc y1 by auto
+    then have y4:"x = y'"
+      by (metis (no_types) Suc_eq_plus1 UINT_MAX_def a1 add.commute add.left_neutral add_diff_cancel_left' le_less linorder_not_le local.Suc(1) local.Suc(2) local.Suc(4) not_less_eq of_nat_add of_nat_diff y1 y3)
+    thus ?case using Suc y1 Suc_diff_1 a1 by blast
+  qed
+qed
+
+lemma nat_word_ineq:"x < 4294967295 \<Longrightarrow> ((of_nat x::32 word) < 0xFFFFFFFF)"
+proof (induct x)
+  case 0
+  then show ?case by auto
+next
+  case (Suc x)
+  then have y1:"x < 4294967294" by auto
+  then have y2:"x < 4294967295" by auto
+  then have y3:"((of_nat x::32 word) < 0xFFFFFFFF)" using Suc by auto
+  then have "\<And>n. (1::32 word) + numeral (num.Bit0 n) = numeral (num.Bit1 n) + 0"
+      by simp
+  then have "(of_nat x::32 word) = 0xFFFFFFFE \<or> (of_nat x::32 word) < 0xFFFFFFFE"
+      by (metis (no_types)  y3 add.commute add.left_neutral inc_le le_less linorder_not_le)
+   thus ?case
+   proof
+     assume a1:"(of_nat x::32 word) = 0xFFFFFFFE"
+     then have "of_nat x = (of_nat 4294967294::32 word)" by auto
+     then have "x = 4294967294" using a1 y2 no_overflow_of_nat_identity by auto
+     thus ?case using Suc by auto
+   next
+     assume a1:"(of_nat x::32 word) < 0xFFFFFFFE"
+     thus ?case
+       by (metis add.commute add_diff_cancel_left' eval_nat_numeral(3) inc_le linorder_not_le of_nat_Suc of_nat_numeral word32_identity1)
+   qed
+qed
+
+lemma word32_addition_ineq2:"x < UINT_MAX \<Longrightarrow> (p::32 word) \<noteq> p + of_nat x \<or> x = 0"
+proof(induct x)
+  case 0
+  then show ?case by auto
+next
+  case (Suc x)
+  then have y1:"x < UINT_MAX" by auto
+  then have "x = 0 \<or> 0 < x" by auto
+  thus ?case
+  proof
+    assume "x = 0"
+    then have "p \<noteq> p + of_nat (Suc x)" by auto
+    thus ?case by auto
+  next
+    assume a1:"0 < x"
+    then have "p \<noteq> p + of_nat x" using Suc y1 by auto
+    then have y2:"p \<noteq> p + of_nat x \<or> x = 0" using Suc y1 by auto
+    thus ?case
+    proof
+      assume "p \<noteq> p + of_nat x"
+      have "\<exists>w. of_nat x < (w::32 word)"
+          using UINT_MAX_def nat_word_ineq y1 by auto
+      thus ?case
+        by (metis (no_types)  Suc nat_word_ineq add.commute add_cancel_right_right add_diff_cancel_right' 
+            add_uminus_conv_diff of_nat_Suc word_not_simps(3))
+    next
+      assume "x = 0"
+      thus ?case using a1 by blast
+    qed
+  qed
+qed
+  
+lemma ptr_ushort_offset_equality_is_zero:
+  assumes a1:"a \<le> USHORT_MAX"
+  and a2:"(p::Waypoint_struct_C ptr) = p +\<^sub>p a"
+  shows "a = 0"
+proof -
+  have y1:"a * size_of TYPE(Waypoint_struct_C) < UINT_MAX" using a1 uxas_array_length_lt_uint_max by fastforce  
+  then have "ptr_val p \<noteq> ptr_val p + of_nat a * of_nat (size_of TYPE(Waypoint_struct_C)) \<or> a = 0" using word32_addition_ineq2 
+  by fastforce 
+  thus ?thesis
+  proof
+    assume "ptr_val p \<noteq> ptr_val p + of_nat a * of_nat (size_of TYPE(Waypoint_struct_C))" 
+    then have "ptr_val p \<noteq> ptr_val p + of_int (int a) * of_nat (size_of TYPE(Waypoint_struct_C))" by auto 
+    then have "(Ptr(ptr_val p)::Waypoint_struct_C ptr) \<noteq> Ptr(ptr_val p + of_int (int a) * of_nat (size_of TYPE(Waypoint_struct_C)))" by blast
+    then have "(p::Waypoint_struct_C ptr) \<noteq> p +\<^sub>p a" by (simp add: CTypesDefs.ptr_add_def)
+    thus ?thesis using a2 by auto
+  next
+    assume "a = 0"
+    thus ?thesis by auto
+  qed
+qed
+  
+lemma add_identity:
+  assumes a1:" (p::Waypoint_struct_C ptr) +\<^sub>p ((a  + 1)::nat) = p +\<^sub>p (b::nat)"
+  shows "p +\<^sub>p int a = p +\<^sub>p (int b - 1)" 
+proof -
+  have "Ptr(ptr_val p + of_nat (a + 1) * of_nat (size_of TYPE(Waypoint_struct_C))) = Ptr(ptr_val p + of_nat b * of_nat (size_of TYPE(Waypoint_struct_C)))"
+    using a1 by (simp add: CTypesDefs.ptr_add_def)
+    have "ptr_val p + of_int (int ((1 + a) * size_of (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) = ptr_val p + of_int (int (b * size_of (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself)))"
+      using \<open>Ptr (ptr_val p + of_nat (a + 1) * of_nat (size_of TYPE(Waypoint_struct_C))) = Ptr (ptr_val p + of_nat b * of_nat (size_of TYPE(Waypoint_struct_C)))\<close> by force
+    then have "Ptr(ptr_val p + of_nat a * of_nat (size_of TYPE(Waypoint_struct_C)) + of_nat (size_of TYPE(Waypoint_struct_C))) = Ptr(ptr_val p + of_nat b * of_nat (size_of TYPE(Waypoint_struct_C)))"
+      by (metis (no_types) add.commute add.left_commute of_int_of_nat_eq of_nat_add of_nat_mult semiring_normalization_rules(3))
+      have f1: "\<And>w wa wb. (w::32 word) + wa + - wb = w + (wa + - wb)"
+        by simp
+      have f2: "\<And>w wa. (w::32 word) + (wa + - w) = wa"
+        by simp
+      have f3: "Ptr (ptr_val p + of_nat a * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) + of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself)))) = (Ptr (ptr_val p + of_nat b * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))))::Waypoint_struct_C ptr)"
+        using \<open>Ptr (ptr_val p + of_nat a * of_nat (size_of TYPE(Waypoint_struct_C)) + of_nat (size_of TYPE(Waypoint_struct_C))) = Ptr (ptr_val p + of_nat b * of_nat (size_of TYPE(Waypoint_struct_C)))\<close> by force
+      have f4: "\<And>w wa. - (w::32 word) + - wa = - (w + wa)"
+        by simp
+      have f5: "\<And>w wa. (w::32 word) + - (wa + w) = - wa"
+        by auto
+      have "ptr_val p + (of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) + of_nat a * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself)))) = ptr_val p + of_nat b * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself)))"
+        using f3 by (simp add: add.commute)
+      then have "of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) + (of_nat a * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) + - (ptr_val p + of_nat b * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))))) = - ptr_val p"
+        using f5 f1 by (metis (no_types))
+      then have "of_nat a * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) + - (ptr_val p + (- ptr_val p + of_nat b * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))))) = - of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself)))"
+        using f5 f4 f1 by (metis (no_types) add.commute)
+      then have "ptr_val p + (- ptr_val p + (of_nat b * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))) + - of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself))))) = of_nat a * of_nat (size_td (typ_info_t (TYPE(Waypoint_struct_C)::Waypoint_struct_C itself)))"
+        using f2 f1 by (metis (no_types))
+      then have "Ptr(ptr_val p + of_nat a * of_nat (size_of TYPE(Waypoint_struct_C))) = Ptr(ptr_val p + of_nat b * of_nat (size_of TYPE(Waypoint_struct_C)) - of_nat (size_of TYPE(Waypoint_struct_C)))"
+        by simp
+      thus ?thesis 
+        by (simp add: CTypesDefs.ptr_add_def Waypoint_struct_C_typ_info mult.commute right_diff_distrib size_of_def)
+    qed
+  
+lemma ptr_offset_equality:"a \<le> USHORT_MAX \<Longrightarrow> b \<le> USHORT_MAX  \<Longrightarrow> (p::Waypoint_struct_C ptr) +\<^sub>p a = p +\<^sub>p b \<Longrightarrow> a = b"
+proof(induct a arbitrary: b)
+  case 0
+  then show ?case using ptr_ushort_offset_equality_is_zero by auto
+next
+  case (Suc a)
+  then have y1:"p +\<^sub>p (int a  + 1) = p +\<^sub>p int b" by (metis Suc_eq_plus1 of_nat_1 of_nat_add)
+  then have y2:"b = 0 \<or> 0 < b" by auto
+  thus ?case
+  proof
+    assume "b = 0"
+    thus ?case by (metis of_nat_eq_0_iff ptr_add_0_id ptr_ushort_offset_equality_is_zero Suc)
+  next
+    assume a1:"0 < b"
+    then have "p +\<^sub>p int a = p +\<^sub>p (int b - 1)" using y1 add_identity by (metis Suc_eq_plus1 local.Suc(4))
+    then have "a = b - 1" by (metis Suc One_nat_def Suc_pred a1 linorder_not_le not_less_eq of_nat_1 of_nat_diff order_le_less)
+    thus ?case by (simp add: a1)
+  qed
+qed
+  
 (* A subset of what we expect a valid mission command to entail. I.E, the ptr to the front
  * of the waypoint pointer array is valid, all elements in that array are valid and all pointers
  * to waypoints are valid. 

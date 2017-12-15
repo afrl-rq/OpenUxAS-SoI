@@ -161,10 +161,37 @@ lemma validNF_guard_bind[wp]:"\<lbrace>\<lambda> s. A s \<and> f s\<rbrace> g ()
   by (wp | auto)+
     
 
-lemma validNF_modify[wp]:"\<forall> s'. \<lbrace> \<lambda> s. P s' \<and> s = f s' \<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> modify f; g od \<lbrace> Q \<rbrace>!"
-  apply (rule validNF_bind[where B="\<lambda> _ s. \<exists> s'. P s' \<and> s = f s'"])
-  sorry
+(* Sledgehammer heads off down some rabbit hole. *) 
+lemma all_imp_exs:"\<forall> s'. \<lbrace>P s'\<rbrace> g \<lbrace>Q\<rbrace>! \<Longrightarrow> \<lbrace>\<lambda>s. \<exists> s'. P s' s\<rbrace> g \<lbrace>Q\<rbrace>!"
+proof -
+  assume a1:"\<forall> s'. \<lbrace>P s'\<rbrace> g \<lbrace>Q\<rbrace>!"
+  then have "\<exists> x. (\<forall>s. P x s \<longrightarrow> (\<forall>(r', s')\<in>fst (g s). Q r' s') \<and> \<not> snd (g s))"  by (simp add: validNF_alt_def)
+  then have "(\<forall>s. \<exists>x. P x s \<longrightarrow> (\<forall>(r', s')\<in>fst (g s). Q r' s') \<and> \<not> snd (g s))" by meson
+  then have "(\<forall>s. (\<exists>x. P x s) \<longrightarrow> (\<forall>(r', s')\<in>fst (g s). Q r' s') \<and> \<not> snd (g s))" by (meson a1 validNF_alt_def)      
+  then have "\<lbrace>\<lambda>s. \<exists>x. P x s\<rbrace> g \<lbrace>Q\<rbrace>!"  using sym[OF validNF_alt_def[where P="\<lambda> s. \<exists> x. P x s" and m=g and Q=Q]] by auto
+  thus ?thesis by auto
+qed
   
+    
+lemma validNF_modify[wp]:"\<forall> s'. \<lbrace> \<lambda> s. P s' \<and> s = f s' \<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> modify f; g od \<lbrace> Q \<rbrace>!"   
+  apply (rule validNF_bind[where B="\<lambda> _ s. \<exists> s'. P s' \<and> s = f s'"])
+  apply (rule all_imp_exs) 
+  apply simp
+proof -
+  assume "\<forall>s'. \<lbrace>\<lambda>s. P s' \<and> s = f s'\<rbrace> g \<lbrace>Q\<rbrace>!"
+  have f1: "\<not> True \<or> True"
+    by auto
+  have "\<lbrace>\<lambda>a. True\<rbrace> modify f \<lbrace>\<lambda>u a. True\<rbrace>!"
+    using no_fail_is_validNF_True no_fail_modify by blast
+  then have f2: "\<lbrace>P\<rbrace> modify f \<lbrace>\<lambda>u a. True\<rbrace>!"
+    using f1 by (meson validNF_chain)
+  have "\<lbrace>P\<rbrace> modify f \<lbrace>\<lambda>u a. \<exists>aa. P aa \<and> a = f aa\<rbrace>"
+    by blast
+  then show "\<lbrace>P\<rbrace> modify f \<lbrace>\<lambda>u a. \<exists>aa. P aa \<and> a = f aa\<rbrace>!"
+    using f2 no_fail_is_validNF_True validNF by blast
+qed
+
+    
 lemma forward_validNF_gets[wp]:"\<forall> x. \<lbrace> \<lambda> s. P s \<and> x = f s \<rbrace> g x \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> gets f; g x od \<lbrace> Q \<rbrace>!"
   apply (rule validNF_bind[where B="\<lambda> x s. P s \<and> x = f s"])
    apply blast
