@@ -1,0 +1,54 @@
+DPSS-5 Results Summary
+======================
+
+Date: 20171215
+Timestamp: 0800hrs.
+
+----------------------
+Status: Completed
+
+Analysis Run Time: 9hr 31min 33s
+
+Primary Focus: 
+- Prove Theorem 1 for Algorithm A
+- Result : Passed in Total Time (9hr 31min 33s)
+
+Summary:
+- 51 Successful Contractual Guarantees (Most in about 3s)
+- 4 Failed Lemmas (2 Observers and 2 CEs)
+-- Traces of associated found in the files listed below
+
+- Analysis Results Images:
+-- DPSS-5_Results (20171215_0800).png
+-- DPSS-5_Results (20171215_0800) AnalysisSettings.png
+-- DPSS-5_Results (20171215_0800) CE_LemmaStable22.png
+-- DPSS-5_Results (20171215_0800) CE_LemmaStable23.png
+-- DPSS-5_Results (20171215_0800) Collapsed.png
+-- DPSS-5_Results (20171215_0800) LemmaStableLess2T.png
+-- DPSS-5_Results (20171215_0800) OBS_WorstStepsConverg.png
+-- DPSS-5_Results (20171215_0800) OBS_WorstTimeConverg.png
+-- DPSS-5_Results (20171215_0800) Theorem1_AlgA.png
+
+- Observers and CounterExamples (CEs):
+-- CE_StableOnOrAfter22 (20171215_0800).xls
+-- CE_StableOnOrAfter23 (20171215_0800).xls
+-- Observer_WorstStepsConvergence (20171215_0800).xls
+-- Observer_WorstTimeConvergence (20171215_0800).xls
+
+
+System Configuration 
+--------------------
+- See SystemConfigInfo.txt for more detail
+
+Operating System: Windows 7 Pro
+
+CPU: dual (2) Intel Xeon E5-2630 V4
+- Stats per CPU (full system is running 2 of these)
+-- Base Freq: 2.20 GHz
+-- Max Turbo Freq: 3.10 GHz
+-- Number Cores: 10
+-- Number of Threads: 20 (allows for virtualization of 20 cores per CPU)
+
+Memory: 128Gb (2 kits of Kingston 64 GB PC4 2133MHz CL15 RDIMM – KVR21R15D4K4/64)
+
+OS Drive: 1TB Samsung 850 Pro SSD (MZ-7KE1T)
