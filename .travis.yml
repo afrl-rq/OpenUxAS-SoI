@@ -11,7 +11,6 @@ addons:
   apt:
     packages:
       - libglu1-mesa-dev
-      - libbsd-dev
       - uuid-dev
       - libboost-filesystem-dev
       - libboost-regex-dev

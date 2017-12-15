@@ -88,8 +88,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     sudo apt -y install libglu1-mesa-dev
     # Install unique ID creation library: in terminal
     sudo apt -y install uuid-dev
-    #Install BSD development library: in terminal
-    sudo apt -y install libbsd-dev
     # Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
     sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev
     # Install pip3: in terminal
