@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-docker build -t uxas/build -f Dockerfile.UxAS_build .
+docker build -t steveras/uxas-build:x86_64 -f Dockerfile.UxAS_build .
