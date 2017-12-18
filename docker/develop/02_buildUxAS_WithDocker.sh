@@ -10,7 +10,7 @@ if [ ! "$(docker ps -q -f name=uxas_build)" ]; then
 	  -it \
 	  -d \
 	  --name uxas_build \
-	  --mount type=bind,source="${PWD}/../../../OpenUxAS",target="/OpenUxAS"  uxas/build 
+	  --mount type=bind,source="${PWD}/../../../OpenUxAS",target="/OpenUxAS"  steveras/uxas-build:x86_64 
 fi
 
 docker exec -it uxas_build bash /OpenUxAS/docker/develop/buildUxAS.sh
