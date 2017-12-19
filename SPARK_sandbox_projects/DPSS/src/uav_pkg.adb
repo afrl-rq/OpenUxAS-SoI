@@ -66,14 +66,6 @@ package body UAV_Pkg with SPARK_Mode is
       next_position := s_pre_pos - DPSS_Constants.V*(next_time - s_pre_time);
     end if;
 
-    pragma Assert(
-      if s_pre_direction = 1 then
-        next_position = s_pre_pos + DPSS_Constants.V*(next_time - s_pre_time));
-
-    pragma Assert(
-      if s_pre_direction = -1 then
-        next_position = s_pre_pos - DPSS_Constants.V*(next_time - s_pre_time));
-
     -- Direction must go next
     if next_position <= 0.0 then
       next_direction := 1;
@@ -94,9 +86,6 @@ package body UAV_Pkg with SPARK_Mode is
     else
       next_direction := s_pre_direction;
     end if;
-
-    pragma Assert(next_direction = 1 or
-                  next_direction = -1);
 
     -- Goal goes last.
     -- If we meed our left neighbor
@@ -121,49 +110,8 @@ package body UAV_Pkg with SPARK_Mode is
 
     -- otherwise
     else
---      pragma Assert(next_direction = -1);
-
       next_goal := 0.0;
     end if;
-
-    pragma Assert(next_goal = 0.0 or
-                  next_goal = S_L or
-                  next_goal = S_R or
-                  next_goal = DPSS_Constants.P_GLOBAL);
-
-    pragma Assert(if pos_LN = next_position and
-                     next_position <= S_L
-                  then
-                    next_goal = DPSS_Constants.P_GLOBAL);
-
-    pragma Assert(if pos_LN = next_position and
-                     next_position >  S_L
-                  then
-                    next_goal = S_L);
-
-    pragma Assert(if pos_LN /= next_position and
-                     pos_RN  = next_position and
-                     next_position >= S_R
-                  then
-                    next_goal = 0.0);
-
-    pragma Assert(if pos_LN /= next_position and
-                     pos_RN  = next_position and
-                     next_position <  S_R
-                  then
-                    next_goal = S_R);
-
-    pragma Assert(if pos_LN /= next_position and
-                     pos_RN /= next_position and
-                     next_direction = 1
-                  then
-                    next_goal = DPSS_Constants.P_GLOBAL);
-
-    pragma Assert(if pos_LN /= next_position and
-                     pos_RN /= next_position and
-                     next_direction /= 1
-                  then
-                    next_goal = 0.0);
 
 
     -- Step 3: Update state elements
