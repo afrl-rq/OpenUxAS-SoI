@@ -114,24 +114,21 @@ r13 : |direction_UAV3, goal_UAV3| ==
 					pos_UAV3)	
 						
 r21 : pos_UAV1 == (initial_pos_UAV1 ->
-						if pre_direction_UAV1 == 1 
-						then 
+						if pre_direction_UAV1 == 1 then
 							pre_pos_UAV1 + V*deltaT
-						else //direction == -1
+						else //pre_direction_UAV1 == -1
 							pre_pos_UAV1 - V*deltaT)
 	
 r22 : pos_UAV2 == (initial_pos_UAV2 ->
-						if pre_direction_UAV2 == 1 
-						then 
+						if pre_direction_UAV2 == 1 then
 							pre_pos_UAV2 + V*deltaT
-						else //direction == -1
+						else //pre_direction_UAV2 == -1
 							pre_pos_UAV2 - V*deltaT)
 
 r23 : pos_UAV3 == (initial_pos_UAV3 ->
-						if pre_direction_UAV3 == 1 
-						then 
+						if pre_direction_UAV3 == 1 then
 							pre_pos_UAV3 + V*deltaT
-						else //direction == -1
+						else //pre_direction_UAV3 == -1
 							pre_pos_UAV3 - V*deltaT)
 
 Properties:

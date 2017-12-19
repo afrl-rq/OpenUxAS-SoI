@@ -87,86 +87,85 @@ Requirements:
 //The next time is the previous time plus the minimum time until a decision/change is made.
 r0 : time == (0.0 s -> previous time + deltaT)
 
-r11 : direction_UAV1 == if meet_neighbor_12
-						then if pos_UAV1 < S_12
-								then 1
-								else //pos_UAV1 >= S_12 
-									-1
-						else if pos_UAV1 <= 0.0 m
-								then 1
-								else pre_direction_UAV1
+r11 : direction_UAV1 == if meet_neighbor_12 then
+							if pos_UAV1 < S_12 then
+								1
+							else //pos_UAV1 >= S_12 
+								-1
+						else if pos_UAV1 <= 0.0 m then
+								1
+							 else
+							 	pre_direction_UAV1
 						
-r12 : direction_UAV2 == if meet_neighbor_12
-							then if pos_UAV2 <= S_12
-								then 1
-								else //pos_UAV2 > S_12
-									-1						
-							else if meet_neighbor_23
-								then if pos_UAV2 < S_23
-									then 1
-									else //pos_UAV2 >= S_23
-										-1 
-								else pre_direction_UAV2 
-
-
-r13 : direction_UAV3 == if meet_neighbor_23
-						then if pos_UAV3 > S_23
-								then -1
-								else //pos_UAV3 <= S_23 
+r12 : direction_UAV2 == if meet_neighbor_12 then
+							if pos_UAV2 <= S_12 then
+								1
+							else //pos_UAV2 > S_12
+								-1						
+						else if meet_neighbor_23 then
+								if pos_UAV2 < S_23 then
 									1
-						else if pos_UAV3 >= P_global
-							then -1
-							else pre_direction_UAV3 
+								else //pos_UAV2 >= S_23
+									-1 
+							 else pre_direction_UAV2 
+
+
+r13 : direction_UAV3 == if meet_neighbor_23 then
+							if pos_UAV3 > S_23 then
+								-1
+							else //pos_UAV3 <= S_23 
+								1
+						else if pos_UAV3 >= P_global then
+								-1
+							 else
+							 	pre_direction_UAV3 
 
 r21 : pos_UAV1 == (initial_pos_UAV1 ->
-						if pre_direction_UAV1 == 1 
-						then 
+						if pre_direction_UAV1 == 1 then
 							pre_pos_UAV1 + V*deltaT
 						else //direction == -1
 							pre_pos_UAV1 - V*deltaT)
 	
 r22 : pos_UAV2 == (initial_pos_UAV2 ->
-						if pre_direction_UAV2 == 1 
-						then 
+						if pre_direction_UAV2 == 1 then
 							pre_pos_UAV2 + V*deltaT
 						else //direction == -1
 							pre_pos_UAV2 - V*deltaT)
 
 r23 : pos_UAV3 == (initial_pos_UAV3 ->
-						if pre_direction_UAV3 == 1 
-						then 
+						if pre_direction_UAV3 == 1 then
 							pre_pos_UAV3 + V*deltaT
 						else //direction == -1
 							pre_pos_UAV3 - V*deltaT)
  
-r31 : goal_UAV1 == if meet_neighbor_12
-						then if pos_UAV1 < S_12
-								then S_12
-								else //pos_UAV1 >= S_12 
-									0.0 m
-						else if direction_UAV1 == 1
-								then P_global
-								else //direction_UAV1 == -1 
-									0.0 m 
+r31 : goal_UAV1 == if meet_neighbor_12 then
+						if pos_UAV1 < S_12 then
+							S_12
+						else //pos_UAV1 >= S_12 
+							0.0 m
+					else if direction_UAV1 == 1 then
+							P_global
+						 else //direction_UAV1 == -1 
+							0.0 m 
 
-r32 : goal_UAV2 == if meet_neighbor_12
-						then S_12
-						else if meet_neighbor_23
-								then S_23
-								else if direction_UAV2 == 1
-									then P_global
-									else //direction_UAV2 == -1 
-										0.0 m 
-							
-r33 : goal_UAV3 == if meet_neighbor_23
-						then if pos_UAV3 > S_23
-								then S_23
-								else //pos_UAV3 <= S_23 
+r32 : goal_UAV2 == 	if meet_neighbor_12 then
+						S_12
+					else if meet_neighbor_23 then
+							S_23
+						 else if direction_UAV2 == 1 then
 									P_global
-						else if direction_UAV3 == 1
-								then P_global
-								else //direction_UAV3 == -1 
+							  else //direction_UAV2 == -1 
 									0.0 m 
+							
+r33 : goal_UAV3 == 	if meet_neighbor_23 then
+						if pos_UAV3 > S_23 then
+							S_23
+						else //pos_UAV3 <= S_23 
+							P_global
+					else if direction_UAV3 == 1 then
+							P_global
+						 else //direction_UAV3 == -1 
+							0.0 m 
 
 Properties:
 Theorem_Alg_A_Three_Vehicles : time >= 1.67*Time_to_travel_full_length implies
@@ -177,4 +176,10 @@ Theorem_Alg_A_Three_Vehicles : time >= 1.67*Time_to_travel_full_length implies
 						))
 					and 
 						(deltaT == Time_to_travel_full_length/real(N))
-					)	
+					)
+
+Not_yet_stable_after_10_steps observe: counter == 9 and not (((pos_UAV1 == 0.0 m and pos_UAV2 == S_23 and pos_UAV3 == S_23)
+							and (pre_pos_UAV1 == S_12 and pre_pos_UAV2 == S_12 and pre_pos_UAV3 == P_global))
+						or ((pos_UAV1 == S_12 and pos_UAV2 == S_12 and pos_UAV3 == P_global)
+							and (pre_pos_UAV1 == 0.0 m and pre_pos_UAV2 == S_23 and pre_pos_UAV3 == S_23)
+						))	

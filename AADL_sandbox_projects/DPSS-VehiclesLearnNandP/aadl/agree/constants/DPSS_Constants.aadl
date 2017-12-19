@@ -1,0 +1,13 @@
+package DPSS_Constants
+public
+	
+	with Base_Types;
+	with DPSS_Data_Types;
+	
+	annex agree {**
+		const V : Base_Types::Float = 1.0; --velocity
+		const LEFT : int = -1;
+		const RIGHT : int = 1;
+	**};
+	
+end DPSS_Constants;

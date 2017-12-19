@@ -31,29 +31,29 @@ r0 : time == (0.0 s -> previous time + min_time(time_to_reach_endpoint(previous 
 											time_to_reach_endpoint(previous direction_UAV2, previous pos_UAV2)))
 
 r1 : direction_UAV1 == (initial_direction_UAV1 ->
-					if pos_UAV1 <= 0.0 m
-					then 1
-					else if pos_UAV1 >= P_global
-							then -1
-							else previous direction_UAV1)
+					if pos_UAV1 <= 0.0 m then
+						1
+					else if pos_UAV1 >= P_global then
+							-1
+						 else 
+						 	previous direction_UAV1)
 	
 r2 : pos_UAV1 == (initial_pos_UAV1 ->
-						if previous direction_UAV1 == 1 
-						then 
+						if previous direction_UAV1 == 1 then
 							previous pos_UAV1 + V*(time - previous time)
 						else //direction == -1
 							previous pos_UAV1 - V*(time - previous time))
 
 r3 : direction_UAV2 == (initial_direction_UAV2 ->
-					if pos_UAV2 <= 0.0 m
-					then 1
-					else if pos_UAV2 >= P_global
-							then -1
-							else previous direction_UAV2)
+					if pos_UAV2 <= 0.0 m then
+						1
+					else if pos_UAV2 >= P_global then
+							-1
+						 else
+							previous direction_UAV2)
 	
 r4 : pos_UAV2 == (initial_pos_UAV2 ->
-						if previous direction_UAV2 == 1 
-						then 
+						if previous direction_UAV2 == 1 then
 							previous pos_UAV2 + V*(time - previous time)
 						else //direction == -1
 							previous pos_UAV2 - V*(time - previous time))

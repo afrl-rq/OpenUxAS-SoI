@@ -1,6 +1,7 @@
 *.aadlbin
 *.aaxl2
 *.aadl_diagram
+*.xls
 
 UxAS_jad/.aadlbin-gen/
 UxAS_jad/instances
@@ -18,6 +19,13 @@ UxAS_responds/.aadlbin-gen/
 UxAS_responds/instances
 UxAS_responds/diagrams
 
+UxAS_responds_realtime
 UxAS_responds_realtime/.aadlbin-gen/
 UxAS_responds_realtime/instances
 UxAS_responds_realtime/diagrams
+
+UxAS_responds_errors
+
+
+
+
