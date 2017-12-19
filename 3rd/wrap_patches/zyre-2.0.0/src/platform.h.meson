@@ -1,46 +1,5 @@
 /* src/platform.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define if building universal (internal helper macro) */
-#mesondefine AC_APPLE_UNIVERSAL_BUILD
-
-/* Have AIX OS */
-#mesondefine CZMQ_HAVE_AIX
-
-/* Have Android OS */
-#mesondefine CZMQ_HAVE_ANDROID
-
-/* Have Cygwin */
-#mesondefine CZMQ_HAVE_CYGWIN
-
-/* Have FreeBSD OS */
-#mesondefine CZMQ_HAVE_FREEBSD
-
-/* Have HPUX OS */
-#mesondefine CZMQ_HAVE_HPUX
-
-/* Have Linux OS */
-#mesondefine CZMQ_HAVE_LINUX
-
-/* Have MinGW32 */
-#mesondefine CZMQ_HAVE_MINGW32
-
-/* Have NetBSD OS */
-#mesondefine CZMQ_HAVE_NETBSD
-
-/* Have OpenBSD OS */
-#mesondefine CZMQ_HAVE_OPENBSD
-
-/* Have DarwinOSX OS */
-#mesondefine CZMQ_HAVE_OSX
-
-/* Have QNX Neutrino OS */
-#mesondefine CZMQ_HAVE_QNXNTO
-
-/* Have Solaris OS */
-#mesondefine CZMQ_HAVE_SOLARIS
-
-/* Have Windows OS */
-#mesondefine CZMQ_HAVE_WINDOWS
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #mesondefine HAVE_ARPA_INET_H
@@ -129,7 +88,7 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #mesondefine HAVE__BOOL
 
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
+/* Define to the sub-directory in which libtool stores uninstalled libraries. */
 #mesondefine LT_OBJDIR
 
 /* Name of package */
@@ -153,13 +112,13 @@
 /* Define to the version of this package. */
 #mesondefine PACKAGE_VERSION
 
-/* CZMQ major version */
+/* ZYRE major version */
 #mesondefine PACKAGE_VERSION_MAJOR
 
-/* CZMQ minor version */
+/* ZYRE minor version */
 #mesondefine PACKAGE_VERSION_MINOR
 
-/* CZMQ patchlevel */
+/* ZYRE patchlevel */
 #mesondefine PACKAGE_VERSION_PATCH
 
 /* Define as the return type of signal handlers (`int' or `void'). */
@@ -173,6 +132,54 @@
 
 /* Version number of package */
 #mesondefine VERSION
+
+/* Enable militant API assertions */
+#mesondefine ZMQ_ACT_MILITANT
+
+/* Provide draft classes and methods */
+#mesondefine ZYRE_BUILD_DRAFT_API
+
+/* Have AIX OS */
+#mesondefine ZMQ_HAVE_AIX
+
+/* Have Android OS */
+#mesondefine ZMQ_HAVE_ANDROID
+
+/* Have Cygwin */
+#mesondefine ZMQ_HAVE_CYGWIN
+
+/* Have FreeBSD OS */
+#mesondefine ZMQ_HAVE_FREEBSD
+
+/* Have GNU/Hurd OS */
+#mesondefine ZYRE_HAVE_GNU
+
+/* Have HPUX OS */
+#mesondefine ZMQ_HAVE_HPUX
+
+/* Have Linux OS */
+#mesondefine ZMQ_HAVE_LINUX
+
+/* Have MinGW32 */
+#mesondefine ZMQ_HAVE_MINGW32
+
+/* Have NetBSD OS */
+#mesondefine ZMQ_HAVE_NETBSD
+
+/* Have OpenBSD OS */
+#mesondefine ZMQ_HAVE_OPENBSD
+
+/* Have DarwinOSX OS */
+#mesondefine ZMQ_HAVE_OSX
+
+/* Have QNX Neutrino OS */
+#mesondefine ZMQ_HAVE_QNXNTO
+
+/* Have Solaris OS */
+#mesondefine ZMQ_HAVE_SOLARIS
+
+/* Have Windows OS */
+#mesondefine ZMQ_HAVE_WINDOWS
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
