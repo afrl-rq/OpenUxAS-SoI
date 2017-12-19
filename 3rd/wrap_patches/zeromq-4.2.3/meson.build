@@ -2,7 +2,7 @@ project('zeromq', 'cpp')
 
 os = target_machine.system()
 cpp = meson.get_compiler('cpp')
-cpp_args = []
+cpp_args = ['-DHAVE_CXX11=1']
 deps = []
 cdata = configuration_data()
 
@@ -33,6 +33,7 @@ check_headers = [
   ['HAVE_ARPA_INET_H', 'arpa/inet.h'],
   ['HAVE_DLFCN_H', 'dlfcn.h'],
   ['HAVE_ERRNO_H', 'errno.h'],
+  ['HAVE_GSSAPI_GSSAPI_GENERIC_H', 'gssapi/gssapi_generic.h'],
   ['HAVE_IFADDRS_H', 'ifaddrs.h'],
   ['HAVE_INTTYPES_H', 'inttypes.h'],
   ['HAVE_LIMITS_H', 'limits.h'],
@@ -62,6 +63,11 @@ foreach h : check_headers
     if h.get(0) == 'HAVE_SYS_EVENTFD_H'
       cpp_args += ['-DZMQ_HAVE_EVENTFD']
     endif
+
+    if h.get(0) == 'HAVE_IFADDRS_H'
+      cpp_args += ['-DZMQ_HAVE_IFADDRS']
+    endif
+
   endif
 endforeach
 
@@ -70,14 +76,20 @@ if cpp.has_header('sys/uio.h')
   cpp_args += ['-DZMQ_HAVE_UIO']
 endif
 
+# check for both time and sys/time
+if cpp.has_header('time.h') and cpp.has_header('sys/time.h')
+  cpp_args += ['-DTIME_WITH_SYS_TIME']
+endif
+
 check_functions = [
+  ['HAVE_ACCEPT4', 'accept4', '#include <sys/socket.h>'],
   ['HAVE_CLOCK_GETTIME', 'clock_gettime', '#include<time.h>'],
 # check token ('HAVE_DECL_LOCAL_PEERCRED',)
 # check token ('HAVE_DECL_SO_PEERCRED',)
   ['HAVE_FORK', 'fork', '#include<unistd.h>'],
-# check token ('HAVE_FREEIFADDRS',)
-# check token ('HAVE_GETHRTIME',)
-# check token ('HAVE_GETIFADDRS',)
+  ['HAVE_FREEIFADDRS', 'freeifaddrs', '#include <ifaddrs.h>'],
+  ['HAVE_GETHRTIME', 'gethrtime', '#include <sys/time.h>'],
+  ['HAVE_GETIFADDRS', 'getifaddrs', '#include <ifaddrs.h>'],
   ['HAVE_GETTIMEOFDAY', 'gettimeofday', '#include<sys/time.h>'],
   ['HAVE_LIBGSSAPI_KRB5', 'gss_init_sec_context', '#include <gssapi/gssapi.h>'],
 # check token ('HAVE_LIBIPHLPAPI',)
@@ -88,7 +100,8 @@ check_functions = [
 # check token ('HAVE_LIBSOCKET',)
 # check token ('HAVE_LIBWS2_32',)
   ['HAVE_MEMSET', 'memset', '#include<string.h>'],
-# check token ('HAVE_PERROR',)
+  ['HAVE_POSIX_MEMALIGN', 'posix_memalign', '#include <stdlib.h>'],
+  ['HAVE_PERROR', 'perror', '#include <errno.h>'],
   ['HAVE_SOCKET', 'socket', '#include<sys/socket.h>'],
 # check token ('HAVE__BOOL',)
 ]

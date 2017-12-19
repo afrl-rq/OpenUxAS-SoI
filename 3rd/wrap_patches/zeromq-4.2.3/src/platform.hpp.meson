@@ -1,5 +1,8 @@
 /* src/platform.hpp.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the `accept4' function. */
+#mesondefine HAVE_ACCEPT4
+
 /* Define to 1 if you have the <alloca.h> header file. */
 #mesondefine HAVE_ALLOCA_H
 
@@ -37,6 +40,9 @@
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #mesondefine HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the <gssapi/gssapi_generic.h> header file. */
+#mesondefine HAVE_GSSAPI_GSSAPI_GENERIC_H
 
 /* Define to 1 if you have the <ifaddrs.h> header file. */
 #mesondefine HAVE_IFADDRS_H
@@ -88,6 +94,9 @@
 
 /* Define to 1 if you have the `perror' function. */
 #mesondefine HAVE_PERROR
+
+/* Define to 1 if you have the `posix_memalign' function. */
+#mesondefine HAVE_POSIX_MEMALIGN
 
 /* Define to 1 if you have the `socket' function. */
 #mesondefine HAVE_SOCKET
@@ -236,6 +245,9 @@
 
 /* Have Solaris OS */
 #mesondefine ZMQ_HAVE_SOLARIS
+
+/* Whether SO_BINDTODEVICE is supported. */
+#mesondefine ZMQ_HAVE_SO_BINDTODEVICE
 
 /* Whether SO_KEEPALIVE is supported. */
 #mesondefine ZMQ_HAVE_SO_KEEPALIVE
