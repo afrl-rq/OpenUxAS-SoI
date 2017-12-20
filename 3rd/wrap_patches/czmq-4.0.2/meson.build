@@ -64,12 +64,18 @@ elif os == 'darwin'
   c_args += ['-std=c11', '-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
 elif os == 'windows'
   c_args += [
-    '-DZMQ_STATIC',
-    '-DLIBCZMQ_STATIC',
+	'-D_CRT_SECURE_NO_WARNINGS',
+	'-DBASE_THREADSAFE',
+    '-DCZMQ_STATIC',
+	'-DZMQ_USE_SELECT',
+	'-DZMQ_STATIC',
+	'-DLIBZMQ_STATIC',
+	'-DZMQ_HAVE_WINDOWS=1',
   ]
   cdata.set('CZMQ_HAVE_WINDOWS', 1)
   cdata.set('HAVE_LIBUUID', 1)
   deps += [
+    c.find_library('Rpcrt4'),
     c.find_library('Iphlpapi'),
 	c.find_library('WS2_32'),
   ]
@@ -104,7 +110,6 @@ lib = static_library(
     'src/zlist.c',
     'src/zlistx.c',
     'src/zloop.c',
-    'src/zmakecert.c',
     'src/zmonitor.c',
     'src/zmsg.c',
     'src/zpoller.c',

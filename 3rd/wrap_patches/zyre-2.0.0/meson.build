@@ -21,12 +21,21 @@ elif os == 'darwin'
   ]
 elif os == 'windows'
   c_args += [
-    '/std=c++14',
+	'-D_CRT_SECURE_NO_WARNINGS',
+	'-DBASE_THREADSAFE',
+  	'-DZYRE_STATIC',
+	'-DZYRE_HAVE_WINDOWS=1',
 	'-DZMQ_USE_SELECT',
 	'-DZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
-  	'-DLIBZYRE_STATIC',
-	'-DZYRE_HAVE_WINDOWS=1',
+	'-DLIBZMQ_STATIC',
+	'-DZMQ_HAVE_WINDOWS=1',
+    '-DCZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+  ]
+  deps += [
+	c.find_library('Ws2_32'),
+	c.find_library('Rpcrt4'),
+	c.find_library('Iphlpapi'),
   ]
 endif
 
@@ -99,19 +108,13 @@ deps += [dependency('threads')]
 subdir('src')
 
 lib = static_library('zyre', [
-	'src/perf_local.c',
-	'src/perf_remote.c',
 	'src/zpinger.c',
 	'src/zre_msg.c',
-	'src/ztester_beacon.c',
-	'src/ztester_gossip.c',
 	'src/zyre.c',
 	'src/zyre_event.c',
 	'src/zyre_group.c',
 	'src/zyre_node.c',
 	'src/zyre_peer.c',
-	'src/zyre_private_selftest.c',
-	'src/zyre_selftest.c',
 	],
 	dependencies: deps,
 	c_args: c_args,

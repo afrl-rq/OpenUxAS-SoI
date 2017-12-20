@@ -66,9 +66,12 @@ cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
   cpp_args += [
   	'/std:c++14',
-	'-DZMQ_DEFINED_STDINT',
-    '-DZMQ_STATIC',
+	'-DZMQ_STATIC',
+	'-DCZMQ_STATIC',
+	'-DZYRE_STATIC',
+	'-DLIBZMQ_STATIC',
 	'-DLIBCZMQ_STATIC',
+	'-DLIBZYRE_STATIC',
   ]
 else
   cpp_args += [

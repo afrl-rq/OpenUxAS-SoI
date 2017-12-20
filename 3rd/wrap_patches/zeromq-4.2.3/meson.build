@@ -16,7 +16,9 @@ elif os == 'darwin'
 elif os == 'windows'
   cpp_args += [
     '-D_CRT_SECURE_NO_WARNINGS',
-	'-DFD_SETSIZE=4096',
+	'-D_WINSOCK_DEPRECATED_NO_WARNINGS',
+	'-DFD_SETSIZE=16384',
+	'-DWIN32_LEAN_AND_MEAN',
 	'-DZMQ_USE_SELECT',
 	'-DZMQ_STATIC',
 	'-DZMQ_HAVE_WINDOWS=1',
@@ -25,6 +27,7 @@ elif os == 'windows'
     cpp.find_library('Advapi32'),
 	cpp.find_library('Ws2_32'),
 	cpp.find_library('Rpcrt4'),
+	cpp.find_library('Iphlpapi'),
   ]
 endif
 
