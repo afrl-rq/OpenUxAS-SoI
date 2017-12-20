@@ -43,7 +43,17 @@ endif
 cpp_args = []
 
 cpp = meson.get_compiler('cpp')
-if cpp.get_id() != 'msvc'
+if cpp.get_id() == 'msvc'
+  cpp_args += [
+    '/std:c++14',
+	'-DZMQ_STATIC',
+	'-DCZMQ_STATIC',
+	'-DZYRE_STATIC',
+	'-DLIBZMQ_STATIC',
+	'-DLIBCZMQ_STATIC',
+	'-DLIBZYRE_STATIC',
+  ]
+else
   cpp_args += [
     '-std=c++11',
     '-Wno-unused-function',
