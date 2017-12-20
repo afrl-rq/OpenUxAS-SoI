@@ -37,11 +37,21 @@ incs_tasks = [
   incs_lmcp,
 ]
 
-
 if get_option('afrl_internal')
   incs_tasks += [incs_tasks_internal]
 else
   srcs_tasks_internal = files()
+endif
+
+cpp_args = []
+cpp = meson.get_compiler('cpp')
+
+if cpp.get_id() != 'msvc'
+  cpp_args += [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
 endif
 
 lib_tasks = static_library(
@@ -51,8 +61,6 @@ lib_tasks = static_library(
   dependencies: [
     dep_boost,
   ],
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args,
   include_directories: incs_tasks
 )
