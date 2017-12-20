@@ -2,8 +2,7 @@
 <UxAS EntityID="1000" FormatVersion="1.0" EntityType="Aircraft">
 
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
-    <!-- on Linux, type 'ifconfig' to find interface name -->
-    <!-- on Mac, type 'ipconfig' to find interface name -->
+    <!-- on Linux and Mac, type 'ifconfig' to find interface name -->
     <!-- on Windows, type 'ipconfig' to find interface name (name is after adapter type)	
 	     Windows example name: Wireless Network Connection
 	-->
