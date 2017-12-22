@@ -80,7 +80,7 @@ package UAV_Pkg with SPARK_Mode is
 
 
   -- ------------------------------------------------------------------------ --
-  -- Component Initializatoin
+  -- Component Initialization
 
   procedure initialize_component(
     suggested_initial_direction : in DPSS_Data_Types.direction_type;
@@ -122,8 +122,8 @@ package UAV_Pkg with SPARK_Mode is
       --
       -- NOTE: Arrow operator semantics handled through use of separate
       -- initialization procedure.
-      (suggested_initial_direction = DPSS_Constants.LEFT or
-       suggested_initial_direction = DPSS_Constants.RIGHT) and
+      --
+      -- NOTE: this assumption is now encoded in the direction_type
 
       -- Make sure we don't initialize multiple times
       not ghost_initialized

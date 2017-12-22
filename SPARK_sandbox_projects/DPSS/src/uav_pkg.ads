@@ -67,7 +67,7 @@ package UAV_Pkg with SPARK_Mode is
   -- Since we're doing this implementation in SPARK, we get that kind of update
   -- behavior "automatically" - but we do need to be able to talk about how
   -- the updates take place, so that we can prove our constraints.
-  --
+  --f
   -- For now, we are modeling the prev by carrying around an explicit state
   -- variable that records the prior value. We check this update on the
   -- postcondition of run using 'Old.
@@ -105,7 +105,7 @@ package UAV_Pkg with SPARK_Mode is
 
 
   -- ------------------------------------------------------------------------ --
-  -- Component Initializatoin
+  -- Component Initialization
 
   procedure initialize_component(
     suggested_initial_direction : in DPSS_Data_Types.direction_type;
@@ -230,24 +230,24 @@ package UAV_Pkg with SPARK_Mode is
             S_L
          )
 
-         -- Else if co-located with right neighbor,...
-         elsif meet_RN(pos_RN, s_pos) then
-           --...and at or to the right of the shared border, make goal the left endpoint
-           (if s_pos >= S_R then
-              0.0
-
-            --...and to the left of the shared border, make goal the shared border
-            else -- pos < S_R
-              S_R
-            )
-
-          -- Else if heading right, set goal to the right endpoint
-          elsif s_direction = 1 then
-            DPSS_Constants.P_GLOBAL
-
-          -- Else if heading left, set goal to the left endpoint
-          else --direction = -1
+       -- Else if co-located with right neighbor,...
+       elsif meet_RN(pos_RN, s_pos) then
+         --...and at or to the right of the shared border, make goal the left endpoint
+         (if s_pos >= S_R then
             0.0
+
+          --...and to the left of the shared border, make goal the shared border
+          else -- pos < S_R
+            S_R
+          )
+
+       -- Else if heading right, set goal to the right endpoint
+       elsif s_direction = 1 then
+         DPSS_Constants.P_GLOBAL
+
+       -- Else if heading left, set goal to the left endpoint
+       else --direction = -1
+         0.0
     ));
 
 
@@ -277,15 +277,15 @@ package UAV_Pkg with SPARK_Mode is
     pos       : out DPSS_Data_Types.position_type)
   with
     Global => (Input  => (s_id,
-                         s_initialized),
+                          s_initialized),
 
-              In_Out => (s_direction,
-                         s_pos,
-                         s_time,
-                         s_pre_time),
+               In_Out => (s_direction,
+                          s_pos,
+                          s_time,
+                          s_pre_time),
 
-              Output => (s_pre_direction,
-                         s_pre_pos)),
+               Output => (s_pre_direction,
+                          s_pre_pos)),
 
     Pre => (
       s_initialized and
