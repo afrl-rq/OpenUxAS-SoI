@@ -1,4 +1,4 @@
-echo "Installing Dependencies for UxAS..."
+echo "Installing Basic Dependencies for UxAS..."
 
 # exit on non-zero return
 set -e
@@ -32,9 +32,9 @@ cd ./temp
  bash ../sqlitecpp.sh $_SUDO
  bash ../zlib.sh $_SUDO
  bash ../minizip.sh $_SUDO
- bash ../geographiclib.sh $_SUDO
+ #bash ../geographiclib.sh $_SUDO
  bash ../googletest.sh $_SUDO
- bash ../gdal.sh $_SUDO
+ #bash ../gdal.sh $_SUDO
 
  #../opencv.sh $_SUDO
  #../ffmpeg.sh $_SUDO
@@ -42,4 +42,4 @@ cd ./temp
 cd $INSTALL_CWD
 $_SUDO rm -rf ./temp
 
-echo "Finished installing UxAS dependencies!"
+echo "Finished installing  Basic UxAS dependencies!"
