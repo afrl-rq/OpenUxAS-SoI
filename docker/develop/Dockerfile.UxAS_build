@@ -5,8 +5,13 @@ WORKDIR /UxAS
 
 COPY InstallLibraries/ /UxAS/Installation/InstallLibraries/
 
-RUN apt-get update -y -q && apt-get install -y -q git-all build-essential  bash-completion unzip zip curl wget libtbb-dev \
-cmake-curses-gui gdb valgrind vim exuberant-ctags google-mock libgtest-dev libglu1-mesa-dev uuid-dev pkg-config python-dev python3-pip\
+RUN apt-get update -y -q \
+ && apt-get install -y -q git-all build-essential \
+    bash-completion unzip zip curl wget libtbb-dev \
+    cmake-curses-gui gdb valgrind vim exuberant-ctags \
+    google-mock libgtest-dev libglu1-mesa-dev uuid-dev \
+    pkg-config python-dev python3-pip\
+    openjdk-8-jdk ant \
  && apt-get clean \
  && pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.42.1/meson-0.42.1.tar.gz \
  && pip3 install ninja \
