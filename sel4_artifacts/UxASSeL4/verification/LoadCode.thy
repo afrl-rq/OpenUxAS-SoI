@@ -245,7 +245,7 @@ definition are_valid_Waypoints where
   "are_valid_Waypoints s wsp (len::nat) \<equiv> 
     is_valid_Waypoint_struct_C s wsp
     \<and> wsp \<noteq> NULL
-    \<and> (\<forall> j < len. is_valid_Waypoint_struct_C s (wsp +\<^sub>p j)) "
+    \<and> (\<forall> j < len. is_valid_Waypoint_struct_C s (wsp +\<^sub>p j) \<and> wsp +\<^sub>p j \<noteq> NULL) "
   
 lemma valid_waypoints[simp]:
 "are_valid_Waypoints s wsp len 

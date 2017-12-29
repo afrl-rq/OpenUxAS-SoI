@@ -85,7 +85,7 @@ qed
 lemma lift_waypoints_take_id:"(take len (lift_waypoints s wsp len)) = (lift_waypoints s wsp len)"
   apply(induct len)
    apply auto
-    by (simp add: lift_waypoints_length)
+  by (simp add: lift_waypoints_length)
 
 lemma findwp_success_supp1:
 "
@@ -99,7 +99,7 @@ j < len
 \<Longrightarrow> None = find_waypoint (take (Suc j) (lift_waypoints s wsp len)) i"
   by (metis find_waypoint_none_extend 
       lift_waypoints_length lift_waypoints_to_get_waypoint take_Suc_conv_app_nth)
-      
+     
 lemma findwp_success_aux[wp]:
 "
 \<lbrace> \<lambda> (s::lifted_globals).
@@ -109,14 +109,15 @@ lemma findwp_success_aux[wp]:
   \<and> P s\<rbrace>
    LoadCode.WaypointManagerUtils.FindWaypoint' wsp len i
 \<lbrace> \<lambda> r s. are_valid_Waypoints s wsp len
-  \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i 
-  \<and> is_valid_Waypoint_struct_C s r 
+  \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i
+  \<and> is_valid_Waypoint_struct_C s r
+  \<and> r \<noteq> NULL 
   \<and> P s \<rbrace>!"
-  apply (rule validNF_assume_pre)
-  apply (unfold LoadCode.WaypointManagerUtils.FindWaypoint'_def)
-  apply (unfold skipE_def)
-  apply wp
-  apply(subst whileLoopE_add_inv
+ apply (rule validNF_assume_pre)
+ apply (unfold LoadCode.WaypointManagerUtils.FindWaypoint'_def)
+ apply (unfold skipE_def)
+ apply wp
+ apply(subst whileLoopE_add_inv
         [where 
           M = "\<lambda> (j,s). len - j"
           and I = 
@@ -127,31 +128,35 @@ lemma findwp_success_aux[wp]:
             \<and> P s
             \<and> j \<le> len"
         ])
-  apply wp
-    apply clarsimp  
-    using lift_waypoints_next_success findwp_success_supp1 findwp_success_supp1 max_short_fix apply fastforce
-   by (clarsimp, simp add: lift_waypoints_take_id find_waypoint_def)+    
- 
+ apply wp
+   apply clarsimp  
+   apply auto
+      apply (metis lift_waypoints_next_success option.inject)
+     using are_valid_Waypoints_def apply blast
+    apply (metis findwp_success_supp1)
+   using max_short_fix  apply fastforce
+  apply (simp add: lift_waypoints_take_id)
+   by (metis append_is_Nil_conv find_waypoint_success_construction option.exhaust)
+    
 lemma findwp_success[wp]: 
 " 
 \<forall> r. 
 \<lbrace> \<lambda> s.  are_valid_Waypoints s wsp len
   \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i 
   \<and> is_valid_Waypoint_struct_C s r 
+  \<and> r \<noteq> NULL
   \<and> P s\<rbrace> 
 g r 
 \<lbrace> Q \<rbrace>!
-\<Longrightarrow>
-(\<forall> s. P s \<longrightarrow>  len \<le> USHORT_MAX  \<and> are_valid_Waypoints s wsp len \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i)) 
-\<Longrightarrow>
-\<lbrace> P \<rbrace> 
+\<Longrightarrow> (\<forall> s. P s \<longrightarrow>  len \<le> USHORT_MAX  \<and> are_valid_Waypoints s wsp len \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i))
+\<Longrightarrow> \<lbrace> P \<rbrace> 
 do x \<leftarrow> WaypointManagerUtils.FindWaypoint' wsp len i; 
         g x 
 od 
-\<lbrace> Q \<rbrace>!"    
-  apply (rule validNF_bind[where B="\<lambda> r s. are_valid_Waypoints s wsp len \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i \<and> is_valid_Waypoint_struct_C s r \<and> P s"])
-   apply simp
-     apply (rule validNF_weaken_pre)
+\<lbrace> Q \<rbrace>!"
+  apply (rule validNF_bind[where B="\<lambda> r s. are_valid_Waypoints s wsp len \<and> Some (heap_Waypoint_struct_C s r) = find_waypoint (lift_waypoints s wsp len) i \<and> is_valid_Waypoint_struct_C s r \<and> r \<noteq> NULL \<and> P s"])
+    apply simp 
+    apply (rule validNF_weaken_pre)
    apply (rule validNF_weaken_pre[where Q="\<lambda> s. len \<le> USHORT_MAX  \<and> are_valid_Waypoints s wsp len \<and> (\<exists> w. Some w = find_waypoint (lift_waypoints s wsp len) i) \<and> P s"])
    apply (rule findwp_success_aux)
   by blast+
@@ -160,7 +165,6 @@ lemma validNF_guard_bind[wp]:"\<lbrace>\<lambda> s. A s \<and> f s\<rbrace> g ()
   apply (rule validNF_bind[where B="\<lambda> _ s. A s \<and> f s"])
   by (wp | auto)+
     
-
 (* Sledgehammer heads off down some rabbit hole. *) 
 lemma validNF_modify_supp1:"\<forall> s'. \<lbrace>P s'\<rbrace> g \<lbrace>Q\<rbrace>! \<Longrightarrow> \<lbrace>\<lambda>s. \<exists> s'. P s' s\<rbrace> g \<lbrace>Q\<rbrace>!"
 proof -
@@ -172,10 +176,8 @@ proof -
   thus ?thesis by auto
 qed
 
-
 lemma validNF_modify_supp2:" \<forall>s'. \<lbrace>\<lambda>s. P s' \<and> s = f s'\<rbrace> g \<lbrace>Q\<rbrace>! \<Longrightarrow> \<lbrace>P\<rbrace> modify f \<lbrace>\<lambda>_ s. \<exists>s'. P s' \<and> s = f s'\<rbrace>!"
   apply wp by auto
-  
     
 lemma validNF_modify[wp]:"\<forall> s'. \<lbrace> \<lambda> s. P s' \<and> s = f s' \<rbrace> g \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> modify f; g od \<lbrace> Q \<rbrace>!"   
   apply (rule validNF_bind[where B="\<lambda> _ s. \<exists> s'. P s' \<and> s = f s'"])
@@ -185,7 +187,6 @@ lemma validNF_modify[wp]:"\<forall> s'. \<lbrace> \<lambda> s. P s' \<and> s = f
   apply simp
   done
 
-    
 lemma forward_validNF_gets[wp]:"\<forall> x. \<lbrace> \<lambda> s. P s \<and> x = f s \<rbrace> g x \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace> do x \<leftarrow> gets f; g x od \<lbrace> Q \<rbrace>!"
   apply (rule validNF_bind[where B="\<lambda> x s. P s \<and> x = f s"])
    apply blast
@@ -212,7 +213,6 @@ theorem "size_td (typ_info_t TYPE(Waypoint_struct_C)) = x"
   apply simp
 
  *)  
-    
 lemma MCWaypointSubSequence_to_funspec_supp1:
 assumes a2:"Some win = waypoints_window_aux (lift_waypoints s wsp len_ws) i len_ws_win"
 and a8:"a = 0 \<longrightarrow> b = sint i"
@@ -308,7 +308,32 @@ lemma lift_lift_waypoint_agnostic_prop:
 \<Longrightarrow>
 lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c = wsp +\<^sub>p int len_ws +\<^sub>p int a then v b else b c) (s::lifted_globals)) wsp len_ws = lift_waypoints s wsp len_ws"
 by auto
+      
+lemma condition_sufficient_left:"\<forall> s. Q s \<longrightarrow> P s \<Longrightarrow> \<lbrace>\<lambda> s. Q s \<and> P s\<rbrace> A \<lbrace> R \<rbrace>! \<Longrightarrow> \<lbrace>\<lambda> s. Q s\<rbrace> condition P A B \<lbrace> R \<rbrace>!"
+    apply(unfold validNF_def)
+  apply(unfold valid_def)
+    by (metis (mono_tags) condition_true no_fail_def)
+  
+lemma stuff:"\<lbrace> A \<rbrace> f >>= g \<lbrace> C \<rbrace>! \<Longrightarrow> \<exists> B. (\<lbrace> A \<rbrace> f \<lbrace> B \<rbrace>! \<and> (\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!))"
+  sorry
+    
+lemma validNF_condition_tru[wp]:"\<forall> s. Q s \<longrightarrow> P s \<Longrightarrow> \<lbrace>\<lambda> s. Q s \<and> P s\<rbrace> A >>= g \<lbrace>R\<rbrace>! \<Longrightarrow> \<lbrace>\<lambda> s. Q s\<rbrace> condition P A B >>= g \<lbrace>R\<rbrace>!"
+proof -
+  assume a1:"\<forall> s. Q s \<longrightarrow> P s"
+  assume a2:"\<lbrace>\<lambda> s. Q s \<and> P s\<rbrace> A >>= g \<lbrace>R\<rbrace>!"
+  then obtain B where y1:"\<lbrace>\<lambda>s. Q s \<and> P s\<rbrace> A \<lbrace>B\<rbrace>!" and y2:"\<forall>r. \<lbrace>B r\<rbrace> g r \<lbrace>R\<rbrace>!" using stuff[OF a2] by auto
+  thus ?thesis using validNF_bind[OF _ y1] by (metis (mono_tags) a1 condition_sufficient_left validNF_seq_ext)
+qed
 
+lemma validNF_simple_tuple_return:"\<lbrace> P \<rbrace> return (nid, Suc 0) \<lbrace>\<lambda> r s. P s \<and> r = (nid, Suc 0) \<rbrace>!"
+  apply wp
+  by auto
+    
+    
+lemma [simp]:"do x \<leftarrow>  (do y \<leftarrow> f ; g y od) ; h x od = do x \<leftarrow> f ; y \<leftarrow> g x ; h y od"
+  by (simp add: NonDetMonad.bind_assoc)
+  
+        
 lemma FillWindow_to_funspec:
 "len_ws \<le> USHORT_MAX
 \<Longrightarrow> Some win = waypoints_window_aux ws i len_ws_win
@@ -324,13 +349,15 @@ lemma FillWindow_to_funspec:
   are_valid_Waypoints s ( wsp +\<^sub>p len_ws) len_ws_win
   \<and> are_valid_Waypoints s wsp len_ws
   \<and> ws = lift_waypoints s wsp len_ws
-  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s ( wsp +\<^sub>p len_ws +\<^sub>p j) = win ! j) \<rbrace>!"
+  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s ( wsp +\<^sub>p len_ws +\<^sub>p j) = win ! j) 
+  \<and> r = 1\<rbrace>!"
   apply (unfold LoadCode.WaypointManagerUtils.FillWindow'_def)
+    apply wp
       apply(subst whileLoop_add_inv
         [where 
-          M = "\<lambda> ((j,nid),s). len_ws_win - j"
+          M = "\<lambda> ((j,nid,success),s). len_ws_win - j"
           and I = 
-            "\<lambda> (j,nid) s.
+            "\<lambda> (j,nid,success) s.
   are_valid_Waypoints s  (wsp +\<^sub>p len_ws) len_ws_win
   \<and>  are_valid_Waypoints s wsp len_ws
   \<and> ws = lift_waypoints s wsp len_ws
@@ -338,19 +365,43 @@ lemma FillWindow_to_funspec:
 \<and> (j = 0 \<longrightarrow> nid = sint i)
 \<and> (0 < j \<longrightarrow> nid = sint (nextwaypoint_C (win ! (j - 1))))
 \<and> (\<forall> k \<le> j - 1. 0 < j \<longrightarrow> heap_Waypoint_struct_C s ( wsp +\<^sub>p len_ws +\<^sub>p k) = win ! k)
-" ])        
-  by ( assumption 
-      | clarsimp  
-      | wp_once 
-      | simp add: lift_lift_waypoint_agnostic_prop 
-                  MCWaypointSubSequence_to_funspec_supp2
-      | rule
-      | rule MCWaypointSubSequence_to_funspec_supp1 
-             MCWaypointSubSequence_to_funspec_supp2 
-             MCWaypointSubSequence_to_funspec_supp4 
-             MCWaypointSubSequence_to_funspec_supp5 
-      | linarith)+ (* Takes a little while *)
-
+\<and> success = 1
+" ])
+  apply (wp_once)
+  apply(simp add: lift_lift_waypoint_agnostic_prop)
+    apply clarsimp
+    apply (rule findwp_success)
+     apply rule
+    apply(rule validNF_condition_tru)
+      apply simp+
+     apply wp
+       apply clarsimp
+    apply wp
+       apply clarsimp
+    apply wp
+       apply clarsimp
+    
+         apply rule
+  apply (metis (no_types, hide_lams) One_nat_def not_gr0 of_int_sint option.inject waypoint_window_aux_nextwp)
+         apply rule+
+  apply (meson MCWaypointSubSequence_to_funspec_supp4)    
+          apply (metis diff_diff_cancel diff_zero less_nat_zero_code nat_le_Suc_less_imp not_gr0 zero_less_diff)
+    apply linarith
+        apply rule+
+    using loadcode19 apply force
+           apply rule+
+         apply auto[1]
+                 apply rule+
+        apply blast
+       apply rule+
+    apply force
+      apply rule+
+       apply blast
+      apply rule+
+       apply blast
+      apply clarsimp
+          apply (meson MCWaypointSubSequence_to_funspec_supp1)
+       by(auto split:option.splits)           
         
 lemma GroomWindow_to_funspec_supp1:
   assumes a2:"Some win' = waypoints_window_aux ws i len_ws_win"
@@ -399,24 +450,28 @@ lemma GroomWindow_to_funspec:
   \<and> are_valid_Waypoints s wsp len_ws
   \<and> ws = lift_waypoints s wsp len_ws
  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p len_ws +\<^sub>p j) = win' ! j)
+ \<and> P s
 \<rbrace>
   LoadCode.WaypointManagerUtils.GroomWindow' len_ws_win (wsp +\<^sub>p len_ws)
 \<lbrace> \<lambda> r s. 
   are_valid_Waypoints s (wsp +\<^sub>p len_ws) len_ws_win
   \<and> are_valid_Waypoints s wsp len_ws
   \<and> ws = lift_waypoints s wsp len_ws
-  \<and> (\<exists> win. Some win = waypoints_window ws i len_ws_win
-    \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p len_ws +\<^sub>p j) = win ! j)) \<rbrace>!"
+  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p len_ws +\<^sub>p j) = (butlast win' @ [nextwp_update (last win') (number_C (last win'))]) ! j) \<rbrace>!"
   apply (subgoal_tac "len_ws_win - 1 < len_ws_win")
   apply (subgoal_tac "\<exists> win. Some win = waypoints_window ws i len_ws_win")
   apply (subgoal_tac "\<And> (s::lifted_globals) v.  lift_waypoints s wsp len_ws = lift_waypoints (heap_Waypoint_struct_C_update (\<lambda>b c. if c =  wsp +\<^sub>p int len_ws +\<^sub>p (int len_ws_win - 1) then v b else b c) s) wsp len_ws")
   apply (unfold LoadCode.WaypointManagerUtils.GroomWindow'_def)
   apply wp
      apply (clarsimp | rule conjI impI)+
-      apply (rule exI[where x = "(butlast win' @ [nextwp_update (last win') (number_C (last win'))])"])
      using lift_lift_waypoint_agnostic_prop[of "len_ws_win - 1"] apply (auto split: option.splits simp add: GroomWindow_to_funspec_supp1 GroomWindow_to_funspec_supp2)
     by (metis (hide_lams) are_valid_Waypoints_def One_nat_def Suc_le_eq le_less neq0_conv of_nat_1 of_nat_diff zero_less_diff)+
 
+      
+lemma FillWindow_ignore_output:"\<lbrace> P \<rbrace> do WaypointManagerUtils.FillWindow' wsp len_ws i len_ws_win (wsp +\<^sub>p int len_ws); g od \<lbrace> Q \<rbrace>! \<Longrightarrow> \<lbrace> P \<rbrace>  do ret' \<leftarrow> WaypointManagerUtils.FillWindow' wsp len_ws i len_ws_win (wsp +\<^sub>p int len_ws); g od \<lbrace> Q \<rbrace>!"
+  by auto
+    
+        
 lemma FillAndGroomWaypoint_to_funspec:
 "len_ws \<le> USHORT_MAX
 \<Longrightarrow> waypoints_wf ws
@@ -436,11 +491,26 @@ lemma FillAndGroomWaypoint_to_funspec:
   \<and> (\<exists> win. Some win = waypoints_window ws i len_ws_win
     \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p len_ws +\<^sub>p j) = win ! j)) \<rbrace>!"
   apply (unfold LoadCode.WaypointManagerUtils.AutoPilotMissionCommandSegment'_def)
-  apply (rule validNF_nobind[where B="\<lambda> s. 
-  are_valid_Waypoints s (wsp +\<^sub>p len_ws) len_ws_win
-  \<and> are_valid_Waypoints s wsp len_ws
-  \<and> ws = lift_waypoints s wsp len_ws
-  \<and> (\<forall> j. j <  len_ws_win \<longrightarrow> heap_Waypoint_struct_C s (wsp +\<^sub>p len_ws +\<^sub>p j) = win' ! j)"])
-  by (rule GroomWindow_to_funspec | clarsimp | assumption | rule FillWindow_to_funspec)+
-    
+  apply wp_once
+   defer
+   apply(rule FillWindow_to_funspec)
+       apply(assumption)+
+  apply wp_once_trace
+   apply clarsimp
+    apply (rule validNF_return)
+  apply wp_once
+   apply(simp split:option.splits)
+   apply rule
+    apply rule
+    apply simp
+   apply rule
+   apply rule
+    apply clarsimp
+   apply(rule GroomWindow_to_funspec[where i=i])
+    apply(assumption )+
+    apply simp
+  apply clarsimp
+  apply simp
+done
+
 end

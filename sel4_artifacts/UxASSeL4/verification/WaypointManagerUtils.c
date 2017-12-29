@@ -4,31 +4,20 @@
  * License: Air Force Open Source Agreement Version 1.0
  *
  * Testing build:                                                          
- *   gcc -g -I../CMASI -I../CMASI/common/ -D__WAYPOINTMANAGERUTILS_TESTS__ *.c ../CMASI/*.c ../CMASI/common/*.c -o tests
- *   ./tests
+ *   o gcc -g -I../CMASI -I../CMASI/common/ -D__WAYPOINTMANAGERUTILS_TESTS__ \
+ *     .c ../CMASI/*.c ../CMASI/common/*.c -o tests
+ *   o ./tests
  *   
  */
 #include "WaypointManagerUtils.h"
 #include <stdbool.h>
 
-int lmcp_process_msg(uint8_t** inb, size_t size, lmcp_object **o);
-int lmcp_unpack(uint8_t** inb, size_t size, lmcp_object **o);
-
-#define AUTOCORRES
-#ifdef AUTOCORRES
-#define printf(args...) 
-#define assert(x)
-void *memset(void *s, int c, size_t n);
-void *calloc(size_t nmemb, size_t size);
-void free(void * p);
-#else
-#include <assert.h>
-#include <stdlib.h>
-#endif
-
 /* ASM: ws != null */
-/* ASM: length > 0 */
-Waypoint * FindWaypoint(const Waypoint * ws, const uint16_t len, const int64_t id) {
+/* ASM: len > 0 */
+/* ASM: forall i < len, ws[i] is valid memory. */
+Waypoint * FindWaypoint(const Waypoint * ws,
+                        const uint16_t len,
+                        const int64_t id) {
   for(uint16_t i = 0 ; i < len; i++) {
     if(ws[i].number == id) {
      return ws + i;
@@ -47,7 +36,7 @@ Waypoint * FindWaypoint(const Waypoint * ws, const uint16_t len, const int64_t i
 /* ASM: len_ws_win is less than the number of waypoints that can be
    stored in ws_win. */
 /* ASM: Last waypoint starts a cycle. */
-void FillWindow(  Waypoint * ws
+bool FillWindow(  Waypoint * ws
                   , uint16_t len_ws
                   , int64_t id
                   , uint16_t len_ws_win
@@ -55,13 +44,17 @@ void FillWindow(  Waypoint * ws
   uint16_t i;
   int64_t nid = id;
   Waypoint * wp = NULL;
-  for(i=0; i < len_ws_win; i++) {
+  bool success = true;
+  for(i=0; i < len_ws_win && success == true; i++) {
+    success = false;
     wp = FindWaypoint(ws, len_ws, nid);
-    ws_win[i] = *wp;
-    nid = ws_win[i].nextwaypoint;    
+    if(wp != NULL) {
+      success = true;
+      ws_win[i] = *wp;
+      nid = ws_win[i].nextwaypoint;
+    }
   }
-  /*ws_win[i].nextwaypoint = ws_win[i].number; */
-  return;
+  return success;
 }
 
 void GroomWindow(uint16_t len_ws_win
@@ -80,19 +73,25 @@ void GroomWindow(uint16_t len_ws_win
 /* ASM: len_ws_win is less than the number of waypoints that can be
    stored in ws_win. */
 /* ASM: Last waypoint starts a cycle. */
-void AutoPilotMissionCommandSegment(  Waypoint * ws
+bool AutoPilotMissionCommandSegment(  Waypoint * ws
                                       , uint16_t len_ws
                                       , int64_t id
                                       , Waypoint * ws_win /* out */
                                       , uint16_t len_ws_win) {
-  FillWindow(ws, len_ws, id, len_ws_win, ws_win);
-  GroomWindow(len_ws_win, ws_win);
-  return;
+  bool success = false;
+  success = FillWindow(ws, len_ws, id, len_ws_win, ws_win);
+  if(success == true) {GroomWindow(len_ws_win, ws_win);}
+  return success;
 }
 
 #ifdef __WAYPOINTMANAGERUTILS_TESTS__
 #include <stdio.h>
 #include "MissionCommand.h"
+#include <assert.h>
+#include <stdlib.h>
+
+int lmcp_process_msg(uint8_t** inb, size_t size, lmcp_object **o);
+int lmcp_unpack(uint8_t** inb, size_t size, lmcp_object **o);
 
 
 #define DEBUG(fmt,args...) \
@@ -251,11 +250,11 @@ bool ExhaustiveTest(MissionCommand * omcp) {
     int64_t last_subseq_id = omcp->firstwaypoint;
     ws_seg = calloc(sizeof(Waypoint),i);        
     for(uint16_t j = 1 ; j < i ; j++) {
-      AutoPilotMissionCommandSegment(ws,
+      RETURNONFAIL(AutoPilotMissionCommandSegment(ws,
                                      ws_len,
                                      omcp->firstwaypoint,
                                      ws_seg,
-                                     i);
+                                                  i) == true);
       RETURNONFAIL(MissionCommandSegmentCheck(ws,
                                               ws_len,
                                               omcp->firstwaypoint,
@@ -265,11 +264,11 @@ bool ExhaustiveTest(MissionCommand * omcp) {
       last_subseq_id = omcp->firstwaypoint;
       wp = FindWaypoint(ws,ws_len,last_subseq_id);
       RETURNONFAIL(wp != NULL);
-      AutoPilotMissionCommandSegment(ws,
+      RETURNONFAIL(AutoPilotMissionCommandSegment(ws,
                                ws_len,
                                wp->number,
                                ws_seg,
-                               i);      
+                                            i) == true);      
 
       uint16_t c = 0;
       uint16_t n = 0;
@@ -280,11 +279,11 @@ bool ExhaustiveTest(MissionCommand * omcp) {
         RETURNONFAIL(wp != NULL);
       }
       while(wp->number != wp->nextwaypoint) {
-        AutoPilotMissionCommandSegment(ws,
+        RETURNONFAIL(AutoPilotMissionCommandSegment(ws,
                                        ws_len,
                                        wp->number,
                                        ws_seg,
-                                       i);
+                                                    i) == true);
         RETURNONFAIL(MissionCommandSegmentCheck(ws,
                                                 ws_len,
                                                 wp->number,

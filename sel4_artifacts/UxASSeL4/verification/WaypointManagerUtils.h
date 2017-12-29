@@ -20,7 +20,7 @@
 #include <stdbool.h>
 #include "../CMASI/Waypoint.h"
 
-void AutoPilotMissionCommandSegment( Waypoint * ws /* mission
+bool AutoPilotMissionCommandSegment( Waypoint * ws /* mission
                                                       command. */
                                      , uint16_t len_ws /* mission
                                                           command
@@ -28,7 +28,9 @@ void AutoPilotMissionCommandSegment( Waypoint * ws /* mission
                                      , int64_t id /* starting ID for
                                                      mission command
                                                      segment. */
-                                     , Waypoint * ws_win /* mission command segment */ /* out */
+                                     , Waypoint * ws_win /* mission
+                                                            command
+                                                            segment */ /* out */
                                      , uint16_t len_ws_win /* mission
                                                               command
                                                               segment
