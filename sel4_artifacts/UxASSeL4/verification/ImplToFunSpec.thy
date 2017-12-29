@@ -314,7 +314,7 @@ lemma condition_sufficient_left:"\<forall> s. Q s \<longrightarrow> P s \<Longri
   apply(unfold valid_def)
     by (metis (mono_tags) condition_true no_fail_def)
   
-lemma stuff:"\<lbrace> A \<rbrace> f >>= g \<lbrace> C \<rbrace>! \<Longrightarrow> \<exists> B. (\<lbrace> A \<rbrace> f \<lbrace> B \<rbrace>! \<and> (\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!))"
+lemma validNF_bind_intermediate_pre:"\<lbrace> A \<rbrace> f >>= g \<lbrace> C \<rbrace>! \<Longrightarrow> \<exists> B. (\<lbrace> A \<rbrace> f \<lbrace> B \<rbrace>! \<and> (\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!))"
   apply(rule exI[where x="\<lambda> r s2. \<exists> s. A s \<and> (r,s2)\<in>fst (f s) \<and> \<not> snd (f s) \<and> (\<forall> v2 \<in> fst (g r s2). (case v2 of (r2,s3) \<Rightarrow> C r2 s3))"])
    apply (unfold bind_def validNF_def valid_def no_fail_def)
   by (clarsimp | auto | blast)+
@@ -347,7 +347,7 @@ lemma validNF_condition_tru[wp]:"\<forall> s. Q s \<longrightarrow> P s \<Longri
 proof -
   assume a1:"\<forall> s. Q s \<longrightarrow> P s"
   assume a2:"\<lbrace>\<lambda> s. Q s \<and> P s\<rbrace> A >>= g \<lbrace>R\<rbrace>!"
-  then obtain B where y1:"\<lbrace>\<lambda>s. Q s \<and> P s\<rbrace> A \<lbrace>B\<rbrace>!" and y2:"\<forall>r. \<lbrace>B r\<rbrace> g r \<lbrace>R\<rbrace>!" using stuff[OF a2] by auto
+  then obtain B where y1:"\<lbrace>\<lambda>s. Q s \<and> P s\<rbrace> A \<lbrace>B\<rbrace>!" and y2:"\<forall>r. \<lbrace>B r\<rbrace> g r \<lbrace>R\<rbrace>!" using validNF_bind_intermediate_pre[OF a2] by auto
   thus ?thesis using validNF_bind[OF _ y1] by (metis (mono_tags) a1 condition_sufficient_left validNF_seq_ext)
 qed
 
