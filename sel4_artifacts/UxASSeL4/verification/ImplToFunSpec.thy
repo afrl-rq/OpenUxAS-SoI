@@ -204,10 +204,10 @@ lemma are_valid_waypoints_noninter[simp]:"are_valid_Waypoints (heap_Waypoint_str
 (*
 (* TODO: How do I prove this *)
 lemma base_Waypoint_struct_C_ptr_ineq:"(p::Waypoint_struct_C ptr) +\<^sub>p (1::nat) \<noteq> p" 
-  sorry
+  
 (* TODO: How do I prove this *)
 lemma general_Waypoint_struct_C_ptr_ineq:"0<(x::nat)  \<Longrightarrow> (p::Waypoint_struct_C ptr) +\<^sub>p  x  \<noteq> p "   
-  sorry
+ 
 
 theorem "size_td (typ_info_t TYPE(Waypoint_struct_C)) = x"
   apply simp
@@ -315,7 +315,33 @@ lemma condition_sufficient_left:"\<forall> s. Q s \<longrightarrow> P s \<Longri
     by (metis (mono_tags) condition_true no_fail_def)
   
 lemma stuff:"\<lbrace> A \<rbrace> f >>= g \<lbrace> C \<rbrace>! \<Longrightarrow> \<exists> B. (\<lbrace> A \<rbrace> f \<lbrace> B \<rbrace>! \<and> (\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!))"
-  sorry
+  apply(rule exI[where x="\<lambda> r s2. \<exists> s. A s \<and> (r,s2)\<in>fst (f s) \<and> \<not> snd (f s) \<and> (\<forall> v2 \<in> fst (g r s2). (case v2 of (r2,s3) \<Rightarrow> C r2 s3))"])
+   apply (unfold bind_def validNF_def valid_def no_fail_def)
+  by (clarsimp | auto | blast)+
+
+
+(*  assume a1:"\<lbrace>A\<rbrace> f >>= g \<lbrace>C\<rbrace>!"
+  assume a2:"\<nexists>B. \<lbrace>A\<rbrace> f \<lbrace>B\<rbrace>! \<and> (\<forall>r. \<lbrace>B r\<rbrace> g r \<lbrace>C\<rbrace>!)"
+   thus ?thesis sledgehammer[z3 e spass] *)
+(*  assume a1:"\<lbrace> A \<rbrace> f >>= g \<lbrace> C \<rbrace>!"
+  then obtain B where y1:"\<lbrace> A \<rbrace> f \<lbrace> B \<rbrace>!" 
+    by (metis no_fail_def no_fail_is_validNF_True snd_bind validNF_alt_def validNF_valid)
+  then have "(\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!) \<or> \<not>(\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!)" by auto
+  thus ?thesis
+  proof
+    assume a2:"(\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!)"
+    thus ?thesis using y1 by auto
+  next
+    assume a2:"\<not>(\<forall> r. \<lbrace> B r \<rbrace> g r \<lbrace> C \<rbrace>!)"
+    then obtain r where "\<not> (\<lbrace> B r\<rbrace> g r \<lbrace> C \<rbrace>!)" by auto
+    then have "((\<exists> s. \<lbrace> \<lambda> s'. A s' \<and> s = s'\<rbrace> f \<lbrace> \<lambda> r' s. r' = r\<rbrace>) \<or> \<not> (\<exists> s. \<lbrace> \<lambda> s'. A s' \<and> s = s'\<rbrace> f \<lbrace> \<lambda> r' s. r' = r\<rbrace>))" by auto
+    thus ?thesis
+    proof
+      assume "(\<exists> s. \<lbrace> \<lambda> s'. A s' \<and> s = s'\<rbrace> f \<lbrace> \<lambda> r' s. r' = r\<rbrace>)"
+      then obtain s where "\<lbrace> \<lambda> s'. A s' \<and> s = s'\<rbrace> f \<lbrace> \<lambda> r' s. r' = r\<rbrace>" by auto
+      then have "\<not> \<lbrace>\<lambda> s'. A s' \<and> s = s' \<rbrace> f >>= g \<lbrace> C \<rbrace>!" 
+  apply
+  sorry*)
     
 lemma validNF_condition_tru[wp]:"\<forall> s. Q s \<longrightarrow> P s \<Longrightarrow> \<lbrace>\<lambda> s. Q s \<and> P s\<rbrace> A >>= g \<lbrace>R\<rbrace>! \<Longrightarrow> \<lbrace>\<lambda> s. Q s\<rbrace> condition P A B >>= g \<lbrace>R\<rbrace>!"
 proof -
