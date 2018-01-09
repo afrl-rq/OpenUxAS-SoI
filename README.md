@@ -328,7 +328,7 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
 1. (**optional**) Build OpenAMASE
    * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
-   * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
+   * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.7.1/LmcpGen.jar)
    * Place `LmcpGen.jar` in `LmcpGen/dist` folder
    * From the Git Bash shell in the root UxAS directory, run `bash RunLmcpGen.sh`
    * Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE repositories follow the folder structure labeled in the [Build UxAS](#build-uxas) section.
