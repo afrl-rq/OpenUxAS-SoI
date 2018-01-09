@@ -104,12 +104,28 @@ public
 					pre_goal_UAV3
 				);
 			
-			eq deltaT : DPSS_Data_Types::Time_Type = 
-							DPSS_Node_Lib.min_time(time_until_UAV1_reaches_goal,
-							DPSS_Node_Lib.min_time(time_until_UAV2_reaches_goal,
-							DPSS_Node_Lib.min_time(time_until_UAV3_reaches_goal,
-							DPSS_Node_Lib.min_time(time_to_reach_neighbor_12,
-												   time_to_reach_neighbor_23))));
+			eq time_until_UAV3_reaches_P : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV3, 
+					pre_pos_UAV3, 
+					P_GLOBAL
+				);
+				
+			eq time_until_UAV1_reaches_0 : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1, 
+					pre_pos_UAV1, 
+					0.0
+				); 
+			
+			eq deltaT : DPSS_Data_Types::Time_Type =
+							--Added time_until_UAV3_reaches_P since UAV3 might not know where P is.
+							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_P,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_12,
+												   time_to_reach_neighbor_23)))));
 			
 			eq stable : bool = 
 				--Either
@@ -152,6 +168,14 @@ public
 				and initial_pos_UAV2 <= initial_pos_UAV3)
 				-> true;
 				
+			--We didn't need this when the vehicles know P, but we
+			-- need it when they don't know P. Otherwise, if initially co-located at 0,
+			-- UAV1 needs to turn around at epsilon and we don't have a good way to model that.
+			assume "UAVs are not co-located on the initial timestep":
+				(	initial_pos_UAV1 < initial_pos_UAV2 
+				and initial_pos_UAV2 < initial_pos_UAV3)
+				-> true;
+				
 			assume "Initial positions are between 0 and P_GLOBAL":
 				(0.0 <= initial_pos_UAV1 
 				and initial_pos_UAV1 <= P_GLOBAL
@@ -179,6 +203,9 @@ public
 				(time >= ((2.0*N_real - 1.0)/N_real)*Time_to_travel_full_length) =>
 					(stable	and deltaT = Time_to_travel_full_length/N_real);
 			
+			guarantee "deltaT is positive":
+				true -> deltaT > 0.0;
+			
 			guarantee "Initial positions are the input initial positions":
 				(pos_UAV1 = initial_pos_UAV1
 				and pos_UAV2 = initial_pos_UAV2
@@ -199,8 +226,7 @@ public
 				and pos_UAV2 <= P_GLOBAL
 				and 0.0 <= pos_UAV3 
 				and pos_UAV3 <= P_GLOBAL;
-			
-			--Commenting this one out results in unknown consistency for this component instead of known INconsistency. 
+			 
 			guarantee "UAVs stay in order":
 				pos_UAV1 <= pos_UAV2
 				and pos_UAV2 <= pos_UAV3;
