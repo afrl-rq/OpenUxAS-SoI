@@ -1,5 +1,5 @@
 import zmq, json, string, sys
-sys.path.insert(0, '../../../src/LMCP/py')
+sys.path.append('../../../src/LMCP/py')
 from lmcp import LMCPFactory
 
 if __name__ == '__main__':
@@ -15,21 +15,26 @@ if __name__ == '__main__':
     # subscribe to all possible messages
     # duplicate of UxAS config file, but necessary
     for c in string.ascii_letters:
-        socket_sub.setsockopt(zmq.SUBSCRIBE, c)
+        if (sys.version_info > (3, 0)):
+            socket_sub.setsockopt_string(zmq.SUBSCRIBE, c)
+        else:
+            socket_sub.setsockopt_string(zmq.SUBSCRIBE, c.decode('utf-8'))
 
     socket_send = context.socket(zmq.PUSH)
     socket_send.connect("tcp://127.0.0.1:5561")
 
     # main loop: receive a message, then process it
     while True:
-        print("--------------------------------------------")
         
-        data = socket_sub.recv()
+        # raw bytes from socket        
+        data = bytearray(socket_sub.recv())
+
         # messages are single part with a header followed by
         # serialized LMCP
         # header format: [address]$[format]|[type]|[group]|[entity]|[service]$
-        address, attributes, msg = data.split('$', 2)
-        msg_format, msg_type, msg_group, entityid, serviceid = attributes.split('|',4)
+        address, attributes, msg = data.split(bytearray('$','ascii'), 2)
+        msg_format, msg_type, msg_group, entityid, serviceid = attributes.split(bytearray('|','ascii'),4)
+
         obj = factory.getObject(msg)
         
         # sending as entityid{0} and serviceid{0}, so check for loopback
@@ -77,9 +82,9 @@ if __name__ == '__main__':
         obj.set_Value("World")
         
         # syntax to send back to UxAS
-        header = str(obj.FULL_LMCP_TYPE_NAME) + "$lmcp|" + str(obj.FULL_LMCP_TYPE_NAME) + "||0|0$"
-        smsg = LMCPFactory.packMessage(obj, True)
-        socket_send.send(header + smsg)
+        smsg = bytearray(str(obj.FULL_LMCP_TYPE_NAME) + "$lmcp|" + str(obj.FULL_LMCP_TYPE_NAME) + "||0|0$",'ascii')
+        smsg.extend(LMCPFactory.packMessage(obj, True))
+        socket_send.send(smsg)
         print("  Sent:   " + obj.FULL_LMCP_TYPE_NAME)
 
 
