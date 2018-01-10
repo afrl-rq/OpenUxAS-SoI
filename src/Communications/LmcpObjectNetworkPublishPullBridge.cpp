@@ -21,10 +21,8 @@
 #define STRING_XML_ADDRESS_PULL "AddressPULL"
 #define STRING_XML_ADDRESS_PUB "AddressPUB"
 
-namespace uxas
-{
-namespace communications
-{
+namespace uxas {
+namespace communications {
 
 LmcpObjectNetworkPublishPullBridge::LmcpObjectNetworkPublishPullBridge()
 {
@@ -63,8 +61,16 @@ LmcpObjectNetworkPublishPullBridge::configure(const pugi::xml_node& bridgeXmlNod
         UXAS_LOG_INFORM(s_typeName(), "::configure failed to find external pub socket in XML configuration; external pub socket is ", m_externalPublishSocketAddress);
     }
     
-    // TODO review IMPACT messaging requirements (need to modify object before sending?)
-    // handle mapping of UxAS internal single/multi-part messages to IMPACT single/multi-part messages 
+    if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
+    {
+        m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
+    }
+    else
+    {
+        UXAS_LOG_INFORM(s_typeName(), "::configure did not find 'ConsiderSelfGenerated' boolean in XML configuration; 'ConsiderSelfGenerated' boolean is ", m_isConsideredSelfGenerated);
+    }
+
     for (pugi::xml_node currentXmlNode = bridgeXmlNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
         if (uxas::common::StringConstant::SubscribeToMessage() == currentXmlNode.name())
@@ -74,12 +80,12 @@ LmcpObjectNetworkPublishPullBridge::configure(const pugi::xml_node& bridgeXmlNod
                 addSubscriptionAddress(currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value());
             }
         }
-    } 
+    }
 
     // do not forward any uni-cast messages addressed to this bridge
-    //UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
-    //m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
-    //m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
+    UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
+    m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
+    m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
 
     return (isSuccess);
 };
@@ -88,11 +94,11 @@ bool
 LmcpObjectNetworkPublishPullBridge::initialize()
 {
     m_externalLmcpObjectMessageReceiverPipe.initializeExternalPull(m_entityId, m_networkId,
-                                                                           m_externalPullSocketAddress, true);
+        m_externalPullSocketAddress, true);
     UXAS_LOG_INFORM(s_typeName(), " external pull socket address is ", m_externalPullSocketAddress);
 
     m_externalLmcpObjectMessageSenderPipe.initializeExternalPub(m_messageSourceGroup, m_entityId, m_networkId,
-                                                                 m_externalPublishSocketAddress, true);
+        m_externalPublishSocketAddress, true);
     UXAS_LOG_INFORM(s_typeName(), " external pub socket address is ", m_externalPublishSocketAddress);
     UXAS_LOG_INFORM(s_typeName(), "::initialize succeeded");
     return (true);
@@ -102,7 +108,7 @@ bool
 LmcpObjectNetworkPublishPullBridge::start()
 {
     m_externalReceiveProcessingThread = uxas::stduxas::make_unique<std::thread>(&LmcpObjectNetworkPublishPullBridge
-            ::executeExternalSerializedLmcpObjectReceiveProcessing, this);
+        ::executeExternalSerializedLmcpObjectReceiveProcessing, this);
     UXAS_LOG_INFORM(s_typeName(), "::start pull receive processing thread [", m_externalReceiveProcessingThread->get_id(), "]");
     return (true);
 };
@@ -125,23 +131,29 @@ LmcpObjectNetworkPublishPullBridge::terminate()
 
 bool
 LmcpObjectNetworkPublishPullBridge::processReceivedSerializedLmcpMessage(std::unique_ptr<uxas::communications::data::AddressedAttributedMessage>
-                                                                                receivedLmcpMessage)
+    receivedLmcpMessage)
 {
     // send message to the external entity
     UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage before sending serialized message ",
-              "having address ", receivedLmcpMessage->getAddress(),
-              " and size ", receivedLmcpMessage->getPayload().size());
+        "having address ", receivedLmcpMessage->getAddress(),
+        " and size ", receivedLmcpMessage->getPayload().size());
 
-	// Note: We are going to process all messages, even those that originated externally.
-
-    if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
+    // process messages from a local service (only)
+    if (m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
     {
-        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
-        m_externalLmcpObjectMessageSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
+        if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
+            m_externalLmcpObjectMessageSenderPipe.sendSerializedMessage(std::move(receivedLmcpMessage));
+        }
+        else
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+        }
     }
     else
     {
-        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
     }
 
     return (false); // always false implies never terminating bridge from here
@@ -156,35 +168,31 @@ LmcpObjectNetworkPublishPullBridge::executeExternalSerializedLmcpObjectReceivePr
         {
             // TODO review IMPACT messaging requirements (need to modify object before sending?)
             std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg
-                    = m_externalLmcpObjectMessageReceiverPipe.getNextSerializedMessage();
-            
-            if (recvdAddAttMsg == NULL)
+                = m_externalLmcpObjectMessageReceiverPipe.getNextSerializedMessage();
+
+            if (!recvdAddAttMsg)
             {
-                UXAS_LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing NULL message");
+                // no message available
                 continue;
             }
 
-            // send message to the external entity
+            // send message from the external entity to the local system
             UXAS_LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing before sending serialized message ",
-                          "having address ", recvdAddAttMsg->getAddress(),
-                          " and size ", recvdAddAttMsg->getPayload().size());
+                "having address ", recvdAddAttMsg->getAddress(),
+                " and size ", recvdAddAttMsg->getPayload().size());
             if (recvdAddAttMsg->isValid())
             {
-                // process messages from an external service (only)
-                if (m_entityIdString != recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
+                if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
                 {
-                    if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
+                    if(m_isConsideredSelfGenerated)
                     {
-                        sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
+                        recvdAddAttMsg->updateSourceAttributes("PublishPullBridge", std::to_string(m_entityId), std::to_string(m_networkId));
                     }
-                    else
-                    {
-                        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
-                    }
+                    sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
                 }
                 else
                 {
-                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
                 }
             }
             else

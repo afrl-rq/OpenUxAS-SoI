@@ -73,14 +73,7 @@ namespace uxas
      * for the SUB socket, see @ref m_ptr_ZsckSubscribe. The attribute: <B><I>AddressPUSH<I/><B/>
      * is used to set the address of the PUSH socket, see @ref m_ptr_ZsckPush
      *
-     * <li> The <B>Server<B/> element in the configuration entry is set to <I>true<I/>
-     * or <I>false<I/> and controls if the address are bound (bind) or connected
-     * (connect) to the sockets.
-     *
      * </ul> @n
-     *
-     *
-     *
      *
      */
 

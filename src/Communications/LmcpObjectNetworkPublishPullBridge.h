@@ -17,6 +17,53 @@
 #include <atomic>
 #include <cstdint>
 
+/** \class LmcpObjectNetworkPublishPullBridge
+     *  \brief A component that allows an external entity to connect to the internal message
+     * bus. It exposes <I>ZMQ_PUB<I/> and <I>ZMQ_PULL<I/> sockets. 
+     *
+     *  @par Description:
+     * The <B>Publish/Pull Bridge<B/> component allows connections from external entities by
+     * exposing <I>ZMQ_PUB<I/> and <I>ZMQ_PULL<I/> sockets. The external entity sends messages to the
+     * <B>Publish/Pull Bridge<B/> using a ZeroMQ PUSH socket and receives messages using
+     * a PUB socket. The the <B>Publish/Pull Bridge<B/> sends messages received from
+     * the external entity to the local @ref c_CommunicationHub. Subscribed messages
+     * received from the local @ref c_CommunicationHub are sent to the external entity.
+     *
+     * @par Example:
+     * <Bridge Type="LmcpObjectNetworkPublishPullBridge"
+     *    AddressPUB="tcp://localhost:5556"
+     *    AddressPULL="tcp://localhost:5555"
+     *    ConsiderSelfGenerated="false">
+     *
+     * AddressPUB: the address and port for the ZeroMQ publication connection
+     * AddressPULL: the address and port for the ZeroMQ pull connection
+     * ConsiderSelfGenerated: boolean that when true sends local messages with bridge service ID
+     *
+     * @par Details:
+     * <ul style="padding-left:1em;margin-left:0">
+     * <li> Message Subscription -
+     * The subscriptions for messages from the local @ref c_CommunicationHub to be
+     * sent to the external entity are set in the configuration file, e.g.:
+     *
+     * <I>"<SubscribeToLocalMessage MessageType=""lmcp:""/>"<I/>
+     *
+     * The subscriptions for messages to be sent from the external entity's ZMQ_PUB
+     * socket and sent to the local @ref c_CommunicationHub are set in the configuration
+     * file, e.g.:
+     *
+     * <I>"<SubscribeToExternalMessage MessageType=""lmcp:""/>"<I/>
+     *
+     *
+     * <li> Addressing -
+     * The TCP/IP addresses for the PUB and PULL sockets are set via the configuration
+     * file. The attribute: <B><I>AddressPUB<I/><B/> is used to set the address
+     * for the PUB socket, see @ref m_ptr_ZsckPublish. The attribute: <B><I>AddressPULL<I/><B/>
+     * is used to set the address of the PULL socket, see @ref m_ptr_ZsckPull
+     *
+     * </ul> @n
+     *
+     */
+
 namespace uxas
 {
 namespace communications
@@ -81,6 +128,7 @@ private:
 
     std::string m_externalPullSocketAddress = std::string("tcp://*:5555");
     std::string m_externalPublishSocketAddress = std::string("tcp://*:5556");
+    bool m_isConsideredSelfGenerated{ false };
 };
 
 }; //namespace communications
