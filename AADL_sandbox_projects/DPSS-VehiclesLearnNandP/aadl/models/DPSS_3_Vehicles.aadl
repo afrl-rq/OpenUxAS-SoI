@@ -199,8 +199,8 @@ public
 			-----------------------------------------------------
 			
 			-- Main Theorem			
-			guarantee "Theorem 1 for Algorithm A for 3 Vehicles":
-				(time >= ((2.0*N_real - 1.0)/N_real)*Time_to_travel_full_length) =>
+			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
+				(time >= ((5.0*N_real - 1.0)/N_real)*Time_to_travel_full_length) =>
 					(stable	and deltaT = Time_to_travel_full_length/N_real);
 			
 			guarantee "deltaT is positive":
@@ -319,7 +319,8 @@ public
 			
 			--Expected number of steps it takes to converge to the stable configuration
 			--This might be more for unknown N and P
-			eq steps_to_converge : int = 11;
+			--This is a guess at this point
+			--eq steps_to_converge : int = 22;
 			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
@@ -328,20 +329,20 @@ public
 			lemma "Observer: Worst time convergence":
 				not (
 					stable
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.02)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.97)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.98)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.99)
 				);
 				
-			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
-				steps = steps_to_converge - 1 => stable;
-				
-			lemma "Observer: Just trying to get a trace, any trace, of more than two steps":
-				not (steps > 2 
-				and	pos_UAV1 = 5.0
+--			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+--				steps = steps_to_converge - 1 => stable;
+									
+			lemma "Observer: A 5 step trace":
+				not (steps > 4 
+				and	pos_UAV1 = 0.0
 				);
 			
 			----------------------------------------------------------------------------
@@ -363,8 +364,20 @@ public
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;
 					
-			lemma "Stable on and after steps_to_converge steps":
-				steps >= steps_to_converge => stable;
+--			lemma "Stable on and after steps_to_converge steps":
+--				steps >= steps_to_converge => stable;
+			
+			lemma "Stable on and after 22 steps":
+				steps >= 22 => stable;
+				
+			lemma "Stable on and after 23 steps":
+				steps >= 23 => stable;
+
+			lemma "Stable on and after 25 steps":
+				steps >= 25 => stable;
+			
+			lemma "Stable on and after 30 steps":
+				steps >= 30 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = Time_to_travel_full_length/N_real;
@@ -375,12 +388,10 @@ public
 					and deltaT < Time_to_travel_full_length
 					);
 					
-			-- This is a good way to find the real time bound!
- 			-- The lemma is valid for time < 2T but not for time < (2-1/N)T.
- 			-- I believe it would be valid with (2-1/N)T if we only required one timestep of stability instead of two. 			
-			lemma "Time to become stable is less than 2T":
+			-- This is a good way to find the real time bound!	
+			lemma "Time to become stable is less than 5T":
 				(stable and not (pre(stable))) => 
-					(time < 2.0*Time_to_travel_full_length);
+					(time < 5.0*Time_to_travel_full_length);
 			
 		**};
 		
