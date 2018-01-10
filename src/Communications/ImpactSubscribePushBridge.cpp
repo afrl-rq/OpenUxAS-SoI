@@ -14,7 +14,6 @@
 
 #include "avtas/lmcp/Factory.h"
 
-
 #include <sstream>
 #include <iostream>
 #include <locale>
@@ -26,314 +25,281 @@
 #define STRING_XML_ADDRESS_SUB "AddressSUB"
 #define STRING_XML_ADDRESS_PUSH "AddressPUSH"
 #define STRING_XML_EXTERNAL_ENTITY_ID "ExternalID"
-#define STRING_XML_PREVENT_LOOPBACK "PreventLoopBack"
 #define STRING_XML_THROTTLE_CONFIGURATION_FORWARDING "ThrottleConfigurationForwarding"
 
-namespace uxas
+namespace uxas {
+namespace communications {
+
+ImpactSubscribePushBridge::ImpactSubscribePushBridge()
 {
-  namespace communications
-  {
+};
 
-    ImpactSubscribePushBridge::ImpactSubscribePushBridge()
+ImpactSubscribePushBridge::~ImpactSubscribePushBridge()
+{
+    if (m_externalReceiveProcessingThread && m_externalReceiveProcessingThread->joinable())
     {
-    };
-
-    ImpactSubscribePushBridge::~ImpactSubscribePushBridge()
-    {
-      if (m_externalReceiveProcessingThread && m_externalReceiveProcessingThread->joinable())
-      {
         m_externalReceiveProcessingThread->detach();
-      }
-    };
+    }
+};
 
-    bool
-      ImpactSubscribePushBridge::configure(const pugi::xml_node& bridgeXmlNode)
+bool
+ImpactSubscribePushBridge::configure(const pugi::xml_node& bridgeXmlNode)
+{
+    // initialize external ID to be as if messages are generated locally
+    m_externalID = m_entityId;
+
+    if (!bridgeXmlNode.attribute(STRING_XML_ADDRESS_SUB).empty())
     {
-      bool isSuccess{ true };
-
-      if (!bridgeXmlNode.attribute(STRING_XML_ADDRESS_SUB).empty())
-      {
         m_externalSubscribeSocketAddress = bridgeXmlNode.attribute(STRING_XML_ADDRESS_SUB).value();
         UXAS_LOG_INFORM(s_typeName(), "::configure setting external subscribe socket address to ", m_externalSubscribeSocketAddress, " from XML configuration");
-      }
-      else
-      {
+    }
+    else
+    {
         UXAS_LOG_INFORM(s_typeName(), "::configure failed to find external subscribe socket address in XML configuration; external subscribe socket address is ", m_externalSubscribeSocketAddress);
-      }
+    }
 
-      if (!bridgeXmlNode.attribute(STRING_XML_ADDRESS_PUSH).empty())
-      {
+    if (!bridgeXmlNode.attribute(STRING_XML_ADDRESS_PUSH).empty())
+    {
         m_externalPushSocketAddress = bridgeXmlNode.attribute(STRING_XML_ADDRESS_PUSH).value();
         UXAS_LOG_INFORM(s_typeName(), "::configure setting external push socket address to ", m_externalPushSocketAddress, " from XML configuration");
-      }
-      else
-      {
+    }
+    else
+    {
         UXAS_LOG_INFORM(s_typeName(), "::configure failed to find external push socket in XML configuration; external push socket is ", m_externalPushSocketAddress);
-      }
+    }
 
-      if (!bridgeXmlNode.attribute(uxas::common::StringConstant::Server().c_str()).empty())
-      {
-        m_isServer = bridgeXmlNode.attribute(uxas::common::StringConstant::Server().c_str()).as_bool();
-        UXAS_LOG_INFORM(s_typeName(), "::configure setting server boolean to ", m_isServer, " from XML configuration");
-      }
-      else
-      {
-        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find server boolean in XML configuration; server boolean is ", m_isServer);
-      }
-      if (!bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).empty())
-      {
-        externalID = bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).value();
-      }
+    if (!bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).empty())
+    {
+        // set external ID from configuration, falling back to local ID if parse fails
+        m_externalID = bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).as_int64(m_entityId);
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting external ID to ", m_externalID, " from XML configuration");
+    }
+    else
+    {
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to external ID in XML configuration; external matches local ID as ", m_externalID);
+    }
 
-      if (!bridgeXmlNode.attribute(STRING_XML_PREVENT_LOOPBACK).empty())
-      {
-        m_preventLoopBack = bridgeXmlNode.attribute(STRING_XML_PREVENT_LOOPBACK).as_bool();
-        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'prevent loopback' boolean to ", m_preventLoopBack, " from XML configuration");
-      }
-      else
-      {
-        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find 'prevent loopback' boolean in XML configuration; server boolean is ", m_preventLoopBack);
-      }
-
-      if (!bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).empty())
-      {
+    if (!bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).empty())
+    {
         m_throttleConfigurationForwarding = bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).as_bool();
         UXAS_LOG_INFORM(s_typeName(), "::configure setting 'throttle configuration forwarding' boolean to ", m_throttleConfigurationForwarding, " from XML configuration");
-      }
-      else
-      {
+    }
+    else
+    {
         UXAS_LOG_INFORM(s_typeName(), "::configure failed to find 'throttle configuration forwarding' boolean in XML configuration; server boolean is ", m_throttleConfigurationForwarding);
-      }
+    }
+    
+    if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
+    {
+        m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
+    }
+    else
+    {
+        UXAS_LOG_INFORM(s_typeName(), "::configure did not find 'ConsiderSelfGenerated' boolean in XML configuration; 'ConsiderSelfGenerated' boolean is ", m_isConsideredSelfGenerated);
+    }
 
-      // TODO review IMPACT messaging requirements (need to modify object before sending?)
-      // handle mapping of UxAS internal single/multi-part messages to IMPACT single/multi-part messages 
-      for (pugi::xml_node currentXmlNode = bridgeXmlNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
-      {
+    // handle all subscriptions, reminder: external subscriptions follow IMPACT subscription format
+    for (pugi::xml_node currentXmlNode = bridgeXmlNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
+    {
         if (uxas::common::StringConstant::SubscribeToMessage() == currentXmlNode.name())
         {
-          if (!currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).empty())
-          {
-            addSubscriptionAddress(currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value());
-          }
+            if (!currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).empty())
+            {
+                addSubscriptionAddress(currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value());
+            }
         }
         else if (uxas::common::StringConstant::SubscribeToExternalMessage() == currentXmlNode.name())
         {
-          if (!currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).empty())
-          {
-            m_externalSubscriptionAddresses.emplace(currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value());
-          }
+            if (!currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).empty())
+            {
+                m_externalSubscriptionAddresses.emplace(currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value());
+            }
         }
-      }
+    }
 
-      //
-      // DESIGN 20150911 RJT message addressing - entity ID
-      // - received/sent LMCP messages always include entity ID
-      // - the entity cast address is derived from entity ID (see getEntityCastAddress function)
-      // - bridges never subscribe to the entity cast address on the internal network
-      // - bridges usually subscribe (or coordinate subscription) to the entity cast address on external networks
-      //   (TCP and serial bridges do not have external subscription)
-      //
-      // subscribe to external messages addressed to this entity
-      UXAS_LOG_INFORM(s_typeName(), "::configure externally subscribing to entity cast address [", getEntityCastAddress(m_entityId), "]");
-      m_externalSubscriptionAddresses.emplace(getEntityCastAddress(m_entityId));
+    // do not forward any uni-cast messages addressed to this bridge
+    UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
+    m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
+    m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
 
-      // do not forward any uni-cast messages addressed to this bridge
-      UXAS_LOG_INFORM(s_typeName(), "::configure adding non-forward address [", getNetworkClientUnicastAddress(m_entityId, m_networkId), "]");
-      m_nonImportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
-      m_nonExportForwardAddresses.emplace(getNetworkClientUnicastAddress(m_entityId, m_networkId));
-
-      return (isSuccess);
-    };
-
-    bool
-      ImpactSubscribePushBridge::initialize()
+    // self generated overrides configured reported entity ID
+    if(m_isConsideredSelfGenerated)
     {
-      int32_t zmqhighWaterMark{ 100000 };
+        m_externalID = m_entityId;
+    }
+    
+    return (true); // no failure criteria for this configuration set, reverts to defaults
+};
 
-      //push socket
-      auto pushConfig = transport::ZeroMqSocketConfiguration(uxas::communications::transport::NETWORK_NAME::zmqLmcpNetwork(),
+bool
+ImpactSubscribePushBridge::initialize()
+{
+    int32_t zmqhighWaterMark{ 100000 };
+
+    // push socket
+    auto pushConfig = transport::ZeroMqSocketConfiguration(uxas::communications::transport::NETWORK_NAME::zmqLmcpNetwork(),
         m_externalPushSocketAddress, ZMQ_PUSH, false, false, zmqhighWaterMark, zmqhighWaterMark);
 
-      sender = transport::ZeroMqFabric::getInstance().createSocket(pushConfig);
+    sender = transport::ZeroMqFabric::getInstance().createSocket(pushConfig);
 
-
-      //sub socket
-      auto subConfig = transport::ZeroMqSocketConfiguration(uxas::communications::transport::NETWORK_NAME::zmqLmcpNetwork(),
+    // sub socket
+    auto subConfig = transport::ZeroMqSocketConfiguration(uxas::communications::transport::NETWORK_NAME::zmqLmcpNetwork(),
         m_externalSubscribeSocketAddress, ZMQ_SUB, false, true, zmqhighWaterMark, zmqhighWaterMark);
-      subscriber = transport::ZeroMqFabric::getInstance().createSocket(subConfig);
-      //subscriber->setsockopt(ZMQ_SUBSCRIBE, "lmcp:", 4);
-
-      //loop through m_externalSubscriptionAddresses
-      for (auto externalSubscription : m_externalSubscriptionAddresses)
-      {
+    subscriber = transport::ZeroMqFabric::getInstance().createSocket(subConfig);
+    
+    // loop through m_externalSubscriptionAddresses and subscribe following IMPACT message addressing
+    for (auto externalSubscription : m_externalSubscriptionAddresses)
+    {
         subscriber->setsockopt(ZMQ_SUBSCRIBE, externalSubscription.c_str(), externalSubscription.size());
-      }
+    }
 
-      UXAS_LOG_INFORM(s_typeName(), "::initialize succeeded");
-      return (true);
-    };
+    UXAS_LOG_INFORM(s_typeName(), "::initialize succeeded");
+    return (true);
+};
 
-    bool
-      ImpactSubscribePushBridge::start()
-    {
-      m_externalReceiveProcessingThread = uxas::stduxas::make_unique<std::thread>(&ImpactSubscribePushBridge
+bool
+ImpactSubscribePushBridge::start()
+{
+    m_externalReceiveProcessingThread = uxas::stduxas::make_unique<std::thread>(&ImpactSubscribePushBridge
         ::executeExternalSerializedLmcpObjectReceiveProcessing, this);
-      UXAS_LOG_INFORM(s_typeName(), "::start subscribe receive processing thread [", m_externalReceiveProcessingThread->get_id(), "]");
-      return (true);
-    };
+    UXAS_LOG_INFORM(s_typeName(), "::start subscribe receive processing thread [", m_externalReceiveProcessingThread->get_id(), "]");
+    return (true);
+};
 
-    bool
-      ImpactSubscribePushBridge::terminate()
+bool
+ImpactSubscribePushBridge::terminate()
+{
+    m_isTerminate = true;
+    if (m_externalReceiveProcessingThread && m_externalReceiveProcessingThread->joinable())
     {
-      m_isTerminate = true;
-      if (m_externalReceiveProcessingThread && m_externalReceiveProcessingThread->joinable())
-      {
         m_externalReceiveProcessingThread->join();
         UXAS_LOG_INFORM(s_typeName(), "::terminate calling thread completed m_externalReceiveProcessingThread join");
-      }
-      else
-      {
-        UXAS_LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_externalReceiveProcessingThread");
-      }
-
-      return (true);
-    };
-
-    bool
-      ImpactSubscribePushBridge::processReceivedSerializedLmcpMessage(std::unique_ptr<uxas::communications::data::AddressedAttributedMessage>
-        receivedLmcpMessage)
+    }
+    else
     {
+        UXAS_LOG_WARN(s_typeName(), "::terminate unexpectedly could not join m_externalReceiveProcessingThread");
+    }
 
-      // send message to the external entity
-      UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage before sending serialized message ",
+    return (true);
+};
+
+bool
+ImpactSubscribePushBridge::processReceivedSerializedLmcpMessage(
+    std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> receivedLmcpMessage)
+{
+    // send message to the external entity
+    UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedSerializedLmcpMessage before sending serialized message ",
         "having address ", receivedLmcpMessage->getAddress(),
         " and size ", receivedLmcpMessage->getPayload().size());
 
-      // process messages from a local service (only)
-      if (m_preventLoopBack && m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
-      {
-        if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
-        {
-          UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
-
-          //convert to LMCP to get series name
-          std::string message = receivedLmcpMessage->getPayload();
-          avtas::lmcp::ByteBuffer byteBuffer;
-          byteBuffer.allocate(message.size());
-          byteBuffer.put(reinterpret_cast<const uint8_t*>(message.c_str()), message.size());
-          byteBuffer.rewind();
-
-          std::shared_ptr<avtas::lmcp::Object> ptr_Object;
-          ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
-
-          if(m_throttleConfigurationForwarding && std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object))
-          {
-             auto config = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object);
-             if(m_configs.find(config->getID()) != m_configs.end())
-             {
-                if(m_configs[config->getID()]->toXML().compare(config->toXML()) == 0)
-                {
-                   std::cout << " ##ZeroMQ_Bridge: Blocking AirVehicleConfiguration, already sent" << std::endl;
-                   return false; // don't forward configs already forwarded
-                }
-             }
-             m_configs[config->getID()] = config;
-          }
-
-          std::string seriesName = ptr_Object->getSeriesName();
-
-          std::locale loc;
-          //convert seriesName to uppercase
-          for (std::string::size_type i = 0; i < seriesName.length(); i++)
-          {
-            seriesName[i] = std::toupper(seriesName[i], loc);
-          }
-
-          std::string header = "lmcp:" + seriesName + ":" + ptr_Object->getLmcpTypeName();
-          n_ZMQ::s_sendmore(*sender, header);
-          n_ZMQ::s_send(*sender, receivedLmcpMessage->getPayload());
-
-
-        }
-        else
-        {
-          UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
-        }
-      }
-      else
-      {
-        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring message with source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId());
-      }
-
-      return (false); // always false implies never terminating bridge from here
-    };
-
-    void
-      ImpactSubscribePushBridge::executeExternalSerializedLmcpObjectReceiveProcessing()
+    // do not forward uni-cast messages (or any address on blocked list)
+    if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
     {
-      try
-      {
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
 
+        // unpack message to get complete attributes
+        std::string message = receivedLmcpMessage->getPayload();
+        avtas::lmcp::ByteBuffer byteBuffer;
+        byteBuffer.allocate(message.size());
+        byteBuffer.put(reinterpret_cast<const uint8_t*> (message.c_str()), message.size());
+        byteBuffer.rewind();
 
+        std::shared_ptr<avtas::lmcp::Object> ptr_Object;
+        ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
+        if(!ptr_Object)
+        {
+            UXAS_LOG_WARN(s_typeName(), "::processReceivedSerializedLmcpMessage received an invalid LMCP object, ignoring");
+            return false;
+        }
+
+        // check for air vehicle configuration throttling
+        if (m_throttleConfigurationForwarding && std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object))
+        {
+            auto config = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object);
+            if (m_configs.find(config->getID()) != m_configs.end())
+            {
+                if (m_configs[config->getID()]->toXML().compare(config->toXML()) == 0)
+                {
+                    UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage blocking AirVehicleConfiguration, already sent" );
+                    return false; // don't forward configs already forwarded
+                }
+            }
+            m_configs[config->getID()] = config;
+        }
+
+        // build IMPACT messaging address 'lmcp:[MDM SERIES NAME]:[message type name]'
+        std::string seriesName = ptr_Object->getSeriesName();
+
+        // convert seriesName to uppercase
+        std::transform(seriesName.begin(), seriesName.end(), seriesName.begin(), toupper);
+
+        std::string impact_address = "lmcp:" + seriesName + ":" + ptr_Object->getLmcpTypeName();
+        n_ZMQ::s_sendmore(*sender, impact_address);
+        n_ZMQ::s_send(*sender, receivedLmcpMessage->getPayload());
+    }
+    else
+    {
+        UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage ignoring non-export message with address ", receivedLmcpMessage->getAddress(), ", source entity ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
+    }
+
+    return (false); // always false implies never terminating bridge from here
+}
+
+void
+ImpactSubscribePushBridge::executeExternalSerializedLmcpObjectReceiveProcessing()
+{
+    try
+    {
         while (!m_isTerminate)
         {
+            std::string impact_address = n_ZMQ::s_recv(*subscriber);
+            std::string message = n_ZMQ::s_recv(*subscriber);
 
-          std::string key = n_ZMQ::s_recv(*subscriber);
-          std::string message = n_ZMQ::s_recv(*subscriber);
+            // ignore impact address, construct UxAS address from valid LMCP message
+            avtas::lmcp::ByteBuffer byteBuffer;
+            byteBuffer.allocate(message.size());
+            byteBuffer.put(reinterpret_cast<const uint8_t*> (message.c_str()), message.size());
+            byteBuffer.rewind();
 
-          //don't care about key. Construct header from valid LMCP.
-
-          avtas::lmcp::ByteBuffer byteBuffer;
-          byteBuffer.allocate(message.size());
-          byteBuffer.put(reinterpret_cast<const uint8_t*>(message.c_str()), message.size());
-          byteBuffer.rewind();
-
-          std::shared_ptr<avtas::lmcp::Object> ptr_Object;
-          ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
-
-          auto header = ptr_Object->getFullLmcpTypeName();
-          std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
-
-          recvdAddAttMsg->setAddressAttributesAndPayload(header, "lmcp", header, "fusion", externalID, "1", message);
-
-          // send message to the external entity
-          if (recvdAddAttMsg->isValid())
-          {
-            UXAS_LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing before sending serialized message ",
-              "having address ", recvdAddAttMsg->getAddress(),
-              " and size ", recvdAddAttMsg->getPayload().size());
-
-            // process messages from an external service (only)
-            if (m_entityIdString != recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
+            std::shared_ptr<avtas::lmcp::Object> ptr_Object;
+            ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
+            
+            if(ptr_Object)
             {
-              if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
-              {
-                sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
-                //LmcpObjectNetworkClientBase::sendSharedLmcpObjectBroadcastMessage(ptr_Object);
+                auto broadcast_address = ptr_Object->getFullLmcpTypeName();
+                std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
 
-              }
-              else
-              {
-                UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
-              }
+                // internal message addressing is formatted as 'broadcast' from 'fusion' group
+                // with entity ID set from configuration
+                recvdAddAttMsg->setAddressAttributesAndPayload(broadcast_address, "lmcp", broadcast_address, "fusion", std::to_string(m_externalID), std::to_string(m_networkId), message);
+
+                // send message from the external entity to the local bus
+                if (recvdAddAttMsg->isValid())
+                {
+                    UXAS_LOG_DEBUGGING(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing before sending serialized message ",
+                        "having address ", recvdAddAttMsg->getAddress(),
+                        " and size ", recvdAddAttMsg->getPayload().size());
+
+                    sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
+                }
+                else
+                {
+                    UXAS_LOG_WARN(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing ignoring received, invalid AddressedAttributedMessage object");
+                }
             }
             else
             {
-              UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
+                UXAS_LOG_WARN(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing ignoring invalid LMCP object");
             }
-          }
-          else
-          {
-            UXAS_LOG_WARN(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing ignoring received, invalid AddressedAttributedMessage object");
-          }
         }
         UXAS_LOG_INFORM(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
-      }
-      catch (std::exception& ex)
-      {
+    }
+    catch (std::exception& ex)
+    {
         UXAS_LOG_ERROR(s_typeName(), "::executeExternalSerializedLmcpObjectReceiveProcessing EXCEPTION: ", ex.what());
-      }
-    };
+    }
+}
 
-  }; //namespace communications
+}; //namespace communications
 }; //namespace uxas

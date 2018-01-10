@@ -24,9 +24,10 @@ namespace uxas
   {
 
     /** \class ImpactSubscribePushBridge
-        \brief A component that connects an external entity to the internal message
-     * bus using <I>ZMQ_SUB<I/> and <I>ZMQ_PUSH<I/> sockets.
-
+     *  \brief A component that connects an external entity to the internal message
+     * bus using <I>ZMQ_SUB<I/> and <I>ZMQ_PUSH<I/> sockets. Uses two part messages
+     * with IMPACT addressing (i.e. 'lmcp:[MDM SERIES NAME]:[message type name]')
+     * and reports group as 'fusion'
      *
      *
      *  @par Description:
@@ -41,17 +42,15 @@ namespace uxas
      * <Bridge Type="ImpactSubscribePushBridge"
      *    AddressSUB="tcp://localhost:6561"
      *    AddressPUSH="tcp://localhost:6562"
-     *    ExternalID="100"
-     *    Server="false"
-     *    PreventLoopBack="true"
-     *    ThrottleConfigurationForwarding="false">
+     *    ExternalID=entityID
+     *    ThrottleConfigurationForwarding="false"
+     *    ConsiderSelfGenerated="false">
      *
      * AddressSUB: the address and port for the ZeroMQ subscription connection
      * AddressPUSH: the address and port for the ZeroMQ push connection
      * ExternalID: the entity ID for which this connection should report all traffic as originating from
-     * Server: boolean indicating connections as 'bind' or 'connect'
-     * PreventLoopBack: boolean that when true drops any messages that have the originating entity ID as the currently configured UxAS instance
      * ThrottleConfigurationForwarding: boolean that when true prevents duplicate air vehicle configurations from being forwarded
+     * ConsiderSelfGenerated: boolean that when true overwrites the external ID with local ID
      *
      * @par Details:
      * <ul style="padding-left:1em;margin-left:0">
@@ -140,17 +139,14 @@ namespace uxas
 
       std::string m_externalSubscribeSocketAddress = std::string("tcp://*:5555");
       std::string m_externalPushSocketAddress = std::string("tcp://*:5556");
-      /** \brief  should the pub and pull sockects be set up as a server (default) or a client?*/
-      bool m_isServer{ false };
 
       std::unique_ptr<zmq::socket_t> sender;
       std::unique_ptr<zmq::socket_t> subscriber;
 
       std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::AirVehicleConfiguration> > m_configs;
       bool m_throttleConfigurationForwarding{ false };
-      bool m_preventLoopBack{ true };
-
-      std::string externalID = "100";
+      bool m_isConsideredSelfGenerated{ false };
+      int64_t m_externalID{0};
 
     };
 
