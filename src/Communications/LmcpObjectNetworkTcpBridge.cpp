@@ -219,59 +219,6 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
             UXAS_LOG_DEBUG_VERBOSE_BRIDGE("getPayload:       [", receivedTcpMessage->getPayload(), "]");
             UXAS_LOG_DEBUG_VERBOSE_BRIDGE("getString:        [", receivedTcpMessage->getString(), "]");
 
-// 20151203 dbk, rjt how much firewall, spam protection is necessary ??
-#ifdef IMPACT_BUILD
-            // Only allow configurations to be sent out once per session
-            // NOTE: this removes the ability to update configurations during run time
-            // When AMASE is fixed to not spam configurations, this will no longer be necessary
-            static std::unordered_set<int64_t> s_entityConfiguration;
-            if (receivedTcpMessage->getDescriptor() == afrl::cmasi::AirVehicleConfiguration::Subscription ||
-                    receivedTcpMessage->getDescriptor() == afrl::vehicles::GroundVehicleConfiguration::Subscription ||
-                    receivedTcpMessage->getDescriptor() == afrl::vehicles::SurfaceVehicleConfiguration::Subscription)
-            {
-                // deserialize and create throw-away EntityConfiguration
-                std::unique_ptr<avtas::lmcp::Object> lmcpObject = m_externalLmcpObjectMessageReceiverPipe.deserializeMessage(receivedTcpMessage->getPayload());
-                afrl::cmasi::EntityConfiguration* entityCfg = static_cast<afrl::cmasi::EntityConfiguration*> (lmcpObject.get());
-                auto entityCfgIt = s_entityConfiguration.find(entityCfg->getID());
-                if (entityCfgIt == s_entityConfiguration.end())
-                {
-                    // current configuration not found
-                    // send the message along, then put in set for future blocking
-                    // process messages from an external service (only)
-                    if (m_entityIdString != receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId())
-                    {
-                        sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
-                    }
-                    else
-                    {
-                        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                    }
-                    s_entityConfiguration.insert(entityCfg->getID());
-                }
-                else
-                {
-                    // already received a configuration for this ID and assuming it will not change
-                }
-            }
-            else if (receivedTcpMessage->getDescriptor() == afrl::cmasi::SessionStatus::Subscription ||
-                    receivedTcpMessage->getDescriptor() == afrl::cmasi::ServiceStatus::Subscription)
-            {
-                // block Session Status and Service Status messages
-            }
-            else
-            {
-                // send it along
-                // process messages from an external service (only)
-                if (m_entityIdString != receivedTcpMessage->getMessageAttributesReference()->getSourceEntityId())
-                {
-                    sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
-                }
-                else
-                {
-                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                }
-            }
-#else
             if (receivedTcpMessage)
             {
                 if (m_nonImportForwardAddresses.find(receivedTcpMessage->getAddress()) == m_nonImportForwardAddresses.end())
@@ -307,7 +254,6 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
             {
                 UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
             }
-#endif
         }
         UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
