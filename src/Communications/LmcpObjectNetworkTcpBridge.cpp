@@ -24,15 +24,6 @@
 #include <iomanip>
 #include <thread>
 
-//#define IMPACT_BUILD
-
-// IMPACT AMASE THROTTLE
-#ifdef IMPACT_BUILD
-#include <unordered_set>
-#include "afrl/impact/IMPACT.h"
-#include "afrl/cmasi/CMASI.h"
-#endif
-
 namespace uxas
 {
 namespace communications
@@ -225,25 +216,9 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
                 {
                     if(m_isConsideredSelfGenerated)
                     {
-                        // remove `envelope` and replace with a `broadcast` as if this message
-                        // originated with this bridge service
-                        
-                        // decode message so that `envelope` is auto-created
-                        avtas::lmcp::ByteBuffer buf;
-                        buf.allocate(receivedTcpMessage->getPayload().size());
-                        buf.put((uint8_t*) receivedTcpMessage->getPayload().c_str(), receivedTcpMessage->getPayload().size(), 0);
-                        buf.rewind();
-                        auto obj = std::shared_ptr<avtas::lmcp::Object>(avtas::lmcp::Factory::getObject(buf));
-                        if(obj)
-                        {
-                            sendSharedLmcpObjectBroadcastMessage(obj);
-                        }
+                        receivedTcpMessage->updateSourceAttributes("TcpBridge", std::to_string(m_entityId), std::to_string(m_networkId));
                     }
-                    else
-                    {
-                        // send along message with the exact `envelope` as was received
-                        sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
-                    }
+                    sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
                 }
                 else
                 {
