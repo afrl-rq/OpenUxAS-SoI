@@ -267,7 +267,7 @@ private:
     bool
     setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode);
 
-#ifdef AFRL_INTERNAL_ENABLED
+#if defined(AFRL_INTERNAL_ENABLED) && defined(USE_GEO_LIBS)
     /** \brief The <B><i>loadUtilityValuesFromXmlNode</i></B> method loads 
      * found within child nodes of the UxAS node. After loading the values
      * the utility initialization functions are called.
