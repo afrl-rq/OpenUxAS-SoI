@@ -4,3 +4,10 @@ option(
   type: 'boolean',
   value: false,
 )
+
+option(
+  'geo_libs',
+  description: 'build with extra ground height fidelity (requires gdal and GeographicLib)',
+  type: 'boolean',
+  value: false,
+)
