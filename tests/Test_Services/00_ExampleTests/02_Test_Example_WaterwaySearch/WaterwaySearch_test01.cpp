@@ -16,13 +16,13 @@ TEST(WaterwaySearch_Test01, CorrectNumberMessages)
 	// configFileName - the file name of the UxAS configuration file
 	std::string configFileName;
 	#ifdef _WIN32
-		testPath = "../../../../../tests/Test_Services/00_ExampleTests/02_Test_Example_WaterwaySearch/";
-		configFileName = "cfg_WaterwaySearch_Windows.xml";
+		#include "windows.h"
+		SetCurrentDirectory("../../../../");
 	#endif
-	#ifndef _WIN32
-		testPath = "../tests/Test_Services/00_ExampleTests/02_Test_Example_WaterwaySearch/";
-		configFileName = "cfg_WaterwaySearch.xml";
-	#endif // !_WIN32
+
+	testPath = "../tests/Test_Services/00_ExampleTests/02_Test_Example_WaterwaySearch/";
+	configFileName = "cfg_WaterwaySearch.xml";
+
 	// uxasConfigurationFile - path and file name of the UxAS configuration file
 	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files

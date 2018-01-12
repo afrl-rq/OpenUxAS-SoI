@@ -195,10 +195,10 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                 {
                     zyre_event_t *zyre_event = zyre_event_new(m_zyreNode);
 
-                    if (zyre_event_type(zyre_event) == ZYRE_EVENT_ENTER)
+                    if (strcmp(zyre_event_type(zyre_event),"ENTER") == 0)
                     {
                         // <editor-fold defaultstate="collapsed" desc="ZYRE_EVENT_ENTER">
-                        std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_sender(zyre_event)));
+                        std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_peer_uuid(zyre_event)));
                         UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ZYRE_EVENT_ENTER event from ", zyreRemoteUuid);
                         if (!zyreRemoteUuid.empty())
                         {
@@ -231,20 +231,20 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                         }
                         // </editor-fold>
                     }
-                    else if (zyre_event_type(zyre_event) == ZYRE_EVENT_JOIN)
+                    else if (strcmp(zyre_event_type(zyre_event), "JOIN") == 0)
                     {
                         UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_JOIN event from ",
-                                 static_cast<const char*> (zyre_event_sender(zyre_event)));
+                                 static_cast<const char*> (zyre_event_peer_uuid(zyre_event)));
                     }
-                    else if (zyre_event_type(zyre_event) == ZYRE_EVENT_LEAVE)
+                    else if (strcmp(zyre_event_type(zyre_event), "LEAVE") == 0)
                     {
                         UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_LEAVE event from ",
-                                 static_cast<const char*> (zyre_event_sender(zyre_event)));
+                                 static_cast<const char*> (zyre_event_peer_uuid(zyre_event)));
                     }
-                    else if (zyre_event_type(zyre_event) == ZYRE_EVENT_EXIT)
+                    else if (strcmp(zyre_event_type(zyre_event), "EXIT") == 0)
                     {
                         // <editor-fold defaultstate="collapsed" desc="ZYRE_EVENT_EXIT">
-                        std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_sender(zyre_event)));
+                        std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_peer_uuid(zyre_event)));
                         if (!zyreRemoteUuid.empty())
                         {
                             if (m_isZyreExitMessageHandler)
@@ -263,15 +263,15 @@ ZeroMqZyreBridge::executeZyreEventProcessing()
                         }
                         // </editor-fold>
                     }
-                    else if (zyre_event_type(zyre_event) == ZYRE_EVENT_SHOUT)
+                    else if (strcmp(zyre_event_type(zyre_event), "SHOUT") == 0)
                     {
                         UXAS_LOG_INFORM(s_typeName(), "::executeZyreEventProcessing ignoring ZYRE_EVENT_SHOUT event from ",
-                                 static_cast<const char*> (zyre_event_sender(zyre_event)));
+                                 static_cast<const char*> (zyre_event_peer_uuid(zyre_event)));
                     }
-                    else if (zyre_event_type(zyre_event) == ZYRE_EVENT_WHISPER)
+                    else if (strcmp(zyre_event_type(zyre_event), "WHISPER") == 0)
                     {
                         // <editor-fold defaultstate="collapsed" desc="ZYRE_EVENT_WHISPER">
-                        std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_sender(zyre_event)));
+                        std::string zyreRemoteUuid(static_cast<const char*> (zyre_event_peer_uuid(zyre_event)));
                         if (!zyreRemoteUuid.empty())
                         {
                             zmsg_t *msg = zyre_event_msg(zyre_event);

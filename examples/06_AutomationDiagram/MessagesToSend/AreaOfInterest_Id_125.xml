@@ -1,0 +1,19 @@
+<AreaOfInterest Series="IMPACT">
+            <AreaID>125</AreaID>
+            <Area>
+                <Rectangle Series="CMASI">
+                    <CenterPoint>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.23733953451899</Latitude>
+                            <Longitude>-80.56869848012519</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </CenterPoint>
+                    <Width>1566.6202</Width>
+                    <Height>1322.2699</Height>
+                    <Rotation>0.0</Rotation>
+                </Rectangle>
+            </Area>
+        </AreaOfInterest>
+        

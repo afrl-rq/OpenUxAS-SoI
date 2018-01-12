@@ -21,15 +21,16 @@ srcs_services = [
   'Test_SimulationTime.cpp',
   'RoutePlannerVisibilityService.cpp',
   'WaypointPlanManagerService.cpp',
+  'SimpleWaypointPlanManagerService.cpp',
 ]
 
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
-      '../../3rd/cppzmq-4.2.1',
-      '../../3rd/zeromq-4.1.6/include',
-      '../../3rd/czmq-3.0.1/include',
-      '../../3rd/zyre-1.1.0/include',
+      '../../3rd/cppzmq-4.2.2',
+      '../../3rd/zeromq-4.2.3/include',
+      '../../3rd/czmq-4.0.2/include',
+      '../../3rd/zyre-2.0.0/include',
       '../../3rd/sqlite-amalgamation-3120200',
       '../../3rd/SQLiteCpp-1.3.1/include',
       '../../3rd/zlib-1.2.8/contrib/minizip',
@@ -69,9 +70,12 @@ cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
   cpp_args += [
   	'/std:c++14',
-	'-DZMQ_DEFINED_STDINT',
-    '-DZMQ_STATIC',
+	'-DZMQ_STATIC',
+	'-DCZMQ_STATIC',
+	'-DZYRE_STATIC',
+	'-DLIBZMQ_STATIC',
 	'-DLIBCZMQ_STATIC',
+	'-DLIBZYRE_STATIC',
   ]
 else
   cpp_args += [

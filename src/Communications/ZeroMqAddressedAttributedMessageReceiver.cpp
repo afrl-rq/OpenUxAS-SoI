@@ -30,6 +30,15 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
 {
     std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> nextMsg;
 
+    // just send the next message if one is available
+    if(!m_recvdMsgs.empty())
+    {
+        nextMsg = std::move(m_recvdMsgs[0]);
+        m_recvdMsgs.pop_front();
+        return nextMsg;
+    }
+    
+    // no messages in queue, attempt to read from socket
     if (m_zmqSocket)
     {
         UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageReceiver::getNextMessage BEFORE zmq::pollitem_t");
@@ -66,31 +75,20 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
                         std::string framePayload(reinterpret_cast<const char*> (payloadData), payloadSize);
                         UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageReceiver::getNextMessage TCP framePayload is: [", framePayload, "]");
                         std::string recvdTcpDataSegment = m_receiveTcpDataBuffer.getNextPayloadString(framePayload);
-                        if (!recvdTcpDataSegment.empty())
+                        while (!recvdTcpDataSegment.empty())
                         {
                             UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageReceiver::getNextMessage processing complete object string segment");
                             std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdTcpAddAttMsg
                                     = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
                             if (recvdTcpAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdTcpDataSegment)))
                             {
-                                // process messages from an external service (only - since TCP stream is only used for bridging to other entities)
-                                if (m_entityIdString != recvdTcpAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
-                                {
-                                    nextMsg = std::move(recvdTcpAddAttMsg);
-                                }
-                                else
-                                {
-                                    UXAS_LOG_INFORM("ZeroMqAddressedAttributedMessageReceiver::getNextMessage ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                                }
+                                m_recvdMsgs.push_back( std::move(recvdTcpAddAttMsg) );
                             }
                             else
                             {
                                 UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageReceiver::getNextMessage failed to create AddressedAttributedMessage object from TCP stream serial buffer string segment");
                             }
-                        }
-                        else
-                        {
-                            UXAS_LOG_DEBUGGING("ZeroMqAddressedAttributedMessageReceiver::getNextMessage data appended to serial buffer, but serial buffer does not yet contain a complete object string segment");
+                            recvdTcpDataSegment = m_receiveTcpDataBuffer.getNextPayloadString("");
                         }
                         UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageReceiver::getNextMessage BEFORE zframe_destroy");
                         zframe_destroy(&frameData);
@@ -107,6 +105,7 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
             }
             else
             {
+                // not a stream, so should only be a single message
                 if (uxas::common::ConfigurationManager::getIsZeroMqMultipartMessage())
                 {
                     std::string address = n_ZMQ::s_recv(*m_zmqSocket);
@@ -123,7 +122,7 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
                         if (recvdMultipartAddAttMsg->setAddressAttributesAndPayload(std::move(address), std::move(contentType), std::move(descriptor), std::move(sourceGroup),
                                                                                     std::move(sourceEntityId), std::move(sourceServiceId), std::move(payload)))
                         {
-                            nextMsg = std::move(recvdMultipartAddAttMsg);
+                            m_recvdMsgs.push_back( std::move(recvdMultipartAddAttMsg) );
                         }
                         else
                         {
@@ -144,7 +143,7 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
                         if (m_entityIdString != recvdSinglepartAddAttMsg->getMessageAttributesReference()->getSourceEntityId()
                                 || m_serviceIdString != recvdSinglepartAddAttMsg->getMessageAttributesReference()->getSourceServiceId())
                         {
-                            nextMsg = std::move(recvdSinglepartAddAttMsg);
+                            m_recvdMsgs.push_back( std::move(recvdSinglepartAddAttMsg) );
                         }
                         else
                         {
@@ -160,6 +159,11 @@ ZeroMqAddressedAttributedMessageReceiver::getNextMessage()
         }
     } //if(m_zmqSocket)
 
+    if(!m_recvdMsgs.empty())
+    {
+        nextMsg = std::move(m_recvdMsgs[0]);
+        m_recvdMsgs.pop_front();
+    }
     return (nextMsg);
 };
 

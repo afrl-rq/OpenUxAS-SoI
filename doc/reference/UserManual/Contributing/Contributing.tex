@@ -140,7 +140,7 @@ odd. Eventually, we would like to replace these team branches with
 entire repo forks for each team, but until OpenUxAS is public, this
 would prevent forks from using the \texttt{afrl-rq} Travis-CI account.
 
-\subsubsection{Creating}\label{creating}
+\subsection{Create New Branch}\label{create-new-branch}
 
 Start by creating a new branch that will serve as the active development
 branch for your team. This step should only be necessary once for your
@@ -152,7 +152,7 @@ $ git checkout develop
 $ git checkout -b teamA
 \end{verbatim}
 
-\subsubsection{Updating}\label{updating}
+\subsection{Updating}\label{updating}
 
 You will want to regularly incorporate the latest changes from the
 \texttt{develop} branch in your team branch. This reduces the pain when
@@ -184,13 +184,13 @@ your team branch has commits you would like to see in \texttt{develop},
 you can simply create a new feature branch and begin the pull request
 process right away.
 
-\subsubsection{Naming}\label{naming}
+\subsection{Naming}\label{naming}
 
 To help the OpenUxAS maintainers know which branches belong to which
 teams, feature branches should be named using your team name as a
 prefix, for example \texttt{teamA-feature1}.
 
-\subsubsection{Creating}\label{creating-1}
+\subsection{Creating}\label{creating-1}
 
 Create a feature branch by checking it out off of your team branch. Note
 that it will save you some effort at the later merge to update your team
@@ -201,7 +201,7 @@ $ git checkout teamA
 $ get checkout -b teamA/feature1
 \end{verbatim}
 
-\subsubsection{Merging to Team Branch}\label{merging-to-team-branch}
+\subsection{Merging to Team Branch}\label{merging-to-team-branch}
 
 For a long-running feature branch, you may want to occasionally merge it
 back into your team branch so it can be shared within your team before
@@ -212,7 +212,7 @@ $ git checkout teamA
 $ git merge teamA/feature1
 \end{verbatim}
 
-\subsubsection{Merging to develop}\label{merging-to-develop}
+\subsection{Merging to develop}\label{merging-to-develop}
 
 You cannot directly merge a feature branch into \texttt{develop},
 because it is protected. Instead, open a pull request from the feature
