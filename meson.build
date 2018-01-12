@@ -196,7 +196,7 @@ if get_option('internal_3rd_libraries')
 endif
 
 if get_option('afrl_internal')
-  deps += deps_internal
+  #deps += deps_internal
 endif
 
 cpp_args = []
