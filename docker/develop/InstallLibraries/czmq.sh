@@ -12,9 +12,9 @@ BUILD_TYPE="AUTOTOOLS"
 
 LIBRARY_NAME="czmq"
 LIBRARY_FOLDER_NAME="czmq"
-SOURCE_ARCHIVE_FILE="v3.0.1.zip"
+SOURCE_ARCHIVE_FILE="v4.0.2.zip"
 SOURCE_ARCHIVE_ADDRESS="https://github.com/zeromq/czmq/archive/"
-SOURCE_FOLDER_NAME="czmq-3.0.1"
+SOURCE_FOLDER_NAME="czmq-4.0.2"
 
 echo "Making Dirs"
 CWD=$(pwd)
