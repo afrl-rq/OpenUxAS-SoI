@@ -15,13 +15,14 @@ else
     '-Wno-unused-function',
     '-Wno-unused-variable',
   ]
+endif
 
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
       '../3rd/cppzmq-4.2.2',
       '../3rd/zeromq-4.2.3/include',
-      '../3rd/zyre-2.2.0/include',
+      '../3rd/zyre-2.0.0/include',
       '../3rd/sqlite-amalgamation-3120200',
       '../3rd/SQLiteCpp-1.3.1/include',
       '../3rd/googletest-release-1.8.0/googletest/include/',
@@ -29,7 +30,6 @@ if get_option('internal_3rd_libraries')
 endif
 
 srcs_test = [
-  sub_gtest.get_variable('libsources')
 ]
 
 inc_test = [
@@ -44,7 +44,6 @@ inc_test = [
   ),
   inc_3rd,
   incs_lmcp,
-  sub_gtest.get_variable('incdir'),
 ]
 
 libs_test = [

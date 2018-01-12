@@ -2,17 +2,17 @@ option(
   'afrl_internal',
   description: 'build with internal AFRL modules',
   type: 'boolean',
-  value: false,
+  value: true,
 )
 option(
     'internal_3rd_libraries',
     description: 'build with internal 3rd party libraries',
     type : 'boolean',
-    value : true,
+    value : false,
 )
 option(
   'geo_libs',
   description: 'build with extra ground height fidelity (requires gdal and GeographicLib)',
   type: 'boolean',
-  value: false,
+  value: true,
 )

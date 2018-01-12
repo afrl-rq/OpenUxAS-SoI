@@ -6,7 +6,7 @@ link_args = []
 
 os = target_machine.system()
 
-if get_option('use_geographic_libraries')
+if get_option('geo_libs')
     add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
 		link_args += [
       	 '-l:libgdal.a','-l:libGeographic.a','-l:libexpat.a','-l:libz.a']
@@ -24,7 +24,7 @@ if os.startswith('linux')
   				'-l:libzmq.a','-l:libczmq.a','-l:libzyre.a',
           '-l:libSQLiteCpp.a','-l:libsqlite3.a',
           '-l:libgtest.a',
-  				'-lrt', '-ldl']
+  				'-luuid','-lrt', '-ldl']
 	endif
 elif os == 'darwin'
   link_args += ['-ldl']
