@@ -1,0 +1,50 @@
+<AreaSearchTask Series="CMASI">
+            <SearchArea>
+                <Polygon Series="CMASI">
+                    <BoundaryPoints>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.33283722055879</Latitude>
+                            <Longitude>-80.55416376813571</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.332531627963462</Latitude>
+                            <Longitude>-80.53962905614624</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.322447072317658</Latitude>
+                            <Longitude>-80.53523484089361</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.319696738959713</Latitude>
+                            <Longitude>-80.54976955288308</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.324891813080278</Latitude>
+                            <Longitude>-80.55889599994624</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </BoundaryPoints>
+                </Polygon>
+            </SearchArea>
+            <ViewAngleList />
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.2</GroundSampleDistance>
+            <TaskID>21</TaskID>
+            <Label>AS21</Label>
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </AreaSearchTask>
+        

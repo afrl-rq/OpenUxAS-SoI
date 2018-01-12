@@ -10,19 +10,19 @@ TEST(ImpactPlayAirExpandSqPointTest01, InitialTest)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
 	// duration_s - number of second to run UxAS
-    uint32_t duration_s{10};
+    uint32_t duration_s{5};
     // testPath - relative path to the directory containing configration and othe test files
 	std::string testPath;
 	// configFileName - the file name of the UxAS configuration file
 	std::string configFileName;
 	#ifdef _WIN32
-		testPath = "../../../../tests/Test_Services/ImpactPlayAirExpandSqPointTest01/";
-		configFileName = "cfg_Test01_Windows.xml";
+		#include "windows.h"
+		SetCurrentDirectory("../../../");
 	#endif
-	#ifndef _WIN32
-		testPath = "../tests/Test_Services/ImpactPlayAirExpandSqPointTest01/";
-		configFileName = "cfg_Test01.xml";
-	#endif // !_WIN32
+
+	testPath = "../tests/Test_Services/ImpactPlayAirExpandSqPointTest01/";
+	configFileName = "cfg_Test01.xml";
+
 	// uxasConfigurationFile - path and file name of the UxAS configuration file
 	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files

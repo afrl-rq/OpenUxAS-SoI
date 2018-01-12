@@ -10,6 +10,7 @@
 #ifndef UXAS_MESSAGE_TRANSPORT_ZERO_MQ_ADDRESSED_ATTRIBUTED_MESSAGE_RECEIVER_H
 #define UXAS_MESSAGE_TRANSPORT_ZERO_MQ_ADDRESSED_ATTRIBUTED_MESSAGE_RECEIVER_H
 
+#include <deque>
 #include "ZeroMqReceiverBase.h"
 
 #include "AddressedAttributedMessage.h"
@@ -88,6 +89,7 @@ private:
     bool m_isTcpStream{false};
 
     uxas::common::SentinelSerialBuffer m_receiveTcpDataBuffer;
+    std::deque< std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> > m_recvdMsgs;
 
 };
 

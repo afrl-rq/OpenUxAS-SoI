@@ -29,7 +29,7 @@ if os.startswith('linux')
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
-  #link_args += []
+  link_args += []
 endif
 
 if get_option('afrl_internal')
@@ -196,7 +196,7 @@ if get_option('internal_3rd_libraries')
 endif
 
 if get_option('afrl_internal')
-	deps += deps_internal
+  deps += deps_internal
 endif
 
 cpp_args = []
@@ -209,17 +209,17 @@ endif
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
-      '3rd/cppzmq-4.2.1',
-      '3rd/zeromq-4.1.6/include',
-      '3rd/zyre-1.1.0/include',
+      '3rd/cppzmq-4.2.2',
+      '3rd/zeromq-4.2.3/include',
+      '3rd/zyre-2.0.0/include',
       '3rd/sqlite-amalgamation-3120200',
       '3rd/SQLiteCpp-1.3.1/include',
     )
 endif
 
-      message('@@@@@ link_args [[ @@@@@')
-      message(link_args)
-      message('@@@@@ ]] link_args @@@@@')
+      #message('@@@@@ link_args [[ @@@@@')
+      #message(link_args)
+      #message('@@@@@ ]] link_args @@@@@')
 
 
 executable(
@@ -244,6 +244,8 @@ executable(
 )
 
 subdir('tests')
+
 if get_option('afrl_internal')
   subdir('UxAS-afrl_internal/tests')
 endif
+

@@ -24,9 +24,9 @@ srcs_tasks = [
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
-      '../../3rd/cppzmq-4.2.1',
-      '../../3rd/zeromq-4.1.6/include',
-      '../../3rd/zyre-1.1.0/include',
+      '../../3rd/cppzmq-4.2.2',
+      '../../3rd/zeromq-4.2.3/include',
+      '../../3rd/zyre-2.0.0/include',
       '../../3rd/sqlite-amalgamation-3120200',
       '../../3rd/SQLiteCpp-1.3.1/include',
     )
@@ -59,13 +59,22 @@ else
   srcs_tasks_internal = files()
 endif
 
+cpp_args = []
+cpp = meson.get_compiler('cpp')
+
+if cpp.get_id() != 'msvc'
+  cpp_args += [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
+endif
+
 lib_tasks = static_library(
   'tasks',
   srcs_tasks,
   srcs_tasks_internal,
   dependencies: dep_3rd,
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args,
   include_directories: incs_tasks
 )

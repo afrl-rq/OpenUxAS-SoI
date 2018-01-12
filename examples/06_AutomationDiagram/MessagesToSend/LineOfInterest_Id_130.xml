@@ -1,0 +1,36 @@
+<LineOfInterest Series="IMPACT">
+            <LineID>130</LineID>
+            <Line>
+                <Location3D Series="CMASI">
+                    <Latitude>25.269748915395933</Latitude>
+                    <Longitude>-80.44003441280218</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.27375037112692</Latitude>
+                    <Longitude>-80.4299765831583</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.280298207777616</Latitude>
+                    <Longitude>-80.42675807767225</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.287937350536765</Latitude>
+                    <Longitude>-80.4299765831583</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.292666343673382</Latitude>
+                    <Longitude>-80.43842516005915</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </Line>
+        </LineOfInterest>
+        

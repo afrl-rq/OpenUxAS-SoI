@@ -1,0 +1,35 @@
+<EntityState Series="CMASI">
+            <ID>1</ID>
+            <u>0.0</u>
+            <v>0.0</v>
+            <w>0.0</w>
+            <udot>0.0</udot>
+            <vdot>0.0</vdot>
+            <wdot>0.0</wdot>
+            <Heading>0.0</Heading>
+            <Pitch>0.0</Pitch>
+            <Roll>0.0</Roll>
+            <p>0.0</p>
+            <q>0.0</q>
+            <r>0.0</r>
+            <Course>0.0</Course>
+            <Groundspeed>0.0</Groundspeed>
+            <Location>
+                <Location3D Series="CMASI">
+                    <Latitude>25.295627258612505</Latitude>
+                    <Longitude>-80.48851723546046</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>AGL</AltitudeType>
+                </Location3D>
+            </Location>
+            <EnergyAvailable>90.0</EnergyAvailable>
+            <ActualEnergyRate>0.005</ActualEnergyRate>
+            <PayloadStateList />
+            <CurrentWaypoint>0</CurrentWaypoint>
+            <CurrentCommand>0</CurrentCommand>
+            <Mode>Waypoint</Mode>
+            <AssociatedTasks />
+            <Time>0</Time>
+            <Info />
+        </EntityState>
+        

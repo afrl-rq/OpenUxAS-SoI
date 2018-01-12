@@ -112,7 +112,7 @@ def main():
 			line, = plt.plot(NorthEast_m[1],NorthEast_m[0],'o',markersize=12,color=[0.5,0.5,0.5])
 			plotLines.append(line)
 		else:
-			print 'Missing data: Could not plot task ' + taskLabel
+			print('Missing data: Could not plot task ' + taskLabel)
 	# THE ZONES
 	for zone in zoneArrayPd.itertuples():
 		zoneId = zone.zoneID

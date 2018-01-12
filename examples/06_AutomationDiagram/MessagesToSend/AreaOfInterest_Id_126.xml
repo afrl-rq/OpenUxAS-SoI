@@ -1,0 +1,17 @@
+<AreaOfInterest Series="IMPACT">
+            <AreaID>126</AreaID>
+            <Area>
+                <Circle Series="CMASI">
+                    <CenterPoint>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.327030961247587</Latitude>
+                            <Longitude>-80.46205425610944</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </CenterPoint>
+                    <Radius>926.22406</Radius>
+                </Circle>
+            </Area>
+        </AreaOfInterest>
+        

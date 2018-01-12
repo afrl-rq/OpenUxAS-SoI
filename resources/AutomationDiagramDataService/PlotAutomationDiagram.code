@@ -112,7 +112,7 @@ file << "\t\t\tplt.text(NorthEast_m[1],NorthEast_m[0],taskLabel,horizontalalignm
 file << "\t\t\tline, = plt.plot(NorthEast_m[1],NorthEast_m[0],'o',markersize=12,color=[0.5,0.5,0.5])" << std::endl;
 file << "\t\t\tplotLines.append(line)" << std::endl;
 file << "\t\telse:" << std::endl;
-file << "\t\t\tprint 'Missing data: Could not plot task ' + taskLabel" << std::endl;
+file << "\t\t\tprint('Missing data: Could not plot task ' + taskLabel)" << std::endl;
 file << "\t# THE ZONES" << std::endl;
 file << "\tfor zone in zoneArrayPd.itertuples():" << std::endl;
 file << "\t\tzoneId = zone.zoneID" << std::endl;
