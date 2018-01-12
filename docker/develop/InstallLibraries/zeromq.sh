@@ -13,9 +13,9 @@ BUILD_TYPE="AUTOTOOLS"
 
 LIBRARY_NAME="zeromq"
 LIBRARY_FOLDER_NAME="zeromq"
-SOURCE_ARCHIVE_FILE="zeromq-4.1.6.zip"
-SOURCE_ARCHIVE_ADDRESS="https://github.com/zeromq/zeromq4-1/releases/download/v4.1.6/"
-SOURCE_FOLDER_NAME="zeromq-4.1.6"
+SOURCE_ARCHIVE_FILE="zeromq-4.2.3.zip"
+SOURCE_ARCHIVE_ADDRESS="https://github.com/zeromq/zeromq4-1/releases/download/v4.2.3/"
+SOURCE_FOLDER_NAME="zeromq-4.2.3"
 
 echo "Making Dirs"
 CWD=$(pwd)
