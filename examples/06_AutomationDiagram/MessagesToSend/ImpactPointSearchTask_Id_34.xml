@@ -1,0 +1,45 @@
+<ImpactPointSearchTask Series="IMPACT">
+            <SearchLocationID>134</SearchLocationID>
+            <SearchLocation>
+                
+                <Location3D Series="CMASI">
+                    <Latitude>25.329151760019545</Latitude>
+                    <Longitude>-80.52222036521432</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </SearchLocation>
+            <StandoffDistance>400.0</StandoffDistance>
+            <ViewAngleList />
+            <DesiredWavelengthBands />
+            <DesiredAction>
+                <LoiterAction Series="CMASI">
+                    <LoiterType>Circular</LoiterType>
+                    <Radius>400.0</Radius>
+                    <Axis>0.0</Axis>
+                    <Length>0.0</Length>
+                    <Direction>VehicleDefault</Direction>
+                    <Duration>300000</Duration>
+                    <Airspeed>22.0</Airspeed>
+                    <Location>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.31450166483915</Latitude>
+                            <Longitude>-80.56869848012519</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </Location>
+                    <AssociatedTaskList />
+                </LoiterAction>
+            </DesiredAction>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>34</TaskID>
+            <Label>IPS34</Label>
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </ImpactPointSearchTask>
+        

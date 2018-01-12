@@ -55,7 +55,7 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
 void
 gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string baseCfgXmlPath, std::string outputPath, std::string& logFilePath)
 {
-    std::string logPath = outputPath + "/log/";
+    std::string logPath = outputPath + "log/";
     gtestuxascommonLogManagerInitialize(logPath);
     UXAS_LOG_INFORM("START gtestuxastestserviceServiceManagerStartAndRun");
     UXAS_LOG_INFORM("isCalledgtestuxastestserviceServiceManagerStartAndRun=", isCalledgtestuxastestserviceServiceManagerStartAndRun);
@@ -65,7 +65,7 @@ gtestuxastestserviceServiceManagerStartAndRun(uint32_t duration_s, std::string b
     {
         isCalledgtestuxastestserviceServiceManagerStartAndRun = true;
 
-        uxas::common::ConfigurationManager::s_rootDataWorkDirectory = outputPath + "/SavedData/";
+        uxas::common::ConfigurationManager::s_rootDataWorkDirectory = outputPath + "SavedData/";
 
         UXAS_LOG_INFORM("Base cfg XML path parameter is: ", baseCfgXmlPath);
         ASSERT_TRUE((baseCfgXmlPath.empty() ?

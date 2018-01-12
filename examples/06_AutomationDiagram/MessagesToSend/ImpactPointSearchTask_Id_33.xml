@@ -1,0 +1,17 @@
+<ImpactPointSearchTask Series="IMPACT">
+            <SearchLocationID>133</SearchLocationID>
+            <SearchLocation />
+            <StandoffDistance>0.0</StandoffDistance>
+            <ViewAngleList />
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>33</TaskID>
+            <Label>IPS33</Label>
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </ImpactPointSearchTask>
+        

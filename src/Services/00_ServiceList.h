@@ -95,7 +95,6 @@
 // test
 #include "SendMessagesService.h"
 #include "SerialAutomationRequestTestService.h"
-#include "TcpBridge.h"
 #include "Test_SimulationTime.h"
 
 // general services
@@ -109,6 +108,7 @@
 #include "RoutePlannerService.h"
 #include "SensorManagerService.h"
 #include "WaypointPlanManagerService.h"
+#include "SimpleWaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE HEADERS
@@ -136,9 +136,6 @@
 
 // examples
 {auto svc = uxas::stduxas::make_unique<uxas::service::HelloWorld>();}
-
-// adapter
-{auto svc = uxas::stduxas::make_unique<uxas::service::adapter::TcpBridge>();}   //TEST ONLY
 
 // data
 {auto svc = uxas::stduxas::make_unique<uxas::service::data::MessageLoggerDataService>();}
@@ -183,6 +180,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::SensorManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::SimpleWaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE DUMMY INSTANCES

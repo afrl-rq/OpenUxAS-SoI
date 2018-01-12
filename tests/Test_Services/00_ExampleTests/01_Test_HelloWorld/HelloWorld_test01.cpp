@@ -14,11 +14,12 @@ TEST(HelloWorld_Test01, CorrectNumberMessages)
     // testPath - relative path to the directory containing configration and other test files
 	std::string testPath;
 	#ifdef _WIN32
-		testPath = "../../../../../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/";
+		#include "windows.h"
+		SetCurrentDirectory("../../../../");
 	#endif
-	#ifndef _WIN32
-		testPath = "../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/";
-	#endif // !_WIN32
+
+	testPath = "../tests/Test_Services/00_ExampleTests/01_Test_HelloWorld/";
+
     // uxasConfigurationFile - path and file name of the UxAS configuration file
     std::string uxasConfigurationFile = testPath + "cfg_HelloWorld.xml";
     // outputPath - path for saving output files
