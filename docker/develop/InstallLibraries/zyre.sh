@@ -12,9 +12,9 @@ BUILD_TYPE="AUTOTOOLS"
 
 LIBRARY_NAME="zyre"
 LIBRARY_FOLDER_NAME="zyre"
-SOURCE_ARCHIVE_FILE="v1.1.0.zip"
+SOURCE_ARCHIVE_FILE="v2.0.0.zip"
 SOURCE_ARCHIVE_ADDRESS="https://github.com/zeromq/zyre/archive/"
-SOURCE_FOLDER_NAME="zyre-1.1.0"
+SOURCE_FOLDER_NAME="zyre-2.0.0"
 
 echo "Making Dirs"
 CWD=$(pwd)

@@ -13,9 +13,9 @@ BUILD_TYPE="HEADER_ONLY"
 
 LIBRARY_NAME="cppzmq"
 LIBRARY_FOLDER_NAME="cppzmq"
-SOURCE_ARCHIVE_FILE="v4.2.1.zip"
+SOURCE_ARCHIVE_FILE="v4.2.2.zip"
 SOURCE_ARCHIVE_ADDRESS="https://github.com/zeromq/cppzmq/archive/"
-SOURCE_FOLDER_NAME="cppzmq-4.2.1"
+SOURCE_FOLDER_NAME="cppzmq-4.2.2"
 
 echo "Making Dirs"
 CWD=$(pwd)
