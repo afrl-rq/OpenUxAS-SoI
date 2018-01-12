@@ -403,7 +403,6 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
     return (isSuccess);
 };
 
-#if defined(AFRL_INTERNAL_ENABLED) && defined(USE_GEO_LIBS)
 void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 {
     pugi::xml_node xmlUxasNode = xmlNode.child(StringConstant::UxAS().c_str());
@@ -411,6 +410,7 @@ void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xm
     {
         for (auto currentXmlNode = xmlUxasNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
         {
+#if defined(AFRL_INTERNAL_ENABLED) && defined(USE_GEO_LIBS)
             if ((std::string(currentXmlNode.name()) == std::string("Utility"))
                     && (!currentXmlNode.attribute("Type").empty()) &&
                     (currentXmlNode.attribute("Type").value() == std::string("DtedLookup")))
@@ -436,10 +436,10 @@ void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xm
                     }
                 }
             }
+#endif
         }
     }
 }
-#endif
 
 
 
