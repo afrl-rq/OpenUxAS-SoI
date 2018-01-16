@@ -1,0 +1,20 @@
+[binaries]
+c = '/opt/arm-buildroot-linux-gnueabihf/bin/arm-buildroot-linux-gnueabihf-gcc'
+cpp = '/opt/arm-buildroot-linux-gnueabihf/bin/arm-buildroot-linux-gnueabihf-g++'
+rust = ['rustc',
+        '--target', 'armv7-unknown-linux-gnueabihf',
+        '-C', 'linker=/opt/arm-buildroot-linux-gnueabihf/bin/arm-buildroot-linux-gnueabihf-gcc'
+        ]
+ar = '/opt/arm-buildroot-linux-gnueabihf/bin/arm-buildroot-linux-gnueabihf-ar'
+strip = '/opt/arm-buildroot-linux-gnueabihf/bin/arm-buildroot-linux-gnueabihf-strip'
+pkgconfig = '/opt/arm-buildroot-linux-gnueabihf/bin/pkg-config'
+exe_wrapper = ['/usr/bin/qemu-arm-static', '-r', '4.14.12', '-L', '/opt/arm-buildroot-linux-gnueabihf/arm-buildroot-linux-gnueabihf/sysroot']
+
+[properties]
+root = '/opt/arm-buildroot-linux-gnueabihf/arm-buildroot-linux-gnueabihf/sysroot'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'arm'
+cpu = 'armv7'
+endian = 'little'
