@@ -82,6 +82,14 @@ public:
             return (m_isValid);
         }
    };
+   
+   bool
+   updateSourceAttributes(const std::string sourceGroup, const std::string sourceEntityId, const std::string sourceServiceId)
+   {
+       m_isValid = m_isValid & m_messageAttributes->updateSourceAttributes(sourceGroup, sourceEntityId, sourceServiceId);
+       m_string = m_address + s_addressAttributesDelimiter() + m_messageAttributes->getString() + s_addressAttributesDelimiter() + m_payload;
+       return (m_isValid);
+   };
 
     bool
     setAddressAttributesAndPayloadFromDelimitedString(const std::string delimitedString)

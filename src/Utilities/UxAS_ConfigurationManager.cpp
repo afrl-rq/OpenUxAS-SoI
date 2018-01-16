@@ -9,7 +9,7 @@
 
 #include "UxAS_ConfigurationManager.h"
 
-#ifdef AFRL_INTERNAL_ENABLED
+#if defined(AFRL_INTERNAL_ENABLED) && defined(USE_GEO_LIBS)
 #include "GroundHeight.h"   // utility function that needs dted configuration file names form the cfg file
 #endif
 
@@ -403,7 +403,7 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
     return (isSuccess);
 };
 
-#ifdef AFRL_INTERNAL_ENABLED
+#if defined(AFRL_INTERNAL_ENABLED) && defined(USE_GEO_LIBS)
 void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 {
     pugi::xml_node xmlUxasNode = xmlNode.child(StringConstant::UxAS().c_str());

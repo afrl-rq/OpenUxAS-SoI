@@ -25,7 +25,6 @@ sub_crc16 = subproject('rust-crc16')
 lib_crc16 = sub_crc16.get_variable('lib')
 
 if get_option('afrl_internal')
-  add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
 endif
 
@@ -137,9 +136,7 @@ subdir('src/Includes')
 deps = []
 
 # OpenGL, specifically the GLU library
-if not (target_machine.cpu_family() == 'arm')
-  deps += [dependency('gl')]
-endif
+deps += [dependency('gl')]
 if os == 'darwin'
   # newer MacOS splits out GLU into a separate framework, but we can't
   # ask Meson for the version in order to handle things differently
@@ -151,9 +148,7 @@ if os == 'darwin'
     endif
   endforeach
 elif os.startswith('linux')
-  if not (target_machine.cpu_family() == 'arm')
-    deps += [dependency('glu')]
-  endif
+  deps += [dependency('glu')]
 elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
@@ -186,8 +181,8 @@ executable(
       'src/Communications',
       'src/Includes',
       'src/Services',
-      '3rd/cppzmq-4.2.1',
-      '3rd/zeromq-4.1.6/include',
+      '3rd/cppzmq-4.2.2',
+      '3rd/zeromq-4.2.3/include',
       '3rd/PugiXML/src',
       '3rd/sqlite-amalgamation-3120200',
       '3rd/SQLiteCpp-1.3.1/include',

@@ -1,0 +1,17 @@
+<PatternSearchTask Series="IMPACT">
+            <SearchLocationID>137</SearchLocationID>
+            <SearchLocation />
+            <Pattern>Sector</Pattern>
+            <Extent>500.0</Extent>
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>37</TaskID>
+            <Label>PaS37</Label>
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </PatternSearchTask>
+        

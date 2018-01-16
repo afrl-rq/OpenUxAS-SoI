@@ -10,6 +10,7 @@
 #ifndef UXAS_MESSAGE_TRANSPORT_ZERO_MQ_ADDRESSED_ATTRIBUTED_MESSAGE_TCP_RECEIVER_SENDER_H
 #define UXAS_MESSAGE_TRANSPORT_ZERO_MQ_ADDRESSED_ATTRIBUTED_MESSAGE_TCP_RECEIVER_SENDER_H
 
+#include <deque>
 #include "ZeroMqReceiverBase.h"
 
 #include "AddressedAttributedMessage.h"
@@ -73,6 +74,7 @@ public:
 private:
 
     uxas::common::SentinelSerialBuffer m_receiveTcpDataBuffer;
+    std::deque< std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> > m_recvdMsgs;
     std::string m_sourceGroup;
     
     // for return sending for zeromq tcp sockets

@@ -114,7 +114,11 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
                 m_entityConfigurations.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
                 auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
                 auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-                m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+                auto targetEntityIds = m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)];
+                if (std::find(targetEntityIds.begin(), targetEntityIds.end(), entityConfiguration->getID()) == targetEntityIds.end())
+                {
+                    m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+                }
             }
         }
         else if ( dynamic_cast<afrl::cmasi::EntityState*>(object) )
@@ -172,6 +176,9 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationResponse::Subscription);
     addSubscriptionAddress(uxas::messages::route::RoutePlanResponse::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskImplementationRequest::Subscription);
+
+    addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
+    addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
 
     isSuccessful = isSuccessful && configureTask(serviceXmlNode);
 
@@ -269,7 +276,11 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
             m_entityConfigurations.insert(std::make_pair(entityConfiguration->getID(), entityConfiguration));
             auto nominalSpeedToOneDecimalPlace_mps = std::round(entityConfiguration->getNominalSpeed()*10.0) / 10.0;
             auto nominalAltitudeRounded = std::round(entityConfiguration->getNominalAltitude());
-            m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+            auto targetEntityIds = m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)];
+            if (std::find(targetEntityIds.begin(), targetEntityIds.end(), entityConfiguration->getID()) == targetEntityIds.end())
+            {
+                m_speedAltitudeVsEligibleEntityIds[std::make_pair(nominalSpeedToOneDecimalPlace_mps, nominalAltitudeRounded)].push_back(entityConfiguration->getID());
+            }
         }
     }
     else if (uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object))
@@ -417,6 +428,19 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     break;
             }
         }
+    }
+    else if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object))
+    {
+        auto ares = std::static_pointer_cast<afrl::cmasi::AutomationResponse>(receivedLmcpMessage->m_object);
+        for (auto v : ares->getMissionCommandList())
+        {
+            m_currentMissions[v->getVehicleID()] = std::shared_ptr<afrl::cmasi::MissionCommand>(v->clone());
+        }
+    }
+    else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
+    {
+        auto mish = std::static_pointer_cast<afrl::cmasi::MissionCommand>(receivedLmcpMessage->m_object);
+        m_currentMissions[mish->getVehicleID()] = mish;
     }
 
     isKillService = isKillService || processReceivedLmcpMessageTask(receivedLmcpMessage->m_object);

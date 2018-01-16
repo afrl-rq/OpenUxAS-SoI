@@ -1,0 +1,40 @@
+<AreaOfInterest Series="IMPACT">
+            <AreaID>124</AreaID>
+            <Area>
+                <Polygon Series="CMASI">
+                    <BoundaryPoints>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.265301256991446</Latitude>
+                            <Longitude>-80.47303979424098</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.258272627298915</Latitude>
+                            <Longitude>-80.4581670656936</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.248799256843768</Latitude>
+                            <Longitude>-80.45444888355676</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.245437738295166</Latitude>
+                            <Longitude>-80.46763152931466</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.2558278865363</Latitude>
+                            <Longitude>-80.48115219163044</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </BoundaryPoints>
+                </Polygon>
+            </Area>
+        </AreaOfInterest>
+        

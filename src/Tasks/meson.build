@@ -32,17 +32,27 @@ incs_tasks = [
     '../../src/DPSS',
     '../../src/VisilibityLib',
     '../../3rd/PugiXML/src',
-    '../../3rd/cppzmq-4.2.1',
-    '../../3rd/zeromq-4.1.6/include',
+    '../../3rd/cppzmq-4.2.2',
+    '../../3rd/zeromq-4.2.3/include',
   ),
   incs_lmcp,
 ]
-
 
 if get_option('afrl_internal')
   incs_tasks += [incs_tasks_internal]
 else
   srcs_tasks_internal = files()
+endif
+
+cpp_args = []
+cpp = meson.get_compiler('cpp')
+
+if cpp.get_id() != 'msvc'
+  cpp_args += [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
 endif
 
 lib_tasks = static_library(
@@ -52,8 +62,6 @@ lib_tasks = static_library(
   dependencies: [
     dep_boost,
   ],
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args,
   include_directories: incs_tasks
 )

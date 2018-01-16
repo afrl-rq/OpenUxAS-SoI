@@ -22,11 +22,21 @@ TEST(EligibleEntitiesTest, Test01_EntityEligibilityPointSearch)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{2};
+    uint32_t duration_s{10};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/EligibleEntitiesTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_EligibleEntities_Test01.xml";
+	std::string testPath;
+	// configFileName - the file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		#include "windows.h"
+		SetCurrentDirectory("../../../");
+	#endif
+
+	testPath = "../tests/Test_Utilities/EligibleEntitiesTests/";
+	configFileName = "cfg_EligibleEntities_Test01.xml";
+
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
@@ -169,11 +179,20 @@ TEST(EligibleEntitiesTest, Test02_EntityEligibilityLineSearch)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{2};
+    uint32_t duration_s{6};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/EligibleEntitiesTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_EligibleEntities_Test02.xml";
+	std::string testPath;
+	// configFileName - the file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		#include "windows.h"
+		SetCurrentDirectory("../../../");
+	#endif
+	testPath = "../tests/Test_Utilities/EligibleEntitiesTests/";
+	configFileName = "cfg_EligibleEntities_Test02.xml";
+
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files

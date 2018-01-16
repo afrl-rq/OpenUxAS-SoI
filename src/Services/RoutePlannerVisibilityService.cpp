@@ -220,8 +220,8 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
         auto request = std::static_pointer_cast<uxas::messages::route::RoutePlanRequest>(receivedLmcpMessage->m_object);
         auto itEntityConfiguration = m_idVsEntityConfiguration.find(request->getVehicleID());
         if (itEntityConfiguration != m_idVsEntityConfiguration.end() &&
-                (afrl::cmasi::isAirVehicleConfiguration(itEntityConfiguration->second.get()) ||
-                afrl::vehicles::isSurfaceVehicleConfiguration(itEntityConfiguration->second.get())))
+                (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(itEntityConfiguration->second) ||
+                std::dynamic_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(itEntityConfiguration->second)))
         {
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             if (bProcessRoutePlanRequest(request, routePlanResponse))
@@ -235,6 +235,14 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
                         ),
                         message);
             }
+            else
+            {
+               CERR_FILE_LINE_MSG("Error processing route plan request")
+            }
+        }
+        else
+        {
+           CERR_FILE_LINE_MSG("No available air vehicle configurations")
         }
     }
     else

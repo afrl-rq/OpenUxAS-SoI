@@ -14,11 +14,20 @@ TEST(AutomationRequestTest, Test01_GoodRequest)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{3};
+    uint32_t duration_s{6};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/AutomationRequestTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_AutomationRequest_Test01.xml";
+	std::string testPath;
+	// configFileName - file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		#include "windows.h"
+		SetCurrentDirectory("../../../");
+	#endif
+	testPath = "../tests/Test_Utilities/AutomationRequestTests/";
+	configFileName = "cfg_AutomationRequest_Test01.xml";
+
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
@@ -68,7 +77,6 @@ TEST(AutomationRequestTest, Test01_GoodRequest)
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(5,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
-    //EXPECT_EQ(13,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService")));
     
 };
 
@@ -78,11 +86,21 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{3};
+    uint32_t duration_s{4};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/AutomationRequestTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_AutomationRequest_Test02.xml";
+	std::string testPath;
+	// configFileName - file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		#include "windows.h"
+		SetCurrentDirectory("../../../");
+	#endif
+
+	testPath = "../tests/Test_Utilities/AutomationRequestTests/";
+	configFileName = "cfg_AutomationRequest_Test02.xml";
+
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
@@ -133,7 +151,6 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
     EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(5,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
-    //EXPECT_EQ(13,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService")));
 };
 
 TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
@@ -142,11 +159,21 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{3};
+    uint32_t duration_s{6};
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Utilities/AutomationRequestTests/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_AutomationRequest_Test03.xml";
+	std::string testPath;
+	//configFileName - file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		#include "windows.h"
+		SetCurrentDirectory("../../../");
+	#endif
+
+	testPath = "../tests/Test_Utilities/AutomationRequestTests/";
+	configFileName = "cfg_AutomationRequest_Test03.xml";
+
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files
@@ -197,7 +224,6 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(6,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
-    //EXPECT_EQ(14,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService")));
     
 };
 

@@ -1,0 +1,16 @@
+<AngledAreaSearchTask Series="IMPACT">
+            <SearchAreaID>124</SearchAreaID>
+            <SweepAngle>30.0</SweepAngle>
+            <StartPoint />
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>24</TaskID>
+            <Label>AAS24</Label>
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </AngledAreaSearchTask>
+        

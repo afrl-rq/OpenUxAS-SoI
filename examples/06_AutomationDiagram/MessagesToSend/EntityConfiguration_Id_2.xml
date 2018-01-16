@@ -1,0 +1,12 @@
+<EntityConfiguration Series="CMASI">
+            <ID>2</ID>
+            <Affiliation>Unknown</Affiliation>
+            <EntityType />
+            <Label />
+            <NominalSpeed>11.0</NominalSpeed>
+            <NominalAltitude>0.0</NominalAltitude>
+            <NominalAltitudeType>AGL</NominalAltitudeType>
+            <PayloadConfigurationList />
+            <Info />
+        </EntityConfiguration>
+        
