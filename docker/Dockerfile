@@ -24,11 +24,17 @@ RUN cd /opt/arm-buildroot-linux-gnueabihf && sh relocate-sdk.sh
 
 RUN apt-get update && apt-get install -y \
   build-essential \
+  curl \
   git \
   ninja-build \
   python3 \
   python3-pip \
   qemu-user-static
+
+RUN curl https://sh.rustup.rs -sSf -o /opt/rustup.sh
+RUN sh /opt/rustup.sh -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup target install armv7-unknown-linux-gnueabihf
 
 WORKDIR /src
 RUN git clone -b rust-cross https://github.com/acfoltzer/meson.git
