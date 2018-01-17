@@ -23,8 +23,8 @@ if os.startswith('linux')
           '-l:libboost_filesystem.a','-l:libboost_regex.a', '-l:libboost_system.a', 
   				'-l:libzmq.a','-l:libczmq.a','-l:libzyre.a',
           '-l:libSQLiteCpp.a','-l:libsqlite3.a',
-          '-l:libgtest.a',
-  				'-luuid','-lrt', '-ldl']
+          '-l:libgtest.a','-l:libuuid.a',
+  				'-lrt', '-ldl']
 	endif
 elif os == 'darwin'
   link_args += ['-ldl']
