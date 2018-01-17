@@ -108,6 +108,7 @@ public:
         {
             UXAS_LOG_ERROR(s_typeName(), "::setAddressAndPayloadFromDelimitedString delimited string length must be >= ", s_minimumDelimitedAddressAttributeMessageStringLength);
             m_isValid = false;
+            return m_isValid;
         }
     };
 

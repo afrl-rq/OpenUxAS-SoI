@@ -8,12 +8,12 @@
 // ===============================================================================
 
 /* 
- * File:   c00_ServiceTemplate.cpp
+ * File:   ServiceTemplate.cpp
  * Author: steve
  *
  * Created on March 17, 2017, 5:55 PM
  *
- * <Service Type="c00_ServiceTemplate" OptionString="Option_01" OptionInt="36" />
+ * <Service Type="ServiceTemplate" OptionString="Option_01" OptionInt="36" />
  * 
  */
 
@@ -36,18 +36,18 @@ namespace service   // uxas::service::
 {
 
 // this entry registers the service in the service creation registry
-c00_ServiceTemplate::ServiceBase::CreationRegistrar<c00_ServiceTemplate>
-c00_ServiceTemplate::s_registrar(c00_ServiceTemplate::s_registryServiceTypeNames());
+ServiceTemplate::ServiceBase::CreationRegistrar<ServiceTemplate>
+ServiceTemplate::s_registrar(ServiceTemplate::s_registryServiceTypeNames());
 
 // service constructor
-c00_ServiceTemplate::c00_ServiceTemplate()
-: ServiceBase(c00_ServiceTemplate::s_typeName(), c00_ServiceTemplate::s_directoryName()) { };
+ServiceTemplate::ServiceTemplate()
+: ServiceBase(ServiceTemplate::s_typeName(), ServiceTemplate::s_directoryName()) { };
 
 // service destructor
-c00_ServiceTemplate::~c00_ServiceTemplate() { };
+ServiceTemplate::~ServiceTemplate() { };
 
 
-bool c00_ServiceTemplate::configure(const pugi::xml_node& ndComponent)
+bool ServiceTemplate::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
 
@@ -67,7 +67,7 @@ bool c00_ServiceTemplate::configure(const pugi::xml_node& ndComponent)
     return (isSuccess);
 }
 
-bool c00_ServiceTemplate::initialize()
+bool ServiceTemplate::initialize()
 {
     // perform any required initialization before the service is started
     std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -75,7 +75,7 @@ bool c00_ServiceTemplate::initialize()
     return (true);
 }
 
-bool c00_ServiceTemplate::start()
+bool ServiceTemplate::start()
 {
     // perform any actions required at the time the service starts
     std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -83,7 +83,7 @@ bool c00_ServiceTemplate::start()
     return (true);
 };
 
-bool c00_ServiceTemplate::terminate()
+bool ServiceTemplate::terminate()
 {
     // perform any action required during service termination, before destructor is called.
     std::cout << "*** TERMINATING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -91,7 +91,7 @@ bool c00_ServiceTemplate::terminate()
     return (true);
 }
 
-bool c00_ServiceTemplate::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
+bool ServiceTemplate::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
     if (afrl::cmasi::isKeyValuePair(receivedLmcpMessage->m_object))
     {

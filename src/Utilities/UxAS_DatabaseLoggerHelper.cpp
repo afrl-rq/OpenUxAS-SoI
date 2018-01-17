@@ -135,12 +135,11 @@ DatabaseLoggerHelper::insertValuesIntoTable(const std::string& commaDelimitedVal
     if (isSuccess)
     {
         std::string insertSqlStmt = "INSERT INTO " + m_dbTableName + " (" + m_dbTableColumnNames + ") VALUES (" + commaDelimitedValues + ")";
-        int execRtn = 0;
         try
         {
             // begin transaction
             SQLite::Transaction transaction(*(m_db.get()));
-            execRtn = m_db->exec(insertSqlStmt);
+            m_db->exec(insertSqlStmt);
             // commit transaction
             transaction.commit();
             m_dbStatementCount++;

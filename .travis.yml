@@ -21,8 +21,10 @@ addons:
 before_install:
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
-  # install newer Meson than is packaged in repos
-  - pip3 install --user meson
+  # install verion of Meson that is compatible with UxAS build
+  - curl -L -s https://github.com/mesonbuild/meson/archive/0.42.1.zip -o meson-linux.zip
+  - unzip meson-linux.zip
+  - cd meson-0.42.1; python3 setup.py install --user; cd ..
   - meson --version
   # download newer Ninja than is packaged in repos
   - curl -L -s https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip -o ninja-linux.zip
@@ -32,10 +34,11 @@ before_install:
 
 install:
   # clone, build, and run LmcpGen
-  - git clone git@github.com:afrl-rq/LmcpGen.git ../LmcpGen
+  - git clone https://github.com/afrl-rq/LmcpGen.git ../LmcpGen
   # tries to check out the same branch as the one we're building if it's
   # available, so that development can proceed in tandem
-  - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)
+  # - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)
+  - cd ../LmcpGen; ant jar; cd ../OpenUxAS
   - sh RunLmcpGen.sh
   # process the wraps and their patches
   - ./prepare

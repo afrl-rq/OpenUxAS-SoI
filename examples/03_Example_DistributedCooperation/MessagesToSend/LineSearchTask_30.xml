@@ -24,8 +24,8 @@
   <Label>LS30</Label>
   <EligibleEntities>
     <int64>1000</int64>
-    <int64>1001</int64>
-    <int64>1002</int64>
+    <int64>2000</int64>
+    <int64>3000</int64>
   </EligibleEntities>
   <RevisitRate>0</RevisitRate>
   <Parameters></Parameters>

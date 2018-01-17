@@ -42,7 +42,7 @@ def main():
 	zoneArrayPd = pd.read_pickle(zonesPickle)
 
 	print('')	# add a line return
-	print('*** PLOTING ***')
+	print('*** PLOTTING ***')
 	print('')	# add a line return
 
 	fig = plt.figure(10000)
@@ -98,19 +98,21 @@ def main():
 		North_m = []
 		East_m = []
 		# print('task.searchBoundaryPd.size[' + str(task.searchBoundaryPd.size) + ']')
-		if task.searchBoundaryPd.shape[0] != 1:
+		if task.searchBoundaryPd.shape[0] != 1 and task.searchBoundaryPd.shape[0] != 0:
 			for boundary in task.searchBoundaryPd.itertuples():
 				NorthEast_m = LocalCoords.LatLong_degToNorthEast_m(boundary.latitude,boundary.longitude)
 				North_m.append(NorthEast_m[0])
 				East_m.append(NorthEast_m[1])
-			# plt.text(East_m[0],North_m[0],taskLabel,horizontalalignment='right',verticalalignment='top',color=[0.1,0.1,0.1],size=15)
+			plt.text(East_m[0],North_m[0],taskLabel,horizontalalignment='right',verticalalignment='top',color=[0.1,0.1,0.1],size=15)
 			line, = plt.plot(East_m,North_m,linewidth=3,linestyle='--',color=[0.5,0.5,0.5])
 			plotLines.append(line)
-		else:
+		elif task.searchBoundaryPd.shape[0] != 0:
 			NorthEast_m = LocalCoords.LatLong_degToNorthEast_m(task.searchBoundaryPd.latitude[0],task.searchBoundaryPd.longitude[0])
 			plt.text(NorthEast_m[1],NorthEast_m[0],taskLabel,horizontalalignment='right',verticalalignment='top',color=[0.1,0.1,0.1],size=15)
 			line, = plt.plot(NorthEast_m[1],NorthEast_m[0],'o',markersize=12,color=[0.5,0.5,0.5])
 			plotLines.append(line)
+		else:
+			print('Missing data: Could not plot task ' + taskLabel)
 	# THE ZONES
 	for zone in zoneArrayPd.itertuples():
 		zoneId = zone.zoneID

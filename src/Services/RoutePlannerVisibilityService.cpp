@@ -33,12 +33,10 @@
 #include "afrl/cmasi/Polygon.h"
 #include "afrl/cmasi/Rectangle.h"
 
-#include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/cmasi/AirVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityConfigurationDescendants.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 
 #include "pugixml.hpp"
 
@@ -143,10 +141,12 @@ RoutePlannerVisibilityService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::OperatingRegion::Subscription);
 
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
-
+    //ENTITY CONFIGURATIONS
+    addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
     // service 'global' path planning requests (system assumes aircraft)
     addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
     
@@ -155,9 +155,11 @@ RoutePlannerVisibilityService::configure(const pugi::xml_node& ndComponent)
 
     if (m_isRoutAggregator)
     {
-        addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-        addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-        addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
+         // ENTITY STATES
+        addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+        std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+        for(auto child : childstates)
+            addSubscriptionAddress(child);
         addSubscriptionAddress(uxas::messages::route::RouteRequest::Subscription);
     }
 
@@ -184,37 +186,17 @@ bool
 RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 //example: if (afrl::cmasi::isServiceStatus(receivedLmcpMessage->m_object.get()))
 {
-    if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    auto entityConfig = std::dynamic_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
+    
+    if (entityConfig)
     {
         auto entityConfiguration = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
-        m_idVsEntityConfiguration[entityConfiguration->getID()] = entityConfiguration;
-        calculatePlannerParameters(entityConfiguration);
+        m_idVsEntityConfiguration[entityConfig->getID()] = entityConfig;
+        calculatePlannerParameters(entityConfig);
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (entityState)
     {
-        auto entityConfiguration = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
-        m_idVsEntityConfiguration[entityConfiguration->getID()] = entityConfiguration;
-        calculatePlannerParameters(entityConfiguration);
-    }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
-    {
-        auto entityConfiguration = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
-        m_idVsEntityConfiguration[entityConfiguration->getID()] = entityConfiguration;
-        calculatePlannerParameters(entityConfiguration);
-    }
-    else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_idVsEntityState[entityState->getID()] = entityState;
-    }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-        m_idVsEntityState[entityState->getID()] = entityState;
-    }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
-    {
-        auto entityState = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_idVsEntityState[entityState->getID()] = entityState;
     }
     else if (afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
@@ -238,8 +220,8 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
         auto request = std::static_pointer_cast<uxas::messages::route::RoutePlanRequest>(receivedLmcpMessage->m_object);
         auto itEntityConfiguration = m_idVsEntityConfiguration.find(request->getVehicleID());
         if (itEntityConfiguration != m_idVsEntityConfiguration.end() &&
-                (afrl::cmasi::isAirVehicleConfiguration(itEntityConfiguration->second.get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(itEntityConfiguration->second.get())))
+                (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(itEntityConfiguration->second) ||
+                std::dynamic_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(itEntityConfiguration->second)))
         {
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             if (bProcessRoutePlanRequest(request, routePlanResponse))
@@ -253,6 +235,14 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
                         ),
                         message);
             }
+            else
+            {
+               CERR_FILE_LINE_MSG("Error processing route plan request")
+            }
+        }
+        else
+        {
+           CERR_FILE_LINE_MSG("No available air vehicle configurations")
         }
     }
     else
@@ -584,7 +574,7 @@ bool RoutePlannerVisibilityService::isCalculateWaypoints(const n_FrameworkLib::P
 void RoutePlannerVisibilityService::calculatePlannerParameters(const std::shared_ptr<afrl::cmasi::EntityConfiguration>& enityConfiguration)
 {
     auto plannerParameters = std::make_shared<s_PlannerParameters>();
-    if (afrl::cmasi::isAirVehicleConfiguration(enityConfiguration.get()))
+    if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(enityConfiguration))
     {
         auto airVehicleConfiguration = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(enityConfiguration);
 

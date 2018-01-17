@@ -53,7 +53,6 @@ public:
     static bool
     isValidAddress(const std::string& address)
     {
-        std::string::size_type sz = address.find(*(s_addressAttributesDelimiter().c_str()));
         if (address.length() < 1)
         {
             UXAS_LOG_ERROR(s_typeName(), "::isValidAddress address must be non-empty");
@@ -72,6 +71,8 @@ public:
     s_typeName() { static std::string s_string("AddressedMessage"); return (s_string); };
 
     AddressedMessage() { };
+
+    virtual ~AddressedMessage() { }
 
     bool
     setAddressAndPayload(const std::string address, const std::string payload)

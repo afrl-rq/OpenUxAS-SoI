@@ -1,0 +1,15 @@
+<WatchTask Series="IMPACT">
+            <WatchedEntityID>2</WatchedEntityID>
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>40</TaskID>
+            <Label />
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </WatchTask>
+        
+        

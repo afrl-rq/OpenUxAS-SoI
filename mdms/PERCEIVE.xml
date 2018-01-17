@@ -28,7 +28,7 @@
             <Field Name="PerceiverID" Type="uint32"/>
 
             <!-- The IDs of the payloads that reported this perception. -->
-            <Field Name="PerceiverPayloads" Type="uint32[]"/>
+            <Field Name="PerceiverPayloads" Type="uint32[]" MaxArrayLength="8" />
 
             <!-- The perceived target velocity in three-dimensions.  The velocity should be stated
                  in tangential-plane coordinates using the North-East-Down coordinate system.
@@ -57,8 +57,8 @@
             <!-- If true, denotes that the attitude and attitude error have meaning. -->
             <Field Name="AttitudeValid" Type="bool" Default="false"/>
 
-            <!-- The entity location -->
-            <Field Name="Location" Type="CMASI/Location3D"/>
+            <!-- The entity location. A valid EntityPerception must define Location (null not allowed) -->
+            <Field Name="Location" Type="CMASI/Location3D" Optional="false" />
 
             <!-- Error in the perception of the location of this entity.  The first index is North-South error, the second index
                  is the East-West error, and the third index is the vertical error.  The result is an error cylinder.

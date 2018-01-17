@@ -94,8 +94,6 @@ private:
     // Grid constants
     const double NearEpsilon;
     const double dHUGE;
-    const unsigned short GR_FULL_VERT;    //    0x01;    /* line crosses vertically */
-    const unsigned short GR_FULL_HORZ;    //    0x02;    /* line crosses horizontally */
     const unsigned short GC_BL_IN;    //    0x0001;    /* bottom left corner is in (else out) */
     const unsigned short GC_BR_IN;    //    0x0002;    /* bottom right corner is in (else out) */
     const unsigned short GC_TL_IN;    //    0x0004;    /* top left corner is in (else out) */
@@ -136,7 +134,7 @@ private:
     // copy constructor - make unusable to prevent bad things from happening
     CGrid(const CGrid& grid);
     // assignment operator - make unusable to prevent bad things from happening
-    CGrid & operator = (const CGrid& grid) {};
+    CGrid & operator = (const CGrid& grid) = delete;
     
     
     /************************************************

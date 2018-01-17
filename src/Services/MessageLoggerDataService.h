@@ -35,12 +35,14 @@ namespace data
  * 
  * 
  * Configuration String: 
- *  <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000" LogFileName="testfile">
- *      <LogMessage MessageType="uxas.messages.task.AssignmentCostMatrix" NumberMessagesToSkip="0"/>
+ *  <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="10000">
+ *      <LogMessage MessageType="uxas.messages.task.AssignmentCostMatrix" />
  *  </Service>
  *
  * Options:
  *  - LogFileMessageCountLimit
+ *     (if provided, turns on additional plain text file logging with each
+ *      file containing 'LogFileMessageCountLimit' number of messages)
  * 
  * Subscribed Messages:
  *  - all those in "LogMessage" entries
@@ -99,10 +101,10 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-    bool isDatabaseLogger{true};
-    bool isFileLogger{false};
+    bool isDatabaseLogger{true};  // always save to database log
+    bool isFileLogger{false};     // only save to file if message count limit provided
     uint32_t m_logDatabaseMessageCountLimit{UINT32_MAX};
-    uint32_t m_logFileMessageCountLimit{1000};
+    uint32_t m_logFileMessageCountLimit{0};
     std::unique_ptr<uxas::common::log::LoggerBase> m_databaseLogger;
     std::unique_ptr<uxas::common::log::LoggerBase> m_fileLogger;
 

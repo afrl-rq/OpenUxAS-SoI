@@ -69,7 +69,7 @@ static void ZhashLookup(zhash_t *headers,const std::string& strKey,std::string& 
     {
         strValue = pcValue;
     }
-    delete cstrKey; cstrKey = 0;
+    delete[] cstrKey; cstrKey = 0;
 }
 
 //  ---------------------------------------------------------------------
@@ -81,9 +81,9 @@ static void zyreSetHeaderEntry(zyre_t* pZyreNode,const std::string& strKey,const
         std::strcpy (cstrKey,strKey.c_str());
         char * cstrValue = new char [strValue.length()+1];
         std::strcpy (cstrValue, strValue.c_str());
-        zyre_set_header(pZyreNode,cstrKey,cstrValue);
-        delete cstrKey; cstrKey = 0;
-        delete cstrValue; cstrValue = 0;
+        zyre_set_header(pZyreNode,cstrKey,"%s",cstrValue);
+        delete[] cstrKey; cstrKey = 0;
+        delete[] cstrValue; cstrValue = 0;
 }
 
 //  ---------------------------------------------------------------------
@@ -94,7 +94,7 @@ static void zyreJoin(zyre_t* pZyreNode,const std::string& strZyreGroup)
         char * cstrZyreGroup = new char [strZyreGroup.length()+1];
         std::strcpy (cstrZyreGroup, strZyreGroup.c_str());
         zyre_join(pZyreNode,cstrZyreGroup);
-        delete cstrZyreGroup; cstrZyreGroup = 0;
+        delete[] cstrZyreGroup; cstrZyreGroup = 0;
 }
 
 

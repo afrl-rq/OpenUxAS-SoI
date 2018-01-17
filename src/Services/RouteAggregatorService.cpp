@@ -69,12 +69,18 @@ RouteAggregatorService::configure(const pugi::xml_node& ndComponent)
     // track states and configurations for assignment cost matrix calculation
     // [EntityStates] are used to calculate costs from current position to first task
     // [EntityConfigurations] are used for nominal speed values (all costs are in terms of time to arrive)
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleState::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleState::Subscription);
-    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::GroundVehicleConfiguration::Subscription);
-    addSubscriptionAddress(afrl::impact::SurfaceVehicleConfiguration::Subscription);
+    
+    //ENTITY CONFIGURATIONS
+    addSubscriptionAddress(afrl::cmasi::EntityConfiguration::Subscription);
+    std::vector< std::string > childconfigs = afrl::cmasi::EntityConfigurationDescendants();
+    for(auto child : childconfigs)
+        addSubscriptionAddress(child);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     // track requests to kickoff matrix calculation
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -115,37 +121,37 @@ RouteAggregatorService::processReceivedLmcpMessage(std::unique_ptr<uxas::communi
         auto rreq = std::static_pointer_cast<uxas::messages::route::RouteRequest>(receivedLmcpMessage->m_object);
         HandleRouteRequest(rreq);
     }
-    else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_airVehicles.insert(id);
     }
-    else if (afrl::impact::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_groundVehicles.insert(id);
     }
-    else if (afrl::impact::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
         m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
         m_surfaceVehicles.insert(id);
     }
-    else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
         m_airVehicles.insert(id);
     }
-    else if (afrl::impact::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
         m_groundVehicles.insert(id);
     }
-    else if (afrl::impact::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+    else if (afrl::vehicles::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
         m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
@@ -224,6 +230,15 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
     m_pendingAutoReq[reqId] = std::unordered_set<int64_t>();
     std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendAirPlanRequest;
     std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendGroundPlanRequest;
+    
+    // if the 'EntityList' is empty, then ALL vehicles are considered eligible
+    if(areq->getOriginalRequest()->getEntityList().empty())
+    {
+        for(auto entity : m_entityStates)
+        {
+            areq->getOriginalRequest()->getEntityList().push_back(entity.second->getID());
+        }
+    }
 
     // to minimize network traffic make a separate request for each vehicle
     for (size_t v = 0; v < areq->getOriginalRequest()->getEntityList().size(); v++)
@@ -533,17 +548,6 @@ void RouteAggregatorService::SendMatrix(int64_t autoKey)
             auto taskpair = m_routeTaskPairing.find(rId);
             if (taskpair != m_routeTaskPairing.end())
             {
-                int64_t optionCost = 0;
-                if (m_taskOptions.find(taskpair->second->taskId) != m_taskOptions.end())
-                {
-                    for (auto& opt : m_taskOptions[taskpair->second->taskId]->getOptions())
-                    {
-                        if (opt->getOptionID() == taskpair->second->taskOption)
-                        {
-                            optionCost = opt->getCost();
-                        }
-                    }
-                }
                 if (plan->second.second->getRouteCost() < 0)
                 {
                     routesNotFound << "V[" << taskpair->second->vehicleId << "](" << taskpair->second->prevTaskId << "," << taskpair->second->prevTaskOption << ")-(" << taskpair->second->taskId << "," << taskpair->second->taskOption << ")" << std::endl;

@@ -9,7 +9,8 @@
 
 #include "Test_SimulationTime.h"
 
-#include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/EntityStateDescendants.h"
 
 #include "UxAS_Time.h"
 
@@ -39,10 +40,12 @@ bool
 Test_SimulationTime::configure(const pugi::xml_node& serviceXmlNode)
 {
     bool isSuccess{true};
-
-    //TODO:: other type of states??
-    //TDO:: choose and entity?? and only update on that entitystate
-    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
+    
+    // ENTITY STATES
+    addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
+    std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
+    for(auto child : childstates)
+        addSubscriptionAddress(child);
 
     return (isSuccess);
 };
@@ -63,10 +66,10 @@ bool
 Test_SimulationTime::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
     bool isFinished(false);
-    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
+    auto entityState = std::dynamic_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
+    if (entityState)
     {
-        auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
-        uxas::common::Time::getInstance().setDiscreteTime_ms(airVehicleState->getTime());
+        uxas::common::Time::getInstance().setDiscreteTime_ms(entityState->getTime());
     }
     return (isFinished);
 };

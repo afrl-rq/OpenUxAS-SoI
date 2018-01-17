@@ -139,7 +139,7 @@ protected:
     /** \brief static service creation function implemented that is implemented by subclasses.  */
     static
     ServiceBase*
-    create() { };
+    create() { return nullptr; };
 
     /** \brief registers service type name, alias type names and it's create() function for a subclass.  */
     static

@@ -4,12 +4,20 @@
 <!--
         <h2>Introduction</h2>
         This MDM defines the interface to a route planning service. It includes geometric constructs defining road networks to support the routing of ground vehicles.
+
+        <h2>Changes</h2>
+        
+        <h3>27 August 2017</h3>
+        <ul>
+            <li>Added {@link RoadPointsConstraints}, {@link RoadPointsRequest} , and {@link RoadPointsResponse} messages. These messages manage route request/responses for road search tasks</li>
+        </ul>
+        
 -->
 
 <MDM>
     <SeriesName>ROUTE</SeriesName>
     <Namespace>uxas/messages/route</Namespace>
-    <Version>3</Version>
+    <Version>4</Version>
 
     <StructList>
 
@@ -17,10 +25,10 @@
         <Struct Name="GraphNode">
             <!-- Unique ID for the node, used to build edges between nodes -->
             <Field Name="NodeID" Type="int64" Units="None" />
-            <!-- Lat/Lon coordinates of node -->
-            <Field Name="Coordinates" Type="CMASI/Location3D" />
+            <!-- Lat/Lon coordinates of node. A valid GraphNode must define Coordinates (null not allowed). -->
+            <Field Name="Coordinates" Type="CMASI/Location3D" Optional="false" />
             <!-- IDs of edges that have this node as an endpoint -->
-            <Field Name="AssociatedEdges" Type="int64[]" />
+            <Field Name="AssociatedEdges" Type="int64[]" MaxArrayLength="8" />
         </Struct>
         
         <!-- Defines an edge for a geo-spatial graph. An edge must connect two nodes defined by
@@ -34,17 +42,17 @@
             <!-- GraphNode ID which defines the end point of the edge -->
             <Field Name="EndNode" Type="int64" Units="None" />
             <!-- Optional waypoints describing physical edge in lat/lon coordinates -->
-            <Field Name="Waypoints" Type="CMASI/Location3D[]" />
+            <Field Name="Waypoints" Type="CMASI/Location3D[]" MaxArrayLength="1024" />
         </Struct>
         
         <!-- Defines a complete geo-spatial graph -->
         <Struct Name="GraphRegion">
             <!-- ID for full region data structure -->
             <Field Name="ID" Type="int64" Units="None" />
-            <!-- List of all nodes that represent the network -->
-            <Field Name="NodeList" Type="GraphNode[]" LargeArray="true" />
-            <!-- List of all edges that represent the network -->
-            <Field Name="EdgeList" Type="GraphEdge[]" LargeArray="true" />
+            <!-- List of all nodes that represent the network (note 2^24 max) -->
+            <Field Name="NodeList" Type="GraphNode[]" MaxArrayLength="16777216" LargeArray="true" />
+            <!-- List of all edges that represent the network (note 2^24 max) -->
+            <Field Name="EdgeList" Type="GraphEdge[]" MaxArrayLength="16777216" LargeArray="true" />
         </Struct>
 
 
@@ -54,20 +62,20 @@
             <!-- ID denoting this set of route constraints -->
             <Field Name="RouteID" Type="int64" />
             
-            <!-- Location from which the planned route will start -->
-            <Field Name="StartLocation" Type="CMASI/Location3D" />
+            <!-- Location from which the planned route will start. A valid RouteConstraints message must define StartLocation (null not allowed). -->
+            <Field Name="StartLocation" Type="CMASI/Location3D" Optional="false" />
             <!-- Heading of entity at the start of the route -->
             <Field Name="StartHeading" Type="real32" Units="degrees"/>
             <!-- If "true" the heading value in StartHeading must be used
             to start the route. If not, any starting heading can be used. -->
             <Field Name="UseStartHeading" Type="bool" Default="true" />
             
-            <!-- Location to which the planned route will end -->
-            <Field Name="EndLocation" Type="CMASI/Location3D" />
+            <!-- Location to which the planned route will end. A valid RouteConstraints message must define EndLocation (null not allowed). -->
+            <Field Name="EndLocation" Type="CMASI/Location3D" Optional="false" />
             <!-- Heading of entity at the end of the route -->
             <Field Name="EndHeading" Type="real32" Units="degrees"/>
             <!-- If "true" the heading value in EndHeading must be used
-            to end the route. If not, ant ending heading can be used. -->
+            to end the route. If not, any ending heading can be used. -->
             <Field Name="UseEndHeading" Type="bool" Default="true" />
             
         </Struct>
@@ -80,11 +88,11 @@
             <Field Name="AssociatedTaskID" Type="int64" Default="0" />
             <!-- Vehicles to consider when planning. If list is empty, route planner
             plans for all known vehicles. -->
-            <Field Name="VehicleID" Type="int64[]" />
+            <Field Name="VehicleID" Type="int64[]" MaxArrayLength="16" />
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- List of all requests for this vehicle set + operating region situation -->
-            <Field Name="RouteRequests" Type="RouteConstraints[]" />
+            <Field Name="RouteRequests" Type="RouteConstraints[]" MaxArrayLength="256" />
             <!-- Request that planner only return costs of routes rather than complete waypoint plans -->
             <Field Name="IsCostOnlyRequest" Type="bool" Default="true" />
             
@@ -101,7 +109,7 @@
             <!-- Operating region to be considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- List of all requests for this vehicle + operating region situation -->
-            <Field Name="RouteRequests" Type="RouteConstraints[]" />
+            <Field Name="RouteRequests" Type="RouteConstraints[]" MaxArrayLength="256" />
             <!-- Request that planner only return costs of routes rather than complete waypoint plans -->
             <Field Name="IsCostOnlyRequest" Type="bool" Default="true" />
             
@@ -112,11 +120,11 @@
             <!-- ID denoting this plan corresponding with requested route constraint pair -->
             <Field Name="RouteID" Type="int64" />
             <!-- Waypoints that connect the start location with the end location. Empty if only costs were requested -->
-            <Field Name="Waypoints" Type="CMASI/Waypoint[]" />
+            <Field Name="Waypoints" Type="CMASI/Waypoint[]" MaxArrayLength="1024" />
             <!-- Time cost of route. If less than zero, a planning error has occurred -->
             <Field Name="RouteCost" Type="int64" Units="milliseconds" Default="-1"/>
             <!-- Error messages, if applicable -->
-            <Field Name="RouteError" Type="CMASI/KeyValuePair[]" />
+            <Field Name="RouteError" Type="CMASI/KeyValuePair[]" MaxArrayLength="8" />
         </Struct>
         
         <!-- Route plan response: list of all fulfilled route requests -->
@@ -130,7 +138,7 @@
             <!-- Operating region that was considered during planning -->
             <Field Name="OperatingRegion" Type="int64" />
             <!-- List of all responses for this vehicle + operating region situation -->
-            <Field Name="RouteResponses" Type="RoutePlan[]" />
+            <Field Name="RouteResponses" Type="RoutePlan[]" MaxArrayLength="256" />
         </Struct>
         
         <!-- Route response: list of all fulfilled route requests for a complete
@@ -139,15 +147,15 @@
             <!-- Response ID matching ID from request ({@link RouteRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- Corresponding route responses for all requested vehicles -->
-            <Field Name="Routes" Type="RoutePlanResponse[]" />
+            <Field Name="Routes" Type="RoutePlanResponse[]" MaxArrayLength="4096" />
         </Struct>
 		
         <!-- Egress route request: find all egress routes (nearby intersections) from a point -->
         <Struct Name="EgressRouteRequest" >
             <!-- Request ID for correlating with response -->
             <Field Name="RequestID" Type="int64" />
-            <!-- Location from which to calculate the routes -->
-            <Field Name="StartLocation" Type="CMASI/Location3D" />
+            <!-- Location from which to calculate the routes. A valid EgressRouteRequest must define StartLocation (null not allowed). -->
+            <Field Name="StartLocation" Type="CMASI/Location3D" Optional="false" />
             <!-- The radius of the area of concern -->
             <Field Name="Radius" Type="real32" Default="60" Units="meters" />
         </Struct>
@@ -157,10 +165,37 @@
             <!-- Response ID matching ID from request ({@link EgressRouteRequest}) -->
             <Field Name="ResponseID" Type="int64" />
             <!-- The route locations -->
-            <Field Name="NodeLocations" Type="CMASI/Location3D[]" />
+            <Field Name="NodeLocations" Type="CMASI/Location3D[]" MaxArrayLength="32" />
             <!-- The orientations -->
-            <Field Name="Headings" Type="real32[]" Units="degrees" />
+            <Field Name="Headings" Type="real32[]" MaxArrayLength="32" Units="degrees" />
         </Struct>
+
+         <!-- Start/end points for a road points request -->
+         <Struct Name="RoadPointsConstraints" >
+            <!-- ID denoting this set of road points constraints -->
+            <Field Name="RoadPointsID" Type="int64" />           
+            <!-- Location from which the road points will start -->
+            <Field Name="StartLocation" Type="CMASI/Location3D" />
+            <!-- Location to which theroad points will end -->
+            <Field Name="EndLocation" Type="CMASI/Location3D" />
+        </Struct>
+
+        <!-- Route plan request: find route from the current vehicle position to a point of interest or world location -->
+        <Struct Name="RoadPointsRequest" >
+            <!-- Request ID for correlating with response -->
+            <Field Name="RequestID" Type="int64" />
+            <!-- List of all requests for this vehicle + operating region situation -->
+            <Field Name="RoadPointsRequests" Type="RoadPointsConstraints[]" />
+        </Struct>
+
+        <!-- Resonse to RoadPointsRequest: list of all fulfilled road points requests -->
+        <Struct Name="RoadPointsResponse" >
+            <!-- Response ID matching ID from request ({@link RoadPointsRequest}) -->
+            <Field Name="ResponseID" Type="int64" />
+            <!-- Corresponding road points respones, returned as LineOfInterest messages -->
+            <Field Name="RoadPointsResponses" Type="IMPACT/LineOfInterest[]" />
+        </Struct>
+        
         
     </StructList>
 </MDM>

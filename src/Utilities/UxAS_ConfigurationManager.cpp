@@ -9,6 +9,10 @@
 
 #include "UxAS_ConfigurationManager.h"
 
+#ifdef AFRL_INTERNAL_ENABLED
+#include "GroundHeight.h"   // utility function that needs dted configuration file names form the cfg file
+#endif
+
 #include "UxAS_ConsoleLogger.h"
 #include "UxAS_HeadLogDataDatabaseLogger.h"
 #include "UxAS_FileLogger.h"
@@ -144,6 +148,9 @@ ConfigurationManager::loadXml(const std::string& xml, bool isFile, bool isBaseXm
         {
             isSuccess = false;
         }
+#ifdef AFRL_INTERNAL_ENABLED
+        loadUtilityValuesFromXmlNode(m_baseXmlDoc.root());
+#endif
     }
 
     if (isSuccess)
@@ -243,7 +250,7 @@ ConfigurationManager::populateEnabledComponentXmlNode(pugi::xml_node& uxasNode, 
         if (nodeName.compare(baseNode.name()) == 0)
         {
             // add copy of base XML component node to the enabled XML
-            pugi::xml_node newCmpntNode = uxasNode.append_copy(baseNode);
+            uxasNode.append_copy(baseNode);
 //            UXAS_LOG_DEBUGGING(s_typeName(), "::populateEnabledComponentXmlNode appended new copy of base ", cmpntType->first, " XML node");
         }
     }
@@ -395,6 +402,48 @@ ConfigurationManager::setEntityValuesFromXmlNode(const pugi::xml_node& xmlNode)
 
     return (isSuccess);
 };
+
+#ifdef AFRL_INTERNAL_ENABLED
+void ConfigurationManager::loadUtilityValuesFromXmlNode(const pugi::xml_node& xmlNode)
+{
+    pugi::xml_node xmlUxasNode = xmlNode.child(StringConstant::UxAS().c_str());
+    if (xmlUxasNode)
+    {
+        for (auto currentXmlNode = xmlUxasNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
+        {
+            if ((std::string(currentXmlNode.name()) == std::string("Utility"))
+                    && (!currentXmlNode.attribute("Type").empty()) &&
+                    (currentXmlNode.attribute("Type").value() == std::string("DtedLookup")))
+            {
+                std::string pathToFiles;
+                if (!currentXmlNode.attribute("PathToFiles").empty())
+                {
+                    pathToFiles = std::string(currentXmlNode.attribute("PathToFiles").value());
+                    // make sure it ends with a '/'
+                    pathToFiles = (*(pathToFiles.rbegin()) == '/') ? (pathToFiles) : (pathToFiles + "/"); 
+                }
+                for (auto dtedFileXmlNode = currentXmlNode.first_child(); dtedFileXmlNode; dtedFileXmlNode = dtedFileXmlNode.next_sibling())
+                {
+                    if ((std::string(dtedFileXmlNode.name()) == std::string("DtedFile"))
+                            && (!dtedFileXmlNode.attribute("FileName").empty()))
+                    {
+                        std::string fileName = dtedFileXmlNode.attribute("FileName").value();
+                        if(!fileName.empty())
+                        {
+                            std::string pathFile = pathToFiles + fileName;
+                            utilities::GroundHeight::getInstance().isLoadDtedFile(pathFile);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+#endif
+
+
+
+
 
 // <editor-fold defaultstate="collapsed" desc="buildUxasMasterFile cfg file UTILITY ONLY">
 

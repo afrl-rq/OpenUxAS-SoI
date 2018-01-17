@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import xml.dom.minidom
+from xml.dom.minidom import Node
 import pandas as pd
 import glob
 
@@ -12,44 +13,44 @@ def ProcessMissionCommand(missionCommand):
 	try:
 		firstWaypoint = 0
 		elements = missionCommand.getElementsByTagName('FirstWaypoint')
-		if len(elements):
+		if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 			firstWaypoint = int(elements[0].firstChild.data)
 
 		commandID = 0
 		elements = missionCommand.getElementsByTagName('CommandID')
-		if len(elements):
+		if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 			commandID = int(elements[0].firstChild.data)
 
 		vehicleID = 0
 		elements = missionCommand.getElementsByTagName('VehicleID')
-		if len(elements):
+		if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 			vehicleID = int(elements[0].firstChild.data)
 
 		status = 'Cancelled'
 		elements = missionCommand.getElementsByTagName('Status')
-		if len(elements):
+		if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 			status = str(elements[0].firstChild.data)
 
 		waypointList = []
 		elements = missionCommand.getElementsByTagName('WaypointList')
-		if len(elements):
+		if elements:
 			elementWaypoints = elements[0].getElementsByTagName('Waypoint')
 			for elementWaypoint in elementWaypoints:
 				number = -1
 				elements1 = elementWaypoint.getElementsByTagName('Number')
-				if len(elements1):
+				if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 					number = int(elements1[0].firstChild.data)
 				altitude = -1
 				elements1 = elementWaypoint.getElementsByTagName('Altitude')
-				if len(elements1):
+				if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 					altitude = float(elements1[0].firstChild.data)
 				latitude = 0
 				elements1 = elementWaypoint.getElementsByTagName('Latitude')
-				if len(elements1):
+				if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 					latitude = float(elements1[0].firstChild.data)
 				elements1 = elementWaypoint.getElementsByTagName('Longitude')
 				longitude = 0
-				if len(elements1):
+				if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 					longitude = float(elements1[0].firstChild.data)
 				waypointList.append([number,latitude,longitude,altitude])
 				# print('# 5a status[' + str(waypointList) + ']')

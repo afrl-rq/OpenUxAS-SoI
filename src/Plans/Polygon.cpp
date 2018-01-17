@@ -229,8 +229,9 @@ void CPolygon::FindPolygonBoundingBox(V_POSITION_t& vposVertexContainer,stringst
                     {
                         dirChanges++;
                     }
-                    curDir = thisDir;                        \
-                        if ( thisSign = WhichSide(first, second, third) ) 
+                    curDir = thisDir;
+                    thisSign = WhichSide(first, second, third);
+                        if ( thisSign != 0 )
                         {
                             if ( angleSign == -thisSign )
                             {
@@ -255,8 +256,9 @@ void CPolygon::FindPolygonBoundingBox(V_POSITION_t& vposVertexContainer,stringst
                 {
                     dirChanges++;
                 }
-                curDir = thisDir;                        \
-                    if ( thisSign = WhichSide(first, second, third) ) 
+                curDir = thisDir;
+                thisSign = WhichSide(first, second, third);
+                    if ( thisSign != 0 )
                     {
                         if ( angleSign == -thisSign )
                         {
@@ -273,8 +275,9 @@ void CPolygon::FindPolygonBoundingBox(V_POSITION_t& vposVertexContainer,stringst
             {
                 dirChanges++;
             }
-            curDir = thisDir;                        \
-                if ( thisSign = WhichSide(first, second, third) ) 
+            curDir = thisDir;
+            thisSign = WhichSide(first, second, third);
+                if ( thisSign != 0 )
                 {
                     if ( angleSign == -thisSign )
                     {
@@ -332,7 +335,6 @@ void CPolygon::FindPolygonBoundingBox(V_POSITION_t& vposVertexContainer,stringst
                     }
                     if(!bExisitingEdge)
                     {
-                        bool bIntersectionFound(false);
                         double dCenterNorth_m = (vposVertexContainer[*itVertex2].m_north_m - vposVertexContainer[*itVertex1].m_north_m)*0.5 + vposVertexContainer[*itVertex1].m_north_m;
                         double dCenterEast_m = (vposVertexContainer[*itVertex2].m_east_m - vposVertexContainer[*itVertex1].m_east_m)*0.5 + vposVertexContainer[*itVertex1].m_east_m;
 

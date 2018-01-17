@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
 import xml.dom.minidom
+from xml.dom.minidom import Node
 import pandas as pd
 import glob
-import math 	# pi
+import sys
 # import the conversion module
 import LocalCoords
 
@@ -16,7 +17,7 @@ def ProcessEntityStateFile(filename):
 		try:
 			entityId = 0
 			elements = doc2.getElementsByTagName('ID')
-			if len(elements):
+			if elements and elements[0].firstChild and elements[0].firstChild.nodeType == Node.TEXT_NODE:
 				entityId = int(elements[0].firstChild.data)
 			latitude = 0.0
 			longitude = 0.0
@@ -40,10 +41,10 @@ def ProcessEntityStateFile(filename):
 				heading = float(elements[0].firstChild.data)
 
 		except Exception:
-			print('### Error encountered while processing the EnityState ###')
+			print('### Error encountered while processing the EntityState ###')
 			isGoodMessage = False
 		except:
-			print('### Error encountered while processing the EnityState ###Unexpected error:', sys.exc_info()[0])
+			print('### Error encountered while processing the EntityState ###Unexpected error:', sys.exc_info()[0])
 			isGoodMessage = False
 	if isGoodMessage:
 		return [entityId,latitude,longitude,altitude,heading]

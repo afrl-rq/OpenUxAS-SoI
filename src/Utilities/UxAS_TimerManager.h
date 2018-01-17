@@ -49,7 +49,7 @@ private:
 
         template<typename Tfunction>
         Timer(Tfunction&& handler, const std::string& name) noexcept
-        : m_handler(std::forward<Tfunction>(handler)), m_name(name) { };
+        : m_name(name), m_handler(std::forward<Tfunction>(handler)) { };
 
         Timer(Timer const& r) = delete;
 

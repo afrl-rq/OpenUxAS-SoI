@@ -57,8 +57,6 @@ ImpactPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -76,8 +74,10 @@ ImpactPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
             }
             if (m_pointSearchTask->getSearchLocationID() > 0)
             {
-                if ((m_pointOfInterest) && (m_pointSearchTask->getSearchLocationID() == m_pointOfInterest->getPointID()))
+                auto foundPoint = m_pointsOfInterest.find(m_pointSearchTask->getSearchLocationID());
+                if (foundPoint != m_pointsOfInterest.end())
                 {
+                    m_pointOfInterest = foundPoint->second;
                     m_pointSearchTask->setSearchLocation(m_pointOfInterest->getLocation()->clone());
                 }
                 else
@@ -270,7 +270,6 @@ bool ImpactPointSearchTaskService::isCalculateOption(const int64_t& taskId, int6
 
         auto taskOptionLocal = taskOption->clone();
         taskOptionLocal->setOptionID(optionId);
-        bool optionPushedBack(false);
         for (auto itEligibleEntites = m_speedAltitudeVsEligibleEntityIdsRequested.begin(); itEligibleEntites != m_speedAltitudeVsEligibleEntityIdsRequested.end(); itEligibleEntites++)
         {
             taskOptionLocal->getEligibleEntities() = itEligibleEntites->second;
@@ -283,7 +282,6 @@ bool ImpactPointSearchTaskService::isCalculateOption(const int64_t& taskId, int6
             pTaskOptionClass->m_orderedRouteIdVsPlan[routePlan->getRouteID()] = routePlan;
             m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
             m_taskPlanOptions->getOptions().push_back(taskOptionLocal);
-            optionPushedBack = true;
             // start a new option
             optionId++;
             taskOptionLocal = taskOption->clone();

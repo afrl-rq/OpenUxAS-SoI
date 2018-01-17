@@ -28,10 +28,10 @@
 #include "afrl/cmasi/LoiterAction.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/FollowPathCommand.h"
-#include "afrl/impact/GroundVehicleConfiguration.h"
-#include "afrl/impact/SurfaceVehicleConfiguration.h"
-#include "afrl/impact/GroundVehicleState.h"
-#include "afrl/impact/SurfaceVehicleState.h"
+#include "afrl/vehicles/GroundVehicleConfiguration.h"
+#include "afrl/vehicles/SurfaceVehicleConfiguration.h"
+#include "afrl/vehicles/GroundVehicleState.h"
+#include "afrl/vehicles/SurfaceVehicleState.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
 #include "uxas/messages/task/TaskOption.h"
 #include "uxas/messages/route/RouteRequest.h"
@@ -76,8 +76,6 @@ EscortTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -154,13 +152,13 @@ EscortTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::O
         auto ares = std::static_pointer_cast<afrl::cmasi::AutomationResponse>(receivedLmcpObject);
         for (auto v : ares->getMissionCommandList())
         {
-            m_vehicleIdVsCurrentMission[v->getVehicleID()] = std::shared_ptr<afrl::cmasi::MissionCommand>(v->clone());
+            m_currentMissions[v->getVehicleID()] = std::shared_ptr<afrl::cmasi::MissionCommand>(v->clone());
         }
     }
     else if (afrl::cmasi::isMissionCommand(receivedLmcpObject))
     {
         auto mish = std::static_pointer_cast<afrl::cmasi::MissionCommand>(receivedLmcpObject);
-        m_vehicleIdVsCurrentMission[mish->getVehicleID()] = mish;
+        m_currentMissions[mish->getVehicleID()] = mish;
     }
     else if (afrl::cmasi::isFollowPathCommand(receivedLmcpObject))
     {
@@ -170,12 +168,12 @@ EscortTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::O
         {
             path->getWaypointList().push_back(wp->clone());
         }
-        m_vehicleIdVsCurrentMission[fpc->getVehicleID()] = path;
+        m_currentMissions[fpc->getVehicleID()] = path;
     }
     else if (afrl::impact::isLineOfInterest(receivedLmcpObject))
     {
         auto loi = std::static_pointer_cast<afrl::impact::LineOfInterest>(receivedLmcpObject);
-        m_idVsLineOfInterest[loi->getLineID()] = loi;
+        m_linesOfInterest[loi->getLineID()] = loi;
     }
     return (false); // always false implies never terminating service from here
 };
@@ -263,7 +261,6 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
     if (m_supportedEntityStateLast)
     {
         // extract location of desired entity to track
-        int64_t trackId = m_escortTask->getSupportedEntityID();
         std::shared_ptr<afrl::cmasi::Location3D> targetLocation;
         double targetHeading = 0.0;
         double targetSpeed = 0.0;
@@ -279,7 +276,7 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
         }
 
         // only send out every 2 seconds (even on fast simulation mode)
-        if (!afrl::impact::isGroundVehicleState(entityState.get()) || m_throttle[entityState->getID()] + 2000 <= uxas::common::utilities::c_TimeUtilities::getTimeNow_ms())
+        if (!afrl::vehicles::isGroundVehicleState(entityState.get()) || m_throttle[entityState->getID()] + 2000 <= uxas::common::utilities::c_TimeUtilities::getTimeNow_ms())
         {
             m_throttle[entityState->getID()] = uxas::common::utilities::c_TimeUtilities::getTimeNow_ms();
         }
@@ -290,9 +287,9 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
 
         // look up speed to use for commanding vehicle
         double speed = entityState->getGroundspeed();
-        if (m_idVsEntityConfiguration.find(entityState->getID()) != m_idVsEntityConfiguration.end())
+        if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
         {
-            speed = m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed();
+            speed = m_entityConfigurations[entityState->getID()]->getNominalSpeed();
         }
 
         CalculateTargetPoint(targetLocation, targetHeading, targetSpeed, m_escortTask);
@@ -324,7 +321,7 @@ void EscortTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::Ent
         missionCommand->getWaypointList().push_back(wp);
 
         // check if surface or ground vehicle
-        if ((afrl::impact::isSurfaceVehicleState(entityState.get()) || afrl::impact::isGroundVehicleState(entityState.get())) && !missionCommand->getWaypointList().empty())
+        if ((afrl::vehicles::isSurfaceVehicleState(entityState.get()) || afrl::vehicles::isGroundVehicleState(entityState.get())) && !missionCommand->getWaypointList().empty())
         {
             afrl::cmasi::Waypoint* hwp = wp->clone();
             hwp->setNumber(2);
@@ -376,13 +373,13 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> EscortTaskService::CalculateG
     auto surveyType = afrl::cmasi::LoiterType::Circular;
     std::vector<int64_t> gimbalId;
 
-    if (m_idVsEntityConfiguration.find(entityState->getID()) != m_idVsEntityConfiguration.end())
+    if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
     {
-        surveySpeed = m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed();
+        surveySpeed = m_entityConfigurations[entityState->getID()]->getNominalSpeed();
         // find all gimbals to steer
-        for (size_t a = 0; a < m_idVsEntityConfiguration[entityState->getID()]->getPayloadConfigurationList().size(); a++)
+        for (size_t a = 0; a < m_entityConfigurations[entityState->getID()]->getPayloadConfigurationList().size(); a++)
         {
-            auto payload = m_idVsEntityConfiguration[entityState->getID()]->getPayloadConfigurationList().at(a);
+            auto payload = m_entityConfigurations[entityState->getID()]->getPayloadConfigurationList().at(a);
             if (afrl::cmasi::isGimbalConfiguration(payload))
             {
                 gimbalId.push_back(payload->getPayloadID());
@@ -390,15 +387,15 @@ std::shared_ptr<afrl::cmasi::VehicleActionCommand> EscortTaskService::CalculateG
         }
 
         // calculate proper radius
-        if (afrl::impact::isGroundVehicleConfiguration(m_idVsEntityConfiguration[entityState->getID()].get()) ||
-                afrl::impact::isSurfaceVehicleConfiguration(m_idVsEntityConfiguration[entityState->getID()].get()))
+        if (afrl::vehicles::isGroundVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()) ||
+                afrl::vehicles::isSurfaceVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
             surveyRadius = 0.0;
             surveyType = afrl::cmasi::LoiterType::Hover;
         }
-        else if (afrl::cmasi::isAirVehicleConfiguration(m_idVsEntityConfiguration[entityState->getID()].get()))
+        else if (afrl::cmasi::isAirVehicleConfiguration(m_entityConfigurations[entityState->getID()].get()))
         {
-            double speed = m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed();
+            double speed = m_entityConfigurations[entityState->getID()]->getNominalSpeed();
             double bank = 25.0 * n_Const::c_Convert::dDegreesToRadians();
             // Note: R = V/omega for coordinated turn omega = g*tan(phi)/V
             // Therefore: R = V^2/(g*tan(phi))
@@ -446,10 +443,10 @@ void EscortTaskService::CalculateTargetPoint(std::shared_ptr<afrl::cmasi::Locati
     if (task->getRouteID() == 0)
     {
         // look up from known waypoints
-        if (m_vehicleIdVsCurrentMission.find(task->getSupportedEntityID()) != m_vehicleIdVsCurrentMission.end())
+        if (m_currentMissions.find(task->getSupportedEntityID()) != m_currentMissions.end())
         {
-            path.assign(m_vehicleIdVsCurrentMission[task->getSupportedEntityID()]->getWaypointList().begin(),
-                    m_vehicleIdVsCurrentMission[task->getSupportedEntityID()]->getWaypointList().end());
+            path.assign(m_currentMissions[task->getSupportedEntityID()]->getWaypointList().begin(),
+                    m_currentMissions[task->getSupportedEntityID()]->getWaypointList().end());
         }
         else if (!task->getPrescribedWaypoints().empty())
         {
@@ -461,7 +458,7 @@ void EscortTaskService::CalculateTargetPoint(std::shared_ptr<afrl::cmasi::Locati
             // from set of known lines of interest
             double ldist = -1.0;
             int64_t lId = 0;
-            for (auto line : m_idVsLineOfInterest)
+            for (auto line : m_linesOfInterest)
             {
                 double dist = DistanceToLine(targetLocation, line.second);
                 if (dist > 0.0 && (ldist < 0 || dist < ldist))
@@ -471,9 +468,9 @@ void EscortTaskService::CalculateTargetPoint(std::shared_ptr<afrl::cmasi::Locati
                 }
             }
 
-            if (lId && m_idVsLineOfInterest.find(lId) != m_idVsLineOfInterest.end())
+            if (lId && m_linesOfInterest.find(lId) != m_linesOfInterest.end())
             {
-                path.assign(m_idVsLineOfInterest[lId]->getLine().begin(), m_idVsLineOfInterest[lId]->getLine().end());
+                path.assign(m_linesOfInterest[lId]->getLine().begin(), m_linesOfInterest[lId]->getLine().end());
                 if (fabs(targetSpeed) < 1.0)
                 {
                     // target is stationary, reverse the line if closer to end than beginning
@@ -513,7 +510,7 @@ void EscortTaskService::CalculateTargetPoint(std::shared_ptr<afrl::cmasi::Locati
                         std::reverse(path.begin(), path.end());
                     }
                 }
-                else if (FlipLine(targetLocation, targetHeading, m_idVsLineOfInterest[lId]))
+                else if (FlipLine(targetLocation, targetHeading, m_linesOfInterest[lId]))
                 {
                     std::reverse(path.begin(), path.end());
                 }
@@ -524,9 +521,9 @@ void EscortTaskService::CalculateTargetPoint(std::shared_ptr<afrl::cmasi::Locati
     {
         // look up from lines of interest
         int64_t lineId = task->getRouteID();
-        if (m_idVsLineOfInterest.find(lineId) != m_idVsLineOfInterest.end())
+        if (m_linesOfInterest.find(lineId) != m_linesOfInterest.end())
         {
-            path.assign(m_idVsLineOfInterest[lineId]->getLine().begin(), m_idVsLineOfInterest[lineId]->getLine().end());
+            path.assign(m_linesOfInterest[lineId]->getLine().begin(), m_linesOfInterest[lineId]->getLine().end());
         }
     }
 

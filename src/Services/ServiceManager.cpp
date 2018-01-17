@@ -8,6 +8,7 @@
 // ===============================================================================
 
 #include "ServiceManager.h"
+#include "LmcpObjectNetworkBridgeManager.h"
 
 #define INCLUDE_SERVICE_HEADERS //this switches 00_ServiceList.h to load the service headers
 #include "00_ServiceList.h"
@@ -261,7 +262,7 @@ ServiceManager::initialize()
 
 uint32_t
 ServiceManager::removeTerminatedServices() // lock m_servicesByIdMutex before invoking
-{
+{   
     uint32_t runningSvcCnt{0};
     uint32_t terminatedSvcCnt{0};
     for (auto svcIt = m_servicesById.begin(); svcIt != m_servicesById.end();)
@@ -279,6 +280,10 @@ ServiceManager::removeTerminatedServices() // lock m_servicesByIdMutex before in
             svcIt++;
         }
     }
+    
+    // check to see if bridges are ready for termination
+    uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().removeTerminatedBridges(runningSvcCnt, terminatedSvcCnt);
+    
     UXAS_LOG_INFORM(s_typeName(), "::removeTerminatedServices retained [", runningSvcCnt, "] services and removed [", terminatedSvcCnt, "] services");
     return (runningSvcCnt);
 };
@@ -482,11 +487,32 @@ ServiceManager::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
     if (uxas::messages::uxnative::isCreateNewService(receivedLmcpMessage->m_object.get()))
     {
         auto createNewService = std::static_pointer_cast<uxas::messages::uxnative::CreateNewService>(receivedLmcpMessage->m_object);
-        std::string xmlConfig = "";
-        for (auto& xmlmsg : createNewService->getXmlConfiguration())
+        std::string xmlConfig = createNewService->getXmlConfiguration() + "\n";
+        for (auto& msg : createNewService->getEntityConfigurations())
         {
-            xmlConfig += xmlmsg;
+            xmlConfig += msg->toXML() + "\n";
         }
+        for (auto& msg : createNewService->getEntityStates())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        for (auto& msg : createNewService->getMissionCommands())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        for (auto& msg : createNewService->getAreas())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        for (auto& msg : createNewService->getLines())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        for (auto& msg : createNewService->getPoints())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        xmlConfig += "</Service>";
         if (createService(xmlConfig,createNewService->getServiceID()))
         {
             UXAS_LOG_INFORM(s_typeName(), "::processReceivedLmcpMessage created service using XML configuration from message payload");
@@ -520,6 +546,9 @@ ServiceManager::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
 void
 ServiceManager::terminateAllServices()
 {
+    // Kill all bridges first
+    uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().terminateAllBridges();
+    
     // send KillService message to any non-terminated services
     std::lock_guard<std::mutex> lock(m_servicesByIdMutex);
     for (auto svcIt = m_servicesById.cbegin(), serviceItEnd = m_servicesById.cend(); svcIt != serviceItEnd; svcIt++)

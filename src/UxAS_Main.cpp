@@ -8,7 +8,7 @@
 // ===============================================================================
 
 #include "afrl/cmasi/AirVehicleState.h"
-#include "afrl/impact/GroundVehicleState.h"
+#include "afrl/impact/AreaOfInterest.h"
 
 #include "LmcpObjectNetworkBridgeManager.h"
 #include "LmcpObjectNetworkServer.h"
@@ -23,7 +23,7 @@
 #include "UxAS_StringUtil.h"
 
 #ifdef AFRL_INTERNAL_ENABLED
-#include "UxAS_SerialPortEmulator.h"
+//#include "UxAS_SerialPortEmulator.h"
 #endif
 
 #include "stdUniquePtr.h"
@@ -38,9 +38,10 @@
 
 #define ARG_CFG_PATH "-cfgPath"
 #define ARG_VERSION "-version"
+#define ARG_RUN_UNTIL "-runUntil"
 
 #define MAJOR_VERSION "3"
-#define MINOR_VERSION "1"
+#define MINOR_VERSION "2"
 #define PATCH_VERSION "0"
 
 #define BEFORE_LOG_MANAGER_INITIALIZATION_LOG_MESSAGE(message) std::cout << message << std::endl; std::cout.flush();
@@ -66,6 +67,7 @@ main(int argc, char** argv)
     // example arguments: -cfgBasePath ./cfg/cfgbase2.xml
     //
     std::string cfgPath{"cfg.xml"};
+	uint32_t runUntil_sec = 0;
 
     for (int i = 1; i < argc; i++)
     {
@@ -74,10 +76,15 @@ main(int argc, char** argv)
             i++;
             cfgPath = std::string(argv[i]);
         }
+        else if (strcmp((const char *) argv[i], ARG_RUN_UNTIL) == 0)
+        {
+            i++;
+            runUntil_sec = std::atoi(argv[i]);
+        }
         else if (strcmp((const char *) argv[i], ARG_VERSION) == 0)
         {
             auto o = new afrl::cmasi::AirVehicleState;
-            auto p = new afrl::impact::GroundVehicleState;
+            auto p = new afrl::impact::AreaOfInterest;
             std::cout << std::endl << "#######################" << std::endl;
             std::cout << "   VERSION: " << MAJOR_VERSION << "." << MINOR_VERSION << "." << PATCH_VERSION << std::endl;
             std::cout << "     CMASI:  " << o->getSeriesVersion() << std::endl;
@@ -203,19 +210,6 @@ main(int argc, char** argv)
     }
 
     //
-    // build bridges
-    //
-    if (uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().initialize())
-    {
-        UXAS_LOG_INFORM("UxAS_Main initialized bridge manager");
-    }
-    else
-    {
-        UXAS_LOG_ERROR("UxAS_Main failed to initialize bridge manager");
-        return (300);
-    }
-
-    //
     // service manager and services
     //
     if (uxas::service::ServiceManager::getInstance().configureServiceManager())
@@ -238,30 +232,39 @@ main(int argc, char** argv)
         return (410);
     }
 
+    //
+    // build bridges
+    //
+    if (uxas::communications::LmcpObjectNetworkBridgeManager::getInstance().initialize())
+    {
+        UXAS_LOG_INFORM("UxAS_Main initialized bridge manager");
+    }
+    else
+    {
+        UXAS_LOG_ERROR("UxAS_Main failed to initialize bridge manager");
+        return (300);
+    }
+
     UXAS_LOG_INFORM("UxAS_Main running ServiceManager");
-    uxas::service::ServiceManager::getInstance().runUntil(uxas::common::ConfigurationManager::getInstance().getRunDuration_s());
+    if(!runUntil_sec)
+    {
+        uxas::service::ServiceManager::getInstance().runUntil(uxas::common::ConfigurationManager::getInstance().getRunDuration_s());
+    }
+    else
+    {
+        uxas::service::ServiceManager::getInstance().runUntil(runUntil_sec);
+    }
 
     uxas::service::ServiceManager::getInstance().destroyServiceManager();
     networkServer->terminate();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     networkServer.reset();
-    uxas::communications::transport::ZeroMqFabric::getInstance().~ZeroMqFabric();
+    uxas::communications::transport::ZeroMqFabric::Destroy();
 
-    std::cout << std::endl << "***************************************************" << std::endl << std::endl;
-    std::cout << std::endl << "****** UxAS is Shutting Down immediately !!! ******" << std::endl << std::endl;
-    std::cout << std::endl << "***************************************************" << std::endl << std::endl;
-
-    //this causes a nasty termination
-    // but it terminates. there probably a dangling thread, somewhere
-    try 
-    {
-        throw; // Insert code that will return by throwing a exception.
-    }
-    catch (const std::exception& e) // Consider using a custom exception type for intentional
-    { // throws. A good idea might be a `return_exception`.
-        //        return EXIT_SUCCESS;
-        std::cout << "Standard exception: " << e.what() << std::endl;
-    }
+    std::cout << std::endl;
+    std::cout << "***************************************************" << std::endl;
+    std::cout << "****** UxAS is Shutting Down immediately !!! ******" << std::endl;
+    std::cout << "***************************************************" << std::endl;
 
     return EXIT_SUCCESS;
 

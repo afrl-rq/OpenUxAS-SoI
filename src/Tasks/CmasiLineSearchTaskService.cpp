@@ -66,8 +66,6 @@ CmasiLineSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -617,8 +615,8 @@ void CmasiLineSearchTaskService::activeEntityState(const std::shared_ptr<afrl::c
         // find the gimbal payload id to use to point the camera 
         //ASSUME: use first gimbal
         int64_t gimbalPayloadId = 0;
-        auto itEntityConfiguration = m_idVsEntityConfiguration.find(entityState->getID());
-        if (itEntityConfiguration != m_idVsEntityConfiguration.end())
+        auto itEntityConfiguration = m_entityConfigurations.find(entityState->getID());
+        if (itEntityConfiguration != m_entityConfigurations.end())
         {
             for (auto& payload : itEntityConfiguration->second->getPayloadConfigurationList())
             {

@@ -123,7 +123,7 @@ LmcpObjectMessageReceiverPipe::getNextMessageObject()
         {
             std::unique_ptr<uxas::communications::data::LmcpMessage> lmcpMessage 
                     = uxas::stduxas::make_unique<uxas::communications::data::LmcpMessage>
-                    (std::move(nextZeroMqMessage->getMessageAttributesOwnership()), std::move(lmcpObject));
+              (nextZeroMqMessage->getMessageAttributesOwnership(), std::move(lmcpObject));
             return (lmcpMessage);
         }
     }
@@ -151,7 +151,7 @@ LmcpObjectMessageReceiverPipe::deserializeMessage(const std::string& payload)
     lmcpByteBuffer.allocate(payload.size());
     lmcpByteBuffer.rewind();
 
-    for (int32_t charIndex = 0; charIndex < payload.size(); charIndex++)
+    for (size_t charIndex = 0; charIndex < payload.size(); charIndex++)
     {
         lmcpByteBuffer.putByte(payload[charIndex]); // TODO REVIEW
     }

@@ -89,10 +89,10 @@ namespace task
  *  - afrl::cmasi::EntityConfiguration
  *  - afrl::cmasi::AirVehicleState
  *  - afrl::cmasi::AirVehicleConfiguration
- *  - afrl::impact::GroundVehicleState
- *  - afrl::impact::GroundVehicleConfiguration
- *  - afrl::impact::SurfaceVehicleState
- *  - afrl::impact::SurfaceVehicleConfiguration
+ *  - afrl::vehicles::GroundVehicleState
+ *  - afrl::vehicles::GroundVehicleConfiguration
+ *  - afrl::vehicles::SurfaceVehicleState
+ *  - afrl::vehicles::SurfaceVehicleConfiguration
  *  - uxas::messages::task::UniqueAutomationRequest
  *  - uxas::messages::task::UniqueAutomationResponse
  *  - uxas::messages::route::RoutePlanResponse
@@ -174,6 +174,7 @@ private:
 
 private:
     std::shared_ptr<afrl::cmasi::LineSearchTask> m_lineSearchTask;
+    std::shared_ptr<afrl::impact::LineOfInterest> m_lineOfInterest;
     std::unordered_multimap<int64_t, std::shared_ptr<Dpss> > m_optionIdVsDpss;
     std::shared_ptr<Dpss> m_activeDpss;
     bool m_isPlanBothDirections = true;

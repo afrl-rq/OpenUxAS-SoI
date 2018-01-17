@@ -13,9 +13,20 @@ TEST(DistributedCooperation_Test01, CorrectNumberMessages)
     uint32_t duration_s{10};
     // The runtime directory for all tests is: "uxas/code/builds/netbeans/nb_8.2/FunctionalTests"
     // testPath - relative path to the directory containing configration and othe test files
-    std::string testPath("../tests/Test_Services/00_ExampleTests/03_Test_Example_DistributedCooperation/");
-    // uxasConfigurationFile - path and file name of the UxAS configuration file
-    std::string uxasConfigurationFile = testPath + "cfg_DistributedCooperation.xml";
+	std::string testPath;
+	// configFileName - the file name of the UxAS configuration file
+	std::string configFileName;
+	#ifdef _WIN32
+		#include "windows.h"
+		SetCurrentDirectory("../../../../");
+	#endif
+
+	testPath = "../tests/Test_Services/00_ExampleTests/03_Test_Example_DistributedCooperation/";
+	configFileName = "cfg_DistributedCooperation.xml";
+
+
+	// uxasConfigurationFile - path and file name of the UxAS configuration file
+	std::string uxasConfigurationFile = testPath + configFileName;
     // outputPath - path for saving output files
     std::string outputPath = testPath + "output/";
     // outputPath - path for saving log files

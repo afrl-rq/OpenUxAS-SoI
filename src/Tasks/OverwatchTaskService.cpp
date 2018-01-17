@@ -65,8 +65,6 @@ OverwatchTaskService::configureTask(const pugi::xml_node& ndComponent)
 
 {
     std::string strBasePath = m_workDirectoryPath;
-    uint32_t ui32EntityID = m_entityId;
-    uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
@@ -209,9 +207,9 @@ void OverwatchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::
         // add the loiter
         auto loiterAction = new afrl::cmasi::LoiterAction();
         loiterAction->setLocation(m_watchedEntityStateLast->getLocation()->clone());
-        if (m_idVsEntityConfiguration.find(entityState->getID()) != m_idVsEntityConfiguration.end())
+        if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
         {
-            loiterAction->setAirspeed(m_idVsEntityConfiguration[entityState->getID()]->getNominalSpeed());
+            loiterAction->setAirspeed(m_entityConfigurations[entityState->getID()]->getNominalSpeed());
         }
         else
         {

@@ -132,7 +132,7 @@ public:
 
 #ifdef AFRL_INTERNAL_ENABLED
   // accurate method for selecting center waypoints from a given road input
-  void PlanPrecisely(std::vector<xyPoint> &xyPoints, int maxWps);
+  //void PlanPrecisely(std::vector<xyPoint> &xyPoints, int maxWps);
 #endif
 
   // removes road points that lie outside of comm range

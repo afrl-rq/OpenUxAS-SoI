@@ -26,6 +26,8 @@
 #define STRING_XML_ADDRESS_SUB "AddressSUB"
 #define STRING_XML_ADDRESS_PUSH "AddressPUSH"
 #define STRING_XML_EXTERNAL_ENTITY_ID "ExternalID"
+#define STRING_XML_PREVENT_LOOPBACK "PreventLoopBack"
+#define STRING_XML_THROTTLE_CONFIGURATION_FORWARDING "ThrottleConfigurationForwarding"
 
 namespace uxas
 {
@@ -81,6 +83,26 @@ namespace uxas
       if (!bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).empty())
       {
         externalID = bridgeXmlNode.attribute(STRING_XML_EXTERNAL_ENTITY_ID).value();
+      }
+
+      if (!bridgeXmlNode.attribute(STRING_XML_PREVENT_LOOPBACK).empty())
+      {
+        m_preventLoopBack = bridgeXmlNode.attribute(STRING_XML_PREVENT_LOOPBACK).as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'prevent loopback' boolean to ", m_preventLoopBack, " from XML configuration");
+      }
+      else
+      {
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find 'prevent loopback' boolean in XML configuration; server boolean is ", m_preventLoopBack);
+      }
+
+      if (!bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).empty())
+      {
+        m_throttleConfigurationForwarding = bridgeXmlNode.attribute(STRING_XML_THROTTLE_CONFIGURATION_FORWARDING).as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'throttle configuration forwarding' boolean to ", m_throttleConfigurationForwarding, " from XML configuration");
+      }
+      else
+      {
+        UXAS_LOG_INFORM(s_typeName(), "::configure failed to find 'throttle configuration forwarding' boolean in XML configuration; server boolean is ", m_throttleConfigurationForwarding);
       }
 
       // TODO review IMPACT messaging requirements (need to modify object before sending?)
@@ -188,21 +210,37 @@ namespace uxas
         " and size ", receivedLmcpMessage->getPayload().size());
 
       // process messages from a local service (only)
-      if (m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
+      if (m_preventLoopBack && m_entityIdString == receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
       {
         if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
         {
           UXAS_LOG_INFORM(s_typeName(), "::processReceivedSerializedLmcpMessage processing message with source service ID ", receivedLmcpMessage->getMessageAttributesReference()->getSourceServiceId());
 
-          //make header
-          std::string ClassName(receivedLmcpMessage->getAddress());
-          std::string last(ClassName.substr(ClassName.rfind(".") + 1));
+          //convert to LMCP to get series name
+          std::string message = receivedLmcpMessage->getPayload();
+          avtas::lmcp::ByteBuffer byteBuffer;
+          byteBuffer.allocate(message.size());
+          byteBuffer.put(reinterpret_cast<const uint8_t*>(message.c_str()), message.size());
+          byteBuffer.rewind();
 
+          std::shared_ptr<avtas::lmcp::Object> ptr_Object;
+          ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
 
-          std::stringstream ss(receivedLmcpMessage->getMessageAttributesReference()->getDescriptor());
-          std::string seriesName;
-          std::getline(ss, seriesName, '.');
-          std::getline(ss, seriesName, '.');
+          if(m_throttleConfigurationForwarding && std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object))
+          {
+             auto config = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(ptr_Object);
+             if(m_configs.find(config->getID()) != m_configs.end())
+             {
+                if(m_configs[config->getID()]->toXML().compare(config->toXML()) == 0)
+                {
+                   std::cout << " ##ZeroMQ_Bridge: Blocking AirVehicleConfiguration, already sent" << std::endl;
+                   return false; // don't forward configs already forwarded
+                }
+             }
+             m_configs[config->getID()] = config;
+          }
+
+          std::string seriesName = ptr_Object->getSeriesName();
 
           std::locale loc;
           //convert seriesName to uppercase
@@ -211,8 +249,7 @@ namespace uxas
             seriesName[i] = std::toupper(seriesName[i], loc);
           }
 
-          std::string header = "lmcp:" + seriesName + ":" + last;
-
+          std::string header = "lmcp:" + seriesName + ":" + ptr_Object->getLmcpTypeName();
           n_ZMQ::s_sendmore(*sender, header);
           n_ZMQ::s_send(*sender, receivedLmcpMessage->getPayload());
 
@@ -244,24 +281,7 @@ namespace uxas
           std::string key = n_ZMQ::s_recv(*subscriber);
           std::string message = n_ZMQ::s_recv(*subscriber);
 
-
-          std::stringstream ss(key);
-          std::string LMCPHeader, seriesName, className;
-
-          //parse out the header from the two-part message.
-          std::getline(ss, LMCPHeader, ':');
-          std::getline(ss, seriesName, ':');
-          std::getline(ss, className, ':');
-
-          std::locale loc;
-          //convert seriesName to lowercase
-          for (std::string::size_type i = 0; i < seriesName.length(); i++)
-          {
-            seriesName[i] = std::tolower(seriesName[i], loc);
-          }
-
-          //build back to the LMCP_FULL_NAME 
-          std::string fullName = "afrl." + seriesName + "." + className;
+          //don't care about key. Construct header from valid LMCP.
 
           avtas::lmcp::ByteBuffer byteBuffer;
           byteBuffer.allocate(message.size());
@@ -271,10 +291,10 @@ namespace uxas
           std::shared_ptr<avtas::lmcp::Object> ptr_Object;
           ptr_Object.reset(avtas::lmcp::Factory::getObject(byteBuffer));
 
+          auto header = ptr_Object->getFullLmcpTypeName();
           std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
 
-          recvdAddAttMsg->setAddressAttributesAndPayload(fullName, "lmcp", fullName, "fusion", externalID, "1", message);
-
+          recvdAddAttMsg->setAddressAttributesAndPayload(header, "lmcp", header, "fusion", externalID, "1", message);
 
           // send message to the external entity
           if (recvdAddAttMsg->isValid())

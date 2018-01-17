@@ -79,13 +79,13 @@ void Dpss::SmoothPath(DpssWaypoint pathPoints[], int numPoints, SmoothPathInput*
     // if we still don't have enough waypoints to represent the
     // road at this level of fidelity, then further pruning is needed
     
-    if( (spi->maxWaypoints)/2 < (int)xyPoints.size() )
+    if( (spi->maxWaypoints)/2 < xyPoints.size() )
     {
         if(spi->roughPlan)
             PlanQuickly(xyPoints, (spi->maxWaypoints)/2);
 #ifdef AFRL_INTERNAL_ENABLED
-        else
-            PlanPrecisely(xyPoints, (spi->maxWaypoints)/2);
+//        else
+//            PlanPrecisely(xyPoints, (spi->maxWaypoints)/2);
 #endif
     }
     

@@ -45,7 +45,9 @@ using namespace std;
 //using std::ostream;
 #include <map>
 
+// TODO: remove all waypoint mangling
 #define TASK_ID_MULTIPLIER 10000    // use this to make the waypoint index visible in the mangeled id (up to 9999 waypoints)
+
 namespace n_FrameworkLib
 {
     
@@ -69,10 +71,10 @@ public:    //constructors
                     double reNorth=0.0,double reEast=0.0,double reAltitude=0.0,
                     double rePhi=0.0,double reTheta=0.0,double rePsi=0.0,
                     double reVelocity=50.0)
-        :   m_reTime_sec(reTime),
+        :   CPosition(reNorth,reEast,reAltitude),
+			m_reTime_sec(reTime),
             m_rePhi_deg(rePhi),m_reTheta_deg(reTheta),m_rePsi_deg(rePsi),
-            m_speed_mps(reVelocity),
-            CPosition(reNorth,reEast,m_altitude_m)
+            m_speed_mps(reVelocity)
     {};
     virtual ~CDataPoint(){};
 
@@ -322,25 +324,25 @@ public:    //constructors
                 double tend=0
             )
         :CWaypointSmall(dPositionNorth_m,dPositionEast_m,dAltitude_m),
-        m_speed_mps(dVelocity_mpersec),
-        m_bMachCommandFlag(bMachCommandFlag),
-        m_dSegmentLength_m(SegmentLength_m),
-        m_circleTurn(dTurnCenterNorth_m,dTurnCenterEast_m,dTurnRadius_m,turnDirection),
-        m_typeWaypoint(typeWaypoint),
-        m_iObjectiveID(iObjectiveID),
-        m_dObjectiveDesiredDirection_rad(0.0),
-        m_dObjectiveDesiredStandOff_m(0.0),
-        m_bResetVehiclePosition(false),
-        m_sstateSensorState(sstateFrontCamera),
-        m_reSegmentTime_sec(0.0),
-        m_iID(-1),
-        m_iNextWaypointID(-1),
-        m_tstart(tstart),
-        m_tend(tend),
-        m_dLoiterRadius_m(-1.0),    //invalid
-        m_iLoiterDuration_s(0),
-        m_bDoNotRemove(false),
-                m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
+		 m_iID(-1),
+		 m_iNextWaypointID(-1),
+         m_speed_mps(dVelocity_mpersec),
+         m_bMachCommandFlag(bMachCommandFlag),
+         m_dSegmentLength_m(SegmentLength_m),
+         m_circleTurn(dTurnCenterNorth_m,dTurnCenterEast_m,dTurnRadius_m,turnDirection),
+         m_typeWaypoint(typeWaypoint),
+         m_iObjectiveID(iObjectiveID),
+         m_dObjectiveDesiredDirection_rad(0.0),
+         m_dObjectiveDesiredStandOff_m(0.0),
+         m_bResetVehiclePosition(false),
+         m_sstateSensorState(sstateFrontCamera),
+         m_reSegmentTime_sec(0.0),
+         m_tstart(tstart),
+         m_tend(tend),
+         m_dLoiterRadius_m(-1.0),    //invalid
+         m_iLoiterDuration_s(0),
+         m_bDoNotRemove(false),
+         m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
     {
     };
 
@@ -348,72 +350,72 @@ public:    //constructors
                 double dNorth,double dEast,double dAltitude,double dVelocity_mpersec
             )
         :CWaypointSmall(dNorth,dEast,dAltitude,postionUnits),
-        m_speed_mps(dVelocity_mpersec),
-        m_dSegmentLength_m(0.0),
-        m_circleTurn((std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),CCircle::turnNone),
-        m_typeWaypoint(waytypeEnroute),
-        m_iObjectiveID(-1),
-        m_dObjectiveDesiredDirection_rad(0.0),
-        m_dObjectiveDesiredStandOff_m(0.0),
-        m_bResetVehiclePosition(false),
-        m_sstateSensorState(sstateFrontCamera),
-        m_reSegmentTime_sec(0.0),
-        m_iID(-1),
-        m_iNextWaypointID(-1),
-        m_tstart(0.0),
-        m_tend(0.0),
-        m_dLoiterRadius_m(-1.0),    //invalid
-        m_iLoiterDuration_s(0),
-        m_bDoNotRemove(false),
-                m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
+		 m_iID(-1),
+		 m_iNextWaypointID(-1),
+         m_speed_mps(dVelocity_mpersec),
+         m_dSegmentLength_m(0.0),
+         m_circleTurn((std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),CCircle::turnNone),
+         m_typeWaypoint(waytypeEnroute),
+         m_iObjectiveID(-1),
+         m_dObjectiveDesiredDirection_rad(0.0),
+         m_dObjectiveDesiredStandOff_m(0.0),
+         m_bResetVehiclePosition(false),
+         m_sstateSensorState(sstateFrontCamera),
+         m_reSegmentTime_sec(0.0),
+         m_tstart(0.0),
+         m_tend(0.0),
+         m_dLoiterRadius_m(-1.0),    //invalid
+         m_iLoiterDuration_s(0),
+         m_bDoNotRemove(false),
+         m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
 
     {
     };
 
     CWaypoint()
         :CWaypointSmall(0.0,0.0,0.0),
-        m_speed_mps(0.0),
-        m_dSegmentLength_m(0.0),
-        m_circleTurn((std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),CCircle::turnNone),
-        m_typeWaypoint(waytypeEnroute),
-        m_iObjectiveID(-1),
-        m_dObjectiveDesiredDirection_rad(0.0),
-        m_dObjectiveDesiredStandOff_m(0.0),
-        m_bResetVehiclePosition(false),
-        m_sstateSensorState(sstateFrontCamera),
-        m_reSegmentTime_sec(0.0),
-        m_iID(-1),
-        m_iNextWaypointID(-1),
-        m_tstart(0.0),
-        m_tend(0.0),
-        m_dLoiterRadius_m(-1.0),    //invalid
-        m_iLoiterDuration_s(0),
-        m_bDoNotRemove(false),
-                m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
+		 m_iID(-1),
+		 m_iNextWaypointID(-1),
+         m_speed_mps(0.0),
+         m_dSegmentLength_m(0.0),
+         m_circleTurn((std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),CCircle::turnNone),
+         m_typeWaypoint(waytypeEnroute),
+         m_iObjectiveID(-1),
+         m_dObjectiveDesiredDirection_rad(0.0),
+         m_dObjectiveDesiredStandOff_m(0.0),
+         m_bResetVehiclePosition(false),
+         m_sstateSensorState(sstateFrontCamera),
+         m_reSegmentTime_sec(0.0),
+         m_tstart(0.0),
+         m_tend(0.0),
+         m_dLoiterRadius_m(-1.0),    //invalid
+         m_iLoiterDuration_s(0),
+         m_bDoNotRemove(false),
+         m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
 
     {
     };
 
     CWaypoint(double reNorth,double reEast,double reAltitude=0.0,const CPosition::enPositionUnits& postionUnits=CPosition::unitsFeet)
         :CWaypointSmall(reNorth,reEast,reAltitude,postionUnits),
-        m_speed_mps(0.0),
-        m_dSegmentLength_m(0.0),
-        m_circleTurn((std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),CCircle::turnNone),
-        m_typeWaypoint(waytypeEnroute),
-        m_iObjectiveID(-1),
-        m_dObjectiveDesiredDirection_rad(0.0),
-        m_dObjectiveDesiredStandOff_m(0.0),
-        m_bResetVehiclePosition(false),
-        m_sstateSensorState(sstateFrontCamera),
-        m_reSegmentTime_sec(0.0),
-        m_iID(-1),
-        m_iNextWaypointID(-1),
-        m_tstart(0.0),
-        m_tend(0.0),
-        m_dLoiterRadius_m(-1.0),    //invalid
-        m_iLoiterDuration_s(0),
-        m_bDoNotRemove(false),
-                m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
+		 m_iID(-1),
+		 m_iNextWaypointID(-1),
+         m_speed_mps(0.0),
+         m_dSegmentLength_m(0.0),
+         m_circleTurn((std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),(std::numeric_limits<double>::max)(),CCircle::turnNone),
+         m_typeWaypoint(waytypeEnroute),
+         m_iObjectiveID(-1),
+         m_dObjectiveDesiredDirection_rad(0.0),
+         m_dObjectiveDesiredStandOff_m(0.0),
+         m_bResetVehiclePosition(false),
+         m_sstateSensorState(sstateFrontCamera),
+         m_reSegmentTime_sec(0.0),
+         m_tstart(0.0),
+         m_tend(0.0),
+         m_dLoiterRadius_m(-1.0),    //invalid
+         m_iLoiterDuration_s(0),
+         m_bDoNotRemove(false),
+         m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
 
     {
     };
@@ -432,25 +434,25 @@ public:    //constructors
                     enSensorStates m_sstateSensorState=sstateFrontCamera,
                     double m_reSegmentTime_sec=0.0
                     ) 
-    :    CWaypointSmall(posPosition), 
-        m_speed_mps(dMachCommand),m_bMachCommandFlag(bMachCommandFlag),
-        m_dSegmentLength_m(dSegmentLength_m),
-        m_circleTurn(dTurnCenterX_m,dTurnCenterY_m,dTurnRadius_m,turnDirection),
-        m_typeWaypoint(typeWaypoint),
-        m_iObjectiveID(iObjectiveID),
-        m_dObjectiveDesiredDirection_rad(0.0),
-        m_dObjectiveDesiredStandOff_m(0.0),
-        m_bResetVehiclePosition(bResetVehiclePosition),
-        m_sstateSensorState(sstateFrontCamera),
-        m_reSegmentTime_sec(0.0),
-        m_iID(-1),
-        m_iNextWaypointID(-1),
-        m_tstart(0.0),
-        m_tend(0.0),
-        m_dLoiterRadius_m(-1.0),    //invalid
-        m_iLoiterDuration_s(0),
-        m_bDoNotRemove(false),
-                m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
+    	:CWaypointSmall(posPosition),
+		 m_iID(-1),
+		 m_iNextWaypointID(-1),
+         m_speed_mps(dMachCommand),m_bMachCommandFlag(bMachCommandFlag),
+         m_dSegmentLength_m(dSegmentLength_m),
+         m_circleTurn(dTurnCenterX_m,dTurnCenterY_m,dTurnRadius_m,turnDirection),
+         m_typeWaypoint(typeWaypoint),
+         m_iObjectiveID(iObjectiveID),
+         m_dObjectiveDesiredDirection_rad(0.0),
+         m_dObjectiveDesiredStandOff_m(0.0),
+         m_bResetVehiclePosition(bResetVehiclePosition),
+         m_sstateSensorState(sstateFrontCamera),
+         m_reSegmentTime_sec(0.0),
+         m_tstart(0.0),
+         m_tend(0.0),
+         m_dLoiterRadius_m(-1.0),    //invalid
+         m_iLoiterDuration_s(0),
+         m_bDoNotRemove(false),
+         m_ptr_CMASI_Waypoint(new afrl::cmasi::Waypoint())
 
     {
     };
@@ -614,33 +616,6 @@ public:    //constructors
         }
     };
 
-#ifdef STEVETEST
-    int64_t dwObjID_IndexToWptID(const int& iObjectiveID,const int& iIndex)
-    {
-        return(MAKELONG_l(iIndex,static_cast<WORD_t>(iObjectiveID)));
-    };
-
-    const int64_t dwObjID_IndexToWptID(const int& iObjectiveID,const int& iIndex) const
-    {
-        return(MAKELONG_l(iIndex,static_cast<WORD_t>(iObjectiveID)));
-    };
-
-    int iWptID_ToIndex(const int64_t& dwID)
-    {
-        return(static_cast<int>(LOWWORD_l(dwID)));
-    };
-
-    int iWptID_ToObjectiveID(const int64_t& dwID)
-    {
-        return(static_cast<int>(HIWORD_l(dwID)));
-    };
-#else    //stevetest
-    //int64_t dwObjID_IndexToWptID(const int& iObjectiveID,const int& iIndex)
-    //{
-    //    int64_t dwReturn = (iObjectiveID*TASK_ID_MULTIPLIER) + iIndex;
-    //    return(dwReturn);
-    //};
-
     const int64_t dwObjID_IndexToWptID(const int& iObjectiveID, const int& iIndex) const
     {
 
@@ -663,7 +638,6 @@ public:    //constructors
         int iReturn = static_cast<int>(dwID / TASK_ID_MULTIPLIER);
         return(iReturn);
     };
-#endif    // STEVETEST
 
 
 public:

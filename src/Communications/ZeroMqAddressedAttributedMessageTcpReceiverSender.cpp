@@ -71,15 +71,7 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
                                 = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
                         if (recvdTcpAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdTcpDataSegment)))
                         {
-                            // process messages from an external service (only - since TCP stream is only used for bridging to other entities)
-                            if (m_entityIdString != recvdTcpAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
-                            {
-                                nextMsg = std::move(recvdTcpAddAttMsg);
-                            }
-                            else
-                            {
-                                UXAS_LOG_INFORM("ZeroMqAddressedAttributedMessageReceiver::getNextMessage ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                            }
+                            nextMsg = std::move(recvdTcpAddAttMsg);
                         }
                         else
                         {
@@ -128,16 +120,13 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessag
 {
     if (m_zmqSocket)
     {
-        static size_t idSize{0};
-        static uint8_t id[256];
-
-        if (idSize == 0)
+        if (m_idSize == 0)
         {
-            memset(id, 0, 256);
-            idSize = 256;
-            m_zmqSocket->getsockopt(ZMQ_IDENTITY, id, &idSize);
+            memset(m_id, 0, 256);
+            m_idSize = 256;
+            m_zmqSocket->getsockopt(ZMQ_IDENTITY, m_id, &m_idSize);
         }
-        zmq_send(*m_zmqSocket, id, idSize, ZMQ_SNDMORE);
+        zmq_send(*m_zmqSocket, m_id, m_idSize, ZMQ_SNDMORE);
 
         std::string sentinelStr = uxas::common::SentinelSerialBuffer::createSentinelizedString(message->getString());
         UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessage BEFORE sending TCP stream single-part message");
