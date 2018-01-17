@@ -352,3 +352,28 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
 
 - The Visual Studio backend for Meson mostly works, but will fail when regenerating build files. If you modify one of the `meson.build` files, delete the `build` directory and run `meson.py build --backend=vs` again. The steps following the `meson.build` command must also be performed.
 - The UxAS test suite uses some hardcoded POSIX-style paths, and so does not currently work on Windows.
+
+# Cross-compilation
+
+OpenUxAS can be cross-compiled to a variety of targets, and has
+first-class support for the ODROID-XU4. The easiest way to build for
+this board is to use the Docker-based infrastructure found in the
+`/docker` directory. Note that while Docker is available on macOS and
+Windows, this process has, so far, only been tested on Linux.
+
+1. Install [Docker CE](https://www.docker.com/community-edition).
+1. Generate the LMCP libraries through the steps listed above, running `RunLmcpGen.sh`.
+1. From the root of the repository, run `python prepare`.
+1. From the root of the repository, run `./docker/build_sdcard_and_uxas.sh`
+
+At the end of this process, you will have an ODROID-XU4 system image
+at `/sdcard.img` ready to flash to an SD card or eMMC module, and you
+will have a cross-compiled UxAS binary at `/build_cross/uxas`.
+
+The system image is configured to resize itself at first boot to fit
+the available space on the SD card or eMMC module. It also runs an SSH
+server at startup and has a default user `uxas` with the password
+`uxas`. Upon its initial boot, you should be able to copy the UxAS
+cross-compiled binary and config files into place with `scp`, and then
+`ssh` in to run them.
+

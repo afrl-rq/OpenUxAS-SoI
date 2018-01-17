@@ -19,6 +19,7 @@ RUN make -C buildroot sdk
 
 FROM ubuntu:16.04
 
+COPY --from=0 /src/buildroot/output/images/sdcard.img /opt/uxas/sdcard.img
 COPY --from=0 /src/buildroot/output/host /opt/arm-buildroot-linux-gnueabihf
 RUN cd /opt/arm-buildroot-linux-gnueabihf && sh relocate-sdk.sh
 
