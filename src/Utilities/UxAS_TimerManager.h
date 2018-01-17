@@ -162,6 +162,15 @@ public:
     bool
     startPeriodicTimer(uint64_t timerId, uint64_t startDelayFromNow_ms, uint64_t period_ms);
 
+    /** \brief Check to see if a timer is active/running
+     * 
+     * @param timerId identifier for timer to be check for active state
+     * @return true indicates that timer is active, false indicates that timer
+     * callback will not be called until activated via a start timer call
+     */
+    bool
+    isTimerActive(uint64_t timerId);
+
     /** \brief Disable (not destroy) timer; timer can be started or destroyed later.
      * 
      * @param timerId identifier for timer to be disabled.
