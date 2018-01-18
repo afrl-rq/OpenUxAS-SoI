@@ -18,6 +18,8 @@ docker run --rm -v $(pwd):/src/OpenUxAS afrl-rq/openuxas sh -c 'cp -r /opt/uxas/
 echo '[build_sdcard_and_uxas.sh] Cross-compiling UxAS to `/OpenUxAS/build_cross/uxas`'
 
 docker run --rm -v $(pwd):/src/OpenUxAS afrl-rq/openuxas sh -c "rm -rf build_cross && \
+python3 rm-external && \
+python3 prepare && \
 meson.py build_cross --cross-file docker/odroid-xu4-gnueabihf.txt && \
 ninja -C build_cross uxas \
 "
