@@ -1,6 +1,0 @@
-FROM scratch
-COPY . /
-
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/lib/x86_64-linux-gnu/mesa
-ENV PATH=${PATH}:/app
-ENTRYPOINT ["uxas"]
