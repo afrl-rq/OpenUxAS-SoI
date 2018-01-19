@@ -1,6 +1,9 @@
 #!/bin/bash -e
 
+
+
 cd Image
+mkdir -p app
 # copy the uxas executable to the local directory structure
 if [ -e "../../../build/uxas" ] ; then
 	cp ../../../build/uxas app/uxas;
@@ -10,7 +13,5 @@ else
 fi
 
 # build the image
-docker build -f Dockerfile.UxAS_run -t uxas/run .
-
-
+docker build  --no-cache -f Dockerfile.UxAS_run -t uxas/run .
 
