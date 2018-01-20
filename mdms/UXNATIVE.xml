@@ -106,6 +106,8 @@
         <Struct Name="AutopilotKeepAlive" >
             <!-- Enable communications between UxAS and the autopilot -->
             <Field Name="AutopilotEnabled" Type="bool" Default="true" />
+            <!-- Allow UxAS to send speed commands to the autopilot -->
+            <Field Name="SpeedAuthorized" Type="bool" Default="true" />
             <!-- Enable communications between UxAS and the Gimbal.
             Note: this does not effect the video stream. -->
             <Field Name="GimbalEnabled" Type="bool" Default="true" />
