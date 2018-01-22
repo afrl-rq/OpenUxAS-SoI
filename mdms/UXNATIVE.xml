@@ -51,13 +51,13 @@
         </Struct>
         
         <!-- Indicate to the waypoint manager to move to the next waypoint in the current list -->
-        <Struct Name="IncrementWaypoint" >
+        <Struct Name="IncrementWaypoint">
             <!-- ID of vehicle which should move to the next waypoint in its list -->
             <Field Name="VehicleID" Type="int64" />
         </Struct>
         
         <!-- Translate from heading or heading-rate to a single leading waypoint that respects airspace constraints -->
-        <Struct Name="SafeHeadingAction" >
+        <Struct Name="SafeHeadingAction" Extends="CMASI/VehicleAction" >
             <!-- ID of vehicle which will be commanded to a safe waypoint that approximates the desired heading -->
             <Field Name="VehicleID" Type="int64" />
             <!-- Operating region ID indicating airspace constraints that must be respected -->
