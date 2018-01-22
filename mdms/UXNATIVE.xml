@@ -55,6 +55,24 @@
             <!-- ID of vehicle which should move to the next waypoint in its list -->
             <Field Name="VehicleID" Type="int64" />
         </Struct>
+        
+        <!-- Translate from heading or heading-rate to a single leading waypoint that respects airspace constraints -->
+        <Struct Name="SafeHeadingAction" >
+            <!-- ID of vehicle which will be commanded to a safe waypoint that approximates the desired heading -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Operating region ID indicating airspace constraints that must be respected -->
+            <Field Name="OperatingRegion" Type="int64" />
+            <!-- Lead-ahead distance for waypoint placement -->
+            <Field Name="LeadAheadDistance" Type="real32" Default="1000.0" Units="meters" />
+            <!-- Loiter radius on lead-ahead waypoint. If zero or negative, uses calcuated minimum turn radius from vehicle configuration -->
+            <Field Name="LoiterRadius" Type="real32" Default="0.0" Units="meters" />
+            <!-- Desired heading that vehicle should attemtpt to reach in degress from true north -->
+            <Field Name="DesiredHeading" Type="real32" Units="degrees" />
+            <!-- Desired heading rate for the vehicle -->
+            <Field Name="DesiredHeadingRate" Type="real32" Units="degrees/sec" />
+            <!-- Flag indicating selecting between heading (false) or heading rate (true) commands -->
+            <Field Name="UseHeadingRate" Type="bool" Default="false" />
+        </Struct>
     
         <!-- Simple location broadcast from entities for tracking -->
         <Struct Name="EntityLocation" >
