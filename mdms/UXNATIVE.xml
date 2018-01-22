@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>3</Version>
+    <Version>4</Version>
     
     <StructList>
         
@@ -51,9 +51,27 @@
         </Struct>
         
         <!-- Indicate to the waypoint manager to move to the next waypoint in the current list -->
-        <Struct Name="IncrementWaypoint" >
+        <Struct Name="IncrementWaypoint">
             <!-- ID of vehicle which should move to the next waypoint in its list -->
             <Field Name="VehicleID" Type="int64" />
+        </Struct>
+        
+        <!-- Translate from heading or heading-rate to a single leading waypoint that respects airspace constraints -->
+        <Struct Name="SafeHeadingAction" Extends="CMASI/VehicleAction" >
+            <!-- ID of vehicle which will be commanded to a safe waypoint that approximates the desired heading -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Operating region ID indicating airspace constraints that must be respected -->
+            <Field Name="OperatingRegion" Type="int64" />
+            <!-- Lead-ahead distance for waypoint placement -->
+            <Field Name="LeadAheadDistance" Type="real32" Default="1000.0" Units="meters" />
+            <!-- Loiter radius on lead-ahead waypoint. If zero or negative, uses calcuated minimum turn radius from vehicle configuration -->
+            <Field Name="LoiterRadius" Type="real32" Default="0.0" Units="meters" />
+            <!-- Desired heading that vehicle should attemtpt to reach in degress from true north -->
+            <Field Name="DesiredHeading" Type="real32" Units="degrees" />
+            <!-- Desired heading rate for the vehicle -->
+            <Field Name="DesiredHeadingRate" Type="real32" Units="degrees/sec" />
+            <!-- Flag indicating selecting between heading (false) or heading rate (true) commands -->
+            <Field Name="UseHeadingRate" Type="bool" Default="false" />
         </Struct>
     
         <!-- Simple location broadcast from entities for tracking -->
@@ -106,6 +124,8 @@
         <Struct Name="AutopilotKeepAlive" >
             <!-- Enable communications between UxAS and the autopilot -->
             <Field Name="AutopilotEnabled" Type="bool" Default="true" />
+            <!-- Allow UxAS to send speed commands to the autopilot -->
+            <Field Name="SpeedAuthorized" Type="bool" Default="true" />
             <!-- Enable communications between UxAS and the Gimbal.
             Note: this does not effect the video stream. -->
             <Field Name="GimbalEnabled" Type="bool" Default="true" />
