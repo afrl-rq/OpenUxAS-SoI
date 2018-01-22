@@ -1,0 +1,54 @@
+package UxAS_responds_2cpts_pkg
+public
+	--Included DataTypes
+    with CMASI;
+    with UXTASK;
+    with UxAS_Node_Lib;
+    
+    -- Included Main Services
+	with AutomationRequestValidatorService_Pkg;	
+	with PlanBuilderService_Pkg;
+    
+    process UxAS_responds
+    	features
+    		AutomationRequest_in: in event data port CMASI::AutomationRequest.i;
+    		AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
+    	annex agree {**
+
+    		--Note: We do not accept a new request until the previous request has been responded to.    		
+    		assume "A new AutomationRequest is not made until 
+    			an AutomationResponse has been sent to the previous request.":
+    		UxAS_Node_Lib.one_request_at_a_time(event(AutomationResponse_out), event(AutomationRequest_in));
+    		
+    		eq NUM_STEPS : int = 3;
+    					
+    		--Note: The UxAS_Node_Lib.responds_exactly_once_within node ignores requests received 
+    		--  while processing, and does not allow "spurious" responses.
+    		guarantee "(UxAS responds, 2 cpts, no errors) Upon receiving an AutomationRequest_in, 
+    			UxAS responds exactly once with an AutomationResponse_out within NUM_STEPS steps.":
+    			UxAS_Node_Lib.responds_exactly_once_within(
+    				event(AutomationResponse_out), 
+    				event(AutomationRequest_in), 
+    				NUM_STEPS
+    			); 
+    					
+    	**};
+    end UxAS_responds;
+    
+    process implementation UxAS_responds.i
+    	subcomponents
+    		 AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService;
+    		 PlanBuilderService: thread PlanBuilderService_Pkg::PlanBuilderService;
+    	connections
+    		conn001: port AutomationRequest_in -> AutomationRequestValidatorService.AutomationRequest_in;
+    		conn002: port AutomationRequestValidatorService.AutomationResponse_out -> AutomationResponse_out;
+    	    conn52:  port PlanBuilderService.UniqueAutomationResponse_out -> AutomationRequestValidatorService.UniqueAutomationResponse_in;
+    		conn137: port AutomationRequestValidatorService.UniqueAutomationRequest_out -> PlanBuilderService.UniqueAutomationRequest_in;
+ 
+    	annex agree {**
+    		lemma "Observe event(AutomationResponse_out)": 
+    			not event(AutomationResponse_out);
+    	**};
+    end UxAS_responds.i;
+    
+end UxAS_responds_2cpts_pkg;
