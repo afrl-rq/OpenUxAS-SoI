@@ -71,10 +71,6 @@ if get_option('internal_3rd_libraries')
   sub_minizip             = subproject('minizip')
   lib_minizip             = sub_minizip.get_variable('lib')
 
-  # https://github.com/nmoinvaz/minizip
-  sub_gtest             = subproject('gtest')
-  lib_gtest             = sub_gtest.get_variable('lib')
-
 	dep_boost = dependency(
 	  'boost',
 	  modules: ['filesystem', 'regex', 'system'],

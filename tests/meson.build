@@ -61,8 +61,7 @@ libs_test = [
 ]
 
 if get_option('internal_3rd_libraries')
-  libs_3rd = [  
-    lib_gtest,
+  libs_3rd = [
     lib_sqlitecpp,
     lib_sqlite3,
     lib_zeromq,
