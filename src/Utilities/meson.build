@@ -43,12 +43,12 @@ cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
   cpp_args += [
     '/std:c++14',
-	'-DZMQ_STATIC',
-	'-DCZMQ_STATIC',
-	'-DZYRE_STATIC',
-	'-DLIBZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
-	'-DLIBZYRE_STATIC',
+    '-DZMQ_STATIC',
+    '-DCZMQ_STATIC',
+    '-DZYRE_STATIC',
+    '-DLIBZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+    '-DLIBZYRE_STATIC',
   ]
 else
   cpp_args += [
@@ -63,9 +63,12 @@ lib_utilities = static_library(
   srcs_utilities,
   srcs_utilities_internal,
   dependencies: [
+    dep_boost,
     dep_cppzmq,
     dep_pugixml,
+    dep_sqlite3,
     dep_sqlitecpp,
+    dep_zeromq,
   ],
   cpp_args: cpp_args,
   include_directories: incs_utilities,

@@ -68,6 +68,7 @@ lib_uxas_communications = static_library(
     dep_cppzmq,
     dep_pugixml,
     dep_serial,
+    dep_zeromq,
     dep_zyre,
   ],
   include_directories: inc_dirs,

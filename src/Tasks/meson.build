@@ -69,8 +69,10 @@ lib_tasks = static_library(
   srcs_tasks,
   srcs_tasks_internal,
   dependencies: [
+    dep_boost,
     dep_cppzmq,
     dep_pugixml,
+    dep_zeromq,
   ],
   cpp_args: cpp_args,
   include_directories: incs_tasks

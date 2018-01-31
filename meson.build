@@ -32,12 +32,6 @@ elif os == 'windows'
   link_args += []
 endif
 
-if get_option('afrl_internal')
-  #message('@@@@@ afrl_internal @@@@@')
-  add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
-  subdir('UxAS-afrl_internal')
-endif
-
 if get_option('internal_3rd_libraries')
   # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
   sub_zeromq              = subproject('zeromq')
@@ -70,7 +64,7 @@ if get_option('internal_3rd_libraries')
 
   dep_boost = dependency(
     'boost',
-    modules: ['filesystem', 'regex', 'system'],
+    modules: ['date-time', 'filesystem', 'regex', 'system'],
     static: true,
     fallback: ['boost', 'dep'],
   )
@@ -82,25 +76,22 @@ endif
 # The TinyGPS repo captured by UxAS does not seem to be available.
 # The repo contains *only* version 13, while UxAS uses what appears
 # to be version 12. Perhaps contact the author...?
-sub_tinygps = []
-if get_option('internal_3rd_libraries')
-  sub_tinygps             = subproject('TinyGPS')
-else
-  sub_tinygps             = subproject('TinyGPS_NoBoost')
-endif
-dep_tinygps             = sub_tinygps.get_variable('dep')
+dep_tinygps             = subproject('TinyGPS').get_variable('dep')
 
 # https://github.com/wjwwood/serial
-sub_serial              = subproject('serial-1.2.1')
-dep_serial              = sub_serial.get_variable('dep')
+dep_serial              = subproject('serial-1.2.1').get_variable('dep')
 
 # https://github.com/zeux/pugixml
 # No versions of this pugixml repo are compatible.
-sub_pugixml             = subproject('PugiXML')
-dep_pugixml             = sub_pugixml.get_variable('dep')
+dep_pugixml             = subproject('PugiXML').get_variable('dep')
+
+if get_option('afrl_internal')
+  subdir('UxAS-afrl_internal')
+endif
 
 deps = [
   dependency('threads'),
+  dep_boost,
   dep_zeromq,
   dep_czmq,
   dep_cppzmq,
@@ -143,12 +134,6 @@ libs = [
   lib_dpss,
 ]
 
-if get_option('internal_3rd_libraries')
-  libs_3rd = [
-  ]
-  libs += libs_3rd
-endif
-
 if get_option('afrl_internal')
   libs += libs_internal
 endif
@@ -178,14 +163,8 @@ elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
 
-if get_option('internal_3rd_libraries')
-  deps += [
-    dep_boost,
-  ]
-endif
-
 if get_option('afrl_internal')
-  #deps += deps_internal
+  deps += deps_internal
 endif
 
 cpp_args = []

@@ -1,5 +1,5 @@
 srcs_services = [
-	'LoiterLeash.cpp',
+  'LoiterLeash.cpp',
   '00_ServiceTemplate.cpp',
   '01_HelloWorld.cpp',
   'AutomationDiagramDataService.cpp',
@@ -24,13 +24,6 @@ srcs_services = [
   'SimpleWaypointPlanManagerService.cpp',
 ]
 
-inc_3rd = include_directories('.')
-if get_option('internal_3rd_libraries')
-  inc_3rd = include_directories(
-    )
-endif
-
-
 incs_services = [
   include_directories(
     '../../src/Utilities',
@@ -43,11 +36,20 @@ incs_services = [
     '../../src/DPSS',
     '../../src/Tasks',
   ),
-  inc_3rd,
   incs_lmcp,
 ]
 
+deps_services = [
+  dep_boost,
+  dep_cppzmq,
+  dep_pugixml,
+  dep_sqlite3,
+  dep_sqlitecpp,
+  dep_zeromq,
+]
+
 if get_option('afrl_internal')
+  deps_services += [deps_services_internal]
   incs_services += [incs_services_internal]
 else
   srcs_services_internal = files()
@@ -58,13 +60,13 @@ cpp = meson.get_compiler('cpp')
 
 if cpp.get_id() == 'msvc'
   cpp_args += [
-  	'/std:c++14',
-	'-DZMQ_STATIC',
-	'-DCZMQ_STATIC',
-	'-DZYRE_STATIC',
-	'-DLIBZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
-	'-DLIBZYRE_STATIC',
+    '/std:c++14',
+    '-DZMQ_STATIC',
+    '-DCZMQ_STATIC',
+    '-DZYRE_STATIC',
+    '-DLIBZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+    '-DLIBZYRE_STATIC',
   ]
 else
   cpp_args += [
@@ -74,20 +76,11 @@ else
   ]
 endif
 
-dep_3rd = []
-if get_option('internal_3rd_libraries')
-  dep_3rd = [dep_boost]
-endif
-
 lib_services = static_library(
   'services',
   srcs_services,
   srcs_services_internal,
-  dependencies: [
-    dep_cppzmq,
-    dep_pugixml,
-    dep_sqlitecpp,
-  ],
+  dependencies: deps_services,
   cpp_args: cpp_args,
   include_directories: incs_services,
 )
