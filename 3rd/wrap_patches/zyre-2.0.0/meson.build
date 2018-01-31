@@ -3,7 +3,10 @@ project('zyre', 'c')
 os = target_machine.system()
 c = meson.get_compiler('c')
 c_args = []
-deps = []
+deps = [
+  subproject('zeromq').get_variable('dep'),
+  subproject('czmq').get_variable('dep'),
+]
 cdata = configuration_data()
 
 if os == 'linux'
@@ -121,7 +124,12 @@ lib = static_library('zyre', [
 	include_directories: include_directories(
 		'include',
 		'src',
-		'../czmq-4.0.2/include',
-		'../zeromq-4.2.3/include',
 	),
+)
+
+dep = declare_dependency(
+  link_with: lib,
+  include_directories: include_directories(
+    'include',
+  ),
 )

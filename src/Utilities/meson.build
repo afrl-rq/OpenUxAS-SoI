@@ -21,18 +21,12 @@ srcs_utilities = [
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
-      '../../3rd/cppzmq-4.2.2',
-      '../../3rd/zeromq-4.2.3/include',
-      '../../3rd/zyre-2.0.0/include',
-      '../../3rd/sqlite-amalgamation-3120200',
-      '../../3rd/SQLiteCpp-1.3.1/include',
     )
 endif
 
 incs_utilities = [
   include_directories(
     '../../src/Includes',
-    '../../3rd/PugiXML/src',
   ),
   inc_3rd,
 ]
@@ -64,16 +58,15 @@ else
   ]
 endif
 
-dep_3rd = []
-if get_option('internal_3rd_libraries')
-  dep_3rd = [dep_boost]
-endif
-
 lib_utilities = static_library(
   'utilities',
   srcs_utilities,
   srcs_utilities_internal,
-  dependencies: dep_3rd,
+  dependencies: [
+    dep_cppzmq,
+    dep_pugixml,
+    dep_sqlitecpp,
+  ],
   cpp_args: cpp_args,
   include_directories: incs_utilities,
 )

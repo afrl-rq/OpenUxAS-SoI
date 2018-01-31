@@ -22,12 +22,6 @@ endif
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
-      '../../3rd/cppzmq-4.2.2',
-      '../../3rd/czmq-4.0.2/include',
-      '../../3rd/zeromq-4.2.3/include',
-      '../../3rd/zyre-2.0.0/include',
-      '../../3rd/sqlite-amalgamation-3120200',
-      '../../3rd/SQLiteCpp-1.3.1/include',
     )
 endif
 
@@ -36,8 +30,6 @@ inc_dirs = [
       '../../src/Includes',
       '../../src/Utilities',
       '../../src/Services',
-      '../../3rd/PugiXML/src',
-      '../../3rd/serial-1.2.1/include',
     ),
     inc_3rd,
     incs_lmcp,
@@ -71,5 +63,12 @@ lib_uxas_communications = static_library(
     'ZeroMqZyreBridge.cpp',
   ],
   cpp_args: cpp_args,
-  include_directories:inc_dirs, 
+  dependencies: [
+    dep_czmq,
+    dep_cppzmq,
+    dep_pugixml,
+    dep_serial,
+    dep_zyre,
+  ],
+  include_directories: inc_dirs,
 )

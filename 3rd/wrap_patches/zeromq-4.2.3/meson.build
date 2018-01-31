@@ -320,3 +320,10 @@ lib = static_library(
     'src',
   ),
 )
+
+dep = declare_dependency(
+  link_with: lib,
+  include_directories: include_directories(
+    'include',
+  ),
+)

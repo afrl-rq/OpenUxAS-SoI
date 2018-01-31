@@ -39,44 +39,41 @@ if get_option('afrl_internal')
 endif
 
 if get_option('internal_3rd_libraries')
-	# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
-	sub_zeromq              = subproject('zeromq')
-	lib_zeromq              = sub_zeromq.get_variable('lib')
+  # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
+  sub_zeromq              = subproject('zeromq')
+  dep_zeromq              = sub_zeromq.get_variable('dep')
 
-	sub_czmq                = subproject('czmq')
-	lib_czmq                = sub_czmq.get_variable('lib')
+  sub_czmq                = subproject('czmq')
+  dep_czmq                = sub_czmq.get_variable('dep')
 
-	sub_cppzmq              = subproject('cppzmq')
-	lib_cppzmq              = sub_cppzmq.get_variable('lib')
+  sub_cppzmq              = subproject('cppzmq')
+  dep_cppzmq              = sub_cppzmq.get_variable('dep')
 
-	sub_zyre                = subproject('zyre')
-	lib_zyre                = sub_zyre.get_variable('lib')
+  sub_zyre                = subproject('zyre')
+  dep_zyre                = sub_zyre.get_variable('dep')
 
-	# Windows-only:
-	# https://github.com/jedisct1/libsodium
+  # https://www.sqlite.org/src
+  sub_sqlite3             = subproject('sqlite3')
+  dep_sqlite3             = sub_sqlite3.get_variable('dep')
 
-	# https://www.sqlite.org/src
-	sub_sqlite3             = subproject('sqlite3')
-	lib_sqlite3             = sub_sqlite3.get_variable('lib')
+  # https://github.com/SRombauts/SQLiteCpp
+  sub_sqlitecpp           = subproject('sqlitecpp')
+  dep_sqlitecpp           = sub_sqlitecpp.get_variable('dep')
 
-	# https://github.com/SRombauts/SQLiteCpp
-	sub_sqlitecpp           = subproject('sqlitecpp')
-	lib_sqlitecpp           = sub_sqlitecpp.get_variable('lib')
-
-	# https://github.com/madler/zlib
-	sub_zlib                = subproject('zlib')
-	lib_zlib                = sub_zlib.get_variable('lib')
+  # https://github.com/madler/zlib
+  sub_zlib                = subproject('zlib')
+  dep_zlib                = sub_zlib.get_variable('dep')
 
   # https://github.com/nmoinvaz/minizip
   sub_minizip             = subproject('minizip')
-  lib_minizip             = sub_minizip.get_variable('lib')
+  dep_minizip             = sub_minizip.get_variable('dep')
 
-	dep_boost = dependency(
-	  'boost',
-	  modules: ['filesystem', 'regex', 'system'],
-	  static: true,
-	  fallback: ['boost', 'dep_boost'],
-	)
+  dep_boost = dependency(
+    'boost',
+    modules: ['filesystem', 'regex', 'system'],
+    static: true,
+    fallback: ['boost', 'dep'],
+  )
 
 endif
 
@@ -91,16 +88,31 @@ if get_option('internal_3rd_libraries')
 else
   sub_tinygps             = subproject('TinyGPS_NoBoost')
 endif
-lib_tinygps             = sub_tinygps.get_variable('lib')
+dep_tinygps             = sub_tinygps.get_variable('dep')
 
 # https://github.com/wjwwood/serial
 sub_serial              = subproject('serial-1.2.1')
-lib_serial              = sub_serial.get_variable('lib')
+dep_serial              = sub_serial.get_variable('dep')
 
 # https://github.com/zeux/pugixml
 # No versions of this pugixml repo are compatible.
 sub_pugixml             = subproject('PugiXML')
-lib_pugixml             = sub_pugixml.get_variable('lib')
+dep_pugixml             = sub_pugixml.get_variable('dep')
+
+deps = [
+  dependency('threads'),
+  dep_zeromq,
+  dep_czmq,
+  dep_cppzmq,
+  dep_zyre,
+  dep_sqlite3,
+  dep_sqlitecpp,
+  dep_zlib,
+  dep_minizip,
+  dep_tinygps,
+  dep_serial,
+  dep_pugixml,
+]
 
 subdir('src/DPSS')
 
@@ -120,34 +132,21 @@ subdir('src/Utilities')
 
 subdir('src/Plans')
 
-dep_thread              = dependency('threads')
-
 libs = [
   lib_services,
   lib_tasks,
   lib_lmcp,
   lib_uxas_communications,
   lib_utilities,
-  lib_pugixml,
   lib_visilibity,
-  lib_serial,
   lib_plans,
-  lib_tinygps,
   lib_dpss,
 ]
 
 if get_option('internal_3rd_libraries')
-	libs_3rd = [  
-		lib_sqlitecpp,
-		lib_sqlite3,
-		lib_zeromq,
-		lib_zyre,
-		lib_czmq,
-		lib_cppzmq,
-		lib_minizip,
-		lib_zlib,
-	]
-	libs += libs_3rd
+  libs_3rd = [
+  ]
+  libs += libs_3rd
 endif
 
 if get_option('afrl_internal')
@@ -156,8 +155,6 @@ endif
 
 # creates src/Includes/config.h
 subdir('src/Includes')
-
-deps = []
 
 # OpenGL, specifically the GLU library
 if not (target_machine.cpu_family() == 'arm')
@@ -181,14 +178,10 @@ elif os == 'windows'
   deps += [cpp.find_library('glu32')]
 endif
 
-deps += [
-  dep_thread,
-]
-
 if get_option('internal_3rd_libraries')
-	deps += [
-	  dep_boost,
-	]
+  deps += [
+    dep_boost,
+  ]
 endif
 
 if get_option('afrl_internal')
@@ -205,17 +198,12 @@ endif
 inc_3rd = include_directories('.')
 if get_option('internal_3rd_libraries')
   inc_3rd = include_directories(
-      '3rd/cppzmq-4.2.2',
-      '3rd/zeromq-4.2.3/include',
-      '3rd/zyre-2.0.0/include',
-      '3rd/sqlite-amalgamation-3120200',
-      '3rd/SQLiteCpp-1.3.1/include',
-    )
+  )
 endif
 
-      #message('@@@@@ link_args [[ @@@@@')
-      #message(link_args)
-      #message('@@@@@ ]] link_args @@@@@')
+#message('@@@@@ link_args [[ @@@@@')
+#message(link_args)
+#message('@@@@@ ]] link_args @@@@@')
 
 
 executable(
@@ -230,7 +218,6 @@ executable(
       'src/Communications',
       'src/Includes',
       'src/Services',
-      '3rd/PugiXML/src',
     ),
     inc_3rd,
     incs_lmcp,
@@ -244,4 +231,3 @@ subdir('tests')
 if get_option('afrl_internal')
   subdir('UxAS-afrl_internal/tests')
 endif
-

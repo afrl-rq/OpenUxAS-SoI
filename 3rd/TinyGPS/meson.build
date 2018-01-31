@@ -28,3 +28,10 @@ lib = static_library(
     '../../../src/Utilities',
   ),
 )
+
+dep = declare_dependency(
+  link_with: lib,
+  include_directories: include_directories(
+    '.',
+  ),
+)
