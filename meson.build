@@ -6,10 +6,14 @@ link_args = []
 
 os = target_machine.system()
 
+# needed to add these libraries early for static linking
 if get_option('geo_libs')
     add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
-		link_args += [
-      	 '-l:libgdal.a','-l:libGeographic.a','-l:libexpat.a','-l:libz.a']
+  if get_option('internal_3rd_libraries')
+    link_args += ['-lgdal', '-lGeographic']
+  else
+	link_args += ['-l:libgdal.a','-l:libGeographic.a','-l:libexpat.a','-l:libz.a']
+  endif
 endif
 
 if os.startswith('linux')
@@ -17,7 +21,7 @@ if os.startswith('linux')
 	if get_option('internal_3rd_libraries')
     #message('@@@@@ internal_3rd_libraries @@@@@')
 		link_args += ['-lrt', '-ldl']
-  	else
+	else
       message('@@@@@ external_3rd_libraries @@@@@')
   		link_args += [
           '-l:libboost_filesystem.a','-l:libboost_regex.a', '-l:libboost_system.a', 
