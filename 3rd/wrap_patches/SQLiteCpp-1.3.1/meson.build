@@ -1,5 +1,10 @@
 project('sqlitecpp', 'cpp')
 
+dep_sqlite3 = dependency(
+  'sqlite3',
+  fallback: ['sqlite3', 'dep'],
+)
+
 lib = static_library(
   'sqlitecpp',
   [
@@ -12,7 +17,7 @@ lib = static_library(
   cpp_args: [
     '-std=c++11',
   ],
-  dependencies: subproject('sqlite3').get_variable('dep'),
+  dependencies: dep_sqlite3,
   include_directories: include_directories(
     'include',
   ),

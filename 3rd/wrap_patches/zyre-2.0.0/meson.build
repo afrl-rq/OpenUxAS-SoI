@@ -3,42 +3,53 @@ project('zyre', 'c')
 os = target_machine.system()
 c = meson.get_compiler('c')
 c_args = []
-deps = [
-  subproject('zeromq').get_variable('dep'),
-  subproject('czmq').get_variable('dep'),
-]
 cdata = configuration_data()
+
+dep_zeromq = dependency(
+  'libzmq',
+  fallback: ['zeromq', 'dep'],
+)
+
+dep_czmq = dependency(
+  'libczmq',
+  fallback: ['czmq', 'dep'],
+)
+
+deps = [
+  dep_zeromq,
+  dep_czmq,
+]
 
 if os == 'linux'
   c_args += [
     '-std=c11',
-  	'-DLINUX',
-	'-D_GNU_SOURCE',
-	'-DZYRE_HAVE_LINUX=1',
+    '-DLINUX',
+    '-D_GNU_SOURCE',
+    '-DZYRE_HAVE_LINUX=1',
   ]
 elif os == 'darwin'
   c_args += [
-  	'-std=c11',
-	'-D_DARWIN_C_SOURCE',
-	'-DZYRE_HAVE_OSX=1',
+    '-std=c11',
+    '-D_DARWIN_C_SOURCE',
+    '-DZYRE_HAVE_OSX=1',
   ]
 elif os == 'windows'
   c_args += [
-	'-D_CRT_SECURE_NO_WARNINGS',
-	'-DBASE_THREADSAFE',
-  	'-DZYRE_STATIC',
-	'-DZYRE_HAVE_WINDOWS=1',
-	'-DZMQ_USE_SELECT',
-	'-DZMQ_STATIC',
-	'-DLIBZMQ_STATIC',
-	'-DZMQ_HAVE_WINDOWS=1',
+    '-D_CRT_SECURE_NO_WARNINGS',
+    '-DBASE_THREADSAFE',
+    '-DZYRE_STATIC',
+    '-DZYRE_HAVE_WINDOWS=1',
+    '-DZMQ_USE_SELECT',
+    '-DZMQ_STATIC',
+    '-DLIBZMQ_STATIC',
+    '-DZMQ_HAVE_WINDOWS=1',
     '-DCZMQ_STATIC',
     '-DLIBCZMQ_STATIC',
   ]
   deps += [
-	c.find_library('Ws2_32'),
-	c.find_library('Rpcrt4'),
-	c.find_library('Iphlpapi'),
+    c.find_library('Ws2_32'),
+    c.find_library('Rpcrt4'),
+    c.find_library('Iphlpapi'),
   ]
 endif
 
@@ -110,21 +121,23 @@ deps += [dependency('threads')]
 
 subdir('src')
 
-lib = static_library('zyre', [
-	'src/zpinger.c',
-	'src/zre_msg.c',
-	'src/zyre.c',
-	'src/zyre_event.c',
-	'src/zyre_group.c',
-	'src/zyre_node.c',
-	'src/zyre_peer.c',
-	],
-	dependencies: deps,
-	c_args: c_args,
-	include_directories: include_directories(
-		'include',
-		'src',
-	),
+lib = static_library(
+  'zyre',
+  [
+    'src/zpinger.c',
+    'src/zre_msg.c',
+    'src/zyre.c',
+    'src/zyre_event.c',
+    'src/zyre_group.c',
+    'src/zyre_node.c',
+    'src/zyre_peer.c',
+  ],
+  dependencies: deps,
+  c_args: c_args,
+  include_directories: include_directories(
+    'include',
+    'src',
+  ),
 )
 
 dep = declare_dependency(

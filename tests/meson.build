@@ -1,21 +1,10 @@
+dep_gtest = dependency('gtest')
+
 deps_test = deps + [
-  subproject('gtest').get_variable('gtest_dep'),
+  dep_gtest
 ]
 
-cpp_args_test = []
-cpp_test = meson.get_compiler('cpp')
-
-if cpp_test.get_id() == 'msvc'
-  cpp_args_test += [
-    '/std:c++14',
-  ]
-else
-  cpp_args_test += [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
-  ]
-endif
+cpp_args_test = cpp_args
 
 inc_test = [
   include_directories(

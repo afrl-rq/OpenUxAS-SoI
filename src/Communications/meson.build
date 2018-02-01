@@ -1,39 +1,29 @@
-cpp_args = []
-cpp = meson.get_compiler('cpp')
+cpp_args_comms = cpp_args
 
 if cpp.get_id() == 'msvc'
-  cpp_args += [
-    '/std:c++14',
-	'-DZMQ_STATIC',
-	'-DCZMQ_STATIC',
-	'-DZYRE_STATIC',
-	'-DLIBZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
-	'-DLIBZYRE_STATIC',
+  cpp_args_comms += [
+    '-DZMQ_STATIC',
+    '-DCZMQ_STATIC',
+    '-DZYRE_STATIC',
+    '-DLIBZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+    '-DLIBZYRE_STATIC',
   ]
 else
-  cpp_args += [
-    '-std=c++11',
+  cpp_args_comms += [
     '-Wno-unused-function',
     '-Wno-unused-variable',
   ]
 endif
 
-inc_3rd = include_directories('.')
-if get_option('internal_3rd_libraries')
-  inc_3rd = include_directories(
-    )
-endif
-
 inc_dirs = [
-    include_directories(
-      '../../src/Includes',
-      '../../src/Utilities',
-      '../../src/Services',
-    ),
-    inc_3rd,
-    incs_lmcp,
-  ]
+  include_directories(
+    '../../src/Includes',
+    '../../src/Utilities',
+    '../../src/Services',
+  ),
+  incs_lmcp,
+]
 
 lib_uxas_communications = static_library(
   'uxas_messages',
@@ -62,7 +52,7 @@ lib_uxas_communications = static_library(
     'ZeroMqSenderBase.cpp',
     'ZeroMqZyreBridge.cpp',
   ],
-  cpp_args: cpp_args,
+  cpp_args: cpp_args_comms,
   dependencies: [
     dep_czmq,
     dep_cppzmq,

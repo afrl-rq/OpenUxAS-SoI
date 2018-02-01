@@ -1,89 +1,101 @@
 project('UxAS', 'c', 'cpp', subproject_dir: '3rd')
 
+cpp = meson.get_compiler('cpp')
 conf = configuration_data()
+os = target_machine.system()
+
+if cpp.get_id() == 'msvc'
+  cpp_args = [
+    '/std:c++14',
+  ]
+else
+  cpp_args = [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
+endif
 
 link_args = []
 
-os = target_machine.system()
-
-if get_option('geo_libs')
-    add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
-		link_args += [
-      	 '-l:libgdal.a','-l:libGeographic.a','-l:libexpat.a','-l:libz.a']
-endif
-
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-	if get_option('internal_3rd_libraries')
-    #message('@@@@@ internal_3rd_libraries @@@@@')
-		link_args += ['-lrt', '-ldl']
-  	else
-      message('@@@@@ external_3rd_libraries @@@@@')
-  		link_args += [
-          '-l:libboost_filesystem.a','-l:libboost_regex.a', '-l:libboost_system.a', 
-  				'-l:libzmq.a','-l:libczmq.a','-l:libzyre.a',
-          '-l:libSQLiteCpp.a','-l:libsqlite3.a',
-          '-l:libgtest.a','-l:libuuid.a',
-  				'-lrt', '-ldl']
-	endif
+  link_args += ['-lrt', '-dl']
 elif os == 'darwin'
   link_args += ['-ldl']
 elif os == 'windows'
   link_args += []
 endif
 
-if get_option('internal_3rd_libraries')
-  # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
-  sub_zeromq              = subproject('zeromq')
-  dep_zeromq              = sub_zeromq.get_variable('dep')
+# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
+dep_zeromq = dependency(
+  'libzmq',
+  fallback: ['zeromq', 'dep'],
+)
 
-  sub_czmq                = subproject('czmq')
-  dep_czmq                = sub_czmq.get_variable('dep')
+dep_czmq = dependency(
+  'libczmq',
+  fallback: ['czmq', 'dep'],
+)
 
-  sub_cppzmq              = subproject('cppzmq')
-  dep_cppzmq              = sub_cppzmq.get_variable('dep')
-
-  sub_zyre                = subproject('zyre')
-  dep_zyre                = sub_zyre.get_variable('dep')
-
-  # https://www.sqlite.org/src
-  sub_sqlite3             = subproject('sqlite3')
-  dep_sqlite3             = sub_sqlite3.get_variable('dep')
-
-  # https://github.com/SRombauts/SQLiteCpp
-  sub_sqlitecpp           = subproject('sqlitecpp')
-  dep_sqlitecpp           = sub_sqlitecpp.get_variable('dep')
-
-  # https://github.com/madler/zlib
-  sub_zlib                = subproject('zlib')
-  dep_zlib                = sub_zlib.get_variable('dep')
-
-  # https://github.com/nmoinvaz/minizip
-  sub_minizip             = subproject('minizip')
-  dep_minizip             = sub_minizip.get_variable('dep')
-
-  dep_boost = dependency(
-    'boost',
-    modules: ['date-time', 'filesystem', 'regex', 'system'],
-    static: true,
-    fallback: ['boost', 'dep'],
-  )
-
+if cpp.has_header('zmq.hpp')
+  # cppzmq is a header-only dependency, so if we already have the
+  # header in place, we don't need to actually change anything
+  dep_cppzmq = [] #declare_dependency()
+else
+  dep_cppzmq = subproject('cppzmq').get_variable('dep')
 endif
 
+dep_zyre = dependency(
+  'libzyre',
+  fallback: ['zyre', 'dep'],
+)
+
+# https://www.sqlite.org/src
+dep_sqlite3 = dependency(
+  'sqlite3',
+  fallback: ['sqlite3', 'dep'],
+)
+
+# SQLiteCpp is unfortunately not packaged with pkg-config
+lib_sqlitecpp = cpp.find_library('SQLiteCpp', required: false)
+if lib_sqlitecpp.found() and cpp.has_header('SQLiteCpp/SQLiteCpp.h')
+  dep_sqlitecpp = lib_sqlitecpp
+else
+  # https://github.com/SRombauts/SQLiteCpp
+  dep_sqlitecpp = subproject('sqlitecpp').get_variable('dep')
+endif
+
+# https://github.com/madler/zlib
+dep_zlib = dependency(
+  'zlib',
+  fallback: ['zlib', 'dep'],
+)
+
+# https://github.com/nmoinvaz/minizip
+dep_minizip = dependency(
+  'minizip',
+  fallback: ['minizip', 'dep'],
+)
+
+dep_boost = dependency(
+  'boost',
+  modules: ['date_time', 'filesystem', 'regex', 'system'],
+  fallback: ['boost', 'dep'],
+)
 
 # https://github.com/mikalhart/TinyGPS
 # The TinyGPS repo captured by UxAS does not seem to be available.
 # The repo contains *only* version 13, while UxAS uses what appears
 # to be version 12. Perhaps contact the author...?
-dep_tinygps             = subproject('TinyGPS').get_variable('dep')
+dep_tinygps = subproject('TinyGPS').get_variable('dep')
 
 # https://github.com/wjwwood/serial
-dep_serial              = subproject('serial-1.2.1').get_variable('dep')
+dep_serial = subproject('serial-1.2.1').get_variable('dep')
 
 # https://github.com/zeux/pugixml
 # No versions of this pugixml repo are compatible.
-dep_pugixml             = subproject('PugiXML').get_variable('dep')
+dep_pugixml = subproject('PugiXML').get_variable('dep')
 
 if get_option('afrl_internal')
   subdir('UxAS-afrl_internal')
@@ -141,48 +153,30 @@ endif
 # creates src/Includes/config.h
 subdir('src/Includes')
 
+glu_deps = []
 # OpenGL, specifically the GLU library
-if not (target_machine.cpu_family() == 'arm')
-  deps += [dependency('gl')]
-endif
 if os == 'darwin'
   # newer MacOS splits out GLU into a separate framework, but we can't
   # ask Meson for the version in order to handle things differently
-  deps += [dependency('glu', required: false)]
-  glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
-  foreach fn : glu_functions
-    if not cpp.has_function(fn, dependencies: deps)
-      error('GLU library functions not found')
-    endif
-  endforeach
+  glu_deps += [dependency('gl')]
+  glu_deps += [dependency('glu', required: false)]
 elif os.startswith('linux')
-  if not (target_machine.cpu_family() == 'arm')
-    deps += [dependency('glu')]
-  endif
+  glu_deps += [dependency('glu')]
 elif os == 'windows'
-  deps += [cpp.find_library('glu32')]
+  glu_deps += [cpp.find_library('glu32')]
 endif
+
+glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
+foreach fn : glu_functions
+  if not cpp.has_function(fn, dependencies: glu_deps)
+    error('GLU library functions not found')
+  endif
+endforeach
+deps += glu_deps
 
 if get_option('afrl_internal')
   deps += deps_internal
 endif
-
-cpp_args = []
-if cpp.get_id() == 'msvc'
-  cpp_args += ['/std:c++14']
-else
-  cpp_args += ['-std=c++11']
-endif
-
-inc_3rd = include_directories('.')
-if get_option('internal_3rd_libraries')
-  inc_3rd = include_directories(
-  )
-endif
-
-#message('@@@@@ link_args [[ @@@@@')
-#message(link_args)
-#message('@@@@@ ]] link_args @@@@@')
 
 
 executable(
@@ -198,7 +192,6 @@ executable(
       'src/Includes',
       'src/Services',
     ),
-    inc_3rd,
     incs_lmcp,
   ],
   link_with: libs,

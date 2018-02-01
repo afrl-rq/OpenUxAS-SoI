@@ -1,6 +1,9 @@
 project('czmq', 'c')
 
-sub_zeromq = subproject('zeromq')
+dep_zeromq = dependency(
+  'libzmq',
+  fallback: ['zeromq', 'dep'],
+)
 
 cc = meson.get_compiler('c')
 
@@ -58,7 +61,7 @@ endforeach
 c = meson.get_compiler('c')
 c_args = []
 deps = [
-  sub_zeromq.get_variable('dep'),
+  dep_zeromq,
 ]
 
 os = target_machine.system()

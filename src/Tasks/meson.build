@@ -21,13 +21,6 @@ srcs_tasks = [
   'TaskTrackerService.cpp',
 ]
 
-inc_3rd = include_directories('.')
-if get_option('internal_3rd_libraries')
-  inc_3rd = include_directories(
-    )
-endif
-
-
 incs_tasks = [
   include_directories(
     '../../src/Includes',
@@ -38,30 +31,13 @@ incs_tasks = [
     '../../src/DPSS',
     '../../src/VisilibityLib',
   ),
-  inc_3rd,
   incs_lmcp,
 ]
-
-dep_3rd = []
-if get_option('internal_3rd_libraries')
-  dep_3rd = [dep_boost]
-endif
 
 if get_option('afrl_internal')
   incs_tasks += [incs_tasks_internal]
 else
   srcs_tasks_internal = files()
-endif
-
-cpp_args = []
-cpp = meson.get_compiler('cpp')
-
-if cpp.get_id() != 'msvc'
-  cpp_args += [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
-  ]
 endif
 
 lib_tasks = static_library(

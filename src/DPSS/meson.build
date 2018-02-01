@@ -1,16 +1,8 @@
-cpp_args = []
-cpp = meson.get_compiler('cpp')
+cpp_args_dpss = cpp_args
 
 if cpp.get_id() == 'msvc'
-  cpp_args += [
-    '/std:c++14',
-	'-DDPSS_STATIC',
-  ]
-else
-  cpp_args += [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
+  cpp_args_dpss += [
+    '-DDPSS_STATIC',
   ]
 endif
 
@@ -29,7 +21,7 @@ lib_dpss = static_library(
     'SegmentMap.cpp',
     'SensorSteering.cpp',
   ],
-  cpp_args: cpp_args,
+  cpp_args: cpp_args_dpss,
   include_directories: include_directories(
     '../../src/Includes',
     '../../src/Utilities',

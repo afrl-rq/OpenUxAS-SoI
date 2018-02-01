@@ -18,17 +18,10 @@ srcs_utilities = [
   'UxAS_ZeroMQ.cpp',
 ]
 
-inc_3rd = include_directories('.')
-if get_option('internal_3rd_libraries')
-  inc_3rd = include_directories(
-    )
-endif
-
 incs_utilities = [
   include_directories(
     '../../src/Includes',
   ),
-  inc_3rd,
 ]
 
 if get_option('afrl_internal')
@@ -37,24 +30,16 @@ else
   srcs_utilities_internal = files()
 endif
 
-cpp_args = []
+cpp_args_utilities = cpp_args
 
-cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
-  cpp_args += [
-    '/std:c++14',
+  cpp_args_utilities += [
     '-DZMQ_STATIC',
     '-DCZMQ_STATIC',
     '-DZYRE_STATIC',
     '-DLIBZMQ_STATIC',
     '-DLIBCZMQ_STATIC',
     '-DLIBZYRE_STATIC',
-  ]
-else
-  cpp_args += [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
   ]
 endif
 
@@ -70,6 +55,6 @@ lib_utilities = static_library(
     dep_sqlitecpp,
     dep_zeromq,
   ],
-  cpp_args: cpp_args,
+  cpp_args: cpp_args_utilities,
   include_directories: incs_utilities,
 )
