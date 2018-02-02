@@ -1,28 +1,27 @@
-The files in this directory are used to construct
-and deploy Docker containers that are used to deploy
-UxAS.
+The files in this directory are used to construct and deploy Docker
+containers that are used to deploy UxAS.
 
-Notes: 
-	1) UxAS must be built and the file: 'OpenUxAS/build/uxas' 
-	must exist.
+Notes:
+- UxAS must be built and the file: `OpenUxAS/build/uxas` must exist.
 
-	2) The Docker image "steveras/uxas-run_deps:x86_64" must be 
-	available on the local system or downloaded automatically
-	from: the Docker Hub, "https://hub.docker.com/". 
+- The Docker image `uxas_run` must be available on the local system or
+  downloaded automatically from: the Docker Hub,
+  "https://hub.docker.com/".
 
 FILES:
 
-01_buildRun_Image.sh - this is a linux script that 
-	uses Docker commands to construct the "uxas/run" 
-	Docker image
+- `01_buildRun_Image.sh` uses Docker commands to construct the
+  `uxas_run` Docker image
 
-02_runUxAS.sh - this is a linux script that uses the 
-	"uxas/run" image to start UxAS in the local directory.
+- `02_runUxAS.sh` uses the `uxas_run` image to start UxAS in the local
+  directory. Optionally takes an argument that points to the UxAS XML
+  configuration.
 
-03_StopRunContainer.sh - this linux executes the docker command
-	to stop the "uxas/run" container.
+- `03_StopRunContainer.sh` executes the docker command to stop the
+  `uxas_run` container.
 
-cfg_TestUxAS.xml - this is a sample UxAS configuration file.
+- `cfg_TestUxAS.xml` sample UxAS configuration file used by default in
+  `02_runUxAS.sh`
 
-Image/Dockerfile.UxAS_run - the DockerFile used to build the 
-	"uxas/run" image.
+- `Image/Dockerfile.UxAS_run` is the Dockerfile used to build the
+  `uxas_run` image.

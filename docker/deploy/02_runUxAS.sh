@@ -12,6 +12,5 @@ fi
 docker run \
   -it \
   --name uxas_run -w="/working" \
-  --mount type=bind,source="${PWD}",target="/working"  uxas/run \
-  -cfgPath ./cfg_TestUxAS.xml
-
+  --mount type=bind,source="${PWD}",target="/working"  uxas_run \
+  -cfgPath ${1-./cfg_TestUxAS.xml}

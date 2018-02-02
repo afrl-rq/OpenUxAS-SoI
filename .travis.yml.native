@@ -1,0 +1,54 @@
+dist: trusty
+sudo: false
+
+os:
+  - linux
+
+language:
+  - cpp
+
+addons:
+  apt:
+    packages:
+      - libglu1-mesa-dev
+      - uuid-dev
+      - libboost-date-time-dev
+      - libboost-filesystem-dev
+      - libboost-regex-dev
+      - libboost-system-dev
+      - libgtest-dev
+      - ant
+      - oracle-java8-set-default
+
+before_install:
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  # install verion of Meson that is compatible with UxAS build
+  - curl -L -s https://github.com/mesonbuild/meson/archive/0.44.0.zip -o meson-linux.zip
+  - unzip meson-linux.zip
+  - cd meson-0.44.0; python3 setup.py install --user; cd ..
+  - meson --version
+  # download newer Ninja than is packaged in repos
+  - curl -L -s https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip -o ninja-linux.zip
+  - unzip ninja-linux.zip
+  - mv ninja ~/.local/bin
+  - ninja --version
+
+install:
+  # clone, build, and run LmcpGen
+  - git clone https://github.com/afrl-rq/LmcpGen.git ../LmcpGen
+  # tries to check out the same branch as the one we're building if it's
+  # available, so that development can proceed in tandem
+  # - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)
+  - cd ../LmcpGen; ant jar; cd ../OpenUxAS
+  - sh RunLmcpGen.sh
+  # process the wraps and their patches
+  - ./prepare
+
+before_script:
+  - meson build
+
+script:
+  # build with -j2; Travis has 2 "cores"
+  - ninja -C build test -j2
+  
