@@ -1,4 +1,5 @@
 srcs_services = [
+	'StatusReportService.cpp',
 	'LoiterLeash.cpp',
   '00_ServiceTemplate.cpp',
   '01_HelloWorld.cpp',

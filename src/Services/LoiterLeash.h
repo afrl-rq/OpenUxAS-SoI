@@ -33,16 +33,22 @@ namespace service
  *  In order to ensure that direct heading commands respect airspace constraints,
  *  the LoiterLeash service will lead the aircraft with a "leash", a waypoint
  *  projected out a fixed distance that when followed approximates the desired
- *  heading but is guaranteed to remain in clear airspace.
+ *  heading but is guaranteed to remain in approved airspace.
  * 
  *  The LoiterLeash service will estimate the time step between air vehicle
  *  states to allow conversion of heading-rate commands to direct heading commands.
  *  The desired heading is then used to project a loiter out from the current
  *  vehicle position in the desired direction, terminating in a loiter. If the
  *  loiter would intersect or fall outside of allowable airspace, then the
- *  closest point that would all the loiter to feasibly fit is used.
+ *  closest point that would allow the loiter to feasibly fit is used.
  * 
- * Configuration String: <Service Type="LoiterLeash" />
+ * Configuration String: <Service Type="LoiterLeash" VehicleID="0" LeadAheadDistance="1000" LoiterRadius="0.0" Override="false" />
+ *
+ * Parameters
+ *  - VehicleID: when non-zero only interprets safe heading action for that specific vehicle
+ *  - LeadAheadDistance: distance from vehicle to center of leading loiter (meters)
+ *  - LoiterRadius: radius for the loiter leading the vehicle, if 0.0 defaults to estimated minimum turn radius (meters)
+ *  - Override: when true, uses 'LeadAheadDistance' and 'LoiterRaduis' as configured in the service rathern than in requested message
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::EntityState
@@ -52,7 +58,8 @@ namespace service
  * 
  * Sent Messages:
  *  - afrl::messages::route::RoutePlanRequest
- *  - afrl::cmasi::MissionCommand
+ *  - afrl::cmasi::VehicleActionCommand
+ *    (containing a single afrl::cmasi::LoiterAction)
  * 
  */
 

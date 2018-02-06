@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>4</Version>
+    <Version>5</Version>
     
     <StructList>
         
@@ -133,12 +133,24 @@
             <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
         </Struct>
     
-        <!-- Message reporting that the onboard processor is functioning -->
-        <Struct Name="OnboardProcessorIsAlive" >
-            <!-- ID of vehicle with onboard processor -->
+        <!-- Message for reporting onboard status of UxAS -->
+        <Struct Name="OnboardStatusReport">
+            <!-- ID of vehicle for status report -->
             <Field Name="VehicleID" Type="int64" />
-            <!-- Time that this message was sent -->
-            <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- List of entities in communication with vehicle (from join/exit message traffic) -->
+            <Field Name="ConnectedEntities" Type="int64[]" />
+            <!-- Current task list being carried out by vehicle -->
+            <Field Name="CurrentTaskList" Type="int64[]" />
+            <!-- Entity has valid state -->
+            <Field Name="ValidState" Type="bool" Default="false" />
+            <!-- Entity is authorized to act -->
+            <Field Name="ValidAuthorization" Type="bool" Default="false" />
+            <!-- Entity is authorized to change speed -->
+            <Field Name="SpeedAuthorization" Type="bool" Default="false" />
+            <!-- Entity is authorized to change payload/gimbal -->
+            <Field Name="GimbalAuthorization" Type="bool" Default="false" />
+            <!-- Time of last entity state message received -->
+            <Field Name="VehicleTime" Type="int64" Units="milliseconds since 1 Jan 1970" />
         </Struct>
         
         <!-- Entity Join -->
