@@ -110,6 +110,7 @@
 #include "WaypointPlanManagerService.h"
 #include "SimpleWaypointPlanManagerService.h"
 #include "RoutePlannerVisibilityService.h"
+#include "DAIDALUS_WCV_Detection.h"
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE HEADERS
 #include "StatusReportService.h"
@@ -184,6 +185,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::SimpleWaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::DAIDULUS_WCV_Detection>();}
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE DUMMY INSTANCES
 {auto svc = uxas::stduxas::make_unique<uxas::service::StatusReportService>();}

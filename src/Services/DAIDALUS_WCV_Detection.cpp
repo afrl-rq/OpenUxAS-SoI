@@ -8,17 +8,17 @@
 // ===============================================================================
 
 /* 
- * File:   ServiceTemplate.cpp
+ * File:   DAIDALUS_WCV_Detection.cpp
  * Author: steve
  *
  * Created on March 17, 2017, 5:55 PM
  *
- * <Service Type="ServiceTemplate" OptionString="Option_01" OptionInt="36" />
+ * <Service Type="DAIDALUS_WCV_Detection" OptionString="Option_01" OptionInt="36" />
  * 
  */
 
 // include header for this service
-#include "00_ServiceTemplate.h"
+#include "DAIDALUS_WCV_Detection.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
@@ -36,18 +36,18 @@ namespace service   // uxas::service::
 {
 
 // this entry registers the service in the service creation registry
-ServiceTemplate::ServiceBase::CreationRegistrar<ServiceTemplate>
-ServiceTemplate::s_registrar(ServiceTemplate::s_registryServiceTypeNames());
+DAIDALUS_WCV_Detection::ServiceBase::CreationRegistrar<DAIDALUS_WCV_Detection>
+DAIDALUS_WCV_Detection::s_registrar(DAIDALUS_WCV_Detection::s_registryServiceTypeNames());
 
 // service constructor
-ServiceTemplate::ServiceTemplate()
-: ServiceBase(ServiceTemplate::s_typeName(), ServiceTemplate::s_directoryName()) { };
+DAIDALUS_WCV_Detection::DAIDALUS_WCV_Detection()
+: ServiceBase(DAIDALUS_WCV_Detection::s_typeName(), DAIDALUS_WCV_Detection::s_directoryName()) { };
 
 // service destructor
-ServiceTemplate::~ServiceTemplate() { };
+DAIDALUS_WCV_Detection::~DAIDALUS_WCV_Detection() { };
 
 
-bool ServiceTemplate::configure(const pugi::xml_node& ndComponent)
+bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
 
@@ -67,7 +67,7 @@ bool ServiceTemplate::configure(const pugi::xml_node& ndComponent)
     return (isSuccess);
 }
 
-bool ServiceTemplate::initialize()
+bool DAIDALUS_WCV_Detection::initialize()
 {
     // perform any required initialization before the service is started
     std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -75,7 +75,7 @@ bool ServiceTemplate::initialize()
     return (true);
 }
 
-bool ServiceTemplate::start()
+bool DAIDALUS_WCV_Detection::start()
 {
     // perform any actions required at the time the service starts
     std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -83,7 +83,7 @@ bool ServiceTemplate::start()
     return (true);
 };
 
-bool ServiceTemplate::terminate()
+bool DAIDALUS_WCV_Detection::terminate()
 {
     // perform any action required during service termination, before destructor is called.
     std::cout << "*** TERMINATING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
@@ -91,7 +91,7 @@ bool ServiceTemplate::terminate()
     return (true);
 }
 
-bool ServiceTemplate::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
+bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
     if (afrl::cmasi::isKeyValuePair(receivedLmcpMessage->m_object))
     {

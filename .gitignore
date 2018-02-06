@@ -17,6 +17,10 @@ doc/reference/UserManual/UxAS_UserManual.log
 doc/reference/UserManual/UxAS_UserManual.out
 doc/reference/UserManual/UxAS_UserManual.pdf
 doc/reference/UserManual/UxAS_UserManual.toc
+doc/reference/UserManual/UxAS_UserManual_Supplement.aux
+doc/reference/UserManual/UxAS_UserManual_Supplement.log
+doc/reference/UserManual/UxAS_UserManual_Supplement.out
+doc/reference/UserManual/UxAS_UserManual_Supplement.pdf
 
 # generated LMCP source code
 src/LMCP
@@ -35,3 +39,11 @@ examples/**/datawork/**
 # Visual Studio
 /.vs
 /regen-temp
+
+# 3rd party stuff
+3rd
+
+# Miscellaneous Windows stuff
+AADL_project/
+AADL_sandbox_projects
+Arguments

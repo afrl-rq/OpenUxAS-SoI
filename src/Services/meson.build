@@ -23,6 +23,7 @@ srcs_services = [
   'RoutePlannerVisibilityService.cpp',
   'WaypointPlanManagerService.cpp',
   'SimpleWaypointPlanManagerService.cpp',
+  'DAIDALUS_WCV_Detection.cpp',
 ]
 
 inc_3rd = include_directories('.')
