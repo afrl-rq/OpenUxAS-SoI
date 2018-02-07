@@ -24,7 +24,7 @@ lib = static_library(
     '-std=c++11',
   ],
   include_directories: include_directories(
-    '../../../src/Includes',
-    '../../../src/Utilities',
+    '../../src/Includes',
+    '../../src/Utilities',
   ),
 )
