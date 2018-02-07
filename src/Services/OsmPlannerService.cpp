@@ -126,7 +126,7 @@ OsmPlannerService::configure(const pugi::xml_node& ndComponent)
     if (!ndComponent.attribute(STRING_XML_OSM_FILE).empty())
     {
         m_osmFileName = ndComponent.attribute(STRING_XML_OSM_FILE).value();
-        UXAS_LOG_INFORM("**** Reading and processing OSM File [" << m_osmFileName << "] ****");
+        UXAS_LOG_INFORM("**** Reading and processing OSM File [", m_osmFileName, "] ****");
 
         isSuccessful = isBuildRoadGraphWithOsm(m_osmFileName);
         if (!isSuccessful)
@@ -231,7 +231,7 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
     }
     else
     {
-        UXAS_LOG_INFORM("WARNING::Unknown Message Type Encountered ptr_Object->getLmcpTypeName()[" << receivedLmcpMessage->m_object->getFullLmcpTypeName() << "]")
+        UXAS_LOG_INFORM("WARNING::Unknown Message Type Encountered ptr_Object->getLmcpTypeName()[", receivedLmcpMessage->m_object->getFullLmcpTypeName(), "]");
     }
     return (false); // always false implies never terminating service from here
 };
@@ -1184,8 +1184,8 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
             auto endTime = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed_seconds = endTime - startTime;
             m_processMapTime_s = elapsed_seconds.count();
-            UXAS_LOG_INFORM(" **** Finished reading and processing OSM File; and building the Graph: Elapsed Seconds[" << m_processMapTime_s << "] ****");
-            UXAS_LOG_INFORM("OSM FILE:: loaded [" << m_numberHighways << "] highways, [" << m_numberNodes << "] nodes, [" << m_numberPlanningNodes << "] planning nodes, and [" << m_numberPlanningEdges << "] planning edges");
+            UXAS_LOG_INFORM(" **** Finished reading and processing OSM File; and building the Graph: Elapsed Seconds[", m_processMapTime_s, "] ****");
+            UXAS_LOG_INFORM("OSM FILE:: loaded [", m_numberHighways, "] highways, [", m_numberNodes, "] nodes, [", m_numberPlanningNodes, "] planning nodes, and [", m_numberPlanningEdges, "] planning edges");
 
         }
         else //if (osmMap)
@@ -1399,7 +1399,7 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                         else
                         {
                             currentWayId = -1; //need to find a valid start point before proceeding
-                            UXAS_LOG_INFORM("OSM FILE:: while building edges:: could not find index for node[" << itNode->second << "]");
+                            UXAS_LOG_INFORM("OSM FILE:: while building edges:: could not find index for node[", itNode->second, "]");
                         }
                     }
                     else
@@ -1421,7 +1421,7 @@ bool OsmPlannerService::isBuildGraph(const std::unordered_set<int64_t>& planning
                             int64_t distance = static_cast<int64_t> (itEndId->second->relativeDistance2D_m(*(itLastNode->second)) + runningLength_m);
 
                             m_edges.push_back(n_FrameworkLib::CEdge(startIndex, endIndex, distance));
-                            UXAS_LOG_INFORM("startId[" << itStartId->first << "] endId[" << itEndId->first << "] distance[" << distance << "]" << std::endl);
+                            UXAS_LOG_INFORM("startId[", itStartId->first, "] endId[", itEndId->first, "] distance[", distance, "]");
 
                             itStartId = itEndId;
                             itLastNode = itEndId;
@@ -1565,11 +1565,11 @@ bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const in
             auto endTime = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed_seconds = endTime - startTime;
             m_searchTime_s = elapsed_seconds.count();
-            UXAS_LOG_INFORM(" **** Finished running ASTAR search from startNodeId[" << startNodeId << "] to endNodeId[" << endNodeId << "] Elapsed Seconds[" << elapsed_seconds.count() << "] ****");
+            UXAS_LOG_INFORM(" **** Finished running ASTAR search from startNodeId[", startNodeId, "] to endNodeId[", endNodeId, "] Elapsed Seconds[", elapsed_seconds.count(), "] ****");
 
 #define PRINT_SHORTEST_PATH
 #ifdef PRINT_SHORTEST_PATH
-            UXAS_LOG_INFORM("isFindShortestRoute:: Shortest path from startNodeId[" << startNodeId << "] to endNodeId[" << endNodeId << "] " << std::endl);
+            UXAS_LOG_INFORM("isFindShortestRoute:: Shortest path from startNodeId[", startNodeId, "] to endNodeId[", endNodeId, "] ");
             for (auto itNode = pathNodes.begin(); itNode != pathNodes.end(); itNode++)
             {
                 std::cout << " -> " << *itNode;
