@@ -6,14 +6,8 @@ link_args = []
 
 os = target_machine.system()
 
-# needed to add these libraries early for static linking
 if get_option('geo_libs')
-    add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
-  if get_option('internal_3rd_libraries')
-    link_args += ['-lgdal', '-lGeographic']
-  else
-	link_args += ['-l:libgdal.a','-l:libGeographic.a','-l:libexpat.a','-l:libz.a']
-  endif
+  add_project_arguments('-DUSE_GEO_LIBS', language: ['c', 'cpp'])
 endif
 
 if os.startswith('linux')
@@ -36,10 +30,18 @@ elif os == 'windows'
   link_args += []
 endif
 
+
 if get_option('afrl_internal')
-  #message('@@@@@ afrl_internal @@@@@')
+  message('@@@@@ afrl_internal @@@@@')
   add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
   subdir('UxAS-afrl_internal')
+  if get_option('geo_libs')
+      link_args_temp = link_args
+      # needed to add these libraries early for static linking
+      link_args = link_args_internal_static
+      link_args += link_args_temp
+  endif
+  link_args += link_args_internal
 endif
 
 if get_option('internal_3rd_libraries')
@@ -200,7 +202,7 @@ if get_option('internal_3rd_libraries')
 endif
 
 if get_option('afrl_internal')
-  #deps += deps_internal
+  deps += deps_internal
 endif
 
 cpp_args = []
