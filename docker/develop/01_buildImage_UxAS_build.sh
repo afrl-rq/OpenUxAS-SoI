@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-docker build -t uxas_build -f Dockerfile.UxAS_build .
+docker build -t uxas_develop -f Dockerfile.uxas_develop .
