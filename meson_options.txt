@@ -5,14 +5,20 @@ option(
   value: false,
 )
 option(
-    'internal_3rd_libraries',
-    description: 'build with internal 3rd party libraries',
-    type : 'boolean',
-    value : true,
+  'internal_3rd_libraries',
+  description: 'build with internal 3rd party libraries',
+  type : 'boolean',
+  value : true,
 )
 option(
   'geo_libs',
   description: 'build with extra ground height fidelity (requires gdal and GeographicLib)',
+  type: 'boolean',
+  value: false,
+)
+option(
+  'video_steam_detector',
+  description: 'include video stream detector service (requires additional libraries)',
   type: 'boolean',
   value: false,
 )
