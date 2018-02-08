@@ -39,11 +39,3 @@ examples/**/datawork/**
 # Visual Studio
 /.vs
 /regen-temp
-
-# 3rd party stuff
-3rd
-
-# Miscellaneous Windows stuff
-AADL_project/
-AADL_sandbox_projects
-Arguments

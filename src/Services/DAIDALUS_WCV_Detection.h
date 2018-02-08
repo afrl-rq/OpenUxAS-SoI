@@ -8,14 +8,14 @@
 // ===============================================================================
 
 /* 
- * File:   ServiceTemplate.h
- * Author: steve
+ * File:   DAIDALUS_WCV_Detection.h
+ * Author: SeanR
  *
- * Created on March 17, 2017, 5:55 PM
+ * Created on Feb 06 2018
  */
 
-#ifndef UXAS_00_SERVICE_TEMPLATE_H
-#define UXAS_00_SERVICE_TEMPLATE_H
+#ifndef UXAS_DAIDALUS_WCV_DETECTION_H
+#define UXAS_DAIDALUS_WCV_DETECTION_H
 
 
 
@@ -28,7 +28,7 @@ namespace uxas
 namespace service
 {
 
-/*! \class ServiceTemplate
+/*! \class DAIDALUS_WCV_Detection
     \brief This is a basic service that can be used as a template when 
  * constructing new services.
 
@@ -37,7 +37,7 @@ namespace service
  *  @par To add a new service:
  * <ul style="padding-left:1em;margin-left:0">
  * <li>Make copies of the source and header files of this template.</li>
- * <li>Search for the string ServiceTemplate and Replace it with the new 
+ * <li>Search for the string DAIDALUS_WCV_Detection and Replace it with the new 
  * service name.</li>
  * <li>Change the unique include guard entries, in the header file, i.e. 
  * "UXAS_00_SERVICE_TEMPLATE_H" to match the new service name</li>
@@ -48,7 +48,7 @@ namespace service
  *  
  * </ul> @n
  * 
- * Configuration String: <Service Type="ServiceTemplate" OptionString="Option_01" OptionInt="36" />
+ * Configuration String: <Service Type="DAIDALUS_WCV_Detection" OptionString="Option_01" OptionInt="36" />
  * 
  * Options:
  *  - OptionString - sample string option
@@ -63,17 +63,17 @@ namespace service
  * 
  */
 
-class ServiceTemplate : public ServiceBase
+class DAIDALUS_WCV_Detection : public ServiceBase
 {
 public:
 
     /** \brief This string is used to identify this service in XML configuration
-     * files, i.e. Service Type="ServiceTemplate". It is also entered into
+     * files, i.e. Service Type="DAIDALUS_WCV_Detection". It is also entered into
      * service registry and used to create new instances of this service. */
     static const std::string&
     s_typeName()
     {
-        static std::string s_string("ServiceTemplate");
+        static std::string s_string("DAIDALUS_WCV_Detection");
         return (s_string);
     };
 
@@ -93,24 +93,24 @@ public:
     static ServiceBase*
     create()
     {
-        return new ServiceTemplate;
+        return new DAIDALUS_WCV_Detection;
     };
 
-    ServiceTemplate();
+    DAIDALUS_WCV_Detection();
 
     virtual
-    ~ServiceTemplate();
+    ~DAIDALUS_WCV_Detection();
 
 private:
 
     static
-    ServiceBase::CreationRegistrar<ServiceTemplate> s_registrar;
+    ServiceBase::CreationRegistrar<DAIDALUS_WCV_Detection> s_registrar;
 
     /** brief Copy construction not permitted */
-    ServiceTemplate(ServiceTemplate const&) = delete;
+    DAIDALUS_WCV_Detection(DAIDALUS_WCV_Detection const&) = delete;
 
     /** brief Copy assignment operation not permitted */
-    void operator=(ServiceTemplate const&) = delete;
+    void operator=(DAIDALUS_WCV_Detection const&) = delete;
 
     bool
     configure(const pugi::xml_node& serviceXmlNode) override;
@@ -137,5 +137,5 @@ private:
 }; //namespace service
 }; //namespace uxas
 
-#endif /* UXAS_00_SERVICE_TEMPLATE_H */
+#endif /* UXAS_DAIDALUS_WCV_DETECTION_H */
 

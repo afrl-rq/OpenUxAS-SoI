@@ -185,7 +185,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::WaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::SimpleWaypointPlanManagerService>();}
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
-{auto svc = uxas::stduxas::make_unique<uxas::service::DAIDULUS_WCV_Detection>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::DAIDALUS_WCV_Detection>();}
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE DUMMY INSTANCES
 {auto svc = uxas::stduxas::make_unique<uxas::service::StatusReportService>();}

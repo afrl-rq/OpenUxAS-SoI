@@ -9,7 +9,7 @@
 
 /* 
  * File:   DAIDALUS_WCV_Detection.cpp
- * Author: steve
+ * Author: SeanR
  *
  * Created on March 17, 2017, 5:55 PM
  *

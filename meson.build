@@ -124,6 +124,8 @@ subdir('src/Utilities')
 
 subdir('src/Plans')
 
+subdir('src/DAIDALUS')
+
 dep_thread              = dependency('threads')
 
 libs = [
@@ -138,6 +140,7 @@ libs = [
   lib_plans,
   lib_tinygps,
   lib_dpss,
+  lib_daidalus,
 ]
 
 if get_option('internal_3rd_libraries')
