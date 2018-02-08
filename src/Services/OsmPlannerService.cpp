@@ -1891,11 +1891,11 @@ void OsmPlannerService::savePythonPlotCode()
     pythonFileStream << "\tif PlotVisibleEdges:" << std::endl;
     pythonFileStream << "\t\trecarrayVisibleEdges = []" << std::endl;
     pythonFileStream << "\t\tfor visibleedgesFile in glob.glob('*" << m_mapEdgesFileName << "*') :" << std::endl;
-    pythonFileStream << "\t\t\tprint 'loading [' + visibleedgesFile + ']'" << std::endl;
+    pythonFileStream << "\t\t\t(print 'loading [' + visibleedgesFile + ']')" << std::endl;
     pythonFileStream << "\t\t\ttry:" << std::endl;
     pythonFileStream << "\t\t\t\trecarrayVisibleEdges.append(mlab.csv2rec(visibleedgesFile))" << std::endl;
     pythonFileStream << "\t\t\texcept StandardError:" << std::endl;
-    pythonFileStream << "\t\t\t\tprint 'No edges found in [' + visibleedgesFile + ']'" << std::endl;
+    pythonFileStream << "\t\t\t\t(print 'No edges found in [' + visibleedgesFile + ']')" << std::endl;
     pythonFileStream << "\t\t\tfor recarrayEdge in recarrayVisibleEdges :" << std::endl;
     pythonFileStream << "\t\t\t\tfor edge in recarrayEdge :" << std::endl;
     pythonFileStream << "\t\t\t\t\tline, = plt.plot([edge.edge_east_01, edge.edge_east_02], [edge.edge_north_01, edge.edge_north_02],linewidth=2.0, linestyle = '-', color = '#555555')" << std::endl;
@@ -1918,11 +1918,11 @@ void OsmPlannerService::savePythonPlotCode()
         pythonFileStream << "\tif PlotShortestPath:" << std::endl;
         pythonFileStream << "\t\trecarrayShortestPath = []" << std::endl;
         pythonFileStream << "\t\tfor ShortestPathFile in glob.glob('*" << m_shortestPathFileName << "*') :" << std::endl;
-        pythonFileStream << "\t\t\tprint 'loading [' + ShortestPathFile + ']'" << std::endl;
+        pythonFileStream << "\t\t\t(print 'loading [' + ShortestPathFile + ']')" << std::endl;
         pythonFileStream << "\t\t\ttry:" << std::endl;
         pythonFileStream << "\t\t\t\trecarrayShortestPath.append(mlab.csv2rec(ShortestPathFile))" << std::endl;
         pythonFileStream << "\t\t\texcept StandardError:" << std::endl;
-        pythonFileStream << "\t\t\t\tprint 'No edges found in [' + ShortestPathFile + ']'" << std::endl;
+        pythonFileStream << "\t\t\t\t(print 'No edges found in [' + ShortestPathFile + ']')" << std::endl;
         pythonFileStream << "\t\t\tfor recarrayEdge in recarrayShortestPath :" << std::endl;
         pythonFileStream << "\t\t\t\tfor edge in recarrayEdge :" << std::endl;
         pythonFileStream << "\t\t\t\t\tline, = plt.plot([edge.edge_east_01, edge.edge_east_02], [edge.edge_north_01, edge.edge_north_02],linewidth=4.0, linestyle = '-', color = '#880000')" << std::endl;
@@ -1931,7 +1931,7 @@ void OsmPlannerService::savePythonPlotCode()
         pythonFileStream << "\t#############################################" << std::endl;
     }
 
-    pythonFileStream << "\tprint 'Drawing Plot'" << std::endl;
+    pythonFileStream << "\t(print 'Drawing Plot')" << std::endl;
     pythonFileStream << "\tplt.title('OpenStreetMapFile[" << m_osmFileName << "]')" << std::endl;
     pythonFileStream << "\tplt.ylabel('postion north (m)')" << std::endl;
     pythonFileStream << "\tplt.xlabel('position east (m)')" << std::endl;
