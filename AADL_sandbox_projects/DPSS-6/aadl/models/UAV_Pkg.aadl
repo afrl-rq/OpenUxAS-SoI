@@ -76,53 +76,67 @@ public
 
 			guarantee "Direction formula":
 				direction = (
-					-- Turn around at the left boundary
+					-- Turn around at the left boundary.
 					if pos <= 0.0 then
 						1
-					-- Turn around at the right boundary
-					else if pos >= DPSS_Constants.P_GLOBAL then
+					else 
+						-- Turn around at the right boundary.
+						if pos >= DPSS_Constants.P_GLOBAL then
 							-1
-						 -- If meeting left neighbor, travel together to shared border
-						 else if meet_LN then
+						else 
+							-- If meeting left neighbor, travel together toward shared border.
+							if meet_LN then
 								if pos <= S_L then
 									1
 								else --pos > S_L
-									-1						
-						 	  -- Else if meeting right neighbor, travel together to shared border
-							  else if meet_RN then
-										if pos < S_R then
-											1
-										else --pos >= S_R
-											-1 
-								   -- In all other cases, proceed in the same direction
-								   else 
-										pre_direction
+									-1
+							else
+								-- If meeting right neighbor, travel together toward shared border. 
+							  	if meet_RN then
+									if pos < S_R then
+										1
+									else --pos >= S_R
+										-1 
+								-- In all other cases, proceed in the same direction.
+								else 
+									pre_direction
 				);  
 
 			guarantee "Goal formula":
 				goal = (
-						-- If co-located with left neighbor,...
-						if meet_LN then
-							--...and at or to the left of the shared border, make goal the right endpoint
+						-- If co-located with left and right neighbors,...
+						if meet_LN and meet_RN then
+							--...and at or to the left of the shared border with the left neighbor, make goal the shared border with the right neighbor.
 							if pos <= S_L then
-								DPSS_Constants.P_GLOBAL
-							--...and to the right of the shared border, make goal the shared border
+								S_R
+							--...and to the right of the shared border with the left neighbor, make goal the shared border with the left neighbor.
 							else -- pos > S_L
-								S_L
-						-- Else if co-located with right neighbor,...
-						else if meet_RN then
-								--...and at or to the right of the shared border, make goal the left endpoint
-								if pos >= S_R then
-									0.0
-								--...and to the left of the shared border, make goal the shared border
-								else -- pos < S_R
-									S_R
-							 -- Else if heading right, set goal to the right endpoint
-							 else if direction = 1 then
+								S_L 
+						else		
+							-- If co-located with left neighbor only,...
+							if meet_LN then
+								--...and at or to the left of the shared border with the left neighbor, make goal the right endpoint.
+								if pos <= S_L then
 									DPSS_Constants.P_GLOBAL
-								  -- Else if heading left, set goal to the left endpoint
-								  else --direction = -1 
-									0.0 
+								--...and to the right of the shared border with the left neighbor, make goal the shared border with the left neighbor.
+								else -- pos > S_L
+									S_L
+							else 
+								-- If co-located with right neighbor only,...
+								if meet_RN then
+									--...and at or to the right of the shared border with the right neighbor, make goal the left endpoint.
+									if pos >= S_R then
+										0.0
+									--...and to the left of the shared border with the right neighbor, make goal the shared border with the right neighbor.
+									else -- pos < S_R
+										S_R
+								else -- If not co-located with either neighbor,...
+									-- ...and heading right, set goal to the right endpoint. 
+									if direction = 1 then
+										DPSS_Constants.P_GLOBAL
+									  -- ...and heading left, set goal to the left endpoint.
+									else --direction = -1 
+										0.0 
 				); 
 
 			guarantee "Position formula":
