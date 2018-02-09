@@ -771,7 +771,7 @@
         <!--
             Defines an angular range for use in setting constraints or desired approaches to tasks.  In most cases, wedges are
             defined in the inertial sense, where azimuth is the angle between North and the center of the wedge, elevation is the
-            angle between the horizon and the center of the wedge.  In some instances, other coordinate systems are defined, such as
+            angle between the horizon and the center of the wedge (positive up).  In some instances, other coordinate systems are defined, such as
             angles relative to a line.
         -->
         <Struct Name="Wedge">
