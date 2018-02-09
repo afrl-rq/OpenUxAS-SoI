@@ -99,7 +99,7 @@
 	<ViewAngleList>
 		<Wedge Series="CMASI">
 			<AzimuthCenterline>35.0</AzimuthCenterline>
-			<VerticalCenterline>60.0</VerticalCenterline>
+			<VerticalCenterline>-60.0</VerticalCenterline>
 		</Wedge>
 	</ViewAngleList>
 	<RevisitRate>0</RevisitRate>
