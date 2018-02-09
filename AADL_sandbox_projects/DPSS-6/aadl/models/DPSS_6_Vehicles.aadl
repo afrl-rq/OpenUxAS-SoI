@@ -485,48 +485,24 @@ public
 						
 			lemma "Once stable, stays stable":
 				true -> pre(stable) => stable;
+
+			lemma "Stable on and after 24 steps":
+				steps >= 24 => stable;
 			
 			lemma "Stable on and after 25 steps":
 				steps >= 25 => stable;
 			
---			lemma "Stable on and after 26 steps":
---				steps >= 26 => stable;
---			
---			lemma "Stable on and after 27 steps":
---				steps >= 27 => stable;
---				
---			lemma "Stable on and after 28 steps":
---				steps >= 28 => stable;
---			
---			lemma "Stable on and after 29 steps":
---				steps >= 29 => stable;
+			lemma "Stable on and after 26 steps":
+				steps >= 26 => stable;
 			
-			lemma "Stable on and after 30 steps":
-				steps >= 30 => stable;
-			
---			lemma "Stable on and after 31 steps":
---				steps >= 31 => stable;
---				
---			lemma "Stable on and after 32 steps":
---				steps >= 32 => stable;
---				
---			lemma "Stable on and after 33 steps":
---				steps >= 33 => stable;
---
---			lemma "Stable on and after 34 steps":
---				steps >= 34 => stable;
-						
-			lemma "Stable on and after 35 steps":
-				steps >= 35 => stable;
-			
---			lemma "Stable on and after 40 steps":
---				steps >= 40 => stable;
+			lemma "Stable on and after 27 steps":
+				steps >= 27 => stable;
 				
-			lemma "Stable on and after 45 steps":
-				steps >= 45 => stable;
-				
---			lemma "Stable on and after 50 steps":
---				steps >= 50 => stable;
+			lemma "Stable on and after 28 steps":
+				steps >= 28 => stable;
+			
+			lemma "Stable on and after 29 steps":
+				steps >= 29 => stable;
 					
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = DPSS_Constants.Time_to_travel_full_length/DPSS_Constants.N_real;
