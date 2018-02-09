@@ -1,4 +1,7 @@
-dep_gtest = dependency('gtest')
+dep_gtest = dependency(
+  'gtest',
+  fallback: ['gtest', 'dep']
+)
 
 deps_test = deps + [
   dep_gtest
