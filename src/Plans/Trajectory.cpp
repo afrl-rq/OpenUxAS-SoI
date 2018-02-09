@@ -167,11 +167,21 @@ double CTrajectory::dMinimumDistanceDubins(CTrajectoryParameters& cTrajectoryPar
                 dMinimumDistanceMAVWind(assignTemp,cTrajectoryParameters,*itParametersEnd,*itHeadingParameters);
                 break;
             }
+           
+            double distanceStartToFirst_m{0.0};;
+            if(assignTemp.vwayGetWaypoints().size() > 0)
+            {
+                distanceStartToFirst_m = cTrajectoryParameters.bobjGetStart().relativeDistance2D_m(assignTemp.vwayGetWaypoints().front());
+            }
+
             
             double dDistanceFinalLeg_m = itHeadingParameters->dGetStandoff_m() - itHeadingParameters->dGetFreeToTurn_m();
             dDistanceFinalLeg_m = (dDistanceFinalLeg_m>0)?(dDistanceFinalLeg_m):(0.0);
+            
+            double distancePathTotal_m = distanceStartToFirst_m + assignTemp.dGetDistanceTotal() + dDistanceFinalLeg_m;
+            
             // check to see if this is the current minimum distance path
-            if(n_Const::c_Convert::bCompareDouble((assignTemp.dGetDistanceTotal() + dDistanceFinalLeg_m),dDistanceTotalMinimum_m,n_Const::c_Convert::enLess))
+            if(n_Const::c_Convert::bCompareDouble(distancePathTotal_m,dDistanceTotalMinimum_m,n_Const::c_Convert::enLess))
             {
                 if (assignTemp.vwayGetWaypoints().size()>=1)
                 {
@@ -191,7 +201,7 @@ double CTrajectory::dMinimumDistanceDubins(CTrajectoryParameters& cTrajectoryPar
                                                             dDistanceFinalLeg_m,
                                                             std::numeric_limits<double>::max(),std::numeric_limits<double>::max(),std::numeric_limits<double>::max(),CCircle::turnNone,
                                                             CWaypoint::waytypeEnroute,0,false,CWaypoint::sstateFrontCamera));
-                    }        //if(itHeadingParameters->dGetFreeToTurn_m() > 0.0)
+                    }        //if(tHeadingParameters->dGetFreeToTurn_m() > 0.0)
 
                     //calculate final segment time
                     if (assignTemp.vwayGetWaypoints().size()>=2)
@@ -208,7 +218,7 @@ double CTrajectory::dMinimumDistanceDubins(CTrajectoryParameters& cTrajectoryPar
 
                     assignTemp.SetHeadingFinal(dHeadingFrom_rad);
                     assignMinimum = assignTemp;
-                    dDistanceTotalMinimum_m = assignTemp.dGetDistanceTotal() + dDistanceFinalLeg_m;
+                    dDistanceTotalMinimum_m = distancePathTotal_m;
                     cParametersEndFinal = *itParametersEnd;
                     cParametersEndFinal.vGetHeadingParameters().clear();
                     cParametersEndFinal.vGetHeadingParameters().push_back(*itHeadingParameters);

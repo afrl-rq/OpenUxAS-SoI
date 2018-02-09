@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+SECONDS=0
+
 IS_INTERNAL=$1
 USE_INTERNAL="false"
 if [ "$IS_INTERNAL" = "true" ]
@@ -24,3 +26,6 @@ fi
 
 # 3 - compile the code
 ninja -C build all
+
+duration=$SECONDS
+echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."

@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>5</Version>
+    <Version>6</Version>
     
     <StructList>
         
@@ -168,6 +168,15 @@
             <!-- Label of entity exiting network -->
             <Field Name="Label" Type="string" />
         </Struct>  
+        
+        <!-- Message for indicating that UxAS has handled an EntityState update
+             which allows an external simulation to pause until received -->
+        <Struct Name="SimulationTimeStepAcknowledgement" >
+            <!-- Vehicle for which the entity state update was handled -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Associated time from the handled entity state -->
+            <Field Name="ReportedTime" Type="int64" Units="milliseconds" />
+        </Struct>
 
  </StructList>
 </MDM>

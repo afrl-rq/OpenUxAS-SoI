@@ -10,3 +10,9 @@ option(
   type: 'boolean',
   value: false,
 )
+option(
+  'video_steam_detector',
+  description: 'include video stream detector service (requires additional libraries)',
+  type: 'boolean',
+  value: false,
+)
