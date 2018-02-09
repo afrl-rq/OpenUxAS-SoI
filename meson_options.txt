@@ -5,12 +5,6 @@ option(
   value: false,
 )
 option(
-  'internal_3rd_libraries',
-  description: 'build with internal 3rd party libraries',
-  type : 'boolean',
-  value : true,
-)
-option(
   'geo_libs',
   description: 'build with extra ground height fidelity (requires gdal and GeographicLib)',
   type: 'boolean',
