@@ -157,9 +157,11 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
         //ViewAngleList
         if (!m_lineSearchTask->getViewAngleList().empty())
         {
-            // I'm assuming the elevation is measured from the horizon, positive down
-            auto elevationMin_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();
-            auto elevationMax_rad = 90.0 * n_Const::c_Convert::dDegreesToRadians();
+            // I'm assuming the elevation is measured from the horizon, positive up
+            //TODO:: the min/max values in the AirVehicleConfiguration need to be used instead of the following
+            auto elevationMin_rad = -90.0 * n_Const::c_Convert::dDegreesToRadians();
+            auto elevationMax_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();
+                
 
             for (auto itWedge = m_lineSearchTask->getViewAngleList().begin();
                     itWedge != m_lineSearchTask->getViewAngleList().end();
@@ -191,7 +193,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
                         std::string algebraString;
                         if (isCalculateOption(taskId, itEligibleEntities->second,
                                 itEligibleEntities->first.second, itEligibleEntities->first.first,
-                                dHeadingCurrent_rad, -elevationLookAngleCurrent_rad,
+                                dHeadingCurrent_rad, elevationLookAngleCurrent_rad,
                                 optionId, algebraString))
                         {
                             compositionString += algebraString + " ";
@@ -210,7 +212,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
                             std::string algebraString;
                             if (isCalculateOption(taskId, itEligibleEntities->second,
                                     itEligibleEntities->first.second, itEligibleEntities->first.first,
-                                    dHeadingCurrent_rad, -elevationLookAngleCurrent_rad,
+                                    dHeadingCurrent_rad, elevationLookAngleCurrent_rad,
                                     optionId, algebraString))
                             {
                                 compositionString += algebraString + " ";
