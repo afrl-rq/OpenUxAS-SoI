@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+DOCKER_NO_CACHE=""
+
+while getopts ":f" opt; do
+    case $opt in
+        f)
+            DOCKER_NO_CACHE="--no-cache"
+            echo "[build_sdcard_and_uxas.sh] Building Docker image without cache" >&2
+            ;;
+        \?)
+            echo "[build_sdcard_and_uxas.sh] Invalid option: -$OPTARG" >&2
+            ;;
+    esac
+done
+
 set -e
 
 if [ ! -f docker/Dockerfile ]; then
@@ -7,17 +21,17 @@ if [ ! -f docker/Dockerfile ]; then
     exit 1
 fi
 
-echo '[build_sdcard_and_uxas.sh] Building Docker image; this will take a while'
+echo '[build_sdcard_and_uxas.sh] Building Docker image; this will take a while the first time'
 
-docker build -t afrl-rq/openuxas docker/
+docker build $DOCKER_NO_CACHE -t uxas_cross docker/
 
 echo '[build_sdcard_and_uxas.sh] Docker image built; extracting SD card image to `/OpenUxAS/sdcard.img`'
 
-docker run --rm -v $(pwd):/src/OpenUxAS afrl-rq/openuxas sh -c 'cp -r /opt/uxas/sdcard.img /src/OpenUxAS/sdcard.img'
+docker run --rm -v $(pwd):/src/OpenUxAS uxas_cross sh -c 'cp -r /opt/uxas/sdcard.img /src/OpenUxAS/sdcard.img'
 
 echo '[build_sdcard_and_uxas.sh] Cross-compiling UxAS to `/OpenUxAS/build_cross/uxas`'
 
-docker run --rm -v $(pwd):/src/OpenUxAS afrl-rq/openuxas sh -c "rm -rf build_cross && \
+docker run --rm -v $(pwd):/src/OpenUxAS uxas_cross sh -c "rm -rf build_cross && \
 python3 rm-external && \
 python3 prepare && \
 meson.py build_cross --cross-file docker/odroid-xu4-gnueabihf.txt && \
