@@ -49,6 +49,7 @@ incs_services = [
     '../../src/Includes',
     '../../src/Services',
     '../../src/VisilibityLib',
+    '../DAIDALUS/include', #compilation fails if after Plans inclusion
     '../../src/Plans',
     '../../src/DPSS',
     '../../src/Tasks',

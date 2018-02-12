@@ -19,6 +19,7 @@
 
 // include header for this service
 #include "DAIDALUS_WCV_Detection.h"
+#include "Daidalus.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
@@ -28,6 +29,8 @@
 // convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
 #define STRING_XML_OPTION_INT "OptionInt"
+
+using namespace larcfm;
 
 // namespace definitions
 namespace uxas  // uxas::
