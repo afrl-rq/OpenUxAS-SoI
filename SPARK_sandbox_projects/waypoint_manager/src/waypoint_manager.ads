@@ -36,7 +36,7 @@ package waypoint_manager with SPARK_Mode is
    with Pre => (last <= wp_List'Last),
    Ghost;
 
-   -- Amn in-order list is one such that each next ids point to the id of the
+   -- An in-order list is one such that each next ids point to the id of the
    -- next element in the array
    function in_order(wp_list: waypoint_list) return boolean is
       (for all i in wp_list'First .. wp_list'Last - 1 =>
@@ -76,7 +76,7 @@ package waypoint_manager with SPARK_Mode is
 
    function find_wp(waypoint_id: positive; wp_list: waypoint_list) return waypoint
      with
-       Pre => valid(wp_list),
+      Pre => valid(wp_list),
       Post => ((if valid(find_wp'Result) then
                 -- if the waypoint is found, it should have the desired id
                  (find_wp'Result.id = waypoint_id and

@@ -42,7 +42,7 @@ Package body waypoint_manager with SPARK_Mode is
       end loop;
       -- Post3 (and helps Post8)
       retval(retval'Last).next := retval(retval'Last).id;
-      -- The following pragma assert cuts the proof tie from about 1 minute to
+      -- The following pragma assert cuts the proof time from about 1 minute to
       -- about 15-18 seconds
       pragma Assert(in_order(retval));
       return retval;
