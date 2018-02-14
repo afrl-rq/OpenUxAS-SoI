@@ -1,0 +1,23 @@
+package AutomationRequestValidatorService_Pkg
+public
+    -- Include DataTypes
+    with CMASI;
+    with UXTASK;
+    with IMPACT;
+    with UxAS_Node_Lib;
+
+thread AutomationRequestValidatorService
+	features
+		AutomationRequest_in: in event data port cmasi::AutomationRequest.i;
+        AutomationResponse_out: out event data port cmasi::AutomationResponse.i;
+	annex agree {**
+				
+		guarantee "(1 cpt, no errors) Upon receiving an AutomationRequest_in, 
+			the AutomationRequestValidatorService responds exactly once, on the next timestep, 
+			with an AutomationResponse_out." :
+			UxAS_Node_Lib.responds_exactly_once_within(event(AutomationResponse_out), event(AutomationRequest_in), 1);
+			
+	**};	
+end AutomationRequestValidatorService;
+    	
+end AutomationRequestValidatorService_Pkg;
