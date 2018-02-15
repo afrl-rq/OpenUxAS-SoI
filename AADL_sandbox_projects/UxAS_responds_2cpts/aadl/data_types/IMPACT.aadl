@@ -1,0 +1,740 @@
+package IMPACT
+public
+	with CMASI;
+	with Common_Data;
+	with Base_Types;
+	with Data_Model;
+	renames Common_Data::all;
+	renames CMASI::all;
+
+data PowerConfiguration extends PayloadConfiguration
+end PowerConfiguration;
+
+--Indicates the power plant configuration carried by a vehicle
+data implementation PowerConfiguration.i extends PayloadConfiguration.i
+    subcomponents
+        --Power generation system (used for acoustic signature)
+        NominalPowerConfiguration: data PowerPlant.i;
+end PowerConfiguration.i;
+
+data RadioConfiguration extends PayloadConfiguration
+end RadioConfiguration;
+
+--Indicates the radio specification carried by an entity
+data implementation RadioConfiguration.i extends PayloadConfiguration.i
+    subcomponents
+        --The range of the radio
+        FIXMERange: data real32.i;
+        --The vehicle's rally point
+        RallyPoint: data Location3D.i;
+        --Time after loss of communications the vehicle should return to its
+        --rally point
+        Timeout: data int64.i;
+end RadioConfiguration.i;
+
+data RadioTowerConfiguration extends EntityConfiguration
+end RadioTowerConfiguration;
+
+--Indicates a radio tower
+data implementation RadioTowerConfiguration.i extends EntityConfiguration.i
+    subcomponents
+        --The position of the tower
+        Position: data Location3D.i;
+        --The range of the radio
+        FIXMERange: data real32.i;
+        --Whether the radio is enabled
+        Enabled: data bool.i;
+end RadioTowerConfiguration.i;
+
+data RadioState extends PayloadState
+end RadioState;
+
+--Indicates the radio state
+data implementation RadioState.i extends PayloadState.i
+    subcomponents
+        --Whether the radio is enabled
+        Enabled: data bool.i;
+        --Whether the vehicle is in communications range
+        InRange: data bool.i;
+end RadioState.i;
+
+data RadioTowerState extends EntityState
+end RadioTowerState;
+
+--Indicates a radio tower state
+data implementation RadioTowerState.i extends EntityState.i
+    subcomponents
+        --Whether the radio is enabled
+        Enabled: data bool.i;
+end RadioTowerState.i;
+
+data ImpactPayloadConfiguration extends PayloadConfiguration
+end ImpactPayloadConfiguration;
+
+--Indicates the IMPACT specific payloads carried by an entity
+data implementation ImpactPayloadConfiguration.i extends PayloadConfiguration.i
+    subcomponents
+        --Payloads available for this entity
+        AvailablePayloads: data ImpactPayloadType.i {Data_Model::Data_Representation => Array;};
+end ImpactPayloadConfiguration.i;
+
+data DeployImpactPayload extends CMASI::VehicleAction
+end DeployImpactPayload;
+
+--Indicator for use of an IMPACT payload
+data implementation DeployImpactPayload.i extends CMASI::VehicleAction.i
+    subcomponents
+        --IMPACT vehicle from which to deploy payload
+        VehicleID: data int64.i;
+        --Payload to deploy
+        DeployedPayload: data ImpactPayloadType.i;
+        --Entity to which the payload will be deployed. If zero, then payload
+        --is assumed deployed at the current position of the deploying vehicle.
+        TargetEntityID: data int64.i;
+end DeployImpactPayload.i;
+
+data PowerPlantState extends PayloadState
+end PowerPlantState;
+
+--Describes the current state of the power system
+data implementation PowerPlantState.i extends PayloadState.i
+    subcomponents
+        --The active power plant
+        ActivePowerPlant: data PowerPlant.i;
+end PowerPlantState.i;
+
+data BatchRoutePlanRequest
+end BatchRoutePlanRequest;
+
+--Batch Route plan request. Plans from current vehicle locations to
+--the start of each task in 'TaskList'
+data implementation BatchRoutePlanRequest.i
+    subcomponents
+        --Request ID for correlating with response
+        RequestID: data int64.i;
+        --An array of vehicles (by ID) to consider when planning
+        Vehicles: data int64.i {Data_Model::Data_Representation => Array;};
+        --List of task IDs to be planned to
+        TaskList: data int64.i {Data_Model::Data_Representation => Array;};
+        --Operating region to be considered during planning
+        OperatingRegion: data int64.i;
+        --Flag to report timing between tasks
+        ComputeTaskToTaskTiming: data bool.i;
+        --Flag to report timing between incremental progress on task and
+        --subsequent tasks
+        ComputeInterTaskToTaskTiming: data bool.i;
+        --List of task percentages along task to plan from
+        InterTaskPercentage: data real32.i {Data_Model::Data_Representation => Array;};
+end BatchRoutePlanRequest.i;
+
+data BatchRoutePlanResponse
+end BatchRoutePlanResponse;
+
+--Batch Route plan response with vehicle-to-task timing reported.
+data implementation BatchRoutePlanResponse.i
+    subcomponents
+        --Response ID matching request from ({@link BatchRoutePlanRequest})
+        ResponseID: data int64.i;
+        --Set of task-to-task timings for each requested vehicle
+        VehicleTiming: data TaskTimingPair.i {Data_Model::Data_Representation => Array;};
+end BatchRoutePlanResponse.i;
+
+data TaskTimingPair
+end TaskTimingPair;
+
+--Single task/vehicle timing information capturing the estimated time
+--for the specified vehicle to travel to or between tasks
+data implementation TaskTimingPair.i
+    subcomponents
+        --Corresponding Vehicle ID
+        VehicleID: data int64.i;
+        --Initial task ID (if zero, corresponds to current vehicle location)
+        InitialTaskID: data int64.i;
+        --Normalized progress along initial task (0.0 .. 1.0)
+        InitialTaskPercentage: data real32.i;
+        --Destination task ID
+        DestinationTaskID: data int64.i;
+        --Timing corresponding to travel between tasks. If time is less than
+        --zero, no feasible path exists between tasks. If 'DestinationTaskID' is
+        --equal to 'InitialTaskID' then 'TimeToGo' is the time to complete the
+        --task when performed by 'VehicleID'
+        TimeToGo: data int64.i;
+end TaskTimingPair.i;
+
+data BatchSummaryRequest
+end BatchSummaryRequest;
+
+--Batch summary request whereby vehicle-to-task information is
+--requested
+data implementation BatchSummaryRequest.i
+    subcomponents
+        --Request ID for correlating with response
+        RequestID: data int64.i;
+        --An array of vehicles (by ID) to consider when planning
+        Vehicles: data int64.i {Data_Model::Data_Representation => Array;};
+        --List of task IDs to be planned to
+        TaskList: data int64.i {Data_Model::Data_Representation => Array;};
+        --List of task percentages along task to plan from
+        InterTaskPercentage: data real32.i {Data_Model::Data_Representation => Array;};
+        --Operating region to be considered during planning
+        OperatingRegion: data int64.i;
+end BatchSummaryRequest.i;
+
+data BatchSummaryResponse
+end BatchSummaryResponse;
+
+--Batch summary response as a list of all vehicle-to-task information
+data implementation BatchSummaryResponse.i
+    subcomponents
+        --Response ID matching request from ({@link BatchSummaryRequest})
+        ResponseID: data int64.i;
+        --Set of vehicle-to-task and task-to-task summaries including timing,
+        --communication, and remaining energy
+        Summaries: data TaskSummary.i {Data_Model::Data_Representation => Array;};
+end BatchSummaryResponse.i;
+
+data TaskSummary
+end TaskSummary;
+
+--Summary information that describes a particular way to carry out the
+--task. In general, multiple task summaries for each task will be sent
+--corresponding to each eligible vehicle completing the task. In the
+--case where a task is completed by multiple vehicles simultaneously,
+--then each TaskSummary will include the set of vehicles that would be
+--used to complete the task.
+data implementation TaskSummary.i
+    subcomponents
+        --ID of task in consideration
+        TaskID: data int64.i;
+        --Summary of information for each vehicle used simultaneously to
+        --complete this task. If there are zero performing vehicles, then
+        --'TaskID' cannot be completed with any set of available vehicles in the
+        --system.
+        PerformingVehicles: data VehicleSummary.i {Data_Model::Data_Representation => Array;};
+        --Task cannot be completed as specified and is using best effort.
+        --Estimated percent achieved while using best effort strategy.
+        BestEffort: data real32.i;
+end TaskSummary.i;
+
+data VehicleSummary
+end VehicleSummary;
+
+--Single vehicle-to-task summary information
+data implementation VehicleSummary.i
+    subcomponents
+        --ID of vehicle considered to complete 'DestinationTaskID'
+        VehicleID: data int64.i;
+        --ID of task for which 'VehicleID' is considered to perform
+        DestinationTaskID: data int64.i;
+        --ID of task from which 'VehicleID' is considered leave from. If zero,
+        --from current position of vehicle
+        InitialTaskID: data int64.i;
+        --Percentage along initial task that vehicle should plan from
+        InitialTaskPercentage: data real32.i;
+        --Estimated time from start of task to task-percentage location
+        EstimateTimeToTaskPercentage: data int64.i;
+        --Travel time from the current vehicle location to the start of the
+        --task.
+        TimeToArrive: data int64.i;
+        --Time for this task to be completed by the specified vehicle
+        TimeOnTask: data int64.i;
+        --Energy remaining for vehicle after task has been completed,
+        --expressed in terms of the percentage of maximum capacity
+        EnergyRemaining: data real32.i;
+        --Flag for indicating that the vehicle will leave communication range
+        --either enroute or during the task
+        BeyondCommRange: data bool.i;
+end VehicleSummary.i;
+
+data ImpactHeartbeat
+end ImpactHeartbeat;
+
+--Component heartbeat expected to be sent out @ 1Hz
+data implementation ImpactHeartbeat.i
+    subcomponents
+        --Label of system component sending heartbeat
+        ComponentLabel: data string.i;
+        --Time at which this heatbeat was sent (milliseconds since 1 Jan 1970
+        --00:00 GMT)
+        HeartbeatTime: data int64.i;
+end ImpactHeartbeat.i;
+
+data ImpactComponentJoin
+end ImpactComponentJoin;
+
+--Component Join
+data implementation ImpactComponentJoin.i
+    subcomponents
+        --Label of component joining network
+        ComponentLabel: data string.i;
+end ImpactComponentJoin.i;
+
+data ImpactComponentLeave
+end ImpactComponentLeave;
+
+--Component Leave
+data implementation ImpactComponentLeave.i
+    subcomponents
+        --Label of component leaving network
+        ComponentLabel: data string.i;
+end ImpactComponentLeave.i;
+
+data SpeedAltPair
+end SpeedAltPair;
+
+--Data structure for associating a vehicle to a particular altitude
+--and speed
+data implementation SpeedAltPair.i
+    subcomponents
+        --ID of vehicle for which altitude and speed is attached
+        VehicleID: data int64.i;
+        --The speed attached to this vehicle
+        Speed: data real32.i;
+        --Altitude attached to this vehicle
+        Altitude: data real32.i;
+        --Altitude type for specified altitude
+        AltitudeType: data CMASI::AltitudeType.i;
+end SpeedAltPair.i;
+
+data ImpactAutomationRequest
+end ImpactAutomationRequest;
+
+--Automation request specific to IMPACT (includes 'sandbox' feature
+--and play/soln IDs)
+data implementation ImpactAutomationRequest.i
+    subcomponents
+        --Request ID for correlating with response
+        RequestID: data int64.i;
+        --Standard CMASI Automation request
+        TrialRequest: data AutomationRequest.i;
+        --Override nominal speed/alt. If a vehicle is not in list, its nominal
+        --speed/alt is used
+        OverridePlanningConditions: data SpeedAltPair.i {Data_Model::Data_Representation => Array;};
+        --Associated play ID
+        PlayID: data int64.i;
+        --Associated solution ID
+        SolutionID: data int64.i;
+        --Flag indicating 'sandbox', i.e. not to be implemented
+        Sandbox: data bool.i;
+end ImpactAutomationRequest.i;
+
+data ImpactAutomationResponse
+end ImpactAutomationResponse;
+
+--Automation response with specific IMPACT supporting fields
+data implementation ImpactAutomationResponse.i
+    subcomponents
+        --Response ID matching request from ({@link ImpactAutomationRequest})
+        ResponseID: data int64.i;
+        --Automation response from the request
+        TrialResponse: data AutomationResponse.i;
+        --Associated play ID
+        PlayID: data int64.i;
+        --Associated solution ID
+        SolutionID: data int64.i;
+        --Flag indicating 'sandbox', i.e. not to be implemented
+        Sandbox: data bool.i;
+        --Set of vehicle-to-task summaries that will be implemented by this
+        --automation response. Including timing, communication, and remaining
+        --energy
+        Summaries: data TaskSummary.i {Data_Model::Data_Representation => Array;};
+end ImpactAutomationResponse.i;
+
+data PointOfInterest
+end PointOfInterest;
+
+--Point of interest
+data implementation PointOfInterest.i
+    subcomponents
+        --ID for points of interest
+        PointID: data int64.i;
+        --Point of interest location
+        Location: data Location3D.i;
+end PointOfInterest.i;
+
+data LineOfInterest
+end LineOfInterest;
+
+--Line of interest
+data implementation LineOfInterest.i
+    subcomponents
+        --ID for lines of interest
+        LineID: data int64.i;
+        --List of points to search
+        Line: data Location3D.i {Data_Model::Data_Representation => Array;};
+end LineOfInterest.i;
+
+data AreaOfInterest
+end AreaOfInterest;
+
+--Area of interest
+data implementation AreaOfInterest.i
+    subcomponents
+        --ID for area of interest
+        AreaID: data int64.i;
+        --Geometry describing the area
+        Area: data AbstractGeometry.i;
+end AreaOfInterest.i;
+
+data ImpactPointSearchTask extends SearchTask
+end ImpactPointSearchTask;
+
+--Impact Point Search Task
+data implementation ImpactPointSearchTask.i extends SearchTask.i
+    subcomponents
+        --Point to search (from available points of interest). Only valid if
+        --ID is non-zero
+        SearchLocationID: data int64.i;
+        --If search location ID is zero, then use direct coordinates
+        SearchLocation: data Location3D.i;
+        --Minimum distance that an aircraft must maintain from the point of
+        --interest.
+        StandoffDistance: data real32.i;
+        --A list of acceptable look-angles for this task. Each wedge is
+        --defined relative to true North. To be a valid look angle, a sensor
+        --must be looking from a direction within the bounds of the wedge.
+        ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
+        --Loiter action to complete to fulfill task. If null, then simply
+        --points camera but main trajectory does not change. Otherwise,
+        --completes the specified loiter action.
+        DesiredAction: data LoiterAction.i;
+end ImpactPointSearchTask.i;
+
+data PatternSearchTask extends SearchTask
+end PatternSearchTask;
+
+--Search task with specified search pattern
+data implementation PatternSearchTask.i extends SearchTask.i
+    subcomponents
+        --Point at which to search is centered (from available points of
+        --interest)
+        SearchLocationID: data int64.i;
+        --If search search location ID is zero, then use direct coordinates
+        SearchLocation: data Location3D.i;
+        --Search pattern to use
+        Pattern: data AreaSearchPattern.i;
+        --Pattern extent
+        Extent: data real32.i;
+end PatternSearchTask.i;
+
+data AngledAreaSearchTask extends SearchTask
+end AngledAreaSearchTask;
+
+--Area search task with specified direction
+data implementation AngledAreaSearchTask.i extends SearchTask.i
+    subcomponents
+        --Area to search (from available areas of interest)
+        SearchAreaID: data int64.i;
+        --Sweep angle defined from true North in clockwise manner
+        SweepAngle: data real32.i;
+        --Start point for this search
+        StartPoint: data Location3D.i;
+end AngledAreaSearchTask.i;
+
+data ImpactLineSearchTask extends SearchTask
+end ImpactLineSearchTask;
+
+--Defines a line search task. A line search is a list of points that
+--forms a polyline. The ViewAngleList determines from which direction
+--the line may be viewed. View angles are specified using the {@link
+--Wedge} type. If the UseInertialViewAngles option is true, then wedges
+--are defined in terms of North-East coordinates, otherwise wedges are
+--defined relative to the line segment currently being viewed (a vector
+--from point i through point i+1). To be a valid look angle, the line
+--segment must be viewed from an angle within the bounds of the wedge.
+data implementation ImpactLineSearchTask.i extends SearchTask.i
+    subcomponents
+        --ID of line to search (from available lines of interest)
+        LineID: data int64.i;
+        --Defines a list of acceptable look-angles for this task. See the
+        --documentation above for details.
+        ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
+        --If true, the ViewAngleList specifies inertial (North-East) angles.
+        --See documentation above.
+        UseInertialViewAngles: data bool.i;
+end ImpactLineSearchTask.i;
+
+data WatchTask extends SearchTask
+end WatchTask;
+
+--Vehicle Watch task
+data implementation WatchTask.i extends SearchTask.i
+    subcomponents
+        --Entity ID to follow and watch
+        WatchedEntityID: data int64.i;
+end WatchTask.i;
+
+data MultiVehicleWatchTask extends SearchTask
+end MultiVehicleWatchTask;
+
+--Multi vehicle overwatch task
+data implementation MultiVehicleWatchTask.i extends SearchTask.i
+    subcomponents
+        --Entity ID to follow and watch
+        WatchedEntityID: data int64.i;
+        --Number of vehicles to simultaneously overwatch the target
+        NumberVehicles: data byte.i;
+end MultiVehicleWatchTask.i;
+
+data CommRelayTask extends Task
+end CommRelayTask;
+
+--Task for providing comm relay support
+data implementation CommRelayTask.i extends Task.i
+    subcomponents
+        --ID of entity which requires comm relay support
+        SupportedEntityID: data int64.i;
+        --Destination location for supported entity
+        DestinationLocation: data CMASI::Location3D.i;
+        --ID of entity to which communication will be delivered (i.e. Tower
+        --ID)
+        TowerID: data int64.i;
+end CommRelayTask.i;
+
+data CordonTask extends Task
+end CordonTask;
+
+--Task for using multiple ground vehicles to block access to an area.
+--Given a point to secure and a standoff distance, task identifies
+--number (K) routes that must be blocked to successfully deny access to
+--the area. If there are not enough eligible vehicles, then this task
+--will use the maximum number of eligible vehicles in a best effort
+--strategy which attempts to maximize radial coverage.
+data implementation CordonTask.i extends Task.i
+    subcomponents
+        --Block road access to this location
+        CordonLocation: data CMASI::Location3D.i;
+        --Distance away from 'CordonLocation' that access should be blocked
+        StandoffDistance: data real32.i;
+end CordonTask.i;
+
+data BlockadeTask extends Task
+end BlockadeTask;
+
+--Task for using multiple vehicles to surround an entity, for example,
+--multiple surface vehicles surrounding incoming enemy ship.
+data implementation BlockadeTask.i extends Task.i
+    subcomponents
+        --Entity to surround and deny access
+        BlockedEntityID: data int64.i;
+        --When in blocking formation, the distance that vehicles should stand
+        --off.
+        StandoffDistance: data real32.i;
+        --Number of vehicles to simultaneously block the target
+        NumberVehicles: data byte.i;
+        --Biases the blockade so that more vehicles are between enemy and
+        --protected location. If no location is given, then blockade attempts to
+        --block in direction of enemy travel
+        ProtectedLocation: data CMASI::Location3D.i;
+end BlockadeTask.i;
+
+data EscortTask extends SearchTask
+end EscortTask;
+
+--Task for targeting surveillance at an offset of a moving entity, for
+--example to scout ahead of a convoy.
+data implementation EscortTask.i extends SearchTask.i
+    subcomponents
+        --ID of entity which will provide the basis for the escort. Tasked
+        --vehicle will attempt to stay 'StandoffDistance' ahead of this entity
+        --on its route.
+        SupportedEntityID: data int64.i;
+        --ID of line which describes the route that the 'SupportedEntityID' is
+        --following. If the 'SupportedEntityID' is one of the controlled
+        --entities, such as a taskable ground vehicle, then 'RouteID' can be
+        --zero and this task will use current, known route for that vehicle.
+        --Otherwise, 'RouteID' must be an ID for a previously described '{@link
+        --LineOfInterest}'.
+        RouteID: data int64.i;
+        --Waypoints that the supported entity is presumed to be following if
+        --'RouteID' is zero
+        PrescribedWaypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+        --Distance ahead (positive) or behind (negative) that the vehicle will
+        --provide surveillance relative to 'SupportedEntityID's location on
+        --route 'RouteID'
+        StandoffDistance: data real32.i;
+end EscortTask.i;
+
+data ConfigurationRequest
+end ConfigurationRequest;
+
+--Requests the latest configurations for vehicles in the system
+data implementation ConfigurationRequest.i
+    subcomponents
+        --Vehicle IDs for which the corresponding configuration should be
+        --sent. If the list is empty, all available configurations should be
+        --sent in response.
+        VehicleID: data int64.i {Data_Model::Data_Representation => Array;};
+end ConfigurationRequest.i;
+
+data GroundVehicleConfiguration extends CMASI::EntityConfiguration
+end GroundVehicleConfiguration;
+
+--Provides information regarding a vehicle's configuration items.
+data implementation GroundVehicleConfiguration.i extends CMASI::EntityConfiguration.i
+    subcomponents
+        --Valid operational road network. UGV adheres to positions defined in
+        --this graph. Indicated by previously sent GraphRegion's ID
+        RoadGraphID: data int64.i;
+        --The minimum speed that should be commanded for this vehicle
+        MinimumSpeed: data real32.i;
+        --The maximum speed that should be commanded for this vehicle
+        MaximumSpeed: data real32.i;
+        --The consumption rate of available energy at nominal speed, expressed
+        --in terms of the percentage of maximum capacity used per second.
+        EnergyRate: data real32.i;
+end GroundVehicleConfiguration.i;
+
+data GroundVehicleState extends CMASI::EntityState
+end GroundVehicleState;
+
+--Provides basic state information regarding entity position,
+--orientation, and velocity.
+data implementation GroundVehicleState.i extends CMASI::EntityState.i
+end GroundVehicleState.i;
+
+data WaterReport
+end WaterReport;
+
+--Reports on navigability of the water in the "Area". Based on the
+--WeatherReport CMASI message, designed to allow changes during
+--execution.
+data implementation WaterReport.i
+    subcomponents
+        --Area for which this report is valid
+        Area: data AbstractGeometry.i;
+        --Speed of the current, e.g. due to tides or river flow
+        CurrentSpeed: data real32.i;
+        --Direction of the current
+        CurrentDirection: data real32.i;
+        --Wave direction of travel. Generally in the direction of the wind,
+        --except near sea coasts
+        WaveDirection: data real32.i;
+        --Average wave height
+        WaveHeight: data real32.i;
+end WaterReport.i;
+
+data WaterZone extends CMASI::AbstractZone
+end WaterZone;
+
+--Region that defines water areas navigable for surface vehicles.
+--Ground vehicles should not enter this zone.
+data implementation WaterZone.i extends CMASI::AbstractZone.i
+    
+end WaterZone.i;
+
+data SurfaceVehicleConfiguration extends CMASI::EntityConfiguration
+end SurfaceVehicleConfiguration;
+
+--Provides information regarding a vehicle's configuration items.
+data implementation SurfaceVehicleConfiguration.i extends CMASI::EntityConfiguration.i
+    subcomponents
+        --Valid operational water zone (by ID). USV adheres to this area
+        WaterArea: data int64.i;
+        --The minimum speed that should be commanded for this vehicle
+        MinimumSpeed: data real32.i;
+        --The maximum speed that should be commanded for this vehicle
+        MaximumSpeed: data real32.i;
+        --The consumption rate of available energy at nominal speed, expressed
+        --in terms of the percentage of maximum capacity used per second.
+        EnergyRate: data real32.i;
+        --The maximum angle that this vehicle will bank
+        MaxBankAngle: data real32.i;
+        --The maximum angular rate that this vehicle will bank
+        MaxBankRate: data real32.i;
+end SurfaceVehicleConfiguration.i;
+
+data SurfaceVehicleState extends CMASI::EntityState
+end SurfaceVehicleState;
+
+--Provides basic state information regarding entity position,
+--orientation, and velocity.
+data implementation SurfaceVehicleState.i extends CMASI::EntityState.i
+    subcomponents
+        --Current bank angle of the surface vehicle
+        BankAngle: data real32.i;
+        --Forward speed of the vehicle relative to the mass of water
+        Speed: data real32.i;
+end SurfaceVehicleState.i;
+
+data AreaSearchPattern extends Base_Types::Integer
+    properties
+        Data_Model::Enumerators => (
+            --Sweep
+            "Spiral",
+            --Sweep
+            "Sector",
+            --Sweep
+            "Sweep");
+end AreaSearchPattern;
+
+data implementation AreaSearchPattern.i
+end AreaSearchPattern.i;
+
+data PowerPlant extends Base_Types::Integer
+    properties
+        Data_Model::Enumerators => (
+            --Hybrid electric/gasoline
+            "Gasoline",
+            --Hybrid electric/gasoline
+            "JP5",
+            --Hybrid electric/gasoline
+            "JP8",
+            --Hybrid electric/gasoline
+            "FuelCell",
+            --Hybrid electric/gasoline
+            "Hybrid");
+end PowerPlant;
+
+data implementation PowerPlant.i
+end PowerPlant.i;
+
+data ImpactPayloadType extends Base_Types::Integer
+    properties
+        Data_Model::Enumerators => (
+            --Laser Designator
+            "Unknown",
+            --Laser Designator
+            "EO",
+            --Laser Designator
+            "FLIR",
+            --Laser Designator
+            "MWIR",
+            --Laser Designator
+            "LFIR",
+            --Laser Designator
+            "Track",
+            --Laser Designator
+            "Tag",
+            --Laser Designator
+            "Megaphone",
+            --Laser Designator
+            "Siren",
+            --Laser Designator
+            "SearchLight",
+            --Laser Designator
+            "FiftyCal",
+            --Laser Designator
+            "M240B",
+            --Laser Designator
+            "Flashbang",
+            --Laser Designator
+            "TearGas",
+            --Laser Designator
+            "Taser",
+            --Laser Designator
+            "HeatBeam",
+            --Laser Designator
+            "SEGM",
+            --Laser Designator
+            "CommRelay",
+            --Laser Designator
+            "GMTI",
+            --Laser Designator
+            "LaserDesignator");
+end ImpactPayloadType;
+
+data implementation ImpactPayloadType.i
+end ImpactPayloadType.i;
+
+end IMPACT;
