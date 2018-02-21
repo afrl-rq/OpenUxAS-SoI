@@ -16,14 +16,14 @@ done
 
 set -e
 
-if [ ! -f docker/Dockerfile ]; then
-    echo '[build_sdcard_and_uxas.sh] `docker/Dockerfile` not found; are you running this script from the root of OpenUxAS?'
+if [ ! -f docker/odroidxu4/Dockerfile ]; then
+    echo '[build_sdcard_and_uxas.sh] `docker/odroidxu4/Dockerfile` not found; are you running this script from the root of OpenUxAS?'
     exit 1
 fi
 
 echo '[build_sdcard_and_uxas.sh] Building Docker image; this will take a while the first time'
 
-docker build $DOCKER_NO_CACHE -t uxas_cross docker/
+docker build $DOCKER_NO_CACHE -t uxas_cross docker/odroidxu4
 
 echo '[build_sdcard_and_uxas.sh] Docker image built; extracting SD card image to `/OpenUxAS/sdcard.img`'
 
@@ -34,6 +34,6 @@ echo '[build_sdcard_and_uxas.sh] Cross-compiling UxAS to `/OpenUxAS/build_cross/
 docker run --rm -v $(pwd):/src/OpenUxAS uxas_cross sh -c "rm -rf build_cross && \
 python3 rm-external && \
 python3 prepare && \
-meson.py build_cross --cross-file docker/odroid-xu4-gnueabihf.txt && \
+meson.py build_cross --cross-file docker/odroidxu4/odroid-xu4-gnueabihf.txt && \
 ninja -C build_cross uxas \
 "

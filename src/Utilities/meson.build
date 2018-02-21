@@ -21,43 +21,25 @@ srcs_utilities = [
 incs_utilities = [
   include_directories(
     '../../src/Includes',
-    '../../3rd/cppzmq-4.2.2',
-    '../../3rd/PugiXML/src',
-    '../../3rd/sqlite-amalgamation-3120200',
-    '../../3rd/SQLiteCpp-1.3.1/include',
-    '../../3rd/zeromq-4.2.3/include',
   ),
-]
-
-deps_utilities = [
-    dep_boost,
 ]
 
 if get_option('afrl_internal')
   incs_utilities += incs_utilities_internal
-  deps_utilities += deps_utilities_internal
 else
   srcs_utilities_internal = files()
 endif
 
-cpp_args = []
+cpp_args_utilities = cpp_args
 
-cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
-  cpp_args += [
-    '/std:c++14',
-	'-DZMQ_STATIC',
-	'-DCZMQ_STATIC',
-	'-DZYRE_STATIC',
-	'-DLIBZMQ_STATIC',
-	'-DLIBCZMQ_STATIC',
-	'-DLIBZYRE_STATIC',
-  ]
-else
-  cpp_args += [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
+  cpp_args_utilities += [
+    '-DZMQ_STATIC',
+    '-DCZMQ_STATIC',
+    '-DZYRE_STATIC',
+    '-DLIBZMQ_STATIC',
+    '-DLIBCZMQ_STATIC',
+    '-DLIBZYRE_STATIC',
   ]
 endif
 
@@ -65,7 +47,14 @@ lib_utilities = static_library(
   'utilities',
   srcs_utilities,
   srcs_utilities_internal,
-  dependencies: deps_utilities,
-  cpp_args: cpp_args,
+  dependencies: [
+    dep_boost,
+    dep_cppzmq,
+    dep_pugixml,
+    dep_sqlite3,
+    dep_sqlitecpp,
+    dep_zeromq,
+  ],
+  cpp_args: cpp_args_utilities,
   include_directories: incs_utilities,
 )

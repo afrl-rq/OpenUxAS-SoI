@@ -1,7 +1,6 @@
 exe_SampleTest_Test01 = executable(
   'SampleTest_Test01',
   'SampleTest_Test01.cpp',
-  srcs_test,
   dependencies: deps_test,
   cpp_args: cpp_args_test,
   include_directories: inc_test,

@@ -7,6 +7,7 @@ srcs_services = [
   'AutomationRequestValidatorService.cpp',
   'BatchSummaryService.cpp',
   'HelloRust.cpp',
+  'LoiterLeash.cpp',
   'MessageLoggerDataService.cpp',
   'OperatingRegionStateService.cpp',
   'OsmPlannerService.cpp',
@@ -19,9 +20,10 @@ srcs_services = [
   'SerialAutomationRequestTestService.cpp',
   'ServiceBase.cpp',
   'ServiceManager.cpp',
+  'SimpleWaypointPlanManagerService.cpp',
+  'StatusReportService.cpp',
   'Test_SimulationTime.cpp',
   'WaypointPlanManagerService.cpp',
-  'SimpleWaypointPlanManagerService.cpp',
 ]
 
 incs_services = [
@@ -35,17 +37,6 @@ incs_services = [
     '../../src/Plans',
     '../../src/DPSS',
     '../../src/Tasks',
-    '../../3rd/cppzmq-4.2.2',
-    '../../3rd/zeromq-4.2.3/include',
-    '../../3rd/czmq-4.0.2/include',
-    '../../3rd/zyre-2.0.0/include',
-    '../../3rd/PugiXML/src',
-    '../../3rd/SQLiteCpp-1.3.1/include',
-    '../../3rd/sqlite-amalgamation-3120200',
-    '../../3rd/serial-1.2.1/include',
-    '../../3rd/TinyGPS',
-    '../../3rd/zlib-1.2.8/contrib/minizip',
-    '../../3rd/zlib-1.2.8',
   ),
   incs_lmcp,
 ]
@@ -58,34 +49,35 @@ lib_services_link_with = [
 
 deps_services = [
   dep_boost,
+  dep_cppzmq,
+  dep_pugixml,
+  dep_sqlite3,
+  dep_sqlitecpp,
+  dep_zeromq,
 ]
 
+if os.startswith('linux') or os == 'darwin'
+  deps_services += [cpp.find_library('dl')]
+endif
+
 if get_option('afrl_internal')
+  deps_services += [deps_services_internal]
   incs_services += [incs_services_internal]
   lib_services_link_with += [lib_services_rs_internal]
-  deps_services += deps_services_internal
 else
   srcs_services_internal = files()
 endif
 
-cpp_args = []
-cpp = meson.get_compiler('cpp')
+cpp_args_services = cpp_args
 
 if cpp.get_id() == 'msvc'
-  cpp_args += [
-    '/std:c++14',
+  cpp_args_services += [
     '-DZMQ_STATIC',
     '-DCZMQ_STATIC',
     '-DZYRE_STATIC',
     '-DLIBZMQ_STATIC',
     '-DLIBCZMQ_STATIC',
     '-DLIBZYRE_STATIC',
-  ]
-else
-  cpp_args += [
-    '-std=c++11',
-    '-Wno-unused-function',
-    '-Wno-unused-variable',
   ]
 endif
 
@@ -95,6 +87,6 @@ lib_services = static_library(
   srcs_services_internal,
   dependencies: deps_services,
   link_with: lib_services_link_with,
-  cpp_args: cpp_args,
+  cpp_args: cpp_args_services,
   include_directories: incs_services,
 )

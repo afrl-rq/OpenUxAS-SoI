@@ -234,18 +234,21 @@ LmcpObjectNetworkSerialBridge::executeSerialReceiveProcessing()
             }
             catch (std::exception& ex2)
             {
-                std::string errorMessage;
-                std::unique_ptr<avtas::lmcp::Object> lmcpServiceStatus = uxas::communications::data::SerialHelper
-                        ::createLmcpMessageObjectSerialConnectionFailure(s_typeName(), uxas::communications::data::SerialConnectionAction::READ, 
-                                                                         m_serialPortAddress, m_serialBaudRate, ex2, errorMessage);
-                sendLmcpObjectBroadcastMessage(std::move(lmcpServiceStatus));
-                UXAS_LOG_ERROR(errorMessage, " EXCEPTION: ", ex2.what());
+                std::cerr << "Serial exception: " << ex2.what() << std::endl;
+                //std::string errorMessage;
+                //std::unique_ptr<avtas::lmcp::Object> lmcpServiceStatus = uxas::communications::data::SerialHelper
+                //        ::createLmcpMessageObjectSerialConnectionFailure(s_typeName(), uxas::communications::data::SerialConnectionAction::READ, 
+                //                                                         m_serialPortAddress, m_serialBaudRate, ex2, errorMessage);
+                //sendLmcpObjectBroadcastMessage(std::move(lmcpServiceStatus));
+                //UXAS_LOG_ERROR(errorMessage, " EXCEPTION: ", ex2.what());
             }
         }
+        std::cerr << "executeSerialReceiveProcessing exiting infinite loop thread" << std::endl;
         UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
     catch (std::exception& ex)
     {
+        std::cerr << "executeSerialReceiveProcessing catching unknown exception: " << ex.what() << std::endl;
         UXAS_LOG_ERROR(s_typeName(), "::executeSerialReceiveProcessing EXCEPTION: ", ex.what());
     }
 };

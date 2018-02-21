@@ -114,6 +114,8 @@
 #include "RoutePlannerVisibilityService.h"
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE HEADERS
+#include "StatusReportService.h"
+#include "LoiterLeash.h"
 
 
 #endif  //UXAS_SERVICE_LIST_CODE_HEADERS
@@ -188,6 +190,8 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::RoutePlannerVisibilityService>();}
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW SERVICE DUMMY INSTANCES
+{auto svc = uxas::stduxas::make_unique<uxas::service::StatusReportService>();}
+{auto svc = uxas::stduxas::make_unique<uxas::service::LoiterLeash>();}
 
 
 #endif  //REGISTER_SERVICE_CODE

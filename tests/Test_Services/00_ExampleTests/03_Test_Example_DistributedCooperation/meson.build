@@ -1,7 +1,6 @@
 exe_DistributedCooperation_test01 = executable(
   'DistributedCooperation_test01',
   'DistributedCooperation_test01.cpp',
-  srcs_test,
   dependencies: deps_test,
   cpp_args: cpp_args_test,
   include_directories: inc_test,

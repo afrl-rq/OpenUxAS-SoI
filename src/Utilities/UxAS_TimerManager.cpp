@@ -88,6 +88,28 @@ TimerManager::startPeriodicTimer(uint64_t timerId, uint64_t startDelayFromNow_ms
 };
 
 bool
+TimerManager::isTimerActive(uint64_t timerId)
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    
+    // ensure that timer has been initialized
+    if (m_timersById.find(timerId) == m_timersById.end())
+    {
+        // Timer was destroyed or never initialized
+        UXAS_LOG_WARN(s_typeName(), "::isTimerActive attempted to reference destroyed or uninitialized timer ID ", timerId);
+        return (false);
+    }
+    
+    // timer exists, check to see if it is in the timing queue
+    auto queuedTimer = m_queue.find(std::ref(m_timersById.find(timerId)->second));
+    if (queuedTimer != m_queue.end())
+        return (true);
+    
+    // not in queue, report in-active
+    return (false);
+};
+
+bool
 TimerManager::disableTimer(uint64_t timerId, uint64_t timeOut_ms)
 {
     std::unique_lock<std::mutex> lock(m_mutex);

@@ -1,5 +1,10 @@
 project('czmq', 'c')
 
+dep_zeromq = dependency(
+  'libzmq',
+  fallback: ['zeromq', 'dep'],
+)
+
 cc = meson.get_compiler('c')
 
 cdata = configuration_data()
@@ -55,7 +60,9 @@ endforeach
 
 c = meson.get_compiler('c')
 c_args = []
-deps = []
+deps = [
+  dep_zeromq,
+]
 
 os = target_machine.system()
 if os == 'linux'
@@ -64,20 +71,20 @@ elif os == 'darwin'
   c_args += ['-std=c11', '-D_DARWIN_C_SOURCE', '-DCZMQ_HAVE_OSX=1']
 elif os == 'windows'
   c_args += [
-	'-D_CRT_SECURE_NO_WARNINGS',
-	'-DBASE_THREADSAFE',
+    '-D_CRT_SECURE_NO_WARNINGS',
+    '-DBASE_THREADSAFE',
     '-DCZMQ_STATIC',
-	'-DZMQ_USE_SELECT',
-	'-DZMQ_STATIC',
-	'-DLIBZMQ_STATIC',
-	'-DZMQ_HAVE_WINDOWS=1',
+    '-DZMQ_USE_SELECT',
+    '-DZMQ_STATIC',
+    '-DLIBZMQ_STATIC',
+    '-DZMQ_HAVE_WINDOWS=1',
   ]
   cdata.set('CZMQ_HAVE_WINDOWS', 1)
   cdata.set('HAVE_LIBUUID', 1)
   deps += [
     c.find_library('Rpcrt4'),
     c.find_library('Iphlpapi'),
-	c.find_library('WS2_32'),
+    c.find_library('WS2_32'),
   ]
 endif
 
@@ -126,6 +133,12 @@ lib = static_library(
   include_directories: include_directories(
     'include',
     'src',
-    '../zeromq-4.2.3/include'
+  ),
+)
+
+dep = declare_dependency(
+  link_with: lib,
+  include_directories: include_directories(
+    'include',
   ),
 )

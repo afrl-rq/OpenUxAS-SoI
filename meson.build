@@ -1,14 +1,26 @@
 project('UxAS', 'c', 'cpp', 'rust', subproject_dir: '3rd')
 
+cpp = meson.get_compiler('cpp')
 conf = configuration_data()
+os = target_machine.system()
+
+if cpp.get_id() == 'msvc'
+  cpp_args = [
+    '/std:c++14',
+  ]
+else
+  cpp_args = [
+    '-std=c++11',
+    '-Wno-unused-function',
+    '-Wno-unused-variable',
+  ]
+endif
 
 link_args = []
 
-os = target_machine.system()
-
 if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
-  link_args += ['-lrt', '-ldl']
+  link_args += ['-lrt', '-dl']
 elif os == 'darwin'
   link_args += ['-lresolv', '-ldl']
 elif os == 'windows'
@@ -24,64 +36,95 @@ lib_byteorder = sub_byteorder.get_variable('lib')
 sub_crc16 = subproject('rust-crc16')
 lib_crc16 = sub_crc16.get_variable('lib')
 
-if get_option('afrl_internal')
-  subdir('UxAS-afrl_internal')
+# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
+dep_zeromq = dependency(
+  'libzmq',
+  fallback: ['zeromq', 'dep'],
+)
+
+dep_czmq = dependency(
+  'libczmq',
+  fallback: ['czmq', 'dep'],
+)
+
+if cpp.has_header('zmq.hpp')
+  # cppzmq is a header-only dependency, so if we already have the
+  # header in place, we don't need to actually change anything
+  dep_cppzmq = [] #declare_dependency()
+else
+  dep_cppzmq = subproject('cppzmq').get_variable('dep')
 endif
 
-# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
-sub_zeromq              = subproject('zeromq')
-lib_zeromq              = sub_zeromq.get_variable('lib')
-
-sub_czmq                = subproject('czmq')
-lib_czmq                = sub_czmq.get_variable('lib')
-
-sub_cppzmq              = subproject('cppzmq')
-lib_cppzmq              = sub_cppzmq.get_variable('lib')
-
-sub_zyre                = subproject('zyre')
-lib_zyre                = sub_zyre.get_variable('lib')
-
-# Windows-only:
-# https://github.com/jedisct1/libsodium
+dep_zyre = dependency(
+  'libzyre',
+  fallback: ['zyre', 'dep'],
+)
 
 # https://www.sqlite.org/src
-sub_sqlite3             = subproject('sqlite3')
-lib_sqlite3             = sub_sqlite3.get_variable('lib')
+dep_sqlite3 = dependency(
+  'sqlite3',
+  fallback: ['sqlite3', 'dep'],
+)
 
-# https://github.com/SRombauts/SQLiteCpp
-sub_sqlitecpp           = subproject('sqlitecpp')
-lib_sqlitecpp           = sub_sqlitecpp.get_variable('lib')
+# SQLiteCpp is unfortunately not packaged with pkg-config
+lib_sqlitecpp = cpp.find_library('SQLiteCpp', required: false)
+if lib_sqlitecpp.found() and cpp.has_header('SQLiteCpp/SQLiteCpp.h')
+  dep_sqlitecpp = lib_sqlitecpp
+else
+  # https://github.com/SRombauts/SQLiteCpp
+  dep_sqlitecpp = subproject('sqlitecpp').get_variable('dep')
+endif
 
 # https://github.com/madler/zlib
-sub_zlib                = subproject('zlib')
-lib_zlib                = sub_zlib.get_variable('lib')
+dep_zlib = dependency(
+  'zlib',
+  fallback: ['zlib', 'dep'],
+)
 
 # https://github.com/nmoinvaz/minizip
-sub_minizip             = subproject('minizip')
-lib_minizip             = sub_minizip.get_variable('lib')
+dep_minizip = dependency(
+  'minizip',
+  fallback: ['minizip', 'dep'],
+)
 
 dep_boost = dependency(
   'boost',
-  modules: ['filesystem', 'regex', 'system'],
-  static: true,
-  fallback: ['boost', 'dep_boost'],
+  modules: ['date_time', 'filesystem', 'regex', 'system'],
+  fallback: ['boost', 'dep'],
 )
 
 # https://github.com/mikalhart/TinyGPS
 # The TinyGPS repo captured by UxAS does not seem to be available.
 # The repo contains *only* version 13, while UxAS uses what appears
 # to be version 12. Perhaps contact the author...?
-sub_tinygps             = subproject('TinyGPS')
-lib_tinygps             = sub_tinygps.get_variable('lib')
+dep_tinygps = subproject('TinyGPS').get_variable('dep')
 
 # https://github.com/wjwwood/serial
-sub_serial              = subproject('serial')
-lib_serial              = sub_serial.get_variable('lib')
+dep_serial = subproject('serial-1.2.1').get_variable('dep')
 
 # https://github.com/zeux/pugixml
 # No versions of this pugixml repo are compatible.
-sub_pugixml             = subproject('PugiXML')
-lib_pugixml             = sub_pugixml.get_variable('lib')
+dep_pugixml = subproject('PugiXML').get_variable('dep')
+
+if get_option('afrl_internal')
+  subdir('UxAS-afrl_internal')
+endif
+
+deps = [
+  dependency('threads'),
+  dep_boost,
+  dep_zeromq,
+  dep_czmq,
+  dep_cppzmq,
+  dep_zyre,
+  dep_sqlite3,
+  dep_sqlitecpp,
+  dep_zlib,
+  dep_minizip,
+  dep_tinygps,
+  dep_serial,
+  dep_pugixml,
+]
 
 subdir('src/DPSS')
 
@@ -102,27 +145,14 @@ subdir('src/Utilities')
 
 subdir('src/Plans')
 
-dep_thread              = dependency('threads')
-
 libs = [
   lib_services,
   lib_tasks,
   lib_lmcp,
   lib_uxas_communications,
-  lib_zeromq,
-  lib_zyre,
-  lib_czmq,
-  lib_cppzmq,
   lib_utilities,
-  lib_sqlitecpp,
-  lib_sqlite3,
-  lib_pugixml,
   lib_visilibity,
-  lib_serial,
   lib_plans,
-  lib_tinygps,
-  lib_minizip,
-  lib_zlib,
   lib_dpss,
 ]
 
@@ -133,40 +163,29 @@ endif
 # creates src/Includes/config.h
 subdir('src/Includes')
 
-deps = []
-
+glu_deps = []
 # OpenGL, specifically the GLU library
-deps += [dependency('gl')]
 if os == 'darwin'
   # newer MacOS splits out GLU into a separate framework, but we can't
   # ask Meson for the version in order to handle things differently
-  deps += [dependency('glu', required: false)]
-  glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
-  foreach fn : glu_functions
-    if not cpp.has_function(fn, dependencies: deps)
-      error('GLU library functions not found')
-    endif
-  endforeach
+  glu_deps += [dependency('gl')]
+  glu_deps += [dependency('glu', required: false)]
 elif os.startswith('linux')
-  deps += [dependency('glu')]
+  glu_deps += [dependency('glu')]
 elif os == 'windows'
-  deps += [cpp.find_library('glu32')]
+  glu_deps += [cpp.find_library('glu32')]
 endif
 
-deps += [
-  dep_thread,
-  dep_boost,
-]
+glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
+foreach fn : glu_functions
+  if not cpp.has_function(fn, dependencies: glu_deps)
+    error('GLU library functions not found')
+  endif
+endforeach
+deps += glu_deps
 
 if get_option('afrl_internal')
   deps += deps_internal
-endif
-
-cpp_args = []
-if cpp.get_id() == 'msvc'
-  cpp_args += ['/std:c++14']
-else
-  cpp_args += ['-std=c++11']
 endif
 
 executable(
@@ -181,11 +200,6 @@ executable(
       'src/Communications',
       'src/Includes',
       'src/Services',
-      '3rd/cppzmq-4.2.2',
-      '3rd/zeromq-4.2.3/include',
-      '3rd/PugiXML/src',
-      '3rd/sqlite-amalgamation-3120200',
-      '3rd/SQLiteCpp-1.3.1/include',
     ),
     incs_lmcp,
   ],
@@ -198,4 +212,3 @@ subdir('tests')
 if get_option('afrl_internal')
   subdir('UxAS-afrl_internal/tests')
 endif
-

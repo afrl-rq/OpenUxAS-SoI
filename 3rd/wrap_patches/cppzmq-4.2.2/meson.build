@@ -1,6 +1,5 @@
 project('cppzmq', 'cpp')
 
-lib = static_library('cppzmq', [
-	'dummy.cpp'
-	]
+dep = declare_dependency(
+  include_directories: include_directories('.'),
 )
