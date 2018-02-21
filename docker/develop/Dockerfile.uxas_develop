@@ -31,6 +31,11 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 RUN apt-get install -y --no-install-recommends \
     automake
 
+RUN curl https://sh.rustup.rs -sSf -o /opt/rustup.sh
+RUN sh /opt/rustup.sh -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup target install armv7-unknown-linux-gnueabihf
+
 RUN pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.44.0/meson-0.44.0.tar.gz
 
 WORKDIR /UxAS/Installation/InstallLibraries/
