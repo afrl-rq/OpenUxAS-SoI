@@ -65,7 +65,7 @@
       <WindSpeed>0.0</WindSpeed>
       <WindDirection>0.0</WindDirection>
       <ID>4208</ID>
-      <u>0.0</u>
+      <u>20.0</u>
       <v>0.0</v>
       <w>0.0</w>
       <udot>0.0</udot>
@@ -153,7 +153,7 @@
       <WindSpeed>0.0</WindSpeed>
       <WindDirection>0.0</WindDirection>
       <ID>1000</ID>
-      <u>0.0</u>
+      <u>20.0</u>
       <v>0.0</v>
       <w>0.0</w>
       <udot>0.0</udot>
@@ -241,7 +241,7 @@
       <WindSpeed>0.0</WindSpeed>
       <WindDirection>0.0</WindDirection>
       <ID>2000</ID>
-      <u>0.0</u>
+      <u>20.0</u>
       <v>0.0</v>
       <w>0.0</w>
       <udot>0.0</udot>
