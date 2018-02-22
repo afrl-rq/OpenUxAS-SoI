@@ -54,8 +54,14 @@ dep_zyre = dependency(
 # https://www.sqlite.org/src
 dep_sqlite3 = dependency(
   'sqlite3',
-  fallback: ['sqlite3', 'dep'],
+  required: false,
 )
+
+# force native build of SQLite3 if load extension function is unavailable
+# required for SQLiteCpp
+if not dep_sqlite3.found() or not cpp.has_function('sqlite3_enable_load_extension', dependencies: dep_sqlite3)
+  dep_sqlite3 = subproject('sqlite3').get_variable('dep')
+endif
 
 # SQLiteCpp is unfortunately not packaged with pkg-config
 lib_sqlitecpp = cpp.find_library('SQLiteCpp', required: false)
