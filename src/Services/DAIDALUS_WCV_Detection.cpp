@@ -11,7 +11,7 @@
  * File:   DAIDALUS_WCV_Detection.cpp
  * Author: SeanR
  *
- * Created on March 17, 2017, 5:55 PM
+ *
  *
  * <Service Type="DAIDALUS_WCV_Detection" OptionString="Option_01" OptionInt="36" />
  * 
@@ -22,15 +22,17 @@
 #include "Daidalus.h"
 
 //include for KeyValuePair LMCP Message
-#include "afrl/cmasi/KeyValuePair.h"
+#include "afrl/cmasi/KeyValuePair.h" //this is an exemplar
+#include "afrl/cmasi/AirVehicleState.h"
 
 #include <iostream>     // std::cout, cerr, etc
+#include <cmath>    //cmath::cos, sin, etc
 
 // convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
 #define STRING_XML_OPTION_INT "OptionInt"
 
-using namespace larcfm;
+//using namespace larcfm;
 
 // namespace definitions
 namespace uxas  // uxas::
@@ -65,7 +67,10 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     }
 
     // subscribe to messages::
-    addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
+    //addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
+    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
+    std::cout << "Successfully subscribed to AirVehicleState from DAIDALUS_WCV_Detection." << std::endl;
+
 
     return (isSuccess);
 }
@@ -96,11 +101,19 @@ bool DAIDALUS_WCV_Detection::terminate()
 
 bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
-    if (afrl::cmasi::isKeyValuePair(receivedLmcpMessage->m_object))
+    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
         //receive message
-        auto keyValuePairIn = std::static_pointer_cast<afrl::cmasi::KeyValuePair> (receivedLmcpMessage->m_object);
-        std::cout << "*** RECEIVED:: Service[" << s_typeName() << "] Received a KeyValuePair with the Key[" << keyValuePairIn->getKey() << "] and Value[" << keyValuePairIn->getValue() << "] *** " << std::endl;
+        auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
+        //std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState" << std::endl ;
+        //handle message
+        auto Total_velocity = airVehicleState->getAirspeed();
+        auto Total_velocity_calculated =std::sqrt(std::pow(airVehicleState->getU(),2)+std::pow(airVehicleState->getV(),2)+std::pow(airVehicleState->getW(),2));
+        if (std::abs(Total_velocity-Total_velocity_calculated)>0.000001)
+        {std::cout << "Danger!! Danger !!  Calculated velocity is not equivalent to broadcast velocity" << std::endl;
+        std::cout << "Broadcast velocity = " << Total_velocity << " Calculated velocity = " << Total_velocity_calculated << std::endl;}
+        else 
+        {std::cout << "Total_velocity = " << Total_velocity_calculated << std::endl;}
         
         // send out response
         auto keyValuePairOut = std::make_shared<afrl::cmasi::KeyValuePair>();

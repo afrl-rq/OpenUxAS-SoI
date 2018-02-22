@@ -1,0 +1,30 @@
+    <AirVehicleConfiguration Series="CMASI">
+      <MinimumSpeed>20.0</MinimumSpeed>
+      <MaximumSpeed>20.0</MaximumSpeed>
+      <NominalFlightProfile>
+        <FlightProfile Series="CMASI">
+          <Name/>
+          <Airspeed>20.0</Airspeed>
+          <PitchAngle>0.0</PitchAngle>
+          <VerticalSpeed>0.0</VerticalSpeed>
+          <MaxBankAngle>20.0</MaxBankAngle>
+          <EnergyRate>0.3</EnergyRate>
+        </FlightProfile>
+      </NominalFlightProfile>
+      <AlternateFlightProfiles/>
+      <AvailableLoiterTypes/>
+      <AvailableTurnTypes/>
+      <MinimumAltitude>0.0</MinimumAltitude>
+      <MinAltitudeType>AGL</MinAltitudeType>
+      <MaximumAltitude>1000000.0</MaximumAltitude>
+      <MaxAltitudeType>MSL</MaxAltitudeType>
+      <ID>2000</ID>
+      <Affiliation>Unknown</Affiliation>
+      <EntityType/>
+      <Label>UAV_2</Label>
+      <NominalSpeed>20.0</NominalSpeed>
+      <NominalAltitude>500.0</NominalAltitude>
+      <NominalAltitudeType>AGL</NominalAltitudeType>
+      <PayloadConfigurationList/>
+      <Info/>
+    </AirVehicleConfiguration>

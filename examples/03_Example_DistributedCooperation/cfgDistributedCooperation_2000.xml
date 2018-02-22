@@ -6,7 +6,7 @@
     <!-- on Windows, type 'ipconfig' to find interface name (name is after adapter type)	
 	     Windows example name: Wireless Network Connection
 	-->
-    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="en0">
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="enp0s3">
         <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
         <SubscribeToExternalMessage MessageType="uxas.messages.task.AssignmentCoordination"/>
     </Bridge>
@@ -32,6 +32,7 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
+    <Service Type="DAIDALUS_WCV_Detection"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"

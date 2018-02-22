@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS EntityID="4208" FormatVersion="1.0" EntityType="Aircraft">
+	
+    <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
+    <!-- on Linux and Mac, type 'ifconfig' to find interface name -->
+    <!-- on Windows, type 'ipconfig' to find interface name (name is after adapter type)	
+	     Windows example name: Wireless Network Connection
+	-->
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="enp0s3">
+        <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
+        <SubscribeToExternalMessage MessageType="uxas.messages.task.AssignmentCoordination"/>
+    </Bridge>
+
+    <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:4208" Server="FALSE" ConsiderSelfGenerated="TRUE">
+        <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
+        <SubscribeToMessage MessageType="afrl.cmasi.PointSearchTask"/>
+    </Bridge>
+
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="SensorManagerService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="PlanBuilderService"/>
+    <Service Type="DAIDALUS_WCV_Detection"/>
+
+        <Service Type="WaypointPlanManagerService" VehicleID="4208" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1" />
+ 
+  <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+            
+        <Message MessageFileName="AirVehicleConfiguration_1000.xml" SendTime_ms="50"/>
+        <Message MessageFileName="AirVehicleConfiguration_2000.xml" SendTime_ms="60"/>
+        <Message MessageFileName="AirVehicleConfiguration_4208.xml" SendTime_ms="70"/>
+
+        <!-- boundaries -->
+        <Message MessageFileName="KeepInZone_10.xml" SendTime_ms="200"/>
+        <Message MessageFileName="OperatingRegion_11.xml" SendTime_ms="210"/>
+
+         <!-- the tasks -->
+        <Message MessageFileName="PointSearchTask_1.xml" SendTime_ms="300"/>
+        <Message MessageFileName="AutomationRequest.xml" SendTime_ms="2000"/>        
+        <Message MessageFileName="AirVehicleState_1000.xml" SendTime_ms="2010"/>
+        <Message MessageFileName="AirVehicleState_2000.xml" SendTime_ms="2020"/>
+        <Message MessageFileName="AirVehicleState_4208.xml" SendTime_ms="2030"/>
+</Service>
+    
+    <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000" LogFileName="testfile">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>
+
+
+
