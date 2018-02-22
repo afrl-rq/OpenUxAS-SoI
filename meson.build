@@ -172,9 +172,11 @@ elif os == 'windows'
   glu_deps += [cpp.find_library('glu32')]
 endif
 
+# ensure that required glu functions are available
+# note: 'has_function' check cannot reach into windows c libraries
 glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
 foreach fn : glu_functions
-  if not cpp.has_function(fn, dependencies: glu_deps)
+  if os != 'windows' and not cpp.has_function(fn, dependencies: glu_deps)
     error('GLU library functions not found')
   endif
 endforeach
