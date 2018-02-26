@@ -27,63 +27,75 @@ elif os == 'windows'
   link_args += []
 endif
 
-# https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
-dep_zeromq = dependency(
-  'libzmq',
-  fallback: ['zeromq', 'dep'],
-)
-
-dep_czmq = dependency(
-  'libczmq',
-  fallback: ['czmq', 'dep'],
-)
-
-if cpp.has_header('zmq.hpp')
-  # cppzmq is a header-only dependency, so if we already have the
-  # header in place, we don't need to actually change anything
-  dep_cppzmq = [] #declare_dependency()
-else
-  dep_cppzmq = subproject('cppzmq').get_variable('dep')
-endif
-
-dep_zyre = dependency(
-  'libzyre',
-  fallback: ['zyre', 'dep'],
-)
-
-# https://www.sqlite.org/src
-dep_sqlite3 = dependency(
-  'sqlite3',
-  required: false,
-)
-
-# force native build of SQLite3 if load extension function is unavailable
-# required for SQLiteCpp
-if not dep_sqlite3.found() or not cpp.has_function('sqlite3_enable_load_extension', dependencies: dep_sqlite3)
-  dep_sqlite3 = subproject('sqlite3').get_variable('dep')
-endif
-
-# SQLiteCpp is unfortunately not packaged with pkg-config
-lib_sqlitecpp = cpp.find_library('SQLiteCpp', required: false)
-if lib_sqlitecpp.found() and cpp.has_header('SQLiteCpp/SQLiteCpp.h')
-  dep_sqlitecpp = lib_sqlitecpp
-else
-  # https://github.com/SRombauts/SQLiteCpp
+if get_option('force_dep_download')
+  dep_zeromq    = subproject('zeromq').get_variable('dep')
+  dep_czmq      = subproject('czmq').get_variable('dep')
+  dep_cppzmq    = subproject('cppzmq').get_variable('dep')
+  dep_zyre      = subproject('zyre').get_variable('dep')
+  dep_sqlite3   = subproject('sqlite3').get_variable('dep')
   dep_sqlitecpp = subproject('sqlitecpp').get_variable('dep')
+  dep_zlib      = subproject('zlib').get_variable('dep')
+  dep_minizip   = subproject('minizip').get_variable('dep')
+else
+  # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
+  dep_zeromq = dependency(
+    'libzmq',
+    fallback: ['zeromq', 'dep'],
+  )
+
+  dep_czmq = dependency(
+    'libczmq',
+    fallback: ['czmq', 'dep'],
+  )
+
+  if cpp.has_header('zmq.hpp')
+    # cppzmq is a header-only dependency, so if we already have the
+    # header in place, we don't need to actually change anything
+    dep_cppzmq = [] #declare_dependency()
+  else
+    dep_cppzmq = subproject('cppzmq').get_variable('dep')
+  endif
+
+  dep_zyre = dependency(
+    'libzyre',
+    fallback: ['zyre', 'dep'],
+  )
+
+  # https://www.sqlite.org/src
+  dep_sqlite3 = dependency(
+    'sqlite3',
+    required: false,
+  )
+
+  # force native build of SQLite3 if load extension function is unavailable
+  # required for SQLiteCpp
+  if not dep_sqlite3.found() or not cpp.has_function('sqlite3_enable_load_extension', dependencies: dep_sqlite3)
+    dep_sqlite3 = subproject('sqlite3').get_variable('dep')
+  endif
+
+  # SQLiteCpp is unfortunately not packaged with pkg-config
+  lib_sqlitecpp = cpp.find_library('SQLiteCpp', required: false)
+  if lib_sqlitecpp.found() and cpp.has_header('SQLiteCpp/SQLiteCpp.h')
+    dep_sqlitecpp = lib_sqlitecpp
+  else
+    # https://github.com/SRombauts/SQLiteCpp
+    dep_sqlitecpp = subproject('sqlitecpp').get_variable('dep')
+  endif
+
+  # https://github.com/madler/zlib
+  dep_zlib = dependency(
+    'zlib',
+    fallback: ['zlib', 'dep'],
+  )
+
+  # https://github.com/nmoinvaz/minizip
+  dep_minizip = dependency(
+    'minizip',
+    fallback: ['minizip', 'dep'],
+  )
 endif
 
-# https://github.com/madler/zlib
-dep_zlib = dependency(
-  'zlib',
-  fallback: ['zlib', 'dep'],
-)
-
-# https://github.com/nmoinvaz/minizip
-dep_minizip = dependency(
-  'minizip',
-  fallback: ['minizip', 'dep'],
-)
-
+# handle boost carefully
 dep_boost = dependency(
   'boost',
   modules: ['date_time', 'filesystem', 'regex', 'system'],
