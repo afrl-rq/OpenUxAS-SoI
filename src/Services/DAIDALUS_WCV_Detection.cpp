@@ -20,6 +20,7 @@
 // include header for this service
 #include "DAIDALUS_WCV_Detection.h"
 #include "Daidalus.h"
+#include "Position.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h" //this is an exemplar
@@ -32,17 +33,32 @@
 #define STRING_XML_OPTION_STRING "OptionString"
 #define STRING_XML_OPTION_INT "OptionInt"
 
-//using namespace larcfm;
+// useful definitions
+#ifndef M_PI 
+#define M_PI 3.141592653589793238462643
+#endif
+
+namespace {
+    void makeVelocityXYZ(double u, double v, double w, double Phi, double Theta, double Psi, double& velocityX, double& velocityY, double& velocityZ)
+    {
+        velocityX = std::cos(Theta)*std::cos(Psi)*u + (std::sin(Phi)*std::sin(Theta)*std::cos(Psi)-std::cos(Phi)*std::sin(Psi))*v + std::sin(Phi)*std::sin(Psi);
+        velocityY = std::cos(Theta)*std::sin(Psi)*u + (std::sin(Phi)*std::sin(Theta)*std::sin(Psi)+std::cos(Phi)*std::cos(Psi))*v + (std::cos(Phi)*std::sin(Theta)*std::sin(Psi)-std::sin(Phi)*std::cos(Psi))*w;
+        velocityZ = -std::sin(Theta)*u + std::sin(Phi)*std::cos(Theta)*v + std::cos(Phi)*std::cos(Theta)*w;
+    }
+}
 
 // namespace definitions
 namespace uxas  // uxas::
 {
 namespace service   // uxas::service::
 {
-
+    const double PI = M_PI;
 // this entry registers the service in the service creation registry
 DAIDALUS_WCV_Detection::ServiceBase::CreationRegistrar<DAIDALUS_WCV_Detection>
 DAIDALUS_WCV_Detection::s_registrar(DAIDALUS_WCV_Detection::s_registryServiceTypeNames());
+
+//create a DAIDALUS object
+larcfm::Daidalus daa;
 
 // service constructor
 DAIDALUS_WCV_Detection::DAIDALUS_WCV_Detection()
@@ -50,7 +66,6 @@ DAIDALUS_WCV_Detection::DAIDALUS_WCV_Detection()
 
 // service destructor
 DAIDALUS_WCV_Detection::~DAIDALUS_WCV_Detection() { };
-
 
 bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
 {
@@ -78,7 +93,9 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
 bool DAIDALUS_WCV_Detection::initialize()
 {
     // perform any required initialization before the service is started
-    std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
+
+    
+    //std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
     
     return (true);
 }
@@ -86,7 +103,7 @@ bool DAIDALUS_WCV_Detection::initialize()
 bool DAIDALUS_WCV_Detection::start()
 {
     // perform any actions required at the time the service starts
-    std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
+    //std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
     
     return (true);
 };
@@ -112,9 +129,19 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         if (std::abs(Total_velocity-Total_velocity_calculated)>0.000001)
         {std::cout << "Danger!! Danger !!  Calculated velocity is not equivalent to broadcast velocity" << std::endl;
         std::cout << "Broadcast velocity = " << Total_velocity << " Calculated velocity = " << Total_velocity_calculated << std::endl;}
-        else 
-        {std::cout << "Total_velocity = " << Total_velocity_calculated << std::endl;}
         
+        //add air vehicle message state to the Daidalus Object
+        auto s_temp = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",  airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m") ;      
+        auto u = airVehicleState->getU();
+        auto v = airVehicleState->getV();
+        auto w = airVehicleState->getW();
+        auto Phi = airVehicleState->getRoll();
+        auto Theta = airVehicleState->getPitch();
+        auto Psi = airVehicleState->getHeading();
+        double velocityX, velocityY, velocityZ;
+        makeVelocityXYZ(u, v, w, Phi*PI/180.0, Theta*PI/180.0, Psi*PI/180.0, velocityX, velocityY, velocityZ);
+        
+      
         // send out response
         auto keyValuePairOut = std::make_shared<afrl::cmasi::KeyValuePair>();
         keyValuePairOut->setKey(s_typeName());

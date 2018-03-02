@@ -12,7 +12,7 @@
   <DesiredWavelengthBands/>
   <DwellTime>0</DwellTime>
   <GroundSampleDistance>0.0</GroundSampleDistance>
-  <TaskID>1</TaskID>
+  <TaskID>0</TaskID>
   <Label>Point A</Label>
   <EligibleEntities>
     <int64>1000</int64>

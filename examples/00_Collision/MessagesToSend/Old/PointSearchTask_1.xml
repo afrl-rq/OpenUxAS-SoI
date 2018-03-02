@@ -1,0 +1,26 @@
+    <PointSearchTask Series="CMASI">
+      <SearchLocation>
+        <Location3D Series="CMASI">
+          <Latitude>40.81389518997841</Latitude>
+          <Longitude>-77.8601571562833</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </SearchLocation>
+      <StandoffDistance>0.0</StandoffDistance>
+      <ViewAngleList/>
+      <DesiredWavelengthBands/>
+      <DwellTime>0</DwellTime>
+      <GroundSampleDistance>0.0</GroundSampleDistance>
+      <TaskID>1</TaskID>
+      <Label>collision point</Label>
+      <EligibleEntities>
+        <int64>1000</int64>
+        <int64>2000</int64>
+        <int64>3000</int64>
+      </EligibleEntities>
+      <RevisitRate>0.0</RevisitRate>
+      <Parameters/>
+      <Priority>0</Priority>
+      <Required>true</Required>
+    </PointSearchTask>

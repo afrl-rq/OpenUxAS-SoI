@@ -1,0 +1,43 @@
+<AreaSearchTask Series="CMASI">
+  <TaskID>50</TaskID>
+  <Label>AS50</Label>
+  <EligibleEntities>
+    <int64>1000</int64>
+    <int64>2000</int64>
+    <int64>3000</int64>
+  </EligibleEntities>
+
+  <SearchArea>
+  <Circle Series="CMASI">
+  <CenterPoint>
+     <Location3D Series="CMASI">
+       <Latitude>-22.70</Latitude>
+       <Longitude>150.67</Longitude>
+     </Location3D>
+  </CenterPoint>
+  <Radius>1500.0</Radius>
+  </Circle>
+  </SearchArea>
+
+  <ViewAngleList>
+    
+<!--     <Wedge Series="CMASI">
+      <AzimuthCenterline>15.0</AzimuthCenterline>
+      <VerticalCenterline>-60.0</VerticalCenterline>
+      <AzimuthExtent>0.0</AzimuthExtent>
+      <VerticalExtent>0.0</VerticalExtent>
+    </Wedge>
+ -->
+  </ViewAngleList>
+  <UseInertialViewAngles>false</UseInertialViewAngles>
+<!-- from CMASI::Task: -->
+  <RevisitRate>0</RevisitRate>
+  <Parameters></Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+<!-- from CMASI::SearchTask -->
+  <DesiredWavelengthBands><WavelengthBand>EO</WavelengthBand></DesiredWavelengthBands>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>5.0</GroundSampleDistance>
+</AreaSearchTask>
+
