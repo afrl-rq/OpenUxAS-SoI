@@ -192,7 +192,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
                         std::string algebraString;
                         if (isCalculateOption(taskId, itEligibleEntities->second,
                                 itEligibleEntities->first.second, itEligibleEntities->first.first,
-                                dHeadingCurrent_rad, -elevationLookAngleCurrent_rad,
+                                dHeadingCurrent_rad, elevationLookAngleCurrent_rad,
                                 optionId, algebraString))
                         {
                             compositionString += algebraString + " ";
@@ -211,7 +211,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
                             std::string algebraString;
                             if (isCalculateOption(taskId, itEligibleEntities->second,
                                     itEligibleEntities->first.second, itEligibleEntities->first.first,
-                                    dHeadingCurrent_rad, -elevationLookAngleCurrent_rad,
+                                    dHeadingCurrent_rad, elevationLookAngleCurrent_rad,
                                     optionId, algebraString))
                             {
                                 compositionString += algebraString + " ";
