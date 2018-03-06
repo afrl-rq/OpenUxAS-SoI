@@ -138,8 +138,8 @@ void CmasiLineSearchTaskService::buildTaskPlanOptions()
         //ViewAngleList
         if (!m_lineSearchTask->getViewAngleList().empty())
         {
-            // I'm assuming the elevation is measured from the horizon, positive up
-            //TODO:: the min/max values in the AirVehicleConfiguration need to be used instead of the following
+            // Elevation is measured from the horizon, positive up
+            // TODO use min/max values in AirVehicleConfiguration
             auto elevationMin_rad = -90.0 * n_Const::c_Convert::dDegreesToRadians();
             auto elevationMax_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();
                 
