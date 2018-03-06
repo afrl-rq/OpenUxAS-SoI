@@ -157,9 +157,10 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
         //ViewAngleList
         if (!m_lineSearchTask->getViewAngleList().empty())
         {
-            // I'm assuming the elevation is measured from the horizon, positive down
-            auto elevationMin_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();
-            auto elevationMax_rad = 90.0 * n_Const::c_Convert::dDegreesToRadians();
+            // Elevation is measured from the horizon, positive up
+            // TODO use min/max values from AirVehicleConfiguration
+            auto elevationMin_rad = -90.0 * n_Const::c_Convert::dDegreesToRadians();
+            auto elevationMax_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();    
 
             for (auto itWedge = m_lineSearchTask->getViewAngleList().begin();
                     itWedge != m_lineSearchTask->getViewAngleList().end();
