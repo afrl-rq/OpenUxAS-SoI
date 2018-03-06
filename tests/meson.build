@@ -58,6 +58,7 @@ libs_test = [
   lib_plans,
   lib_tinygps,
   lib_dpss,
+  lib_daidalus,
 ]
 
 if get_option('internal_3rd_libraries')

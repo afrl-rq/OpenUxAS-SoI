@@ -21,6 +21,8 @@
 #include "DAIDALUS_WCV_Detection.h"
 #include "Daidalus.h"
 #include "Position.h"
+#include "Velocity.h"
+#include "Util.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h" //this is an exemplar
@@ -28,6 +30,7 @@
 
 #include <iostream>     // std::cout, cerr, etc
 #include <cmath>    //cmath::cos, sin, etc
+#include <string>   //std::to_string etc
 
 // convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
@@ -53,6 +56,14 @@ namespace uxas  // uxas::
 namespace service   // uxas::service::
 {
     const double PI = M_PI;
+    
+    struct daidalus_package{
+        larcfm::Position daidalusPosition;
+        larcfm::Velocity daidalusVelocity;
+        double daidalusTime;
+    } vehicleInfo;
+    std::unordered_map<int64_t, daidalus_package> daidalusVehicleInfo;
+    std::unordered_map<int64_t, double> detectedViolations;
 // this entry registers the service in the service creation registry
 DAIDALUS_WCV_Detection::ServiceBase::CreationRegistrar<DAIDALUS_WCV_Detection>
 DAIDALUS_WCV_Detection::s_registrar(DAIDALUS_WCV_Detection::s_registryServiceTypeNames());
@@ -131,7 +142,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         std::cout << "Broadcast velocity = " << Total_velocity << " Calculated velocity = " << Total_velocity_calculated << std::endl;}
         
         //add air vehicle message state to the Daidalus Object
-        auto s_temp = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",  airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m") ;      
+        vehicleInfo.daidalusPosition = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",  airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m") ;      
         auto u = airVehicleState->getU();
         auto v = airVehicleState->getV();
         auto w = airVehicleState->getW();
@@ -140,13 +151,55 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         auto Psi = airVehicleState->getHeading();
         double velocityX, velocityY, velocityZ;
         makeVelocityXYZ(u, v, w, Phi*PI/180.0, Theta*PI/180.0, Psi*PI/180.0, velocityX, velocityY, velocityZ);
+        auto daidalusVelocityZ = -velocityZ;
+        auto daidalusVelocityX = velocityY;
+        auto daidalusVelocityY = velocityX;
+        vehicleInfo.daidalusVelocity = larcfm::Velocity::makeVxyz(daidalusVelocityX,daidalusVelocityY,"m/s",daidalusVelocityZ,"m/s");
+        vehicleInfo.daidalusTime = airVehicleState->getTime()/1000.0;
+        // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship
+        daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
+        if (daidalusVehicleInfo.size()>1 && daidalusVehicleInfo.count(m_entityId))
+        { daa.setOwnshipState(std::to_string(m_entityId),daidalusVehicleInfo[m_entityId].daidalusPosition,daidalusVehicleInfo[m_entityId].daidalusVelocity,daidalusVehicleInfo[m_entityId].daidalusTime);
+        for (auto it_intruderId = daidalusVehicleInfo.begin(); it_intruderId!=daidalusVehicleInfo.end(); it_intruderId++)
+            {
+                if (it_intruderId->first!=m_entityId) //add staleness check to this statement or put check on outer most if
+                    {
+                    daa.addTrafficState(std::to_string(it_intruderId->first),it_intruderId->second.daidalusPosition,it_intruderId->second.daidalusVelocity,it_intruderId->second.daidalusTime);
+                //std::cout << "Added Entity " << it_intruderId->first << " as an intruder to Entity " << m_entityId << std::endl;
+                    }
+            
+            }
+        if (daa.numberOfAircraft()>1)
+        {
+            detectedViolations.clear();
+            for (int intruderIndex = 1; intruderIndex<=daa.numberOfAircraft()-1; intruderIndex++)
+            {
+                auto timeToViolation = daa.timeToViolation(intruderIndex);
+                if (timeToViolation != PINFINITY && timeToViolation != NaN)
+                { 
+                    detectedViolations[std::stoi(daa.getAircraftState(intruderIndex).getId(),nullptr,10)] = timeToViolation;
+                    //std::cout << "Collision with intruder " << daa.getAircraftState(intruderIndex).getId() << " in " << timeToViolation << " seconds" << std::endl;
+                }
+            }
+        }
+        }
+        
         
       
         // send out response
-        auto keyValuePairOut = std::make_shared<afrl::cmasi::KeyValuePair>();
-        keyValuePairOut->setKey(s_typeName());
-        keyValuePairOut->setValue(std::to_string(m_serviceId));
-        sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
+        //auto keyValuePairOut = std::make_shared<afrl::cmasi::KeyValuePair>();
+        //keyValuePairOut->setKey(s_typeName());
+        //keyValuePairOut->setValue(std::to_string(m_serviceId));
+        //sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
+        if (!detectedViolations.empty())
+        {
+            for (auto itViolations = detectedViolations.begin(); itViolations != detectedViolations.end(); itViolations++)
+               std::cout << "Entity " << m_entityId << " will violate the well clear volume with Entity " << itViolations->first << " in " << itViolations->second <<" seconds!!" << std::endl;
+        }
+        else
+        {
+            std::cout << "No violation of well clear volume detected :^)" << std::endl;
+        }
         
     }
     return false;
