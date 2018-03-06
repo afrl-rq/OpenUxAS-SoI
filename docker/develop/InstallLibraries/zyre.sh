@@ -6,10 +6,6 @@ _SUDO=$1
 # exit on non-zero return
 set -e
 
-
-BUILD_TYPE="AUTOTOOLS"
-#BUILD_TYPE="CMAKE"
-
 LIBRARY_NAME="zyre"
 LIBRARY_FOLDER_NAME="zyre"
 SOURCE_ARCHIVE_FILE="v2.0.0.zip"
@@ -37,27 +33,11 @@ cd ${SOURCE_FOLDER_NAME}
 
 echo "Building..."
 
-
-if [ $BUILD_TYPE == CMAKE ]
-then
-	mkdir -p ./build
-	cd ./build
-	cmake ..
-	make -j8; make
-	echo "Installing..."
-	$_SUDO make install
-
-elif [ $BUILD_TYPE == AUTOTOOLS ]
-then
-	./autogen.sh
-	./configure && make check
-	echo "Installing..."
-	$_SUDO make install
-	$_SUDO ldconfig
-
-else
-	echo "!!! UNKNOWN BUILD TYPE ["${BUILD_TYPE}"]"
-fi
+./autogen.sh
+./configure --disable-shared && make check
+echo "Installing..."
+$_SUDO make install
+$_SUDO ldconfig
 
 echo "Cleaning up..."
 cd ${CWD}
@@ -66,4 +46,3 @@ cd ${CWD}
 #rm -rf ./${LIBRARY_FOLDER_NAME}
 
 echo "Finished!"
-

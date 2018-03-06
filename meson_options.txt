@@ -1,14 +1,14 @@
 option(
-  'afrl_internal',
-  description: 'build with internal AFRL modules',
+  'force_dep_download',
+  description: 'do not link os installed dependencies',
   type: 'boolean',
   value: false,
 )
 option(
-  'internal_3rd_libraries',
-  description: 'build with internal 3rd party libraries',
-  type : 'boolean',
-  value : true,
+  'afrl_internal',
+  description: 'build with internal AFRL modules',
+  type: 'boolean',
+  value: false,
 )
 option(
   'geo_libs',

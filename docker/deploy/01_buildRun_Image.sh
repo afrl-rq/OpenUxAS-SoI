@@ -13,5 +13,4 @@ else
 fi
 
 # build the image
-docker build  --no-cache -f Dockerfile.UxAS_run -t uxas/run .
-
+docker build -f Dockerfile.uxas_deploy -t uxas_deploy .

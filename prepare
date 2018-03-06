@@ -4,6 +4,8 @@ from pathlib import Path, PurePath
 import re
 import hashlib
 import tarfile
+import os
+import shutil
 
 cwd = Path.cwd()
 subproject_dir = cwd / '3rd'
@@ -41,5 +43,15 @@ def process_wrap_templates():
                     l = re.sub('%patch_hash%', d, l)
                     w.write(l)
 
+# clean up any old patches before re-creating them
+pd = cwd / Path('3rd')
+for p in pd.glob('*_patch.tar'):
+        d = str(p)[0:-10]
+        if Path(d).is_dir():
+                shutil.rmtree(d)
+pc = pd / 'packagecache'
+for c in pc.glob('*_patch.tar'):
+        os.remove(str(c))
+        
 process_wrap_patches()
 process_wrap_templates()
