@@ -10,6 +10,7 @@ import shutil
 cwd = Path.cwd()
 subproject_dir = cwd / '3rd'
 wrap_patches_dir = subproject_dir / 'wrap_patches'
+cache_dir = subproject_dir / 'packagecache'
 
 def process_wrap_patches():
     for p in wrap_patches_dir.iterdir():
@@ -17,6 +18,7 @@ def process_wrap_patches():
         tf = tarfile.open(str(subproject_dir / (p.name + '_patch.tar')), 'w')
         tf.add(str(p), arcname=p.name)
         tf.close()
+        shutil.copyfile( str(subproject_dir / (p.name + '_patch.tar')), str(cache_dir / (p.name + '_patch.tar')) )
 
 def process_wrap_templates():
     for tf in subproject_dir.glob('*.wrap.tmpl'):
@@ -55,3 +57,5 @@ for c in pc.glob('*_patch.tar'):
         
 process_wrap_patches()
 process_wrap_templates()
+
+
