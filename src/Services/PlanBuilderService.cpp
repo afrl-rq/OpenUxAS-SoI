@@ -16,7 +16,7 @@
 
 
 #include "PlanBuilderService.h"
-
+  
 #include "UnitConversions.h"
 #include "Constants/Convert.h"
 
@@ -228,6 +228,8 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
     if(!( (*planState)->state ) )
         return false;
 
+    std::cout << "taskAssignment->getOptionID(): " << taskAssignment->getOptionID() << std::endl;
+
     auto taskImplementationRequest = std::make_shared<uxas::messages::task::TaskImplementationRequest>();
     taskImplementationRequest->setCorrespondingAutomationRequestID(uniqueRequestID);
     m_expectedResponseID[m_taskImplementationId] = uniqueRequestID;
@@ -261,8 +263,8 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
     // check response ID
     if(m_expectedResponseID.find(taskImplementationResponse->getResponseID()) == m_expectedResponseID.end())
         return;
-    int64_t uniqueRequestID = m_expectedResponseID[taskImplementationResponse->getResponseID()];
-    
+    int64_t uniqueRequestID = m_expectedResponseID[taskImplementationResponse->getResponseID()];    
+
     // cache response (waypoints in m_inProgressResponse)
     if(m_inProgressResponse.find(uniqueRequestID) == m_inProgressResponse.end())
         return;

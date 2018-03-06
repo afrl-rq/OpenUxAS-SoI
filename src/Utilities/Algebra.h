@@ -17,7 +17,7 @@ namespace uxas
 namespace common
 {
 namespace utilities
-{
+{  
 
 // TYPE DEFINITIONS
 typedef int64_t action_t;

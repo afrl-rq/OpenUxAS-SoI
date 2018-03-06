@@ -37,6 +37,12 @@
 #include <memory>       // make_unique
 #include <set>       // set
 
+//ADDED INCLUDES
+#include <regex>
+#include <stack>
+#include <map>
+#include <tuple>
+#include <string>
 
 #define STRING_COMPONENT_NAME "AssignmentTreeBB"
 
@@ -52,11 +58,95 @@
 #define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "<>AssignmentTreeBB:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
 #define CERR_FILE_LINE_MSG(MESSAGE) std::cerr << "<>AssignmentTreeBB:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cerr.flush();
 
-
 namespace uxas
 {
 namespace service
 {
+
+
+
+int c_Node_Base::makeTimeMap(std::string sample) {
+    
+    m_tasksToTime = new std::map<int, std::tuple<int, int, int>>;
+  
+    //Variables
+    auto time = std::make_tuple(0,0,0); //Will make a temp tuple of int type automatically. Can also declare as tuple<int, int, int>.
+    std::stack<int> tmpTaskId; //Stack to store and then reverse numbers (as the string is processed backwards)
+    unsigned int parens(0), pos(0), j; //Keeps track of parens
+    std::string int1 = "", int2 = "", intp = ""; //String values used to store the ints as processed. Will be converted to int later.
+    //Look for time operators and save its information
+    for (unsigned int i = 0; i < sample.length() ; ++i) {
+        if ((sample[i] == '[') && (pos != i-1)) {
+            //Save the position of the start of the time op ('-' or '_')
+            pos = i++ - 1;
+            std::get<2>(time) = 0;
+            if (sample[pos] == '_') {
+                std::get<2>(time) = 1;
+            }
+            else {
+                std::get<2>(time) = 0;
+            }
+
+            //Save the timing information
+            while (sample[i] != ',') {
+                int1 += sample[i++];
+            }
+            while (sample[++i] != ']') {
+                int2 += sample[i];
+            }
+
+            //Store the timing information
+            std::get<0>(time) = std::stoi(int1);
+            std::get<1>(time) = std::stoi(int2);
+
+            //Reset i to be pos
+            i = pos;
+            do {
+                i--;
+
+                //Ignores nested time operators. The nested are processed first, so this gives them precedence.
+                switch(sample[i]) {
+                    case ')':
+                        parens++;
+                        break;
+                    case '(':
+                        parens--;
+                        break;
+                    case ']':
+                        while (sample[i] != '^') {
+                            i--;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                //Until 'p', push int value into a stack, push it into a string to reverse it, and then convert to int
+                if (std::isdigit(sample[i])) {
+                    while (sample[i] != 'p') {
+                        tmpTaskId.push((unsigned int) sample[i--]);
+                    }
+                    while (!tmpTaskId.empty()) {
+                        intp += tmpTaskId.top();
+                        tmpTaskId.pop();
+                    }
+
+                    //Insert the resulting tuple into the map
+                    m_tasksToTime->insert(std::pair<int, std::tuple<int, int, int>>(std::stoi(intp), time));
+                    intp = "";
+                }
+            } while(parens != 0);
+
+            //Reset variables. Also, set i to be after the processed data, so it will continue on.
+            i = pos;
+            int1 = "";
+            int2 = "";
+        }
+    }
+
+    return 1;
+}
+
 
 
 bool c_Node_Base::m_isFinalAssignmentCalculated = false;
@@ -140,6 +230,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
         }
         m_idVsAssigmentPrerequisites[uniqueAutomationRequest->getRequestID()]->m_uniqueAutomationRequest = uniqueAutomationRequest;
         UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "uniqueAutomationRequest->getRequestID()[", uniqueAutomationRequest->getRequestID(), "]");
+	//std::cout << "uniqueAutomationRequest->getRequestID()[" << uniqueAutomationRequest->getRequestID() << "]" << endl;
         if (m_idVsAssigmentPrerequisites[uniqueAutomationRequest->getRequestID()]->isAssignmentReady(m_isUsingAssignmentTypes))
         {
             assigmentPrerequisites = m_idVsAssigmentPrerequisites[uniqueAutomationRequest->getRequestID()];
@@ -154,6 +245,7 @@ AssignmentTreeBranchBoundBase::processReceivedLmcpMessage(std::unique_ptr<uxas::
             m_idVsAssigmentPrerequisites.insert(std::make_pair(taskPlanOptions->getCorrespondingAutomationRequestID(), std::make_shared<AssigmentPrerequisites>()));
         }
         m_idVsAssigmentPrerequisites[taskPlanOptions->getCorrespondingAutomationRequestID()]->m_taskIdVsTaskPlanOptions [taskPlanOptions->getTaskID()] = taskPlanOptions;
+        //std::cout << "Task Stuff" << taskPlanOptions->toString() << std::endl;
         if (m_idVsAssigmentPrerequisites[taskPlanOptions->getCorrespondingAutomationRequestID()]->isAssignmentReady(m_isUsingAssignmentTypes))
         {
             assigmentPrerequisites = m_idVsAssigmentPrerequisites[taskPlanOptions->getCorrespondingAutomationRequestID()];
@@ -275,6 +367,23 @@ void AssignmentTreeBranchBoundBase::sendErrorMsg(std::string& errStr)
     sendSharedLmcpObjectBroadcastMessage(serviceStatus);
 }
 
+//==================================================================================================================
+std::string AssignmentTreeBranchBoundBase::modifyAlgebraString(std::string processAlgebraString)
+{
+    
+  AssignmentTreeBranchBoundBase::originalAlgebraString = processAlgebraString;
+	std::string modifiedAlgebraString = processAlgebraString;
+
+	std::regex upCaratPattern("\\^");
+	std::regex bracketPattern("[_-]\\[[[:digit:]]+,[[:digit:]]+\\]");
+
+	modifiedAlgebraString = std::regex_replace(modifiedAlgebraString, upCaratPattern,"");
+	modifiedAlgebraString = std::regex_replace(modifiedAlgebraString, bracketPattern, "");
+
+	return modifiedAlgebraString;
+}
+//==================================================================================================================*/
+
 bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites)
 {
     bool isSuccess(true);
@@ -360,6 +469,24 @@ bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<As
     if (!assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getTaskRelationships().empty())
     {
         std::string taskRelationships = assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getTaskRelationships();
+
+
+
+		//Print out the pre-expanded algebra string
+		std::cout << "Algebra string before parsing (and before pulling out time stuff): " << taskRelationships << std::endl;
+		//============================================================================================================================================
+		//=============================================================START=OF=CHANGES===============================================================
+		//============================================================================================================================================
+
+		taskRelationships = modifyAlgebraString(taskRelationships);
+
+		//============================================================================================================================================
+		//===================================================================END======================================================================
+		//============================================================================================================================================
+		std::cout << "Algebra string before parsing (and after pulling out time stuff): " << taskRelationships << std::endl;
+
+		std::cout << "Algebra string before parsing (and after pulling out time stuff): " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+
         bool isFinished(false);
         while (!isFinished)
         {
@@ -501,7 +628,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
     /////////////////////////////////////////////////////////
     //construct the inputs for the assignment algorithm
     /////////////////////////////////////////////////////////
-
+  
     // re-initialize static storage/parameters
     nodeAssignment->m_staticAssignmentParameters.reset(new c_StaticAssignmentParameters);
     nodeAssignment->m_staticAssignmentParameters->m_CostFunction = m_CostFunction;
@@ -513,6 +640,9 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
 
     // ALGEBRA:: Initialization
     isError = !isInitializeAlgebra(assigmentPrerequisites);
+    
+    std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+    nodeAssignment->makeTimeMap(AssignmentTreeBranchBoundBase::originalAlgebraString);//Add algebra string stuff here
 
     if (!isError)
     {
@@ -556,6 +686,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
                 nodeAssignment->m_staticAssignmentParameters->m_vehicleIdVsInformation[vehicleId]->m_FromIdVsToIdVsTravelTime[fromId] = std::unique_ptr<std::unordered_map<int64_t, int64_t >> (new std::unordered_map<int64_t, int64_t>);
             }
             nodeAssignment->m_staticAssignmentParameters->m_vehicleIdVsInformation[vehicleId]->m_FromIdVsToIdVsTravelTime[fromId]->operator[](toId) = travelCost;
+            //std::cout << "|vehicleId:\t" << vehicleId << "\t|fromId:\t" << fromId << "\t|toId:\t" << toId << "\t|travelCost:\t" << travelCost << std::endl;
         }
 
         //TODO:: need to calculate "m_maximumVehicleCost" for the c_VehicleCostsStatic's map
@@ -565,10 +696,11 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
         /////////  RUN THE ASSIGNMENT ALGORITHM
         /////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // use errRunAllocation to run the allocation algorithm. 
+        // use errRunAllocation to run the allocation algorithm.
         //  Note: (1)load Objectives and vehicles (2) run allocation algorithm (3)  the function GetWaypoints_m or GetWaypoints_LatLong_rad to return the results
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         nodeAssignment->m_staticAssignmentParameters->m_assignmentStartTime_ms = uxas::common::utilities::c_TimeUtilities::getTimeNow_ms();
+
         nodeAssignment->ExpandNode();
         nodeAssignment->printStatus("INFO::FINAL:  ");
 
@@ -618,6 +750,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
                 }
             }
             auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(taskAssignmentSummary);
+	    //std::cout << taskAssignmentSummary->toString() << std::endl;
             sendSharedLmcpObjectBroadcastMessage(newMessage);
 			UXAS_LOG_INFORM("ASSIGNMENT COMPLETE!");
         }
@@ -710,6 +843,7 @@ std::unique_ptr<c_StaticAssignmentParameters> c_Node_Base::m_staticAssignmentPar
 c_Node_Base::c_Node_Base() //this is used for the root node
 {
     m_staticAssignmentParameters->m_numberNodesVisited++;
+    rootNodePtr = this;
     //CERR_FILE_LINE_MSG("m_staticAssignmentParameters->m_numberNodesAdded[" << m_staticAssignmentParameters->m_numberNodesAdded << "]")
 }
 
@@ -726,9 +860,12 @@ std::unique_ptr<c_Node_Base> c_Node_Base::clone()
 //copy constructor
 
 c_Node_Base::c_Node_Base(const c_Node_Base & rhs) //copy constructor
-: m_travelTimeTotal_ms(rhs.m_travelTimeTotal_ms),
+: rootNodePtr(rhs.rootNodePtr),
+m_tasksToTime(rhs.m_tasksToTime),
+m_travelTimeTotal_ms(rhs.m_travelTimeTotal_ms),
 m_isPruneable(rhs.m_isPruneable),
-m_isLeafNode(rhs.m_isLeafNode)
+m_isLeafNode(rhs.m_isLeafNode),
+m_parentPointer(&rhs)
 {
     m_staticAssignmentParameters->m_numberNodesVisited++;
     for (auto itVehicleAssignmentState = rhs.m_vehicleIdVsAssignmentState.begin();
@@ -752,15 +889,16 @@ void c_Node_Base::printStatus(const std::string& Message)
     double timeSinceStart_s = static_cast<double> (uxas::common::utilities::c_TimeUtilities::getTimeNow_ms() -
             m_staticAssignmentParameters->m_assignmentStartTime_ms) / 1000.0;
     UXAS_LOG_INFORM(Message
-                  , "timeSinceStart_s[" , timeSinceStart_s
-                  , "] m_vehicleID[" , m_vehicleID
-                  , "] cost[" , m_staticAssignmentParameters->m_minimumAssignmentCostCandidate
-                  , "] numberNodesVisited[" , m_staticAssignmentParameters->m_numberNodesVisited
-                  , "] numberNodesRemoved[" , m_staticAssignmentParameters->m_numberNodesRemoved
-                  , "] Number Current Nodes[" , (m_staticAssignmentParameters->m_numberNodesVisited - m_staticAssignmentParameters->m_numberNodesRemoved)
-                  , "] numberNodesAdded[" , m_staticAssignmentParameters->m_numberNodesAdded
-                  , "] numberNodesPruned[" , m_staticAssignmentParameters->m_numberNodesPruned
-                  , "]" );
+                  << "timeSinceStart_s[" << timeSinceStart_s
+                  << "] m_vehicleID[" << m_vehicleID
+                  << "] cost[" << m_staticAssignmentParameters->m_minimumAssignmentCostCandidate
+                  << "] numberNodesVisited[" << m_staticAssignmentParameters->m_numberNodesVisited
+                  << "] numberNodesRemoved[" << m_staticAssignmentParameters->m_numberNodesRemoved
+                  << "] Number Current Nodes[" << (m_staticAssignmentParameters->m_numberNodesVisited - m_staticAssignmentParameters->m_numberNodesRemoved)
+                  << "] numberNodesAdded[" << m_staticAssignmentParameters->m_numberNodesAdded
+                  << "] numberNodesPruned[" << m_staticAssignmentParameters->m_numberNodesPruned
+
+                  << "]" << std::endl)
     UXAS_LOG_INFORM_ASSIGNMENT("timeSinceStart_s[", timeSinceStart_s,
                                   "] cost[", m_staticAssignmentParameters->m_minimumAssignmentCostCandidate,
                                   "] numberNodesVisited[", m_staticAssignmentParameters->m_numberNodesVisited, "]");
@@ -1008,54 +1146,79 @@ void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehi
             // check vehicle's max travel time parameter
             int64_t maxVehicleTravelTime_ms = itVehicleInformation->second->m_maxVehicleTravelTime_ms;
 
-            if ((maxVehicleTravelTime_ms < 0) || (travelTimeTotalToEnd_ms < maxVehicleTravelTime_ms))
-            {
-                // create new child for cost calculation
-                auto newChild = std::unique_ptr<c_Node_Base>(clone());
-                // calculate assignment cost
-                int64_t nodeCost(INT64_MAX);
-                int64_t evaluationOrderCost(INT64_MAX);
-                newChild->calculateAssignmentCostBase(vehicleAssignmentState, taskOptionId,
-                                                      taskTime_ms, travelTime_ms,
-                                                      nodeCost, evaluationOrderCost);
-                if (nodeCost < m_staticAssignmentParameters->m_minimumAssignmentCostCandidate)
-                {
-                    // add new child
-                    newChild->m_nodeCost = nodeCost;
-                    //COUT_INFO_MSG("nodeCost[" << nodeCost << "]")
-                    newChild->m_travelTimeTotal_ms = travelTimeTotalToEnd_ms;
-                    newChild->m_vehicleID = vehicleId;
-                    newChild->m_taskOptionID = taskOptionId;
-                    //tell the algebra function that we have accounted for this objective
-                    newChild->m_viObjectiveIDs_Assigned.push_back(taskOptionId);
+            //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+            //ADDED CODE
+            int64_t taskId(taskOptionId / 100000);
+            int64_t maxTime(-1);
 
-                    //////// update the task //////////
-                    if (newChild->m_taskIdVsAssignmentState.find(taskOptionId) == newChild->m_taskIdVsAssignmentState.end())
+            if (m_tasksToTime->find(taskId) != m_tasksToTime->end()) {
+                //Check what time operator the information is for
+                if (std::get<2>(m_tasksToTime->at(taskId)) == 0) {
+                    //Do this if '-' is found at the beginning of the time info
+                }
+                else if (std::get<2>(m_tasksToTime->at(taskId)) == 1) {
+                    maxTime = std::get<1>(m_tasksToTime->at(taskId));
+                }
+            }
+
+            std::cout << "First: " << maxTime << " vs " << travelTimeTotalToEnd_ms << std::endl;
+
+            if((maxTime > travelTimeTotalToEnd_ms) || (maxTime == -1)){ //changed here
+                std::cout << "Second: " << maxTime << " vs " << travelTimeTotalToEnd_ms << std::endl;
+                if ((maxVehicleTravelTime_ms < 0) || (travelTimeTotalToEnd_ms < maxVehicleTravelTime_ms))
+                {
+                    // create new child for cost calculation
+                    auto newChild = std::unique_ptr<c_Node_Base>(clone());
+                    // calculate assignment cost
+                    int64_t nodeCost(INT64_MAX);
+                    int64_t evaluationOrderCost(INT64_MAX);
+                    newChild->calculateAssignmentCostBase(vehicleAssignmentState, taskOptionId,
+                                                          taskTime_ms, travelTime_ms,
+                                                          nodeCost, evaluationOrderCost);
+                    if (nodeCost < m_staticAssignmentParameters->m_minimumAssignmentCostCandidate)
                     {
-                        newChild->m_taskIdVsAssignmentState[taskOptionId] = std::unique_ptr<c_TaskAssignmentState>(new c_TaskAssignmentState(taskOptionId));
+                        // add new child
+                        newChild->m_nodeCost = nodeCost;
+                        //COUT_INFO_MSG("nodeCost[" << nodeCost << "]")
+                        newChild->m_travelTimeTotal_ms = travelTimeTotalToEnd_ms;
+                        newChild->m_vehicleID = vehicleId;
+                        newChild->m_taskOptionID = taskOptionId;
+                        //tell the algebra function that we have accounted for this objective
+                        newChild->m_viObjectiveIDs_Assigned.push_back(taskOptionId);
+
+                        //////// update the task //////////
+                        if (newChild->m_taskIdVsAssignmentState.find(taskOptionId) == newChild->m_taskIdVsAssignmentState.end())
+                        {
+                            newChild->m_taskIdVsAssignmentState[taskOptionId] = std::unique_ptr<c_TaskAssignmentState>(new c_TaskAssignmentState(taskOptionId));
+                        }
+                        newChild->m_taskIdVsAssignmentState[taskOptionId]->m_taskCompletionTime_ms = travelTimeTotalToEnd_ms;
+                        //////// update the vehicle //////////
+                        newChild->m_vehicleIdVsAssignmentState[vehicleAssignmentState->m_vehicleId]->m_travelTimeTotal_ms = travelTimeTotalToEnd_ms;
+                        // add the assignment
+                        auto taskAssignment = std::unique_ptr<uxas::messages::task::TaskAssignment>(new uxas::messages::task::TaskAssignment());
+                        taskAssignment->setTaskID(c_TaskAssignmentState::getTaskID(taskOptionId));
+                        taskAssignment->setOptionID(c_TaskAssignmentState::getOptionID(taskOptionId));
+                        taskAssignment->setAssignedVehicle(vehicleId);
+                        taskAssignment->setTimeThreshold(prerequisiteTime_ms);
+                        taskAssignment->setTimeTaskCompleted(travelTimeTotalToEnd_ms);
+                        newChild->m_vehicleIdVsAssignmentState[vehicleAssignmentState->m_vehicleId]->m_taskAssignments.push_back(std::move(taskAssignment));
+                        m_costVsChildren.insert(std::pair<int64_t, std::unique_ptr<c_Node_Base> >(evaluationOrderCost, std::move(newChild)));
+                        m_staticAssignmentParameters->m_numberNodesAdded++;
                     }
-                    newChild->m_taskIdVsAssignmentState[taskOptionId]->m_taskCompletionTime_ms = travelTimeTotalToEnd_ms;
-                    //////// update the vehicle //////////
-                    newChild->m_vehicleIdVsAssignmentState[vehicleAssignmentState->m_vehicleId]->m_travelTimeTotal_ms = travelTimeTotalToEnd_ms;
-                    // add the assignment
-                    auto taskAssignment = std::unique_ptr<uxas::messages::task::TaskAssignment>(new uxas::messages::task::TaskAssignment());
-                    taskAssignment->setTaskID(c_TaskAssignmentState::getTaskID(taskOptionId));
-                    taskAssignment->setOptionID(c_TaskAssignmentState::getOptionID(taskOptionId));
-                    taskAssignment->setAssignedVehicle(vehicleId);
-                    taskAssignment->setTimeThreshold(prerequisiteTime_ms);
-                    taskAssignment->setTimeTaskCompleted(travelTimeTotalToEnd_ms);
-                    newChild->m_vehicleIdVsAssignmentState[vehicleAssignmentState->m_vehicleId]->m_taskAssignments.push_back(std::move(taskAssignment));
-                    m_costVsChildren.insert(std::pair<int64_t, std::unique_ptr<c_Node_Base> >(evaluationOrderCost, std::move(newChild)));
-                    m_staticAssignmentParameters->m_numberNodesAdded++;
+                    else
+                    {
+                        newChild.reset();
+                    }
                 }
                 else
                 {
-                    newChild.reset();
+                    m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_WARNING:: Vehicle[" << vehicleId << "] exceeded travel time[" << maxVehicleTravelTime_ms << "]!" << std::endl;
                 }
             }
             else
             {
-                m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_WARNING:: Vehicle[" << vehicleId << "] exceeded travel time[" << maxVehicleTravelTime_ms << "]!" << std::endl;
+                //Turn off to bugfix; TURN BACK ON LATER
+                //m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_WARNING:: Vehicle[" << vehicleId << "] exceeded time window" << std::endl;
             }
         }
         else //if (travelTime_ms > 0)

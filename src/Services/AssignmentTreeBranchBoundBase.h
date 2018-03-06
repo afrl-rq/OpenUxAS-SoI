@@ -14,7 +14,7 @@
  * Created on August 31, 2015, 6:17 PM
  */
 
-
+  
 #ifndef UXAS_SERVICE_ASSIGNMENT_TREE_BRANCH_BOUND_BASE_H
 #define UXAS_SERVICE_ASSIGNMENT_TREE_BRANCH_BOUND_BASE_H
 
@@ -32,6 +32,9 @@
 
 #include <cstdint> // int64_t
 #include <map>
+
+//ADDED INCLUDES
+#include <tuple>
 
 #define MAX_COST_MS (INT64_MAX / 10000)
 
@@ -211,11 +214,13 @@ private:
 class c_Node_Base
 {
 public: //constructors/destructors
-    
+  
     c_Node_Base();
     virtual ~c_Node_Base();
 
     c_Node_Base(const c_Node_Base& rhs);
+    
+    int makeTimeMap(std::string sample);
     
 public: //member functions - prototypes
     virtual void ExpandNode();
@@ -227,6 +232,10 @@ protected: //member functions - prototypes
                                             int64_t& nodeCost, int64_t& evaluationOrderCost){};
     virtual void calculateFinalAssignment(){};                                        
 
+    
+    c_Node_Base * rootNodePtr;
+    std::map<int, std::tuple<int, int, int>> * m_tasksToTime;
+    
 public: // member functions - prototypes
     void PruneChildren();
     void printStatus(const std::string& Message);
@@ -249,6 +258,8 @@ public:
     /*! \brief  this is used to determine the type of cost calculation to call */
     static uxas::project::pisr::AssignmentType::AssignmentType m_assignmentType;
 #endif
+    int64_t m_nodeCost{0};
+    int64_t m_totalCost{0};
     
 protected: //member storage
     /*! \brief map of children of this node, sorted by cost */
@@ -266,10 +277,13 @@ protected: //member storage
     bool m_isPruneable = {true}; //can this node be pruned
     bool m_isLeafNode = {false}; //is this a leaf node
 
-    int64_t m_nodeCost{0};
-    
-    
+    int m_relativeTime[2] { -1 -1 };
+    int m_absoluteTime[2] { -1 -1 };
+
+    //int m_tasksToTime;
+
 private:
+    const c_Node_Base *m_parentPointer;
     /*! @name Private: No Copying*/
     c_Node_Base& operator=(const c_Node_Base&) = delete; //no copying
 };
@@ -308,6 +322,8 @@ public:
     virtual
     ~AssignmentTreeBranchBoundBase();
 
+    std::string originalAlgebraString;
+    
 private:
 
     /** brief Copy construction not permitted */
@@ -325,6 +341,7 @@ private:
     bool processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
 protected: //virtual
+
     class AssigmentPrerequisites
     {
     public:
@@ -365,7 +382,8 @@ protected: //virtual
     /** brief starts the branch and bound assignment. */
     virtual void calculateAssignment(std::unique_ptr<c_Node_Base> nodeAssignment,const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
     void sendErrorMsg(std::string& errStr);
-
+    /** Modifies the algebra string to disclude time opperators to avoid parsing them */
+    virtual std::string modifyAlgebraString(std::string processAlgebraString);
 
 protected:
     

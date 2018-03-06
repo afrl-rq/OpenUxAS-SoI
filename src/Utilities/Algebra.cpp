@@ -506,7 +506,7 @@ parseTreeNode *CAlgebraBase::parseFormula(const std::string formulaIn)
 
 void CAlgebraBase::initPredsRec(parseTreeNode *ptRoot)
 {
-
+  
     if (ptRoot->getNodeType() == ND_OPERATOR)
     {
         // Get all the children actions of all the children nodes and store in the data structure below
