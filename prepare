@@ -18,6 +18,8 @@ def process_wrap_patches():
         tf = tarfile.open(str(subproject_dir / (p.name + '_patch.tar')), 'w')
         tf.add(str(p), arcname=p.name)
         tf.close()
+        if not os.path.exists( str(cache_dir) ):
+            os.mkdir( str(cache_dir) )
         shutil.copyfile( str(subproject_dir / (p.name + '_patch.tar')), str(cache_dir / (p.name + '_patch.tar')) )
 
 def process_wrap_templates():
