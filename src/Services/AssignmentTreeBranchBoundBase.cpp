@@ -470,22 +470,14 @@ bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<As
     {
         std::string taskRelationships = assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getTaskRelationships();
 
+        //Print out the pre-expanded algebra string
+        //std::cout << "Algebra string before parsing (and before pulling out time stuff): " << taskRelationships << std::endl;
 
+        taskRelationships = modifyAlgebraString(taskRelationships);        
 
-		//Print out the pre-expanded algebra string
-		std::cout << "Algebra string before parsing (and before pulling out time stuff): " << taskRelationships << std::endl;
-		//============================================================================================================================================
-		//=============================================================START=OF=CHANGES===============================================================
-		//============================================================================================================================================
-
-		taskRelationships = modifyAlgebraString(taskRelationships);
-
-		//============================================================================================================================================
-		//===================================================================END======================================================================
-		//============================================================================================================================================
-		std::cout << "Algebra string before parsing (and after pulling out time stuff): " << taskRelationships << std::endl;
-
-		std::cout << "Algebra string before parsing (and after pulling out time stuff): " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+        //print statements to aid in bugfixing the parsing of the algebra string
+        //std::cout << "Algebra string before parsing (and after pulling out time stuff): " << taskRelationships << std::endl;
+        //std::cout << "Algebra string before parsing (and after pulling out time stuff): " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
 
         bool isFinished(false);
         while (!isFinished)
@@ -1161,10 +1153,10 @@ void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehi
                 }
             }
 
-            std::cout << "First: " << maxTime << " vs " << travelTimeTotalToEnd_ms << std::endl;
-
+            //std::cout << "First: " << maxTime << " vs " << travelTimeTotalToEnd_ms << std::endl;
+ 
             if((maxTime > travelTimeTotalToEnd_ms) || (maxTime == -1)){ //changed here
-                std::cout << "Second: " << maxTime << " vs " << travelTimeTotalToEnd_ms << std::endl;
+                //std::cout << "Second: " << maxTime << " vs " << travelTimeTotalToEnd_ms << std::endl;
                 if ((maxVehicleTravelTime_ms < 0) || (travelTimeTotalToEnd_ms < maxVehicleTravelTime_ms))
                 {
                     // create new child for cost calculation

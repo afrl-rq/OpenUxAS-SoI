@@ -297,6 +297,8 @@
             <Field Name="FinalHeading" Type="real32" Units="degrees" />
             <!-- Time when vehicle is at the final location -->
             <Field Name="FinalTime" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Time before which this task cannot begin -->
+            <Field Name="TimeThreshold" Type="int64" Units="milliseconds since 1 Jan 1970" />
         </Struct>
         
         <!-- Matrix of costs consisting of:
