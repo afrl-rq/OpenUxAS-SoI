@@ -665,6 +665,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 taskImplementationResponse->setFinalLocation(itTaskOptionClass->second->m_taskOption->getEndLocation()->clone());
                                 taskImplementationResponse->setFinalHeading(itTaskOptionClass->second->m_taskOption->getEndHeading());
                                 taskImplementationResponse->setFinalTime(itTaskImplementationRequest->second->getStartTime() + itTaskOptionClass->second->m_taskOption->getCost());
+				taskImplementationResponse->setTimeThreshold(itTaskImplementationRequest->second->getTimeThreshold());
                                 int64_t waypointId = itTaskImplementationRequest->second->getStartingWaypointID();
                                 // waypoints from the saved routes
                                 bool isFirstWaypoint = true;

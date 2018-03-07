@@ -180,7 +180,7 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
             planState->setEntityID(vID);
             planState->setPlanningPosition(entityState->getLocation()->clone());
             planState->setPlanningHeading(entityState->getHeading());
-            
+
             uxas::common::utilities::CUnitConversions unitConversions;
             double north_m(0.0);
             double east_m(0.0);
@@ -196,19 +196,19 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
             unitConversions.ConvertNorthEast_mToLatLong_deg(north_m, east_m, latitude_deg, longitude_deg);
             planState->getPlanningPosition()->setLatitude(latitude_deg);
             planState->getPlanningPosition()->setLongitude(longitude_deg);
-            
+
             projectedState->setState(planState);
         }
-                                            
+
         m_projectedEntityStates[taskAssignmentSummary->getCorrespondingAutomationRequestID()].push_back(projectedState);
     }
-    
+
     // queue up all task assignments to be made
     for(auto t : taskAssignmentSummary->getTaskList())
     {
         m_remainingAssignments[taskAssignmentSummary->getCorrespondingAutomationRequestID()].push_back(std::shared_ptr<uxas::messages::task::TaskAssignment>(t->clone()));
     }
-    
+
     sendNextTaskImplementationRequest(taskAssignmentSummary->getCorrespondingAutomationRequestID());
 }
 
@@ -219,7 +219,7 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
     if(m_remainingAssignments[uniqueRequestID].empty())
         return false;
     auto taskAssignment = m_remainingAssignments[uniqueRequestID].front();
-    
+
     auto planState = std::find_if(m_projectedEntityStates[uniqueRequestID].begin(), m_projectedEntityStates[uniqueRequestID].end(),
                                   [&](std::shared_ptr<ProjectedState> state)
                                   { return( (!state || !(state->state)) ? false : (state->state->getEntityID() == taskAssignment->getAssignedVehicle()) ); });
@@ -260,6 +260,7 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
 
 void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse)
 {
+    std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
     // check response ID
     if(m_expectedResponseID.find(taskImplementationResponse->getResponseID()) == m_expectedResponseID.end())
         return;
