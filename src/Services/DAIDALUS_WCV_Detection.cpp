@@ -20,9 +20,10 @@
 // include header for this service
 #include "DAIDALUS_WCV_Detection.h"
 #include "Daidalus.h"
-#include "Position.h"
-#include "Velocity.h"
-#include "Util.h"
+//#include "Position.h"
+//#include "Velocity.h"
+//#include "Util.h"
+//#include "Constants/Convert.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h" //this is an exemplar
@@ -37,9 +38,7 @@
 #define STRING_XML_OPTION_INT "OptionInt"
 
 // useful definitions
-#ifndef M_PI 
-#define M_PI 3.141592653589793238462643
-#endif
+
 
 namespace {
     void makeVelocityXYZ(double u, double v, double w, double Phi, double Theta, double Psi, double& velocityX, double& velocityY, double& velocityZ)
@@ -54,26 +53,17 @@ namespace {
 namespace uxas  // uxas::
 {
 namespace service   // uxas::service::
-{
-    const double PI = M_PI;
-    
-    struct daidalus_package{
-        larcfm::Position daidalusPosition;
-        larcfm::Velocity daidalusVelocity;
-        double daidalusTime;
-    } vehicleInfo;
-    std::unordered_map<int64_t, daidalus_package> daidalusVehicleInfo;
-    std::unordered_map<int64_t, double> detectedViolations;
+{   
+
 // this entry registers the service in the service creation registry
 DAIDALUS_WCV_Detection::ServiceBase::CreationRegistrar<DAIDALUS_WCV_Detection>
 DAIDALUS_WCV_Detection::s_registrar(DAIDALUS_WCV_Detection::s_registryServiceTypeNames());
 
 //create a DAIDALUS object
-larcfm::Daidalus daa;
 
 // service constructor
 DAIDALUS_WCV_Detection::DAIDALUS_WCV_Detection()
-: ServiceBase(DAIDALUS_WCV_Detection::s_typeName(), DAIDALUS_WCV_Detection::s_directoryName()) { };
+: ServiceBase(DAIDALUS_WCV_Detection::s_typeName(), DAIDALUS_WCV_Detection::s_directoryName()), daa(larcfm::Daidalus()) { };
 
 // service destructor
 DAIDALUS_WCV_Detection::~DAIDALUS_WCV_Detection() { };
@@ -83,15 +73,33 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     bool isSuccess(true);
 
     // process options from the XML configuration node:
-    if (!ndComponent.attribute(STRING_XML_OPTION_STRING).empty())
+    if (!ndComponent.attribute("LookAheadTime").empty())
     {
-        m_option01 = ndComponent.attribute(STRING_XML_OPTION_STRING).value();
+        m_lookahead_time = ndComponent.attribute("LookAheadTime").as_int();
+        daa.parameters.setLookaheadTime(m_lookahead_time, "s");
     }
-    if (!ndComponent.attribute(STRING_XML_OPTION_INT).empty())
+    if (!ndComponent.attribute("LeftTrack").empty())
     {
-        m_option02 = ndComponent.attribute(STRING_XML_OPTION_INT).as_int();
+        m_left_trk = ndComponent.attribute("LeftTrack").as_double();
+        daa.parameters.setLeftTrack(m_left_trk, "deg");
     }
-
+    if (!ndComponent.attribute("RightTrack").empty())
+    {
+        m_right_trk = ndComponent.attribute("RightTrack").as_double();
+        daa.parameters.setRightTrack(m_right_trk, "deg");
+    }
+    if (!ndComponent.attribute("MinGroundSpeed").empty())
+    {
+        m_min_gs = ndComponent.attribute("MinGroundSpeed").as_double();
+        daa.parameters.setMinGroundSpeed(m_min_gs, "m/s");
+    }
+    if (!ndComponent.attribute("MaxGroundSpeed").empty())
+    {
+        m_max_gs = ndComponent.attribute("MaxGroundSpeed").as_double();
+        daa.parameters.setMaxGroundSpeed(m_max_gs, "m/s");
+    }
+    // */
+    
     // subscribe to messages::
     //addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
@@ -133,15 +141,18 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
     {
         //receive message
         auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
-        //std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState" << std::endl ;
+        std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << airVehicleState->getID() << std::endl ;
         //handle message
         auto Total_velocity = airVehicleState->getAirspeed();
         auto Total_velocity_calculated =std::sqrt(std::pow(airVehicleState->getU(),2)+std::pow(airVehicleState->getV(),2)+std::pow(airVehicleState->getW(),2));
         if (std::abs(Total_velocity-Total_velocity_calculated)>0.000001)
         {std::cout << "Danger!! Danger !!  Calculated velocity is not equivalent to broadcast velocity" << std::endl;
         std::cout << "Broadcast velocity = " << Total_velocity << " Calculated velocity = " << Total_velocity_calculated << std::endl;}
+        std::unordered_map<int64_t, double> detectedViolations;
+
         
         //add air vehicle message state to the Daidalus Object
+        daidalus_package vehicleInfo;
         vehicleInfo.daidalusPosition = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",  airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m") ;      
         auto u = airVehicleState->getU();
         auto v = airVehicleState->getV();
@@ -150,7 +161,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         auto Theta = airVehicleState->getPitch();
         auto Psi = airVehicleState->getHeading();
         double velocityX, velocityY, velocityZ;
-        makeVelocityXYZ(u, v, w, Phi*PI/180.0, Theta*PI/180.0, Psi*PI/180.0, velocityX, velocityY, velocityZ);
+        makeVelocityXYZ(u, v, w, n_Const::c_Convert::toRadians(Phi), n_Const::c_Convert::toRadians(Theta), n_Const::c_Convert::toRadians(Psi), velocityX, velocityY, velocityZ);
         auto daidalusVelocityZ = -velocityZ;
         auto daidalusVelocityX = velocityY;
         auto daidalusVelocityY = velocityX;
@@ -158,7 +169,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         vehicleInfo.daidalusTime = airVehicleState->getTime()/1000.0;
         // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship
         daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
-        if (daidalusVehicleInfo.size()>1 && daidalusVehicleInfo.count(m_entityId))
+        if (daidalusVehicleInfo.size()>1 && daidalusVehicleInfo.count(m_entityId)>0)
         { daa.setOwnshipState(std::to_string(m_entityId),daidalusVehicleInfo[m_entityId].daidalusPosition,daidalusVehicleInfo[m_entityId].daidalusVelocity,daidalusVehicleInfo[m_entityId].daidalusTime);
         for (auto it_intruderId = daidalusVehicleInfo.begin(); it_intruderId!=daidalusVehicleInfo.end(); it_intruderId++)
             {
@@ -169,9 +180,10 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     }
             
             }
+        //std::cout << "Number of aircraft according to DAIDALUS: " << daa.numberOfAircraft() << std::endl;
         if (daa.numberOfAircraft()>1)
         {
-            detectedViolations.clear();
+            //detectedViolations.clear();
             for (int intruderIndex = 1; intruderIndex<=daa.numberOfAircraft()-1; intruderIndex++)
             {
                 auto timeToViolation = daa.timeToViolation(intruderIndex);
@@ -191,12 +203,13 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         //keyValuePairOut->setKey(s_typeName());
         //keyValuePairOut->setValue(std::to_string(m_serviceId));
         //sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
-        if (!detectedViolations.empty())
+        std::cout << "Number of aircraft according to DAIDALUS: " << daa.numberOfAircraft() << std::endl;
+        if (daa.numberOfAircraft()>1 && !detectedViolations.empty())
         {
             for (auto itViolations = detectedViolations.begin(); itViolations != detectedViolations.end(); itViolations++)
                std::cout << "Entity " << m_entityId << " will violate the well clear volume with Entity " << itViolations->first << " in " << itViolations->second <<" seconds!!" << std::endl;
         }
-        else
+        else if(daa.numberOfAircraft()>1)
         {
             std::cout << "No violation of well clear volume detected :^)" << std::endl;
         }
@@ -205,5 +218,5 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
     return false;
 }
 
-}; //namespace service
-}; //namespace uxas
+} //namespace service
+} //namespace uxas

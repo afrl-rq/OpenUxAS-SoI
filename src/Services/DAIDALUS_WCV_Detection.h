@@ -23,7 +23,9 @@
 #include "CallbackTimer.h"
 #include "TypeDefs/UxAS_TypeDefs_Timer.h"
 #include "Daidalus.h"
-
+#include "Constants/Convert.h"
+#include "Position.h"
+#include "Velocity.h"
 namespace uxas
 {
 namespace service
@@ -133,10 +135,53 @@ private:
     // storage for the option entries
     std::string m_option01 = std::string("No Option 1");
     int32_t m_option02{0};
+    //DAIDALUS parameters
+    int32_t m_lookahead_time = {180};   // seconds
+    double m_left_trk = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())}; // degrees   
+    double m_right_trk = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())};    // degrees
+    double m_min_gs = {5.1444}; // meters per second
+    double m_max_gs = {360.111};    // meters per second
+    double m_min_vs = {-30.48}; // meters per second
+    double m_max_vs = {30.48};  // meters per second
+    double m_min_alt = {100*n_Const::c_Convert::dFeetToMeters()};   // meters
+    double m_max_alt = {50000*n_Const::c_Convert::dFeetToMeters()}; // meters
+    double m_trk_step = {1.0};  // degrees
+    double m_gs_step = {2.57222};   // meters per second
+    double m_vs_step = {100.0/60.0*n_Const::c_Convert::dFeetToMeters()}; // meters per second
+    double m_alt_step = {100*n_Const::c_Convert::dFeetToMeters()};  // meters
+    double m_horizontal_accel = {0.0};  // meters per second per second
+    double m_vertical_accel = {0.0};    // gravity
+    double m_turn_rate = {0.0}; // degrees per second
+    double m_bank_angle = {0.0};    // degrees
+    double m_vertiacl_rate = {0.0}; //meters per second
+    int32_t m_recovery_stability_time = {0};  // seconds
+    double m_min_horizontal_recovery = {1222.32};   // meters
+    double m_min_vertical_recovery = {450.0*n_Const::c_Convert::dFeetToMeters()}; // meters
+    bool m_recovery_trk = {true};   // Boolean
+    bool m_recovery_gs = {true};    // Boolean
+    bool m_recovery_vs = {true};    // Boolean
+    bool m_recovery_alt = {true};   // Boolean
+    bool m_ca_bands = {false};  // Boolean
+    double m_ca_factor = {0.2};
+    double m_horizonatal_nmac = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters
+    double m_vertical_nmac = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters
+    double m_contour_thr = {180.0}; // degrees
+    double m_blobs = {};
+    //-*/
+    
+    //
+     struct daidalus_package{
+       larcfm::Position daidalusPosition;
+        larcfm::Velocity daidalusVelocity;
+        double daidalusTime;
+    };
+    larcfm::Daidalus daa;
+    std::unordered_map<int64_t, daidalus_package> daidalusVehicleInfo;
+
 };
 
-}; //namespace service
-}; //namespace uxas
+} //namespace service
+} //namespace uxas
 
 #endif /* UXAS_DAIDALUS_WCV_DETECTION_H */
 

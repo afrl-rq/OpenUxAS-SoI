@@ -32,7 +32,7 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
-    <!-- Service Type="DAIDALUS_WCV_Detection"/ -->
+    <Service Type="DAIDALUS_WCV_Detection"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="4208" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
