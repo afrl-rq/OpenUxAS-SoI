@@ -196,6 +196,7 @@ deps += glu_deps
 
 if get_option('afrl_internal')
   deps += deps_internal
+  link_args += link_args_internal
 endif
 
 
