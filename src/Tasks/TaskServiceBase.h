@@ -88,6 +88,10 @@ namespace task
         std::unordered_set<int64_t> m_pendingRouteIds;
         /** \brief RoutePlans that will be used to implement the option.  */
         std::map<int64_t, std::shared_ptr<uxas::messages::route::RoutePlan>> m_orderedRouteIdVsPlan;
+        /** \brief starting option of the tasks.  */
+        static const int64_t m_firstOptionId;
+        /** \brief id of the route from the last position to the start of this task option.  */
+        static const int64_t m_restartOptionId;
         /** \brief id of the route from the last position to the start of this task option  */
         static const int64_t m_routeIdFromLastTask;  
         /** \brief first id to use for the implementation routes in this task option  */
@@ -346,6 +350,10 @@ namespace task
         std::shared_ptr<afrl::cmasi::Task> m_task;
         /*! \brief all entities assigned to this task*/
         std::unordered_set<int64_t> m_assignedVehicleIds;
+        /*! \brief the last active task waypoint passed by the vehicle*/
+        std::unordered_map<int64_t,int64_t> m_assignedVehicleIdVsLastTaskWaypoint;
+        /*! \brief the option that was assigned to the vehicle*/
+        std::unordered_map<int64_t,int64_t> m_assignedVehicleIdVsAssignedOptionId;
         /*! \brief  a container for <B><i>TaskOptionClass</i></B>es used to construct
          * task options.
          *  once all the options have been created*/
