@@ -75,7 +75,7 @@ LoiterTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::O
 };
 
 void LoiterTaskService::buildTaskPlanOptions() {
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
 
 
 
