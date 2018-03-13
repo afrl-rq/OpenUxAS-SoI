@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /src
 
-RUN git  clone -b odroidxu4_uxas https://github.com/acfoltzer/buildroot.git
+RUN git clone -b odroidxu4_uxas https://github.com/acfoltzer/buildroot.git
 
 RUN make -C buildroot odroidxu4_uxas_defconfig
 RUN make -C buildroot sdk

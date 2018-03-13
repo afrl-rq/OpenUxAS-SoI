@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory includes two sub-directories, `develop` and `deploy`.
+This directory includes two sub-directories, `develop`, and `deploy`, and `odroidxu4`.
 
 The `develop` directory contains scripts to build a Docker image
 containing all of the UxAS prerequsite software, as well as scripts to
@@ -12,6 +12,10 @@ The `deploy` directory contains scripts to build a Docker image that
 includes the `uxas` binary produced by the `develop` scripts, and the
 libraries required at run-time. That image can then be used to run UxAS
 in a directory mounted from the host computer.
+
+The `odroidxu4` directory contains scripts to build a Docker image for
+cross-compiling UxAS onto an ODROID-XU4 Buildroot Linux image. For
+more, see the README in that directory.
 
 ## Details
 

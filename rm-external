@@ -10,6 +10,10 @@ for p in pd.glob('*_patch.tar'):
         d = str(p)[0:-10]
         if Path(d).is_dir():
                 shutil.rmtree(d)
+for p in pd.glob('*.wrap'):
+        d = str(p)[0:-5]
+        if Path(d).is_dir():
+                shutil.rmtree(d)
 pc = pd / 'packagecache'
 for c in pc.glob('*'):
         os.remove(str(c))
