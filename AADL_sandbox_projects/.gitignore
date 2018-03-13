@@ -1,7 +1,6 @@
 *.aadlbin
 *.aaxl2
 *.aadl_diagram
-*.xls
 
 UxAS_jad/.aadlbin-gen/
 UxAS_jad/instances
