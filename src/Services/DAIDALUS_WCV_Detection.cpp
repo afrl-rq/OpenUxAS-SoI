@@ -98,6 +98,132 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
         m_max_gs = ndComponent.attribute("MaxGroundSpeed").as_double();
         daa.parameters.setMaxGroundSpeed(m_max_gs, "m/s");
     }
+    if (!ndComponent.attribute("MinVerticalSpeed").empty())
+    {
+        m_min_vs = ndComponent.attribute("MinVverticalSpeed").as_double();
+        daa.parameters.setMinVerticalSpeed(m_min_vs, "m/s");
+    }
+    if (!ndComponent.attribute("MaxVerticalSpeed").empty())
+    {
+        m_max_vs = ndComponent.attribute("MaxVerticalSpeed").as_double();
+        daa.parameters.setMaxVerticalSpeed(m_max_vs, "m/s");
+    }
+    if (!ndComponent.attribute("MinAltitude").empty())
+    {
+        m_min_alt = ndComponent.attribute("MinAltitude").as_double();
+        daa.parameters.setMinAltitude(m_min_alt, "m");
+    }
+    if (!ndComponent.attribute("MaxAltitude").empty())
+    {
+        m_max_alt = ndComponent.attribute("MaxAltitue").as_double();
+        daa.parameters.setMaxAltitude(m_max_alt, "m");
+    }
+    if (!ndComponent.attribute("TrackStep").empty())
+    {
+        m_trk_step = ndComponent.attribute("TrackStep").as_double();
+        daa.parameters.setTrackStep(m_trk_step, "deg");
+    }
+    if (!ndComponent.attribute("GroundSpeedStep").empty())
+    {
+        m_gs_step = ndComponent.attribute("GroundSpeedStep").as_double();
+        daa.parameters.setGroundSpeedStep(m_gs_step, "m/s");
+    }
+    if (!ndComponent.attribute("VerticalSpeedStep").empty())
+    {
+        m_vs_step = ndComponent.attribute("VerticalSpeedStep").as_double();
+        daa.parameters.setVerticalSpeedStep(m_vs_step, "m/s");
+    }
+    if (!ndComponent.attribute("AltitudeStep").empty())
+    {
+        m_alt_step = ndComponent.attribute("AltitudeStep").as_double();
+        daa.parameters.setAltitudeStep(m_alt_step, "m");
+    }
+    if (!ndComponent.attribute("HorizontalAcceleration").empty())
+    {
+        m_horizontal_accel = ndComponent.attribute("HorizontalAcceleration").as_double();
+        daa.parameters.setHorizontalAcceleration(m_horizontal_accel, "m/s");
+    }
+    if (!ndComponent.attribute("VerticalAcceleration").empty())
+    {
+        m_vertical_accel = ndComponent.attribute("VerticalAcceleration").as_double();
+        daa.parameters.setVerticalAcceleration(m_vertical_accel, "G");
+    }
+    if (!ndComponent.attribute("TurnRate").empty())
+    {
+        m_turn_rate = ndComponent.attribute("TurnRate").as_double();
+        daa.parameters.setTurnRate(m_turn_rate, "deg/s");
+    }
+    if (!ndComponent.attribute("BankAngle").empty())
+    {
+        m_bank_angle = ndComponent.attribute("BankAngle").as_double();
+        daa.parameters.setBankAngle(m_bank_angle, "deg");
+    }
+    if (!ndComponent.attribute("VerticalRate").empty())
+    {
+        m_vertical_rate = ndComponent.attribute("VerticalRate").as_double();
+        daa.parameters.setVerticalRate(m_vertical_rate, "m/s");
+    }    
+    if (!ndComponent.attribute("RecoveryStabilityTime").empty())
+    {
+        m_recovery_stability_time = ndComponent.attribute("RecoveryStabilityTime").as_int();
+        daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time, "s");
+    }
+    if (!ndComponent.attribute("HorizontalRecovery").empty())
+    {
+        m_min_horizontal_recovery = ndComponent.attribute("HorizontalRecovery").as_double();
+        daa.parameters.setMinHorizontalRecovery(m_min_horizontal_recovery, "m");
+    }
+    if (!ndComponent.attribute("VerticalRecovery").empty())
+    {
+        m_min_vertical_recovery = ndComponent.attribute("VerticalRecovery").as_double();
+        daa.parameters.setMinVerticalRecovery(m_min_vertical_recovery, "m");
+    }
+    if (!ndComponent.attribute("isRecoveryTrack").empty())
+    {
+        m_recovery_trk = ndComponent.attribute("isRecoveryTrack").as_bool();
+        daa.parameters.setRecoveryTrackBands(m_recovery_trk);
+    }
+    if (!ndComponent.attribute("isRecoveryGroundSpeed").empty())
+    {
+        m_recovery_gs = ndComponent.attribute("isRecoveryGroundSpeed").as_bool();
+        daa.parameters.setRecoveryGroundSpeedBands(m_recovery_gs);
+    }
+    if (!ndComponent.attribute("isRecoveryVerticalSpeed").empty())
+    {
+        m_recovery_vs = ndComponent.attribute("isRecoveryVerticalSpeed").as_bool();
+        daa.parameters.setRecoveryVerticalSpeedBands(m_recovery_vs);
+    }
+    if (!ndComponent.attribute("isRecoveryAltitude").empty())
+    {
+        m_recovery_alt = ndComponent.attribute("isRecoveryAltitude").as_bool();
+        daa.parameters.setRecoveryAltitudeBands(m_recovery_alt);
+    }
+    if (!ndComponent.attribute("isCollisionAvoidanceBands").empty())
+    {
+        m_ca_bands = ndComponent.attribute("isCollisionAvoidanceBands").as_bool();
+        daa.parameters.setCollisionAvoidanceBands(m_ca_bands);
+    }
+    if (!ndComponent.attribute("CollisionAvoidanceBandsFactor").empty())
+    {
+        m_ca_factor = ndComponent.attribute("CollisionAvoidanceBandsFactor").as_double();
+        daa.parameters.setCollisionAvoidanceBandsFactor(m_ca_factor);
+    }
+    if (!ndComponent.attribute("HorizontalNMAC").empty())
+    {
+        m_horizontal_nmac = ndComponent.attribute("HorizontalNMAC").as_double();
+        daa.parameters.setHorizontalNMAC(m_horizontal_nmac, "m");
+    }
+    if (!ndComponent.attribute("VerticalNMAC").empty())
+    {
+        m_vertical_nmac = ndComponent.attribute("VerticalNMAC").as_double();
+        daa.parameters.setVerticalNMAC(m_vertical_nmac, "m");
+    }
+    if (!ndComponent.attribute("ContourThreshold").empty())
+    {
+        m_contour_thr = ndComponent.attribute("ContourThreshold").as_double();
+        daa.parameters.setHorizontalContourThreshold(m_contour_thr, "deg");
+    }
+    
     // */
     
     // subscribe to messages::
