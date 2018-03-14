@@ -44,7 +44,7 @@ meson.py build_tmp_for_deps_fetching \
   --cross-file docker/odroidxu4/odroid-xu4-gnueabihf.txt && \
 rm -rf build_tmp_for_deps_fetching && \
 mkdir -p /var/cache/OpenUxAS/3rd && \
-cp -r 3rd/packagecache /var/cache/OpenUxAS/3rd/ \
+cp -r 3rd /var/cache/OpenUxAS/ \
 "
 # save the container state as the new uxas_cross image
 docker commit uxas_cross_deps uxas_cross

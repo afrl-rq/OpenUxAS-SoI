@@ -12,8 +12,7 @@ fi
 echo '[02_cross_compile_uxas.sh] Cross-compiling UxAS to `/OpenUxAS/build_cross/uxas`'
 
 docker run --rm -v $(pwd):/src/OpenUxAS uxas_cross sh -c "rm -rf build_cross && \
-rm -rf 3rd/packagecache && \
-cp -r /var/cache/OpenUxAS/3rd/packagecache 3rd/ && \
+cp -r /var/cache/OpenUxAS/3rd . && \
 meson.py build_cross \
   --buildtype release \
   --cross-file docker/odroidxu4/odroid-xu4-gnueabihf.txt && \

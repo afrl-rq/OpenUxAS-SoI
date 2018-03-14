@@ -41,7 +41,8 @@ LmcpGen, but is optional:
 
 After running the first script, `01_build_sdcard_and_sdk.sh`, which
 must be run with an internet connection, the resulting `uxas_cross`
-Docker image contains a saved copy of the Meson external dependency
-cache. If you make changes to the external dependencies, their wrap
-files, or the wrap patches, you will need to rerun this script for
-those changes to persist through to the second step.
+Docker image contains a saved copy of the `/OpenUxAS/3rd` directory,
+including the Meson external dependency cache. If you make changes to
+the external dependencies, their wrap files, or the wrap patches, you
+will need to rerun this script for those changes to persist through to
+the second step.
