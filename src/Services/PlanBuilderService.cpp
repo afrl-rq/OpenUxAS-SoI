@@ -27,6 +27,9 @@
 #include "afrl/cmasi/ServiceStatus.h"
 #include "pugixml.hpp"
 
+//Added
+#include "afrl/cmasi/LoiterAction.h"
+
 #include <sstream>
 #include <iostream>     // std::cout, cerr, etc
 
@@ -260,7 +263,6 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
 
 void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse)
 {
-    std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
     // check response ID
     if(m_expectedResponseID.find(taskImplementationResponse->getResponseID()) == m_expectedResponseID.end())
         return;
@@ -290,6 +292,31 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
     
     auto corrMish = std::find_if(m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().begin(), m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end(),
                                 [&](afrl::cmasi::MissionCommand* mish) { return mish->getVehicleID() == taskImplementationResponse->getVehicleID(); });
+
+    //std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
+    if(taskImplementationResponse->getTimeThreshold() > 0){
+        //create the loiter action for the task and set it to the first waypoint in the list
+        
+        afrl::cmasi::LoiterAction lTask;
+        //will eventually need to be in epoch time
+        lTask.setDuration(5000);//taskImplementationResponse->getTimeThreshold()
+        lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
+        lTask.setLocation(m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone());
+        //std::cout << lTask.getLocation()->toString() << std::endl;
+        //std::cout << lTask.toString() << std::endl;
+        //std::cout << "Vehicle Action List: " << taskImplementationResponse->toString() << std::endl;
+        //taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().insert(taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().begin(), lTask.clone());
+        taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().push_back(lTask.clone());
+
+/*
+what the plan is and what will need to happen
+1.) use taskImplementationResponse->getTaskWaypoints().front()->getTaskWaypoints() to get the waypoint list for the given task (don't forget to check if it is empty)
+2.) create a new point in the front for the loiter task if and only if TimeThreshold > 0
+3.) add that new point to the front
+4.) Test
+*/
+
+    }
 
     if(corrMish != m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end())
     {

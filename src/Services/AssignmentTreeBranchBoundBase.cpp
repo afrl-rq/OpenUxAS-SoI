@@ -1191,7 +1191,7 @@ void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehi
                         taskAssignment->setTaskID(c_TaskAssignmentState::getTaskID(taskOptionId));
                         taskAssignment->setOptionID(c_TaskAssignmentState::getOptionID(taskOptionId));
                         taskAssignment->setAssignedVehicle(vehicleId);
-                        taskAssignment->setTimeThreshold(prerequisiteTime_ms);
+                        taskAssignment->setTimeThreshold(prerequisiteTime_ms);  //this should be set for testing initially
                         taskAssignment->setTimeTaskCompleted(travelTimeTotalToEnd_ms);
                         newChild->m_vehicleIdVsAssignmentState[vehicleAssignmentState->m_vehicleId]->m_taskAssignments.push_back(std::move(taskAssignment));
                         m_costVsChildren.insert(std::pair<int64_t, std::unique_ptr<c_Node_Base> >(evaluationOrderCost, std::move(newChild)));
