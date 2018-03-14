@@ -33,13 +33,23 @@ docker run --rm -v $TOP:/src/OpenUxAS uxas_cross sh -c 'cp -r /opt/uxas/sdcard.i
 
 echo '[01_build_sdcard_and_sdk.sh] Preparing 3rd party dependencies'
 
-docker run --rm -v $TOP:/src/OpenUxAS uxas_cross sh -c "\
+# clean up any old containers in case a previous run errored out
+docker rm uxas_cross_deps &> /dev/null || true
+# populate the packagecache
+docker run --name uxas_cross_deps -v $TOP:/src/OpenUxAS uxas_cross sh -c "\
+rm -rf build_tmp_for_deps_fetching && \
 python3 ./rm-external && \
 python3 ./prepare && \
 meson.py build_tmp_for_deps_fetching \
   --cross-file docker/odroidxu4/odroid-xu4-gnueabihf.txt && \
-rm -rf build_tmp_for_deps_fetching \
+rm -rf build_tmp_for_deps_fetching && \
+mkdir -p /var/cache/OpenUxAS/3rd && \
+cp -r 3rd/packagecache /var/cache/OpenUxAS/3rd/ \
 "
+# save the container state as the new uxas_cross image
+docker commit uxas_cross_deps uxas_cross
+# clean up the container
+docker rm uxas_cross_deps
 
 echo '[01_build_sdcard_and_sdk.sh] Resetting permissions in `/OpenUxAS` and subdirectories'
 

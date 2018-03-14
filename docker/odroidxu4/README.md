@@ -37,15 +37,11 @@ LmcpGen, but is optional:
    cross-compile UxAS. The resulting binary will be found at
    `/OpenUxAS/build_cross/uxas`, ready to copy to the ODROID.
  
-## Offline Builds
+## Offline Builds and External Dependencies
 
 After running the first script, `01_build_sdcard_and_sdk.sh`, which
-must be run with an internet connection, the OpenUxAS repository is
-left in a state where the `02_cross_compile_uxas.sh` step can be run
-without a connection.
-
-However, this is somewhat fragile at the moment, as the `01` step
-pre-fetches the 3rd party dependencies specified in Meson wrap
-files. Running the `rm-external` script will therefore wipe out this
-cached state, and a network connection will again be required to
-proceed.
+must be run with an internet connection, the resulting `uxas_cross`
+Docker image contains a saved copy of the Meson external dependency
+cache. If you make changes to the external dependencies, their wrap
+files, or the wrap patches, you will need to rerun this script for
+those changes to persist through to the second step.
