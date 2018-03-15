@@ -1,13 +1,12 @@
 package DPSS_Constants
 public
 	
-	with Base_Types;
 	with DPSS_Data_Types;
 	
 	annex agree {**
 			
-		const P_GLOBAL : Base_Types::Float = 10.0;	
-		const V : Base_Types::Float = 1.0; --velocity
+		const P_GLOBAL : real = 10.0;	
+		const V : real = 1.0; --velocity
 		const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_GLOBAL/V;
 		const LEFT : int = -1;
 		const RIGHT : int = 1;
