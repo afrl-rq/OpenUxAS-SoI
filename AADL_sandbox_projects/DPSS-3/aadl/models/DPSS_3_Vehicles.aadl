@@ -1,6 +1,5 @@
 package DPSS_3_Vehicles_Pkg
 public
-	with Base_Types;
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;

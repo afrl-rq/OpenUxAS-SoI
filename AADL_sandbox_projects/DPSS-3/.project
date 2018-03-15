@@ -3,7 +3,6 @@
 	<name>DPSS-3</name>
 	<comment></comment>
 	<projects>
-		<project>Plugin_Resources</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
