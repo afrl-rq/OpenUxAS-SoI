@@ -372,13 +372,13 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;
 			
-			lemma "Stable on and after 22 steps":
+			lemma "Stable on and after 11 steps":
 				steps >= 22 => stable;
 				
-			lemma "Stable on and after 23 steps":
+			lemma "Stable on and after 12 steps":
 				steps >= 23 => stable;
 
-			lemma "Stable on and after 25 steps":
+			lemma "Stable on and after 20 steps":
 				steps >= 25 => stable;
 			
 			lemma "Stable on and after 30 steps":
