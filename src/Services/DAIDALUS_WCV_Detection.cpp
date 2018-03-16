@@ -19,11 +19,6 @@
 
 // include header for this service
 #include "DAIDALUS_WCV_Detection.h"
-#include "Daidalus.h"
-//#include "Position.h"
-//#include "Velocity.h"
-//#include "Util.h"
-//#include "Constants/Convert.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h" //this is an exemplar
@@ -33,19 +28,60 @@
 #include <cmath>    //cmath::cos, sin, etc
 #include <string>   //std::to_string etc
 
+
 // convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
 #define STRING_XML_OPTION_INT "OptionInt"
 
+#define STRING_XML_LOOKAHEADTIME "LookAheadTime"
+#define STRING_XML_LEFTTRACK "LeftTrack"
+#define STRING_XML_RIGHTTRACK "RightTrack"
+#define STRING_XML_MINGROUNDSPEED "MinGroundSpeed"
+#define STRING_XML_MAXGROUNDSPEED "MaxGroundSpeed"
+#define STRING_XML_MINVERTICALSPEED "MinVerticalSpeed"
+#define STRING_XML_MAXVERTICALSPEED "MaxVerticalSpeed"
+#define STRING_XML_MINALTITUDE "MinAltitude"
+#define STRING_XML_MAXALTITUDE "MaxAltitude"
+#define STRING_XML_TRACKSTEP "TrackStep"
+#define STRING_XML_GROUNDSPEEDSTEP "GroundSpeedStep"
+#define STRING_XML_VERTICALSPEEDSTEP "VerticalSpeedStep"
+#define STRING_XML_ALTITUDESTEP "AltitudeStep"
+#define STRING_XML_HORIZONTALACCELERATION "HorizontalAcceleration"
+#define STRING_XML_VERTICALACCELERATION "VerticalAcceleration"
+#define STRING_XML_TURNRATE "TurnRate"
+#define STRING_XML_BANKANGLE "BankAngle"
+#define STRING_XML_VERTICALRATE "VerticalRate"
+#define STRING_XML_RECOVERYSTABILITYTIME "RecoveryStabilityTime"
+#define STRING_XML_MINHORIZONTALRECOVERY "MinHorizontalRecovery"
+#define STRING_XML_MINVERTICALRECOVERY "MinVerticalRecovery"
+#define STRING_XML_ISRECOVERYTRACK "isRecoveryTrack"
+#define STRING_XML_ISRECOVERYGROUNDSPEED "isRecoveryGroundSpeed"
+#define STRING_XML_ISRECOVERYVERTICALSPEED "isRecoveryVerticalSpeed"
+#define STRING_XML_ISRECOVERYALTITUDE "isRecoveryAltitude"
+#define STRING_XML_ISCOLLISIONAVOIDANCE "isCollisionAvoidance"
+#define STRING_XML_COLLISIONAVOIDANCEFACTOR "CollisionAvoidanceFactor"
+#define STRING_XML_HORIZONTALNMAC "HorizontalNMAC"
+#define STRING_XML_VERTICALNMAC "VerticalNMAC"
+#define STRING_XML_HORIZONTALCONTOURTHRESHOLD "HorizontalContourThreshold"
+
+
+
+
 // useful definitions
+#define MILLISECONDTOSECOND 1.0/1000.0
 
-
+//todo add units to variable names
 namespace {
-    void makeVelocityXYZ(double u, double v, double w, double Phi, double Theta, double Psi, double& velocityX, double& velocityY, double& velocityZ)
+    void makeVelocityXYZ(double u, double v, double w, double Phi_rad, double Theta_rad, double Psi_rad, double& velocityX, double& velocityY, 
+            double& velocityZ)
     {
-        velocityX = std::cos(Theta)*std::cos(Psi)*u + (std::sin(Phi)*std::sin(Theta)*std::cos(Psi)-std::cos(Phi)*std::sin(Psi))*v + std::sin(Phi)*std::sin(Psi);
-        velocityY = std::cos(Theta)*std::sin(Psi)*u + (std::sin(Phi)*std::sin(Theta)*std::sin(Psi)+std::cos(Phi)*std::cos(Psi))*v + (std::cos(Phi)*std::sin(Theta)*std::sin(Psi)-std::sin(Phi)*std::cos(Psi))*w;
-        velocityZ = -std::sin(Theta)*u + std::sin(Phi)*std::cos(Theta)*v + std::cos(Phi)*std::cos(Theta)*w;
+        velocityX = std::cos(Theta_rad)*std::cos(Psi_rad)*u + (std::sin(Phi_rad)*std::sin(Theta_rad)*std::cos(Psi_rad)- 
+                std::cos(Phi_rad)*std::sin(Psi_rad))*v + (std::cos(Phi_rad)*std::sin(Theta_rad)*std::cos(Psi_rad) + 
+                std::sin(Phi_rad)*std::sin(Psi_rad))*w;
+        velocityY = std::cos(Theta_rad)*std::sin(Psi_rad)*u + (std::sin(Phi_rad)*std::sin(Theta_rad)*std::sin(Psi_rad)+ 
+                std::cos(Phi_rad)*std::cos(Psi_rad))*v + (std::cos(Phi_rad)*std::sin(Theta_rad)*std::sin(Psi_rad)- 
+                std::sin(Phi_rad)*std::cos(Psi_rad))*w;
+        velocityZ = -std::sin(Theta_rad)*u + std::sin(Phi_rad)*std::cos(Theta_rad)*v + std::cos(Phi_rad)*std::cos(Theta_rad)*w;
     }
 }
 
@@ -63,7 +99,7 @@ DAIDALUS_WCV_Detection::s_registrar(DAIDALUS_WCV_Detection::s_registryServiceTyp
 
 // service constructor
 DAIDALUS_WCV_Detection::DAIDALUS_WCV_Detection()
-: ServiceBase(DAIDALUS_WCV_Detection::s_typeName(), DAIDALUS_WCV_Detection::s_directoryName()), daa(larcfm::Daidalus()) { };
+: ServiceBase(DAIDALUS_WCV_Detection::s_typeName(), DAIDALUS_WCV_Detection::s_directoryName()) { }; 
 
 // service destructor
 DAIDALUS_WCV_Detection::~DAIDALUS_WCV_Detection() { };
@@ -73,165 +109,160 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     bool isSuccess(true);
 
     // process options from the XML configuration node:
-    if (!ndComponent.attribute("LookAheadTime").empty())
+    if (!ndComponent.attribute(STRING_XML_LOOKAHEADTIME).empty())
     {
-        m_lookahead_time = ndComponent.attribute("LookAheadTime").as_int();
-        daa.parameters.setLookaheadTime(m_lookahead_time, "s");
+        m_lookahead_time_s = ndComponent.attribute(STRING_XML_LOOKAHEADTIME).as_int();
+       m_daa.parameters.setLookaheadTime(m_lookahead_time_s, "s");
     }
-    if (!ndComponent.attribute("LeftTrack").empty())
+    if (!ndComponent.attribute(STRING_XML_LEFTTRACK).empty())
     {
-        m_left_trk = ndComponent.attribute("LeftTrack").as_double();
-        daa.parameters.setLeftTrack(m_left_trk, "deg");
+        m_left_trk_deg = ndComponent.attribute(STRING_XML_LEFTTRACK).as_double();
+       m_daa.parameters.setLeftTrack(m_left_trk_deg, "deg");
     }
-    if (!ndComponent.attribute("RightTrack").empty())
+    if (!ndComponent.attribute(STRING_XML_RIGHTTRACK).empty())
     {
-        m_right_trk = ndComponent.attribute("RightTrack").as_double();
-        daa.parameters.setRightTrack(m_right_trk, "deg");
+        m_right_trk_deg = ndComponent.attribute(STRING_XML_RIGHTTRACK).as_double();
+       m_daa.parameters.setRightTrack(m_right_trk_deg, "deg");
     }
-    if (!ndComponent.attribute("MinGroundSpeed").empty())
+    if (!ndComponent.attribute(STRING_XML_MINGROUNDSPEED).empty())
     {
-        m_min_gs = ndComponent.attribute("MinGroundSpeed").as_double();
-        daa.parameters.setMinGroundSpeed(m_min_gs, "m/s");
+        m_min_gs_mps = ndComponent.attribute(STRING_XML_MINGROUNDSPEED).as_double();
+       m_daa.parameters.setMinGroundSpeed(m_min_gs_mps, "m/s");
     }
-    if (!ndComponent.attribute("MaxGroundSpeed").empty())
+    if (!ndComponent.attribute(STRING_XML_MAXGROUNDSPEED).empty())
     {
-        m_max_gs = ndComponent.attribute("MaxGroundSpeed").as_double();
-        daa.parameters.setMaxGroundSpeed(m_max_gs, "m/s");
+        m_max_gs_mps = ndComponent.attribute(STRING_XML_MAXGROUNDSPEED).as_double();
+       m_daa.parameters.setMaxGroundSpeed(m_max_gs_mps, "m/s");
     }
-    if (!ndComponent.attribute("MinVerticalSpeed").empty())
+    if (!ndComponent.attribute(STRING_XML_MINVERTICALSPEED).empty())
     {
-        m_min_vs = ndComponent.attribute("MinVverticalSpeed").as_double();
-        daa.parameters.setMinVerticalSpeed(m_min_vs, "m/s");
+        m_min_vs_mps = ndComponent.attribute(STRING_XML_MINVERTICALSPEED).as_double();
+       m_daa.parameters.setMinVerticalSpeed(m_min_vs_mps, "m/s");
     }
-    if (!ndComponent.attribute("MaxVerticalSpeed").empty())
+    if (!ndComponent.attribute(STRING_XML_MAXVERTICALSPEED).empty())
     {
-        m_max_vs = ndComponent.attribute("MaxVerticalSpeed").as_double();
-        daa.parameters.setMaxVerticalSpeed(m_max_vs, "m/s");
+        m_max_vs_mps = ndComponent.attribute(STRING_XML_MAXVERTICALSPEED).as_double();
+       m_daa.parameters.setMaxVerticalSpeed(m_max_vs_mps, "m/s");
     }
-    if (!ndComponent.attribute("MinAltitude").empty())
+    if (!ndComponent.attribute(STRING_XML_MINALTITUDE).empty())
     {
-        m_min_alt = ndComponent.attribute("MinAltitude").as_double();
-        daa.parameters.setMinAltitude(m_min_alt, "m");
+        m_min_alt_m = ndComponent.attribute(STRING_XML_MINALTITUDE).as_double();
+       m_daa.parameters.setMinAltitude(m_min_alt_m, "m");
     }
-    if (!ndComponent.attribute("MaxAltitude").empty())
+    if (!ndComponent.attribute(STRING_XML_MAXALTITUDE).empty())
     {
-        m_max_alt = ndComponent.attribute("MaxAltitue").as_double();
-        daa.parameters.setMaxAltitude(m_max_alt, "m");
+        m_max_alt_m = ndComponent.attribute(STRING_XML_MAXALTITUDE).as_double();
+       m_daa.parameters.setMaxAltitude(m_max_alt_m, "m");
     }
-    if (!ndComponent.attribute("TrackStep").empty())
+    if (!ndComponent.attribute(STRING_XML_TRACKSTEP).empty())
     {
-        m_trk_step = ndComponent.attribute("TrackStep").as_double();
-        daa.parameters.setTrackStep(m_trk_step, "deg");
+        m_trk_step_deg = ndComponent.attribute(STRING_XML_TRACKSTEP).as_double();
+       m_daa.parameters.setTrackStep(m_trk_step_deg, "deg");
     }
-    if (!ndComponent.attribute("GroundSpeedStep").empty())
+    if (!ndComponent.attribute(STRING_XML_GROUNDSPEEDSTEP).empty())
     {
-        m_gs_step = ndComponent.attribute("GroundSpeedStep").as_double();
-        daa.parameters.setGroundSpeedStep(m_gs_step, "m/s");
+        m_gs_step_mps = ndComponent.attribute(STRING_XML_GROUNDSPEEDSTEP).as_double();
+       m_daa.parameters.setGroundSpeedStep(m_gs_step_mps, "m/s");
     }
-    if (!ndComponent.attribute("VerticalSpeedStep").empty())
+    if (!ndComponent.attribute(STRING_XML_VERTICALSPEEDSTEP).empty())
     {
-        m_vs_step = ndComponent.attribute("VerticalSpeedStep").as_double();
-        daa.parameters.setVerticalSpeedStep(m_vs_step, "m/s");
+        m_vs_step_mps = ndComponent.attribute(STRING_XML_VERTICALSPEEDSTEP).as_double();
+       m_daa.parameters.setVerticalSpeedStep(m_vs_step_mps, "m/s");
     }
-    if (!ndComponent.attribute("AltitudeStep").empty())
+    if (!ndComponent.attribute(STRING_XML_ALTITUDESTEP).empty())
     {
-        m_alt_step = ndComponent.attribute("AltitudeStep").as_double();
-        daa.parameters.setAltitudeStep(m_alt_step, "m");
+        m_alt_step_m = ndComponent.attribute(STRING_XML_ALTITUDESTEP).as_double();
+       m_daa.parameters.setAltitudeStep(m_alt_step_m, "m");
     }
-    if (!ndComponent.attribute("HorizontalAcceleration").empty())
+    if (!ndComponent.attribute(STRING_XML_HORIZONTALACCELERATION).empty())
     {
-        m_horizontal_accel = ndComponent.attribute("HorizontalAcceleration").as_double();
-        daa.parameters.setHorizontalAcceleration(m_horizontal_accel, "m/s");
+        m_horizontal_accel_mpsps = ndComponent.attribute(STRING_XML_HORIZONTALACCELERATION).as_double();
+       m_daa.parameters.setHorizontalAcceleration(m_horizontal_accel_mpsps, "m/s^2");
     }
-    if (!ndComponent.attribute("VerticalAcceleration").empty())
+    if (!ndComponent.attribute(STRING_XML_VERTICALACCELERATION).empty())
     {
-        m_vertical_accel = ndComponent.attribute("VerticalAcceleration").as_double();
-        daa.parameters.setVerticalAcceleration(m_vertical_accel, "G");
+        m_vertical_accel_G = ndComponent.attribute(STRING_XML_VERTICALACCELERATION).as_double();
+       m_daa.parameters.setVerticalAcceleration(m_vertical_accel_G, "G");
     }
-    if (!ndComponent.attribute("TurnRate").empty())
+    if (!ndComponent.attribute(STRING_XML_TURNRATE).empty())
     {
-        m_turn_rate = ndComponent.attribute("TurnRate").as_double();
-        daa.parameters.setTurnRate(m_turn_rate, "deg/s");
+        m_turn_rate_degps = ndComponent.attribute(STRING_XML_TURNRATE).as_double();
+       m_daa.parameters.setTurnRate(m_turn_rate_degps, "deg/s");
     }
-    if (!ndComponent.attribute("BankAngle").empty())
+    if (!ndComponent.attribute(STRING_XML_BANKANGLE).empty())
     {
-        m_bank_angle = ndComponent.attribute("BankAngle").as_double();
-        daa.parameters.setBankAngle(m_bank_angle, "deg");
+        m_bank_angle_deg = ndComponent.attribute(STRING_XML_BANKANGLE).as_double();
+       m_daa.parameters.setBankAngle(m_bank_angle_deg, "deg");
     }
-    if (!ndComponent.attribute("VerticalRate").empty())
+    if (!ndComponent.attribute(STRING_XML_VERTICALRATE).empty())
     {
-        m_vertical_rate = ndComponent.attribute("VerticalRate").as_double();
-        daa.parameters.setVerticalRate(m_vertical_rate, "m/s");
+        m_vertical_rate_mps = ndComponent.attribute(STRING_XML_VERTICALRATE).as_double();
+       m_daa.parameters.setVerticalRate(m_vertical_rate_mps, "m/s");
     }    
-    if (!ndComponent.attribute("RecoveryStabilityTime").empty())
+    if (!ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).empty())
     {
-        m_recovery_stability_time = ndComponent.attribute("RecoveryStabilityTime").as_int();
-        daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time, "s");
+        m_recovery_stability_time_s = ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).as_int();
+       m_daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time_s, "s");
     }
-    if (!ndComponent.attribute("HorizontalRecovery").empty())
+    if (!ndComponent.attribute(STRING_XML_MINHORIZONTALRECOVERY).empty())
     {
-        m_min_horizontal_recovery = ndComponent.attribute("HorizontalRecovery").as_double();
-        daa.parameters.setMinHorizontalRecovery(m_min_horizontal_recovery, "m");
+        m_min_horizontal_recovery_m = ndComponent.attribute(STRING_XML_MINHORIZONTALRECOVERY).as_double();
+       m_daa.parameters.setMinHorizontalRecovery(m_min_horizontal_recovery_m, "m");
     }
-    if (!ndComponent.attribute("VerticalRecovery").empty())
+    if (!ndComponent.attribute(STRING_XML_MINVERTICALRECOVERY).empty())
     {
-        m_min_vertical_recovery = ndComponent.attribute("VerticalRecovery").as_double();
-        daa.parameters.setMinVerticalRecovery(m_min_vertical_recovery, "m");
+        m_min_vertical_recovery_m = ndComponent.attribute(STRING_XML_MINVERTICALRECOVERY).as_double();
+       m_daa.parameters.setMinVerticalRecovery(m_min_vertical_recovery_m, "m");
     }
-    if (!ndComponent.attribute("isRecoveryTrack").empty())
+    if (!ndComponent.attribute(STRING_XML_ISRECOVERYTRACK).empty())
     {
-        m_recovery_trk = ndComponent.attribute("isRecoveryTrack").as_bool();
-        daa.parameters.setRecoveryTrackBands(m_recovery_trk);
+        m_recovery_trk_bool = ndComponent.attribute(STRING_XML_ISRECOVERYTRACK).as_bool();
+       m_daa.parameters.setRecoveryTrackBands(m_recovery_trk_bool);
     }
-    if (!ndComponent.attribute("isRecoveryGroundSpeed").empty())
+    if (!ndComponent.attribute(STRING_XML_ISRECOVERYGROUNDSPEED).empty())
     {
-        m_recovery_gs = ndComponent.attribute("isRecoveryGroundSpeed").as_bool();
-        daa.parameters.setRecoveryGroundSpeedBands(m_recovery_gs);
+        m_recovery_gs_bool = ndComponent.attribute(STRING_XML_ISRECOVERYGROUNDSPEED).as_bool();
+       m_daa.parameters.setRecoveryGroundSpeedBands(m_recovery_gs_bool);
     }
-    if (!ndComponent.attribute("isRecoveryVerticalSpeed").empty())
+    if (!ndComponent.attribute(STRING_XML_ISRECOVERYVERTICALSPEED).empty())
     {
-        m_recovery_vs = ndComponent.attribute("isRecoveryVerticalSpeed").as_bool();
-        daa.parameters.setRecoveryVerticalSpeedBands(m_recovery_vs);
+        m_recovery_vs_bool = ndComponent.attribute(STRING_XML_ISRECOVERYVERTICALSPEED).as_bool();
+       m_daa.parameters.setRecoveryVerticalSpeedBands(m_recovery_vs_bool);
     }
-    if (!ndComponent.attribute("isRecoveryAltitude").empty())
+    if (!ndComponent.attribute(STRING_XML_ISRECOVERYALTITUDE).empty())
     {
-        m_recovery_alt = ndComponent.attribute("isRecoveryAltitude").as_bool();
-        daa.parameters.setRecoveryAltitudeBands(m_recovery_alt);
+        m_recovery_alt_bool = ndComponent.attribute(STRING_XML_ISRECOVERYALTITUDE).as_bool();
+       m_daa.parameters.setRecoveryAltitudeBands(m_recovery_alt_bool);
     }
-    if (!ndComponent.attribute("isCollisionAvoidanceBands").empty())
+    if (!ndComponent.attribute(STRING_XML_ISCOLLISIONAVOIDANCE).empty())
     {
-        m_ca_bands = ndComponent.attribute("isCollisionAvoidanceBands").as_bool();
-        daa.parameters.setCollisionAvoidanceBands(m_ca_bands);
+        m_ca_bands_bool = ndComponent.attribute(STRING_XML_ISCOLLISIONAVOIDANCE).as_bool();
+       m_daa.parameters.setCollisionAvoidanceBands(m_ca_bands_bool);
     }
-    if (!ndComponent.attribute("CollisionAvoidanceBandsFactor").empty())
+    if (!ndComponent.attribute(STRING_XML_COLLISIONAVOIDANCEFACTOR).empty())
     {
-        m_ca_factor = ndComponent.attribute("CollisionAvoidanceBandsFactor").as_double();
-        daa.parameters.setCollisionAvoidanceBandsFactor(m_ca_factor);
+        m_ca_factor = ndComponent.attribute(STRING_XML_COLLISIONAVOIDANCEFACTOR).as_double();
+       m_daa.parameters.setCollisionAvoidanceBandsFactor(m_ca_factor);
     }
-    if (!ndComponent.attribute("HorizontalNMAC").empty())
+    if (!ndComponent.attribute(STRING_XML_HORIZONTALNMAC).empty())
     {
-        m_horizontal_nmac = ndComponent.attribute("HorizontalNMAC").as_double();
-        daa.parameters.setHorizontalNMAC(m_horizontal_nmac, "m");
+        m_horizontal_nmac_m = ndComponent.attribute(STRING_XML_HORIZONTALNMAC).as_double();
+       m_daa.parameters.setHorizontalNMAC(m_horizontal_nmac_m, "m");
     }
-    if (!ndComponent.attribute("VerticalNMAC").empty())
+    if (!ndComponent.attribute(STRING_XML_VERTICALNMAC).empty())
     {
-        m_vertical_nmac = ndComponent.attribute("VerticalNMAC").as_double();
-        daa.parameters.setVerticalNMAC(m_vertical_nmac, "m");
+        m_vertical_nmac_m = ndComponent.attribute(STRING_XML_VERTICALNMAC).as_double();
+       m_daa.parameters.setVerticalNMAC(m_vertical_nmac_m, "m");
     }
-    if (!ndComponent.attribute("ContourThreshold").empty())
+    if (!ndComponent.attribute(STRING_XML_HORIZONTALCONTOURTHRESHOLD).empty())
     {
-        m_contour_thr = ndComponent.attribute("ContourThreshold").as_double();
-        daa.parameters.setHorizontalContourThreshold(m_contour_thr, "deg");
+        m_contour_thr_deg = ndComponent.attribute(STRING_XML_HORIZONTALCONTOURTHRESHOLD).as_double();
+       m_daa.parameters.setHorizontalContourThreshold(m_contour_thr_deg, "deg");
     }
-    
-    // */
-    
-    // subscribe to messages::
-    //addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
+  
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     std::cout << "Successfully subscribed to AirVehicleState from DAIDALUS_WCV_Detection." << std::endl;
-
-
+    
     return (isSuccess);
 }
 
@@ -256,8 +287,8 @@ bool DAIDALUS_WCV_Detection::start()
 bool DAIDALUS_WCV_Detection::terminate()
 {
     // perform any action required during service termination, before destructor is called.
-    std::cout << "*** TERMINATING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
-    
+    std::cout << "*** TERMINATING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << 
+            m_workDirectoryName << "] *** " << std::endl;    
     return (true);
 }
 
@@ -267,59 +298,72 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
     {
         //receive message
         auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
-        std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << airVehicleState->getID() << std::endl ;
+        std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << 
+                airVehicleState->getID() << std::endl;
         //handle message
-        auto Total_velocity = airVehicleState->getAirspeed();
-        auto Total_velocity_calculated =std::sqrt(std::pow(airVehicleState->getU(),2)+std::pow(airVehicleState->getV(),2)+std::pow(airVehicleState->getW(),2));
-        if (std::abs(Total_velocity-Total_velocity_calculated)>0.000001)
-        {std::cout << "Danger!! Danger !!  Calculated velocity is not equivalent to broadcast velocity" << std::endl;
-        std::cout << "Broadcast velocity = " << Total_velocity << " Calculated velocity = " << Total_velocity_calculated << std::endl;}
-        std::unordered_map<int64_t, double> detectedViolations;
-
-        
+        std::unordered_map<int64_t, double> detectedViolations;        
         //add air vehicle message state to the Daidalus Object
-        daidalus_package vehicleInfo;
-        vehicleInfo.daidalusPosition = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",  airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m") ;      
-        auto u = airVehicleState->getU();
-        auto v = airVehicleState->getV();
-        auto w = airVehicleState->getW();
-        auto Phi = airVehicleState->getRoll();
-        auto Theta = airVehicleState->getPitch();
-        auto Psi = airVehicleState->getHeading();
-        double velocityX, velocityY, velocityZ;
-        makeVelocityXYZ(u, v, w, n_Const::c_Convert::toRadians(Phi), n_Const::c_Convert::toRadians(Theta), n_Const::c_Convert::toRadians(Psi), velocityX, velocityY, velocityZ);
-        auto daidalusVelocityZ = -velocityZ;
-        auto daidalusVelocityX = velocityY;
-        auto daidalusVelocityY = velocityX;
-        vehicleInfo.daidalusVelocity = larcfm::Velocity::makeVxyz(daidalusVelocityX,daidalusVelocityY,"m/s",daidalusVelocityZ,"m/s");
-        vehicleInfo.daidalusTime = airVehicleState->getTime()/1000.0;
-        // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship
-        daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
-        if (daidalusVehicleInfo.size()>1 && daidalusVehicleInfo.count(m_entityId)>0)
-        { daa.setOwnshipState(std::to_string(m_entityId),daidalusVehicleInfo[m_entityId].daidalusPosition,daidalusVehicleInfo[m_entityId].daidalusVelocity,daidalusVehicleInfo[m_entityId].daidalusTime);
-        for (auto it_intruderId = daidalusVehicleInfo.begin(); it_intruderId!=daidalusVehicleInfo.end(); it_intruderId++)
+        MydaidalusPackage vehicleInfo;
+        vehicleInfo.m_daidalusPosition = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",
+                                         airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m");      
+        auto u_mps = airVehicleState->getU();
+        auto v_mps = airVehicleState->getV();
+        auto w_mps = airVehicleState->getW();
+        auto Phi_deg = airVehicleState->getRoll();
+        auto Theta_deg = airVehicleState->getPitch();
+        auto Psi_deg = airVehicleState->getHeading();
+        double velocityX_mps, velocityY_mps, velocityZ_mps;
+        makeVelocityXYZ(u_mps, v_mps, w_mps, n_Const::c_Convert::toRadians(Phi_deg), n_Const::c_Convert::toRadians(Theta_deg), 
+                n_Const::c_Convert::toRadians(Psi_deg), velocityX_mps, velocityY_mps, velocityZ_mps);
+        auto daidalusVelocityZ_mps = -velocityZ_mps;    //add a comment for why
+        auto daidalusVelocityX_mps = velocityY_mps;
+        auto daidalusVelocityY_mps = velocityX_mps;
+        vehicleInfo.m_daidalusVelocity = larcfm::Velocity::makeVxyz(daidalusVelocityX_mps, daidalusVelocityY_mps, "m/s", daidalusVelocityZ_mps, "m/s");
+        vehicleInfo.m_daidalusTime_s = airVehicleState->getTime()*MILLISECONDTOSECOND; // conversion from UxAS representation of time in milliseconds to DAIDALUS representation fo time in seconds
+        // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship        
+        m_daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
+        if (m_daidalusVehicleInfo.size()>1 && m_daidalusVehicleInfo.count(m_entityId)>0)    // Conditional to check that at 2 vehicles are known 
+            //and one of the two is the ownship and therefor a well clear violation check is appropriate
+        { 
+            m_daa.setOwnshipState(std::to_string(m_entityId), m_daidalusVehicleInfo[m_entityId].m_daidalusPosition, 
+                m_daidalusVehicleInfo[m_entityId].m_daidalusVelocity, m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s); //set DAIDALUS object ownship state
+            for (const auto& vehiclePackagedInfo : m_daidalusVehicleInfo)
             {
-                if (it_intruderId->first!=m_entityId) //add staleness check to this statement or put check on outer most if
+                if (vehiclePackagedInfo.first!=m_entityId) // add intruder traffic state to DAIDALUS object
+                    //add staleness check to this statement or put check on outer most if
                     {
-                    daa.addTrafficState(std::to_string(it_intruderId->first),it_intruderId->second.daidalusPosition,it_intruderId->second.daidalusVelocity,it_intruderId->second.daidalusTime);
-                //std::cout << "Added Entity " << it_intruderId->first << " as an intruder to Entity " << m_entityId << std::endl;
+                        m_daa.addTrafficState(std::to_string(vehiclePackagedInfo.first), vehiclePackagedInfo.second.m_daidalusPosition, 
+                                vehiclePackagedInfo.second.m_daidalusVelocity, vehiclePackagedInfo.second.m_daidalusTime_s);
+                        //std::cout << "Added Entity " << it_intruderId->first << " as an intruder to Entity " << m_entityId << std::endl;
                     }
-            
             }
-        //std::cout << "Number of aircraft according to DAIDALUS: " << daa.numberOfAircraft() << std::endl;
-        if (daa.numberOfAircraft()>1)
-        {
-            //detectedViolations.clear();
-            for (int intruderIndex = 1; intruderIndex<=daa.numberOfAircraft()-1; intruderIndex++)
+            //std::cout << "Number of aircraft according to DAIDALUS: " <<m_daa.numberOfAircraft() << std::endl;
+            if (m_daa.numberOfAircraft()>1) //Perform well_clear violation check if DAIDALUS object contains ownship and at least one intruder traffic state
             {
-                auto timeToViolation = daa.timeToViolation(intruderIndex);
-                if (timeToViolation != PINFINITY && timeToViolation != NaN)
-                { 
-                    detectedViolations[std::stoi(daa.getAircraftState(intruderIndex).getId(),nullptr,10)] = timeToViolation;
-                    //std::cout << "Collision with intruder " << daa.getAircraftState(intruderIndex).getId() << " in " << timeToViolation << " seconds" << std::endl;
+                for (int intruderIndex = 1; intruderIndex<=m_daa.numberOfAircraft()-1; ++intruderIndex)
+                {
+                    auto timeToViolation_s = m_daa.timeToViolation(intruderIndex);
+                    if (timeToViolation_s != PINFINITY && timeToViolation_s != NaN)
+                    { 
+                        detectedViolations[std::stoi(m_daa.getAircraftState(intruderIndex).getId(),nullptr,10)] = timeToViolation_s;
+                        //std::cout << "Collision with intruder " <<m_daa.getAircraftState(intruderIndex).getId() << " in " << timeToViolation << " seconds" << std::endl;
+                    }
+                }
+                //send out response
+                //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;
+                if (!detectedViolations.empty())
+                {
+                    for (auto itViolations = detectedViolations.begin(); itViolations != detectedViolations.end(); itViolations++)
+                    {
+                        std::cout << "Entity " << m_entityId << " will violate the well clear volume with Entity " << itViolations->first << " in " 
+                                << itViolations->second <<" seconds!!" << std::endl;
+                    }
+                }
+                else 
+                {
+                    std::cout << "No violation of well clear volume detected :^)" << std::endl;
                 }
             }
-        }
         }
         
         
@@ -329,16 +373,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         //keyValuePairOut->setKey(s_typeName());
         //keyValuePairOut->setValue(std::to_string(m_serviceId));
         //sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
-        std::cout << "Number of aircraft according to DAIDALUS: " << daa.numberOfAircraft() << std::endl;
-        if (daa.numberOfAircraft()>1 && !detectedViolations.empty())
-        {
-            for (auto itViolations = detectedViolations.begin(); itViolations != detectedViolations.end(); itViolations++)
-               std::cout << "Entity " << m_entityId << " will violate the well clear volume with Entity " << itViolations->first << " in " << itViolations->second <<" seconds!!" << std::endl;
-        }
-        else if(daa.numberOfAircraft()>1)
-        {
-            std::cout << "No violation of well clear volume detected :^)" << std::endl;
-        }
+        //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;
+ 
         
     }
     return false;

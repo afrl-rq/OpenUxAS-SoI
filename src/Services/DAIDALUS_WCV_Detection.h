@@ -19,13 +19,15 @@
 
 
 
-#include "ServiceBase.h"
-#include "CallbackTimer.h"
-#include "TypeDefs/UxAS_TypeDefs_Timer.h"
-#include "Daidalus.h"
 #include "Constants/Convert.h"
+#include "Daidalus.h"
 #include "Position.h"
+#include "ServiceBase.h"
 #include "Velocity.h"
+
+#include <memory>
+#include <string>
+#include <unordered_map>
 namespace uxas
 {
 namespace service
@@ -133,39 +135,41 @@ private:
 
 private:
     // storage for the option entries
-    std::string m_option01 = std::string("No Option 1");
-    int32_t m_option02{0};
+ //   std::string m_option01 = std::string("No Option 1");
+//    int32_t m_option02{0};
     //DAIDALUS parameters
-    int32_t m_lookahead_time = {180};   // seconds--Time horizon of all DAIDALUS functions (time)
-    double m_left_trk = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())}; // degrees--relative maximum horizontal direction maneuver to the left of the current ownship direction (angle)
-    double m_right_trk = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())};    // degrees--relative maximum horizontal direction maneuver to the right of the current ownship direction (angle)
-    double m_min_gs = {5.1444}; // meters per second--absolute minimum horizontal speed maneuver (speed)
-    double m_max_gs = {360.111};    // meters per second--absolute maximum horizontal speed maneuver (speed)
-    double m_min_vs = {-30.48}; // meters per second--absolute minimum vertical speed maneuver (speed)
-    double m_max_vs = {30.48};  // meters per second--absolute maximum vertical speed maneuver (speed)
-    double m_min_alt = {100*n_Const::c_Convert::dFeetToMeters()};   // meters--absolute minimum altitude maneuver (altitude)
-    double m_max_alt = {50000*n_Const::c_Convert::dFeetToMeters()}; // meters--absolute maximum altitude maneuver (altitude)
-    double m_trk_step = {1.0};  // degrees--granularity of horizontal direction maneuvers (angle)
-    double m_gs_step = {2.57222};   // meters per second--granularity of horizontal speed maneuvers (speed)
-    double m_vs_step = {100.0/60.0*n_Const::c_Convert::dFeetToMeters()}; // meters per second--granularity of vertical speed maneuvers (speed)
-    double m_alt_step = {100*n_Const::c_Convert::dFeetToMeters()};  // meters--granularity of altitude maneuvers (altitude)
-    double m_horizontal_accel = {0.0};  // meters per second per second--horizontal acceleration used in computation of horizontal speed maneuvers (acceleration)
-    double m_vertical_accel = {0.0};    // gravity--vertical acceleration used in the computation of horizontal speed maneuvers (acceleration)
-    double m_turn_rate = {0.0}; // degrees per second--turn rate used in the computation of horizontal direction maneuvers (angle)
-    double m_bank_angle = {0.0};    // degrees--bank angle used in the computation of horizontal direction maneuvers (angle)
-    double m_vertical_rate = {0.0}; //meters per second--vertical rate used in the computation of altitude maneuvers (speed)
-    int32_t m_recovery_stability_time = {0};  // seconds--time delay to stabilize recovery maneuvers 
-    double m_min_horizontal_recovery = {1222.32};   // meters--minimum horizontal separation used in the computation of recovery maneuvers (distance)
-    double m_min_vertical_recovery = {450.0*n_Const::c_Convert::dFeetToMeters()}; // meters--minimum vertical separation used in the computation of recovery maneuvers (distance)
-    bool m_recovery_trk = {true};   // Boolean--enable computation of horizontal direction recovery maneuvers (boolean)
-    bool m_recovery_gs = {true};    // Boolean--enable computation of horizontal speed recovery maneuvers
-    bool m_recovery_vs = {true};    // Boolean--enable computation of vertical speed recovery maneuvers
-    bool m_recovery_alt = {true};   // Boolean--enable computation of altitude recovery maneuvers
-    bool m_ca_bands = {false};  // Boolean--enable computation of collision avoidance maneuvers
+    //to do  append the proper units to the variable name!!
+    
+    int32_t m_lookahead_time_s = {180};   // seconds--Time horizon of all DAIDALUS functions (time)
+    double m_left_trk_deg = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())}; // degrees--relative maximum horizontal direction maneuver to the left of the current ownship direction (angle)
+    double m_right_trk_deg = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())};    // degrees--relative maximum horizontal direction maneuver to the right of the current ownship direction (angle)
+    double m_min_gs_mps = {5.1444}; // meters per second--absolute minimum horizontal speed maneuver (speed)
+    double m_max_gs_mps = {360.111};    // meters per second--absolute maximum horizontal speed maneuver (speed)
+    double m_min_vs_mps = {-30.48}; // meters per second--absolute minimum vertical speed maneuver (speed)
+    double m_max_vs_mps = {30.48};  // meters per second--absolute maximum vertical speed maneuver (speed)
+    double m_min_alt_m = {100*n_Const::c_Convert::dFeetToMeters()};   // meters--absolute minimum altitude maneuver (altitude)
+    double m_max_alt_m = {50000*n_Const::c_Convert::dFeetToMeters()}; // meters--absolute maximum altitude maneuver (altitude)
+    double m_trk_step_deg = {1.0};  // degrees--granularity of horizontal direction maneuvers (angle)
+    double m_gs_step_mps = {2.57222};   // meters per second--granularity of horizontal speed maneuvers (speed)
+    double m_vs_step_mps = {100.0/60.0*n_Const::c_Convert::dFeetToMeters()}; // meters per second--granularity of vertical speed maneuvers (speed)
+    double m_alt_step_m = {100*n_Const::c_Convert::dFeetToMeters()};  // meters--granularity of altitude maneuvers (altitude)
+    double m_horizontal_accel_mpsps = {0.0};  // meters per second per second--horizontal acceleration used in computation of horizontal speed maneuvers (acceleration)
+    double m_vertical_accel_G = {0.0};    // gravity--vertical acceleration used in the computation of horizontal speed maneuvers (acceleration)
+    double m_turn_rate_degps = {0.0}; // degrees per second--turn rate used in the computation of horizontal direction maneuvers (angle)
+    double m_bank_angle_deg = {0.0};    // degrees--bank angle used in the computation of horizontal direction maneuvers (angle)
+    double m_vertical_rate_mps = {0.0}; //meters per second--vertical rate used in the computation of altitude maneuvers (speed)
+    int32_t m_recovery_stability_time_s = {0};  // seconds--time delay to stabilize recovery maneuvers 
+    double m_min_horizontal_recovery_m = {1222.32};   // meters--minimum horizontal separation used in the computation of recovery maneuvers (distance)
+    double m_min_vertical_recovery_m = {450.0*n_Const::c_Convert::dFeetToMeters()}; // meters--minimum vertical separation used in the computation of recovery maneuvers (distance)
+    bool m_recovery_trk_bool = {true};   // Boolean--enable computation of horizontal direction recovery maneuvers (boolean)
+    bool m_recovery_gs_bool = {true};    // Boolean--enable computation of horizontal speed recovery maneuvers
+    bool m_recovery_vs_bool = {true};    // Boolean--enable computation of vertical speed recovery maneuvers
+    bool m_recovery_alt_bool = {true};   // Boolean--enable computation of altitude recovery maneuvers
+    bool m_ca_bands_bool = {false};  // Boolean--enable computation of collision avoidance maneuvers
     double m_ca_factor = {0.2}; //factor to reduce min horizontal/vertical recovery separation when computing collision avoidance maneuvers (scalar (0,1])
-    double m_horizontal_nmac = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters--Horizontal Near Mid-Air Collision (distance)
-    double m_vertical_nmac = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters--Vertical Near Mid-Air Collision (distance)
-    double m_contour_thr = {180.0}; // degrees--threshold relative to ownship horizontal direction for the computation of horizontal contours aka. blobs (angle)
+    double m_horizontal_nmac_m = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters--Horizontal Near Mid-Air Collision (distance)
+    double m_vertical_nmac_m = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters--Vertical Near Mid-Air Collision (distance)
+    double m_contour_thr_deg = {180.0}; // degrees--threshold relative to ownship horizontal direction for the computation of horizontal contours aka. blobs (angle)
     //double m_DMOD = {}; //meters
     //double m_HMOD = {};   //meters
     //int32_t m_TAUMOD = {35};  //seconds
@@ -173,13 +177,14 @@ private:
     //-*/
     
     //
-     struct daidalus_package{
-       larcfm::Position daidalusPosition;
-        larcfm::Velocity daidalusVelocity;
-        double daidalusTime;
+     struct MydaidalusPackage{
+       larcfm::Position m_daidalusPosition;
+        larcfm::Velocity m_daidalusVelocity;
+        double m_daidalusTime_s;
     };
-    larcfm::Daidalus daa;
-    std::unordered_map<int64_t, daidalus_package> daidalusVehicleInfo;
+    
+    larcfm::Daidalus m_daa;
+    std::unordered_map<int64_t, MydaidalusPackage> m_daidalusVehicleInfo;
 
 };
 
