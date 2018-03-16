@@ -50,7 +50,6 @@ namespace task
 
 
 const int64_t TaskOptionClass::m_firstOptionId{10}; // starting option of the tasks.  */
-const int64_t TaskOptionClass::m_restartOptionId{1}; // Id of option to restart task in progress  */
 const int64_t TaskOptionClass::m_routeIdFromLastTask{1}; // id of the route from the last position to the start of this task option  
 const int64_t TaskOptionClass::m_firstImplementationRouteId{2}; // first id to use for the routes in this task option
 //XML STRINGS    
@@ -244,7 +243,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 }
                 m_assignedVehicleIdVsLastTaskWaypoint[entityState->getID()] = entityState->getCurrentWaypoint();
-                COUT_INFO_MSG("entityState->getID()[" << entityState->getID() << "] entityState->getCurrentWaypoint()[" << entityState->getCurrentWaypoint() << "]")
+                //COUT_INFO_MSG("entityState->getID()[" << entityState->getID() << "] entityState->getCurrentWaypoint()[" << entityState->getCurrentWaypoint() << "]")
             }
             else
             {
@@ -323,7 +322,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     }
                 }
 
-                        auto itOption = m_optionIdVsTaskOptionClass.find(optionIdRestart);
+                auto itOption = m_optionIdVsTaskOptionClass.find(optionIdRestart);
                 if (itOption != m_optionIdVsTaskOptionClass.end())
                 {
                     if (waypointIdRestart < itOption->second->m_firstTaskActiveWaypointID)
@@ -343,11 +342,9 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     m_taskPlanOptions->setCorrespondingAutomationRequestID(uniqueAutomationRequest->getRequestID());
                     m_taskPlanOptions->setTaskID(m_task->getTaskID());
 
-                    auto taskOption = std::make_shared<uxas::messages::task::TaskOption>();
-                    auto taskOptionClass = std::make_shared<TaskOptionClass>(taskOption);
-                    taskOptionClass->m_taskOption->setTaskID(m_task->getTaskID());
-                    taskOptionClass->m_taskOption->setOptionID(optionIdRestart);
-                    taskOptionClass->m_taskOption->getEligibleEntities().push_back(vehicleIdRestart);
+                    itOption->second->m_restartTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(itOption->second->m_taskOption->clone());
+                    itOption->second->m_restartTaskOption->getEligibleEntities().clear();
+                    itOption->second->m_restartTaskOption->getEligibleEntities().push_back(vehicleIdRestart);
 
                     // Build the Restart Task 
 
@@ -361,67 +358,57 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
                     uxas::common::utilities::CUnitConversions unitConversions;
 
-                    int64_t waypointNumber{itOption->second->m_firstTaskActiveWaypointID};
                     // find the waypoints from (restartId - 1) to the end of the plan
-                    auto newRoutePlan = std::make_shared<uxas::messages::route::RoutePlan>();
-                    newRoutePlan->setRouteID(TaskOptionClass::m_firstImplementationRouteId);
-                    for (auto& plan : itOption->second->m_orderedRouteIdVsPlan)
+                    itOption->second->m_restartRoutePlan = std::make_shared<uxas::messages::route::RoutePlan>();
+                    itOption->second->m_restartRoutePlan->setRouteID(TaskOptionClass::m_firstImplementationRouteId);
+                    auto itRoute = itOption->second->m_orderedRouteIdVsPlan.find(TaskOptionClass::m_firstImplementationRouteId);
+                    if (itRoute != itOption->second->m_orderedRouteIdVsPlan.end())
                     {
-                        if ((plan.second->getRouteID() != m_transitionRouteRequestId))
+                        for (auto& planWaypoint : itRoute->second->getWaypoints())
                         {
-                            for (auto& planWaypoint : plan.second->getWaypoints())
+                            //COUT_INFO_MSG("waypointIdRestart[" << waypointIdRestart << "], planWaypoint->getNumber()[" << planWaypoint->getNumber() << "]")
+                            if (waypointIdRestart == planWaypoint->getNumber()) // found one waypoint past start of the restart plan
                             {
-                                if (waypointIdRestart == waypointNumber) // found one waypoint past start of the restart plan
-                                {
-                                    newRoutePlan->getWaypoints().push_back(lastWaypoint->clone());
-                                }
-                                else if (!newRoutePlan->getWaypoints().empty()) // we have found the plan
-                                {
-                                    newRoutePlan->getWaypoints().push_back(planWaypoint->clone());
+                                //COUT_INFO_MSG("waypointIdRestart[" << waypointIdRestart << "], planWaypoint->getNumber()[" << planWaypoint->getNumber() << "]")
+                                itOption->second->m_restartRoutePlan->getWaypoints().push_back(lastWaypoint->clone());
+                                // calculate xy coordinates for last waypoint
+                                double north_m(0.0);
+                                double east_m(0.0);
+                                unitConversions.ConvertLatLong_degToNorthEast_m(planWaypoint->getLatitude(),
+                                                                                planWaypoint->getLongitude(), north_m, east_m);
 
-                                    double north_m(0.0);
-                                    double east_m(0.0);
-                                    unitConversions.ConvertLatLong_degToNorthEast_m(planWaypoint->getLatitude(),
-                                                                                    planWaypoint->getLongitude(), north_m, east_m);
-                                    Dpss_Data_n::xyPoint currentVehiclePosition(north_m, east_m, 0.0);
-
-                                    distance_m += currentVehiclePosition.dist(lastVehiclePosition);
-
-                                    if (newRoutePlan->getWaypoints().size() == 2)
-                                    {
-                                        //TODO:: need to check this!!!!!!
-                                        startHeading_deg = lastVehiclePosition.heading2d(currentVehiclePosition);
-                                    }
-
-                                }
-                                // calculate xy coordinates for last waypoint, only once
-                                if (lastWaypoint == nullptr)
-                                {
-
-                                    double north_m(0.0);
-                                    double east_m(0.0);
-                                    unitConversions.ConvertLatLong_degToNorthEast_m(planWaypoint->getLatitude(),
-                                                                                    planWaypoint->getLongitude(), north_m, east_m);
-
-                                    currentVehiclePosition.x = north_m;
-                                    currentVehiclePosition.y = east_m;
-                                }
-                                lastWaypoint = planWaypoint; //DON'T OWN THIS POINTER!!!!
-                                lastlastVehiclePosition = lastVehiclePosition;
-                                lastVehiclePosition = currentVehiclePosition;
-                                waypointNumber++;
+                                currentVehiclePosition.x = north_m;
+                                currentVehiclePosition.y = east_m;
                             }
+                            if (!itOption->second->m_restartRoutePlan->getWaypoints().empty()) // we have found the plan
+                            {
+                                //COUT_INFO_MSG("waypointIdRestart[" << waypointIdRestart << "], planWaypoint->getNumber()[" << planWaypoint->getNumber() << "]")
+                                itOption->second->m_restartRoutePlan->getWaypoints().push_back(planWaypoint->clone());
+
+                                double north_m(0.0);
+                                double east_m(0.0);
+                                unitConversions.ConvertLatLong_degToNorthEast_m(planWaypoint->getLatitude(),
+                                                                                planWaypoint->getLongitude(), north_m, east_m);
+                                Dpss_Data_n::xyPoint currentVehiclePosition(north_m, east_m, 0.0);
+
+                                distance_m += currentVehiclePosition.dist(lastVehiclePosition);
+
+                                if (itOption->second->m_restartRoutePlan->getWaypoints().size() == 2)
+                                {
+                                    //TODO:: need to check this!!!!!!
+                                    startHeading_deg = lastVehiclePosition.heading2d(currentVehiclePosition);
+                                }
+
+                            }
+                            lastWaypoint = planWaypoint; //DON'T OWN THIS POINTER!!!!
+                            lastlastVehiclePosition = lastVehiclePosition;
+                            lastVehiclePosition = currentVehiclePosition;
                         }
                     }
                     lastWaypoint = nullptr; // finished with this, we don't own it
 
-
                     //TODO:: need to check this!!!!!!
                     endHeading_deg = lastlastVehiclePosition.heading2d(lastVehiclePosition);
-
-
-
-                    taskOptionClass->m_orderedRouteIdVsPlan[newRoutePlan->getRouteID()] = newRoutePlan;
 
                     //TODO:: calculate cost, need vehicle speed
                     double vehicleSpeed_ms{0.0};
@@ -434,21 +421,20 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     int64_t cost_ms = INT64_MAX;
                     if (vehicleSpeed_ms > 0.0)
                     {
-                        cost_ms = static_cast<int64_t> (static_cast<double> (distance_m) / vehicleSpeed_ms / 1000.0);
+                        cost_ms = static_cast<int64_t> (static_cast<double> (distance_m) / vehicleSpeed_ms * 1000.0);
                     }
                     else
                     {
                         //TODO ERROR:: could not find vehicle configuration or vehicleSpeed_ms <= 0.0
                     }
 
-                    taskOptionClass->m_taskOption->setCost(cost_ms);
-                    taskOptionClass->m_taskOption->setStartLocation(newRoutePlan->getWaypoints().front()->clone());
-                    taskOptionClass->m_taskOption->setStartHeading(startHeading_deg);
-                    taskOptionClass->m_taskOption->setEndLocation(newRoutePlan->getWaypoints().back()->clone());
-                    taskOptionClass->m_taskOption->setEndHeading(endHeading_deg);
+                    itOption->second->m_restartTaskOption->setCost(cost_ms);
+                    itOption->second->m_restartTaskOption->setStartLocation(itOption->second->m_restartRoutePlan->getWaypoints().front()->clone());
+                    itOption->second->m_restartTaskOption->setStartHeading(startHeading_deg);
+                    itOption->second->m_restartTaskOption->setEndLocation(itOption->second->m_restartRoutePlan->getWaypoints().back()->clone());
+                    itOption->second->m_restartTaskOption->setEndHeading(endHeading_deg);
 
-                    m_optionIdVsTaskOptionClass.insert(std::make_pair(TaskOptionClass::m_restartOptionId, taskOptionClass));
-                    m_taskPlanOptions->getOptions().push_back(taskOptionClass->m_taskOption->clone());
+                    m_taskPlanOptions->getOptions().push_back(itOption->second->m_restartTaskOption->clone());
 
                     std::string compositionString("+(");
                     compositionString += "p";
@@ -457,12 +443,8 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     compositionString += ")";
 
                     m_taskPlanOptions->setComposition(compositionString);
-COUT_INFO_MSG("")
                     auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(m_taskPlanOptions);
-COUT_INFO_MSG("m_taskPlanOptions[" << m_taskPlanOptions->toXML() << "]")
-COUT_INFO_MSG("taskOptionClass->m_taskOption[" << taskOptionClass->m_taskOption->toXML() << "]")
                     sendSharedLmcpObjectBroadcastMessage(newResponse);
-COUT_INFO_MSG("")
                 }
                 else
                 {
@@ -516,7 +498,7 @@ COUT_INFO_MSG("")
                 //TODO:: error invalid task object encountered when receiving a UniqueAutomationRequest
             }
         }
-COUT_INFO_MSG("")
+        //COUT_INFO_MSG("")
     }
     else if (uxas::messages::task::isUniqueAutomationResponse(receivedLmcpMessage->m_object))
     {
@@ -795,6 +777,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
             if ((itTaskOptionClass != m_optionIdVsTaskOptionClass.end()) &&
                     (itTaskImplementationRequest != m_routeIdVsTaskImplementationRequest.end()))
             {
+                itTaskOptionClass->second->m_firstTaskActiveWaypointID = -1;
                 for (auto routePlan : routePlanResponse->getRouteResponses())
                 {
                     if (itTaskOptionClass->second->m_pendingRouteIds.find(routePlan->getRouteID()) != itTaskOptionClass->second->m_pendingRouteIds.end())
@@ -839,18 +822,38 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 int64_t waypointId = itTaskImplementationRequest->second->getStartingWaypointID();
                                 // waypoints from the saved routes
                                 bool isFirstWaypoint = true;
+                                bool isFoundTaskWaypoints = false;
                                 for (auto& plan : itTaskOptionClass->second->m_orderedRouteIdVsPlan)
                                 {
                                     bool isRouteFromLastToTask = (plan.second->getRouteID() == m_transitionRouteRequestId);
-                                    for (auto& planWaypoint : plan.second->getWaypoints())
+                                    auto taskPlan = plan.second;
+                                    if (!isRouteFromLastToTask)
+                                    {
+                                        if (itTaskOptionClass->second->m_restartRoutePlan)
+                                        {
+                                            if (!isFoundTaskWaypoints) // only add the restartRoutePlan, don't add any other routes
+                                            {
+                                                taskPlan = itTaskOptionClass->second->m_restartRoutePlan;
+                                            }
+                                            else
+                                            {
+                                                // already added the restart waypoints, don't add anymore
+                                                taskPlan = std::make_shared<uxas::messages::route::RoutePlan>();
+                                            }
+                                            isFoundTaskWaypoints = true;
+                                        }
+                                    }
+                                    for (auto& planWaypoint : taskPlan->getWaypoints())
                                     {
                                         auto waypoint = planWaypoint->clone();
+                                        planWaypoint->setNumber(waypointId); // need to update the number in the save route waypoints
                                         waypoint->setNumber(waypointId);
                                         waypoint->setAltitude(itEntityConfiguration->second->getNominalAltitude());
                                         waypoint->setAltitudeType(itEntityConfiguration->second->getNominalAltitudeType());
                                         waypoint->setSpeed(itEntityConfiguration->second->getNominalSpeed());
                                         if (!isFirstWaypoint)
                                         {
+                                            //NOTE:: not setting nextwaypoint in saved plan, assume it is not needed and gets set here during implementation
                                             taskImplementationResponse->getTaskWaypoints().back()->setNextWaypoint(waypointId);
                                         }
                                         isFirstWaypoint = false;
@@ -868,20 +871,10 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                         waypoint = nullptr; // gave up ownership
                                         waypointId++;
                                     }
-                                    //                                if (isRouteFromLastToTask && !taskImplementationResponse->getTaskWaypoints().empty())
-                                    //                                {
-                                    //                                    delete taskImplementationResponse->getTaskWaypoints().back();
-                                    //                                    taskImplementationResponse->getTaskWaypoints().pop_back();
-                                    //                                    if (!taskImplementationResponse->getTaskWaypoints().empty())
-                                    //                                    {
-                                    //                                        taskImplementationResponse->getTaskWaypoints().back()->setNextWaypoint(0);
-                                    //                                    }
-                                    //                                    else
-                                    //                                    {
-                                    //                                        isFirstWaypoint = true;
-                                    //                                    }
-                                    //                                }
                                 }
+                                // got a new plan so remove old restart plan, if any
+                                itTaskOptionClass->second->m_restartRoutePlan.reset();
+                                // TODO:: not sure what to do with the next section for task restart
                                 isProcessTaskImplementationRouteResponse(taskImplementationResponse, itTaskOptionClass->second, waypointId, pRoutePlan);
                                 if (!taskImplementationResponse->getTaskWaypoints().empty())
                                 {
