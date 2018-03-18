@@ -294,7 +294,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
                                 [&](afrl::cmasi::MissionCommand* mish) { return mish->getVehicleID() == taskImplementationResponse->getVehicleID(); });
 
     //std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
-    if(taskImplementationResponse->getTimeThreshold() > 0){
+    //if(taskImplementationResponse->getTimeThreshold() > 0){
         //create the loiter action for the task and set it to the first waypoint in the list
         
         afrl::cmasi::LoiterAction lTask;
@@ -303,20 +303,27 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
         lTask.setLocation(m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone());
         //std::cout << lTask.getLocation()->toString() << std::endl;
-        //std::cout << lTask.toString() << std::endl;
+        std::cout << lTask.toString() << std::endl;
         //std::cout << "Vehicle Action List: " << taskImplementationResponse->toString() << std::endl;
         //taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().insert(taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().begin(), lTask.clone());
         taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().push_back(lTask.clone());
 
 /*
 what the plan is and what will need to happen
-1.) use taskImplementationResponse->getTaskWaypoints().front()->getTaskWaypoints() to get the waypoint list for the given task (don't forget to check if it is empty)
-2.) create a new point in the front for the loiter task if and only if TimeThreshold > 0
+1.)  use taskImplementationResponse->getTaskWaypoints().front()->getTaskWaypoints() to get the waypoint list for the given task
+
+2.)  create a new point in the front for the loiter task if TimeThreshold > 0
+2.1)   Will need to change the current system in place for how the 3D location is set. (The current uses the starting position of the UAV)
+2.1.1)   This will need to be changed to the last given task.
+2.2)   Will also need to fix an issue with loitering not finishing ever.
+2.2.1)   No idea as to what is causing this
+
 3.) add that new point to the front
+
 4.) Test
 */
 
-    }
+    //}
 
     if(corrMish != m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end())
     {
