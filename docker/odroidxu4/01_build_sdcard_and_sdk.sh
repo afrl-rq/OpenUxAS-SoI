@@ -41,6 +41,7 @@ rm -rf build_tmp_for_deps_fetching && \
 python3 ./rm-external && \
 python3 ./prepare && \
 meson.py build_tmp_for_deps_fetching \
+  $AFRL_INTERNAL \
   --cross-file docker/odroidxu4/odroid-xu4-gnueabihf.txt && \
 rm -rf build_tmp_for_deps_fetching && \
 mkdir -p /var/cache/OpenUxAS/3rd && \
