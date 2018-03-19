@@ -340,6 +340,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             //std::cout << "Number of aircraft according to DAIDALUS: " <<m_daa.numberOfAircraft() << std::endl;
             if (m_daa.numberOfAircraft()>1) //Perform well_clear violation check if DAIDALUS object contains ownship and at least one intruder traffic state
             {
+                larcfm::KinematicMultiBands m_daa_bands;
+                m_daa.kinematicMultiBands(m_daa_bands);
                 for (int intruderIndex = 1; intruderIndex<=m_daa.numberOfAircraft()-1; ++intruderIndex)
                 {
                     auto timeToViolation_s = m_daa.timeToViolation(intruderIndex);
