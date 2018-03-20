@@ -485,18 +485,6 @@ public
 						
 			lemma "Once stable, stays stable":
 				true -> pre(stable) => stable;
-
-			lemma "Stable on and after 24 steps":
-				steps >= 24 => stable;
-			
-			lemma "Stable on and after 25 steps":
-				steps >= 25 => stable;
-			
-			lemma "Stable on and after 26 steps":
-				steps >= 26 => stable;
-			
-			lemma "Stable on and after 27 steps":
-				steps >= 27 => stable;
 				
 			lemma "Stable on and after 28 steps":
 				steps >= 28 => stable;
