@@ -298,7 +298,6 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         //create the loiter action for the task and set it to the first waypoint in the list
         
         afrl::cmasi::LoiterAction lTask;
-        //will eventually need to be in epoch time
         lTask.setDuration(taskImplementationResponse->getTimeThreshold()); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
         lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
 
@@ -331,6 +330,23 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         auto mish = new afrl::cmasi::MissionCommand;
         mish->setCommandID(m_commandId++);
         mish->setVehicleID(taskImplementationResponse->getVehicleID());
+        /*
+        //This is in the hopes of eventually fixing the first point not loitering bug
+        if(taskImplementationResponse->getTimeThreshold() > 0){
+            afrl::cmasi::LoiterAction lTask;
+            lTask.setDuration(30);//taskImplementationResponse->getTimeThreshold()); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
+            lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
+            lTask.setLocation(m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone());
+            taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().insert(taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().begin(), lTask.clone());
+            
+            afrl::cmasi::Location3D * locationToAdd = m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone();
+            taskImplementationResponse->getTaskWaypoints().front()->setLongitude(locationToAdd->getLongitude());
+            taskImplementationResponse->getTaskWaypoints().front()->setLatitude(locationToAdd->getLatitude());
+            taskImplementationResponse->getTaskWaypoints().front()->setAltitude(locationToAdd->getAltitude());
+            taskImplementationResponse->getTaskWaypoints().front()->setAltitudeType(locationToAdd->getAltitudeType());
+            
+        }
+        */
         mish->setFirstWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
         for(auto wp : taskImplementationResponse->getTaskWaypoints())
             mish->getWaypointList().push_back(wp->clone());
