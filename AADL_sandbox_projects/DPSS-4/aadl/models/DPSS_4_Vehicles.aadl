@@ -7,71 +7,68 @@ public
 	
 	system DPSS_4_Vehicles
 		features
-			--Inputs:
+			-----------------------------------------------------
+			--INPUTS
+			-----------------------------------------------------
+			
+			--Initial positions
 			initial_pos_UAV1 : in data port DPSS_Data_Types::Position_Type;
-			suggested_initial_direction_UAV1 : in data port DPSS_Data_Types::Direction_Type;
 			initial_pos_UAV2 : in data port DPSS_Data_Types::Position_Type;
-			suggested_initial_direction_UAV2 : in data port DPSS_Data_Types::Direction_Type;
 			initial_pos_UAV3 : in data port DPSS_Data_Types::Position_Type;
-			suggested_initial_direction_UAV3 : in data port DPSS_Data_Types::Direction_Type;
 			initial_pos_UAV4 : in data port DPSS_Data_Types::Position_Type;
+						
+			--Suggested initial directions
+			suggested_initial_direction_UAV1 : in data port DPSS_Data_Types::Direction_Type;
+			suggested_initial_direction_UAV2 : in data port DPSS_Data_Types::Direction_Type;
+			suggested_initial_direction_UAV3 : in data port DPSS_Data_Types::Direction_Type;
 			suggested_initial_direction_UAV4 : in data port DPSS_Data_Types::Direction_Type;
 			
-			--Outputs:
+			-----------------------------------------------------
+			--OUTPUTS
+			-----------------------------------------------------
+
+			--Vehicle positions
 			pos_UAV1 : out data port DPSS_Data_Types::Position_Type;
 			pos_UAV2 : out data port DPSS_Data_Types::Position_Type;
 			pos_UAV3 : out data port DPSS_Data_Types::Position_Type;
 			pos_UAV4 : out data port DPSS_Data_Types::Position_Type;
 			 
 		annex agree {**
-			
+				
+			--Directions
 			eq direction_UAV1 : DPSS_Data_Types::Direction_Type;
 			eq direction_UAV2 : DPSS_Data_Types::Direction_Type;
 			eq direction_UAV3 : DPSS_Data_Types::Direction_Type;
 			eq direction_UAV4 : DPSS_Data_Types::Direction_Type;
-	
+
+			--Goals
 			eq goal_UAV1 : DPSS_Data_Types::Position_Type;
 			eq goal_UAV2 : DPSS_Data_Types::Position_Type;
 			eq goal_UAV3 : DPSS_Data_Types::Position_Type;
 			eq goal_UAV4 : DPSS_Data_Types::Position_Type;
 			
 			--Shared border positions
-			eq S_12 : DPSS_Data_Types::Position_Type = 
-				1.0*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;  
-			eq S_23 : DPSS_Data_Types::Position_Type = 
-				2.0*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;
-			eq S_34 : DPSS_Data_Types::Position_Type = 
-				3.0*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;
+			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;  
+			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;
+			eq S_34 : DPSS_Data_Types::Position_Type = 3.0*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;
 			
 			--Previous positions
-			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = 
-				prev(pos_UAV1, initial_pos_UAV1);
-			eq pre_pos_UAV2 : DPSS_Data_Types::Position_Type = 
-				prev(pos_UAV2, initial_pos_UAV2);
-			eq pre_pos_UAV3 : DPSS_Data_Types::Position_Type = 
-				prev(pos_UAV3, initial_pos_UAV3);
-			eq pre_pos_UAV4 : DPSS_Data_Types::Position_Type = 
-				prev(pos_UAV4, initial_pos_UAV4);			
+			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
+			eq pre_pos_UAV2 : DPSS_Data_Types::Position_Type = prev(pos_UAV2, initial_pos_UAV2);
+			eq pre_pos_UAV3 : DPSS_Data_Types::Position_Type = prev(pos_UAV3, initial_pos_UAV3);
+			eq pre_pos_UAV4 : DPSS_Data_Types::Position_Type = prev(pos_UAV4, initial_pos_UAV4);			
 			
 			--Previous directions
-			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = 
-				prev(direction_UAV1, suggested_initial_direction_UAV1);
-			eq pre_direction_UAV2 : DPSS_Data_Types::Direction_Type = 
-				prev(direction_UAV2, suggested_initial_direction_UAV2);
-			eq pre_direction_UAV3 : DPSS_Data_Types::Direction_Type = 
-				prev(direction_UAV3, suggested_initial_direction_UAV3);
-			eq pre_direction_UAV4 : DPSS_Data_Types::Direction_Type = 
-				prev(direction_UAV4, suggested_initial_direction_UAV4);
+			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = prev(direction_UAV1, suggested_initial_direction_UAV1);
+			eq pre_direction_UAV2 : DPSS_Data_Types::Direction_Type = prev(direction_UAV2, suggested_initial_direction_UAV2);
+			eq pre_direction_UAV3 : DPSS_Data_Types::Direction_Type = prev(direction_UAV3, suggested_initial_direction_UAV3);
+			eq pre_direction_UAV4 : DPSS_Data_Types::Direction_Type = prev(direction_UAV4, suggested_initial_direction_UAV4);
 			
 			--Previous goals
-			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = 
-				prev(goal_UAV1, (if direction_UAV1 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
-			eq pre_goal_UAV2 : DPSS_Data_Types::Position_Type = 
-				prev(goal_UAV2, (if direction_UAV2 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
-			eq pre_goal_UAV3 : DPSS_Data_Types::Position_Type = 
-				prev(goal_UAV3, (if direction_UAV3 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
-			eq pre_goal_UAV4 : DPSS_Data_Types::Position_Type = 
-				prev(goal_UAV4, (if direction_UAV4 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV2 : DPSS_Data_Types::Position_Type = prev(goal_UAV2, (if direction_UAV2 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV3 : DPSS_Data_Types::Position_Type = prev(goal_UAV3, (if direction_UAV3 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV4 : DPSS_Data_Types::Position_Type = prev(goal_UAV4, (if direction_UAV4 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
 						
 			--Times to reach neighbors													
 			eq time_to_reach_neighbor_12 : DPSS_Data_Types::Time_Type = 
@@ -182,26 +179,28 @@ public
 				-> true;
 				
 			assume "Initial positions are between 0 and P_GLOBAL":
-				(	0.0 <= initial_pos_UAV1 
+				(--Initial positions are >= 0
+					0.0 <= initial_pos_UAV1 
+				and 0.0 <= initial_pos_UAV2
+				and 0.0 <= initial_pos_UAV3
+				and 0.0 <= initial_pos_UAV4
+				--and initial positions are <= P
 				and initial_pos_UAV1 <= DPSS_Constants.P_GLOBAL
-				and 0.0 <= initial_pos_UAV2 
-				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL
-				and 0.0 <= initial_pos_UAV3 
-				and initial_pos_UAV3 <= DPSS_Constants.P_GLOBAL
-				and 0.0 <= initial_pos_UAV4 
+ 				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL
+ 				and initial_pos_UAV3 <= DPSS_Constants.P_GLOBAL
 				and initial_pos_UAV4 <= DPSS_Constants.P_GLOBAL
 				)
 				-> true;
 				
 			assume "Suggested initial directions are LEFT or RIGHT":
-				((	suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
-					or suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
-				and (suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
-					or suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT)
-				and (suggested_initial_direction_UAV3 = DPSS_Constants.LEFT
-					or suggested_initial_direction_UAV3 = DPSS_Constants.RIGHT)
-				and (suggested_initial_direction_UAV4 = DPSS_Constants.LEFT
-					or suggested_initial_direction_UAV4 = DPSS_Constants.RIGHT)
+				((			suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+						or  suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
+					and (	suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
+						or 	suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT)
+					and (	suggested_initial_direction_UAV3 = DPSS_Constants.LEFT
+						or 	suggested_initial_direction_UAV3 = DPSS_Constants.RIGHT)
+					and (	suggested_initial_direction_UAV4 = DPSS_Constants.LEFT
+						or  suggested_initial_direction_UAV4 = DPSS_Constants.RIGHT)
 				)
 				-> true;
 
@@ -222,23 +221,27 @@ public
 				) -> true;
 			
 			guarantee "Goals are in bounds":
+				--Goals are >= 0
 					0.0 <= goal_UAV1
-				and goal_UAV1 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= goal_UAV2
-				and goal_UAV2 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= goal_UAV3
-				and goal_UAV3 <= DPSS_Constants.P_GLOBAL
 				and 0.0 <= goal_UAV4
+				--and goals are <=P
+				and goal_UAV1 <= DPSS_Constants.P_GLOBAL
+				and goal_UAV2 <= DPSS_Constants.P_GLOBAL
+				and goal_UAV3 <= DPSS_Constants.P_GLOBAL
 				and goal_UAV4 <= DPSS_Constants.P_GLOBAL;	
 			
 			guarantee "Positions are in bounds":
-					0.0 <= pos_UAV1 
+				--Positions are >= 0
+					0.0 <= pos_UAV1
+				and 0.0 <= pos_UAV2	 
+				and 0.0 <= pos_UAV3
+				and 0.0 <= pos_UAV4
+				--and positions are <= P
 				and pos_UAV1 <= DPSS_Constants.P_GLOBAL
-				and 0.0 <= pos_UAV2 
 				and pos_UAV2 <= DPSS_Constants.P_GLOBAL
-				and 0.0 <= pos_UAV3 
 				and pos_UAV3 <= DPSS_Constants.P_GLOBAL
-				and 0.0 <= pos_UAV4 
 				and pos_UAV4 <= DPSS_Constants.P_GLOBAL;
 			
 			guarantee "UAVs stay in order":
@@ -247,13 +250,15 @@ public
 				and pos_UAV3 <= pos_UAV4;
 			
 			guarantee "UAVs turn around at the borders":
+				--UAVs turn around at 0
 					pos_UAV1 = 0.0 => direction_UAV1 = 1
-				and pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1
 				and pos_UAV2 = 0.0 => direction_UAV2 = 1
-				and pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1
 				and pos_UAV3 = 0.0 => direction_UAV3 = 1
-				and pos_UAV3 = DPSS_Constants.P_GLOBAL => direction_UAV3 = -1
 				and pos_UAV4 = 0.0 => direction_UAV4 = 1
+				--and UAVs turn around at P
+				and pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1
+				and pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1
+				and pos_UAV3 = DPSS_Constants.P_GLOBAL => direction_UAV3 = -1
 				and pos_UAV4 = DPSS_Constants.P_GLOBAL => direction_UAV4 = -1;
 				
 			guarantee "Directions are in bounds":
@@ -274,6 +279,7 @@ public
 			UAV4: system UAV_Pkg::UAV;
 			
 		connections
+			
 			--Suggested initial directions
 			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
 			sug_init_dir_UAV2: port	suggested_initial_direction_UAV2 -> UAV2.suggested_initial_direction;
@@ -287,11 +293,13 @@ public
 			init_pos_UAV4: port initial_pos_UAV4 -> UAV4.initial_position;
 			
 			--Connections between neighbors for sharing positions
+			--Share position with right neighbor (get left neighbor position)
 			pos_UAV1_to_UAV2 : port UAV1.pos -> UAV2.pos_LN;
-			pos_UAV2_to_UAV1 : port UAV2.pos -> UAV1.pos_RN;
 			pos_UAV2_to_UAV3 : port UAV2.pos -> UAV3.pos_LN;
-			pos_UAV3_to_UAV2 : port UAV3.pos -> UAV2.pos_RN;
 			pos_UAV3_to_UAV4 : port UAV3.pos -> UAV4.pos_LN;
+			--Share position with left neighbor (get right neighbor position)
+			pos_UAV2_to_UAV1 : port UAV2.pos -> UAV1.pos_RN;
+			pos_UAV3_to_UAV2 : port UAV3.pos -> UAV2.pos_RN;
 			pos_UAV4_to_UAV3 : port UAV4.pos -> UAV3.pos_RN;
 			
 			--Output positions of the UAVs
@@ -340,10 +348,12 @@ public
 			lemma "Observer: Worst time convergence":
 				not (
 					stable
+					--Initially, all UAVs are heading to the right
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
 					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
 					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
 					and DPSS_Node_Lib.initial_value_true(direction_UAV4 = 1)
+					--and the UAVs are located close together on the left end of the perimeter
 					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.0)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.01)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.02)
@@ -357,21 +367,11 @@ public
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
 			----------------------------------------------------------------------------			
 				
-			lemma "UAV1 stays in bounds":
-				0.0 <= pos_UAV1 
-				and pos_UAV1 <= DPSS_Constants.P_GLOBAL;
-			
-			lemma "UAV2 stays in bounds":
-				0.0 <= pos_UAV2 
-				and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
-					
-			lemma "UAV3 stays in bounds":
-				0.0 <= pos_UAV3 
-				and pos_UAV3 <= DPSS_Constants.P_GLOBAL;
-							
-			lemma "UAV4 stays in bounds":
-				0.0 <= pos_UAV4 
-				and pos_UAV4 <= DPSS_Constants.P_GLOBAL;
+			--UAVs stay in bounds (prove one at a time)	
+			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= DPSS_Constants.P_GLOBAL;
+			lemma "UAV2 stays in bounds": 0.0 <= pos_UAV2 and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+			lemma "UAV3 stays in bounds": 0.0 <= pos_UAV3 and pos_UAV3 <= DPSS_Constants.P_GLOBAL;			
+			lemma "UAV4 stays in bounds": 0.0 <= pos_UAV4 and pos_UAV4 <= DPSS_Constants.P_GLOBAL;
 						
 			lemma "Once stable, stays stable":
 				true -> pre(stable) => stable;
