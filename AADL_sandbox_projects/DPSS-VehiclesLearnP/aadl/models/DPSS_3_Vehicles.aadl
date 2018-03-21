@@ -324,7 +324,7 @@ public
 			
 			--Expected number of steps it takes to converge to the stable configuration
 			--This might be more for unknown N and P
-			--eq steps_to_converge : int = 22;
+			eq steps_to_converge : int = 21;
 			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
@@ -341,8 +341,8 @@ public
 					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 9.99)
 				);
 				
---			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
---				steps = steps_to_converge - 1 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+				steps = steps_to_converge - 1 => stable;
 									
 			lemma "Observer: A 5 step trace":
 				not (steps > 4 
@@ -368,21 +368,9 @@ public
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;
 					
---			lemma "Stable on and after steps_to_converge steps":
---				steps >= steps_to_converge => stable;
-										
-			lemma "Stable on and after 19 steps":
-				steps >= 19 => stable;
-				
-			lemma "Stable on and after 20 steps":
-				steps >= 20 => stable;
-
-			lemma "Stable on and after 21 steps":
-				steps >= 21 => stable;
-				
-			lemma "Stable on and after 22 steps":
-				steps >= 22 => stable;
-
+			lemma "Stable on and after steps_to_converge steps":
+				steps >= steps_to_converge => stable;
+													
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = Time_to_travel_full_length/N_real;
 			
@@ -396,17 +384,7 @@ public
 			lemma "Time to become stable is less than 3T":
 				(stable and not (pre(stable))) => 
 					(time < 3.0*Time_to_travel_full_length);
-					
-			-- This is a good way to find the real time bound!	
-			lemma "Time to become stable is less than 4T":
-				(stable and not (pre(stable))) => 
-					(time < 4.0*Time_to_travel_full_length);
-					
-			-- This is a good way to find the real time bound!	
-			lemma "Time to become stable is less than 5T":
-				(stable and not (pre(stable))) => 
-					(time < 5.0*Time_to_travel_full_length);
-			
+								
 		**};
 		
 	end DPSS_3_Vehicles.Impl;
