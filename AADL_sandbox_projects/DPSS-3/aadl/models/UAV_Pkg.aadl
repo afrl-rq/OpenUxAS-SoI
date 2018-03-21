@@ -55,13 +55,13 @@ public
 				true -> (id = pre(id));
 			
 			assume "Input initial position is between 0 and P_GLOBAL":
-				(0.0 <= initial_position
+				(	0.0 <= initial_position
 				and initial_position <= DPSS_Constants.P_GLOBAL)
 				-> true;
 							
 			assume "Suggested initial direction is LEFT or RIGHT":
-				(suggested_initial_direction = DPSS_Constants.LEFT
-					or suggested_initial_direction = DPSS_Constants.RIGHT)
+				(		suggested_initial_direction = DPSS_Constants.LEFT
+					or 	suggested_initial_direction = DPSS_Constants.RIGHT)
 				-> true;
 			
 			assume "ID = 1 implies pos_LN < 0":
