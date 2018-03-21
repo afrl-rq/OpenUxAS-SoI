@@ -331,16 +331,16 @@ public
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
 					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
 					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 0.97)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 0.98)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 0.99)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 9.97)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = 9.98)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = 9.99)
 				);
 				
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 									
-			lemma "Observer: A 5 step trace":
-				not (steps > 4 
+			lemma "Observer: A 6 step trace":
+				not (steps > 5 
 				and	pos_UAV1 = 0.0
 				);
 			
@@ -366,17 +366,14 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;
 			
-			lemma "Stable on and after 22 steps":
-				steps >= 22 => stable;
+			lemma "Stable on and after 20 steps":
+				steps >= 20 => stable;
 				
-			lemma "Stable on and after 23 steps":
-				steps >= 23 => stable;
-
+			lemma "Stable on and after 21 steps":
+				steps >= 21 => stable;
+			
 			lemma "Stable on and after 25 steps":
 				steps >= 25 => stable;
-			
-			lemma "Stable on and after 30 steps":
-				steps >= 30 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = Time_to_travel_full_length/N_real;
@@ -386,6 +383,16 @@ public
 					deltaT > 0.0 
 					and deltaT < Time_to_travel_full_length
 					);
+
+			-- This is a good way to find the real time bound!	
+			lemma "Time to become stable is less than 3T":
+				(stable and not (pre(stable))) => 
+					(time < 3.0*Time_to_travel_full_length);
+
+			-- This is a good way to find the real time bound!	
+			lemma "Time to become stable is less than 4T":
+				(stable and not (pre(stable))) => 
+					(time < 4.0*Time_to_travel_full_length);
 					
 			-- This is a good way to find the real time bound!	
 			lemma "Time to become stable is less than 5T":
