@@ -1,0 +1,12 @@
+package DPSS_Constants
+public
+		
+	annex agree {**
+		const V : real = 1.0; --velocity
+		const LEFT : int = -1;
+		const RIGHT : int = 1;
+		const N_int : int = 4; --Number of vehicles
+		const N_real : real = 4.0; --Number of vehicles
+	**};
+	
+end DPSS_Constants;
