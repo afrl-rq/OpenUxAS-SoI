@@ -163,7 +163,7 @@ protected:
     bool isCalculateWaypoints(const n_FrameworkLib::PTR_VISIBILITYGRAPH_t& visibilityGraph,
             const std::shared_ptr<n_FrameworkLib::CPathInformation>& pathInformation,
             const int64_t& vehicleId, const double& startHeading_deg, const double& endHeading_deg,
-            std::vector<afrl::cmasi::Waypoint*>& planWaypoints);
+            std::vector<afrl::cmasi::Waypoint*>& planWaypoints,const n_FrameworkLib::CTrajectoryParameters::enPathType_t& enpathType);
     void calculatePlannerParameters(const std::shared_ptr<afrl::cmasi::EntityConfiguration>& enityConfiguration);
 
 public:
