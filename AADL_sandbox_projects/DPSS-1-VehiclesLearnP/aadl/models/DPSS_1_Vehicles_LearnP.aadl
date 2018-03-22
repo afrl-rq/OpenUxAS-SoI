@@ -167,7 +167,7 @@ public
 
 			--Set UAV IDs
 			--We use assertions since the IDs are not system-level inputs that we can pass through
---			assert UAV1.id = 1;
+			assert UAV1.id = 1.0;
 
 			--Assign direction variables (used at the system level)
 			assign direction_UAV1 = UAV1.direction;
@@ -181,11 +181,7 @@ public
 							pre_pos_UAV1 + DPSS_Constants.V*(time - pre(time))
 						else --pre_direction = -1
 							pre_pos_UAV1 - DPSS_Constants.V*(time - pre(time))));
-							
-			--We use assertions since the truth value of the perimeter is not a system input that we can pass in.
-			--We could make P_GLOBAL an input, but that would introduce another nonlinearity, so we'll first see if we can prove the theorem when P_GLOBAL is a constant.
-			--assert UAV1.P_truth = P_GLOBAL;
-						
+													
 			--Set the meet_LN variables for each UAV
 			assert UAV1.meet_LN = false; --There is no left neighbor to UAV1
 			
@@ -193,7 +189,10 @@ public
 			assert UAV1.meet_RN = false; --There is no right neighbor to UAVN
 		
 			--Tell the vehicles their current positions
-			assert UAV1.pos = pos_UAV1;		
+			assert UAV1.pos = pos_UAV1;	
+			
+			--Tell the vehicles P_truth (so they know when they hit the end)
+			assert UAV1.P_truth = P_GLOBAL;	
 		
 			--Used in lemmas
 			eq steps : int = 1 -> pre(steps + 1);

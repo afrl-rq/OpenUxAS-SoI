@@ -11,39 +11,27 @@ public
 			initial_position : in data port DPSS_Data_Types::Position_Type;
 			meet_LN : in data port Base_Types::Boolean; --True iff this UAV and its left neighbor are co-located
 			meet_RN : in data port Base_Types::Boolean; --True iff this UAV and its right neighbor are co-located		
---			pos_LN : in data port DPSS_Data_Types::Position_Type; --Position of left neighbor (< 0  if there is no left neighbor)
---			pos_RN : in data port DPSS_Data_Types::Position_Type; --Position of right neighbor (> P_GLOBAL if there is no right neighbor)
 			perimRight_RN : in data port DPSS_Data_Types::Distance_Type; --Perimeter to the right of the right neighbor (as best as the right neighbor knows it) 
 --			perimLeft_LN : in data port DPSS_Data_Types::Distance_Type; --Perimeter to the left of the left neighbor (not necessary because this is equal to pos_LN)
 --			numRight_RN : in data port Base_Types::Integer;
 --			numLeft_LN : in data port Base_Types::Integer;
---			P_truth : in data port DPSS_Data_Types::Distance_Type; --only used to detect when the UAV reaches P
---			id : in data port Base_Types::Integer; --a positive integer between 1 and N
+			P_truth : in data port DPSS_Data_Types::Distance_Type; --only used to detect when the UAV reaches the true right endpoint
+			id : in data port Base_Types::Float; --a positive integer between 1 and N
 			pos : in data port DPSS_Data_Types::Position_Type;
 			
 			--Outputs
 			direction: out data port DPSS_Data_Types::Direction_Type;
 			goal : out data port DPSS_Data_Types::Position_Type;
---			pos : out data port DPSS_Data_Types::Position_Type;
 			perimRight : out data port DPSS_Data_Types::Distance_Type; --perimeter to the right of this UAV (as best as it knows)
 --			numRight : out data port Base_Types::Integer; --number of UAVs to the right of this UAV (as best as this UAV knows)
 --			numLeft : out data port Base_Types::Integer; --number of UAVs to the left of this UAV (as best as this UAV knows)		
 					
 		annex agree {**
-
-			-----------------------------------------------------
-			--CONSTANTS
-			-----------------------------------------------------
-			const P_truth : real = 10.0;
-			const id : int = 1;
 				
 			-----------------------------------------------------
 			--STATE VARIABLES
 			-----------------------------------------------------
 	
-			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep. 
---			eq meet_LN : bool = (pos_LN = pos); --Meet left neighbor?
---			eq meet_RN : bool = (pos_RN = pos); --Meet right neighbor?
 			eq reach_P_truth : bool = (pos >= P_truth); --Since the models are infinitely precise, we could use = here; but I'm using >= for consistency with what we did before
 
 			--Previous numLeft
@@ -67,9 +55,9 @@ public
 				
 			--Shared border positions
 			eq S_L : DPSS_Data_Types::Position_Type = 
-				0.0*P/DPSS_Constants.N_real;  
+				(id - 1.0)*P/DPSS_Constants.N_real;  
 			eq S_R : DPSS_Data_Types::Position_Type = 
-				1.0*P/DPSS_Constants.N_real;	
+				id*P/DPSS_Constants.N_real;	
 				
 			--Previous direction
 			eq pre_direction : DPSS_Data_Types::Direction_Type = 
@@ -83,12 +71,18 @@ public
 			--ASSUMPTIONS
 			-----------------------------------------------------		
 			
---			assume "ID in range":
---				id >= 1 and id <= DPSS_Constants.N_int;
---						
---			assume "ID is fixed":
---				true -> (id = pre(id));
+			assume "ID in range":
+				id >= 1.0 and id <= DPSS_Constants.N_real;
+						
+			assume "ID is fixed":
+				true -> (id = pre(id));
 			
+			assume "P_truth is positive":
+				P_truth > 0.0;
+				
+			assume "P_truth is fixed":
+				true -> (P_truth = pre(P_truth));
+							
 			assume "Input initial position is between 0 and P_truth":
 				(	0.0 <= initial_position
 				and P_truth >= initial_position)
@@ -171,13 +165,7 @@ public
 										0.0 
 				); 
 						
---			guarantee "Position formula":
---				pos = (initial_position -> 
---						(if pre_direction = 1 then
---							pre_pos + DPSS_Constants.V*(time - pre(time))
---						else --pre_direction = -1
---							pre_pos - DPSS_Constants.V*(time - pre(time))));
-			
+		
 --			guarantee "numLeft formula":
 --				numLeft = if meet_LN then numLeft_LN + 1 else pre_numLeft;
 				
