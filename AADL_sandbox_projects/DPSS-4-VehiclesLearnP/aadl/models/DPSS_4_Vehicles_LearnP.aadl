@@ -436,12 +436,18 @@ public
 			lemma "Stable on and after 21 steps":
 				steps >= 21 => stable;
 
+			lemma "Stable on and after 29 steps":
+				steps >= 29 => stable;
+
 			lemma "Stable on and after 30 steps":
 				steps >= 30 => stable;
 				
 			lemma "Stable on and after 31 steps":
 				steps >= 31 => stable;
 													
+			lemma "Stable on and after 32 steps":
+				steps >= 32 => stable;
+
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = Time_to_travel_full_length/DPSS_Constants.N_real;
 			
