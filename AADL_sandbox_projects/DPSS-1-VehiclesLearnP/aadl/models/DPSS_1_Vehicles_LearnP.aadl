@@ -30,8 +30,8 @@ public
 			-----------------------------------------------------
 			
 			--Constants that the vehicles don't know a priori (so they are only defined at the top-level)
-			const P_GLOBAL : real = 10.0;
-			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_GLOBAL/DPSS_Constants.V;
+			const P_TRUTH : real = 10.0;
+			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
 	
 			-----------------------------------------------------
 			--EQ (STATE) VARIABLES
@@ -52,7 +52,7 @@ public
 			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = prev(direction_UAV1, suggested_initial_direction_UAV1);
 			
 			--Previous goals
-			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then P_GLOBAL else 0.0));
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then P_TRUTH else 0.0));
 						
 			--Times to reach neighbors													
 			
@@ -68,7 +68,7 @@ public
 				DPSS_Node_Lib.time_to_reach_target_position(
 					pre_direction_UAV1, 
 					pre_pos_UAV1, 
-					P_GLOBAL
+					P_TRUTH
 				);
 				
 			eq deltaT : DPSS_Data_Types::Time_Type =
@@ -81,11 +81,11 @@ public
 				(	--the UAV is at 0
 						pos_UAV1 = 0.0 
 					--and was previously at P 
-					and pre_pos_UAV1 = P_GLOBAL
+					and pre_pos_UAV1 = P_TRUTH
 				)
 				--or
 				or (--the UAV is at P
-						pos_UAV1 = P_GLOBAL
+						pos_UAV1 = P_TRUTH
 					--and was previously at 0
 					and pre_pos_UAV1 = 0.0 
 				);
@@ -100,7 +100,7 @@ public
 				(--Initial positions are >= 0
 					0.0 <= initial_pos_UAV1 
 				--and initial positions are <= P
-				and initial_pos_UAV1 <= P_GLOBAL
+				and initial_pos_UAV1 <= P_TRUTH
  				)
 				-> true;
 				
@@ -129,20 +129,20 @@ public
 				--Goals are >= 0
 					0.0 <= goal_UAV1
 				--and goals are <=P
-				and goal_UAV1 <= P_GLOBAL;	
+				and goal_UAV1 <= P_TRUTH;	
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= 0
 					0.0 <= pos_UAV1
 				--and positions are <= P
-				and pos_UAV1 <= P_GLOBAL;
+				and pos_UAV1 <= P_TRUTH;
 			
 			
 			guarantee "UAVs turn around at the borders":
 				--UAVs turn around at 0
 					pos_UAV1 = 0.0 => direction_UAV1 = 1
 				--and UAVs turn around at P
-				and pos_UAV1 = P_GLOBAL => direction_UAV1 = -1;
+				and pos_UAV1 = P_TRUTH => direction_UAV1 = -1;
 				
 			guarantee "Directions are in bounds":
 				(	 direction_UAV1 = 1 or direction_UAV1 = -1);
@@ -192,7 +192,7 @@ public
 			assert UAV1.pos = pos_UAV1;	
 			
 			--Tell the vehicles P_truth (so they know when they hit the end)
-			assert UAV1.P_truth = P_GLOBAL;	
+			assert UAV1.P_truth = P_TRUTH;	
 		
 			--Used in lemmas
 			eq steps : int = 1 -> pre(steps + 1);
@@ -222,7 +222,7 @@ public
 			----------------------------------------------------------------------------			
 
 			--UAVs stay in bounds (prove one at a time)	
-			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= P_GLOBAL;		
+			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= P_TRUTH;		
 							
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;					
