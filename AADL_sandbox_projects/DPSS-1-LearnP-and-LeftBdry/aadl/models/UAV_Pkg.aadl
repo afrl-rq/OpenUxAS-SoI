@@ -31,13 +31,6 @@ public
 		annex agree {**
 			
 			-----------------------------------------------------
-			--CONSTANTS
-			-----------------------------------------------------
-			
---			const right_endp_truth : real = 10.0;
---			const left_endp_truth : real = 0.0;
-			
-			-----------------------------------------------------
 			--STATE VARIABLES
 			-----------------------------------------------------
 	
@@ -104,17 +97,7 @@ public
 
 			assume "left_endp_truth is fixed":
 				true -> (left_endp_truth = pre(left_endp_truth));			
-
---			assume "Input initial position is between left_endp_truth and right_endp_truth":
---				(	left_endp_truth <= initial_position
---				and right_endp_truth >= initial_position)
---				-> true;
---							
---			assume "Input initial position is between 0 and P_truth":
---				(	0.0 <= initial_position
---				and P_truth >= initial_position)
---				-> true;
-							
+						
 			assume "Suggested initial direction is LEFT or RIGHT":
 				(	   suggested_initial_direction = DPSS_Constants.LEFT
 					or suggested_initial_direction = DPSS_Constants.RIGHT)
@@ -122,7 +105,10 @@ public
 			
 --			assume "perimRight_RN is nonnegative":
 --				meet_RN => (perimRight_RN >= 0.0);	
-				
+--			
+--			assume "perimLeft_LN is nonnegative":
+--				meet_LN => (perimLeft_LN >= 0.0);	
+			
 			-----------------------------------------------------
 			--GUARANTEES
 			-----------------------------------------------------
