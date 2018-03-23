@@ -1,0 +1,258 @@
+package DPSS_1_Vehicles_LearnP_andLeftBdry_Pkg
+public
+	with DPSS_Data_Types;
+	with DPSS_Node_Lib;
+	with DPSS_Constants;
+	with UAV_Pkg;
+	
+	system DPSS_1_Vehicles_LearnP_andLeftBdry
+		features
+			-----------------------------------------------------
+			--INPUTS
+			-----------------------------------------------------
+			
+			--Initial positions
+			initial_pos_UAV1 : in data port DPSS_Data_Types::Position_Type;
+
+			--Suggested initial directions
+			suggested_initial_direction_UAV1 : in data port DPSS_Data_Types::Direction_Type;
+			
+			-----------------------------------------------------
+			--OUTPUTS
+			-----------------------------------------------------
+
+			pos_UAV1 : out data port DPSS_Data_Types::Position_Type;
+			 
+		annex agree {**
+			
+			-----------------------------------------------------
+			--CONSTANTS
+			-----------------------------------------------------
+			
+			--Constants that the vehicles don't know a priori (so they are only defined at the top-level)
+			const P_TRUTH : real = 10.0;
+			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
+	
+			-----------------------------------------------------
+			--EQ (STATE) VARIABLES
+			-----------------------------------------------------
+											 
+			--Directions
+			eq direction_UAV1 : DPSS_Data_Types::Direction_Type;
+		
+			--Goals
+			eq goal_UAV1 : DPSS_Data_Types::Position_Type;
+			
+			--Shared border positions
+			
+			--Previous positions
+			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
+			
+			--Previous directions
+			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = prev(direction_UAV1, suggested_initial_direction_UAV1);
+			
+			--Previous goals
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then P_TRUTH else 0.0));
+						
+			--Times to reach neighbors													
+			
+			--Times to reach goals
+			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1, 
+					pre_pos_UAV1, 
+					pre_goal_UAV1
+				);
+			
+			eq time_until_UAV1_reaches_P : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1, 
+					pre_pos_UAV1, 
+					P_TRUTH
+				);
+				
+			eq time_until_UAV1_reaches_0 : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1,
+					pre_pos_UAV1,
+					0.0
+				);
+				
+			eq deltaT : DPSS_Data_Types::Time_Type =
+							--Added time_until_UAV1_reaches_P_TRUTH and time_until_UAV1_reaches_0 since UAV1 doesn't know a priori where the left and right endpoints are located.
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_P,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_0,
+								time_until_UAV1_reaches_goal));
+			
+			eq stable : bool = 
+				--Either
+				(	--the UAV is at 0
+						pos_UAV1 = 0.0 
+					--and was previously at P 
+					and pre_pos_UAV1 = P_TRUTH
+				)
+				--or
+				or (--the UAV is at P
+						pos_UAV1 = P_TRUTH
+					--and was previously at 0
+					and pre_pos_UAV1 = 0.0 
+				);
+						
+			-----------------------------------------------------
+			--ASSUMPTIONS
+			-----------------------------------------------------
+			
+			assume "time update": time = (0.0 -> pre(time) + deltaT);	
+				
+			assume "Initial positions are between 0 and P_TRUTH":
+				(--Initial positions are >= 0
+					0.0 <= initial_pos_UAV1 
+				--and initial positions are <= P
+				and initial_pos_UAV1 <= P_TRUTH
+ 				)
+				-> true;
+				
+			assume "Suggested initial directions are LEFT or RIGHT":
+				((			suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+						or  suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
+				)
+				-> true;
+
+			-----------------------------------------------------
+			--GUARANTEES
+			-----------------------------------------------------
+			
+			-- Main Theorem			
+			guarantee "Theorem 2 for Algorithm B for 3 Vehicles (with known N)":
+				(time >= ((5.0*DPSS_Constants.N_real - 1.0)/DPSS_Constants.N_real)*Time_to_travel_full_length) =>
+					(stable	and deltaT = Time_to_travel_full_length/DPSS_Constants.N_real);
+			
+			guarantee "deltaT is positive":
+				true -> deltaT > 0.0;
+			
+			guarantee "Initial positions are the input initial positions":
+				(	pos_UAV1 = initial_pos_UAV1) -> true;
+			
+			guarantee "Goals are in bounds":
+				--Goals are >= 0
+					0.0 <= goal_UAV1
+				--and goals are <=P
+				and goal_UAV1 <= P_TRUTH;	
+			
+			guarantee "Positions are in bounds":
+				--Positions are >= 0
+					0.0 <= pos_UAV1
+				--and positions are <= P
+				and pos_UAV1 <= P_TRUTH;
+					
+			guarantee "UAVs turn around at the borders":
+				--UAVs turn around at 0
+					pos_UAV1 = 0.0 => direction_UAV1 = 1
+				--and UAVs turn around at P
+				and pos_UAV1 = P_TRUTH => direction_UAV1 = -1;
+				
+			guarantee "Directions are in bounds":
+				(	 direction_UAV1 = 1 or direction_UAV1 = -1);
+			
+		**};
+		
+	end DPSS_1_Vehicles_LearnP_andLeftBdry;
+
+	system implementation DPSS_1_Vehicles_LearnP_andLeftBdry.Impl
+		subcomponents
+			UAV1: system UAV_Pkg::UAV;
+			
+		connections
+			
+			--Suggested initial directions
+			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
+			
+			--Initial positions
+			init_pos_UAV1: port initial_pos_UAV1 -> UAV1.initial_position;
+				 		
+		annex agree {**
+
+			--Set UAV IDs
+			--We use assertions since the IDs are not system-level inputs that we can pass through
+			assert UAV1.id = 1.0;
+
+			--Assign direction variables (used at the system level)
+			assign direction_UAV1 = UAV1.direction;
+			
+			--Assign goal variables (used at the system level)
+			assign goal_UAV1 = UAV1.goal;			
+									
+			--Assign positions
+			assign pos_UAV1 = (initial_pos_UAV1 -> 
+						(if pre_direction_UAV1 = 1 then
+							pre_pos_UAV1 + DPSS_Constants.V*(time - pre(time))
+						else --pre_direction = -1
+							pre_pos_UAV1 - DPSS_Constants.V*(time - pre(time))));
+													
+			--Set the meet_LN variables for each UAV
+			assert UAV1.meet_LN = false; --There is no left neighbor to UAV1
+			
+			--Set the meet_RN variables for each UAV
+			assert UAV1.meet_RN = false; --There is no right neighbor to UAVN
+		
+			--Tell the vehicles their current positions
+			assert UAV1.pos = pos_UAV1;	
+			
+			--Tell the vehicles P_truth (so they know when they hit the end)
+			--assert UAV1.P_truth = P_TRUTH;	
+		
+			--Used in lemmas
+			eq steps : int = 1 -> pre(steps + 1);
+			
+			--Expected number of steps it takes to converge to the stable configuration
+			--This might be more for unknown N and P
+			eq steps_to_converge : int = 5;
+			
+			----------------------------------------------------------------------------
+			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
+			----------------------------------------------------------------------------
+						
+			lemma "Observer: Worst time convergence":
+				not (
+					stable
+					--Initially, all UAVs are heading to the left
+					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
+					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 9.99)
+				);
+				
+			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+				steps = steps_to_converge - 1 => stable;
+							
+			----------------------------------------------------------------------------
+			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
+			----------------------------------------------------------------------------			
+
+			--UAVs stay in bounds (prove one at a time)	
+			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= P_TRUTH;		
+							
+			lemma "Once stable, stays stable":
+				true -> pre(stable)	=> stable;					
+													
+			lemma "Stable on and after steps_to_converge steps": 
+				steps >= steps_to_converge => stable;
+													
+			lemma "Stable implies deltaT = T/N":
+				stable => deltaT = Time_to_travel_full_length/DPSS_Constants.N_real;
+			
+			lemma "deltaT is between 0 and T":
+				true -> (
+					deltaT > 0.0 
+					and deltaT <= Time_to_travel_full_length
+					);
+
+			-- This is a good way to find the real time bound!	
+			lemma "Time to become stable is less than 3T":
+				(stable and not (pre(stable))) => 
+					(time < 3.0*Time_to_travel_full_length);
+								
+		**};
+		
+	end DPSS_1_Vehicles_LearnP_andLeftBdry.Impl;
+
+end DPSS_1_Vehicles_LearnP_andLeftBdry_Pkg;
