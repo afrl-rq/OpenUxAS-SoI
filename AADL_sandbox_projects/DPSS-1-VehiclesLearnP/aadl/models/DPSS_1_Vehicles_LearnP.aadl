@@ -96,7 +96,7 @@ public
 			
 			assume "time update": time = (0.0 -> pre(time) + deltaT);	
 				
-			assume "Initial positions are between 0 and P_GLOBAL":
+			assume "Initial positions are between 0 and P_TRUTH":
 				(--Initial positions are >= 0
 					0.0 <= initial_pos_UAV1 
 				--and initial positions are <= P
