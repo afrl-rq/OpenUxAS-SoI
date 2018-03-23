@@ -4,6 +4,7 @@ srcs_utilities = [
   'FileSystemUtilities.cpp',
   'Permute.cpp',
   'TimeUtilities.cpp',
+  'FlatEarth.cpp',
   'UnitConversions.cpp',
   'UxAS_ConfigurationManager.cpp',
   'UxAS_ConsoleLogger.cpp',
