@@ -9,14 +9,6 @@
 
 // FlatEarth.h: interface for the FlatEarth class.
 //
-/// "FlatEarth" Class: used to convert between Latitude/Longitude and North/East coordinates. 
-///        - Latitude/Longitude coordinates are based on the WGS-84 ellipsoid
-///        - North/East coordinates are in a linear Cartesian coordinate system, tangent to the WGS-84 
-///          ellipsoid at a given reference location (lat/long)
-///
-///
-/// It is an error to call one of the "ConvertNorthEast_xxxToLatLong_xxx" functions before the default
-/// "CLinearizationPoint" has been initialized. This will result in erroneous results.
 ///
 ///
 ///
@@ -65,8 +57,22 @@ namespace utilities
 
 
 /*! \class FlatEarth
-    \brief This class manages the linear/geographical conversions by exposing the 
- * conversion functions of the static list of @ref CLinearizationPoint s, see @ref CLinearizationPointsStatic.
+    \brief This utility class is used to convert between geographic (Latitude/Longitude)
+    and linear (North/East) coordinates. 
+        - Latitude/Longitude coordinates are based on the WGS-84 ellipsoid
+        - North/East coordinates are in a linear Cartesian coordinate system, tangent to the WGS-84 
+          ellipsoid at a given reference location (lat/long)
+
+ * Initialization:
+ * - linear coordinates are given with the origin at the 'linearization point'.
+ * - the 'linearization point' is set by either the first call to a "ConvertLatLong_xxxToNorthEast_xxx"
+ * or by calling "Initialize"
+ * - It is an error to call one of the "ConvertNorthEast_xxxToLatLong_xxx" functions before the 
+ * 'linearization point' has been initialized. This will result in erroneous results.
+ * - the 'linearization point' is not static, therefore a class requiring a common
+ * 'linearization point' for all operations must maintain its own instance of FlatEarth, 
+ * i.e. as a member variable.
+ * NOTE: there is no error checking
  * 
  */
 class FlatEarth
@@ -84,23 +90,33 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     ////// FROM LAT/LONG TO NORTH/EAST
 
+    /** brief conversion from latitude/longitude in radians to north/east coordinates in feet */
     void ConvertLatLong_radToNorthEast_ft(const double& latitude_rad, const double& longitude_rad, double& north_ft, double& east_ft);
+    /** brief conversion from latitude/longitude in radians to north/east coordinates in meters */
     void ConvertLatLong_radToNorthEast_m(const double& latitude_rad, const double& longitude_rad, double& north_m, double& east_m);
+    /** brief conversion from latitude/longitude in degrees to north/east coordinates in meters*/
     void ConvertLatLong_degToNorthEast_m(const double& latitude_deg, const double& longitude_deg, double& north_m, double& east_m);
+    /** brief conversion from latitude/longitude in degrees to north/east coordinates in feet */
     void ConvertLatLong_degToNorthEast_ft(const double& latitude_deg, const double& longitude_deg, double& north_ft, double& east_ft);
     ////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////
     ////// FROM NORTH/EAST TO LAT/LONG
 
+    /** brief conversion from north/east coordinates in meters to latitude/longitude in radians*/
     void ConvertNorthEast_mToLatLong_rad(const double& north_m, const double& east_m, double& latitude_rad, double& longitude_rad);
+    /** brief conversion from north/east coordinates in meters to latitude/longitude in degrees*/
     void ConvertNorthEast_mToLatLong_deg(const double& north_m, const double& east_m, double& latitude_deg, double& longitude_deg);
+    /** brief conversion from north/east coordinates in feet to latitude/longitude in radians*/
     void ConvertNorthEast_ftToLatLong_rad(const double& north_ft, const double& east_ft, double& latitude_rad, double& longitude_rad);
+    /** brief conversion from north/east coordinates in feet to latitude/longitude in degrees*/
     void ConvertNorthEast_ftToLatLong_deg(const double& north_ft, const double& east_ft, double& latitude_deg, double& longitude_deg); 
     
     ////////////////////////////////////////////////////////////////////////////
     ////// LINEAR DISTANCES
+    /** brief calculates the linearized distance (meters) between to geographic coordinates (degrees)*/
     double dGetLinearDistance_m_Lat1Long1_deg_To_Lat2Long2_deg(const double& latitude1_deg, const double& longitude1_deg, const double& latitude2_deg, const double& longitude2_deg);
+    /** brief calculates the linearized distance (meters) between to geographic coordinates (radians)*/
     double dGetLinearDistance_m_Lat1Long1_rad_To_Lat2Long2_rad(const double& latitude1_rad, const double& longitude1_rad, const double& latitude2_rad, const double& longitude2_rad);
 
 public:
