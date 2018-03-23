@@ -32,7 +32,8 @@ public
 			--Constants that the vehicles don't know a priori (so they are only defined at the top-level)
 			const RIGHT_ENDP_TRUTH : real = 695.0;
 			const LEFT_ENDP_TRUTH  : real = -182.0;
-			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = (RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH)/DPSS_Constants.V;
+			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
+			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
 	
 			-----------------------------------------------------
 			--EQ (STATE) VARIABLES
@@ -53,7 +54,7 @@ public
 			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = prev(direction_UAV1, suggested_initial_direction_UAV1);
 			
 			--Previous goals
-			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then RIGHT_ENDP_TRUTH else 0.0));
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then RIGHT_ENDP_TRUTH else LEFT_ENDP_TRUTH));
 						
 			--Times to reach neighbors													
 			
@@ -65,14 +66,16 @@ public
 					pre_goal_UAV1
 				);
 			
-			eq time_until_UAV1_reaches_P : DPSS_Data_Types::Time_Type = 
+			--Time for UAVN to reach right endpoint
+			eq time_until_UAVN_reaches_right_endp : DPSS_Data_Types::Time_Type = 
 				DPSS_Node_Lib.time_to_reach_target_position(
 					pre_direction_UAV1, 
 					pre_pos_UAV1, 
 					RIGHT_ENDP_TRUTH
 				);
-				
-			eq time_until_UAV1_reaches_0 : DPSS_Data_Types::Time_Type = 
+			
+			--Time for UAV1 to reach left endpoint	
+			eq time_until_UAV1_reaches_left_endp : DPSS_Data_Types::Time_Type = 
 				DPSS_Node_Lib.time_to_reach_target_position(
 					pre_direction_UAV1,
 					pre_pos_UAV1,
@@ -80,9 +83,9 @@ public
 				);
 				
 			eq deltaT : DPSS_Data_Types::Time_Type =
-							--Added time_until_UAV1_reaches_P_TRUTH and time_until_UAV1_reaches_0 since UAV1 doesn't know a priori where the left and right endpoints are located.
-							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_P,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_0,
+							--Added time_until_UAVN_reaches_right_endp and time_until_UAV1_reaches_left_endp since the UAV's don't know a priori where the left and right endpoints are located.
+							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
 								time_until_UAV1_reaches_goal));
 			
 			eq stable : bool = 
