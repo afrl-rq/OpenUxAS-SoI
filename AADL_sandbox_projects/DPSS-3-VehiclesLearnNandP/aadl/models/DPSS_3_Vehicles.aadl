@@ -332,6 +332,12 @@ public
 			--Since the rightmost UAV has no right neighbor, set pos_RN to something to the right of the right endpoint (so UAVN never meets its "phantom" neighbor).
 			assert UAV3.pos_RN = P_GLOBAL + 1.0;
 			
+--			--Since the leftmost UAV has no left neighbor, set numLeft_LN to 0 to satisfy the assumption in the UAV model
+--			assert UAV1.numLeft_LN = 0;
+--			
+--			--Since the rightmost UAV has no right neighbor, set numRight_RN to 0 to satisfy the assumption in the UAV model
+--			assert UAV3.numRight_RN = 0;
+			
 			--Used in lemmas
 			eq steps : int = 1 -> pre(steps + 1);
 			

@@ -78,9 +78,13 @@ public
 				-> true;
 							
 			assume "Suggested initial direction is LEFT or RIGHT":
-				(suggested_initial_direction = DPSS_Constants.LEFT
-					or suggested_initial_direction = DPSS_Constants.RIGHT)
+				(		suggested_initial_direction = DPSS_Constants.LEFT
+					or 	suggested_initial_direction = DPSS_Constants.RIGHT)
 				-> true;
+			
+--			assume "numLeft_LN is nonnegative": numLeft_LN >= 0;
+--			
+--			assume "numRight_RN is nonnegative": numRight_RN >= 0;
 							
 			-----------------------------------------------------
 			--GUARANTEES
