@@ -15,8 +15,8 @@ public
 			perimLeft_LN : in data port DPSS_Data_Types::Distance_Type; --Perimeter to the left of the left neighbor (not necessary because this is equal to pos_LN)
 --			numRight_RN : in data port Base_Types::Integer;
 --			numLeft_LN : in data port Base_Types::Integer;
---			right_endp_truth : in data port DPSS_Data_Types::Distance_Type; --only used to detect when the UAV reaches the true right endpoint
---			left_endp_truth : in data port DPSS_Data_Types::Distance_Type; --only used to detect when the UAV reaches the true left endpoint
+			right_endp_truth : in data port DPSS_Data_Types::Distance_Type; --only used to detect when the UAV reaches the true right endpoint
+			left_endp_truth : in data port DPSS_Data_Types::Distance_Type; --only used to detect when the UAV reaches the true left endpoint
 			id : in data port Base_Types::Float; --a positive integer between 1 and N
 			pos : in data port DPSS_Data_Types::Position_Type;
 			
@@ -34,8 +34,8 @@ public
 			--CONSTANTS
 			-----------------------------------------------------
 			
-			const right_endp_truth : real = 10.0;
-			const left_endp_truth : real = 0.0;
+--			const right_endp_truth : real = 10.0;
+--			const left_endp_truth : real = 0.0;
 			
 			-----------------------------------------------------
 			--STATE VARIABLES
@@ -96,14 +96,14 @@ public
 			assume "ID is fixed":
 				true -> (id = pre(id));
 
---			assume "right_endp_truth is greater than left_endp_truth":
---				right_endp_truth > left_endp_truth;
---				
---			assume "right_endp_truth is fixed":
---				true -> (right_endp_truth = pre(right_endp_truth));
---
---			assume "left_endp_truth is fixed":
---				true -> (left_endp_truth = pre(left_endp_truth));			
+			assume "right_endp_truth is greater than left_endp_truth":
+				right_endp_truth > left_endp_truth;
+				
+			assume "right_endp_truth is fixed":
+				true -> (right_endp_truth = pre(right_endp_truth));
+
+			assume "left_endp_truth is fixed":
+				true -> (left_endp_truth = pre(left_endp_truth));			
 
 --			assume "Input initial position is between left_endp_truth and right_endp_truth":
 --				(	left_endp_truth <= initial_position
