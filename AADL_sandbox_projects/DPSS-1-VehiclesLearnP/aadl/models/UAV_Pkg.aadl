@@ -77,24 +77,24 @@ public
 			assume "ID is fixed":
 				true -> (id = pre(id));
 			
-			assume "P_truth is positive":
-				P_truth > 0.0;
-				
-			assume "P_truth is fixed":
-				true -> (P_truth = pre(P_truth));
+--			assume "P_truth is positive":
+--				P_truth > 0.0;
+--				
+--			assume "P_truth is fixed":
+--				true -> (P_truth = pre(P_truth));
 							
-			assume "Input initial position is between 0 and P_truth":
-				(	0.0 <= initial_position
-				and P_truth >= initial_position)
-				-> true;
+--			assume "Input initial position is between 0 and P_truth":
+--				(	0.0 <= initial_position
+--				and P_truth >= initial_position)
+--				-> true;
 							
 			assume "Suggested initial direction is LEFT or RIGHT":
 				(	   suggested_initial_direction = DPSS_Constants.LEFT
 					or suggested_initial_direction = DPSS_Constants.RIGHT)
 				-> true;
 			
-			assume "perimRight_RN is nonnegative":
-				meet_RN => (perimRight_RN >= 0.0);	
+--			assume "perimRight_RN is nonnegative":
+--				meet_RN => (perimRight_RN >= 0.0);	
 				
 			-----------------------------------------------------
 			--GUARANTEES
