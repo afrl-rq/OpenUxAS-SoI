@@ -1,11 +1,11 @@
-package DPSS_1_Vehicles_LearnP_Pkg
+package DPSS_1_Vehicles_LearnP_andLeftBdry_Pkg
 public
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;
 	with UAV_Pkg;
 	
-	system DPSS_1_Vehicles_LearnP
+	system DPSS_1_Vehicles_LearnP_andLeftBdry
 		features
 			-----------------------------------------------------
 			--INPUTS
@@ -30,7 +30,9 @@ public
 			-----------------------------------------------------
 			
 			--Constants that the vehicles don't know a priori (so they are only defined at the top-level)
-			const P_TRUTH : real = 10.0;
+			const RIGHT_ENDP_TRUTH : real = 695.0;
+			const LEFT_ENDP_TRUTH  : real = -182.0;
+			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
 			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
 	
 			-----------------------------------------------------
@@ -52,7 +54,7 @@ public
 			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = prev(direction_UAV1, suggested_initial_direction_UAV1);
 			
 			--Previous goals
-			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then P_TRUTH else 0.0));
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then RIGHT_ENDP_TRUTH else LEFT_ENDP_TRUTH));
 						
 			--Times to reach neighbors													
 			
@@ -64,30 +66,40 @@ public
 					pre_goal_UAV1
 				);
 			
-			eq time_until_UAV1_reaches_P : DPSS_Data_Types::Time_Type = 
+			--Time for UAVN to reach right endpoint
+			eq time_until_UAVN_reaches_right_endp : DPSS_Data_Types::Time_Type = 
 				DPSS_Node_Lib.time_to_reach_target_position(
 					pre_direction_UAV1, 
 					pre_pos_UAV1, 
-					P_TRUTH
+					RIGHT_ENDP_TRUTH
+				);
+			
+			--Time for UAV1 to reach left endpoint	
+			eq time_until_UAV1_reaches_left_endp : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1,
+					pre_pos_UAV1,
+					LEFT_ENDP_TRUTH
 				);
 				
 			eq deltaT : DPSS_Data_Types::Time_Type =
-							--Added time_until_UAV1_reaches_P since UAV1 might not know where P is.
-							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_P,
-														time_until_UAV1_reaches_goal);
+							--Added time_until_UAVN_reaches_right_endp and time_until_UAV1_reaches_left_endp since the UAV's don't know a priori where the left and right endpoints are located.
+							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
+								time_until_UAV1_reaches_goal));
 			
 			eq stable : bool = 
 				--Either
-				(	--the UAV is at 0
-						pos_UAV1 = 0.0 
-					--and was previously at P 
-					and pre_pos_UAV1 = P_TRUTH
+				(	--the UAV is at left endpoint
+						pos_UAV1 = LEFT_ENDP_TRUTH
+					--and was previously at right endpoint 
+					and pre_pos_UAV1 = RIGHT_ENDP_TRUTH
 				)
 				--or
-				or (--the UAV is at P
-						pos_UAV1 = P_TRUTH
-					--and was previously at 0
-					and pre_pos_UAV1 = 0.0 
+				or (--the UAV is at right endpoint
+						pos_UAV1 = RIGHT_ENDP_TRUTH
+					--and was previously at left endpoint
+					and pre_pos_UAV1 = LEFT_ENDP_TRUTH
 				);
 						
 			-----------------------------------------------------
@@ -96,11 +108,11 @@ public
 			
 			assume "time update": time = (0.0 -> pre(time) + deltaT);	
 				
-			assume "Initial positions are between 0 and P_TRUTH":
-				(--Initial positions are >= 0
-					0.0 <= initial_pos_UAV1 
-				--and initial positions are <= P
-				and initial_pos_UAV1 <= P_TRUTH
+			assume "Initial positions are between the left and right endpoints":
+				(--Initial positions are >= LEFT_ENDP_TRUTH
+					initial_pos_UAV1 >= LEFT_ENDP_TRUTH 
+				--and initial positions are <= RIGHT_ENDP_TRUTH
+				and initial_pos_UAV1 <= RIGHT_ENDP_TRUTH
  				)
 				-> true;
 				
@@ -126,32 +138,31 @@ public
 				(	pos_UAV1 = initial_pos_UAV1) -> true;
 			
 			guarantee "Goals are in bounds":
-				--Goals are >= 0
-					0.0 <= goal_UAV1
-				--and goals are <=P
-				and goal_UAV1 <= P_TRUTH;	
+				--Goals are >= LEFT_ENDP_TRUTH
+					goal_UAV1 >= LEFT_ENDP_TRUTH
+				--and goals are <= RIGHT_ENDP_TRUTH
+				and goal_UAV1 <= RIGHT_ENDP_TRUTH;	
 			
 			guarantee "Positions are in bounds":
-				--Positions are >= 0
-					0.0 <= pos_UAV1
-				--and positions are <= P
-				and pos_UAV1 <= P_TRUTH;
-			
-			
+				--Positions are >= LEFT_ENDP_TRUTH
+					pos_UAV1 >= LEFT_ENDP_TRUTH
+				--and positions are <= RIGHT_ENDP_TRUTH
+				and pos_UAV1 <= RIGHT_ENDP_TRUTH;
+					
 			guarantee "UAVs turn around at the borders":
-				--UAVs turn around at 0
-					pos_UAV1 = 0.0 => direction_UAV1 = 1
-				--and UAVs turn around at P
-				and pos_UAV1 = P_TRUTH => direction_UAV1 = -1;
+				--UAVs turn around at left endpoint
+					pos_UAV1 = LEFT_ENDP_TRUTH => direction_UAV1 = 1
+				--and UAVs turn around at right endpoint
+				and pos_UAV1 = RIGHT_ENDP_TRUTH => direction_UAV1 = -1;
 				
 			guarantee "Directions are in bounds":
 				(	 direction_UAV1 = 1 or direction_UAV1 = -1);
 			
 		**};
 		
-	end DPSS_1_Vehicles_LearnP;
+	end DPSS_1_Vehicles_LearnP_andLeftBdry;
 
-	system implementation DPSS_1_Vehicles_LearnP.Impl
+	system implementation DPSS_1_Vehicles_LearnP_andLeftBdry.Impl
 		subcomponents
 			UAV1: system UAV_Pkg::UAV;
 			
@@ -191,8 +202,11 @@ public
 			--Tell the vehicles their current positions
 			assert UAV1.pos = pos_UAV1;	
 			
-			--Tell the vehicles P_truth (so they know when they hit the end)
-			assert UAV1.P_truth = P_TRUTH;	
+			--Tell the vehicles right_endp_truth (so they know when they hit the right endpoint)
+			assert UAV1.right_endp_truth = RIGHT_ENDP_TRUTH;	
+		
+			--Tell the vehicles left_endp_truth (so they know when they hit the left endpoint)
+			assert UAV1.left_endp_truth = LEFT_ENDP_TRUTH;
 		
 			--Used in lemmas
 			eq steps : int = 1 -> pre(steps + 1);
@@ -211,18 +225,18 @@ public
 					--Initially, all UAVs are heading to the left
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = 9.99)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.01)
 				);
 				
 			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 				steps = steps_to_converge - 1 => stable;
-			
+							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
 			----------------------------------------------------------------------------			
 
 			--UAVs stay in bounds (prove one at a time)	
-			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= P_TRUTH;		
+			lemma "UAV1 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV1 and pos_UAV1 <= RIGHT_ENDP_TRUTH;		
 							
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;					
@@ -246,6 +260,6 @@ public
 								
 		**};
 		
-	end DPSS_1_Vehicles_LearnP.Impl;
+	end DPSS_1_Vehicles_LearnP_andLeftBdry.Impl;
 
-end DPSS_1_Vehicles_LearnP_Pkg;
+end DPSS_1_Vehicles_LearnP_andLeftBdry_Pkg;

@@ -1,11 +1,11 @@
-package DPSS_3_Vehicles_Pkg
+package DPSS_3_Vehicles_LearnN_Pkg
 public
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;
 	with UAV_Pkg;
 	
-	system DPSS_3_Vehicles
+	system DPSS_3_Vehicles_LearnN
 		features
 			-----------------------------------------------------
 			--INPUTS
@@ -36,8 +36,6 @@ public
 			-----------------------------------------------------
 			
 			--Constants that the vehicles don't know a priori
-			const P_GLOBAL : real = 10.0;
-			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_GLOBAL/DPSS_Constants.V;
 			const N_int : int = 3; --Number of vehicles
 			const N_real : real = 3.0; --Number of vehicles
 
@@ -56,8 +54,8 @@ public
 			eq goal_UAV3 : DPSS_Data_Types::Position_Type;
 			
 			--Shared border positions
-			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*P_GLOBAL/N_real;  
-			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*P_GLOBAL/N_real;
+			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*DPSS_Constants.P_GLOBAL/N_real;  
+			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*DPSS_Constants.P_GLOBAL/N_real;
 			
 			--Previous positions
 			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
@@ -70,9 +68,9 @@ public
 			eq pre_direction_UAV3 : DPSS_Data_Types::Direction_Type = prev(direction_UAV3, suggested_initial_direction_UAV3);
 			
 			--Previous goals
-			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then P_GLOBAL else 0.0));
-			eq pre_goal_UAV2 : DPSS_Data_Types::Position_Type = prev(goal_UAV2, (if direction_UAV2 = 1 then P_GLOBAL else 0.0));
-			eq pre_goal_UAV3 : DPSS_Data_Types::Position_Type = prev(goal_UAV3, (if direction_UAV3 = 1 then P_GLOBAL else 0.0));
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV2 : DPSS_Data_Types::Position_Type = prev(goal_UAV2, (if direction_UAV2 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
+			eq pre_goal_UAV3 : DPSS_Data_Types::Position_Type = prev(goal_UAV3, (if direction_UAV3 = 1 then DPSS_Constants.P_GLOBAL else 0.0));
 									
 			--Times to reach neighbors													
 			eq time_to_reach_neighbor_12 : DPSS_Data_Types::Time_Type = 
@@ -115,16 +113,9 @@ public
 				DPSS_Node_Lib.time_to_reach_target_position(
 					pre_direction_UAV3, 
 					pre_pos_UAV3, 
-					P_GLOBAL
+					DPSS_Constants.P_GLOBAL
 				);
-				
-			eq time_until_UAV1_reaches_0 : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV1, 
-					pre_pos_UAV1, 
-					0.0
-				); 
-			
+						
 			eq deltaT : DPSS_Data_Types::Time_Type =
 							--Added time_until_UAV3_reaches_P since UAV3 might not know where P is.
 							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_P,
@@ -146,7 +137,7 @@ public
 					and (
 						pre_pos_UAV1 = S_12 and 
 						pre_pos_UAV2 = S_12 and 
-						pre_pos_UAV3 = P_GLOBAL
+						pre_pos_UAV3 = DPSS_Constants.P_GLOBAL
 					)
 				)
 				--or
@@ -154,7 +145,7 @@ public
 					(
 						pos_UAV1 = S_12 and 
 						pos_UAV2 = S_12 and 
-						pos_UAV3 = P_GLOBAL
+						pos_UAV3 = DPSS_Constants.P_GLOBAL
 					)
 					--and were previously at 0, S_23, and S_23, respectively
 					and (
@@ -189,9 +180,9 @@ public
 				and 0.0 <= initial_pos_UAV2
 				and 0.0 <= initial_pos_UAV3
 				--and initial positions are <= P
-				and initial_pos_UAV1 <= P_GLOBAL
- 				and initial_pos_UAV2 <= P_GLOBAL
- 				and initial_pos_UAV3 <= P_GLOBAL
+				and initial_pos_UAV1 <= DPSS_Constants.P_GLOBAL
+ 				and initial_pos_UAV2 <= DPSS_Constants.P_GLOBAL
+ 				and initial_pos_UAV3 <= DPSS_Constants.P_GLOBAL
 				)
 				-> true;
 				
@@ -211,8 +202,8 @@ public
 			
 			-- Main Theorem			
 			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
-				(time >= ((5.0*N_real - 1.0)/N_real)*Time_to_travel_full_length) =>
-					(stable	and deltaT = Time_to_travel_full_length/N_real);
+				(time >= ((5.0*N_real - 1.0)/N_real)*DPSS_Constants.Time_to_travel_full_length) =>
+					(stable	and deltaT = DPSS_Constants.Time_to_travel_full_length/N_real);
 			
 			guarantee "deltaT is positive":
 				true -> deltaT > 0.0;
@@ -228,9 +219,9 @@ public
 				and 0.0 <= goal_UAV2
 				and 0.0 <= goal_UAV3
 				--and goals are <=P
-				and goal_UAV1 <= P_GLOBAL
-				and goal_UAV2 <= P_GLOBAL
-				and goal_UAV3 <= P_GLOBAL;	
+				and goal_UAV1 <= DPSS_Constants.P_GLOBAL
+				and goal_UAV2 <= DPSS_Constants.P_GLOBAL
+				and goal_UAV3 <= DPSS_Constants.P_GLOBAL;	
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= 0
@@ -238,9 +229,9 @@ public
 				and 0.0 <= pos_UAV2	 
 				and 0.0 <= pos_UAV3
 				--and positions are <= P
-				and pos_UAV1 <= P_GLOBAL
-				and pos_UAV2 <= P_GLOBAL
-				and pos_UAV3 <= P_GLOBAL;
+				and pos_UAV1 <= DPSS_Constants.P_GLOBAL
+				and pos_UAV2 <= DPSS_Constants.P_GLOBAL
+				and pos_UAV3 <= DPSS_Constants.P_GLOBAL;
 			
 			guarantee "UAVs stay in order":
 					pos_UAV1 <= pos_UAV2
@@ -252,9 +243,9 @@ public
 				and pos_UAV2 = 0.0 => direction_UAV2 = 1
 				and pos_UAV3 = 0.0 => direction_UAV3 = 1
 				--and UAVs turn around at P
-				and pos_UAV1 = P_GLOBAL => direction_UAV1 = -1
-				and pos_UAV2 = P_GLOBAL => direction_UAV2 = -1
-				and pos_UAV3 = P_GLOBAL => direction_UAV3 = -1;
+				and pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1
+				and pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1
+				and pos_UAV3 = DPSS_Constants.P_GLOBAL => direction_UAV3 = -1;
 				
 			guarantee "Directions are in bounds":
 				(	 direction_UAV1 = 1 or direction_UAV1 = -1)
@@ -263,9 +254,9 @@ public
 			
 		**};
 		
-	end DPSS_3_Vehicles;
+	end DPSS_3_Vehicles_LearnN;
 
-	system implementation DPSS_3_Vehicles.Impl
+	system implementation DPSS_3_Vehicles_LearnN.Impl
 		subcomponents
 			UAV1: system UAV_Pkg::UAV;
 			UAV2: system UAV_Pkg::UAV;
@@ -292,8 +283,8 @@ public
 			pos_UAV3_to_UAV2 : port UAV3.pos -> UAV2.pos_RN;
 
 			--Share perimRight with left neighbor (get right neighbor's perimRight)
-			perimRight_UAV2_to_UAV1 : port UAV2.perimRight -> UAV1.perimRight_RN;
-			perimRight_UAV3_to_UAV2 : port UAV3.perimRight -> UAV2.perimRight_RN;
+--			perimRight_UAV2_to_UAV1 : port UAV2.perimRight -> UAV1.perimRight_RN;
+--			perimRight_UAV3_to_UAV2 : port UAV3.perimRight -> UAV2.perimRight_RN;
 
 			--Share numRight with left neighbor (get right neighbor's numRight)
 			numRight_UAV2_to_UAV1 : port UAV2.numRight -> UAV1.numRight_RN;
@@ -322,15 +313,15 @@ public
 			
 			--We use assertions since the truth value of the perimeter is not a system input that we can pass in.
 			--We could make P_GLOBAL an input, but that would introduce another nonlinearity, so we'll first see if we can prove the theorem when P_GLOBAL is a constant.
-			assert UAV1.P_truth = P_GLOBAL;
-			assert UAV2.P_truth = P_GLOBAL;
-			assert UAV3.P_truth = P_GLOBAL;
+			assert UAV1.P_truth = DPSS_Constants.P_GLOBAL;
+			assert UAV2.P_truth = DPSS_Constants.P_GLOBAL;
+			assert UAV3.P_truth = DPSS_Constants.P_GLOBAL;
 						
 			--Since the leftmost UAV has no left neighbor, set pos_LN to something to the left of the left endpoint (so UAV1 never meets its "phantom" neighbor).
 			assert UAV1.pos_LN = -1.0; 
 
 			--Since the rightmost UAV has no right neighbor, set pos_RN to something to the right of the right endpoint (so UAVN never meets its "phantom" neighbor).
-			assert UAV3.pos_RN = P_GLOBAL + 1.0;
+			assert UAV3.pos_RN = DPSS_Constants.P_GLOBAL + 1.0;
 			
 --			--Since the leftmost UAV has no left neighbor, set numLeft_LN to 0 to satisfy the assumption in the UAV model
 --			assert UAV1.numLeft_LN = 0;
@@ -376,9 +367,9 @@ public
 			----------------------------------------------------------------------------			
 
 			--UAVs stay in bounds (prove one at a time)	
-			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= P_GLOBAL;
-			lemma "UAV2 stays in bounds": 0.0 <= pos_UAV2 and pos_UAV2 <= P_GLOBAL;
-			lemma "UAV3 stays in bounds": 0.0 <= pos_UAV3 and pos_UAV3 <= P_GLOBAL;		
+			lemma "UAV1 stays in bounds": 0.0 <= pos_UAV1 and pos_UAV1 <= DPSS_Constants.P_GLOBAL;
+			lemma "UAV2 stays in bounds": 0.0 <= pos_UAV2 and pos_UAV2 <= DPSS_Constants.P_GLOBAL;
+			lemma "UAV3 stays in bounds": 0.0 <= pos_UAV3 and pos_UAV3 <= DPSS_Constants.P_GLOBAL;		
 							
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;
@@ -396,31 +387,31 @@ public
 				steps >= 25 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
-				stable => deltaT = Time_to_travel_full_length/N_real;
+				stable => deltaT = DPSS_Constants.Time_to_travel_full_length/N_real;
 			
 			lemma "deltaT is strictly between 0 and T":
 				true -> (
 					deltaT > 0.0 
-					and deltaT < Time_to_travel_full_length
+					and deltaT < DPSS_Constants.Time_to_travel_full_length
 					);
 
 			-- This is a good way to find the real time bound!	
 			lemma "Time to become stable is less than 3T":
 				(stable and not (pre(stable))) => 
-					(time < 3.0*Time_to_travel_full_length);
+					(time < 3.0*DPSS_Constants.Time_to_travel_full_length);
 
 			-- This is a good way to find the real time bound!	
 			lemma "Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
-					(time < 4.0*Time_to_travel_full_length);
+					(time < 4.0*DPSS_Constants.Time_to_travel_full_length);
 					
 			-- This is a good way to find the real time bound!	
 			lemma "Time to become stable is less than 5T":
 				(stable and not (pre(stable))) => 
-					(time < 5.0*Time_to_travel_full_length);
+					(time < 5.0*DPSS_Constants.Time_to_travel_full_length);
 			
 		**};
 		
-	end DPSS_3_Vehicles.Impl;
+	end DPSS_3_Vehicles_LearnN.Impl;
 
-end DPSS_3_Vehicles_Pkg;
+end DPSS_3_Vehicles_LearnN_Pkg;

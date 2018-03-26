@@ -11,7 +11,7 @@ public
 			initial_position : in data port DPSS_Data_Types::Position_Type;
 			pos_LN : in data port DPSS_Data_Types::Position_Type; --Position of left neighbor (< 0  if there is no left neighbor)
 			pos_RN : in data port DPSS_Data_Types::Position_Type; --Position of right neighbor (> P_GLOBAL if there is no right neighbor)
-			perimRight_RN : in data port DPSS_Data_Types::Distance_Type; --Perimeter to the right of the right neighbor (as best as the right neighbor knows it) 
+--			perimRight_RN : in data port DPSS_Data_Types::Distance_Type; --Perimeter to the right of the right neighbor (as best as the right neighbor knows it) 
 --			perimLeft_LN : in data port DPSS_Data_Types::Distance_Type; --Perimeter to the left of the left neighbor (not necessary because this is equal to pos_LN)
 			numRight_RN : in data port Base_Types::Integer;
 			numLeft_LN : in data port Base_Types::Integer;
@@ -43,7 +43,7 @@ public
 			eq pre_numRight : int = prev(numRight, 0);
 			
 			--Previous perimRight
-			eq pre_perimRight : real = prev(perimRight, 0.0);
+--			eq pre_perimRight : real = prev(perimRight, 0.0);
 
 			--ID (will change during execution as this UAV meets its neighbors)
 			eq id : int = numLeft + 1;
@@ -51,15 +51,16 @@ public
 			--Total number of UAVs (as best as this UAV knows)
 			eq N : int = numLeft + numRight + 1;
 			
-			--Total perimeter (as best as this UAV knows)
-			eq P : DPSS_Data_Types::Position_Type = 
-				pos + perimRight;
+			--In this LearnN verion, the vehicle knows P_GLOBAL
+--			--Total perimeter (as best as this UAV knows)
+--			eq P : DPSS_Data_Types::Position_Type = 
+--				pos + perimRight;
 				
 			--Shared border positions
 			eq S_L : DPSS_Data_Types::Position_Type = 
-				real(id-1)*P/real(N);  
+				real(id-1)*DPSS_Constants.P_GLOBAL/real(N);  
 			eq S_R : DPSS_Data_Types::Position_Type = 
-				real(id)*P/real(N);	
+				real(id)*DPSS_Constants.P_GLOBAL/real(N);	
 				
 			--Previous direction
 			eq pre_direction : DPSS_Data_Types::Direction_Type = 
@@ -90,7 +91,7 @@ public
 			--GUARANTEES
 			-----------------------------------------------------
 			
-				guarantee "Direction formula":
+			guarantee "Direction formula":
 				direction = (
 					-- Turn around at the left boundary.
 					if pos <= 0.0 then
@@ -133,7 +134,7 @@ public
 							if meet_LN then
 								--...and at or to the left of the shared border with the left neighbor, make goal the right endpoint.
 								if pos <= S_L then
-									P
+									DPSS_Constants.P_GLOBAL
 								--...and to the right of the shared border with the left neighbor, make goal the shared border with the left neighbor.
 								else -- pos > S_L
 									S_L
@@ -149,7 +150,7 @@ public
 								else -- If not co-located with either neighbor,...
 									-- ...and heading right, set goal to the right endpoint. 
 									if direction = 1 then
-										P
+										DPSS_Constants.P_GLOBAL
 									  -- ...and heading left, set goal to the left endpoint.
 									else --direction = -1 
 										0.0 
@@ -168,17 +169,17 @@ public
 			guarantee "numRight formula":
 				numRight = if meet_RN then numRight_RN + 1 else pre_numRight;
 			
-			guarantee "perimRight formula":
-				perimRight = if meet_RN then 
-								perimRight_RN 
-							 else 
-							 	if reach_P_truth then
-							 		0.0
-							 	else  
-								 	if pre_direction = 1 then
-								 		pre_perimRight - (pos - pre_pos)
-								 	else --pre_direction = -1
-								 		pre_perimRight + (pre_pos - pos);
+--			guarantee "perimRight formula":
+--				perimRight = if meet_RN then 
+--								perimRight_RN 
+--							 else 
+--							 	if reach_P_truth then
+--							 		0.0
+--							 	else  
+--								 	if pre_direction = 1 then
+--								 		pre_perimRight - (pos - pre_pos)
+--								 	else --pre_direction = -1
+--								 		pre_perimRight + (pre_pos - pos);
 			
 --This should be a lemma in the higher level
 --			guarantee "ID in range":

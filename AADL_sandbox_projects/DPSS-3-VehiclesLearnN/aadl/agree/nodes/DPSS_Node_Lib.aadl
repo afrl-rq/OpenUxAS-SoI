@@ -1,0 +1,91 @@
+-------------------------------------------------------------------
+-- This package contains a library of nodes that can be used 
+-- throughout the project.
+-------------------------------------------------------------------
+
+package DPSS_Node_Lib
+
+public
+
+	with DPSS_Constants;
+	with DPSS_Data_Types;
+
+	annex agree {**
+
+	--Returns the minimum of two inputs of Time_Type
+	node min_time(a: DPSS_Data_Types::Time_Type, 
+					b : DPSS_Data_Types::Time_Type
+	) returns (out: DPSS_Data_Types::Time_Type);
+		let
+			out = if a <= b then a else b; 
+		tel;
+	
+	--Returns the minimum of two inputs of Time_Type, ignoring negative inputs.
+	--If both inputs are negative, this node returns -1.0.
+	node min_pos_time(a: DPSS_Data_Types::Time_Type, 
+					b : DPSS_Data_Types::Time_Type
+	) returns (out: DPSS_Data_Types::Time_Type);
+		let
+			out = if (a >= 0.0 and b >= 0.0) then 
+					if a <= b then a else b
+				  else 
+				  	if a < 0.0 and b < 0.0 then 
+				  		-1.0 
+				  	else --either a or b is negative but not both, so return the bigger (non-negative) one
+				  		if a > b then a else b; 
+		tel;
+		
+	node time_to_reach_neighbor( direction_UAV1: DPSS_Data_Types::Direction_Type, 
+								direction_UAV2 : DPSS_Data_Types::Direction_Type, 
+								position_UAV1: DPSS_Data_Types::Position_Type, 
+								position_UAV2 : DPSS_Data_Types::Position_Type) 
+								returns (out : DPSS_Data_Types::Time_Type);
+		let	
+			out = 	if position_UAV1 = position_UAV2 then
+						-1.0 --We'll reach an endpoint, shared border, or another neighbor before these two meet NEXT.
+					else if position_UAV2 > position_UAV1 then
+							if direction_UAV1 = 1 and direction_UAV2 = -1 then
+								0.5*(position_UAV2 - position_UAV1)/DPSS_Constants.V
+							else
+								-1.0 --we'll reach an endpoint first, so just use the max time to reach an endpoint
+						 else -- position_UAV2 < position_UAV1 
+							if direction_UAV1 = -1 and direction_UAV2 = 1 then
+								0.5*(position_UAV1 - position_UAV2)/DPSS_Constants.V
+							else
+								-1.0; --we'll reach an endpoint first, so just use the max time to reach an endpoint 	
+		tel;	
+	
+	node time_to_reach_target_position(direction: DPSS_Data_Types::Direction_Type, 
+								UAV_pos: DPSS_Data_Types::Position_Type, 
+								target_pos : DPSS_Data_Types::Position_Type
+								) returns (out : DPSS_Data_Types::Time_Type);
+		let	
+			out = 	if target_pos > UAV_pos and direction = 1 then
+						(target_pos - UAV_pos)/DPSS_Constants.V 
+					else if target_pos < UAV_pos and direction = -1 then
+							(UAV_pos - target_pos)/DPSS_Constants.V
+						 else --We're traveling away from the target position, or we're at it but are only interested in the NEXT time we reach the target position
+							-1.0; --We'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
+		tel;
+	
+	node initial_value_true(a : bool) returns (out : bool);
+	var
+	  pre_state : int;
+	  state : int;
+	let
+	  pre_state = prev(state, 0);
+	
+	  state = 
+	  if (pre_state = 0) 
+	  then 
+	    if a 
+	    then 1 
+	    else 2
+	  else pre_state;
+
+	  out = ((state = 0) or (state = 1));
+	
+	tel;
+	
+	**};
+end DPSS_Node_Lib;
