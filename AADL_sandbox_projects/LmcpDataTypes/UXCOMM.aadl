@@ -1,0 +1,63 @@
+package UXCOMM
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data CommTransferTask extends CMASI::Task
+end CommTransferTask;
+
+--Request UAV to visit a location and attempt to establish connection.
+data implementation CommTransferTask.i extends CMASI::Task.i
+	subcomponents
+		--Location of node with which to establish comm
+		CommLocation: data Location3D.i;
+		--ID of comunicating entity
+		CommEntityID: data int64.i;
+		--Communication timeout at this location
+		Timeout: data int64.i;
+		--Continue loitering until the timeout time specified even if the transfer has
+		--completed early
+		ContinueLoiter: data bool.i;
+end CommTransferTask.i;
+
+data CommTransferIsActive
+end CommTransferIsActive;
+
+--Indicates that the comm transfer task is active (i.e. UAV is in the prescribed
+--range)
+data implementation CommTransferIsActive.i
+	subcomponents
+		--ID of vehicle attempting to complete the comm transfer task
+		VehicleID: data int64.i;
+		--ID of entity to which communication is to be established
+		DestinationID: data int64.i;
+end CommTransferIsActive.i;
+
+data CommTransferIsComplete
+end CommTransferIsComplete;
+
+--Indicates that the comm transfer task completed successfully
+data implementation CommTransferIsComplete.i
+	subcomponents
+		--ID of vehicle attempting to complete the comm transfer task
+		VehicleID: data int64.i;
+		--ID of entity to which communication has been established
+		DestinationID: data int64.i;
+end CommTransferIsComplete.i;
+
+data MeetMeTask extends UXCOMM::CommTransferTask
+end MeetMeTask;
+
+--Task to position a UAV at a location to establish communication at a particular
+--time
+data implementation MeetMeTask.i extends UXCOMM::CommTransferTask.i
+	subcomponents
+		--Wall clock time to be at the rendezvous location
+		RendezvousTime: data int64.i;
+end MeetMeTask.i;
+
+

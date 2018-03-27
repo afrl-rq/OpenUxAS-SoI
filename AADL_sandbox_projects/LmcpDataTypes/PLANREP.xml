@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        Defines messages needed for research on "plan repair and error explanation" in
+        UxV mission plans.
+
+-->
+<MDM>
+    
+    <SeriesName>PLANREP</SeriesName>
+    <Namespace>uxas/project/planrep</Namespace>
+    <Version>1</Version>
+
+    <StructList>
+        
+      <!-- 
+          Extended boundary of an area search task to use in computations and for plotting.
+      -->
+      <Struct Name="ExtendedArea">
+          <!-- TaskID of the corresponding AngledAreaSearch task. -->
+          <Field Name="SearchTaskID" Type="int64"/>
+          <!-- Extended boundary of the area search. -->
+          <Field Name="Boundary" Type="CMASI/AbstractGeometry" Units="None"/>
+      </Struct>
+      
+      <!--
+          Extended boundary of a point search task to use in computations and for plotting.
+      -->
+      <Struct Name="ExtendedPoint">
+          <!-- TaskID of the corresponding AngledAreaSearch task. -->
+          <Field Name="SearchTaskID" Type="int64"/>
+          <!-- Location of the corresponding ImpactPointSearch task. -->
+          <Field Name="SearchLocation" Type="CMASI/Location3D" Units="None"/>
+          <!-- Extended boundary of the point search. -->
+          <Field Name="Boundary" Type="CMASI/AbstractGeometry" Units="None"/>
+      </Struct>
+    </StructList>
+    
+</MDM>
+
+
+
+

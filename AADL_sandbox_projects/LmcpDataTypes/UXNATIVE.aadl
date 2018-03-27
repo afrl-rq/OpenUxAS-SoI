@@ -1,0 +1,255 @@
+package UXNATIVE
+public
+	with IMPACT;
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data VideoRecord
+end VideoRecord;
+
+--Start/Stop recording
+data implementation VideoRecord.i
+	subcomponents
+		--Start [true] or stop [false] video recording
+		Record: data bool.i;
+end VideoRecord.i;
+
+data StartupComplete
+end StartupComplete;
+
+--Message sent when all services have been started
+data implementation StartupComplete.i
+end StartupComplete.i;
+
+data CreateNewService
+end CreateNewService;
+
+--Create a new service in UxAS
+data implementation CreateNewService.i
+	subcomponents
+		--Globally unique ID for this service. Negative ServiceIDs are invalid. If ServiceID
+		--== 0, then a unique service ID will be generated.
+		ServiceID: data int64.i;
+		--XML configuration for this service (i.e. options in XML format)
+		XmlConfiguration: data string.i;
+		--Existing entity configurations in the system when this new service is created
+		EntityConfigurations: data EntityConfiguration.i {Data_Model::Data_Representation => Array;};
+		--Existing entity states in the system when this new service is created
+		EntityStates: data EntityState.i {Data_Model::Data_Representation => Array;};
+		--Existing mission commands for vehicles in the system when this new service is
+		--created
+		MissionCommands: data MissionCommand.i {Data_Model::Data_Representation => Array;};
+		--Defined areas of interest at time of service creation
+		Areas: data AreaOfInterest.i {Data_Model::Data_Representation => Array;};
+		--Defined lines of interest at time of service creation
+		Lines: data LineOfInterest.i {Data_Model::Data_Representation => Array;};
+		--Defined points of interest at time of service creation
+		Points: data PointOfInterest.i {Data_Model::Data_Representation => Array;};
+end CreateNewService.i;
+
+data KillService
+end KillService;
+
+--Remove an existing service from UxAS
+data implementation KillService.i
+	subcomponents
+		--Globally unique ID for the service to be removed. If ServiceID == 0, then no
+		--service will be killed. ServiceID == -1 causes all services to be killed and
+		--UxAS to be shutdown.
+		ServiceID: data int64.i;
+end KillService.i;
+
+data IncrementWaypoint
+end IncrementWaypoint;
+
+--Indicate to the waypoint manager to move to the next waypoint in the current list
+data implementation IncrementWaypoint.i
+	subcomponents
+		--ID of vehicle which should move to the next waypoint in its list
+		VehicleID: data int64.i;
+end IncrementWaypoint.i;
+
+data SafeHeadingAction extends CMASI::VehicleAction
+end SafeHeadingAction;
+
+--Translate from heading or heading-rate to a single leading waypoint that respects
+--airspace constraints
+data implementation SafeHeadingAction.i extends CMASI::VehicleAction.i
+	subcomponents
+		--ID of vehicle which will be commanded to a safe waypoint that approximates the
+		--desired heading
+		VehicleID: data int64.i;
+		--Operating region ID indicating airspace constraints that must be respected
+		OperatingRegion: data int64.i;
+		--Lead-ahead distance for waypoint placement
+		LeadAheadDistance: data real32.i;
+		--Loiter radius on lead-ahead waypoint. If zero or negative, uses calcuated minimum
+		--turn radius from vehicle configuration
+		LoiterRadius: data real32.i;
+		--Desired heading that vehicle should attemtpt to reach in degress from true north
+		DesiredHeading: data real32.i;
+		--Desired heading rate for the vehicle
+		DesiredHeadingRate: data real32.i;
+		--Flag indicating selecting between heading (false) or heading rate (true) commands
+		UseHeadingRate: data bool.i;
+end SafeHeadingAction.i;
+
+data EntityLocation
+end EntityLocation;
+
+--Simple location broadcast from entities for tracking
+data implementation EntityLocation.i
+	subcomponents
+		--Entity ID
+		EntityID: data int64.i;
+		--Current location of entity. A valid EntityLocation must define Position (null
+		--not allowed)
+		Position: data Location3D.i;
+		--Corresponding time in milli-seconds since 1 Jan 1970
+		Time: data int64.i;
+end EntityLocation.i;
+
+data BandwidthTest extends UXNATIVE::EntityLocation
+end BandwidthTest;
+
+--Message for measuring actual bandwidth between entities
+data implementation BandwidthTest.i extends UXNATIVE::EntityLocation.i
+	subcomponents
+		--Message ID to track message loss
+		MessageID: data int64.i;
+		--Data payload for creating arbitrarily sized messages
+		Payload: data string.i;
+end BandwidthTest.i;
+
+data BandwidthReceiveReport
+end BandwidthReceiveReport;
+
+--Report for a received message containing positions of both entities and the payload
+--size
+data implementation BandwidthReceiveReport.i
+	subcomponents
+		--Entity from which the message was sent. A valid BandwidthReceiveReport must define
+		--EntitySender (null not allowed).
+		EntitySender: data EntityLocation.i;
+		--Entity which received the message. A valid BandwidthReceiveReport must define
+		--EntityReceiver (null not allowed).
+		EntityReceiver: data EntityLocation.i;
+		--Size of the message that was received
+		TransferPayloadSize: data uint32.i;
+end BandwidthReceiveReport.i;
+
+data SubTaskExecution
+end SubTaskExecution;
+
+--Command entity to execute subtasks either in strict order or determined by optimization.
+--Replaces all current sub-tasks being executed. In addtion to executing the sub-tasks,
+--the mission command used to complete the sub-tasks is returned.
+data implementation SubTaskExecution.i
+	subcomponents
+		--List of tasks that current entity should complete
+		SubTasks: data Task.i {Data_Model::Data_Representation => Array;};
+		--Enable strict ordering
+		StrictOrder: data bool.i;
+end SubTaskExecution.i;
+
+data SubTaskAssignment
+end SubTaskAssignment;
+
+--Command an entity to perform a complete task assignment for the entire team and
+--then execute own role
+data implementation SubTaskAssignment.i
+	subcomponents
+		--List of tasks that current team should complete
+		SubTasks: data Task.i {Data_Model::Data_Representation => Array;};
+		--Neighboring entities to consider
+		Neighbors: data EntityState.i {Data_Model::Data_Representation => Array;};
+end SubTaskAssignment.i;
+
+data AutopilotKeepAlive
+end AutopilotKeepAlive;
+
+--Message to enable onboard processor to send commands to the autopilot, and the
+--gimbal
+data implementation AutopilotKeepAlive.i
+	subcomponents
+		--Enable communications between UxAS and the autopilot
+		AutopilotEnabled: data bool.i;
+		--Allow UxAS to send speed commands to the autopilot
+		SpeedAuthorized: data bool.i;
+		--Enable communications between UxAS and the Gimbal. Note: this does not effect
+		--the video stream.
+		GimbalEnabled: data bool.i;
+		--Time that this message was sent
+		TimeSent: data int64.i;
+		--Overrides speed to this value if greater than zero
+		SpeedOverride: data real32.i;
+		--Overrides altitude to this value (MSL) if greater than zero
+		AltOverride: data real32.i;
+end AutopilotKeepAlive.i;
+
+data OnboardStatusReport
+end OnboardStatusReport;
+
+--Message for reporting onboard status of UxAS
+data implementation OnboardStatusReport.i
+	subcomponents
+		--ID of vehicle for status report
+		VehicleID: data int64.i;
+		--List of entities in communication with vehicle (from join/exit message traffic)
+		ConnectedEntities: data int64.i {Data_Model::Data_Representation => Array;};
+		--Current task list being carried out by vehicle
+		CurrentTaskList: data int64.i {Data_Model::Data_Representation => Array;};
+		--Entity has valid state
+		ValidState: data bool.i;
+		--Entity is authorized to act
+		ValidAuthorization: data bool.i;
+		--Entity is authorized to change speed
+		SpeedAuthorization: data bool.i;
+		--Entity is authorized to change payload/gimbal
+		GimbalAuthorization: data bool.i;
+		--Time of last entity state message received
+		VehicleTime: data int64.i;
+end OnboardStatusReport.i;
+
+data EntityJoin
+end EntityJoin;
+
+--Entity Join
+data implementation EntityJoin.i
+	subcomponents
+		--ID of entity joining network
+		EntityID: data int64.i;
+		--Label of entity joining network
+		Label: data string.i;
+end EntityJoin.i;
+
+data EntityExit
+end EntityExit;
+
+--Entity Exit
+data implementation EntityExit.i
+	subcomponents
+		--ID of entity exiting network
+		EntityID: data int64.i;
+		--Label of entity exiting network
+		Label: data string.i;
+end EntityExit.i;
+
+data SimulationTimeStepAcknowledgement
+end SimulationTimeStepAcknowledgement;
+
+--Message for indicating that UxAS has handled an EntityState update which allows
+--an external simulation to pause until received
+data implementation SimulationTimeStepAcknowledgement.i
+	subcomponents
+		--Vehicle for which the entity state update was handled
+		VehicleID: data int64.i;
+		--Associated time from the handled entity state
+		ReportedTime: data int64.i;
+end SimulationTimeStepAcknowledgement.i;
+
+

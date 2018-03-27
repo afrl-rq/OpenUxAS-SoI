@@ -1,0 +1,78 @@
+package PATROL
+public
+	with CMASI;
+	with ICET;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data AlarmStation
+end AlarmStation;
+
+--Alarm Station location and ID definition for Patrol Algorithm
+data implementation AlarmStation.i
+	subcomponents
+		--Station ID
+		AlarmID: data int64.i;
+		--Station world position
+		Position: data Location3D.i;
+end AlarmStation.i;
+
+data AlarmStatus
+end AlarmStatus;
+
+--When an alarm is tripped, this signal message should be sent
+data implementation AlarmStatus.i
+	subcomponents
+		--Station ID
+		AlarmID: data int64.i;
+		--Status: if true, alarm has been tripped
+		AlarmStatus: data bool.i;
+end AlarmStatus.i;
+
+data MoveOnSignal
+end MoveOnSignal;
+
+--If an operator determines that an alarm should no longer be investigated, this
+--message is sent to notify the automation system that the vehicle should continue
+--its patrol immediately
+data implementation MoveOnSignal.i
+	subcomponents
+		--Vehicle ID for which the signal is intended
+		VehicleID: data int64.i;
+end MoveOnSignal.i;
+
+data PatrolTask extends ICET::LineSurveillanceTask
+end PatrolTask;
+
+--Patrol a perimter with up to four alert stations using up to two UAVs. Uses expected
+--alarm rate, <i>a priori</i> probability of threat, and operator model to determine
+--the amount of time a UAV should investigate an alarm before moving on to service
+--other alarms in the system.
+data implementation PatrolTask.i extends ICET::LineSurveillanceTask.i
+	subcomponents
+		--Maximum number loiters after which alarm has no more value for investigation
+		MaxNumberLoiters: data uint32.i;
+		--List of alarm stations. Alarm station locations should be near the patrol route.
+		--Due to computational constraints, the maximum number of alarm stations is four
+		AlarmStations: data AlarmStation.i {Data_Model::Data_Representation => Array;};
+		--Maximum number of decision locations. A higher number of decision locations allows
+		--the UAVs to turn around sooner to visit alarms behind them. However, there is
+		--a significant computational burden for high numbers of decision locations. Typically,
+		--less than 20 is reccommended. The number of locations must be greater than the
+		--number of alarm locations. The actual number depends on the total length of the
+		--patrol path, speed of the vehicle, and minimum loiter duration.
+		MaxNumberDecisionLocations: data uint32.i;
+		--Assumed alarm arrival time interval.
+		AlarmArrivalTimeInterval: data int64.i;
+		--Information queue weighting factor.
+		WeightingFactor_Beta: data real32.i;
+		--Treat point list as circle. If true, connects the start and end points of the
+		--point list to create a circular perimeter. If false, a thin route encompassing
+		--the line defined by the point list is used.
+		Circular: data bool.i;
+end PatrolTask.i;
+
+

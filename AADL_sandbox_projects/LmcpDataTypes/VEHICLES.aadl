@@ -1,0 +1,82 @@
+package VEHICLES
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data GroundVehicleConfiguration extends CMASI::EntityConfiguration
+end GroundVehicleConfiguration;
+
+--Provides information regarding a vehicle's configuration items.
+data implementation GroundVehicleConfiguration.i extends CMASI::EntityConfiguration.i
+	subcomponents
+		--Valid operational road network. UGV adheres to positions defined in this graph.
+		--Indicated by previously sent GraphRegion's ID
+		RoadGraphID: data int64.i;
+		--The minimum speed that should be commanded for this vehicle
+		MinimumSpeed: data real32.i;
+		--The maximum speed that should be commanded for this vehicle
+		MaximumSpeed: data real32.i;
+		--The consumption rate of available energy at nominal speed, expressed in terms
+		--of the percentage of maximum capacity used per second.
+		EnergyRate: data real32.i;
+end GroundVehicleConfiguration.i;
+
+data GroundVehicleState extends CMASI::EntityState
+end GroundVehicleState;
+
+--Provides basic state information regarding entity position, orientation, and velocity.
+data implementation GroundVehicleState.i extends CMASI::EntityState.i
+end GroundVehicleState.i;
+
+data SurfaceVehicleConfiguration extends CMASI::EntityConfiguration
+end SurfaceVehicleConfiguration;
+
+--Provides information regarding a vehicle's configuration items.
+data implementation SurfaceVehicleConfiguration.i extends CMASI::EntityConfiguration.i
+	subcomponents
+		--Valid operational water zone (by ID). USV adheres to this area
+		WaterArea: data int64.i;
+		--The minimum speed that should be commanded for this vehicle
+		MinimumSpeed: data real32.i;
+		--The maximum speed that should be commanded for this vehicle
+		MaximumSpeed: data real32.i;
+		--The consumption rate of available energy at nominal speed, expressed in terms
+		--of the percentage of maximum capacity used per second.
+		EnergyRate: data real32.i;
+		--The maximum angle that this vehicle will bank
+		MaxBankAngle: data real32.i;
+		--The maximum angular rate that this vehicle will bank
+		MaxBankRate: data real32.i;
+end SurfaceVehicleConfiguration.i;
+
+data SurfaceVehicleState extends CMASI::EntityState
+end SurfaceVehicleState;
+
+--Provides basic state information regarding entity position, orientation, and velocity.
+data implementation SurfaceVehicleState.i extends CMASI::EntityState.i
+	subcomponents
+		--Current bank angle of the surface vehicle
+		BankAngle: data real32.i;
+		--Forward speed of the vehicle relative to the mass of water
+		Speed: data real32.i;
+end SurfaceVehicleState.i;
+
+data StationarySensorConfiguration extends CMASI::EntityConfiguration
+end StationarySensorConfiguration;
+
+--Provides information regarding a sensor's configuration items.
+data implementation StationarySensorConfiguration.i extends CMASI::EntityConfiguration.i
+end StationarySensorConfiguration.i;
+
+data StationarySensorState extends CMASI::EntityState
+end StationarySensorState;
+
+--Provides basic state information regarding entity position, orientation, and velocity.
+data implementation StationarySensorState.i extends CMASI::EntityState.i
+end StationarySensorState.i;
+
+

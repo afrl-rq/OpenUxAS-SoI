@@ -1,0 +1,263 @@
+package VICS
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+--Identifier for the type of payload data being included in the message.
+data PayloadType extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"NoPayload",
+			"Unknown",
+			"Text",
+			"Image",
+			"Video",
+			"Audio");
+end PayloadType;
+
+data implementation PayloadType.i
+end PayloadType.i;
+
+--Requestor type
+data VicsEntityType extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"Unknown",
+			"VSCS_Ground",
+			"Dismount",
+			"Aircraft",
+			"UGS");
+end VicsEntityType;
+
+data implementation VicsEntityType.i
+end VicsEntityType.i;
+
+--The Type of VICS Message.
+data MessageType extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"DismountMessage",
+			"StateTransition",
+			"IntruderAlert");
+end MessageType;
+
+data implementation MessageType.i
+end MessageType.i;
+
+--User-readable priority for dismount messages
+data MessagePriority extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"Low",
+			"Normal",
+			"High");
+end MessagePriority;
+
+data implementation MessagePriority.i
+end MessagePriority.i;
+
+data VicsBase
+end VicsBase;
+
+--Base message for many VICS messages. Every entity must have uniquely identifiable
+--message IDs such that given an originator ID and message ID, the specific message
+--is uniquely identified.
+data implementation VicsBase.i
+	subcomponents
+		--A unique message ID for all messages from originator entity
+		MessageID: data int64.i;
+		--A unique ID for the entity that generated the message
+		OriginatorID: data int64.i;
+		--ID of the immediate sender of this message (not necessarily the originator)
+		SenderID: data int64.i;
+		--A unique ID to indicate that specific messages are associated in the same group
+		GroupID: data int64.i;
+		--The type of entity generating the message
+		OriginatorType: data VicsEntityType.i;
+		--Time stamp of when the message was generated.
+		TimeStamp: data int64.i;
+		--Priority of the message
+		Priority: data MessagePriority.i;
+end VicsBase.i;
+
+data VicsAck
+end VicsAck;
+
+--Sent in response to any message on a TCP/IP connection
+data implementation VicsAck.i
+	subcomponents
+		--ID of message received
+		ReceivedMessageID: data int64.i;
+		--The unique ID for the received message originator
+		ReceivedOriginatorID: data int64.i;
+		--Number of bytes that were received
+		ReceivedNumberOfBytes: data uint32.i;
+end VicsAck.i;
+
+data DismountMessage extends VICS::VicsBase
+end DismountMessage;
+
+--Occurs when a vehicle relays a message from a dismount in the field.
+data implementation DismountMessage.i extends VICS::VicsBase.i
+	subcomponents
+		--This is the actual payload data.
+		Payload: data PayloadData.i;
+		--Brief message description
+		Description: data string.i;
+		--The (optional) location at which payload was generated
+		Location: data Location3D.i;
+end DismountMessage.i;
+
+data UgsConfiguration
+end UgsConfiguration;
+
+--Configuration message for setting up the UGS wirelessly over multicast channel
+data implementation UgsConfiguration.i
+	subcomponents
+		--ID of UGS to configure
+		UgsID: data int64.i;
+		--Default behavior of radar sensor
+		DefaultRadarEnable: data bool.i;
+		--Direction (angle from true north, positive clockwise) that the radar sensor is
+		--aimed after placement
+		HeadingAngle: data real32.i;
+end UgsConfiguration.i;
+
+data UgsStatusRequest
+end UgsStatusRequest;
+
+--Request for UGS status over multicast channel
+data implementation UgsStatusRequest.i
+end UgsStatusRequest.i;
+
+data UgsStatusResponse extends VICS::VicsBase
+end UgsStatusResponse;
+
+--UGS current status sent over multicast channel in response to UgsStatusRequest
+data implementation UgsStatusResponse.i extends VICS::VicsBase.i
+	subcomponents
+		--Default behavior of radar sensor
+		DefaultRadarEnable: data bool.i;
+		--Direction (angle from true north, positive clockwise) that the radar sensor is
+		--aimed after placement
+		HeadingAngle: data real32.i;
+		--Reported lat/lon location. Null if not yet aquired GPS location
+		ReportedLocation: data Location3D.i;
+		--Reported time
+		CurrentTime: data int64.i;
+end UgsStatusResponse.i;
+
+data RadarEnableMessage
+end RadarEnableMessage;
+
+--Allow dismount to selectively enable or disable radar
+data implementation RadarEnableMessage.i
+	subcomponents
+		--Ugs ID for which the radar should be enabled/disabled
+		UgsID: data int64.i;
+		--Indicates whether to enable or disable the radar after message reception and
+		--for time 'TimeOut'
+		EnableRadar: data bool.i;
+		--Time out to revert to default UGS configuration
+		TimeOut: data int64.i;
+end RadarEnableMessage.i;
+
+data PayloadData
+end PayloadData;
+
+--A possible array of payload data.
+data implementation PayloadData.i
+	subcomponents
+		--The byte array of payload data. Can be blank to show presence of a stored message.
+		Data: data byte.i {Data_Model::Data_Representation => Array;};
+		--Payload from the time of the event. Could be nothing, text, images or video.
+		PayloadType: data PayloadType.i;
+		--Expected payload size: not to be used for index in Data field.
+		ExpectedPayloadSize: data uint32.i;
+end PayloadData.i;
+
+data IntruderAlertBase extends VICS::VicsBase
+end IntruderAlertBase;
+
+--Base class for intruder alerts, both red and green
+data implementation IntruderAlertBase.i extends VICS::VicsBase.i
+end IntruderAlertBase.i;
+
+data QueryResponse extends VICS::VicsBase
+end QueryResponse;
+
+--Contains a list of responses in answer to a MessageQuery (note: over tcp/ip channel)
+data implementation QueryResponse.i extends VICS::VicsBase.i
+	subcomponents
+		--Latest alert reported. If not null and not already known, it should be forwarded
+		--to all connected entities
+		LatestAlert: data IntruderAlertBase.i;
+		--The list of responses
+		ResponseMessages: data GlobalMessageID.i {Data_Model::Data_Representation => Array;};
+end QueryResponse.i;
+
+data CompleteQueryResponse extends VICS::VicsBase
+end CompleteQueryResponse;
+
+--Contains a list of responses in answer to a MessageQuery (note: over tcp/ip channel)
+data implementation CompleteQueryResponse.i extends VICS::VicsBase.i
+	subcomponents
+		--Latest alert reported. If not null and not already known, it should be forwarded
+		--to all connected entities
+		LatestAlert: data IntruderAlertBase.i;
+		--Compressed SQLite sub-table of all messages that should be delivered
+		ResponseTable: data byte.i {Data_Model::Data_Representation => Array;};
+end CompleteQueryResponse.i;
+
+data GlobalMessageID
+end GlobalMessageID;
+
+--Identifier for a VICS message based on sender ID and message ID. Should be unique
+--for the entire system
+data implementation GlobalMessageID.i
+	subcomponents
+		--Sender ID of the message
+		OriginatorID: data int64.i;
+		--Specific ID of message unique to the sender
+		MessageID: data int64.i;
+end GlobalMessageID.i;
+
+data MessageQuery extends VICS::VicsBase
+end MessageQuery;
+
+--Contains a list of queries for requested types of messages.
+data implementation MessageQuery.i extends VICS::VicsBase.i
+	subcomponents
+		--The list of queries.
+		Queries: data MessageRequest.i {Data_Model::Data_Representation => Array;};
+end MessageQuery.i;
+
+data MessageRequest
+end MessageRequest;
+
+--Represents a request to an entity for a set of messages of the same type in a given
+--time span defined by the requestor. If the time span is (0,0) then all messages
+--since the last time these entities talked is returned. If all messages since the
+--begining are desired, send (0,now). The requestee responds with all messages of
+--that type it has logged within that time span stripping off all payload data. If
+--the MessageID is non-zero, then the time span is ignored and the full message matching
+--that ID is returned (including all payload data upto 6MB).
+data implementation MessageRequest.i
+	subcomponents
+		--The type of message being requested in the VICS Series.
+		RequestType: data MessageType.i;
+		--The start time for the messages being requested.
+		StartTime: data int64.i;
+		--The end time for the messages being requested.
+		EndTime: data int64.i;
+		--Sender ID of message that should be delivered in full
+		OriginatorID: data int64.i;
+		--Specific ID of message that should be delivered in full
+		MessageID: data int64.i;
+end MessageRequest.i;
+
+

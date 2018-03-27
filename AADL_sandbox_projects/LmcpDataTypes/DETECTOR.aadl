@@ -1,0 +1,102 @@
+package DETECTOR
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data NewImage
+end NewImage;
+
+--used to notify the detector application that there is a new image available for
+--evaluation
+data implementation NewImage.i
+	subcomponents
+		--This is the new image's index into the SQLite database
+		ImageIndex: data int64.i;
+		--This is the path/filename for the SQLite image database file. Note: this path
+		--is relative to the starting location of UxAS.
+		DataBasePath: data string.i;
+end NewImage.i;
+
+data ImageParameters
+end ImageParameters;
+
+--used to describe the parameters rewuired to convert pixel to geograpic location
+data implementation ImageParameters.i
+	subcomponents
+		--size of the image in the x direction
+		ImageSizeX: data int32.i;
+		--size of the image in the y direction
+		ImageSizeY: data int32.i;
+		--geograhic location of the top left corner of the image
+		TopLeft: data Location3D.i;
+		--geograhic location of the top right corner of the image
+		TopRight: data Location3D.i;
+		--geograhic location of the bottom left corner of the image
+		BottomLeft: data Location3D.i;
+		--geograhic location of the bottom right corner of the image
+		BottomRight: data Location3D.i;
+end ImageParameters.i;
+
+data ImageDetection
+end ImageDetection;
+
+--parameters used to describe a detection in an image
+data implementation ImageDetection.i
+	subcomponents
+		--This is the detected class
+		DetectedClass: data int32.i;
+		--cofidence in ???
+		Confidence: data real32.i;
+		--center of the detection in the x direction
+		Location_x: data int32.i;
+		--center of the detection in the y direction
+		Location_y: data int32.i;
+end ImageDetection.i;
+
+data ImageDetections
+end ImageDetections;
+
+--Sent from the detector application to notify the detection service that detection
+--were found in an image
+data implementation ImageDetections.i
+	subcomponents
+		--the image's index into the SQLite database, used for reference
+		ImageIndex: data int64.i;
+		--parameters needed to calculated geographic locations given pixel locations
+		ImageParameters: data ImageParameters.i;
+		--list of detections
+		ImageDetections: data ImageDetection.i {Data_Model::Data_Representation => Array;};
+end ImageDetections.i;
+
+data GeoDetection
+end GeoDetection;
+
+--parameters used to describe a detection in an image
+data implementation GeoDetection.i
+	subcomponents
+		--This is the detected class
+		DetectedClass: data int32.i;
+		--cofidence in ???
+		Confidence: data real32.i;
+		--center of the detection in the geographics coordinates
+		Location: data Location3D.i;
+end GeoDetection.i;
+
+data GeoDetections
+end GeoDetections;
+
+--Sent from the detector application to notify the detection service that detection
+--were found in an image
+data implementation GeoDetections.i
+	subcomponents
+		--the image's index into the SQLite database, used for reference
+		ImageIndex: data int64.i;
+		--list of detections
+		GeoDetections: data GeoDetection.i {Data_Model::Data_Representation => Array;};
+end GeoDetections.i;
+
+

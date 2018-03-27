@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        Message definitions for entity to entity wireless communication
+-->
+<MDM>
+    <SeriesName>UXCOMM</SeriesName>
+    <Namespace>uxas/messages/uxcomm</Namespace>
+    <Version>2</Version>
+
+    <StructList>
+		
+		<!-- Request UAV to visit a location and attempt to establish connection. -->
+		<Struct Name="CommTransferTask" Extends="CMASI/Task" >
+			<!-- Location of node with which to establish comm -->
+			<Field Name="CommLocation" Type="CMASI/Location3D" />
+			<!-- ID of comunicating entity -->
+			<Field Name="CommEntityID" Type="int64" />
+			<!-- Communication timeout at this location -->
+			<Field Name="Timeout" Type="int64" Units="milliseconds" />
+			<!-- Continue loitering until the timeout time specified even if the transfer has completed early -->
+			<Field Name="ContinueLoiter" Type="bool" Default="false" />
+		</Struct>
+		
+		<!-- Indicates that the comm transfer task is active (i.e. UAV is in the prescribed range) -->
+		<Struct Name="CommTransferIsActive" >
+			<!-- ID of vehicle attempting to complete the comm transfer task -->
+			<Field Name="VehicleID" Type="int64" />
+			<!-- ID of entity to which communication is to be established -->
+			<Field Name="DestinationID" Type="int64" />
+		</Struct>
+		
+		<!-- Indicates that the comm transfer task completed successfully -->
+		<Struct Name="CommTransferIsComplete" >
+			<!-- ID of vehicle attempting to complete the comm transfer task -->
+			<Field Name="VehicleID" Type="int64" />
+			<!-- ID of entity to which communication has been established -->
+			<Field Name="DestinationID" Type="int64" />
+		</Struct>
+        
+		<!-- Task to position a UAV at a location to establish communication at a particular time -->
+		<Struct Name="MeetMeTask" Extends="CommTransferTask" >
+			<!-- Wall clock time to be at the rendezvous location -->
+			<Field Name="RendezvousTime" Type="int64" Units="milliseconds since 1 Jan 1970" />
+		</Struct>
+	  
+ </StructList>
+</MDM>

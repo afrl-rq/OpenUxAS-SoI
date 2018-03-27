@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        Message definitions for the Persistent ISR scenario
+-->
+<MDM>
+    <SeriesName>DETECTOR</SeriesName>
+    <Namespace>uxas/project/detector</Namespace>
+    <Version>2</Version>
+
+    <StructList>
+    
+        <!-- used to notify the detector application that there is a new image available for evaluation -->
+        <Struct Name="NewImage">
+            <!-- This is the new image's index into the SQLite database -->
+            <Field Name="ImageIndex" Type="int64" Default="0" />
+            <!-- This is the path/filename for the SQLite image database file. Note:
+            this path is relative to the starting location of UxAS. -->
+            <Field Name="DataBasePath" Type="string" />
+        </Struct>
+
+        <!-- used to describe the parameters rewuired to convert pixel to geograpic location -->
+        <Struct Name="ImageParameters">
+            <!-- size of the image in the x direction -->
+            <Field Name="ImageSizeX" Type="int32" Default="0"/>
+            <!-- size of the image in the y direction -->
+            <Field Name="ImageSizeY" Type="int32" Default="0"/>
+            <!-- geograhic location of the top left corner of the image -->
+            <Field Name="TopLeft" Type="CMASI/Location3D" />
+            <!-- geograhic location of the top right corner of the image -->
+            <Field Name="TopRight" Type="CMASI/Location3D" />
+            <!-- geograhic location of the bottom left corner of the image -->
+            <Field Name="BottomLeft" Type="CMASI/Location3D" />
+            <!-- geograhic location of the bottom right corner of the image -->
+            <Field Name="BottomRight" Type="CMASI/Location3D" />
+        </Struct>
+
+        <!-- parameters used to describe a detection in an image -->
+        <Struct Name="ImageDetection">
+            <!-- This is the detected class -->
+            <Field Name="DetectedClass" Type="int32" Default="0" />
+            <!-- cofidence in ??? -->
+            <Field Name="Confidence" Type="real32" Default="0.0" />
+            <!-- center of the detection in the x direction -->
+            <Field Name="Location_x" Type="int32" Default="0"  Units="Pixels"/>
+            <!-- center of the detection in the y direction -->
+            <Field Name="Location_y" Type="int32" Default="0"  Units="Pixels"/>
+        </Struct>
+
+
+        <!-- Sent from the detector application to notify the detection service that detection were found in an image -->
+        <Struct Name="ImageDetections">
+            <!-- the image's index into the SQLite database, used for reference -->
+            <Field Name="ImageIndex" Type="int64" Default="0" />
+            <!-- parameters needed to calculated geographic locations given pixel locations -->
+            <Field Name="ImageParameters" Type="ImageParameters" />
+            <!-- list of detections -->
+            <Field Name="ImageDetections" Type="ImageDetection[]" MaxArrayLength="1000"/>
+        </Struct>
+
+
+        <!-- parameters used to describe a detection in an image -->
+        <Struct Name="GeoDetection">
+            <!-- This is the detected class -->
+            <Field Name="DetectedClass" Type="int32" Default="0" />
+            <!-- cofidence in ??? -->
+            <Field Name="Confidence" Type="real32" Default="0.0" />
+            <!-- center of the detection in the geographics coordinates -->
+            <Field Name="Location" Type="CMASI/Location3D"/>
+        </Struct>
+
+
+        <!-- Sent from the detector application to notify the detection service that detection were found in an image -->
+        <Struct Name="GeoDetections">
+            <!-- the image's index into the SQLite database, used for reference -->
+            <Field Name="ImageIndex" Type="int64" Default="0" />
+            <!-- list of detections -->
+            <Field Name="GeoDetections" Type="GeoDetection[]" MaxArrayLength="1000"/>
+        </Struct>
+
+
+
+
+    </StructList>
+</MDM>

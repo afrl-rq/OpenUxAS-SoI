@@ -1,0 +1,36 @@
+package PLANREP
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data ExtendedArea
+end ExtendedArea;
+
+--Extended boundary of an area search task to use in computations and for plotting.
+data implementation ExtendedArea.i
+	subcomponents
+		--TaskID of the corresponding AngledAreaSearch task.
+		SearchTaskID: data int64.i;
+		--Extended boundary of the area search.
+		Boundary: data AbstractGeometry.i;
+end ExtendedArea.i;
+
+data ExtendedPoint
+end ExtendedPoint;
+
+--Extended boundary of a point search task to use in computations and for plotting.
+data implementation ExtendedPoint.i
+	subcomponents
+		--TaskID of the corresponding AngledAreaSearch task.
+		SearchTaskID: data int64.i;
+		--Location of the corresponding ImpactPointSearch task.
+		SearchLocation: data Location3D.i;
+		--Extended boundary of the point search.
+		Boundary: data AbstractGeometry.i;
+end ExtendedPoint.i;
+
+
