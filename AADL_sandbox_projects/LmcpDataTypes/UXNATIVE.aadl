@@ -15,7 +15,7 @@ end VideoRecord;
 data implementation VideoRecord.i
 	subcomponents
 		--Start [true] or stop [false] video recording
-		Record: data bool.i;
+		Recordd: data bool.i;
 end VideoRecord.i;
 
 data StartupComplete
@@ -37,18 +37,18 @@ data implementation CreateNewService.i
 		--XML configuration for this service (i.e. options in XML format)
 		XmlConfiguration: data string.i;
 		--Existing entity configurations in the system when this new service is created
-		EntityConfigurations: data EntityConfiguration.i {Data_Model::Data_Representation => Array;};
+		EntityConfigurations: data CMASI::EntityConfiguration.i {Data_Model::Data_Representation => Array;};
 		--Existing entity states in the system when this new service is created
-		EntityStates: data EntityState.i {Data_Model::Data_Representation => Array;};
+		EntityStates: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
 		--Existing mission commands for vehicles in the system when this new service is
 		--created
-		MissionCommands: data MissionCommand.i {Data_Model::Data_Representation => Array;};
+		MissionCommands: data CMASI::MissionCommand.i {Data_Model::Data_Representation => Array;};
 		--Defined areas of interest at time of service creation
-		Areas: data AreaOfInterest.i {Data_Model::Data_Representation => Array;};
+		Areas: data IMPACT::AreaOfInterest.i {Data_Model::Data_Representation => Array;};
 		--Defined lines of interest at time of service creation
-		Lines: data LineOfInterest.i {Data_Model::Data_Representation => Array;};
+		Lines: data IMPACT::LineOfInterest.i {Data_Model::Data_Representation => Array;};
 		--Defined points of interest at time of service creation
-		Points: data PointOfInterest.i {Data_Model::Data_Representation => Array;};
+		Points: data IMPACT::PointOfInterest.i {Data_Model::Data_Representation => Array;};
 end CreateNewService.i;
 
 data KillService
@@ -108,7 +108,7 @@ data implementation EntityLocation.i
 		EntityID: data int64.i;
 		--Current location of entity. A valid EntityLocation must define Position (null
 		--not allowed)
-		Position: data Location3D.i;
+		Position: data CMASI::Location3D.i;
 		--Corresponding time in milli-seconds since 1 Jan 1970
 		Time: data int64.i;
 end EntityLocation.i;
@@ -151,7 +151,7 @@ end SubTaskExecution;
 data implementation SubTaskExecution.i
 	subcomponents
 		--List of tasks that current entity should complete
-		SubTasks: data Task.i {Data_Model::Data_Representation => Array;};
+		SubTasks: data CMASI::Task.i {Data_Model::Data_Representation => Array;};
 		--Enable strict ordering
 		StrictOrder: data bool.i;
 end SubTaskExecution.i;
@@ -164,9 +164,9 @@ end SubTaskAssignment;
 data implementation SubTaskAssignment.i
 	subcomponents
 		--List of tasks that current team should complete
-		SubTasks: data Task.i {Data_Model::Data_Representation => Array;};
+		SubTasks: data CMASI::Task.i {Data_Model::Data_Representation => Array;};
 		--Neighboring entities to consider
-		Neighbors: data EntityState.i {Data_Model::Data_Representation => Array;};
+		Neighbors: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
 end SubTaskAssignment.i;
 
 data AutopilotKeepAlive
@@ -253,3 +253,4 @@ data implementation SimulationTimeStepAcknowledgement.i
 end SimulationTimeStepAcknowledgement.i;
 
 
+end UXNATIVE;

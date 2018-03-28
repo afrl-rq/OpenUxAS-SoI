@@ -38,7 +38,7 @@ end BlackTipImpactTask;
 data implementation BlackTipImpactTask.i extends CMASI::Task.i
 	subcomponents
 		--Point for which munition should plan to impact
-		ImpactLocation: data Location3D.i;
+		ImpactLocation: data CMASI::Location3D.i;
 		--Glide slope angle at which the munition should approach the impact point
 		ApproachAngle: data real32.i;
 		--Altitude at which the munition should plan its approach. Altitude is height above
@@ -53,11 +53,11 @@ data implementation BlackTipImpactTask.i extends CMASI::Task.i
 		--with duration equal to the approximate time it will take the munition to descend
 		--from its current altitude to the ApproachAltitude is placed at this point in
 		--the returned plan.
-		SpiralDownLocation: data Location3D.i;
+		SpiralDownLocation: data CMASI::Location3D.i;
 		--Point to which a ditch plan is computed. An infinite loiter is commanded at this
 		--location and altitude. This could serve as the loss-of-comm point for the munition.
 		--Returned as part of the contingency plan.
-		DitchLocation: data Location3D.i;
+		DitchLocation: data CMASI::Location3D.i;
 		--Raduis of turn to use when computing trajectories and loiters. For each of the
 		--looping manuevers in the loop-back and button-loop plans, this value is used
 		--to size the turn radius implied by the waypoint plan. This value is also used
@@ -85,7 +85,7 @@ data implementation ImpactAction.i extends CMASI::VehicleAction.i
 		--Planned attack heading to target
 		ApproachHeading: data real32.i;
 		--Location of desired impact
-		ImpactLocation: data Location3D.i;
+		ImpactLocation: data CMASI::Location3D.i;
 		--Index of waypoint that begins the waveoff plan
 		WaveoffPlanID: data int64.i;
 		--Wave-off distance for auto-abort manuever. If commit has not been sent and the
@@ -94,4 +94,4 @@ data implementation ImpactAction.i extends CMASI::VehicleAction.i
 		AutoWaveoffDistance: data real32.i;
 end ImpactAction.i;
 
-
+end BLACKTIP;

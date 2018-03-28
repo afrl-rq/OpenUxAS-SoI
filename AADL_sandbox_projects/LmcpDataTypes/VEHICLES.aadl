@@ -79,4 +79,6 @@ end StationarySensorState;
 data implementation StationarySensorState.i extends CMASI::EntityState.i
 end StationarySensorState.i;
 
+end VEHICLES;
+
 

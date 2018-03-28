@@ -17,7 +17,7 @@ data implementation AlarmStation.i
 		--Station ID
 		AlarmID: data int64.i;
 		--Station world position
-		Position: data Location3D.i;
+		Position: data CMASI::Location3D.i;
 end AlarmStation.i;
 
 data AlarmStatus
@@ -76,3 +76,4 @@ data implementation PatrolTask.i extends ICET::LineSurveillanceTask.i
 end PatrolTask.i;
 
 
+end PATROL;

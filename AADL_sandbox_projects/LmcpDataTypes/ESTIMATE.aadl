@@ -95,7 +95,7 @@ end NetworkNodeLatLon;
 data implementation NetworkNodeLatLon.i extends ESTIMATE::NetworkNode.i
 	subcomponents
 		--Lat/Lon coordinates of node
-		Coordinates: data Location3D.i;
+		Coordinates: data CMASI::Location3D.i;
 end NetworkNodeLatLon.i;
 
 data ValueFunction
@@ -169,7 +169,7 @@ data implementation NetworkEdge.i
 		--Edge length in meters
 		EdgeLength: data real32.i;
 		--Optional waypoints describing physical edge in lat/lon coordinates
-		Waypoints: data Location3D.i {Data_Model::Data_Representation => Array;};
+		Waypoints: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
 		--Optional waypoints describing physical edge in x,y coordinates
 		WaypointsXY: data LocationXY.i {Data_Model::Data_Representation => Array;};
 end NetworkEdge.i;
@@ -292,7 +292,7 @@ end CurrentNetworkUpdate;
 data implementation CurrentNetworkUpdate.i
 	subcomponents
 		--Update the stored PDF with the latest UGS measurement
-		Alert: data IntruderAlertBase.i;
+		Alert: data VICS::IntruderAlertBase.i;
 end CurrentNetworkUpdate.i;
 
 data LikertNetworkUpdate
@@ -307,4 +307,4 @@ data implementation LikertNetworkUpdate.i
 		LikertValue: data FuzzyEdgeValue.i;
 end LikertNetworkUpdate.i;
 
-
+end ESTIMATE;

@@ -109,7 +109,7 @@ data implementation DismountMessage.i extends VICS::VicsBase.i
 		--Brief message description
 		Description: data string.i;
 		--The (optional) location at which payload was generated
-		Location: data Location3D.i;
+		Location: data CMASI::Location3D.i;
 end DismountMessage.i;
 
 data UgsConfiguration
@@ -146,7 +146,7 @@ data implementation UgsStatusResponse.i extends VICS::VicsBase.i
 		--aimed after placement
 		HeadingAngle: data real32.i;
 		--Reported lat/lon location. Null if not yet aquired GPS location
-		ReportedLocation: data Location3D.i;
+		ReportedLocation: data CMASI::Location3D.i;
 		--Reported time
 		CurrentTime: data int64.i;
 end UgsStatusResponse.i;
@@ -173,7 +173,7 @@ end PayloadData;
 data implementation PayloadData.i
 	subcomponents
 		--The byte array of payload data. Can be blank to show presence of a stored message.
-		Data: data byte.i {Data_Model::Data_Representation => Array;};
+		Dataa: data byte.i {Data_Model::Data_Representation => Array;};
 		--Payload from the time of the event. Could be nothing, text, images or video.
 		PayloadType: data PayloadType.i;
 		--Expected payload size: not to be used for index in Data field.
@@ -260,4 +260,5 @@ data implementation MessageRequest.i
 		MessageID: data int64.i;
 end MessageRequest.i;
 
+end VICS;
 

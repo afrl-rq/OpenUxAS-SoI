@@ -61,7 +61,7 @@ end PatrolTask;
 data implementation PatrolTask.i extends CMASI::Task.i
 	subcomponents
 		--Location of positions to visit on patrol
-		VisitLocations: data CommTransferTask.i {Data_Model::Data_Representation => Array;};
+		VisitLocations: data UXCOMM::CommTransferTask.i {Data_Model::Data_Representation => Array;};
 end PatrolTask.i;
 
 data UgsManagementTask extends CMASI::Task
@@ -98,7 +98,7 @@ data implementation StateTransition.i extends VICS::VicsBase.i
 		--Brief description of payload data included
 		PayloadDescription: data string.i;
 		--Data associated with the state transition
-		Payload: data PayloadData.i;
+		Payload: data VICS::PayloadData.i;
 		--The ID of the Unattended Ground Sensor it is traveling to, or 0 if destination
 		--is not an UGS.
 		UgsID: data int64.i;
@@ -111,7 +111,7 @@ end IntruderAlert;
 data implementation IntruderAlert.i extends VICS::IntruderAlertBase.i
 	subcomponents
 		--The location at which the object was detected.
-		DetectionLocation: data Location3D.i;
+		DetectionLocation: data CMASI::Location3D.i;
 		--Optional UGS ID of unit that detected the intruder. A value of 0 indicates no
 		--UGS performed the detection.
 		UgsID: data int64.i;
@@ -125,7 +125,7 @@ data implementation IntruderAlert.i extends VICS::IntruderAlertBase.i
 		--Brief description of payload data included
 		PayloadDescription: data string.i;
 		--This is the actual payload data. Each payload stored in row by row format.
-		Payload: data PayloadData.i;
+		Payload: data VICS::PayloadData.i;
 end IntruderAlert.i;
 
 data GreenIntruderAlert extends VICS::IntruderAlertBase
@@ -136,13 +136,13 @@ end GreenIntruderAlert;
 data implementation GreenIntruderAlert.i extends VICS::IntruderAlertBase.i
 	subcomponents
 		--The location at which the absence of measurements is reported
-		DetectionLocation: data Location3D.i;
+		DetectionLocation: data CMASI::Location3D.i;
 		--Optional UGS ID of unit that is reporting an absence of measurements
 		UgsID: data int64.i;
 		--Brief description of payload data included
 		PayloadDescription: data string.i;
 		--This is the actual payload data. Each payload stored in row by row format.
-		Payload: data PayloadData.i;
+		Payload: data VICS::PayloadData.i;
 end GreenIntruderAlert.i;
 
 data FixedUGS
@@ -154,9 +154,9 @@ data implementation FixedUGS.i
 		--UGS ID
 		UgsID: data int64.i;
 		--Location in real world coordinates
-		UgsLocation: data Location3D.i;
+		UgsLocation: data CMASI::Location3D.i;
 		--Location relative to network
-		UgsNetworkLocation: data NetworkLocation.i;
+		UgsNetworkLocation: data ESTIMATE::NetworkLocation.i;
 end FixedUGS.i;
 
 data UgsLaydown
@@ -166,11 +166,11 @@ end UgsLaydown;
 data implementation UgsLaydown.i
 	subcomponents
 		--Network on which all UGS lay
-		RoadNetwork: data NetworkRegion.i;
+		RoadNetwork: data ESTIMATE::NetworkRegion.i;
 		--List of all UGS fixed to this road network
 		UgsList: data FixedUGS.i {Data_Model::Data_Representation => Array;};
 		--Location in real world coordinates of delivery location (VICS Central)
-		DeliveryLocation: data Location3D.i;
+		DeliveryLocation: data CMASI::Location3D.i;
 end UgsLaydown.i;
 
 data IsolationControllerInitialization
@@ -239,7 +239,7 @@ data implementation IsolationCoordination.i
 		--Cleared child nodes
 		ClearedNodes: data int64.i {Data_Model::Data_Representation => Array;};
 		--EntityStates, from self/teammates, for coordination
-		TeamStates: data EntityState.i {Data_Model::Data_Representation => Array;};
+		TeamStates: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
 end IsolationCoordination.i;
 
 data EntityAlertSummary
@@ -251,7 +251,7 @@ data implementation EntityAlertSummary.i
 		--Entity ID
 		EntityID: data int64.i;
 		--Latest report reported from this entity
-		LastAlert: data IntruderAlertBase.i;
+		LastAlert: data VICS::IntruderAlertBase.i;
 		--Total number of red alerts reported from this entity
 		TotalAlerts: data uint32.i;
 end EntityAlertSummary.i;
@@ -265,7 +265,7 @@ data implementation IsolationSummary.i
 		--ID of the entity that sent this message
 		SenderID: data int64.i;
 		--Location of entity
-		SenderLocation: data Location3D.i;
+		SenderLocation: data CMASI::Location3D.i;
 		--Speed of entity
 		SenderSpeed: data real32.i;
 		--Heading of entity from true North
@@ -293,3 +293,4 @@ data implementation IsolationSummary.i
 end IsolationSummary.i;
 
 
+end ISOLATE;

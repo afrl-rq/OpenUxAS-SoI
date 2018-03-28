@@ -16,7 +16,7 @@ data implementation ExtendedArea.i
 		--TaskID of the corresponding AngledAreaSearch task.
 		SearchTaskID: data int64.i;
 		--Extended boundary of the area search.
-		Boundary: data AbstractGeometry.i;
+		Boundary: data CMASI::AbstractGeometry.i;
 end ExtendedArea.i;
 
 data ExtendedPoint
@@ -28,9 +28,10 @@ data implementation ExtendedPoint.i
 		--TaskID of the corresponding AngledAreaSearch task.
 		SearchTaskID: data int64.i;
 		--Location of the corresponding ImpactPointSearch task.
-		SearchLocation: data Location3D.i;
+		SearchLocation: data CMASI::Location3D.i;
 		--Extended boundary of the point search.
-		Boundary: data AbstractGeometry.i;
+		Boundary: data CMASI::AbstractGeometry.i;
 end ExtendedPoint.i;
 
+end PLANREP;
 

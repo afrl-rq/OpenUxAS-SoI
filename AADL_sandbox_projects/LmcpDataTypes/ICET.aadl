@@ -16,7 +16,7 @@ end MaxInformationPointSearchTask;
 data implementation MaxInformationPointSearchTask.i extends CMASI::Task.i
 	subcomponents
 		--Collection of point search tasks to be completed
-		TaskList: data PointSearchTask.i {Data_Model::Data_Representation => Array;};
+		TaskList: data CMASI::PointSearchTask.i {Data_Model::Data_Representation => Array;};
 		--Target revisit must have an angle difference of at least this value
 		LookAngleDifference: data real32.i;
 		--Fuel reserve as a percentage of computed path, i.e. if the fuel reserve is 50%,
@@ -50,4 +50,5 @@ data implementation LineSurveillanceTask.i extends CMASI::LineSearchTask.i
 		PlanOnSameSide: data bool.i;
 end LineSurveillanceTask.i;
 
+end ICET;
 

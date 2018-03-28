@@ -150,7 +150,7 @@ end WaypointSteeringTask;
 data implementation WaypointSteeringTask.i extends CMASI::Task.i
 	subcomponents
 		--List of waypoints to be followed. If none, current route is used
-		WaypointList: data Waypoint.i {Data_Model::Data_Representation => Array;};
+		WaypointList: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
 		--ID of the first waypoint to follow.
 		FirstWaypoint: data int64.i;
 end WaypointSteeringTask.i;
@@ -305,13 +305,13 @@ data implementation Track.i
 		--ID of the equipment that generated this track (unique within platform)
 		SourceEquipID: data int32.i;
 		--LLA of source unit when track was perceived
-		SourceLocation: data Location3D.i;
+		SourceLocation: data CMASI::Location3D.i;
 		--Time this track was created (milliseconds since Jan 1, 1970)
 		TimeCreated: data int64.i;
 		--Time the information for this track was perceived (ms since Jan 1, 1970)
 		TimePerceived: data int64.i;
 		--A container for key-value paris of metadata
-		MetaData: data KeyValuePair.i {Data_Model::Data_Representation => Array;};
+		MetaData: data CMASI::KeyValuePair.i {Data_Model::Data_Representation => Array;};
 end Track.i;
 
 data TrackList
@@ -389,7 +389,7 @@ data implementation TaskStatus.i
 		--ID of the platform generating this message
 		EntityID: data int64.i;
 		--Task currently being executed by the vehicle
-		ActiveTask: data Task.i;
+		ActiveTask: data CMASI::Task.i;
 end TaskStatus.i;
 
 data TimeOnTarget extends CMASI::MustFlyTask
@@ -416,7 +416,7 @@ data implementation DirectedPatrol.i extends CMASI::SearchTask.i
 	subcomponents
 		--Geometric center of the pattern (cannot be null). Altitude value indicates the
 		--altitude at which this task should be carried out.
-		CenterLocation: data Location3D.i;
+		CenterLocation: data CMASI::Location3D.i;
 		--Clockwise angle from true north along which the down-range leg of the pattern
 		--is oriented.
 		DownRangeDirection: data real32.i;
@@ -428,7 +428,7 @@ data implementation DirectedPatrol.i extends CMASI::SearchTask.i
 		--assigned vehicle.
 		PatternWidth: data real32.i;
 		--Direction of travel around the pattern.
-		PatternDirection: data LoiterDirection.i;
+		PatternDirection: data CMASI::LoiterDirection.i;
 		--Maximum speed allowed during execution. If set to 0.0, uses nominal speed of
 		--vehicle assigned.
 		MaxSpeedAllowed: data real32.i;
@@ -437,7 +437,7 @@ data implementation DirectedPatrol.i extends CMASI::SearchTask.i
 		MinSpeedAllowed: data real32.i;
 		--Optional sensor stare location during down-range leg traversal. Selects appropriate
 		--gimballed sensor based on desired wavelength band.
-		SensorFocusPoint: data Location3D.i;
+		SensorFocusPoint: data CMASI::Location3D.i;
 end DirectedPatrol.i;
 
 data PhasedPatrol extends FAMUS::DirectedPatrol
@@ -476,5 +476,7 @@ data implementation SynchronizedPatrol.i extends CMASI::Task.i
 		--leg.
 		BiasDownRange: data bool.i;
 end SynchronizedPatrol.i;
+
+end FAMUS;
 
 

@@ -143,7 +143,7 @@ end DepotTask;
 data implementation DepotTask.i extends CMASI::Task.i
 	subcomponents
 		--Location of the Depot
-		DepotLocation: data Location3D.i;
+		DepotLocation: data CMASI::Location3D.i;
 end DepotTask.i;
 
 data RoadSearchTask extends CMASI::SearchTask
@@ -161,15 +161,15 @@ end RoadSearchTask;
 data implementation RoadSearchTask.i extends CMASI::SearchTask.i
 	subcomponents
 		--location to start the road search
-		StartingLocation: data Location3D.i;
+		StartingLocation: data CMASI::Location3D.i;
 		--location to end the road search
-		EndingLocation: data Location3D.i;
+		EndingLocation: data CMASI::Location3D.i;
 		--Relative direction to search the road. Makes is possible to search the road in
 		--either direction (or reverse, if that make sense)
 		RoadSearchDirection: data RoadSearchDirection.i;
 		--Defines a list of acceptable look-angles for this task. See the documentation
 		--above for details.
-		ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
+		ViewAngleList: data CMASI::Wedge.i {Data_Model::Data_Representation => Array;};
 		--If true, the ViewAngleList specifies inertial (North-East) angles. See documentation
 		--above.
 		UseInertialViewAngles: data bool.i;
@@ -179,5 +179,7 @@ data implementation RoadSearchTask.i extends CMASI::SearchTask.i
 		--If true, the PlanningAltitude will be used. See documentation above.
 		UsePlaningAltitude: data bool.i;
 end RoadSearchTask.i;
+
+end PISR;
 
 

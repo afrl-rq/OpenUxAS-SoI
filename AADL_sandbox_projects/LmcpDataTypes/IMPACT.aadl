@@ -126,10 +126,10 @@ end RadioConfiguration;
 data implementation RadioConfiguration.i extends CMASI::PayloadConfiguration.i
 	subcomponents
 		--The range of the radio
-		Range: data real32.i;
+		Rangee: data real32.i;
 		--The vehicle's rally point during loss of comm contingency. When set to null,
 		--no defined loss of comm behavior.
-		RallyPoint: data Location3D.i;
+		RallyPoint: data CMASI::Location3D.i;
 		--Time after loss of communications the vehicle should return to its rally point
 		Timeout: data int64.i;
 end RadioConfiguration.i;
@@ -142,9 +142,9 @@ data implementation RadioTowerConfiguration.i extends CMASI::EntityConfiguration
 	subcomponents
 		--The position of the tower. A valid RadioTowerConfiguration must define Position
 		--(null not allowed)
-		Position: data Location3D.i;
+		Position: data CMASI::Location3D.i;
 		--The range of the radio
-		Range: data real32.i;
+		Rangee: data real32.i;
 		--Whether the radio is enabled
 		Enabled: data bool.i;
 end RadioTowerConfiguration.i;
@@ -355,7 +355,7 @@ data implementation VehicleSummary.i
 		--but the waypoint list may contain waypoints that are not necessarily linked.
 		--Multiple linked routes may be sent in a single waypoint list. Waypoints are not
 		--necessarily ordered in the list.
-		WaypointList: data Waypoint.i {Data_Model::Data_Representation => Array;};
+		WaypointList: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
 		--ID of the first waypoint in the plan.
 		FirstWaypoint: data int64.i;
 end VehicleSummary.i;
@@ -408,7 +408,7 @@ data implementation SpeedAltPair.i
 		--Altitude attached to this vehicle
 		Altitude: data real32.i;
 		--Altitude type for specified altitude
-		AltitudeType: data AltitudeType.i;
+		AltitudeType: data CMASI::AltitudeType.i;
 end SpeedAltPair.i;
 
 data ImpactAutomationRequest
@@ -422,7 +422,7 @@ data implementation ImpactAutomationRequest.i
 		RequestID: data int64.i;
 		--Standard CMASI Automation request. A valid ImpactAutomationRequest must define
 		--TrialRequest (null not allowed).
-		TrialRequest: data AutomationRequest.i;
+		TrialRequest: data CMASI::AutomationRequest.i;
 		--Override nominal speed/alt. If a vehicle is not in list, its nominal speed/alt
 		--is used
 		OverridePlanningConditions: data SpeedAltPair.i {Data_Model::Data_Representation => Array;};
@@ -444,7 +444,7 @@ data implementation ImpactAutomationResponse.i
 		ResponseID: data int64.i;
 		--Automation response from the request. A valid ImpactAutomationResponse must define
 		--TrialResponse (null not allowed).
-		TrialResponse: data AutomationResponse.i;
+		TrialResponse: data CMASI::AutomationResponse.i;
 		--Associated play ID
 		PlayID: data int64.i;
 		--Associated solution ID
@@ -466,7 +466,7 @@ data implementation PointOfInterest.i
 		PointID: data int64.i;
 		--Point of interest location. A valid PointOfInterest must define Location (null
 		--not allowed).
-		Location: data Location3D.i;
+		Location: data CMASI::Location3D.i;
 		--Action that updated this point of interest (e.g. created, destroyed, modified)
 		PointAction: data AreaActionOptions.i;
 		--Human readable label for point of interest
@@ -484,7 +484,7 @@ data implementation LineOfInterest.i
 		--ID for lines of interest
 		LineID: data int64.i;
 		--List of points to search
-		Line: data Location3D.i {Data_Model::Data_Representation => Array;};
+		Line: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
 		--Action that updated this line of interest (e.g. created, destroyed, modified)
 		LineAction: data AreaActionOptions.i;
 		--Human readable label for line of interest
@@ -503,7 +503,7 @@ data implementation AreaOfInterest.i
 		AreaID: data int64.i;
 		--Geometry describing the area. A valid AreaOfInterest must define Area (null not
 		--allowed).
-		Area: data AbstractGeometry.i;
+		Area: data CMASI::AbstractGeometry.i;
 		--Action that updated this area of interest (e.g. created, destroyed, modified)
 		AreaAction: data AreaActionOptions.i;
 		--Human readable label for area of interest
@@ -521,17 +521,17 @@ data implementation ImpactPointSearchTask.i extends CMASI::SearchTask.i
 		--Point to search (from available points of interest). Only valid if ID is non-zero
 		SearchLocationID: data int64.i;
 		--Defines coordinates directly, only used when SearchLocationID is non-zero
-		SearchLocation: data Location3D.i;
+		SearchLocation: data CMASI::Location3D.i;
 		--Minimum distance that an aircraft must maintain from the point of interest.
 		StandoffDistance: data real32.i;
 		--A list of acceptable look-angles for this task. Each wedge is defined relative
 		--to true North. To be a valid look angle, a sensor must be looking from a direction
 		--within the bounds of the wedge.
-		ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
+		ViewAngleList: data CMASI::Wedge.i {Data_Model::Data_Representation => Array;};
 		--Loiter action to complete to fulfill task. If null, then simply points camera
 		--but main trajectory does not change. Otherwise, completes the specified loiter
 		--action.
-		DesiredAction: data LoiterAction.i;
+		DesiredAction: data CMASI::LoiterAction.i;
 end ImpactPointSearchTask.i;
 
 data PatternSearchTask extends CMASI::SearchTask
@@ -543,7 +543,7 @@ data implementation PatternSearchTask.i extends CMASI::SearchTask.i
 		--Point at which to search is centered (from available points of interest)
 		SearchLocationID: data int64.i;
 		--Defines coordinates directly, only used when SearchLocationID is non-zero
-		SearchLocation: data Location3D.i;
+		SearchLocation: data CMASI::Location3D.i;
 		--Search pattern to use
 		Pattern: data AreaSearchPattern.i;
 		--Pattern extent
@@ -561,7 +561,7 @@ data implementation AngledAreaSearchTask.i extends CMASI::SearchTask.i
 		--Sweep angle defined from true North in clockwise manner
 		SweepAngle: data real32.i;
 		--Optional start point that must be reached before beginning search
-		StartPoint: data Location3D.i;
+		StartPoint: data CMASI::Location3D.i;
 end AngledAreaSearchTask.i;
 
 data ImpactLineSearchTask extends CMASI::SearchTask
@@ -580,7 +580,7 @@ data implementation ImpactLineSearchTask.i extends CMASI::SearchTask.i
 		LineID: data int64.i;
 		--Defines a list of acceptable look-angles for this task. See the documentation
 		--above for details.
-		ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
+		ViewAngleList: data CMASI::Wedge.i {Data_Model::Data_Representation => Array;};
 		--If true, the ViewAngleList specifies inertial (North-East) angles. See documentation
 		--above.
 		UseInertialViewAngles: data bool.i;
@@ -617,7 +617,7 @@ data implementation CommRelayTask.i extends CMASI::Task.i
 		--ID of entity which requires comm relay support
 		SupportedEntityID: data int64.i;
 		--Destination location for supported entity, if known.
-		DestinationLocation: data Location3D.i;
+		DestinationLocation: data CMASI::Location3D.i;
 		--ID of entity to which communication will be delivered (i.e. Tower ID)
 		TowerID: data int64.i;
 end CommRelayTask.i;
@@ -634,7 +634,7 @@ data implementation CordonTask.i extends CMASI::Task.i
 	subcomponents
 		--Block road access to this location. A valid CordonTask must define CordonLocation
 		--(null not allowed)
-		CordonLocation: data Location3D.i;
+		CordonLocation: data CMASI::Location3D.i;
 		--Distance away from 'CordonLocation' that access should be blocked
 		StandoffDistance: data real32.i;
 end CordonTask.i;
@@ -655,7 +655,7 @@ data implementation BlockadeTask.i extends CMASI::Task.i
 		--Biases the blockade so that more vehicles are between enemy and protected location.
 		--If null location is given, then blockade attempts to block in direction of enemy
 		--travel
-		ProtectedLocation: data Location3D.i;
+		ProtectedLocation: data CMASI::Location3D.i;
 end BlockadeTask.i;
 
 data EscortTask extends CMASI::SearchTask
@@ -676,7 +676,7 @@ data implementation EscortTask.i extends CMASI::SearchTask.i
 		RouteID: data int64.i;
 		--Waypoints that the supported entity is presumed to be following if 'RouteID'
 		--is zero
-		PrescribedWaypoints: data Waypoint.i {Data_Model::Data_Representation => Array;};
+		PrescribedWaypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
 		--Distance ahead (positive) or behind (negative) that the vehicle will provide
 		--surveillance relative to 'SupportedEntityID's location on route 'RouteID'
 		StandoffDistance: data real32.i;
@@ -702,7 +702,7 @@ data implementation WaterReport.i
 	subcomponents
 		--Area for which this report is valid. A valid WaterReport must define Area (null
 		--not allowed)
-		Area: data AbstractGeometry.i;
+		Area: data CMASI::AbstractGeometry.i;
 		--Speed of the current, e.g. due to tides or river flow
 		CurrentSpeed: data real32.i;
 		--Direction of the current
@@ -723,3 +723,4 @@ data implementation WaterZone.i extends CMASI::AbstractZone.i
 end WaterZone.i;
 
 
+end IMPACT;

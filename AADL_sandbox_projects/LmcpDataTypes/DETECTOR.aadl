@@ -32,13 +32,13 @@ data implementation ImageParameters.i
 		--size of the image in the y direction
 		ImageSizeY: data int32.i;
 		--geograhic location of the top left corner of the image
-		TopLeft: data Location3D.i;
+		TopLeft: data CMASI::Location3D.i;
 		--geograhic location of the top right corner of the image
-		TopRight: data Location3D.i;
+		TopRight: data CMASI::Location3D.i;
 		--geograhic location of the bottom left corner of the image
-		BottomLeft: data Location3D.i;
+		BottomLeft: data CMASI::Location3D.i;
 		--geograhic location of the bottom right corner of the image
-		BottomRight: data Location3D.i;
+		BottomRight: data CMASI::Location3D.i;
 end ImageParameters.i;
 
 data ImageDetection
@@ -83,7 +83,7 @@ data implementation GeoDetection.i
 		--cofidence in ???
 		Confidence: data real32.i;
 		--center of the detection in the geographics coordinates
-		Location: data Location3D.i;
+		Location: data CMASI::Location3D.i;
 end GeoDetection.i;
 
 data GeoDetections
@@ -98,5 +98,7 @@ data implementation GeoDetections.i
 		--list of detections
 		GeoDetections: data GeoDetection.i {Data_Model::Data_Representation => Array;};
 end GeoDetections.i;
+
+end DETECTOR;
 
 

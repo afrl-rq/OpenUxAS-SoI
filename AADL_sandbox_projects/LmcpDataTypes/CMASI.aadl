@@ -580,7 +580,7 @@ data implementation EntityState.i
 		--(CommandID) is being executed.
 		CurrentCommand: data int64.i;
 		--The current mode for this vehicle.
-		Mode: data NavigationMode.i;
+		Moode: data NavigationMode.i;
 		--Tasks that this entity is currently executing. An empty list indicates no associated
 		--tasks. The task number should coincide with the task number in the task request.
 		--For instance, if a waypoint is associated with a search task, then the task number
@@ -1462,4 +1462,5 @@ data implementation PayloadStowAction.i
 		PayloadID: data int64.i;
 end PayloadStowAction.i;
 
+end CMASI;
 

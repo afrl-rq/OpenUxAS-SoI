@@ -14,7 +14,7 @@ end CommTransferTask;
 data implementation CommTransferTask.i extends CMASI::Task.i
 	subcomponents
 		--Location of node with which to establish comm
-		CommLocation: data Location3D.i;
+		CommLocation: data CMASI::Location3D.i;
 		--ID of comunicating entity
 		CommEntityID: data int64.i;
 		--Communication timeout at this location
@@ -61,3 +61,4 @@ data implementation MeetMeTask.i extends UXCOMM::CommTransferTask.i
 end MeetMeTask.i;
 
 
+end UXCOMM;

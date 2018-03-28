@@ -37,7 +37,7 @@ data implementation RendezvousTask.i extends CMASI::Task.i
 		--If 'MultiLocationRendezvous' is false, all vehicles will meet at this location
 		--simultaneously. When 'MultiLocationRendezvous' is true, Location is allowed to
 		--be null as 'RendezvousStates' will override the single location behavior.
-		Location: data Location3D.i;
+		Location: data CMASI::Location3D.i;
 		--Rendezvous location. All vehicles will arrive with this heading simultaneously
 		--unless 'MultiLocationRendezvous' is set to 'true'.
 		Heading: data real32.i;
@@ -63,7 +63,7 @@ data implementation PlanningState.i
 		EntityID: data int64.i;
 		--Position of this entity for the plan. A valid PlanningState must define PlanningPosition
 		--(null not allowed).
-		PlanningPosition: data Location3D.i;
+		PlanningPosition: data CMASI::Location3D.i;
 		--Heading of this entity for the plan
 		PlanningHeading: data real32.i;
 end PlanningState.i;
@@ -105,7 +105,7 @@ data implementation CoordinatedAutomationRequest.i
 		MaximumResponseTime: data int64.i;
 		--Original automation request without a unique identifier. A valid CoordinatedAutomationRequest
 		--must define OriginalRequest (null not allowed).
-		OriginalRequest: data AutomationRequest.i;
+		OriginalRequest: data CMASI::AutomationRequest.i;
 		--The initial states of entities used in planning. Note: if an eligible entity
 		--does not have a PlanningState, then it must be obtained from the entity in an
 		--{@link AssignmentCoordination} message.
@@ -122,7 +122,7 @@ data implementation TaskAutomationRequest.i
 		RequestID: data int64.i;
 		--Original automation request without a unique identifier. A valid TaskAutomationRequest
 		--must define OriginalRequest (null not allowed).
-		OriginalRequest: data AutomationRequest.i;
+		OriginalRequest: data CMASI::AutomationRequest.i;
 		--If this boolean is true, then the resulting plans based on this automation request
 		--will not be directly implemented, for example, tasks should not expect the waypoints
 		--generated for this request to be active
@@ -144,7 +144,7 @@ data implementation TaskAutomationResponse.i
 		ResponseID: data int64.i;
 		--Original automation request without a unique identifier. A valid TaskAutomationResponse
 		--must define OriginalResponse (null not allowed).
-		OriginalResponse: data AutomationResponse.i;
+		OriginalResponse: data CMASI::AutomationResponse.i;
 		--The final states of entities when the plan is completed.
 		FinalStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
 end TaskAutomationResponse.i;
@@ -159,7 +159,7 @@ data implementation UniqueAutomationRequest.i
 		RequestID: data int64.i;
 		--Original automation request without a unique identifier. A valid UniqueAutomationRequest
 		--must define OriginalRequest (null not allowed).
-		OriginalRequest: data AutomationRequest.i;
+		OriginalRequest: data CMASI::AutomationRequest.i;
 		--If this boolean is true, then the resulting plans based on this automation request
 		--will not be directly implemented, for example, tasks should not expect the waypoints
 		--generated for this request to be active
@@ -181,7 +181,7 @@ data implementation UniqueAutomationResponse.i
 		ResponseID: data int64.i;
 		--Original automation request without a unique identifier. A valid UniqueAutomationResponse
 		--must define OriginalResponse (null not allowed).
-		OriginalResponse: data AutomationResponse.i;
+		OriginalResponse: data CMASI::AutomationResponse.i;
 		--The final states of entities when the plan is completed.
 		FinalStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
 end UniqueAutomationResponse.i;
@@ -211,7 +211,7 @@ data implementation FootprintRequest.i
 		VehicleID: data int64.i;
 		--Camera wavelength to be considered. If list is empty, planner should plan for
 		--all available sensors on each entity
-		EligibleWavelengths: data WavelengthBand.i {Data_Model::Data_Representation => Array;};
+		EligibleWavelengths: data CMASI::WavelengthBand.i {Data_Model::Data_Representation => Array;};
 		--Desired ground sample distance for an eligible sensor. If list is empty, then
 		--footprint calculation uses the max ground sample distance for the specified altitude.
 		GroundSampleDistances: data real32.i {Data_Model::Data_Representation => Array;};
@@ -256,7 +256,7 @@ data implementation SensorFootprint.i
 		--Ground sample distance obtained with this sensor footprint
 		AchievedGSD: data real32.i;
 		--Sensor wavelength used applicable to this footprint calculation
-		CameraWavelength: data WavelengthBand.i;
+		CameraWavelength: data CMASI::WavelengthBand.i;
 		--Distance out front of the entity to the leading edge
 		HorizontalToLeadingEdge: data real32.i;
 		--Distance out front of the entity to the trailing edge
@@ -304,7 +304,7 @@ data implementation TaskImplementationRequest.i
 		VehicleID: data int64.i;
 		--Initial position of entity before task. A valid TaskImplementationRequest must
 		--define StartPosition (null not allowed).
-		StartPosition: data Location3D.i;
+		StartPosition: data CMASI::Location3D.i;
 		--Initial heading of entity before task
 		StartHeading: data real32.i;
 		--Time when vehicle is at the starting location
@@ -344,10 +344,10 @@ data implementation TaskImplementationResponse.i
 		--Vehicle ID
 		VehicleID: data int64.i;
 		--Waypoints that implement this task for the indicated vehicle
-		TaskWaypoints: data Waypoint.i {Data_Model::Data_Representation => Array;};
+		TaskWaypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
 		--Vehicle location when this task is complete. A valid TaskImplementationResponse
 		--must define FinalLocation (null not allowed).
-		FinalLocation: data Location3D.i;
+		FinalLocation: data CMASI::Location3D.i;
 		--Vehicle heading when this task is complete
 		FinalHeading: data real32.i;
 		--Time when vehicle is at the final location
@@ -447,12 +447,12 @@ data implementation TaskOption.i
 		Cost: data int64.i;
 		--Start location entering the option. A valid TaskOption must define StartLocation
 		--(null not allowed).
-		StartLocation: data Location3D.i;
+		StartLocation: data CMASI::Location3D.i;
 		--Start heading entering the option
 		StartHeading: data real32.i;
 		--Ending location for this option. A valid TaskOption must define EndLocation (null
 		--not allowed).
-		EndLocation: data Location3D.i;
+		EndLocation: data CMASI::Location3D.i;
 		--Ending heading for this option
 		EndHeading: data real32.i;
 end TaskOption.i;
@@ -581,3 +581,4 @@ data implementation CancelTask.i
 end CancelTask.i;
 
 
+end UXTASKS;
