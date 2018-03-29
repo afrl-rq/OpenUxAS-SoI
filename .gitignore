@@ -35,3 +35,6 @@ examples/**/datawork/**
 # Visual Studio
 /.vs
 /regen-temp
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json
