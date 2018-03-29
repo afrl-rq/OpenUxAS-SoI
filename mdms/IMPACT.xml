@@ -48,7 +48,7 @@
 <MDM>
     <SeriesName>IMPACT</SeriesName>
     <Namespace>afrl/impact</Namespace>
-    <Version>13</Version>
+    <Version>14</Version>
     
     <EnumList>
         
@@ -322,26 +322,6 @@
             <!-- ID of the first waypoint in the plan. -->
             <Field Name="FirstWaypoint" Type="int64"/>
         </Struct>
-
-        <!-- Component heartbeat expected to be sent out @ 1Hz-->
-        <Struct Name="ImpactHeartbeat" >
-        <!-- Label of system component sending heartbeat -->
-            <Field Name="ComponentLabel" Type="string" />
-            <!-- Time at which this heatbeat was sent (milliseconds since 1 Jan 1970 00:00 GMT) -->
-            <Field Name="HeartbeatTime" Type="int64" Units="milliseconds"/>
-        </Struct>
-        
-        <!-- Component Join -->
-        <Struct Name="ImpactComponentJoin" >
-            <!-- Label of component joining network -->
-            <Field Name="ComponentLabel" Type="string" />
-        </Struct>
-        
-        <!-- Component Leave -->
-        <Struct Name="ImpactComponentLeave" >
-            <!-- Label of component leaving network -->
-            <Field Name="ComponentLabel" Type="string" />
-        </Struct>
         
         <!-- Data structure for associating a vehicle to a particular altitude and speed -->
         <Struct Name="SpeedAltPair" >
@@ -551,7 +531,7 @@
             surveillance relative to 'SupportedEntityID's location on route 'RouteID' -->
             <Field Name="StandoffDistance" Type="real32" Units="meters" Default="100" />
         </Struct>
-
+		
         <!-- Requests the latest configurations for vehicles in the system -->
         <Struct Name="ConfigurationRequest">
             <!-- Vehicle IDs for which the corresponding configuration should be sent. If the list is empty, all available configurations should be sent in response. -->
@@ -576,5 +556,10 @@
         should not enter this zone. -->
         <Struct Name="WaterZone" Extends="CMASI/AbstractZone" />
         
+		<Struct Name="PayloadDropTask" Extends="Task" Series="CMASI">
+		    <Field Name="DropLocation" Type="Location3D" Series="CMASI" Optional="false" />
+		    <Field Name="BDALocation" Type="Location3D" Series="CMASI" Optional="false" />
+		</Struct>
+		
  </StructList>
 </MDM>
