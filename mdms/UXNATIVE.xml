@@ -196,5 +196,13 @@
             <Field Name="ReportedTime" Type="int64" Units="milliseconds" />
         </Struct>
 
+        <!-- Overrides speed commands from waypoints -->
+        <Struct Name="SpeedOverrideAction" Extends="CMASI/VehicleAction" >
+            <!-- ID of vehicle for which speed should be overridden -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Commanded Speed -->
+            <Field Name="Speed" Type="real32" Units="mps"/>
+        </Struct>
+
  </StructList>
 </MDM>
