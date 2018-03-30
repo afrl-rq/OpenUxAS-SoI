@@ -224,7 +224,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
             bool isOnTask = std::find(entityState->getAssociatedTasks().begin(),
                                       entityState->getAssociatedTasks().end(),
                                       m_task->getTaskID()) != entityState->getAssociatedTasks().end();
-            if (isOnTask || m_isTaskAlwayActive)
+            if (isOnTask)
             {
                 activeEntityState(entityState); //virtual
                 if (m_activeEntities.find(entityState->getID()) == m_activeEntities.end())
@@ -859,7 +859,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                         isFirstWaypoint = false;
 
                                         // add task active waypoints
-                                        if ((!isRouteFromLastToTask || m_isMakeTransitionWaypointsActive) && !currentAutomationRequest->getSandBoxRequest())
+                                        if ((!isRouteFromLastToTask) && !currentAutomationRequest->getSandBoxRequest())
                                         {
                                             waypoint->getAssociatedTasks().push_back(m_task->getTaskID());
                                             if ((itTaskOptionClass->second->m_firstTaskActiveWaypointID < 0) && (!isRouteFromLastToTask) && (!currentAutomationRequest->getSandBoxRequest()))

@@ -360,8 +360,6 @@ namespace task
         std::unordered_set<int64_t> m_assignedVehicleIds;
         /*! \brief the last active task waypoint passed by the vehicle*/
         std::unordered_map<int64_t,int64_t> m_assignedVehicleIdVsLastTaskWaypoint;
-        /*! \brief used to cause the task to always call the activeEntityState virtual method when receiving a airvehiclestate*/
-        bool m_isTaskAlwayActive{false};
         /*! \brief the option that was assigned to the vehicle*/
         std::unordered_map<int64_t,int64_t> m_assignedVehicleIdVsAssignedOptionId;
         /*! \brief  a container for <B><i>TaskOptionClass</i></B>es used to construct
