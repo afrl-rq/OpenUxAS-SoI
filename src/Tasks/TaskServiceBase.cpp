@@ -224,7 +224,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
             bool isOnTask = std::find(entityState->getAssociatedTasks().begin(),
                                       entityState->getAssociatedTasks().end(),
                                       m_task->getTaskID()) != entityState->getAssociatedTasks().end();
-            if (isOnTask)
+            if (isOnTask || m_isTaskAlwayActive)
             {
                 activeEntityState(entityState); //virtual
                 if (m_activeEntities.find(entityState->getID()) == m_activeEntities.end())
