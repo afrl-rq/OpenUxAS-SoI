@@ -23,6 +23,8 @@
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h" //this is an exemplar
 #include "afrl/cmasi/AirVehicleState.h"
+#include "BandsRegion.h"
+#include "Interval.h"
 
 #include <iostream>     // std::cout, cerr, etc
 #include <cmath>    //cmath::cos, sin, etc
@@ -417,10 +419,67 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;
                 if (!detectedViolations.empty())
                 {
-                    for (auto itViolations = detectedViolations.begin(); itViolations != detectedViolations.end(); itViolations++)
+                    for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)
+                    {
+                        larcfm::Interval iv = m_daa_bands.track(ii,"deg");
+                        double lower_trk = iv.low;
+                        double upper_trk = iv.up;
+                        std::array<double,2> temp_array;
+                        temp_array[1] = lower_trk;
+                        temp_array[2] = upper_trk;
+                        larcfm::BandsRegion::Region regionType = m_daa_bands.trackRegion(ii);
+                        if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
+                        {
+                            m_nogo_trk_deg.push_back(temp_array);
+                        }
+                    }
+                    for (int ii = 0; ii < m_daa_bands.groundSpeedLength();++ii)
+                    {
+                        larcfm::Interval iv = m_daa_bands.groundSpeed(ii, "mps");
+                        double lower_gs = iv.low;
+                        double upper_gs =iv.up;
+                        std::array<double,2> temp_array;
+                        temp_array[1] = lower_gs;
+                        temp_array[2] = upper_gs;
+                        larcfm::BandsRegion::Region regionType = m_daa_bands.groundSpeedRegion(ii);
+                        if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
+                        {
+                            m_nogo_gs_mps.push_back(temp_array);
+                        }
+                    }
+                    for (int ii =0; ii < m_daa_bands.verticalSpeedLength();++ii)
+                    {
+                        larcfm::Interval iv = m_daa_bands.verticalSpeed(ii, "mps");
+                        double lower_vs = iv.low;
+                        double upper_vs = iv.up;
+                        std::array<double,2> temp_array;
+                        temp_array[1] = lower_vs;
+                        temp_array[2] = upper_vs;
+                        larcfm::BandsRegion::Region regionType = m_daa_bands.verticalSpeedRegion(ii);
+                        if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
+                        {
+                            m_nogo_vs_mps.push_back(temp_array);
+                        }
+                    }
+                    for (int ii = 0; ii < m_daa_bands.altitudeLength(); ++ii)
+                    {
+                        larcfm::Interval iv = m_daa_bands.altitude(ii, "m");
+                        double lower_alt = iv.low;
+                        double upper_alt = iv.up;
+                        std::array<double,2> temp_array;
+                        temp_array[1] = lower_alt;
+                        temp_array[2] = upper_alt;
+                        larcfm::BandsRegion::Region regionType = m_daa_bands.altitudeRegion(ii);
+                        if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
+                        {
+                            m_nogo_alt_m.push_back(temp_array);
+                        }
+                    }
+                    for (auto itViolations = detectedViolations.cbegin(); itViolations != detectedViolations.cend(); itViolations++)
                     {
                         std::cout << "Entity " << m_entityId << " will violate the well clear volume with Entity " << itViolations->first << " in " 
-                                << itViolations->second <<" seconds!!" << std::endl;
+                                << itViolations->second <<" seconds!!" << std::endl<<std::endl;
+                       // std::cout << m_nogo_trk_deg <<  std::endl;
                     }
                 }
                 else 
