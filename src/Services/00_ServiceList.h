@@ -90,6 +90,7 @@
 #include "LoiterTaskService.h"
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW TASK HEADERS
+#include "RendezvousTask.h"
 
 
 // test
@@ -164,6 +165,7 @@
 {auto svc = uxas::stduxas::make_unique<uxas::service::task::LoiterTaskService>();}
 
 // DO NOT REMOVE - USED TO AUTOMATICALLY ADD NEW TASK DUMMY INSTANCES
+{auto svc = uxas::stduxas::make_unique<uxas::service::task::RendezvousTask>();}
 
 
 // test
