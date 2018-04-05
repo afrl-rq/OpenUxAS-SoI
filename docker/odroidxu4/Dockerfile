@@ -26,6 +26,7 @@ RUN cd /opt/arm-buildroot-linux-gnueabihf && sh relocate-sdk.sh
 
 RUN apt-get update && apt-get install -y \
   build-essential \
+  ccache \
   curl \
   git \
   ninja-build \
@@ -46,3 +47,4 @@ WORKDIR /src/OpenUxAS
 VOLUME /src/OpenUxAS
 
 ENV PKG_CONFIG_PATH /opt/arm-buildroot-linux-gnueabihf/arm-buildroot-linux-gnueabihf/sysroot/usr/lib/pkgconfig
+ENV CCACHE_DIR /src/OpenUxAS/.ccache

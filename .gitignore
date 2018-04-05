@@ -37,3 +37,4 @@ examples/**/datawork/**
 /regen-temp
 /build_cross
 /sdcard.img
+/.ccache
