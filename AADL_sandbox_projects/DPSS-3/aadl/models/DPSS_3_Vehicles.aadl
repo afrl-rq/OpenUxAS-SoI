@@ -338,6 +338,39 @@ public
 				(stable and not (pre(stable))) => 
 					(time < 2.0*DPSS_Constants.Time_to_travel_full_length);
 			
+			lemma "Observer: A 'worst time' case":
+				(stable and not (pre(stable))) => 
+					(time < 2.0*DPSS_Constants.Time_to_travel_full_length - 0.001);
+			
+			lemma "(Invalid) Worst case time => UAVs are clustered close to an endpoint and heading in the same direction":
+				(stable and not pre(stable) and (time > 2.0*DPSS_Constants.Time_to_travel_full_length - 0.001))
+				=> ((--Initially, all UAVs are heading to the right
+						DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
+					--and the UAVs are located close together on the left end of the perimeter
+					and DPSS_Node_Lib.initial_value_true(pos_UAV3 <= 0.001))
+					or (
+					--Initially, all UAVs are heading to the left
+						DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
+					--and the UAVs are located close together on the right end of the perimeter
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 >= 9.999)
+					));
+				
+			lemma "Worst case time => UAVs are clustered close to an endpoint":
+				(stable and not pre(stable) and (time > 2.0*DPSS_Constants.Time_to_travel_full_length - 0.001))
+				=> ((--Initially, the UAVs are located close together on the left end of the perimeter
+						DPSS_Node_Lib.initial_value_true(pos_UAV3 <= 0.001)
+					-- and the rightmost UAV is heading right
+					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1))
+				or (
+					--Initially, the UAVs are located close together on the right end of the perimeter
+						DPSS_Node_Lib.initial_value_true(pos_UAV1 >= 9.999)
+					-- and the leftmost UAV is heading left
+					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
+					));
 		**};
 		
 	end DPSS_3_Vehicles.Impl;
