@@ -17,7 +17,7 @@ bool RouteExtension::ExtendPath(std::vector<afrl::cmasi::Waypoint*>& wplist, int
     size_t index = 0;
     double vel = wplist[index]->getSpeed();
     if(vel < 1e-4) return false;
-    double extendlen = (extendTime_ms+0.0)/1000.0/vel;
+    double extendlen = (extendTime_ms+0.0)/1000.0*vel;
     double minlen = RequiredSegmentLength(extendlen, R);
 
     FlatEarth flatEarth;
@@ -37,7 +37,7 @@ bool RouteExtension::ExtendPath(std::vector<afrl::cmasi::Waypoint*>& wplist, int
         {
             // update extend length based on changing speed
             vel = wplist[index]->getSpeed();
-            extendlen = (extendTime_ms+0.0)/1000.0/vel;
+            extendlen = (extendTime_ms+0.0)/1000.0*vel;
             minlen = RequiredSegmentLength(extendlen, R);
         }
 
