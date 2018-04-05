@@ -1,11 +1,11 @@
-package DPSS_2_Vehicles_LearnP_andLeftBdry_Pkg
+package DPSS_2_Vehicles_LearnN_Pkg
 public
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;
 	with UAV_Pkg;
 	
-	system DPSS_2_Vehicles_LearnP_andLeftBdry
+	system DPSS_2_Vehicles_LearnN
 		features
 			-----------------------------------------------------
 			--INPUTS
@@ -223,9 +223,9 @@ public
 			
 		**};
 		
-	end DPSS_2_Vehicles_LearnP_andLeftBdry;
+	end DPSS_2_Vehicles_LearnN;
 
-	system implementation DPSS_2_Vehicles_LearnP_andLeftBdry.Impl
+	system implementation DPSS_2_Vehicles_LearnN.Impl
 		subcomponents
 			UAV1: system UAV_Pkg::UAV;
 			UAV2: system UAV_Pkg::UAV;
@@ -352,6 +352,6 @@ public
 								
 		**};
 		
-	end DPSS_2_Vehicles_LearnP_andLeftBdry.Impl;
+	end DPSS_2_Vehicles_LearnN.Impl;
 
-end DPSS_2_Vehicles_LearnP_andLeftBdry_Pkg;
+end DPSS_2_Vehicles_LearnN_Pkg;
