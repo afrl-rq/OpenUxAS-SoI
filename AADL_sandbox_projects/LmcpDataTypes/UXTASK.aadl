@@ -1,0 +1,584 @@
+package UXTASK
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data AssignmentCoordinatorTask extends CMASI::Task
+end AssignmentCoordinatorTask;
+
+--This task facilitates assignment coordination. When a {@link CoordinatedAutomationRequest}
+--message is received, the {@link AssignmentCoordinatorTask} task waits for up to
+--{@link MaximumResponseTime} for {@link AssignmentCoordination} from all the other
+--entities in the EligibleEtities list of the {@link CoordinatedAutomationRequest}
+--message. Once states have been received for all the EligibleEntities, they are
+--used for planning and assignmnet for the specified {@link CoordinatedAutomationRequest}
+data implementation AssignmentCoordinatorTask.i extends CMASI::Task.i
+end AssignmentCoordinatorTask.i;
+
+data RendezvousTask extends CMASI::Task
+end RendezvousTask;
+
+--This task will synchronize all involved vehicles at a specified location (or set
+--of locations) at the same time. Loiter patterns are used to ensure that when the
+--latest vehicle arrives, the others will be in the proper positions and orientations
+--to satisfy the location specification simultaneously.
+data implementation RendezvousTask.i extends CMASI::Task.i
+	subcomponents
+		--Number of vehicles that will participate in the rendezvous. To restrict the available
+		--participants, use the 'EligibleEntities' field. If the number of participants
+		--is exactly equal to the number of eligible entities, then this task will only
+		--produce a single option that ensures those exact entities meet at the rendezvous
+		--location.
+		NumberOfParticipants: data byte.i;
+		--If 'MultiLocationRendezvous' is false, all vehicles will meet at this location
+		--simultaneously. When 'MultiLocationRendezvous' is true, Location is allowed to
+		--be null as 'RendezvousStates' will override the single location behavior.
+		Location: data CMASI::Location3D.i;
+		--Rendezvous location. All vehicles will arrive with this heading simultaneously
+		--unless 'MultiLocationRendezvous' is set to 'true'.
+		Heading: data real32.i;
+		--Flag for specifying complex rendezvous arrangements. When 'true' vehicles must
+		--arrive according to the list of specified locations.
+		MultiLocationRendezvous: data bool.i;
+		--The desired rendezvous states of the entities. If the EntityID fields are set
+		--to 0, then any eligible vehicle can be used at that location. Only used when
+		--'MultiLocationRendezvous' is set to 'true'. If the EntityID fields are non-zero,
+		--they must correspond to an eligible vehicle and only that particular entity will
+		--be used at that position.
+		RendezvousStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end RendezvousTask.i;
+
+data PlanningState
+end PlanningState;
+
+--The state of an entity to be used as the initial planning state when constructing
+--assignments/plans.
+data implementation PlanningState.i
+	subcomponents
+		--Identifier of the entitiy
+		EntityID: data int64.i;
+		--Position of this entity for the plan. A valid PlanningState must define PlanningPosition
+		--(null not allowed).
+		PlanningPosition: data CMASI::Location3D.i;
+		--Heading of this entity for the plan
+		PlanningHeading: data real32.i;
+end PlanningState.i;
+
+data AssignmentCoordination
+end AssignmentCoordination;
+
+--This messages is used to syncronize the entity states, used for planning, to facilitate
+--assignment coordination. When an entity receives a {@link CoordinatedAutomationRequest}
+--message it's {@link AssignmentCoordinatorTask} task sends out a AssignmentCoordination
+--message with the entity's planning state.
+data implementation AssignmentCoordination.i
+	subcomponents
+		--Identifier of the associated CoordinatedAutomationRequest
+		CoordinatedAutomationRequestID: data int64.i;
+		--The state of the entity that will used for planning/assignment of the given automation
+		--request. A valid AssignmentCoordination must define PlanningState (null not allowed).
+		PlanningState: data PlanningState.i;
+end AssignmentCoordination.i;
+
+data CoordinatedAutomationRequest
+end CoordinatedAutomationRequest;
+
+--A CMASI automation request (with Identifier) that requires coordination among the
+--eligible entities. Note: entities must have a {@link AssignmentCoordinatorTask}
+--task running to utilize this this message.
+data implementation CoordinatedAutomationRequest.i
+	subcomponents
+		--Identifier for tracking requests and coordination
+		RequestID: data int64.i;
+		--This is the maximum time to wait for {@link AssignmentCoordination} messages
+		--from the other eligible entities, before proceeding with the assignment. Note:
+		--the value of -1 indicates that there is no limit. If there are no eligble entites
+		--listed in the {@link CoordinatedAutomationRequest}, then {@link MaximumResponseTime}
+		--is the amount of time the {@link AssignmentCoordinatorTask} waits for {@link
+		--AssignmentCoordination} messages before proceeding with the assignment. Note:
+		--if there are no eligble entities and the {@link MaximumResponseTime} is -1, then
+		--the {@link AssignmentCoordination} proceeds with the assignment immediately.
+		MaximumResponseTime: data int64.i;
+		--Original automation request without a unique identifier. A valid CoordinatedAutomationRequest
+		--must define OriginalRequest (null not allowed).
+		OriginalRequest: data CMASI::AutomationRequest.i;
+		--The initial states of entities used in planning. Note: if an eligible entity
+		--does not have a PlanningState, then it must be obtained from the entity in an
+		--{@link AssignmentCoordination} message.
+		PlanningStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end CoordinatedAutomationRequest.i;
+
+data TaskAutomationRequest
+end TaskAutomationRequest;
+
+--A CMASI automation request (with Identifier) that is sent by tasks.
+data implementation TaskAutomationRequest.i
+	subcomponents
+		--Identifier for tracking requests and responses
+		RequestID: data int64.i;
+		--Original automation request without a unique identifier. A valid TaskAutomationRequest
+		--must define OriginalRequest (null not allowed).
+		OriginalRequest: data CMASI::AutomationRequest.i;
+		--If this boolean is true, then the resulting plans based on this automation request
+		--will not be directly implemented, for example, tasks should not expect the waypoints
+		--generated for this request to be active
+		SandBoxRequest: data bool.i;
+		--The initial states of entities used in planning. Note: if an eligible entity
+		--does not have a PlanningState, then it's most recent EntityState is used for
+		--plannning.
+		PlanningStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end TaskAutomationRequest.i;
+
+data TaskAutomationResponse
+end TaskAutomationResponse;
+
+--A CMASI automation response (with Identifier) that is sent back to tasks.
+data implementation TaskAutomationResponse.i
+	subcomponents
+		--Identifier for tracking requests and responses. Must match RequestID from corresponding
+		--TaskAutomationRequest
+		ResponseID: data int64.i;
+		--Original automation request without a unique identifier. A valid TaskAutomationResponse
+		--must define OriginalResponse (null not allowed).
+		OriginalResponse: data CMASI::AutomationResponse.i;
+		--The final states of entities when the plan is completed.
+		FinalStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end TaskAutomationResponse.i;
+
+data UniqueAutomationRequest
+end UniqueAutomationRequest;
+
+--Patches CMASI automation request to add a unique identifier
+data implementation UniqueAutomationRequest.i
+	subcomponents
+		--Identifier for tracking requests and responses
+		RequestID: data int64.i;
+		--Original automation request without a unique identifier. A valid UniqueAutomationRequest
+		--must define OriginalRequest (null not allowed).
+		OriginalRequest: data CMASI::AutomationRequest.i;
+		--If this boolean is true, then the resulting plans based on this automation request
+		--will not be directly implemented, for example, tasks should not expect the waypoints
+		--generated for this request to be active
+		SandBoxRequest: data bool.i;
+		--The initial states of entities used in planning. Note: if an eligible entity
+		--does not have a PlanningState, then it's most recent EntityState is used for
+		--plannning.
+		PlanningStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end UniqueAutomationRequest.i;
+
+data UniqueAutomationResponse
+end UniqueAutomationResponse;
+
+--Patches CMASI automation response to add a unique identifier
+data implementation UniqueAutomationResponse.i
+	subcomponents
+		--Identifier for tracking requests and responses. Must match RequestID from corresponding
+		--UniqueAutomationRequest
+		ResponseID: data int64.i;
+		--Original automation request without a unique identifier. A valid UniqueAutomationResponse
+		--must define OriginalResponse (null not allowed).
+		OriginalResponse: data CMASI::AutomationResponse.i;
+		--The final states of entities when the plan is completed.
+		FinalStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end UniqueAutomationResponse.i;
+
+data SensorFootprintRequests
+end SensorFootprintRequests;
+
+--Request to compute a set of sensor footprints from possible vehicles in the system
+data implementation SensorFootprintRequests.i
+	subcomponents
+		--Request ID for correlating to response
+		RequestID: data int64.i;
+		--Request ID for correlating to response
+		Footprints: data FootprintRequest.i {Data_Model::Data_Representation => Array;};
+end SensorFootprintRequests.i;
+
+data FootprintRequest
+end FootprintRequest;
+
+--Request to compute potential eligible sensor footprint for a single vehicle at
+--various GSDs and altitudes from available sensors on the vehicle
+data implementation FootprintRequest.i
+	subcomponents
+		--ID corresponding to this specific footprint request
+		FootprintRequestID: data int64.i;
+		--Single vehicle to be considered for sensor request.
+		VehicleID: data int64.i;
+		--Camera wavelength to be considered. If list is empty, planner should plan for
+		--all available sensors on each entity
+		EligibleWavelengths: data CMASI::WavelengthBand.i {Data_Model::Data_Representation => Array;};
+		--Desired ground sample distance for an eligible sensor. If list is empty, then
+		--footprint calculation uses the max ground sample distance for the specified altitude.
+		GroundSampleDistances: data real32.i {Data_Model::Data_Representation => Array;};
+		--AGL Altitude to consider during sensor information calculation. If 'AglAltitudes'
+		--list is empty, sensor planner should use nominal altitude from entity configurations
+		AglAltitudes: data real32.i {Data_Model::Data_Representation => Array;};
+		--Desired camera elevation angles. If list is empty, then uses an optimal elevation
+		--angle for achieving max GSD
+		ElevationAngles: data real32.i {Data_Model::Data_Representation => Array;};
+end FootprintRequest.i;
+
+data SensorFootprint
+end SensorFootprint;
+
+--Description of a sensor footprint
+data implementation SensorFootprint.i
+	subcomponents
+		--Response ID that matches corresponding request ID. Note that multiple responses
+		--may be generated from a single request (such as multiple cameras which all meet
+		--the specification). Each response must contain the matching request ID in it's
+		--FootprintResponseID field.
+		FootprintResponseID: data int64.i;
+		--Vehicle for which the footprint calculation applies
+		VehicleID: data int64.i;
+		--Camera from which settings (such as zoom and field of view) were used in the
+		--footprint calculation
+		CameraID: data int64.i;
+		--Gimbal from which parameters such as allowable steering angles were used in the
+		--footprint calculation
+		GimbalID: data int64.i;
+		--The selected horizontal field of view of the camera necessary to get the reported
+		--footprint (equivalent to zoom)
+		HorizontalFOV: data real32.i;
+		--Altitude above ground level for which the footprint was calculated
+		AglAltitude: data real32.i;
+		--Commanded gimbal elevation to achieve sensor footprint
+		GimbalElevation: data real32.i;
+		--Aspect ratio (width/height) of the camera image used for footprint calculation.
+		--Note: combine with horizontal field of view to determine camera vertical field
+		--of view.
+		AspectRatio: data real32.i;
+		--Ground sample distance obtained with this sensor footprint
+		AchievedGSD: data real32.i;
+		--Sensor wavelength used applicable to this footprint calculation
+		CameraWavelength: data CMASI::WavelengthBand.i;
+		--Distance out front of the entity to the leading edge
+		HorizontalToLeadingEdge: data real32.i;
+		--Distance out front of the entity to the trailing edge
+		HorizontalToTrailingEdge: data real32.i;
+		--Distance out front of the entity to the center of the footprint
+		HorizontalToCenter: data real32.i;
+		--Width of the footprint at the vertical center
+		WidthCenter: data real32.i;
+		--At the prescribed settings (e.g. altitude, elevation angle, etc) the distance
+		--from the camera to the center of the footprint
+		SlantRangeToCenter: data real32.i;
+end SensorFootprint.i;
+
+data SensorFootprintResponse
+end SensorFootprintResponse;
+
+--Response to a Sensor Footprint Request containing all sensor footprint information
+data implementation SensorFootprintResponse.i
+	subcomponents
+		--ID matching initial request ID
+		ResponseID: data int64.i;
+		--All sensor footprints calculated during request
+		Footprints: data SensorFootprint.i {Data_Model::Data_Representation => Array;};
+end SensorFootprintResponse.i;
+
+data TaskImplementationRequest
+end TaskImplementationRequest;
+
+--Request to generate waypoints enroute to the task as well as to complete a task.
+--From a given start position and heading, a task must plan enroute waypoints to
+--reach the task and then append task waypoints for computing the task and then report
+--final position and heading of the vehicle.
+data implementation TaskImplementationRequest.i
+	subcomponents
+		--Request ID for correlating to matching response
+		RequestID: data int64.i;
+		--This task implementation request is part of fulfilling a unique automation request
+		CorrespondingAutomationRequestID: data int64.i;
+		--Starting waypoint ID that task must use when building response. Note that Plan
+		--Builder reserves all values greater than 1,000,000,000. Therefore all *internal*
+		--task waypoints must be less than 1e9 and can be obtained from the reported waypoint
+		--number by "waypoint->getNumber()%1e9" .
+		StartingWaypointID: data int64.i;
+		--Assigned vehicle ID
+		VehicleID: data int64.i;
+		--Initial position of entity before task. A valid TaskImplementationRequest must
+		--define StartPosition (null not allowed).
+		StartPosition: data CMASI::Location3D.i;
+		--Initial heading of entity before task
+		StartHeading: data real32.i;
+		--Time when vehicle is at the starting location
+		StartTime: data int64.i;
+		--ID for full region in which entity should plan
+		RegionID: data int64.i;
+		--Task ID to be completed
+		TaskID: data int64.i;
+		--Using option ID to complete this task
+		OptionID: data int64.i;
+		--Time before which this task cannot begin
+		TimeThreshold: data int64.i;
+		--Predicted locations and headings of all other entities at the point in the mission
+		--when this option is to be conducted.
+		NeighborLocations: data PlanningState.i {Data_Model::Data_Representation => Array;};
+end TaskImplementationRequest.i;
+
+data TaskImplementationResponse
+end TaskImplementationResponse;
+
+--Response to a final task implementation request (one for each vehicle assigned).
+--Note that in addition to calculating task waypoints that achieve that task purpose,
+--a task implementation also includes the enroute waypoints to get the vehicle(s)
+--to that task to be completed. Finally, an ending position and heading for the vehicle
+--is reported so that the next task in order will have a valid start position and
+--heading.
+data implementation TaskImplementationResponse.i
+	subcomponents
+		--Response ID that matches the initial request
+		ResponseID: data int64.i;
+		--This task implementation response is part of fulfilling a unique automation request
+		CorrespondingAutomationRequestID: data int64.i;
+		--Task ID
+		TaskID: data int64.i;
+		--Option ID that was selected for this task
+		OptionID: data int64.i;
+		--Vehicle ID
+		VehicleID: data int64.i;
+		--Waypoints that implement this task for the indicated vehicle
+		TaskWaypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+		--Vehicle location when this task is complete. A valid TaskImplementationResponse
+		--must define FinalLocation (null not allowed).
+		FinalLocation: data CMASI::Location3D.i;
+		--Vehicle heading when this task is complete
+		FinalHeading: data real32.i;
+		--Time when vehicle is at the final location
+		FinalTime: data int64.i;
+end TaskImplementationResponse.i;
+
+data AssignmentCostMatrix
+end AssignmentCostMatrix;
+
+--Matrix of costs consisting of: (1) costs from initial vehicle positions to all
+--task options; and (2) costs from each task option to every other task option
+data implementation AssignmentCostMatrix.i
+	subcomponents
+		--ID that matches this cost matrix with the appropriate unique automation request
+		CorrespondingAutomationRequestID: data int64.i;
+		--Over-arching task relationship description (directly from automation request).
+		--A process algebra string with only task IDs.
+		TaskLevelRelationship: data string.i;
+		--List of all tasks that this cost matrix includes
+		TaskList: data int64.i {Data_Model::Data_Representation => Array;};
+		--Operating region that was used during matrix calculation
+		OperatingRegion: data int64.i;
+		--Set of task-to-task timings for each requested vehicle. Assume 'T' max tasks
+		--[16], 'O' max options per task [8], 'V' max vehicles [16]: then max number of
+		--elements in matrix is 'V*T*O + (T*O)^2' [18432]
+		CostMatrix: data TaskOptionCost.i {Data_Model::Data_Representation => Array;};
+end AssignmentCostMatrix.i;
+
+data TaskOptionCost
+end TaskOptionCost;
+
+--Single task option cost for a particular vehicle
+data implementation TaskOptionCost.i
+	subcomponents
+		--Corresponding Vehicle ID
+		VehicleID: data int64.i;
+		--Initial task ID (if zero, corresponds to current vehicle location)
+		IntialTaskID: data int64.i;
+		--Initial task option
+		IntialTaskOption: data int64.i;
+		--Destination task ID
+		DestinationTaskID: data int64.i;
+		--Destination task option
+		DestinationTaskOption: data int64.i;
+		--Timing corresponding to travel between ('InitialTask' using 'InitialTaskOption')
+		--and ('DestinationTask' using 'DestinationTaskOption'). If time is less than zero,
+		--no feasible path exists between tasks.
+		TimeToGo: data int64.i;
+end TaskOptionCost.i;
+
+data TaskAssignment
+end TaskAssignment;
+
+--Representation of the assignment of entities to a task
+data implementation TaskAssignment.i
+	subcomponents
+		--Task ID
+		TaskID: data int64.i;
+		--Option ID that was selected for this task
+		OptionID: data int64.i;
+		--Vehicle that is assigned to this task
+		AssignedVehicle: data int64.i;
+		--Time before which this task cannot begin
+		TimeThreshold: data int64.i;
+		--Time that this task is assigned to be completed.
+		TimeTaskCompleted: data int64.i;
+end TaskAssignment.i;
+
+data TaskAssignmentSummary
+end TaskAssignmentSummary;
+
+--A completed assignment consisting of an <b>ordered</b> list of tasks
+data implementation TaskAssignmentSummary.i
+	subcomponents
+		--ID that matches this summary with the appropriate unique automation request
+		CorrespondingAutomationRequestID: data int64.i;
+		--Operating region which was considered during this assignment
+		OperatingRegion: data int64.i;
+		--Ordered list of tasks to be completed
+		TaskList: data TaskAssignment.i {Data_Model::Data_Representation => Array;};
+end TaskAssignmentSummary.i;
+
+data TaskOption
+end TaskOption;
+
+--Start/end locations and headings and cost for implementing the task from this configuration
+data implementation TaskOption.i
+	subcomponents
+		--Task ID
+		TaskID: data int64.i;
+		--ID for this option
+		OptionID: data int64.i;
+		--Eligible entities for completing this option with identical cost to complete.
+		--If list is empty, then all vehicles are assumed to be eligible.
+		EligibleEntities: data int64.i {Data_Model::Data_Representation => Array;};
+		--Cost to complete option in terms of time (given in milliseconds)
+		Cost: data int64.i;
+		--Start location entering the option. A valid TaskOption must define StartLocation
+		--(null not allowed).
+		StartLocation: data CMASI::Location3D.i;
+		--Start heading entering the option
+		StartHeading: data real32.i;
+		--Ending location for this option. A valid TaskOption must define EndLocation (null
+		--not allowed).
+		EndLocation: data CMASI::Location3D.i;
+		--Ending heading for this option
+		EndHeading: data real32.i;
+end TaskOption.i;
+
+data TaskPlanOptions
+end TaskPlanOptions;
+
+--Summary of available options to complete this task
+data implementation TaskPlanOptions.i
+	subcomponents
+		--ID that matches this message with the appropriate unique automation request
+		CorrespondingAutomationRequestID: data int64.i;
+		--Task ID
+		TaskID: data int64.i;
+		--Process algebra string encoding all of the different options
+		Composition: data string.i;
+		--List of options. NOTE for computational reasons, the larger the number of options,
+		--the much greater the computation
+		Options: data TaskOption.i {Data_Model::Data_Representation => Array;};
+end TaskPlanOptions.i;
+
+data TaskPause
+end TaskPause;
+
+--Place a task in a 'paused' state where it no longer sends commands to any entities
+data implementation TaskPause.i
+	subcomponents
+		--Task ID
+		TaskID: data int64.i;
+end TaskPause.i;
+
+data TaskResume
+end TaskResume;
+
+--Resumes execution of a task from it's paused state
+data implementation TaskResume.i
+	subcomponents
+		--Task ID
+		TaskID: data int64.i;
+		--Instead of resuming from paused task state, re-start the complete task
+		RestartCompletely: data bool.i;
+		--Instead of resuming from paused task state with the previously assigned entities,
+		--resume task with new assignment options. Only used when not null.
+		ReAssign: data TaskAssignment.i;
+end TaskResume.i;
+
+data TaskProgress
+end TaskProgress;
+
+--Reports the progress of the task
+data implementation TaskProgress.i
+	subcomponents
+		--Response ID that matches the task progress request
+		ResponseID: data int64.i;
+		--Task ID
+		TaskID: data int64.i;
+		--Percentage of progress on task
+		PercentComplete: data real32.i;
+		--Entities that are working this task
+		EntitiesEngaged: data int64.i {Data_Model::Data_Representation => Array;};
+end TaskProgress.i;
+
+data TaskProgressRequest
+end TaskProgressRequest;
+
+--Optional task progress query
+data implementation TaskProgressRequest.i
+	subcomponents
+		--Task progress request ID for properly matching corresponding response
+		RequestID: data int64.i;
+		--Task ID to report current progress
+		TaskID: data int64.i;
+end TaskProgressRequest.i;
+
+data TaskInitialized
+end TaskInitialized;
+
+--Task initialized message indicating that the corresponding task service is available
+--for use in automation requests
+data implementation TaskInitialized.i
+	subcomponents
+		--Task ID is initialized and ready for use in automation requests
+		TaskID: data int64.i;
+end TaskInitialized.i;
+
+data TaskActive
+end TaskActive;
+
+--Task Active message. Sent when task becomes active
+data implementation TaskActive.i
+	subcomponents
+		--Task ID that was just activated
+		TaskID: data int64.i;
+		--Entity ID that activated the task
+		EntityID: data int64.i;
+		--Time that this task was activated.
+		TimeTaskActivated: data int64.i;
+end TaskActive.i;
+
+data TaskComplete
+end TaskComplete;
+
+--Task complete message
+data implementation TaskComplete.i
+	subcomponents
+		--Task ID that was just completed
+		TaskID: data int64.i;
+		--Entity IDs that completed the task
+		EntitiesInvolved: data int64.i {Data_Model::Data_Representation => Array;};
+		--Time that this task was completed.
+		TimeTaskCompleted: data int64.i;
+end TaskComplete.i;
+
+data CancelTask
+end CancelTask;
+
+--Task cancel message
+data implementation CancelTask.i
+	subcomponents
+		--List of vehicle IDs that are directed to cancel tasks. If empty, all vehicles
+		--currently on a listed task will be directed to cancel.
+		Vehicles: data int64.i {Data_Model::Data_Representation => Array;};
+		--Task ID(s) to be removed from task lists of indicated vehicles. If empty, then
+		--only the current task is removed.
+		CanceledTasks: data int64.i {Data_Model::Data_Representation => Array;};
+end CancelTask.i;
+
+
+end UXTASKS;

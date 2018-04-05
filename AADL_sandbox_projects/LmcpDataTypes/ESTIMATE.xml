@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        Message definitions intruder position estimation given a road network instrumented with sensors.
+-->
+<MDM>
+    <SeriesName>ESTIMATE</SeriesName>
+    <Namespace>uxas/project/estimate</Namespace>
+    <Version>2</Version>
+
+	<EnumList>
+		
+		<!-- Possible status when querying UGS -->
+        <Enum Name="UgsStatus">
+            <Entry Name="Green" Value="0"/>
+            <Entry Name="Red" Value="1"/>
+        </Enum>
+		
+		<!-- Possible values for fuzzy update of edge probabilities.
+        'VeryUnlikely' corresponds to 10%, 'SomewhatUnlikely' corresponds to 30%,
+        'Neutral' corresponds to 50%, 'SomewhatLikely' corresponds to 70%,
+        'VeryLikely' corresponds to 90% -->
+		<Enum Name="FuzzyEdgeValue">
+			<Entry Name="VeryUnlikely" Value="0" />
+			<Entry Name="SomewhatUnlikely" Value="1" />
+			<Entry Name="Neutral" Value="2" />
+			<Entry Name="SomewhatLikely" Value="3" />
+			<Entry Name="VeryLikely" Value="4" />
+		</Enum>
+
+	</EnumList>
+	
+    <StructList>
+
+        <!-- Defines a simple Euclidean location in the plane -->
+        <Struct Name="LocationXY">
+            <!-- Position in the X direction -->
+            <Field Name="x" Type="real32" Units="meters" />
+            <!-- Position in the Y direction -->
+            <Field Name="y" Type="real32" Units="meters" />
+        </Struct>
+	  
+        <!-- Edge -->
+        <Struct Name="EdgePairProbability">
+            <!-- Entry Edge ID -->
+            <Field Name="EntryEdgeID" Type="uint32" />
+            <!-- Exit Edge ID -->
+            <Field Name="ExitEdgeID" Type="uint32" />
+            <!-- Probability of transition from Entry edge to Exit edge -->
+            <Field Name="TransitionProbability" Type="real32" Units="normalized probability" />
+        </Struct>
+	  
+        <!-- Defines a base node for a geo-spacial network. -->
+        <Struct Name="NetworkNode">
+            <!-- Unique ID for the node, used to build edges between nodes -->
+            <Field Name="NodeID" Type="uint32" Units="None" />
+            <!-- ID of edges entering this node -->
+            <Field Name="InboundEdges" Type="uint32[]" />
+            <!-- ID of edges exiting this node -->
+            <Field Name="OutboundEdges" Type="uint32[]" />
+            <!-- Probability that intruder will exit on a particular edge when entering on a specific edge -->
+            <Field Name="TurnProbabilities" Type="EdgePairProbability[]" />
+        </Struct>
+	  
+        <!-- Defines a node for a spacial network in the simple XY plane. -->
+        <Struct Name="NetworkNodeXY" Extends="NetworkNode" >
+            <!-- Local coordinates of node -->
+            <Field Name="Coordinates" Type="LocationXY" />
+        </Struct>
+	  
+        <!-- Defines a node for a spacial network described in Lat/Lon/Alt. -->
+        <Struct Name="NetworkNodeLatLon" Extends="NetworkNode" >
+            <!-- Lat/Lon coordinates of node -->
+            <Field Name="Coordinates" Type="Location3D" Series="CMASI" />
+        </Struct>
+	  
+        <!-- Base class for a functional representation of the value
+        along a segment of unit length -->
+        <Struct Name="ValueFunction">
+        </Struct>
+	  
+        <!-- Piecewise constant representation of the value along a unit length segment.
+        Value[i] is the value from Discretization[i-1] to Discretization[i]. The
+        final discretization value must be 1.0 and the lengths of Value and
+        Discretization must match. -->
+        <Struct Name="PiecewiseConstantUnitLength" Extends="ValueFunction" >
+            <!-- Normalized discretization of edge (0,1]. The value of the edge goes from
+            the (n-1)^th discretization point to the n^th. The last value in this list must
+            be 1.0 -->
+            <Field Name="DomainDiscretization" Type="real32[]" Units="None"/>
+            <!-- Value at each of the discretized locations along the edge. Must be the same
+            length as the discretization. -->
+            <Field Name="Value" Type="real32[]" Units="None" />
+        </Struct>
+	  
+        <!-- Piecewise constant representation of the value along a segment with specified end points.
+        Value[i] is the value from Discretization[i-1] to Discretization[i]. The lengths of Value and
+        DomainDiscretization must match. -->
+        <Struct Name="PiecewiseConstantFixedEndPoints" Extends="ValueFunction" >
+            <!-- Start point for the domain of the defined function -->
+            <Field Name="StartPoint" Type="real32" Default="0.0" Units="None"/>
+            <!-- End point for the domain of the defined function -->
+            <Field Name="EndPoint" Type="real32" Default="0.0" Units="None"/>
+            <!-- Discretization of steps on the segment in the interval (StartPoint,EndPoint].
+            The value of the edge goes from the (n-1)^th discretization point to the n^th.
+            The last entry in this list must be equal to EndPoint -->
+            <Field Name="DomainDiscretization" Type="real32[]" Units="None"/>
+            <!-- Value at each of the discretized portions of the segment. Must be the same
+            length as the discretization. -->
+            <Field Name="Value" Type="real32[]" Units="None" />
+        </Struct>
+	  
+        <!-- Defines an edge for a spacial network. An edge must connect two nodes defined by
+        NetworkNodes. Each edge consists of a set of waypoints connecting the two endpoints and
+        a functional representation of the value along the edge. Except at the estimator level,
+        all roads are considered bi-directional (i.e. one-way roads are not defined) -->
+        <Struct Name="NetworkEdge">
+            <!-- Unique ID for the edge -->
+            <Field Name="EdgeID" Type="uint32" Units="None" />
+            <!-- ID for the optional edge traveling in the reverse direction. An ID of zero corresponds to no reverse edge. -->
+            <Field Name="ReverseEdgeID" Type="uint32" Units="None" Default="0" />
+            <!-- NetworkNode ID which defines the start point of the edge -->
+            <Field Name="StartNode" Type="uint32" Units="None" />
+            <!-- NetworkNode ID which defines the end point of the edge -->
+            <Field Name="EndNode" Type="uint32" Units="None" />
+            <!-- Functional description of the probability of location along this edge. -->
+            <Field Name="PositionProbability" Type="ValueFunction" />
+            <!-- Functional description of the velocity profile of an intruder on this edge. -->
+            <Field Name="VelocityProfile" Type="ValueFunction" Units="m/s" />
+            <!-- Edge length in meters -->
+            <Field Name="EdgeLength" Type="real32" Units="meters" />
+            <!-- Optional waypoints describing physical edge in lat/lon coordinates -->
+            <Field Name="Waypoints" Type="Location3D[]" Series="CMASI" />
+            <!-- Optional waypoints describing physical edge in x,y coordinates -->
+            <Field Name="WaypointsXY" Type="LocationXY[]" />
+        </Struct>
+	  
+        <!-- Defines a network over which requests arrive and are to be serviced
+        by the team of agents. -->
+        <Struct Name="NetworkRegion">
+            <!-- ID for full region data structure -->
+            <Field Name="RegionID" Type="uint32" Units="None" />
+            <!-- List of all nodes that represent the network -->
+            <Field Name="NodeList" Type="NetworkNode[]" />
+            <!-- List of all edges that represent the network -->
+            <Field Name="EdgeList" Type="NetworkEdge[]" />
+            <!-- Probability that intruder is no longer on this network region -->
+            <Field Name="ExitProbability" Type="real32" Units="None" Default="0.0" />
+        </Struct>
+	  
+        <!-- Initialization message for the estimator. Should return a
+        NetworkRegion with the proper discretization steps. -->
+        <Struct Name="InitializeEstimator">
+            <!-- Time synchronization -->
+            <Field Name="InitialTime" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Network for which the estimator should consider -->
+            <Field Name="Region" Type="NetworkRegion" />
+            <!-- U-turn probability at an intersection (0 .. 1.0) -->
+            <Field Name="ProbabilityUTurn" Type="real32" Default="0.05" />
+            <!-- Exit probability for dead-end edges (0 .. 1.0) -->
+            <Field Name="ProbabilityExit" Type="real32" Default="0.0" />
+            <!-- Discretization along edges -->
+            <Field Name="CellLength" Type="real32" Default="60.0" Units="meters" />
+            <!-- Default intruder minimum speed (when edge does not specify) -->
+            <Field Name="DefaultMinIntruderSpeed" Type="real32" Default="7.0" Units="m/s" />
+            <!-- Default intruder maximum speed (when edge does not specify) -->
+            <Field Name="DefaultMaxIntruderSpeed" Type="real32" Default="13.0" Units="m/s" />
+            <!-- Default intruder speed step size (speed discretization) -->
+            <Field Name="DefaultSpeedStepSize" Type="real32" Default="2.0" Units="m/s" />
+        </Struct>
+	  	  
+        <!-- Location relative to a defined network region -->
+        <Struct Name="NetworkLocation">
+            <!-- ID of the network on which this location is applicable -->
+            <Field Name="NetworkID" Type="uint32" Units="None" />
+            <!-- Edge (indicated by edge ID) along which location is found -->
+            <Field Name="NetworkEdge" Type="uint32" Units="None" />
+            <!-- Normalized value along the edge [0,1] -->
+            <Field Name="EdgeLocation" Type="real32" Units="Normalized" />
+        </Struct>
+	  
+        <!-- UGS Measurement: either green or red  -->
+        <Struct Name="UgsReport">	
+            <!-- UGS Status -->
+            <Field Name="Status" Type="UgsStatus" />
+            <!-- The time at which the UGS was queried  -->
+            <Field Name="EventTime" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- UGS location -->
+            <Field Name="UgsLocation" Type="NetworkLocation" />
+            <!-- UGS ID, if this UGS is a fixed position UGS. If not, ID is zero -->
+            <Field Name="UgsID" Type="int64" Default="0" />
+            <!-- The speed at which the detected object is going (only valid for red status).  -->
+            <Field Name="ObjectSpeed" Type="real32" Units="meter/sec" /> 
+        </Struct>
+	  
+        <!-- Request for PDF measurement update (green light only). Estimator
+        returns new NetworkRegion containing the updated PDF. -->
+        <Struct Name="NetworkPropagate">
+            <!-- Network containing pdf of current intruder location -->
+            <Field Name="InitialPDF" Type="NetworkRegion" />
+            <!-- Time to propagate the pdf forward -->
+            <Field Name="TimeToPropagate" Type="int64" Units="milliseconds since 1 Jan 1970" />
+        </Struct>
+	  
+        <!-- Request for PDF measurement update (green light only). Estimator
+        returns new NetworkRegion containing the updated PDF only until the
+        latest green measurement -->
+        <Struct Name="NetworkUpdate">
+            <!-- Initial red measurement -->
+            <Field Name="RedMeasurement" Type="UgsReport" />
+            <!-- Location of green measurements (i.e. intruder has not passed before
+            this time since initial red measurement) -->
+            <Field Name="GreenMeasurements" Type="UgsReport[]" />
+        </Struct>
+	  
+        <!-- VSCS drawing message -->
+        <Struct Name="CurrentNetworkStatus">
+            <!-- Update the stored PDF to the current time -->
+            <Field Name="Time" Type="int64" Units="milliseconds since 1 Jan 1970" />
+        </Struct>
+	  
+        <!-- VSCS update message -->
+        <Struct Name="CurrentNetworkUpdate">
+            <!-- Update the stored PDF with the latest UGS measurement -->
+            <Field Name="Alert" Type="VICS/IntruderAlertBase" />
+        </Struct>
+	  
+        <!-- Inclination map user update message -->
+        <Struct Name="LikertNetworkUpdate" >
+            <!-- Change the probability of taking these edges -->
+            <Field Name="AffectedEdgeIDs" Type="uint32[]" />
+            <!-- Likert value that the edges should be set to -->
+            <Field Name="LikertValue" Type="FuzzyEdgeValue" Default="Neutral" />
+        </Struct>
+
+ </StructList>
+</MDM>

@@ -1,0 +1,482 @@
+package FAMUS
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+--afrl.famus.TurnDirection: Specifies preference for turn direction when changing
+--heading
+data TurnDirection extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"Shortest",
+			"Left",
+			"Right");
+end TurnDirection;
+
+data implementation TurnDirection.i
+end TurnDirection.i;
+
+--afrl.famus.Affiliation: Specifies perceived IFF status for an entity
+data Affiliation extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"UNDEFINED",
+			"PENDING",
+			"UNKNOWN",
+			"ASSUMED_FRIEND",
+			"FRIEND",
+			"NEUTRAL",
+			"SUSPECT",
+			"HOSTILE");
+end Affiliation;
+
+data implementation Affiliation.i
+end Affiliation.i;
+
+--afrl.famus.EntityType: Specifies perceived vehicle category for an entity
+data EntityType extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"AIR_INTERCEPTOR",
+			"BOMBER",
+			"AAM",
+			"SAM",
+			"SAM_LAUNCHER",
+			"AIR",
+			"SURFACE",
+			"SUBSURFACE",
+			"UNKNOWN",
+			"INVALID");
+end EntityType;
+
+data implementation EntityType.i
+end EntityType.i;
+
+--afrl.famus.FormationType: Specifies the type of formation to fly
+data FormationType extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"BODY_REF",
+			"GEO_REF",
+			"TRAIL");
+end FormationType;
+
+data implementation FormationType.i
+end FormationType.i;
+
+data StartupComplete
+end StartupComplete;
+
+--afrl.famus.StartupComplete: Notify other components that this component (and all
+--dependencies) have been started. This message is expected to be sent by each independently
+--executed simulation component (i.e. UxAS, FUSION) when they are initialized and
+--ready to execute. AFSIM (or aircraft platform adapter) will send this message once
+--all components are initialized, *including* UxAS and FUSION. The aircraft startup
+--complete will be identified with the label "master". The UpTime counter on each
+--platform starts at zero from the origination time of this master StartupComplete
+--message. Most services should not begin processing or transmit messages until this
+--master StartupComplete message is received.
+data implementation StartupComplete.i
+	subcomponents
+		--User-defined label for this component (should be unique)
+		ComponentLabel: data string.i;
+		--Unique ID of this platform
+		EntityID: data int64.i;
+		--Wall-clock (GPS) time when startup completed
+		Time: data int64.i;
+end StartupComplete.i;
+
+data AirVehicleState extends CMASI::AirVehicleState
+end AirVehicleState;
+
+--afrl.famus.AirVehicleState: Provides basic states for an entity including position,
+--velocity, acceleration, and orientation information. PayloadStateList and Info
+--fields will NOT be populated. This message is expected to be produced at 1 Hz by
+--any entity that is running FAMUS autonomy services. Non-cooperative entities (i.e.
+--hostile or commercial traffic) would be represented by a Track message and not
+--an AirVehicleState.
+data implementation AirVehicleState.i extends CMASI::AirVehicleState.i
+	subcomponents
+		--Time since aircraft startup (NOT synchronized between platforms)
+		UpTime: data int64.i;
+end AirVehicleState.i;
+
+data AirVehicleConfiguration extends CMASI::AirVehicleConfiguration
+end AirVehicleConfiguration;
+
+--afrl.famus.AirVehicleConfiguration: Provides vehicle paramters and limits. This
+--message is sent once during vehicle initialization, and in response to a ConfigurationRequest
+--message. This message will be sent from any aircraft runing FAMUS autonomy services,
+--and NOT from any aircraft without FAMUS services. The local vehicle's network layer
+--will ensure that an AirVehicleConfiguration message is generated for any vehicle
+--joining the network, so that local services have knowledge of the capabilities
+--of the new vehicle.
+data implementation AirVehicleConfiguration.i extends CMASI::AirVehicleConfiguration.i
+	subcomponents
+		--Maximum fuel weight at 100% reported capacity (lbs)
+		InitialEnergyQuantity: data real32.i;
+end AirVehicleConfiguration.i;
+
+data ConfigurationRequest
+end ConfigurationRequest;
+
+--afrl.famus.ConfigurationRequest: Request retransmission of configuration messages
+data implementation ConfigurationRequest.i
+	subcomponents
+		--ID of vehicle for which configuration is requested (0: all vehicles)
+		EntityID: data real64.i;
+end ConfigurationRequest.i;
+
+data VectorSteeringTask extends CMASI::Task
+end VectorSteeringTask;
+
+--afrl.famus.VectorSteeringTask: Request vehicle fly specified heading, speed and
+--altitude
+data implementation VectorSteeringTask.i extends CMASI::Task.i
+	subcomponents
+		--Requested vector steering command
+		DesiredAction: data FlightDirectorAction.i;
+end VectorSteeringTask.i;
+
+data WaypointSteeringTask extends CMASI::Task
+end WaypointSteeringTask;
+
+--afrl.famus.WaypointSteeringTask: Request vehicle fly specified route, or change
+--active waypoint on current route
+data implementation WaypointSteeringTask.i extends CMASI::Task.i
+	subcomponents
+		--List of waypoints to be followed. If none, current route is used
+		WaypointList: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+		--ID of the first waypoint to follow.
+		FirstWaypoint: data int64.i;
+end WaypointSteeringTask.i;
+
+data FormationNavigationTask extends CMASI::Task
+end FormationNavigationTask;
+
+--afrl.famus.FormationNavigationTask: Request vehicle fly specified position relative
+--to another vehicle
+data implementation FormationNavigationTask.i extends CMASI::Task.i
+	subcomponents
+		--Vehicle ID to fly formation to
+		LeadID: data uint32.i;
+		--Formation type
+		FormationType: data FormationType.i;
+		--Range offset (m) from lead (positive is away from lead, in direction of AngleOffset)
+		RangeOffset: data real32.i;
+		--Angle offset (deg) based on formation type (ignored for TRAIL). Angle is relative
+		--to leader's heading (positive clockwise) for BODY_REF, and relative to true north
+		--(positive east) for GEO_REF.
+		AngleOffset: data real32.i;
+		--Altitude offset (m) from lead (positive is above lead)
+		AltitudeOffset: data real32.i;
+		--Desired turn direction when joining up in formation
+		Direction: data TurnDirection.i;
+		--Maximum bank angle to use during maneuver (0: unlimited)
+		MaxBankAngle: data real32.i;
+end FormationNavigationTask.i;
+
+data TargetedNavigationTask extends CMASI::Task
+end TargetedNavigationTask;
+
+--afrl.famus.TargetedNavigationTask: Request vehicle fly specified trajectory relative
+--to another vehicle
+data implementation TargetedNavigationTask.i extends CMASI::Task.i
+	subcomponents
+		--Track ID to fly relative to
+		LeadID: data uint32.i;
+		--Altitude to fly (MSL) (m)
+		AltitudeOffset: data real32.i;
+		--True airspeed to fly (m/s)
+		Speed: data real32.i;
+		--If true, Bearing is ignored and assigned vehicle will fly collision course to
+		--target
+		CollisionCourse: data bool.i;
+		--Approach angle from nose of target; range is +/- 180
+		Bearing: data real32.i;
+		--Desired turn direction when changing heading
+		Direction: data TurnDirection.i;
+		--Maximum bank angle to use during maneuver (0: unlimited)
+		MaxBankAngle: data real32.i;
+end TargetedNavigationTask.i;
+
+data FlightDirectorAction extends CMASI::FlightDirectorAction
+end FlightDirectorAction;
+
+--afrl.famus.FlightDirectorAction: Request vehicle fly specified heading, speed and
+--altitude
+data implementation FlightDirectorAction.i extends CMASI::FlightDirectorAction.i
+	subcomponents
+		--Desired turn direction when changing heading
+		TurnDirection: data TurnDirection.i;
+		--Maximum bank angle to use during maneuver (0: unlimited)
+		MaxBankAngle: data real32.i;
+end FlightDirectorAction.i;
+
+data Vector3D
+end Vector3D;
+
+--Represents a point in 3D space
+data implementation Vector3D.i
+	subcomponents
+		x: data real32.i;
+		y: data real32.i;
+		z: data real32.i;
+end Vector3D.i;
+
+data Track
+end Track;
+
+--Defines sensed information for a sensor perception (track) either of an actual
+--entity or potentially a false reading. When using the perceived fields the corresponding
+--valid flag should be checked first, not all tracks will have all state information
+--available. This will be determined by the capabilities of the sensor generating
+--the track.
+data implementation Track.i
+	subcomponents
+		--Unique (within the scope of the platform) ID for this track
+		TrackID: data int64.i;
+		--Is perceived latitude valid for this track
+		TargetLatitudeValid: data bool.i;
+		--Perceived latitude of target (deg)
+		TargetLatitude: data real64.i;
+		--Is perceived longitude valid for this track
+		TargetLongitudeValid: data bool.i;
+		--Perceived longitude of target (deg)
+		TargetLongitude: data real64.i;
+		--Is perceived MSL altitude valid for this track
+		TargetAltitudeValid: data bool.i;
+		--Perceived MSL altitude of target (m)
+		TargetAltitude: data real32.i;
+		--Standard deviation of altitude error (m)
+		TargetAltitudeError: data real32.i;
+		--Is perceived ECR position valid for this track
+		TargetPositionValid: data bool.i;
+		--Perceived ECR position of target (m)
+		TargetPosition: data Vector3D.i;
+		--Standard deviation of position error (m)
+		TargetPositionError: data real32.i;
+		--Is perceived velocity valid for this track
+		TargetVelocityValid: data bool.i;
+		--Perceived ECR velocity of target (m/s)
+		TargetVelocity: data Vector3D.i;
+		--Standard deviation of velocity error (m/s)
+		TargetVelocityError: data real32.i;
+		--Is perceived true bearing valid for this track
+		TargetTrueBearingValid: data bool.i;
+		--Perceived true bearing from source to target (deg)
+		TargetTrueBearing: data real32.i;
+		--Standard deviation of bearing error (deg)
+		TargetTrueBearingError: data real32.i;
+		--Is perceived elevation valid for this track
+		TargetElevationValid: data bool.i;
+		--Perceived elevation of target, relative to local horizontal (deg)
+		TargetElevation: data real32.i;
+		--Standard deviation of elevation error (deg)
+		TargetElevationError: data real32.i;
+		--Is perceived range to target valid for this track
+		TargetRangeValid: data bool.i;
+		--Perceived range from source to target (m)
+		TargetRange: data real32.i;
+		--Standard deviation of range error (m)
+		TargetRangeError: data real32.i;
+		--Is perceived range rate valid for this track
+		TargetRangeRateValid: data bool.i;
+		--Perceived range rate of target (m/s)
+		TargetRangeRate: data real32.i;
+		--Standard deviation of range rate error (m/sec)
+		TargetRangeRateError: data real32.i;
+		--Is perceived target type valid for this track
+		TargetTypeValid: data bool.i;
+		--Perceived type of the target unit
+		TargetType: data EntityType.i;
+		--Is perceived target affiliation for this track valid
+		TargetAffiliationValid: data bool.i;
+		--IFF-type target classification
+		TargetAffiliation: data Affiliation.i;
+		--General track quality value, between 0 (worst) and 1 (best)
+		Quality: data real32.i;
+		--Unique ID of the platform that generated this track
+		SourcePlatformID: data int64.i;
+		--ID of the equipment that generated this track (unique within platform)
+		SourceEquipID: data int32.i;
+		--LLA of source unit when track was perceived
+		SourceLocation: data CMASI::Location3D.i;
+		--Time this track was created (milliseconds since Jan 1, 1970)
+		TimeCreated: data int64.i;
+		--Time the information for this track was perceived (ms since Jan 1, 1970)
+		TimePerceived: data int64.i;
+		--A container for key-value paris of metadata
+		MetaData: data CMASI::KeyValuePair.i {Data_Model::Data_Representation => Array;};
+end Track.i;
+
+data TrackList
+end TrackList;
+
+--Defines list of tracks. This data type might be used at multiple levels of processing
+--(i.e. raw tracks from a sensor or correlated tracks combining multiple data sources).
+--In almost every case, a derived class should be used instead, to clarify the type
+--of track data that is being generated or consumed.
+data implementation TrackList.i
+	subcomponents
+		--Wall-clock (GPS) time when this message was sent
+		Time: data int64.i;
+		--Unique ID of the platform that generated this track list
+		SourcePlatformID: data int64.i;
+		--Human-readable description of the contents of this track list (for display and
+		--debugging purposes only)
+		Description: data string.i;
+		--List of currently active tracks (including coasted tracks)
+		Tracks: data Track.i {Data_Model::Data_Representation => Array;};
+end TrackList.i;
+
+data TwoDTrackList extends FAMUS::TrackList
+end TwoDTrackList;
+
+--Defines a list of two-dimensional tracks generated by one or more sensors (or processors)
+--on a single platform. Tracks in this list have not yet been correlated, and contain
+--information from a single source.. This list contains information for all active
+--tracks from a sensor, regardless of whether or not it was updated since the last
+--message.
+data implementation TwoDTrackList.i extends FAMUS::TrackList.i
+end TwoDTrackList.i;
+
+data ThreeDTrackList extends FAMUS::TrackList
+end ThreeDTrackList;
+
+--Defines a list of three-dimensional tracks generated by one or more sensors (or
+--processors) on a single platform. Tracks in this list have not yet been correlated,
+--and contain information from a single source.. This list contains information for
+--all active tracks from a sensor, regardless of whether or not it was updated since
+--the last message.
+data implementation ThreeDTrackList.i extends FAMUS::TrackList.i
+end ThreeDTrackList.i;
+
+data MasterTrackList extends FAMUS::TrackList
+end MasterTrackList;
+
+--Defines a combined list of all tracks from any sources on a platform. Tracks in
+--this list have been correlated, and contain the combined information on each target
+--from all available sources. This list contains information for all active tracks
+--from any sensor, regardless of whether or not it was updated since the last message.
+data implementation MasterTrackList.i extends FAMUS::TrackList.i
+end MasterTrackList.i;
+
+data TrackUpdateList extends FAMUS::TrackList
+end TrackUpdateList;
+
+--Defines a list of locally updated (or newly created) tracks, for coordination of
+--master track lists among multiple platforms. Tracks in this list have been correlated,
+--and contain the combined information on each target from all available sources.
+--This list contains information for only the tracks that have been updated by a
+--local sensor since the last transmisison of this message.
+data implementation TrackUpdateList.i extends FAMUS::TrackList.i
+end TrackUpdateList.i;
+
+data TaskStatus
+end TaskStatus;
+
+--Reports the current command being executed by a vehicle, primarily for confirmation
+--to the pilot that the request has been processed correctly.
+data implementation TaskStatus.i
+	subcomponents
+		--Wall-clock (GPS) time when this message was sent
+		Time: data int64.i;
+		--ID of the platform generating this message
+		EntityID: data int64.i;
+		--Task currently being executed by the vehicle
+		ActiveTask: data CMASI::Task.i;
+end TaskStatus.i;
+
+data TimeOnTarget extends CMASI::MustFlyTask
+end TimeOnTarget;
+
+--Extends the MustFlyTask to allow time of arrival specification
+data implementation TimeOnTarget.i extends CMASI::MustFlyTask.i
+	subcomponents
+		--Time at which vehicle should arrive at the designated location. Time datum is
+		--defined by the application, but unless otherwise specified is milliseconds since
+		--1 Jan 1970
+		TimeOfArrival: data int64.i;
+end TimeOnTarget.i;
+
+data DirectedPatrol extends CMASI::SearchTask
+end DirectedPatrol;
+
+--Creates a racetrack pattern to carry out a Combat Air Patrol (CAP) oriented in
+--a particular direction. Allows specification of speed window during pattern hold
+--to allow speed variation in higher-level synchronization tasks. Optional sensor
+--focus point uses desired wavelength to orient an appropriate sensor gimbal during
+--pattern.
+data implementation DirectedPatrol.i extends CMASI::SearchTask.i
+	subcomponents
+		--Geometric center of the pattern (cannot be null). Altitude value indicates the
+		--altitude at which this task should be carried out.
+		CenterLocation: data CMASI::Location3D.i;
+		--Clockwise angle from true north along which the down-range leg of the pattern
+		--is oriented.
+		DownRangeDirection: data real32.i;
+		--Length of the pattern (dimension in down-range direction). The 'down-range' leg
+		--of the pattern starts at length/2 up-range from the center location.
+		DownRangeLength: data real32.i;
+		--Width of the pattern (orthogonal to down-range direction). If a value of 0.0
+		--is indicated, the width will be re-sized to meet the minimum turn radius of the
+		--assigned vehicle.
+		PatternWidth: data real32.i;
+		--Direction of travel around the pattern.
+		PatternDirection: data CMASI::LoiterDirection.i;
+		--Maximum speed allowed during execution. If set to 0.0, uses nominal speed of
+		--vehicle assigned.
+		MaxSpeedAllowed: data real32.i;
+		--Minimum speed allowed during execution. If set to 0.0, uses nominal speed of
+		--vehicle assigned.
+		MinSpeedAllowed: data real32.i;
+		--Optional sensor stare location during down-range leg traversal. Selects appropriate
+		--gimballed sensor based on desired wavelength band.
+		SensorFocusPoint: data CMASI::Location3D.i;
+end DirectedPatrol.i;
+
+data PhasedPatrol extends FAMUS::DirectedPatrol
+end PhasedPatrol;
+
+--A directed patrol augmented with a phase parameter to indicate relative phasing
+--between multiple directed patrol patterns.
+data implementation PhasedPatrol.i extends FAMUS::DirectedPatrol.i
+	subcomponents
+		--Phase difference from lead pattern. Defined as clockwise angle from down-range
+		--leg of lead pattern. For example, a value of 90 degrees indicates that this pattern
+		--will be half-way along its down-range leg when the lead is half-way through the
+		--turn toward its own up-range leg.
+		PhaseAngle: data real32.i;
+end PhasedPatrol.i;
+
+data SynchronizedPatrol extends CMASI::Task
+end SynchronizedPatrol;
+
+--Super task to synchronize multiple Combat Air Patrol (CAP) patterns. Follower patterns
+--use the location of the lead pattern vehicle to adjust speed to match prescribed
+--phase angles. This task is only valid when vehicles and sub-patrol patterns have
+--compatible lengths, widths, and speed windows.
+data implementation SynchronizedPatrol.i extends CMASI::Task.i
+	subcomponents
+		--Pattern followed by lead vehicle. Operates at mid-point of speed window. Cannot
+		--be null.
+		LeadPattern: data DirectedPatrol.i;
+		--Patterns for followers, each dynamically adjusting to acheive desired phase spacing.
+		FollowerPatterns: data PhasedPatrol.i {Data_Model::Data_Representation => Array;};
+		--Flag to indicate that tight phase lock is to be sacrificed for additional down-range
+		--view time. When this flag is true, any follower that is on a down-range leg operates
+		--at a slower speed (biased toward minimum allowable speed) and does not adjust
+		--speed while traveling down-range. Any vehicle approaching its down-range leg
+		--adjusts speed so that it starts down-range before a previous completes a down-range
+		--leg.
+		BiasDownRange: data bool.i;
+end SynchronizedPatrol.i;
+
+end FAMUS;
+
+

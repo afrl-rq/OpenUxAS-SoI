@@ -1,0 +1,53 @@
+package Common_Data
+public
+	with Base_Types;
+	
+	data string extends Base_Types::String
+	end string;
+	
+	data implementation string.i
+	end string.i;
+	
+	data real64 extends Base_Types::Float_64
+	end real64;
+	
+	data implementation real64.i
+	end real64.i;
+	
+	data real32 extends Base_Types::Float_32
+	end real32;
+	
+	data implementation real32.i
+	end real32.i;
+	
+	data int64 extends Base_Types::Integer_64
+	end int64;
+	
+	data implementation int64.i
+	end int64.i;
+	
+	data int32 extends Base_Types::Integer_32
+	end int32;
+	
+	data implementation int32.i
+	end int32.i;
+	
+	data uint32 extends Base_Types::Unsigned_32
+	end uint32;
+	
+	data implementation uint32.i
+	end uint32.i;
+	
+	data byte extends Base_Types::Integer_8
+	end byte;
+	
+	data implementation byte.i
+	end byte.i;
+	
+	data bool extends Base_Types::Boolean
+	end bool;
+	
+	data implementation bool.i
+	end bool.i;
+	
+end Common_Data;

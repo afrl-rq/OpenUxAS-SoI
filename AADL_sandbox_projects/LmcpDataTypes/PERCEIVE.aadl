@@ -1,0 +1,103 @@
+package PERCEIVE
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data EntityPerception
+end EntityPerception;
+
+--A report of a potential target/tracked entity. Perceptions are received from a
+--given sensor or set of sensors. Entities can be perceived by scenario aircraft
+--or other entities.
+data implementation EntityPerception.i
+	subcomponents
+		--A scenario-unique ID for this target entity. IDs should be greater than zero.
+		--Since this is a perception, the entity ID may not be known. In that case, this
+		--field should be set to zero.
+		PerceivedEntityID: data uint32.i;
+		--ID of the entity or aircraft that reported the detection/perception
+		PerceiverID: data uint32.i;
+		--The IDs of the payloads that reported this perception.
+		PerceiverPayloads: data uint32.i {Data_Model::Data_Representation => Array;};
+		--The perceived target velocity in three-dimensions. The velocity should be stated
+		--in tangential-plane coordinates using the North-East-Down coordinate system.
+		Velocity: data real32.i {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (3);
+		};
+		--Velocity error for this perception. The error terms should be in the same coordinate
+		--system as the velocity.
+		VelocityError: data real32.i {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (3);
+		};
+		--If true, denotes that the velocity and velocity error have meaning.
+		VelocityValid: data bool.i;
+		--Euler angle tangential-plane attitude for this entity. Should be stated as Psi-Theta-Phi.
+		--For information on Euler coordinates, see <a href="http://en.wikipedia.org/wiki/Euler_angle">Euler
+		--Angles</a>
+		Attitude: data real32.i {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (3);
+		};
+		--Error in the perception of the entity attitude. This should be in the same coordinate
+		--system as the attitude.
+		AttitudeError: data real32.i {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (3);
+		};
+		--If true, denotes that the attitude and attitude error have meaning.
+		AttitudeValid: data bool.i;
+		--The entity location. A valid EntityPerception must define Location (null not
+		--allowed)
+		Location: data CMASI::Location3D.i;
+		--Error in the perception of the location of this entity. The first index is North-South
+		--error, the second index is the East-West error, and the third index is the vertical
+		--error. The result is an error cylinder.
+		LocationError: data real32.i {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (3);
+		};
+		--Time that this entity was perceived since scenario start.
+		TimeLastSeen: data int64.i;
+end EntityPerception.i;
+
+data TrackEntityAction extends CMASI::VehicleAction
+end TrackEntityAction;
+
+--This puts an entity into a "track" mode, where the vehicle commands itself and
+--its onboard sensors to attempt to keep a target in view. If multiple sensors are
+--to be used simultaneously, multiple track actions should be sent.
+data implementation TrackEntityAction.i extends CMASI::VehicleAction.i
+	subcomponents
+		--The unique identifier of the target to be tracked.
+		EntityID: data uint32.i;
+		--The unique identifier of the sensor that is to be actively steered to track the
+		--target.
+		SensorID: data uint32.i;
+		--The waypoint that this vehicle is to return to when complete (or lost track)
+		ReturnToWaypoint: data uint32.i;
+end TrackEntityAction.i;
+
+data TrackEntityTask extends CMASI::Task
+end TrackEntityTask;
+
+--A request to track a specific entity. It is assumed that the tracked entity can
+--move at any time during the scenario.
+data implementation TrackEntityTask.i extends CMASI::Task.i
+	subcomponents
+		--The ID of the target to be tracked.
+		EntityID: data uint32.i;
+		--Required sensor modality for tracking the target
+		SensorModality: data CMASI::WavelengthBand.i;
+		--The minimum ground sample distance that should be maintained for this target
+		--track operation.
+		GroundSampleDistance: data real32.i;
+end TrackEntityTask.i;
+
+
+end PERCIEVE;

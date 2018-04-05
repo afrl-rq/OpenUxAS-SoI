@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+
+<!--
+        <h2>Introduction</h2>
+        Message definitions for the Persistent ISR scenario
+-->
+<MDM>
+    <SeriesName>PISR</SeriesName>
+    <Namespace>uxas/project/pisr</Namespace>
+    <Version>3</Version>
+
+	<EnumList>
+        <!-- selection of assignment costs -->
+        <Enum Name="AssignmentType">
+            <Entry Name="MinMaxTime" Value="0"/>
+            <Entry Name="MinCumlativeTime" Value="1"/>
+            <Entry Name="LengthConstrainedMtsp" Value="2"/>
+            <Entry Name="MWRRP" Value="3"/>
+            <Entry Name="DynamicDistributedPisr" Value="4"/>
+        </Enum>
+        <Enum Name="RoadSearchDirection">
+            <Entry Name="Forward" Value="0"/>
+            <Entry Name="Reverse" Value="1"/>
+            <Entry Name="Either" Value="2"/>
+        </Enum>
+    </EnumList>
+	
+    <StructList>
+    
+        <!-- Used to set the assignment type for PISR automation requests -->
+        <Struct Name="PSIR_AssignmentType">
+            <!-- The ID of the AutomationRequest associated with this AssignmentType. The Assignment Service will wait to recieve an AutomationRequest with this ID, unless the ID == -1. AutomationRequestID == -1 directs the assignment service to use this AssignmentType for future assignments. -->
+            <Field Name="AutomationRequestID" Type="int64" Default="0" />
+            <!-- An AssignmentType enumeration indicating the type of assignment to be implemented. -->
+            <Field Name="AssignmentType" Type="AssignmentType" Default="MinMaxTime" />
+        </Struct>
+        
+        <!-- Parameters for Persistent Intelligence Surveillance and Reconnaissance (PISR) sub-tasks -->
+        <Struct Name="PISR_SubTaskParameters" >
+            <!-- The ID of the sub-task. -->
+            <Field Name="TaskID" Type="int64" />
+            <!-- The desired frequency of task completion. Note that, depending on the tasks,
+            attaining this frequency may not be possible. -->
+            <Field Name="RevisitPeriod" Type="int64" Default="-1" Units="seconds" />
+            <!-- The maximum tolerable delay from task completion to data delivery. -->
+            <Field Name="MaximumDataLatency" Type="int64" Default="-1" Units="seconds" />
+            <!-- The weight applied to this task relative to the other tasks. -->
+            <Field Name="RelativeTaskWeight" Type="real32" Default="1" />
+        </Struct>
+
+        <!-- List of Tasks for a Persistent Intelligence Surveillance and Reconnaissance (PISR) task -->
+        <Struct Name="PISR_TaskList">
+            <!-- The list of the tasks. -->
+            <Field Name="TaskList" Type="PISR_SubTaskParameters[]" />
+            <!-- The MWRRP Beta Parameter associated with this task list. -->
+            <Field Name="Beta_MWRRP" Type="real32" Default="0" />
+        </Struct>
+
+        <!-- Persistent Intelligence Surveillance and Reconnaissance (PISR) task -->
+        <Struct Name="PISR_Task" Extends="CMASI/Task">
+            <!-- The list of the tasks to be performed. -->
+            <Field Name="TaskList" Type="PISR_TaskList" />
+            <!-- If this is true, then the tasks in the TaskList are to be executed in the order given.
+            If false, the execution order of the tasks must be determine by the  PISR_Task. -->
+            <Field Name="isListOrdered" Type="bool" Default="true" />
+            <!-- Operating region ID to be considered during planning -->
+            <Field Name="OperatingRegion" Type="int64"/>
+            <!-- The type (PSIR_AssignmentType) of assignment to be implemented. -->
+            <Field Name="AssignmentType" Type="AssignmentType" />
+             <!-- This will cause the PISR task to use ProjectedActiveTimes' rather than TaskActiveTimes'
+             in cost functions, where appropriate. -->
+            <Field Name="useProjectedTaskActiveTime" Type="bool" Default="false"/>
+        </Struct>
+
+        <!-- PISR task state -->
+        <Struct Name="PISR_TaskState" >
+            <!-- The ID of the task. -->
+            <Field Name="TaskID" Type="int64" />
+            <!-- last time this task was completed.  -->
+            <Field Name="LastCompletionTime" Type="int64" Default="0" Units="milliseconds" />
+        </Struct>
+
+        <!-- Projected time the entity will start the task -->
+        <Struct Name="ProjectedTaskActive" >
+            <!-- ID of the entity that sent this message -->
+            <Field Name="SenderID" Type="int64" />
+            <!-- The ID of the task. -->
+            <Field Name="TaskID" Type="int64" />
+            <!-- Projected time this task will become active. (ProjectedActiveTime > 0) or it is invalid -->
+            <Field Name="ProjectedActiveTime" Type="int64" Default="0" Units="milliseconds" />
+        </Struct>
+
+        <!-- Time Advance Approval -->
+        <Struct Name="TimeAdvanceApproval" >
+            <!-- ID of the entity that sent this message -->
+            <Field Name="SenderID" Type="int64" />
+            <!-- Does the sender of this message approve advancing to the next time step? -->
+            <Field Name="IsTimeAdvanceApproved" Type="bool"  Default="true"/>
+        </Struct>  
+        
+        <!-- Depot task -->
+        <Struct Name="DepotTask" Extends="CMASI/Task">
+            <!-- Location of the Depot -->
+            <Field Name="DepotLocation" Type="CMASI/Location3D" />
+        </Struct>
+
+        <!-- Defines a road search task.
+            A road search is a task that causes a vehicle to follow road(s) and point its sensor.  The ViewAngleList determines
+            from which direction the road may be viewed.  View angles are specified using the {@link CMASI/Wedge} type. If the
+            UseInertialViewAngles option is true, then wedges are defined in terms of North-East coordinates, otherwise
+            wedges are defined relative to the line segment currently being viewed (a vector from point i through point i+1).
+            To be a valid look angle, the road must be viewed from an angle within the bounds of the wedge. NOTE:: this task 
+            requires a planner that can respond to a {@link ROUTE/RoadPointsRequest}, such as the OsmPlannerService.
+        -->
+        <Struct Name="RoadSearchTask" Extends="SearchTask" Series="CMASI" >
+
+            <!-- location to start the road search -->
+            <Field Name="StartingLocation" Type="CMASI/Location3D" />
+
+            <!-- location to end the road search -->
+            <Field Name="EndingLocation" Type="CMASI/Location3D" />
+
+            <!-- Relative direction to search the road. Makes is possible to search the road in either direction 
+            (or reverse, if that make sense) -->
+            <Field Name="RoadSearchDirection" Type="RoadSearchDirection"  Default="Forward"/>
+
+            <!-- Defines a list of acceptable look-angles for this task.  See the documentation above for details. -->
+            <Field Name="ViewAngleList" Type="Wedge[]" Series="CMASI" />
+
+            <!-- If true, the ViewAngleList specifies inertial (North-East) angles. See documentation above. -->
+            <Field Name="UseInertialViewAngles" Type="bool" Default="false"/>
+
+	        <!-- The altitude to use for line search planning. Changes the aircraft stand-off from the road. -->
+	        <Field Name="PlaningAltitude" Type="uint32" Default="0" Units="meters" />
+	        
+            <!-- If true, the PlanningAltitude will be used. See documentation above. -->
+            <Field Name="UsePlaningAltitude" Type="bool" Default="false"/>
+
+        </Struct>
+        
+
+
+
+ </StructList>
+</MDM>

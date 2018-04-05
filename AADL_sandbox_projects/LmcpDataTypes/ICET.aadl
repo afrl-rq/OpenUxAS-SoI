@@ -1,0 +1,54 @@
+package ICET
+public
+	with CMASI;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+data MaxInformationPointSearchTask extends CMASI::Task
+end MaxInformationPointSearchTask;
+
+--Enhance a set of point surveillance tasks to account for operator and target density
+--statistics to determine revisit decisions based on remaining fuel and operator
+--delay.
+data implementation MaxInformationPointSearchTask.i extends CMASI::Task.i
+	subcomponents
+		--Collection of point search tasks to be completed
+		TaskList: data CMASI::PointSearchTask.i {Data_Model::Data_Representation => Array;};
+		--Target revisit must have an angle difference of at least this value
+		LookAngleDifference: data real32.i;
+		--Fuel reserve as a percentage of computed path, i.e. if the fuel reserve is 50%,
+		--then the UAV is allowed to make manuevers for revisit of length up to 50% of
+		--the origial path length for visiting all targets
+		FuelReserve: data real32.i;
+		-- <i>A priori</i> probability that a target has the distinguishing feature. For
+		--very low values of expected true targets, the algorithm will tend to reconfirm
+		--target sightings.
+		p: data real32.i;
+		--Operator probability of false alarm: probability that the operator will mark
+		--a target has having a feature when in reality it does not
+		Pfa: data real32.i;
+		--Operator probability of misdetection: probability that the operator will mark
+		--a target has having no feature when in reality it does
+		Pmd: data real32.i;
+end MaxInformationPointSearchTask.i;
+
+data LineSurveillanceTask extends CMASI::LineSearchTask
+end LineSurveillanceTask;
+
+--Constantly monitor a line path using a team of vehicles. Attempts to optimize revisit
+--rate along the line path (e.g. balance coverage across set of vehicles)
+data implementation LineSurveillanceTask.i extends CMASI::LineSearchTask.i
+	subcomponents
+		--Number of vehicles used during task execution
+		TeamSize: data uint32.i;
+		--Max number of waypoints to be used to describe the flight path
+		MaxNumberWaypoints: data uint32.i;
+		--Create a waypoint path that traverses only on one side of the given point list.
+		PlanOnSameSide: data bool.i;
+end LineSurveillanceTask.i;
+
+end ICET;
+

@@ -1,0 +1,310 @@
+package ESTIMATE
+public
+	with CMASI;
+	with VICS;
+
+	with Data_Model;
+	with Base_Types;
+	with Common_Data;
+	renames Common_Data::all;
+    
+--Possible status when querying UGS
+data UgsStatus extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"Green",
+			"Red");
+end UgsStatus;
+
+data implementation UgsStatus.i
+end UgsStatus.i;
+
+--Possible values for fuzzy update of edge probabilities. 'VeryUnlikely' corresponds
+--to 10%, 'SomewhatUnlikely' corresponds to 30%, 'Neutral' corresponds to 50%, 'SomewhatLikely'
+--corresponds to 70%, 'VeryLikely' corresponds to 90%
+data FuzzyEdgeValue extends Base_Types::Integer
+	properties
+		Data_Model::Enumerators => (
+			"VeryUnlikely",
+			"SomewhatUnlikely",
+			"Neutral",
+			"SomewhatLikely",
+			"VeryLikely");
+end FuzzyEdgeValue;
+
+data implementation FuzzyEdgeValue.i
+end FuzzyEdgeValue.i;
+
+data LocationXY
+end LocationXY;
+
+--Defines a simple Euclidean location in the plane
+data implementation LocationXY.i
+	subcomponents
+		--Position in the X direction
+		x: data real32.i;
+		--Position in the Y direction
+		y: data real32.i;
+end LocationXY.i;
+
+data EdgePairProbability
+end EdgePairProbability;
+
+--Edge
+data implementation EdgePairProbability.i
+	subcomponents
+		--Entry Edge ID
+		EntryEdgeID: data uint32.i;
+		--Exit Edge ID
+		ExitEdgeID: data uint32.i;
+		--Probability of transition from Entry edge to Exit edge
+		TransitionProbability: data real32.i;
+end EdgePairProbability.i;
+
+data NetworkNode
+end NetworkNode;
+
+--Defines a base node for a geo-spacial network.
+data implementation NetworkNode.i
+	subcomponents
+		--Unique ID for the node, used to build edges between nodes
+		NodeID: data uint32.i;
+		--ID of edges entering this node
+		InboundEdges: data uint32.i {Data_Model::Data_Representation => Array;};
+		--ID of edges exiting this node
+		OutboundEdges: data uint32.i {Data_Model::Data_Representation => Array;};
+		--Probability that intruder will exit on a particular edge when entering on a specific
+		--edge
+		TurnProbabilities: data EdgePairProbability.i {Data_Model::Data_Representation => Array;};
+end NetworkNode.i;
+
+data NetworkNodeXY extends ESTIMATE::NetworkNode
+end NetworkNodeXY;
+
+--Defines a node for a spacial network in the simple XY plane.
+data implementation NetworkNodeXY.i extends ESTIMATE::NetworkNode.i
+	subcomponents
+		--Local coordinates of node
+		Coordinates: data LocationXY.i;
+end NetworkNodeXY.i;
+
+data NetworkNodeLatLon extends ESTIMATE::NetworkNode
+end NetworkNodeLatLon;
+
+--Defines a node for a spacial network described in Lat/Lon/Alt.
+data implementation NetworkNodeLatLon.i extends ESTIMATE::NetworkNode.i
+	subcomponents
+		--Lat/Lon coordinates of node
+		Coordinates: data CMASI::Location3D.i;
+end NetworkNodeLatLon.i;
+
+data ValueFunction
+end ValueFunction;
+
+--Base class for a functional representation of the value along a segment of unit
+--length
+data implementation ValueFunction.i
+end ValueFunction.i;
+
+data PiecewiseConstantUnitLength extends ESTIMATE::ValueFunction
+end PiecewiseConstantUnitLength;
+
+--Piecewise constant representation of the value along a unit length segment. Value[i]
+--is the value from Discretization[i-1] to Discretization[i]. The final discretization
+--value must be 1.0 and the lengths of Value and Discretization must match.
+data implementation PiecewiseConstantUnitLength.i extends ESTIMATE::ValueFunction.i
+	subcomponents
+		--Normalized discretization of edge (0,1]. The value of the edge goes from the
+		--(n-1)^th discretization point to the n^th. The last value in this list must be
+		--1.0
+		DomainDiscretization: data real32.i {Data_Model::Data_Representation => Array;};
+		--Value at each of the discretized locations along the edge. Must be the same length
+		--as the discretization.
+		Value: data real32.i {Data_Model::Data_Representation => Array;};
+end PiecewiseConstantUnitLength.i;
+
+data PiecewiseConstantFixedEndPoints extends ESTIMATE::ValueFunction
+end PiecewiseConstantFixedEndPoints;
+
+--Piecewise constant representation of the value along a segment with specified end
+--points. Value[i] is the value from Discretization[i-1] to Discretization[i]. The
+--lengths of Value and DomainDiscretization must match.
+data implementation PiecewiseConstantFixedEndPoints.i extends ESTIMATE::ValueFunction.i
+	subcomponents
+		--Start point for the domain of the defined function
+		StartPoint: data real32.i;
+		--End point for the domain of the defined function
+		EndPoint: data real32.i;
+		--Discretization of steps on the segment in the interval (StartPoint,EndPoint].
+		--The value of the edge goes from the (n-1)^th discretization point to the n^th.
+		--The last entry in this list must be equal to EndPoint
+		DomainDiscretization: data real32.i {Data_Model::Data_Representation => Array;};
+		--Value at each of the discretized portions of the segment. Must be the same length
+		--as the discretization.
+		Value: data real32.i {Data_Model::Data_Representation => Array;};
+end PiecewiseConstantFixedEndPoints.i;
+
+data NetworkEdge
+end NetworkEdge;
+
+--Defines an edge for a spacial network. An edge must connect two nodes defined by
+--NetworkNodes. Each edge consists of a set of waypoints connecting the two endpoints
+--and a functional representation of the value along the edge. Except at the estimator
+--level, all roads are considered bi-directional (i.e. one-way roads are not defined)
+data implementation NetworkEdge.i
+	subcomponents
+		--Unique ID for the edge
+		EdgeID: data uint32.i;
+		--ID for the optional edge traveling in the reverse direction. An ID of zero corresponds
+		--to no reverse edge.
+		ReverseEdgeID: data uint32.i;
+		--NetworkNode ID which defines the start point of the edge
+		StartNode: data uint32.i;
+		--NetworkNode ID which defines the end point of the edge
+		EndNode: data uint32.i;
+		--Functional description of the probability of location along this edge.
+		PositionProbability: data ValueFunction.i;
+		--Functional description of the velocity profile of an intruder on this edge.
+		VelocityProfile: data ValueFunction.i;
+		--Edge length in meters
+		EdgeLength: data real32.i;
+		--Optional waypoints describing physical edge in lat/lon coordinates
+		Waypoints: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+		--Optional waypoints describing physical edge in x,y coordinates
+		WaypointsXY: data LocationXY.i {Data_Model::Data_Representation => Array;};
+end NetworkEdge.i;
+
+data NetworkRegion
+end NetworkRegion;
+
+--Defines a network over which requests arrive and are to be serviced by the team
+--of agents.
+data implementation NetworkRegion.i
+	subcomponents
+		--ID for full region data structure
+		RegionID: data uint32.i;
+		--List of all nodes that represent the network
+		NodeList: data NetworkNode.i {Data_Model::Data_Representation => Array;};
+		--List of all edges that represent the network
+		EdgeList: data NetworkEdge.i {Data_Model::Data_Representation => Array;};
+		--Probability that intruder is no longer on this network region
+		ExitProbability: data real32.i;
+end NetworkRegion.i;
+
+data InitializeEstimator
+end InitializeEstimator;
+
+--Initialization message for the estimator. Should return a NetworkRegion with the
+--proper discretization steps.
+data implementation InitializeEstimator.i
+	subcomponents
+		--Time synchronization
+		InitialTime: data int64.i;
+		--Network for which the estimator should consider
+		Region: data NetworkRegion.i;
+		--U-turn probability at an intersection (0 .. 1.0)
+		ProbabilityUTurn: data real32.i;
+		--Exit probability for dead-end edges (0 .. 1.0)
+		ProbabilityExit: data real32.i;
+		--Discretization along edges
+		CellLength: data real32.i;
+		--Default intruder minimum speed (when edge does not specify)
+		DefaultMinIntruderSpeed: data real32.i;
+		--Default intruder maximum speed (when edge does not specify)
+		DefaultMaxIntruderSpeed: data real32.i;
+		--Default intruder speed step size (speed discretization)
+		DefaultSpeedStepSize: data real32.i;
+end InitializeEstimator.i;
+
+data NetworkLocation
+end NetworkLocation;
+
+--Location relative to a defined network region
+data implementation NetworkLocation.i
+	subcomponents
+		--ID of the network on which this location is applicable
+		NetworkID: data uint32.i;
+		--Edge (indicated by edge ID) along which location is found
+		NetworkEdge: data uint32.i;
+		--Normalized value along the edge [0,1]
+		EdgeLocation: data real32.i;
+end NetworkLocation.i;
+
+data UgsReport
+end UgsReport;
+
+--UGS Measurement: either green or red
+data implementation UgsReport.i
+	subcomponents
+		--UGS Status
+		Status: data UgsStatus.i;
+		--The time at which the UGS was queried
+		EventTime: data int64.i;
+		--UGS location
+		UgsLocation: data NetworkLocation.i;
+		--UGS ID, if this UGS is a fixed position UGS. If not, ID is zero
+		UgsID: data int64.i;
+		--The speed at which the detected object is going (only valid for red status).
+		ObjectSpeed: data real32.i;
+end UgsReport.i;
+
+data NetworkPropagate
+end NetworkPropagate;
+
+--Request for PDF measurement update (green light only). Estimator returns new NetworkRegion
+--containing the updated PDF.
+data implementation NetworkPropagate.i
+	subcomponents
+		--Network containing pdf of current intruder location
+		InitialPDF: data NetworkRegion.i;
+		--Time to propagate the pdf forward
+		TimeToPropagate: data int64.i;
+end NetworkPropagate.i;
+
+data NetworkUpdate
+end NetworkUpdate;
+
+--Request for PDF measurement update (green light only). Estimator returns new NetworkRegion
+--containing the updated PDF only until the latest green measurement
+data implementation NetworkUpdate.i
+	subcomponents
+		--Initial red measurement
+		RedMeasurement: data UgsReport.i;
+		--Location of green measurements (i.e. intruder has not passed before this time
+		--since initial red measurement)
+		GreenMeasurements: data UgsReport.i {Data_Model::Data_Representation => Array;};
+end NetworkUpdate.i;
+
+data CurrentNetworkStatus
+end CurrentNetworkStatus;
+
+--VSCS drawing message
+data implementation CurrentNetworkStatus.i
+	subcomponents
+		--Update the stored PDF to the current time
+		Time: data int64.i;
+end CurrentNetworkStatus.i;
+
+data CurrentNetworkUpdate
+end CurrentNetworkUpdate;
+
+--VSCS update message
+data implementation CurrentNetworkUpdate.i
+	subcomponents
+		--Update the stored PDF with the latest UGS measurement
+		Alert: data VICS::IntruderAlertBase.i;
+end CurrentNetworkUpdate.i;
+
+data LikertNetworkUpdate
+end LikertNetworkUpdate;
+
+--Inclination map user update message
+data implementation LikertNetworkUpdate.i
+	subcomponents
+		--Change the probability of taking these edges
+		AffectedEdgeIDs: data uint32.i {Data_Model::Data_Representation => Array;};
+		--Likert value that the edges should be set to
+		LikertValue: data FuzzyEdgeValue.i;
+end LikertNetworkUpdate.i;
+
+end ESTIMATE;

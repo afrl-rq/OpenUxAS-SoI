@@ -1,0 +1,1008 @@
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/BLACKTIP.aadl b/AADL_sandbox_projects/LmcpDataTypes/BLACKTIP.aadl
+index 4b52031..a950201 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/BLACKTIP.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/BLACKTIP.aadl
+@@ -38,7 +38,7 @@ end BlackTipImpactTask;
+ data implementation BlackTipImpactTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--Point for which munition should plan to impact
+-		ImpactLocation: data Location3D.i;
++		ImpactLocation: data CMASI::Location3D.i;
+ 		--Glide slope angle at which the munition should approach the impact point
+ 		ApproachAngle: data real32.i;
+ 		--Altitude at which the munition should plan its approach. Altitude is height above
+@@ -53,11 +53,11 @@ data implementation BlackTipImpactTask.i extends CMASI::Task.i
+ 		--with duration equal to the approximate time it will take the munition to descend
+ 		--from its current altitude to the ApproachAltitude is placed at this point in
+ 		--the returned plan.
+-		SpiralDownLocation: data Location3D.i;
++		SpiralDownLocation: data CMASI::Location3D.i;
+ 		--Point to which a ditch plan is computed. An infinite loiter is commanded at this
+ 		--location and altitude. This could serve as the loss-of-comm point for the munition.
+ 		--Returned as part of the contingency plan.
+-		DitchLocation: data Location3D.i;
++		DitchLocation: data CMASI::Location3D.i;
+ 		--Raduis of turn to use when computing trajectories and loiters. For each of the
+ 		--looping manuevers in the loop-back and button-loop plans, this value is used
+ 		--to size the turn radius implied by the waypoint plan. This value is also used
+@@ -85,7 +85,7 @@ data implementation ImpactAction.i extends CMASI::VehicleAction.i
+ 		--Planned attack heading to target
+ 		ApproachHeading: data real32.i;
+ 		--Location of desired impact
+-		ImpactLocation: data Location3D.i;
++		ImpactLocation: data CMASI::Location3D.i;
+ 		--Index of waypoint that begins the waveoff plan
+ 		WaveoffPlanID: data int64.i;
+ 		--Wave-off distance for auto-abort manuever. If commit has not been sent and the
+@@ -94,4 +94,4 @@ data implementation ImpactAction.i extends CMASI::VehicleAction.i
+ 		AutoWaveoffDistance: data real32.i;
+ end ImpactAction.i;
+ 
+-
++end BLACKTIP;
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/CMASI.aadl b/AADL_sandbox_projects/LmcpDataTypes/CMASI.aadl
+index c0d2ff0..5a48ef2 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/CMASI.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/CMASI.aadl
+@@ -580,7 +580,7 @@ data implementation EntityState.i
+ 		--(CommandID) is being executed.
+ 		CurrentCommand: data int64.i;
+ 		--The current mode for this vehicle.
+-		Mode: data NavigationMode.i;
++		Moode: data NavigationMode.i;
+ 		--Tasks that this entity is currently executing. An empty list indicates no associated
+ 		--tasks. The task number should coincide with the task number in the task request.
+ 		--For instance, if a waypoint is associated with a search task, then the task number
+@@ -1462,4 +1462,5 @@ data implementation PayloadStowAction.i
+ 		PayloadID: data int64.i;
+ end PayloadStowAction.i;
+ 
++end CMASI;
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/DETECTOR.aadl b/AADL_sandbox_projects/LmcpDataTypes/DETECTOR.aadl
+index 81cb69f..cd21eac 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/DETECTOR.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/DETECTOR.aadl
+@@ -32,13 +32,13 @@ data implementation ImageParameters.i
+ 		--size of the image in the y direction
+ 		ImageSizeY: data int32.i;
+ 		--geograhic location of the top left corner of the image
+-		TopLeft: data Location3D.i;
++		TopLeft: data CMASI::Location3D.i;
+ 		--geograhic location of the top right corner of the image
+-		TopRight: data Location3D.i;
++		TopRight: data CMASI::Location3D.i;
+ 		--geograhic location of the bottom left corner of the image
+-		BottomLeft: data Location3D.i;
++		BottomLeft: data CMASI::Location3D.i;
+ 		--geograhic location of the bottom right corner of the image
+-		BottomRight: data Location3D.i;
++		BottomRight: data CMASI::Location3D.i;
+ end ImageParameters.i;
+ 
+ data ImageDetection
+@@ -83,7 +83,7 @@ data implementation GeoDetection.i
+ 		--cofidence in ???
+ 		Confidence: data real32.i;
+ 		--center of the detection in the geographics coordinates
+-		Location: data Location3D.i;
++		Location: data CMASI::Location3D.i;
+ end GeoDetection.i;
+ 
+ data GeoDetections
+@@ -99,4 +99,6 @@ data implementation GeoDetections.i
+ 		GeoDetections: data GeoDetection.i {Data_Model::Data_Representation => Array;};
+ end GeoDetections.i;
+ 
++end DETECTOR;
++
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/ESTIMATE.aadl b/AADL_sandbox_projects/LmcpDataTypes/ESTIMATE.aadl
+index 89bbf5d..2e8d38e 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/ESTIMATE.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/ESTIMATE.aadl
+@@ -95,7 +95,7 @@ end NetworkNodeLatLon;
+ data implementation NetworkNodeLatLon.i extends ESTIMATE::NetworkNode.i
+ 	subcomponents
+ 		--Lat/Lon coordinates of node
+-		Coordinates: data Location3D.i;
++		Coordinates: data CMASI::Location3D.i;
+ end NetworkNodeLatLon.i;
+ 
+ data ValueFunction
+@@ -169,7 +169,7 @@ data implementation NetworkEdge.i
+ 		--Edge length in meters
+ 		EdgeLength: data real32.i;
+ 		--Optional waypoints describing physical edge in lat/lon coordinates
+-		Waypoints: data Location3D.i {Data_Model::Data_Representation => Array;};
++		Waypoints: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+ 		--Optional waypoints describing physical edge in x,y coordinates
+ 		WaypointsXY: data LocationXY.i {Data_Model::Data_Representation => Array;};
+ end NetworkEdge.i;
+@@ -292,7 +292,7 @@ end CurrentNetworkUpdate;
+ data implementation CurrentNetworkUpdate.i
+ 	subcomponents
+ 		--Update the stored PDF with the latest UGS measurement
+-		Alert: data IntruderAlertBase.i;
++		Alert: data VICS::IntruderAlertBase.i;
+ end CurrentNetworkUpdate.i;
+ 
+ data LikertNetworkUpdate
+@@ -307,4 +307,4 @@ data implementation LikertNetworkUpdate.i
+ 		LikertValue: data FuzzyEdgeValue.i;
+ end LikertNetworkUpdate.i;
+ 
+-
++end ESTIMATE;
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/FAMUS.aadl b/AADL_sandbox_projects/LmcpDataTypes/FAMUS.aadl
+index 22fb42a..5f4a4f3 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/FAMUS.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/FAMUS.aadl
+@@ -150,7 +150,7 @@ end WaypointSteeringTask;
+ data implementation WaypointSteeringTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--List of waypoints to be followed. If none, current route is used
+-		WaypointList: data Waypoint.i {Data_Model::Data_Representation => Array;};
++		WaypointList: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+ 		--ID of the first waypoint to follow.
+ 		FirstWaypoint: data int64.i;
+ end WaypointSteeringTask.i;
+@@ -305,13 +305,13 @@ data implementation Track.i
+ 		--ID of the equipment that generated this track (unique within platform)
+ 		SourceEquipID: data int32.i;
+ 		--LLA of source unit when track was perceived
+-		SourceLocation: data Location3D.i;
++		SourceLocation: data CMASI::Location3D.i;
+ 		--Time this track was created (milliseconds since Jan 1, 1970)
+ 		TimeCreated: data int64.i;
+ 		--Time the information for this track was perceived (ms since Jan 1, 1970)
+ 		TimePerceived: data int64.i;
+ 		--A container for key-value paris of metadata
+-		MetaData: data KeyValuePair.i {Data_Model::Data_Representation => Array;};
++		MetaData: data CMASI::KeyValuePair.i {Data_Model::Data_Representation => Array;};
+ end Track.i;
+ 
+ data TrackList
+@@ -389,7 +389,7 @@ data implementation TaskStatus.i
+ 		--ID of the platform generating this message
+ 		EntityID: data int64.i;
+ 		--Task currently being executed by the vehicle
+-		ActiveTask: data Task.i;
++		ActiveTask: data CMASI::Task.i;
+ end TaskStatus.i;
+ 
+ data TimeOnTarget extends CMASI::MustFlyTask
+@@ -416,7 +416,7 @@ data implementation DirectedPatrol.i extends CMASI::SearchTask.i
+ 	subcomponents
+ 		--Geometric center of the pattern (cannot be null). Altitude value indicates the
+ 		--altitude at which this task should be carried out.
+-		CenterLocation: data Location3D.i;
++		CenterLocation: data CMASI::Location3D.i;
+ 		--Clockwise angle from true north along which the down-range leg of the pattern
+ 		--is oriented.
+ 		DownRangeDirection: data real32.i;
+@@ -428,7 +428,7 @@ data implementation DirectedPatrol.i extends CMASI::SearchTask.i
+ 		--assigned vehicle.
+ 		PatternWidth: data real32.i;
+ 		--Direction of travel around the pattern.
+-		PatternDirection: data LoiterDirection.i;
++		PatternDirection: data CMASI::LoiterDirection.i;
+ 		--Maximum speed allowed during execution. If set to 0.0, uses nominal speed of
+ 		--vehicle assigned.
+ 		MaxSpeedAllowed: data real32.i;
+@@ -437,7 +437,7 @@ data implementation DirectedPatrol.i extends CMASI::SearchTask.i
+ 		MinSpeedAllowed: data real32.i;
+ 		--Optional sensor stare location during down-range leg traversal. Selects appropriate
+ 		--gimballed sensor based on desired wavelength band.
+-		SensorFocusPoint: data Location3D.i;
++		SensorFocusPoint: data CMASI::Location3D.i;
+ end DirectedPatrol.i;
+ 
+ data PhasedPatrol extends FAMUS::DirectedPatrol
+@@ -477,4 +477,6 @@ data implementation SynchronizedPatrol.i extends CMASI::Task.i
+ 		BiasDownRange: data bool.i;
+ end SynchronizedPatrol.i;
+ 
++end FAMUS;
++
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/ICET.aadl b/AADL_sandbox_projects/LmcpDataTypes/ICET.aadl
+index e91b2b6..bc9b3f9 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/ICET.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/ICET.aadl
+@@ -16,7 +16,7 @@ end MaxInformationPointSearchTask;
+ data implementation MaxInformationPointSearchTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--Collection of point search tasks to be completed
+-		TaskList: data PointSearchTask.i {Data_Model::Data_Representation => Array;};
++		TaskList: data CMASI::PointSearchTask.i {Data_Model::Data_Representation => Array;};
+ 		--Target revisit must have an angle difference of at least this value
+ 		LookAngleDifference: data real32.i;
+ 		--Fuel reserve as a percentage of computed path, i.e. if the fuel reserve is 50%,
+@@ -50,4 +50,5 @@ data implementation LineSurveillanceTask.i extends CMASI::LineSearchTask.i
+ 		PlanOnSameSide: data bool.i;
+ end LineSurveillanceTask.i;
+ 
++end ICET;
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/IMPACT.aadl b/AADL_sandbox_projects/LmcpDataTypes/IMPACT.aadl
+index d8fbc1b..eee2fea 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/IMPACT.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/IMPACT.aadl
+@@ -126,10 +126,10 @@ end RadioConfiguration;
+ data implementation RadioConfiguration.i extends CMASI::PayloadConfiguration.i
+ 	subcomponents
+ 		--The range of the radio
+-		Range: data real32.i;
++		Rangee: data real32.i;
+ 		--The vehicle's rally point during loss of comm contingency. When set to null,
+ 		--no defined loss of comm behavior.
+-		RallyPoint: data Location3D.i;
++		RallyPoint: data CMASI::Location3D.i;
+ 		--Time after loss of communications the vehicle should return to its rally point
+ 		Timeout: data int64.i;
+ end RadioConfiguration.i;
+@@ -142,9 +142,9 @@ data implementation RadioTowerConfiguration.i extends CMASI::EntityConfiguration
+ 	subcomponents
+ 		--The position of the tower. A valid RadioTowerConfiguration must define Position
+ 		--(null not allowed)
+-		Position: data Location3D.i;
++		Position: data CMASI::Location3D.i;
+ 		--The range of the radio
+-		Range: data real32.i;
++		Rangee: data real32.i;
+ 		--Whether the radio is enabled
+ 		Enabled: data bool.i;
+ end RadioTowerConfiguration.i;
+@@ -355,7 +355,7 @@ data implementation VehicleSummary.i
+ 		--but the waypoint list may contain waypoints that are not necessarily linked.
+ 		--Multiple linked routes may be sent in a single waypoint list. Waypoints are not
+ 		--necessarily ordered in the list.
+-		WaypointList: data Waypoint.i {Data_Model::Data_Representation => Array;};
++		WaypointList: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+ 		--ID of the first waypoint in the plan.
+ 		FirstWaypoint: data int64.i;
+ end VehicleSummary.i;
+@@ -408,7 +408,7 @@ data implementation SpeedAltPair.i
+ 		--Altitude attached to this vehicle
+ 		Altitude: data real32.i;
+ 		--Altitude type for specified altitude
+-		AltitudeType: data AltitudeType.i;
++		AltitudeType: data CMASI::AltitudeType.i;
+ end SpeedAltPair.i;
+ 
+ data ImpactAutomationRequest
+@@ -422,7 +422,7 @@ data implementation ImpactAutomationRequest.i
+ 		RequestID: data int64.i;
+ 		--Standard CMASI Automation request. A valid ImpactAutomationRequest must define
+ 		--TrialRequest (null not allowed).
+-		TrialRequest: data AutomationRequest.i;
++		TrialRequest: data CMASI::AutomationRequest.i;
+ 		--Override nominal speed/alt. If a vehicle is not in list, its nominal speed/alt
+ 		--is used
+ 		OverridePlanningConditions: data SpeedAltPair.i {Data_Model::Data_Representation => Array;};
+@@ -444,7 +444,7 @@ data implementation ImpactAutomationResponse.i
+ 		ResponseID: data int64.i;
+ 		--Automation response from the request. A valid ImpactAutomationResponse must define
+ 		--TrialResponse (null not allowed).
+-		TrialResponse: data AutomationResponse.i;
++		TrialResponse: data CMASI::AutomationResponse.i;
+ 		--Associated play ID
+ 		PlayID: data int64.i;
+ 		--Associated solution ID
+@@ -466,7 +466,7 @@ data implementation PointOfInterest.i
+ 		PointID: data int64.i;
+ 		--Point of interest location. A valid PointOfInterest must define Location (null
+ 		--not allowed).
+-		Location: data Location3D.i;
++		Location: data CMASI::Location3D.i;
+ 		--Action that updated this point of interest (e.g. created, destroyed, modified)
+ 		PointAction: data AreaActionOptions.i;
+ 		--Human readable label for point of interest
+@@ -484,7 +484,7 @@ data implementation LineOfInterest.i
+ 		--ID for lines of interest
+ 		LineID: data int64.i;
+ 		--List of points to search
+-		Line: data Location3D.i {Data_Model::Data_Representation => Array;};
++		Line: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+ 		--Action that updated this line of interest (e.g. created, destroyed, modified)
+ 		LineAction: data AreaActionOptions.i;
+ 		--Human readable label for line of interest
+@@ -503,7 +503,7 @@ data implementation AreaOfInterest.i
+ 		AreaID: data int64.i;
+ 		--Geometry describing the area. A valid AreaOfInterest must define Area (null not
+ 		--allowed).
+-		Area: data AbstractGeometry.i;
++		Area: data CMASI::AbstractGeometry.i;
+ 		--Action that updated this area of interest (e.g. created, destroyed, modified)
+ 		AreaAction: data AreaActionOptions.i;
+ 		--Human readable label for area of interest
+@@ -521,17 +521,17 @@ data implementation ImpactPointSearchTask.i extends CMASI::SearchTask.i
+ 		--Point to search (from available points of interest). Only valid if ID is non-zero
+ 		SearchLocationID: data int64.i;
+ 		--Defines coordinates directly, only used when SearchLocationID is non-zero
+-		SearchLocation: data Location3D.i;
++		SearchLocation: data CMASI::Location3D.i;
+ 		--Minimum distance that an aircraft must maintain from the point of interest.
+ 		StandoffDistance: data real32.i;
+ 		--A list of acceptable look-angles for this task. Each wedge is defined relative
+ 		--to true North. To be a valid look angle, a sensor must be looking from a direction
+ 		--within the bounds of the wedge.
+-		ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
++		ViewAngleList: data CMASI::Wedge.i {Data_Model::Data_Representation => Array;};
+ 		--Loiter action to complete to fulfill task. If null, then simply points camera
+ 		--but main trajectory does not change. Otherwise, completes the specified loiter
+ 		--action.
+-		DesiredAction: data LoiterAction.i;
++		DesiredAction: data CMASI::LoiterAction.i;
+ end ImpactPointSearchTask.i;
+ 
+ data PatternSearchTask extends CMASI::SearchTask
+@@ -543,7 +543,7 @@ data implementation PatternSearchTask.i extends CMASI::SearchTask.i
+ 		--Point at which to search is centered (from available points of interest)
+ 		SearchLocationID: data int64.i;
+ 		--Defines coordinates directly, only used when SearchLocationID is non-zero
+-		SearchLocation: data Location3D.i;
++		SearchLocation: data CMASI::Location3D.i;
+ 		--Search pattern to use
+ 		Pattern: data AreaSearchPattern.i;
+ 		--Pattern extent
+@@ -561,7 +561,7 @@ data implementation AngledAreaSearchTask.i extends CMASI::SearchTask.i
+ 		--Sweep angle defined from true North in clockwise manner
+ 		SweepAngle: data real32.i;
+ 		--Optional start point that must be reached before beginning search
+-		StartPoint: data Location3D.i;
++		StartPoint: data CMASI::Location3D.i;
+ end AngledAreaSearchTask.i;
+ 
+ data ImpactLineSearchTask extends CMASI::SearchTask
+@@ -580,7 +580,7 @@ data implementation ImpactLineSearchTask.i extends CMASI::SearchTask.i
+ 		LineID: data int64.i;
+ 		--Defines a list of acceptable look-angles for this task. See the documentation
+ 		--above for details.
+-		ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
++		ViewAngleList: data CMASI::Wedge.i {Data_Model::Data_Representation => Array;};
+ 		--If true, the ViewAngleList specifies inertial (North-East) angles. See documentation
+ 		--above.
+ 		UseInertialViewAngles: data bool.i;
+@@ -617,7 +617,7 @@ data implementation CommRelayTask.i extends CMASI::Task.i
+ 		--ID of entity which requires comm relay support
+ 		SupportedEntityID: data int64.i;
+ 		--Destination location for supported entity, if known.
+-		DestinationLocation: data Location3D.i;
++		DestinationLocation: data CMASI::Location3D.i;
+ 		--ID of entity to which communication will be delivered (i.e. Tower ID)
+ 		TowerID: data int64.i;
+ end CommRelayTask.i;
+@@ -634,7 +634,7 @@ data implementation CordonTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--Block road access to this location. A valid CordonTask must define CordonLocation
+ 		--(null not allowed)
+-		CordonLocation: data Location3D.i;
++		CordonLocation: data CMASI::Location3D.i;
+ 		--Distance away from 'CordonLocation' that access should be blocked
+ 		StandoffDistance: data real32.i;
+ end CordonTask.i;
+@@ -655,7 +655,7 @@ data implementation BlockadeTask.i extends CMASI::Task.i
+ 		--Biases the blockade so that more vehicles are between enemy and protected location.
+ 		--If null location is given, then blockade attempts to block in direction of enemy
+ 		--travel
+-		ProtectedLocation: data Location3D.i;
++		ProtectedLocation: data CMASI::Location3D.i;
+ end BlockadeTask.i;
+ 
+ data EscortTask extends CMASI::SearchTask
+@@ -676,7 +676,7 @@ data implementation EscortTask.i extends CMASI::SearchTask.i
+ 		RouteID: data int64.i;
+ 		--Waypoints that the supported entity is presumed to be following if 'RouteID'
+ 		--is zero
+-		PrescribedWaypoints: data Waypoint.i {Data_Model::Data_Representation => Array;};
++		PrescribedWaypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+ 		--Distance ahead (positive) or behind (negative) that the vehicle will provide
+ 		--surveillance relative to 'SupportedEntityID's location on route 'RouteID'
+ 		StandoffDistance: data real32.i;
+@@ -702,7 +702,7 @@ data implementation WaterReport.i
+ 	subcomponents
+ 		--Area for which this report is valid. A valid WaterReport must define Area (null
+ 		--not allowed)
+-		Area: data AbstractGeometry.i;
++		Area: data CMASI::AbstractGeometry.i;
+ 		--Speed of the current, e.g. due to tides or river flow
+ 		CurrentSpeed: data real32.i;
+ 		--Direction of the current
+@@ -723,3 +723,4 @@ data implementation WaterZone.i extends CMASI::AbstractZone.i
+ end WaterZone.i;
+ 
+ 
++end IMPACT;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/ISOLATE.aadl b/AADL_sandbox_projects/LmcpDataTypes/ISOLATE.aadl
+index f394258..53ce12a 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/ISOLATE.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/ISOLATE.aadl
+@@ -61,7 +61,7 @@ end PatrolTask;
+ data implementation PatrolTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--Location of positions to visit on patrol
+-		VisitLocations: data CommTransferTask.i {Data_Model::Data_Representation => Array;};
++		VisitLocations: data UXCOMM::CommTransferTask.i {Data_Model::Data_Representation => Array;};
+ end PatrolTask.i;
+ 
+ data UgsManagementTask extends CMASI::Task
+@@ -98,7 +98,7 @@ data implementation StateTransition.i extends VICS::VicsBase.i
+ 		--Brief description of payload data included
+ 		PayloadDescription: data string.i;
+ 		--Data associated with the state transition
+-		Payload: data PayloadData.i;
++		Payload: data VICS::PayloadData.i;
+ 		--The ID of the Unattended Ground Sensor it is traveling to, or 0 if destination
+ 		--is not an UGS.
+ 		UgsID: data int64.i;
+@@ -111,7 +111,7 @@ end IntruderAlert;
+ data implementation IntruderAlert.i extends VICS::IntruderAlertBase.i
+ 	subcomponents
+ 		--The location at which the object was detected.
+-		DetectionLocation: data Location3D.i;
++		DetectionLocation: data CMASI::Location3D.i;
+ 		--Optional UGS ID of unit that detected the intruder. A value of 0 indicates no
+ 		--UGS performed the detection.
+ 		UgsID: data int64.i;
+@@ -125,7 +125,7 @@ data implementation IntruderAlert.i extends VICS::IntruderAlertBase.i
+ 		--Brief description of payload data included
+ 		PayloadDescription: data string.i;
+ 		--This is the actual payload data. Each payload stored in row by row format.
+-		Payload: data PayloadData.i;
++		Payload: data VICS::PayloadData.i;
+ end IntruderAlert.i;
+ 
+ data GreenIntruderAlert extends VICS::IntruderAlertBase
+@@ -136,13 +136,13 @@ end GreenIntruderAlert;
+ data implementation GreenIntruderAlert.i extends VICS::IntruderAlertBase.i
+ 	subcomponents
+ 		--The location at which the absence of measurements is reported
+-		DetectionLocation: data Location3D.i;
++		DetectionLocation: data CMASI::Location3D.i;
+ 		--Optional UGS ID of unit that is reporting an absence of measurements
+ 		UgsID: data int64.i;
+ 		--Brief description of payload data included
+ 		PayloadDescription: data string.i;
+ 		--This is the actual payload data. Each payload stored in row by row format.
+-		Payload: data PayloadData.i;
++		Payload: data VICS::PayloadData.i;
+ end GreenIntruderAlert.i;
+ 
+ data FixedUGS
+@@ -154,9 +154,9 @@ data implementation FixedUGS.i
+ 		--UGS ID
+ 		UgsID: data int64.i;
+ 		--Location in real world coordinates
+-		UgsLocation: data Location3D.i;
++		UgsLocation: data CMASI::Location3D.i;
+ 		--Location relative to network
+-		UgsNetworkLocation: data NetworkLocation.i;
++		UgsNetworkLocation: data ESTIMATE::NetworkLocation.i;
+ end FixedUGS.i;
+ 
+ data UgsLaydown
+@@ -166,11 +166,11 @@ end UgsLaydown;
+ data implementation UgsLaydown.i
+ 	subcomponents
+ 		--Network on which all UGS lay
+-		RoadNetwork: data NetworkRegion.i;
++		RoadNetwork: data ESTIMATE::NetworkRegion.i;
+ 		--List of all UGS fixed to this road network
+ 		UgsList: data FixedUGS.i {Data_Model::Data_Representation => Array;};
+ 		--Location in real world coordinates of delivery location (VICS Central)
+-		DeliveryLocation: data Location3D.i;
++		DeliveryLocation: data CMASI::Location3D.i;
+ end UgsLaydown.i;
+ 
+ data IsolationControllerInitialization
+@@ -239,7 +239,7 @@ data implementation IsolationCoordination.i
+ 		--Cleared child nodes
+ 		ClearedNodes: data int64.i {Data_Model::Data_Representation => Array;};
+ 		--EntityStates, from self/teammates, for coordination
+-		TeamStates: data EntityState.i {Data_Model::Data_Representation => Array;};
++		TeamStates: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
+ end IsolationCoordination.i;
+ 
+ data EntityAlertSummary
+@@ -251,7 +251,7 @@ data implementation EntityAlertSummary.i
+ 		--Entity ID
+ 		EntityID: data int64.i;
+ 		--Latest report reported from this entity
+-		LastAlert: data IntruderAlertBase.i;
++		LastAlert: data VICS::IntruderAlertBase.i;
+ 		--Total number of red alerts reported from this entity
+ 		TotalAlerts: data uint32.i;
+ end EntityAlertSummary.i;
+@@ -265,7 +265,7 @@ data implementation IsolationSummary.i
+ 		--ID of the entity that sent this message
+ 		SenderID: data int64.i;
+ 		--Location of entity
+-		SenderLocation: data Location3D.i;
++		SenderLocation: data CMASI::Location3D.i;
+ 		--Speed of entity
+ 		SenderSpeed: data real32.i;
+ 		--Heading of entity from true North
+@@ -293,3 +293,4 @@ data implementation IsolationSummary.i
+ end IsolationSummary.i;
+ 
+ 
++end ISOLATE;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/PATROL.aadl b/AADL_sandbox_projects/LmcpDataTypes/PATROL.aadl
+index 1b991f7..58815fa 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/PATROL.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/PATROL.aadl
+@@ -17,7 +17,7 @@ data implementation AlarmStation.i
+ 		--Station ID
+ 		AlarmID: data int64.i;
+ 		--Station world position
+-		Position: data Location3D.i;
++		Position: data CMASI::Location3D.i;
+ end AlarmStation.i;
+ 
+ data AlarmStatus
+@@ -76,3 +76,4 @@ data implementation PatrolTask.i extends ICET::LineSurveillanceTask.i
+ end PatrolTask.i;
+ 
+ 
++end PATROL;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/PERCEIVE.aadl b/AADL_sandbox_projects/LmcpDataTypes/PERCEIVE.aadl
+index 2ac844f..e40652f 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/PERCEIVE.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/PERCEIVE.aadl
+@@ -54,7 +54,7 @@ data implementation EntityPerception.i
+ 		AttitudeValid: data bool.i;
+ 		--The entity location. A valid EntityPerception must define Location (null not
+ 		--allowed)
+-		Location: data Location3D.i;
++		Location: data CMASI::Location3D.i;
+ 		--Error in the perception of the location of this entity. The first index is North-South
+ 		--error, the second index is the East-West error, and the third index is the vertical
+ 		--error. The result is an error cylinder.
+@@ -93,10 +93,11 @@ data implementation TrackEntityTask.i extends CMASI::Task.i
+ 		--The ID of the target to be tracked.
+ 		EntityID: data uint32.i;
+ 		--Required sensor modality for tracking the target
+-		SensorModality: data WavelengthBand.i;
++		SensorModality: data CMASI::WavelengthBand.i;
+ 		--The minimum ground sample distance that should be maintained for this target
+ 		--track operation.
+ 		GroundSampleDistance: data real32.i;
+ end TrackEntityTask.i;
+ 
+ 
++end PERCIEVE;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/PISR.aadl b/AADL_sandbox_projects/LmcpDataTypes/PISR.aadl
+index d6883a5..2d5d63e 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/PISR.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/PISR.aadl
+@@ -143,7 +143,7 @@ end DepotTask;
+ data implementation DepotTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--Location of the Depot
+-		DepotLocation: data Location3D.i;
++		DepotLocation: data CMASI::Location3D.i;
+ end DepotTask.i;
+ 
+ data RoadSearchTask extends CMASI::SearchTask
+@@ -161,15 +161,15 @@ end RoadSearchTask;
+ data implementation RoadSearchTask.i extends CMASI::SearchTask.i
+ 	subcomponents
+ 		--location to start the road search
+-		StartingLocation: data Location3D.i;
++		StartingLocation: data CMASI::Location3D.i;
+ 		--location to end the road search
+-		EndingLocation: data Location3D.i;
++		EndingLocation: data CMASI::Location3D.i;
+ 		--Relative direction to search the road. Makes is possible to search the road in
+ 		--either direction (or reverse, if that make sense)
+ 		RoadSearchDirection: data RoadSearchDirection.i;
+ 		--Defines a list of acceptable look-angles for this task. See the documentation
+ 		--above for details.
+-		ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array;};
++		ViewAngleList: data CMASI::Wedge.i {Data_Model::Data_Representation => Array;};
+ 		--If true, the ViewAngleList specifies inertial (North-East) angles. See documentation
+ 		--above.
+ 		UseInertialViewAngles: data bool.i;
+@@ -180,4 +180,6 @@ data implementation RoadSearchTask.i extends CMASI::SearchTask.i
+ 		UsePlaningAltitude: data bool.i;
+ end RoadSearchTask.i;
+ 
++end PISR;
++
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/PLANREP.aadl b/AADL_sandbox_projects/LmcpDataTypes/PLANREP.aadl
+index 2c36268..a02fa0c 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/PLANREP.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/PLANREP.aadl
+@@ -16,7 +16,7 @@ data implementation ExtendedArea.i
+ 		--TaskID of the corresponding AngledAreaSearch task.
+ 		SearchTaskID: data int64.i;
+ 		--Extended boundary of the area search.
+-		Boundary: data AbstractGeometry.i;
++		Boundary: data CMASI::AbstractGeometry.i;
+ end ExtendedArea.i;
+ 
+ data ExtendedPoint
+@@ -28,9 +28,10 @@ data implementation ExtendedPoint.i
+ 		--TaskID of the corresponding AngledAreaSearch task.
+ 		SearchTaskID: data int64.i;
+ 		--Location of the corresponding ImpactPointSearch task.
+-		SearchLocation: data Location3D.i;
++		SearchLocation: data CMASI::Location3D.i;
+ 		--Extended boundary of the point search.
+-		Boundary: data AbstractGeometry.i;
++		Boundary: data CMASI::AbstractGeometry.i;
+ end ExtendedPoint.i;
+ 
++end PLANREP;
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/ROUTE.aadl b/AADL_sandbox_projects/LmcpDataTypes/ROUTE.aadl
+index 3441ee8..845c9c7 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/ROUTE.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/ROUTE.aadl
+@@ -18,7 +18,7 @@ data implementation GraphNode.i
+ 		NodeID: data int64.i;
+ 		--Lat/Lon coordinates of node. A valid GraphNode must define Coordinates (null
+ 		--not allowed).
+-		Coordinates: data Location3D.i;
++		Coordinates: data CMASI::Location3D.i;
+ 		--IDs of edges that have this node as an endpoint
+ 		AssociatedEdges: data int64.i {Data_Model::Data_Representation => Array;};
+ end GraphNode.i;
+@@ -38,7 +38,7 @@ data implementation GraphEdge.i
+ 		--GraphNode ID which defines the end point of the edge
+ 		EndNode: data int64.i;
+ 		--Optional waypoints describing physical edge in lat/lon coordinates
+-		Waypoints: data Location3D.i {Data_Model::Data_Representation => Array;};
++		Waypoints: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+ end GraphEdge.i;
+ 
+ data GraphRegion
+@@ -65,7 +65,7 @@ data implementation RouteConstraints.i
+ 		RouteID: data int64.i;
+ 		--Location from which the planned route will start. A valid RouteConstraints message
+ 		--must define StartLocation (null not allowed).
+-		StartLocation: data Location3D.i;
++		StartLocation: data CMASI::Location3D.i;
+ 		--Heading of entity at the start of the route
+ 		StartHeading: data real32.i;
+ 		--If "true" the heading value in StartHeading must be used to start the route.
+@@ -73,7 +73,7 @@ data implementation RouteConstraints.i
+ 		UseStartHeading: data bool.i;
+ 		--Location to which the planned route will end. A valid RouteConstraints message
+ 		--must define EndLocation (null not allowed).
+-		EndLocation: data Location3D.i;
++		EndLocation: data CMASI::Location3D.i;
+ 		--Heading of entity at the end of the route
+ 		EndHeading: data real32.i;
+ 		--If "true" the heading value in EndHeading must be used to end the route. If not,
+@@ -135,11 +135,11 @@ data implementation RoutePlan.i
+ 		RouteID: data int64.i;
+ 		--Waypoints that connect the start location with the end location. Empty if only
+ 		--costs were requested
+-		Waypoints: data Waypoint.i {Data_Model::Data_Representation => Array;};
++		Waypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+ 		--Time cost of route. If less than zero, a planning error has occurred
+ 		RouteCost: data int64.i;
+ 		--Error messages, if applicable
+-		RouteError: data KeyValuePair.i {Data_Model::Data_Representation => Array;};
++		RouteError: data CMASI::KeyValuePair.i {Data_Model::Data_Representation => Array;};
+ end RoutePlan.i;
+ 
+ data RoutePlanResponse
+@@ -184,7 +184,7 @@ data implementation EgressRouteRequest.i
+ 		RequestID: data int64.i;
+ 		--Location from which to calculate the routes. A valid EgressRouteRequest must
+ 		--define StartLocation (null not allowed).
+-		StartLocation: data Location3D.i;
++		StartLocation: data CMASI::Location3D.i;
+ 		--The radius of the area of concern
+ 		Radius: data real32.i;
+ end EgressRouteRequest.i;
+@@ -198,7 +198,7 @@ data implementation EgressRouteResponse.i
+ 		--Response ID matching ID from request ({@link EgressRouteRequest})
+ 		ResponseID: data int64.i;
+ 		--The route locations
+-		NodeLocations: data Location3D.i {Data_Model::Data_Representation => Array;};
++		NodeLocations: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+ 		--The orientations
+ 		Headings: data real32.i {Data_Model::Data_Representation => Array;};
+ end EgressRouteResponse.i;
+@@ -212,9 +212,9 @@ data implementation RoadPointsConstraints.i
+ 		--ID denoting this set of road points constraints
+ 		RoadPointsID: data int64.i;
+ 		--Location from which the road points will start
+-		StartLocation: data Location3D.i;
++		StartLocation: data CMASI::Location3D.i;
+ 		--Location to which theroad points will end
+-		EndLocation: data Location3D.i;
++		EndLocation: data CMASI::Location3D.i;
+ end RoadPointsConstraints.i;
+ 
+ data RoadPointsRequest
+@@ -239,7 +239,8 @@ data implementation RoadPointsResponse.i
+ 		--Response ID matching ID from request ({@link RoadPointsRequest})
+ 		ResponseID: data int64.i;
+ 		--Corresponding road points respones, returned as LineOfInterest messages
+-		RoadPointsResponses: data LineOfInterest.i {Data_Model::Data_Representation => Array;};
++		RoadPointsResponses: data IMPACT::LineOfInterest.i {Data_Model::Data_Representation => Array;};
+ end RoadPointsResponse.i;
+ 
+ 
++end ROUTE;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/UXCOMM.aadl b/AADL_sandbox_projects/LmcpDataTypes/UXCOMM.aadl
+index 45096c4..7ea86d7 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/UXCOMM.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/UXCOMM.aadl
+@@ -14,7 +14,7 @@ end CommTransferTask;
+ data implementation CommTransferTask.i extends CMASI::Task.i
+ 	subcomponents
+ 		--Location of node with which to establish comm
+-		CommLocation: data Location3D.i;
++		CommLocation: data CMASI::Location3D.i;
+ 		--ID of comunicating entity
+ 		CommEntityID: data int64.i;
+ 		--Communication timeout at this location
+@@ -61,3 +61,4 @@ data implementation MeetMeTask.i extends UXCOMM::CommTransferTask.i
+ end MeetMeTask.i;
+ 
+ 
++end UXCOMM;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/UXNATIVE.aadl b/AADL_sandbox_projects/LmcpDataTypes/UXNATIVE.aadl
+index 84ae250..41e8cc1 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/UXNATIVE.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/UXNATIVE.aadl
+@@ -15,7 +15,7 @@ end VideoRecord;
+ data implementation VideoRecord.i
+ 	subcomponents
+ 		--Start [true] or stop [false] video recording
+-		Record: data bool.i;
++		Recordd: data bool.i;
+ end VideoRecord.i;
+ 
+ data StartupComplete
+@@ -37,18 +37,18 @@ data implementation CreateNewService.i
+ 		--XML configuration for this service (i.e. options in XML format)
+ 		XmlConfiguration: data string.i;
+ 		--Existing entity configurations in the system when this new service is created
+-		EntityConfigurations: data EntityConfiguration.i {Data_Model::Data_Representation => Array;};
++		EntityConfigurations: data CMASI::EntityConfiguration.i {Data_Model::Data_Representation => Array;};
+ 		--Existing entity states in the system when this new service is created
+-		EntityStates: data EntityState.i {Data_Model::Data_Representation => Array;};
++		EntityStates: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
+ 		--Existing mission commands for vehicles in the system when this new service is
+ 		--created
+-		MissionCommands: data MissionCommand.i {Data_Model::Data_Representation => Array;};
++		MissionCommands: data CMASI::MissionCommand.i {Data_Model::Data_Representation => Array;};
+ 		--Defined areas of interest at time of service creation
+-		Areas: data AreaOfInterest.i {Data_Model::Data_Representation => Array;};
++		Areas: data IMPACT::AreaOfInterest.i {Data_Model::Data_Representation => Array;};
+ 		--Defined lines of interest at time of service creation
+-		Lines: data LineOfInterest.i {Data_Model::Data_Representation => Array;};
++		Lines: data IMPACT::LineOfInterest.i {Data_Model::Data_Representation => Array;};
+ 		--Defined points of interest at time of service creation
+-		Points: data PointOfInterest.i {Data_Model::Data_Representation => Array;};
++		Points: data IMPACT::PointOfInterest.i {Data_Model::Data_Representation => Array;};
+ end CreateNewService.i;
+ 
+ data KillService
+@@ -108,7 +108,7 @@ data implementation EntityLocation.i
+ 		EntityID: data int64.i;
+ 		--Current location of entity. A valid EntityLocation must define Position (null
+ 		--not allowed)
+-		Position: data Location3D.i;
++		Position: data CMASI::Location3D.i;
+ 		--Corresponding time in milli-seconds since 1 Jan 1970
+ 		Time: data int64.i;
+ end EntityLocation.i;
+@@ -151,7 +151,7 @@ end SubTaskExecution;
+ data implementation SubTaskExecution.i
+ 	subcomponents
+ 		--List of tasks that current entity should complete
+-		SubTasks: data Task.i {Data_Model::Data_Representation => Array;};
++		SubTasks: data CMASI::Task.i {Data_Model::Data_Representation => Array;};
+ 		--Enable strict ordering
+ 		StrictOrder: data bool.i;
+ end SubTaskExecution.i;
+@@ -164,9 +164,9 @@ end SubTaskAssignment;
+ data implementation SubTaskAssignment.i
+ 	subcomponents
+ 		--List of tasks that current team should complete
+-		SubTasks: data Task.i {Data_Model::Data_Representation => Array;};
++		SubTasks: data CMASI::Task.i {Data_Model::Data_Representation => Array;};
+ 		--Neighboring entities to consider
+-		Neighbors: data EntityState.i {Data_Model::Data_Representation => Array;};
++		Neighbors: data CMASI::EntityState.i {Data_Model::Data_Representation => Array;};
+ end SubTaskAssignment.i;
+ 
+ data AutopilotKeepAlive
+@@ -253,3 +253,4 @@ data implementation SimulationTimeStepAcknowledgement.i
+ end SimulationTimeStepAcknowledgement.i;
+ 
+ 
++end UXNATIVE;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/UXTASK.aadl b/AADL_sandbox_projects/LmcpDataTypes/UXTASK.aadl
+index c16f05c..7651cff 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/UXTASK.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/UXTASK.aadl
+@@ -37,7 +37,7 @@ data implementation RendezvousTask.i extends CMASI::Task.i
+ 		--If 'MultiLocationRendezvous' is false, all vehicles will meet at this location
+ 		--simultaneously. When 'MultiLocationRendezvous' is true, Location is allowed to
+ 		--be null as 'RendezvousStates' will override the single location behavior.
+-		Location: data Location3D.i;
++		Location: data CMASI::Location3D.i;
+ 		--Rendezvous location. All vehicles will arrive with this heading simultaneously
+ 		--unless 'MultiLocationRendezvous' is set to 'true'.
+ 		Heading: data real32.i;
+@@ -63,7 +63,7 @@ data implementation PlanningState.i
+ 		EntityID: data int64.i;
+ 		--Position of this entity for the plan. A valid PlanningState must define PlanningPosition
+ 		--(null not allowed).
+-		PlanningPosition: data Location3D.i;
++		PlanningPosition: data CMASI::Location3D.i;
+ 		--Heading of this entity for the plan
+ 		PlanningHeading: data real32.i;
+ end PlanningState.i;
+@@ -105,7 +105,7 @@ data implementation CoordinatedAutomationRequest.i
+ 		MaximumResponseTime: data int64.i;
+ 		--Original automation request without a unique identifier. A valid CoordinatedAutomationRequest
+ 		--must define OriginalRequest (null not allowed).
+-		OriginalRequest: data AutomationRequest.i;
++		OriginalRequest: data CMASI::AutomationRequest.i;
+ 		--The initial states of entities used in planning. Note: if an eligible entity
+ 		--does not have a PlanningState, then it must be obtained from the entity in an
+ 		--{@link AssignmentCoordination} message.
+@@ -122,7 +122,7 @@ data implementation TaskAutomationRequest.i
+ 		RequestID: data int64.i;
+ 		--Original automation request without a unique identifier. A valid TaskAutomationRequest
+ 		--must define OriginalRequest (null not allowed).
+-		OriginalRequest: data AutomationRequest.i;
++		OriginalRequest: data CMASI::AutomationRequest.i;
+ 		--If this boolean is true, then the resulting plans based on this automation request
+ 		--will not be directly implemented, for example, tasks should not expect the waypoints
+ 		--generated for this request to be active
+@@ -144,7 +144,7 @@ data implementation TaskAutomationResponse.i
+ 		ResponseID: data int64.i;
+ 		--Original automation request without a unique identifier. A valid TaskAutomationResponse
+ 		--must define OriginalResponse (null not allowed).
+-		OriginalResponse: data AutomationResponse.i;
++		OriginalResponse: data CMASI::AutomationResponse.i;
+ 		--The final states of entities when the plan is completed.
+ 		FinalStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+ end TaskAutomationResponse.i;
+@@ -159,7 +159,7 @@ data implementation UniqueAutomationRequest.i
+ 		RequestID: data int64.i;
+ 		--Original automation request without a unique identifier. A valid UniqueAutomationRequest
+ 		--must define OriginalRequest (null not allowed).
+-		OriginalRequest: data AutomationRequest.i;
++		OriginalRequest: data CMASI::AutomationRequest.i;
+ 		--If this boolean is true, then the resulting plans based on this automation request
+ 		--will not be directly implemented, for example, tasks should not expect the waypoints
+ 		--generated for this request to be active
+@@ -181,7 +181,7 @@ data implementation UniqueAutomationResponse.i
+ 		ResponseID: data int64.i;
+ 		--Original automation request without a unique identifier. A valid UniqueAutomationResponse
+ 		--must define OriginalResponse (null not allowed).
+-		OriginalResponse: data AutomationResponse.i;
++		OriginalResponse: data CMASI::AutomationResponse.i;
+ 		--The final states of entities when the plan is completed.
+ 		FinalStates: data PlanningState.i {Data_Model::Data_Representation => Array;};
+ end UniqueAutomationResponse.i;
+@@ -211,7 +211,7 @@ data implementation FootprintRequest.i
+ 		VehicleID: data int64.i;
+ 		--Camera wavelength to be considered. If list is empty, planner should plan for
+ 		--all available sensors on each entity
+-		EligibleWavelengths: data WavelengthBand.i {Data_Model::Data_Representation => Array;};
++		EligibleWavelengths: data CMASI::WavelengthBand.i {Data_Model::Data_Representation => Array;};
+ 		--Desired ground sample distance for an eligible sensor. If list is empty, then
+ 		--footprint calculation uses the max ground sample distance for the specified altitude.
+ 		GroundSampleDistances: data real32.i {Data_Model::Data_Representation => Array;};
+@@ -256,7 +256,7 @@ data implementation SensorFootprint.i
+ 		--Ground sample distance obtained with this sensor footprint
+ 		AchievedGSD: data real32.i;
+ 		--Sensor wavelength used applicable to this footprint calculation
+-		CameraWavelength: data WavelengthBand.i;
++		CameraWavelength: data CMASI::WavelengthBand.i;
+ 		--Distance out front of the entity to the leading edge
+ 		HorizontalToLeadingEdge: data real32.i;
+ 		--Distance out front of the entity to the trailing edge
+@@ -304,7 +304,7 @@ data implementation TaskImplementationRequest.i
+ 		VehicleID: data int64.i;
+ 		--Initial position of entity before task. A valid TaskImplementationRequest must
+ 		--define StartPosition (null not allowed).
+-		StartPosition: data Location3D.i;
++		StartPosition: data CMASI::Location3D.i;
+ 		--Initial heading of entity before task
+ 		StartHeading: data real32.i;
+ 		--Time when vehicle is at the starting location
+@@ -344,10 +344,10 @@ data implementation TaskImplementationResponse.i
+ 		--Vehicle ID
+ 		VehicleID: data int64.i;
+ 		--Waypoints that implement this task for the indicated vehicle
+-		TaskWaypoints: data Waypoint.i {Data_Model::Data_Representation => Array;};
++		TaskWaypoints: data CMASI::Waypoint.i {Data_Model::Data_Representation => Array;};
+ 		--Vehicle location when this task is complete. A valid TaskImplementationResponse
+ 		--must define FinalLocation (null not allowed).
+-		FinalLocation: data Location3D.i;
++		FinalLocation: data CMASI::Location3D.i;
+ 		--Vehicle heading when this task is complete
+ 		FinalHeading: data real32.i;
+ 		--Time when vehicle is at the final location
+@@ -447,12 +447,12 @@ data implementation TaskOption.i
+ 		Cost: data int64.i;
+ 		--Start location entering the option. A valid TaskOption must define StartLocation
+ 		--(null not allowed).
+-		StartLocation: data Location3D.i;
++		StartLocation: data CMASI::Location3D.i;
+ 		--Start heading entering the option
+ 		StartHeading: data real32.i;
+ 		--Ending location for this option. A valid TaskOption must define EndLocation (null
+ 		--not allowed).
+-		EndLocation: data Location3D.i;
++		EndLocation: data CMASI::Location3D.i;
+ 		--Ending heading for this option
+ 		EndHeading: data real32.i;
+ end TaskOption.i;
+@@ -581,3 +581,4 @@ data implementation CancelTask.i
+ end CancelTask.i;
+ 
+ 
++end UXTASKS;
+\ No newline at end of file
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/VEHICLES.aadl b/AADL_sandbox_projects/LmcpDataTypes/VEHICLES.aadl
+index e899d3d..947a364 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/VEHICLES.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/VEHICLES.aadl
+@@ -79,4 +79,6 @@ end StationarySensorState;
+ data implementation StationarySensorState.i extends CMASI::EntityState.i
+ end StationarySensorState.i;
+ 
++end VEHICLES;
++
+ 
+diff --git a/AADL_sandbox_projects/LmcpDataTypes/VICS.aadl b/AADL_sandbox_projects/LmcpDataTypes/VICS.aadl
+index 5fd55ab..3bd69a4 100644
+--- a/AADL_sandbox_projects/LmcpDataTypes/VICS.aadl
++++ b/AADL_sandbox_projects/LmcpDataTypes/VICS.aadl
+@@ -109,7 +109,7 @@ data implementation DismountMessage.i extends VICS::VicsBase.i
+ 		--Brief message description
+ 		Description: data string.i;
+ 		--The (optional) location at which payload was generated
+-		Location: data Location3D.i;
++		Location: data CMASI::Location3D.i;
+ end DismountMessage.i;
+ 
+ data UgsConfiguration
+@@ -146,7 +146,7 @@ data implementation UgsStatusResponse.i extends VICS::VicsBase.i
+ 		--aimed after placement
+ 		HeadingAngle: data real32.i;
+ 		--Reported lat/lon location. Null if not yet aquired GPS location
+-		ReportedLocation: data Location3D.i;
++		ReportedLocation: data CMASI::Location3D.i;
+ 		--Reported time
+ 		CurrentTime: data int64.i;
+ end UgsStatusResponse.i;
+@@ -173,7 +173,7 @@ end PayloadData;
+ data implementation PayloadData.i
+ 	subcomponents
+ 		--The byte array of payload data. Can be blank to show presence of a stored message.
+-		Data: data byte.i {Data_Model::Data_Representation => Array;};
++		Dataa: data byte.i {Data_Model::Data_Representation => Array;};
+ 		--Payload from the time of the event. Could be nothing, text, images or video.
+ 		PayloadType: data PayloadType.i;
+ 		--Expected payload size: not to be used for index in Data field.
+@@ -260,4 +260,5 @@ data implementation MessageRequest.i
+ 		MessageID: data int64.i;
+ end MessageRequest.i;
+ 
++end VICS;
+ 
