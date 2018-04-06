@@ -25,6 +25,7 @@
 #include "afrl/cmasi/AirVehicleState.h"
 #include "BandsRegion.h"
 #include "Interval.h"
+#include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
 
 #include <iostream>     // std::cout, cerr, etc
 #include <cmath>    //cmath::cos, sin, etc
@@ -360,145 +361,143 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
 {
     if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
+        m_nogo_trk_deg.clear();
+        m_nogo_gs_mps.clear();
+        m_nogo_vs_mps.clear();
+        m_nogo_alt_m.clear();
         //receive message
-        auto airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
+        std::shared_ptr<afrl::cmasi::AirVehicleState> airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
         std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << 
                 airVehicleState->getID() << std::endl;
         //handle message
         std::unordered_map<int64_t, double> detectedViolations;        
         //add air vehicle message state to the Daidalus Object
-        MydaidalusPackage vehicleInfo;
+        MydaidalusPackage vehicleInfo;  
         vehicleInfo.m_daidalusPosition = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",
                                          airVehicleState->getLocation()->getLongitude(), "deg", airVehicleState->getLocation()->getAltitude(), "m");      
-        auto u_mps = airVehicleState->getU();
-        auto v_mps = airVehicleState->getV();
-        auto w_mps = airVehicleState->getW();
-        auto Phi_deg = airVehicleState->getRoll();
-        auto Theta_deg = airVehicleState->getPitch();
-        auto Psi_deg = airVehicleState->getHeading();
+        float u_mps = airVehicleState->getU();
+        float v_mps = airVehicleState->getV();
+        float w_mps = airVehicleState->getW();
+        float Phi_deg = airVehicleState->getRoll();
+        float Theta_deg = airVehicleState->getPitch();
+        float Psi_deg = airVehicleState->getHeading();
         double velocityX_mps, velocityY_mps, velocityZ_mps;
         makeVelocityXYZ(u_mps, v_mps, w_mps, n_Const::c_Convert::toRadians(Phi_deg), n_Const::c_Convert::toRadians(Theta_deg), 
                 n_Const::c_Convert::toRadians(Psi_deg), velocityX_mps, velocityY_mps, velocityZ_mps);
+        // DAIDALUS expects ENUp reference while UxAS internally used NEDown--covert UxAS velocities to DAIDALUS velocities
         auto daidalusVelocityZ_mps = -velocityZ_mps;    //add a comment for why
         auto daidalusVelocityX_mps = velocityY_mps;
         auto daidalusVelocityY_mps = velocityX_mps;
         vehicleInfo.m_daidalusVelocity = larcfm::Velocity::makeVxyz(daidalusVelocityX_mps, daidalusVelocityY_mps, "m/s", daidalusVelocityZ_mps, "m/s");
         vehicleInfo.m_daidalusTime_s = airVehicleState->getTime()*MILLISECONDTOSECOND; // conversion from UxAS representation of time in milliseconds to DAIDALUS representation fo time in seconds
-        // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship        
+        // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship   --TODO delete this comment before commiting to git repository     
         m_daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
-        if (m_daidalusVehicleInfo.size()>1 && m_daidalusVehicleInfo.count(m_entityId)>0)    // Conditional to check that at 2 vehicles are known 
-            //and one of the two is the ownship and therefor a well clear violation check is appropriate
+        // Conditional check for appropriateness off a well clear violation check-- 2 known vehicle states including the ownship
+        if (m_daidalusVehicleInfo.size()>1 && m_daidalusVehicleInfo.count(m_entityId)>0)    
         { 
             m_daa.setOwnshipState(std::to_string(m_entityId), m_daidalusVehicleInfo[m_entityId].m_daidalusPosition, 
                 m_daidalusVehicleInfo[m_entityId].m_daidalusVelocity, m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s); //set DAIDALUS object ownship state
             for (const auto& vehiclePackagedInfo : m_daidalusVehicleInfo)
             {
-                if (vehiclePackagedInfo.first!=m_entityId) // add intruder traffic state to DAIDALUS object
-                    //add staleness check to this statement or put check on outer most if
+                //add intruder traffic state to DAIDALUS object
+                if (vehiclePackagedInfo.first!=m_entityId) //--TODO add staleness check to this statement or put check on outer most if
                     {
                         m_daa.addTrafficState(std::to_string(vehiclePackagedInfo.first), vehiclePackagedInfo.second.m_daidalusPosition, 
                                 vehiclePackagedInfo.second.m_daidalusVelocity, vehiclePackagedInfo.second.m_daidalusTime_s);
-                        //std::cout << "Added Entity " << it_intruderId->first << " as an intruder to Entity " << m_entityId << std::endl;
+                        //std::cout << "Added Entity " << it_intruderId->first << " as an intruder to Entity " << m_entityId << std::endl; --TODO delete before commiting to repository
                     }
             }
-            //std::cout << "Number of aircraft according to DAIDALUS: " <<m_daa.numberOfAircraft() << std::endl;
+            //std::cout << "Number of aircraft according to DAIDALUS: " <<m_daa.numberOfAircraft() << std::endl;--  TODO delete
             if (m_daa.numberOfAircraft()>1) //Perform well_clear violation check if DAIDALUS object contains ownship and at least one intruder traffic state
             {
                 larcfm::KinematicMultiBands m_daa_bands;
                 m_daa.kinematicMultiBands(m_daa_bands);
                 for (int intruderIndex = 1; intruderIndex<=m_daa.numberOfAircraft()-1; ++intruderIndex)
                 {
-                    auto timeToViolation_s = m_daa.timeToViolation(intruderIndex);
+                    double timeToViolation_s = m_daa.timeToViolation(intruderIndex);
                     if (timeToViolation_s != PINFINITY && timeToViolation_s != NaN)
                     { 
                         detectedViolations[std::stoi(m_daa.getAircraftState(intruderIndex).getId(),nullptr,10)] = timeToViolation_s;
-                        //std::cout << "Collision with intruder " <<m_daa.getAircraftState(intruderIndex).getId() << " in " << timeToViolation << " seconds" << std::endl;
+                        //std::cout << "Collision with intruder " <<m_daa.getAircraftState(intruderIndex).getId() << " in " << timeToViolation << " seconds" << std::endl;--TODO delete
                     }
                 }
                 //send out response
-                //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;
+                //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;--TODO delete
                 if (!detectedViolations.empty())
                 {
+                    std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
+                            std::make_shared<larcfm::DAIDALUS::WellClearViolationIntervals>();
                     for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)
                     {
+                        std::unique_ptr<larcfm::DAIDALUS::GroundHeadingInterval> pTempPtr (new larcfm::DAIDALUS::GroundHeadingInterval);
                         larcfm::Interval iv = m_daa_bands.track(ii,"deg");
-                        double lower_trk = iv.low;
-                        double upper_trk = iv.up;
-                        std::array<double,2> temp_array;
-                        temp_array[1] = lower_trk;
-                        temp_array[2] = upper_trk;
+                        double lower_trk_deg = iv.low;
+                        double upper_trk_deg = iv.up;
                         larcfm::BandsRegion::Region regionType = m_daa_bands.trackRegion(ii);
                         if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                         {
-                            m_nogo_trk_deg.push_back(temp_array);
+                            pTempPtr->getGroundHeadings()[0] = lower_trk_deg;
+                            pTempPtr->getGroundHeadings()[1] = upper_trk_deg;
+                            nogo_ptr->getWCVGroundHeadingIntervals().push_back(pTempPtr.release());
                         }
                     }
                     for (int ii = 0; ii < m_daa_bands.groundSpeedLength();++ii)
                     {
+                        std::unique_ptr<larcfm::DAIDALUS::GroundSpeedInterval> pTempPtr (new larcfm::DAIDALUS::GroundSpeedInterval);
                         larcfm::Interval iv = m_daa_bands.groundSpeed(ii, "mps");
-                        double lower_gs = iv.low;
-                        double upper_gs =iv.up;
-                        std::array<double,2> temp_array;
-                        temp_array[1] = lower_gs;
-                        temp_array[2] = upper_gs;
+                        double lower_gs_mps = iv.low;
+                        double upper_gs_mps =iv.up;
                         larcfm::BandsRegion::Region regionType = m_daa_bands.groundSpeedRegion(ii);
                         if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                         {
-                            m_nogo_gs_mps.push_back(temp_array);
+                            pTempPtr->getGroundSpeeds()[0] = lower_gs_mps;
+                            pTempPtr->getGroundSpeeds()[1] = upper_gs_mps;
+                            nogo_ptr->getWCVGroundSpeedIntervals().push_back(pTempPtr.release());
                         }
                     }
                     for (int ii =0; ii < m_daa_bands.verticalSpeedLength();++ii)
                     {
+                        std::unique_ptr<larcfm::DAIDALUS::VerticalSpeedInterval> pTempPtr (new larcfm::DAIDALUS::VerticalSpeedInterval);
                         larcfm::Interval iv = m_daa_bands.verticalSpeed(ii, "mps");
-                        double lower_vs = iv.low;
-                        double upper_vs = iv.up;
-                        std::array<double,2> temp_array;
-                        temp_array[1] = lower_vs;
-                        temp_array[2] = upper_vs;
-                        larcfm::BandsRegion::Region regionType = m_daa_bands.verticalSpeedRegion(ii);
+                        double lower_vs_mps = iv.low;
+                        double upper_vs_mps = iv.up;
+                       larcfm::BandsRegion::Region regionType = m_daa_bands.verticalSpeedRegion(ii);
                         if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                         {
-                            m_nogo_vs_mps.push_back(temp_array);
+                            pTempPtr->getVerticalSpeeds()[0] = lower_vs_mps;
+                            pTempPtr->getVerticalSpeeds()[1] = upper_vs_mps;
+                            nogo_ptr->getWCVVerticalSpeedIntervals().push_back(pTempPtr.release());
                         }
                     }
                     for (int ii = 0; ii < m_daa_bands.altitudeLength(); ++ii)
                     {
+                        std::unique_ptr<larcfm::DAIDALUS::AltitudeInterval> pTempPtr (new larcfm::DAIDALUS::AltitudeInterval);
                         larcfm::Interval iv = m_daa_bands.altitude(ii, "m");
-                        double lower_alt = iv.low;
-                        double upper_alt = iv.up;
-                        std::array<double,2> temp_array;
-                        temp_array[1] = lower_alt;
-                        temp_array[2] = upper_alt;
+                        double lower_alt_m = iv.low;
+                        double upper_alt_m = iv.up;
                         larcfm::BandsRegion::Region regionType = m_daa_bands.altitudeRegion(ii);
                         if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                         {
-                            m_nogo_alt_m.push_back(temp_array);
+                            pTempPtr->getAltitude()[0] = lower_alt_m;
+                            pTempPtr->getAltitude()[1] = upper_alt_m;
+                            nogo_ptr->getWCVAlitudeIntervals().push_back(pTempPtr.release());
                         }
                     }
                     for (auto itViolations = detectedViolations.cbegin(); itViolations != detectedViolations.cend(); itViolations++)
                     {
                         std::cout << "Entity " << m_entityId << " will violate the well clear volume with Entity " << itViolations->first << " in " 
-                                << itViolations->second <<" seconds!!" << std::endl<<std::endl;
-                       // std::cout << m_nogo_trk_deg <<  std::endl;
+                                << itViolations->second <<" seconds!!" << std::endl<<std::endl; //--TODO delete
+                       // std::cout << m_nogo_trk_deg <<  std::endl;--TODO delete
                     }
+                    sendSharedLmcpObjectBroadcastMessage(nogo_ptr);
                 }
                 else 
                 {
-                    std::cout << "No violation of well clear volume detected :^)" << std::endl;
+                    std::cout << "No violation of well clear volume detected :^)" << std::endl; //--TODO delete
+                    //--TODO figure out what the appropriate action should be when there is no violation detected
                 }
             }
         }
-        
-        
-      
-        // send out response
-        //auto keyValuePairOut = std::make_shared<afrl::cmasi::KeyValuePair>();
-        //keyValuePairOut->setKey(s_typeName());
-        //keyValuePairOut->setValue(std::to_string(m_serviceId));
-        //sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
-        //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;
- 
-        
     }
     return false;
 }

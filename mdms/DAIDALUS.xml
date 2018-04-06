@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MDM SYSTEM 'MDM.DTD'>
+    <MDM>
+        <SeriesName>DAIDALUS</SeriesName>
+        <Namespace>larcfm/DAIDALUS</Namespace>
+        <Version>1</Version>
+        <Comment> MDM Comment </Comment>
+               <StructList>
+            <!-- Interval consisting of the lower and upper headings (measured from true North) that will result in a WellClear violation within the detection window -->
+            <Struct Name="GroundHeadingInterval" >
+                    <!-- array containing lower and upper headings of detected WellClear violations in degrees -->
+                <Field Name="GroundHeadings" Type="real64[2]" Units="degrees"/>
+            </Struct>
+            <!-- Interval consisting of the lower and upper speeds that will result in a WellClear violation within the detection window -->
+            <Struct Name="GroundSpeedInterval" >
+                <!-- array containing lower and upper speeds of detected WellClear violations in meters per second -->
+                <Field Name="GroundSpeeds" Type="real64[2]" Units="meters/second" />
+            </Struct>
+            <!-- Interval consisting of the lower and upper vertical speeds that will result in a WellClear violation within the detection window -->
+            <Struct Name="VerticalSpeedInterval" >
+                <!-- array containing the lower and upper vertical of detected WellClear violation in meters per second -->
+                <Field Name="VerticalSpeeds" Type="real64[2]" Units="meters/second" />
+            </Struct>
+            <!-- Interval consisting of the lower and upper altitudes (MSL?) that will result in a WellClear violation within the detection window -->
+            <Struct Name="AltitudeInterval" >
+                <!-- array containing the lower and upper altitude of detected WellClear violation in meters -->
+                <Field Name="Altitude" Type="real64[2]" Units="meters" />
+            </Struct>
+            <!-- List of  intervals that will result in a WellClear violation within the detection window -->
+            <Struct Name="WellClearViolationIntervals">
+                <!-- List of ground heading intervals that will result in a WellClear violation within the detection window -->
+                <Field Name="WCVGroundHeadingIntervals" Type="GroundHeadingInterval[]" Units="None" />
+                <!-- List of ground speed intervals that will result in a WellClear violation within the detection window -->
+                <Field Name="WCVGroundSpeedIntervals" Type="GroundSpeedInterval[]" Units="None" />
+                <!-- List of vertical speed intervals that will result in a WellClear violation within the detection window -->
+                <Field Name="WCVVerticalSpeedIntervals" Type="VerticalSpeedInterval[]" Units="None" />
+                <!-- List of altitude intervals that will result in a WellClear violation within the detection window -->
+                <Field Name="WCVAlitudeIntervals" Type="AltitudeInterval[]" Units="None" />
+            </Struct>
+        </StructList>
+    </MDM>
