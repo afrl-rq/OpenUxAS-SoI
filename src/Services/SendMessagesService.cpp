@@ -143,7 +143,7 @@ SendMessagesService::configure(const pugi::xml_node& serviceXmlNode)
                     }
                     else
                     {
-                        UXAS_LOG_ERROR(s_typeName(), "::configure failed to create LMCP object from loaded XML");
+                        UXAS_LOG_ERROR(s_typeName(), "::configure failed to create LMCP object from loaded XML [",filePath,"]");
                     }
                 }
                 else
