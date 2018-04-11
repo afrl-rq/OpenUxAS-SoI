@@ -29,6 +29,7 @@
 
 //Added
 #include "afrl/cmasi/LoiterAction.h"
+#include "afrl/cmasi/Waypoint.h"
 
 #include <sstream>
 #include <iostream>     // std::cout, cerr, etc
@@ -330,9 +331,9 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         auto mish = new afrl::cmasi::MissionCommand;
         mish->setCommandID(m_commandId++);
         mish->setVehicleID(taskImplementationResponse->getVehicleID());
-        /*
+        ///*
         //This is in the hopes of eventually fixing the first point not loitering bug
-        if(taskImplementationResponse->getTimeThreshold() > 0){
+        //if(taskImplementationResponse->getTimeThreshold() > 0){
             afrl::cmasi::LoiterAction lTask;
             lTask.setDuration(30);//taskImplementationResponse->getTimeThreshold()); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
             lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
@@ -345,8 +346,25 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
             taskImplementationResponse->getTaskWaypoints().front()->setAltitude(locationToAdd->getAltitude());
             taskImplementationResponse->getTaskWaypoints().front()->setAltitudeType(locationToAdd->getAltitudeType());
             
-        }
-        */
+            //std::cout << "Next waypoint: " << taskImplementationResponse->getTaskWaypoints().front()->getNextWaypoint() << std::endl;
+            
+            afrl::cmasi::Waypoint * newWP = taskImplementationResponse->getTaskWaypoints().front()->clone();
+            
+            //std::cout << newWP->toString() << std::endl;
+            newWP->setNextWaypoint(2);
+            taskImplementationResponse->getTaskWaypoints().insert(taskImplementationResponse->getTaskWaypoints().begin(), newWP->clone());
+            
+            /* For bugfixing
+            for(afrl::cmasi::Waypoint * wp : taskImplementationResponse->getTaskWaypoints()){
+                std::cout << wp->getNextWaypoint()-1 << "ActionList:" << std::endl;
+                for(afrl::cmasi::VehicleAction * vhac : wp->getVehicleActionList()){
+                    std::cout << vhac->toString() << std::endl;
+                }
+            }
+            */
+        //}
+        //*/
+        //std::cout << taskImplementationResponse->getTaskWaypoints().front()->toString() << std::endl;
         mish->setFirstWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
         for(auto wp : taskImplementationResponse->getTaskWaypoints())
             mish->getWaypointList().push_back(wp->clone());
