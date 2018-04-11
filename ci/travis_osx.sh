@@ -5,6 +5,10 @@ export PATH=~/.cargo/bin:~/.local/bin:$PATH
 brew bundle --file=./.Brewfile
 export BOOST_ROOT=/usr/local
 
+# install Rust
+curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path
+rustc --version
+
 # install verion of Meson that is compatible with UxAS build
 curl -L -s https://github.com/mesonbuild/meson/archive/0.45.0.zip -o meson.zip
 unzip -q meson.zip
