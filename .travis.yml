@@ -1,19 +1,34 @@
-sudo: required
+dist: trusty
 
-  # # install Rust
-  # - curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path
-  # - rustc --version
+matrix:
+  include:
+    - services: docker
+      os: linux
+      env: BUILD_FLAVOR=linux_docker
+      sudo: required
+    - os: linux
+      env: BUILD_FLAVOR=linux_native
+      sudo: false
+      addons:
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - libglu1-mesa-dev
+            - uuid-dev
+            - libboost-date-time-dev
+            - libboost-filesystem-dev
+            - libboost-regex-dev
+            - libboost-system-dev
+            - libgtest-dev
+            - ant
+            - oracle-java8-set-default
+            - python3.6
+    - os: osx
+      env: BUILD_FLAVOR=osx_native
+      sudo: false
 
-services:
-  - docker
-
-install:
-  # clone LmcpGen
-  - git clone https://github.com/afrl-rq/LmcpGen.git ../LmcpGen
-  # tries to check out the same branch as the one we're building if it's
-  # available, so that development can proceed in tandem
-  - (cd ../LmcpGen; (git checkout $TRAVIS_BRANCH || true); ant jar)
+language: cpp
 
 script:
-  - (cd docker/develop; ./01_buildImage_UxAS_build.sh && ./02_buildUxAS_WithDocker.sh && ./03_stopAndRemoveBuildContainer.sh && ./04_runUxAS_Tests.sh)
-  - (cd docker/deploy; ./01_buildRun_Image.sh)
+  - bash ci/travis.sh

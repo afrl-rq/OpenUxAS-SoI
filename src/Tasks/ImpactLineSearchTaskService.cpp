@@ -147,7 +147,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
     double wedgeAzimuthIncrement(n_Const::c_Convert::dPiO8());
     double wedgeElevationIncrement(n_Const::c_Convert::dPiO8());
 
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
     int64_t taskId(m_lineSearchTask->getTaskID());
 
     std::string compositionString("+(");
@@ -157,9 +157,10 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
         //ViewAngleList
         if (!m_lineSearchTask->getViewAngleList().empty())
         {
-            // I'm assuming the elevation is measured from the horizon, positive down
-            auto elevationMin_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();
-            auto elevationMax_rad = 90.0 * n_Const::c_Convert::dDegreesToRadians();
+            // Elevation is measured from the horizon, positive up
+            // TODO use min/max values from AirVehicleConfiguration
+            auto elevationMin_rad = -90.0 * n_Const::c_Convert::dDegreesToRadians();
+            auto elevationMax_rad = 10.0 * n_Const::c_Convert::dDegreesToRadians();    
 
             for (auto itWedge = m_lineSearchTask->getViewAngleList().begin();
                     itWedge != m_lineSearchTask->getViewAngleList().end();
@@ -191,7 +192,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
                         std::string algebraString;
                         if (isCalculateOption(taskId, itEligibleEntities->second,
                                 itEligibleEntities->first.second, itEligibleEntities->first.first,
-                                dHeadingCurrent_rad, -elevationLookAngleCurrent_rad,
+                                dHeadingCurrent_rad, elevationLookAngleCurrent_rad,
                                 optionId, algebraString))
                         {
                             compositionString += algebraString + " ";
@@ -210,7 +211,7 @@ void ImpactLineSearchTaskService::buildTaskPlanOptions()
                             std::string algebraString;
                             if (isCalculateOption(taskId, itEligibleEntities->second,
                                     itEligibleEntities->first.second, itEligibleEntities->first.first,
-                                    dHeadingCurrent_rad, -elevationLookAngleCurrent_rad,
+                                    dHeadingCurrent_rad, elevationLookAngleCurrent_rad,
                                     optionId, algebraString))
                             {
                                 compositionString += algebraString + " ";

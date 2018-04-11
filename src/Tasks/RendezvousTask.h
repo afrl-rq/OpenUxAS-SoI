@@ -79,26 +79,26 @@ public:
     {
         static std::string s_string("RendezvousTask");
         return (s_string);
-    };
+    }
 
     static const std::vector<std::string>
     s_registryServiceTypeNames()
     {
         std::vector<std::string> registryServiceTypeNames = {s_typeName(),"uxas.messages.task.RendezvousTask"};
         return (registryServiceTypeNames);
-    };
+    }
 
     /** \brief If this string is not empty, it is used to create a data 
      * directory to be used by the service. The path to this directory is
      * accessed through the ServiceBase variable m_workDirectoryPath. */
     static const std::string&
-    s_directoryName() { static std::string s_string(""); return (s_string); };
+    s_directoryName() { static std::string s_string(""); return (s_string); }
 
     static ServiceBase*
     create()
     {
         return new RendezvousTask;
-    };
+    }
 
     RendezvousTask();
 
@@ -163,9 +163,9 @@ private:
 };
 
 
-}; //namespace task
-}; //namespace service
-}; //namespace uxas
+} //namespace task
+} //namespace service
+} //namespace uxas
 
 #endif /* UXAS_RENDEZVOUS_TASK_H */
 

@@ -9,7 +9,7 @@
 
 /* 
  * File:   LoiterLeash.h
- * Author: derek
+ * Author: derek & steve
  *
  * Created on Jan 20, 2018, 12:21 PM
  */
@@ -20,6 +20,11 @@
 #include "ServiceBase.h"
 #include "CallbackTimer.h"
 #include "TypeDefs/UxAS_TypeDefs_Timer.h"
+
+#include "afrl/cmasi/EntityConfiguration.h"
+#include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/VehicleActionCommand.h"
+
 
 namespace uxas
 {
@@ -122,6 +127,17 @@ private:
 private:
     /*! \brief  Time-step estimator window*/
     std::deque<double> m_TimeStepWindow;
+    /*! \brief  ID of the vehicle for this LoiterLeash service*/
+    int64_t m_vehicleID = {-1}; // need a vehicle ID or can't do anything
+    /*! \brief  last state received for this vehicle*/
+    std::shared_ptr<afrl::cmasi::EntityState> m_lastEntityState;
+    /*! \brief  entity configuration for this vehicle*/
+    std::shared_ptr<afrl::cmasi::EntityConfiguration> m_entityConfiguration;
+    
+    /*! \brief  ID to keep track of routerequests */
+    int64_t m_currentRouteId = {0};
+    /*! \brief  vehicle action command to send out if route request returns route with 2 points. */
+    std::shared_ptr<afrl::cmasi::VehicleActionCommand> m_nextVehicleActionCommand;
 };
 
 }; //namespace service

@@ -33,12 +33,12 @@ RendezvousTask::s_registrar(RendezvousTask::s_registryServiceTypeNames());
 
 // service constructor
 RendezvousTask::RendezvousTask()
-: TaskServiceBase(RendezvousTask::s_typeName(), RendezvousTask::s_directoryName()) { };
+: TaskServiceBase(RendezvousTask::s_typeName(), RendezvousTask::s_directoryName()) { }
 
 RendezvousTask::~RendezvousTask()
 {
     UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::~RendezvousTask()");
-};
+}
 
 bool
 RendezvousTask::configureTask(const pugi::xml_node& ndComponent)
@@ -145,6 +145,6 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
     return true;
 }
     
-}; //namespace task
-}; //namespace service
-}; //namespace uxas
+} //namespace task
+} //namespace service
+} //namespace uxas

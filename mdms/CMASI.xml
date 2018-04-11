@@ -22,18 +22,18 @@
 
 
         <h2>Changes</h2>
-        
+
         <h3>19 July 2017</h3>
 		<ul>
 			<li>Added maxmimum length bounds to all arrays. Does not change serialization API, however, it can be used to check properly formatted messages during deserialization. Because 'max array length' is informational, wire compatability is preserved (so version number is NOT incremented).</li>
 			<li>Added 'Optional' indicator on fields of messages that contain references to other messages. For fields that are not indicated as Optional, a viable message must not send 'null' in that field. Does not change serialization API and wire compatability is preserved (so version number is NOT incremented).</li>
 		</ul>
-		
+
         <h3>7 May 2015</h3>
 		<ul>
 			<li>Added nominal altitde in {@link EntityConfiguration}</li>
 		</ul>
- 
+
 		<h3>23 April 2015</h3>
 		<ul>
 			<li>Changed default AltitudeType in {@link Location3D} from "AGL" to "MSL"</li>
@@ -41,19 +41,19 @@
 			<li>Changed DwellTime field in {@link SearchTask} from real32 seconds to int64 milliseconds</li>
 			<li>Changed Duration field in {@link LoiterAction} from real32 seconds to int64 milliseconds</li>
 		</ul>
-		
+
 		<h3>16 April 2015</h3>
 		<ul>
-			<li>Moved "ActualEnergyRate", "CurrentCommand", "CurrentWaypoint", "Mode", and "AssociatedTasks" 
+			<li>Moved "ActualEnergyRate", "CurrentCommand", "CurrentWaypoint", "Mode", and "AssociatedTasks"
 				from {@link AirVehicleState} to {@link EntityState} </li>
 		</ul>
- 
+
 		<h3>18 March 2015</h3>
 		<ul>
             <li>All ID fields updated from uint32 to int64</li>
             <li>PauseTime in {@link PathWaypoint} and Duration in {@link GimbalStareAction} changed to millisecond units</li>
         </ul>
-		
+
 		<h3>11 March 2015</h3>
 		<ul>
 			<li>Moved EntityDetection, TrackEntityTask, and TrackEntityAction to PERCEIVE MDM</li>
@@ -65,7 +65,7 @@
                         <li>Added additional contingency point in {@link Waypoint}</li>
                         <li>Added {@link PayloadStowAction} and added "stowed" to {@link GimbalPointingMode} </li>
                 </ul>
-		
+
 		<h3>5 March 2015</h3>
 		<ul>
 			<li>Moved body axis speeds, accelerations, and angles from {@link AirVehicleState} to {@link EntityState}.</li>
@@ -74,7 +74,7 @@
 			<li>Added {@link TrackEntityTask}, {@link TrackEntityAction}</li>
 			<li>Added {@link FollowPathCommand} and {@link PathWaypoint}</li>
 		</ul>
-        
+
         <h3>25 Feb 2015</h3>
         <ul>
             <li>Created {@link EntityConfiguration} and {@link EntityState} with {@link AirVehicleConfiguration} and {@link AirVehicleState} deriving from them
@@ -85,7 +85,7 @@
             <li>Added altitude type. {@link Location3D} and {@link AbstractZone} now both utilize
             <li>All time fields now use int64 type and are considered in units of milliseconds
         </ul>
- 
+
         <h3>8 October 2010</h3>
         <ul>
             <li>Changed EndPoint in {@link VehicleInfo} to be {@link Location2D} based on group discussion
@@ -119,7 +119,7 @@
             <li>Created {@link WeatherReport}.
             <li>Changed comment regarding WGS-84 and EGM-96.
         </ul>
-        
+
         <h3>31 August 2010</h3>
         <ul>
         <li>Fixed missing type in "UseInertialViewAngles" in {@link LineSearchTask}
@@ -189,7 +189,7 @@
         </ul>
 
         ( Previous changes are reflected in CMASI version 1 MDM )
-        
+
 -->
 <MDM>
     <SeriesName>CMASI</SeriesName>
@@ -339,7 +339,7 @@
             <!-- Height above WGS84 ellipsoid, mean sea level -->
             <Entry Name="MSL"/>
         </Enum>
-		
+
 	<!-- Designates how an entity should treat a path following command.  -->
         <Enum Name="TravelMode">
             <!-- A path is traversed from beginning to end, then the entity stops -->
@@ -349,7 +349,7 @@
             <!-- Upon reaching the end of a route, the entity travels to the first point and repeats the route. -->
             <Entry Name="Loop"/>
         </Enum>
-        
+
         <!-- Used in {@link WaypointTransfer} to indicate the type of waypoint exchange -->
         <Enum Name="WaypointTransferMode">
             <!-- Requests download of waypoints from the aircraft -->
@@ -369,7 +369,7 @@
         <!-- Base class for geometry types -->
         <Struct Name="AbstractGeometry">
         </Struct>
-        
+
         <!-- A container for key/value pairs.  Keys and values can be any valid string. -->
         <Struct Name="KeyValuePair">
             <!-- A key (name) for the property -->
@@ -377,7 +377,7 @@
             <!-- A value for the property -->
             <Field Name="Value" Type="string"/>
         </Struct>
-        
+
         <!--
          Location is defined as a point in the world using the WGS84 specification for latitude
          and longitude.
@@ -385,45 +385,45 @@
         <Struct Name="Location3D">
             <!-- Latitude -->
             <Field Name="Latitude" Type="real64" Units="degree" />
-            
+
             <!-- Longitude -->
             <Field Name="Longitude" Type="real64" Units="degree" />
-            
+
             <!-- Altitude for this waypoint -->
             <Field Name="Altitude" Type="real32" Units="meter"/>
-            
+
             <!-- Altitude type for specified altitude -->
             <Field Name="AltitudeType" Type="AltitudeType" Default="MSL" />
         </Struct>
-        
+
         <!-- An action for controlling a payload item (abstract). -->
         <Struct Name="PayloadAction" Extends="VehicleAction">
             <!-- A unique id for this payload item. -->
             <Field Name="PayloadID" Type="int64" Units="None" />
         </Struct>
-        
+
         <!-- Base type for payloads -->
         <Struct Name="PayloadConfiguration">
             <!-- The unique id for this payload item. -->
             <Field Name="PayloadID" Type="int64" Units="None" />
-            
+
             <!-- A string uniquely identifying the kind of payload item (primarily to be used
              for debugging purposes). -->
             <Field Name="PayloadKind" Type="string" Units="None" />
-            
+
             <!-- Optional parameters associated with payload configuration -->
             <Field Name="Parameters" Type="KeyValuePair[]" MaxArrayLength="8" />
         </Struct>
-        
+
         <!-- Describes the current state of a payload item (abstract). -->
         <Struct Name="PayloadState">
             <!-- The unique id for this payload item. -->
             <Field Name="PayloadID" Type="int64" Units="None" />
-            
+
             <!-- Optional parameters associated with payload state -->
             <Field Name="Parameters" Type="KeyValuePair[]" MaxArrayLength="8" />
         </Struct>
-        
+
         <!--
          Base class for an action to be taken by a vehicle.  This is usually used as an object inside of
          {@link Waypoint} to describe the action that a vehicle is to take upon reaching a waypoint.  This is
@@ -437,7 +437,7 @@
              -->
             <Field Name="AssociatedTaskList" Type="int64[]" MaxArrayLength="8"/>
         </Struct>
-        
+
         <!--
          The base class for all task requests passed to the automation service.  Task requests are not assigned to a specific vehicle, but
          allow the automation service to determine the best vehicle to complete the task.
@@ -445,47 +445,47 @@
         <Struct Name="Task">
             <!-- A unique identifier for this task. -->
             <Field Name="TaskID" Type="int64" Units="None" />
-            
+
             <!-- An optional text string for the task. This is not necesarily unique,
              and is included for information only. TaskID should be used to uniquely
              identify tasks. -->
             <Field Name="Label" Type="string" />
-            
+
             <!-- A list of entity IDs that are eligible to accomplish this task.  If the list is empty, then it is
              assumed all entities are eligible. -->
             <Field Name="EligibleEntities" Type="int64[]" MaxArrayLength="32" Units="None" />
-            
+
             <!--
              If a task is to be repeatedly done, this field indicates how often.
              A value of zero means the task is complete on the first pass.
              -->
             <Field Name="RevisitRate" Type="real32" Units="sec" Default="0"/>
-            
+
             <!-- An optional text string for automation service task parameters. -->
             <Field Name="Parameters" Type="KeyValuePair[]" MaxArrayLength="8" />
-            
+
             <!-- The priority value for this task.  Priority is a relative value of this task compared to other tasks in the scenario.  This
              field should be limited to the range[0..100], 100 being the highest level of priority.  The exact interpretation
              priority may vary depending on algorithm implementation. -->
             <Field Name="Priority" Type="byte" Default="0"/>
-            
+
             <!-- Indicates whether this task <i><b>must</b></i> be executed as part of a mission plan.  -->
             <Field Name="Required" Type="bool" Default="true"/>
-            
+
         </Struct>
-        
+
         <!-- Used to request a search task allocation from the automation service. -->
         <Struct Name="SearchTask" Extends="Task">
-            
+
             <!-- The wavelength bands that should be used to complete the task.   -->
             <Field Name="DesiredWavelengthBands" Type="WavelengthBand[]" MaxArrayLength="8" Default="AllAny" />
-            
+
             <!-- Minimum time that a sensor must look at any given point in this search task. -->
             <Field Name="DwellTime" Type="int64" Units="milliseconds" />
-            
+
             <!-- Average ground sample distance for locations in search area -->
             <Field Name="GroundSampleDistance" Type="real32" Units="meters/pixel" />
-            
+
         </Struct>
 
         <!-- Base Type for all zones (keep-in and keep-out zones) -->
@@ -495,13 +495,13 @@
 
             <!-- Lower altitude bound for the zone -->
             <Field Name="MinAltitude" Type="real32" Units="meter" />
-            
+
             <!-- Altitude type for min altitude -->
             <Field Name="MinAltitudeType" Type="AltitudeType" Default="AGL" />
 
             <!-- Maximum altitude for operations -->
             <Field Name="MaxAltitude" Type="real32" Units="meter" />
-            
+
             <!-- Altitude type for max altitude -->
             <Field Name="MaxAltitudeType" Type="AltitudeType" Default="MSL" />
 
@@ -534,11 +534,11 @@
         <Struct Name="EntityConfiguration">
             <!-- A unique id for this entity -->
             <Field Name="ID" Type="int64" Units="None" />
-            
+
             <!-- the team or "side" that an entity belongs to.  This can be a name of a country, a "friend" or
              "foe" designation, or a team name (e.g. "red team"). -->
             <Field Name="Affiliation" Type="string" Default="Unknown"/>
-            
+
             <!-- The type of this entity.  The content of this field is dependent on the session. The value
              of this field is not specifically defined, so it is up to the simulation/session components
              to define a type system. For a common entity definition, see MIL STD 2525 or use DIS enumerations.
@@ -550,25 +550,25 @@
                 for information only.  ID should be used to uniquely identify entities.
             -->
             <Field Name="Label" Type="string"/>
-            
+
             <!-- The speed that is typically commanded for this entity -->
             <Field Name="NominalSpeed" Type="real32" Units="meter/sec" />
-            
+
             <!-- The altitude that is typically commanded for this entity -->
             <Field Name="NominalAltitude" Type="real32" Units="meter" Default="0.0" />
-            
+
             <!-- Altitude type for nominal altitude -->
             <Field Name="NominalAltitudeType" Type="AltitudeType" Default="AGL" />
 
             <!-- A list of all payload configurations for this vehicle. Examples of payloads include: gimbaled sensors,
                  SAR radars (not yet supported), air-launched UAVs (not yet supported), and weapons (not yet supported). -->
             <Field Name="PayloadConfigurationList" Type="PayloadConfiguration[]" MaxArrayLength="8" Units="None" />
-			
+
 			<!-- A list that maps keys to values for the inclusion of extra, custom information about this entity -->
             <Field Name="Info" Type="KeyValuePair[]" MaxArrayLength="8" />
 
         </Struct>
-        
+
         <!--
          A set of parameter describing the operations of a vehicle.  This can be used to set routing preferences
          for a particular vehicle.  The "Name" field can be used to describe a given condition, such as "cruise" or "climb".
@@ -576,25 +576,25 @@
         <Struct Name="FlightProfile">
             <!-- The unique name for this configuration -->
             <Field Name="Name" Type="string" Units="None" />
-            
+
             <!-- True Airspeed -->
             <Field Name="Airspeed" Type="real32" Units="meter/sec" />
-            
+
             <!-- The pitch angle of the aircraft in this flight condition(assuming zero bank) -->
             <Field Name="PitchAngle" Type="real32" Units="degree" />
-            
+
             <!-- Vertical speed (positive upwards) of the vehicle -->
             <Field Name="VerticalSpeed" Type="real32" Units="meter/sec" />
-            
+
             <!-- The maximum angle that this vehicle will bank -->
             <Field Name="MaxBankAngle" Type="real32" Units="degree" />
-            
+
             <!--
              The consumption rate of available energy, expressed in terms of the percentage of maximum capacity
              used per second.
              -->
             <Field Name="EnergyRate" Type="real32" Units="%/sec" />
-            
+
         </Struct>
 
         <!--
@@ -630,7 +630,7 @@
             <!-- Minimum MSL altitude that this aircraft is allowed to fly.  This value should be treated as
             a regulatory or safety-of-flight parameter and therefore takes precedence over other requests. -->
             <Field Name="MinimumAltitude" Type="real32" Default="0" Units="meter"/>
-            
+
             <!-- Altitude type for min altitude -->
             <Field Name="MinAltitudeType" Type="AltitudeType" Default="AGL" />
 
@@ -638,7 +638,7 @@
             a regulatory or safety-of-flight parameter and therefore takes precedence over other requests.
             -->
             <Field Name="MaximumAltitude" Type="real32" Default="1000000" Units="meter"/>
-            
+
             <!-- Altitude type for max altitude -->
             <Field Name="MaxAltitudeType" Type="AltitudeType" Default="MSL" />
 
@@ -648,7 +648,7 @@
         <Struct Name="EntityState">
             <!-- A unique ID for this entity. IDs should be greater than zero -->
             <Field Name="ID" Type="int64" />
-			
+
 			<!-- Velocity in the body x-direction (postive out nose) -->
             <Field Name="u" Type="real32" Units="meter/sec" />
 
@@ -687,23 +687,23 @@
 
             <!-- Course/Groundtrack angle of the entity referenced to true North -->
             <Field Name="Course" Type="real32" Units="degrees" />
-            
+
             <!-- Current entity ground speed -->
             <Field Name="Groundspeed" Type="real32" Units="m/s" />
 
             <!-- The perceived entity location. A valid EntityState must include Location (null not allowed) -->
             <Field Name="Location" Type="Location3D" Optional="false" />
-            
+
             <!-- The available energy remaining, expressed in terms of the percentage of maximum capacity -->
             <Field Name="EnergyAvailable" Type="real32" Units="%" />
-			
+
 			<!-- The consumption rate of available energy, expressed in terms of the percentage of maximum capacity
                 used per second. -->
             <Field Name="ActualEnergyRate" Type="real32" Units="%/sec" />
 
             <!-- A list of states for any onboard payloads -->
             <Field Name="PayloadStateList" Type="PayloadState[]" MaxArrayLength="8" />
-			
+
 			<!--
                 The ID of the current waypoint. Only valid if the vehicle is in waypoint following mode.
             -->
@@ -715,7 +715,7 @@
             <Field Name="CurrentCommand" Type="int64"/>
 
             <!--
-                The current mode for this vehicle. 
+                The current mode for this vehicle.
             -->
             <Field Name="Mode" Type="NavigationMode" Units="None" />
 
@@ -725,15 +725,15 @@
                 task number associated with that search should be included in this list.
             -->
             <Field Name="AssociatedTasks" Type="int64[]" MaxArrayLength="8" Units="None"/>
-            
+
             <!-- time stamp of this data. Time datum is defined by the application, but unless otherwise specified is milliseconds since 1 Jan 1970 -->
             <Field Name="Time" Type="int64" Units="millisecond" />
-			
+
 			<!-- A list that maps keys to values for the inclusion of extra, custom information about this entity -->
             <Field Name="Info" Type="KeyValuePair[]" MaxArrayLength="32" />
 
         </Struct>
-        
+
         <!--
             Provides basic information regarding the vehicle state with regard to its location and orientation in the
             world, and current velocity in body axis.  <br/>
@@ -751,7 +751,7 @@
             [North Vel, East Vel, Down Vel]' = DCM' * [Vx, Vy, Vz]'  where [Vx, Vy, Vz] is the body vel or accel.
         -->
         <Struct Name="AirVehicleState" Extends="EntityState">
-            
+
             <!-- vehicle true airspeed -->
             <Field Name="Airspeed" Type="real32" Units="meter/sec" />
 
@@ -764,14 +764,14 @@
             <!-- Wind source direction (true) as detected or computed by the vehicle-->
             <Field Name="WindDirection" Type="real32" Units="degree"/>
 
-            
+
 
         </Struct>
 
         <!--
             Defines an angular range for use in setting constraints or desired approaches to tasks.  In most cases, wedges are
             defined in the inertial sense, where azimuth is the angle between North and the center of the wedge, elevation is the
-            angle between the horizon and the center of the wedge.  In some instances, other coordinate systems are defined, such as
+            angle between the horizon and the center of the wedge (positive up).  In some instances, other coordinate systems are defined, such as
             angles relative to a line.
         -->
         <Struct Name="Wedge">
@@ -786,7 +786,7 @@
             A value of zero denotes that this wedge is defined as a single angle. -->
             <Field Name="VerticalExtent" Type="real32" Units="degree"/>
         </Struct>
-        
+
         <!-- Area search task -->
         <Struct Name="AreaSearchTask" Extends="SearchTask">
 
@@ -816,7 +816,7 @@
             fields-of-view and that the field-of-view aspect ratio is the same as the video stream aspect ratio.
         -->
         <Struct Name="CameraConfiguration" Extends="PayloadConfiguration">
-            
+
             <!-- The supported wavelength band of this camera -->
             <Field Name="SupportedWavelengthBand" Type="WavelengthBand" Default="EO"/>
 
@@ -854,18 +854,18 @@
 
             <!-- Current rotation angle of the gimbal boresight (0 degrees aligned with aircraft normal, positive clockwise). -->
             <Field Name="Rotation" Type="real32" Units="degree" />
-            
+
         </Struct>
 
         <!-- Describes the current state of a camera. -->
         <Struct Name="CameraState" Extends="GimballedPayloadState">
-            
+
             <!-- The current horizontal field of view (in sensor axis). -->
             <Field Name="HorizontalFieldOfView" Type="real32" Units="degree" />
 
             <!-- The current vertical field of view (in sensor axis). -->
             <Field Name="VerticalFieldOfView" Type="real32" Units="degree" />
-            
+
             <!-- The current sensor footprint of the camera represented as a polygon with n-vertices.
                  If this field contains zero items then the footprint is unavailable or was not calculated. -->
             <Field Name="Footprint" Type="Location3D[]" MaxArrayLength="8" Units="None" />
@@ -1034,7 +1034,7 @@
 
             <!-- The commanded stare point. A valid GimbalStareAction must define the Starepoint (null not allowed). -->
             <Field Name="Starepoint" Type="Location3D" Units="None" Optional="false" />
-            
+
             <!-- Duration for the stare operation.  Zero denotes an indefinate stare time -->
             <Field Name="Duration" Type="int64" Units="milliseconds"/>
 
@@ -1105,13 +1105,13 @@
             <Field Name="UseInertialViewAngles" Type="bool" Default="false"/>
 
         </Struct>
-        
+
         <!--
          Base action class for all navigation actions that the vehicle may take
          -->
          <Struct Name="NavigationAction" Extends="VehicleAction">
          </Struct>
-         
+
         <!--
             Used to command a vehicle to go into a vehicle-specific hold pattern.
         -->
@@ -1139,7 +1139,7 @@
             <Field Name="Length" Type="real32" Units="meter"/>
 
             <!--
-                Direction of travel. 
+                Direction of travel.
             -->
             <Field Name="Direction" Type="LoiterDirection" Units="None" Default="VehicleDefault"/>
 
@@ -1200,7 +1200,7 @@
             <!-- A waypoint for contingency (e.g. lost-comm, alternate mission) operations.  A value of zero denotes
             that no contingency point is specified. -->
             <Field Name="ContingencyWaypointA" Type="int64" Default="0"/>
-            
+
             <!-- A waypoint for contingency (e.g. lost-comm, alternate mission) operations.  A value of zero denotes
             that no contingency point is specified. -->
             <Field Name="ContingencyWaypointB" Type="int64" Default="0"/>
@@ -1263,17 +1263,17 @@
 
         <!-- Collection of extrusions/zones that define operating region -->
         <Struct Name="OperatingRegion">
-            
+
             <!-- Operating region ID -->
             <Field Name="ID" Type="int64" />
-            
+
             <!-- Abstract Zone IDs in which the entity must remain during operation -->
             <Field Name="KeepInAreas" Type="int64[]" MaxArrayLength="32" />
-            
+
             <!-- Keep Out Zone IDs that an entity must remain out of during operation -->
             <Field Name="KeepOutAreas" Type="int64[]" MaxArrayLength="32" />
         </Struct>
-        
+
         <!--
             This is the primary message for requesting action from the automation service. The automation service is to use the list of
             vehicles, tasks (with associated task relationships), keep-out zones, and keep-in zones to produce {@link MissionCommands}
@@ -1394,7 +1394,7 @@
             <Field Name="RealTimeMultiple" Type="real32"/>
 
             <!--
-                A field to store command-line style parameters used to initialize or modify an execution.  
+                A field to store command-line style parameters used to initialize or modify an execution.
             -->
             <Field Name="Parameters" Type="KeyValuePair[]" MaxArrayLength="8" />
         </Struct>
@@ -1416,7 +1416,7 @@
 
             <!-- Denotes the current execution status of this command. -->
             <Field Name="Status" Type="CommandStatusType"/>
-            
+
         </Struct>
 
         <!-- An action for controlling which sensor is being transmitted on a video stream. -->
@@ -1521,65 +1521,61 @@
             <Field Name="CloudCoverage" Type="real32"/>
 
         </Struct>
-        
+
         <!-- A command to follow a set of ground waypoints.  This is analogous to a {@link MissionCommand} for aircraft. -->
         <Struct Name="FollowPathCommand" Extends="VehicleActionCommand" >
-            
-            <!-- The first waypoint to follow.  This should correspond to the number of a waypoint in the 
+
+            <!-- The first waypoint to follow.  This should correspond to the number of a waypoint in the
             waypoint list. If this is zero, no waypoint will be followed. -->
             <Field Name="FirstWaypoint" Type="int64"/>
-            
+
             <!-- A list of waypoints to follow -->
             <Field Name="WaypointList" Type="PathWaypoint[]" MaxArrayLength="1024" />
-            
+
             <!-- Describes the start time for this action, in scenario time.  If this field is zero, the action is
             completed immediately. -->
             <Field Name="StartTime" Type="int64" Units="milliseconds" Default="0"/>
-            
+
             <!-- Describes the end time for this action, in scenario time.  If this field is zero, it should be ignored, otherwise
             The entity will travel until the stop time is reached. -->
             <Field Name="StopTime" Type="int64" Units="milliseconds" Default="0"/>
-            
+
             <!-- Describes how the entity should treat the end-of-path. Entities can complete the path once, or continuously.-->
             <Field Name="RepeatMode" Type="TravelMode" Default="SinglePass"/>
         </Struct>
-        
+
         <!-- A waypoint that can be used as part of commanding entities' movement -->
         <Struct Name="PathWaypoint" Extends="Waypoint">
             <!-- The amount of time that an entity should pause before moving to the next waypoint. -->
             <Field Name="PauseTime" Type="int64" Units="milliseconds" Default="0"/>
         </Struct>
-        
-        <!-- Tells the Entity to stop at the given location.  If no location is given, then the 
+
+        <!-- Tells the Entity to stop at the given location.  If no location is given, then the
         entity will stop immediately. -->
         <Struct Name="StopMovementAction" Extends="VehicleAction" >
             <!-- A location at which the entity should stop.  If this is null, the entity will stop immediately. -->
             <Field Name="Location" Type="Location3D" Series="CMASI" Default="null" Optional="true" />
         </Struct>
-        
-        <!-- Handles the transfer of waypoints.  This does not affect the current navigation of the 
+
+        <!-- Handles the transfer of waypoints.  This does not affect the current navigation of the
              aircraft.  This can be used to transfer, or request the transfer of, waypoints. -->
         <Struct Name="WaypointTransfer">
             <!-- ID of the entity assoicated with the waypoints -->
             <Field Name="EntityID" Type="int64"/>
-            
+
             <!-- A list of wayppoints to transfer.  This may be empty if the transfer type is "RequestWaypoints" or "ClearWaypoints" -->
             <Field Name="Waypoints" Type="Waypoint[]" MaxArrayLength="1024" />
-            
+
             <!-- describes the transfer action to take -->
             <Field Name="TransferMode" Type="WaypointTransferMode" Default="AddWaypoints"/>
         </Struct>
-        
+
         <!-- Commands a payload to stow. -->
         <Struct Name="PayloadStowAction">
             <!-- payload to stow -->
             <Field Name="PayloadID" Type="int64"/>
         </Struct>
-		
-		
+
+
     </StructList>
 </MDM>
-
-
-
-

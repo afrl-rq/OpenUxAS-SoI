@@ -81,13 +81,20 @@ namespace task
         void operator=(TaskOptionClass const&) = delete;
     public:
         /** \brief the <B><i>uxas::messages::task::TaskOption</i></B>
-         * that is represent by the values stored in this instance class.  */
+         * that is represented by the values stored in this instance class.  */
         std::shared_ptr<uxas::messages::task::TaskOption> m_taskOption;
+        /** \brief the <B><i>uxas::messages::task::TaskOption</i></B>
+         * used when restarting this task.  */
+        std::shared_ptr<uxas::messages::task::TaskOption> m_restartTaskOption;
         /** \brief IDs of the routes the have not yet been received, but are required
          * to construct the option.  */
         std::unordered_set<int64_t> m_pendingRouteIds;
         /** \brief RoutePlans that will be used to implement the option.  */
         std::map<int64_t, std::shared_ptr<uxas::messages::route::RoutePlan>> m_orderedRouteIdVsPlan;
+        /** \brief RoutePlan that will be used to implement the option during a restart.  */
+        std::shared_ptr<uxas::messages::route::RoutePlan> m_restartRoutePlan;
+        /** \brief starting option of the tasks.  */
+        static const int64_t m_firstOptionId;
         /** \brief id of the route from the last position to the start of this task option  */
         static const int64_t m_routeIdFromLastTask;  
         /** \brief first id to use for the implementation routes in this task option  */
@@ -101,6 +108,11 @@ namespace task
         /** \brief Stores the <B><i>RoutePlanRequest</i></B> that will be used to
          generate route costs for the option*/
         std::shared_ptr<uxas::messages::route::RoutePlanRequest> m_routePlanRequest;
+        /** \brief Stores the waypoint ID of the first, implemented, task active 
+         * waypoint. This is used to map the option waypoint IDs to the implemented
+          waypoint IDs. Added to use when restarting uncompleted tasks. Defaults
+         to 'uninitialized' (-1)*/
+        int64_t m_firstTaskActiveWaypointID{-1};
 
         // TASK SPECIFIC PARAMETERS
         /** \brief altitude of the entity (agl?) for this option*/
@@ -346,6 +358,10 @@ namespace task
         std::shared_ptr<afrl::cmasi::Task> m_task;
         /*! \brief all entities assigned to this task*/
         std::unordered_set<int64_t> m_assignedVehicleIds;
+        /*! \brief the last active task waypoint passed by the vehicle*/
+        std::unordered_map<int64_t,int64_t> m_assignedVehicleIdVsLastTaskWaypoint;
+        /*! \brief the option that was assigned to the vehicle*/
+        std::unordered_map<int64_t,int64_t> m_assignedVehicleIdVsAssignedOptionId;
         /*! \brief  a container for <B><i>TaskOptionClass</i></B>es used to construct
          * task options.
          *  once all the options have been created*/
