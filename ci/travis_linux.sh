@@ -1,5 +1,5 @@
 mkdir -p ~/.local/bin
-export PATH=~/.local/bin:$PATH
+export PATH=~/.cargo/bin:~/.local/bin:$PATH
 
 # install Rust
 curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path

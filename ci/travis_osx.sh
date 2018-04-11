@@ -1,5 +1,5 @@
 mkdir -p ~/.local/bin
-export PATH=~/.local/bin:$PATH
+export PATH=~/.cargo/bin:~/.local/bin:$PATH
 
 # Homebrew deps for Mac
 brew bundle --file=./.Brewfile
