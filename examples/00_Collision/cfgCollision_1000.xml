@@ -55,6 +55,7 @@
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="larcfm" NumberMessagesToSkip="0"/>
     </Service>
 </UxAS>
 

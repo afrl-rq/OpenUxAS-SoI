@@ -25,6 +25,7 @@
 #include "afrl/cmasi/AirVehicleState.h"
 #include "BandsRegion.h"
 #include "Interval.h"
+#include "larcfm/DAIDALUS/DAIDALUSConfiguration.h"
 #include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
 
 #include <iostream>     // std::cout, cerr, etc
@@ -114,7 +115,7 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     // process options from the XML configuration node:
     if (!ndComponent.attribute(STRING_XML_LOOKAHEADTIME).empty())
     {
-       m_lookahead_time_s = ndComponent.attribute(STRING_XML_LOOKAHEADTIME).as_int();
+       m_lookahead_time_s = ndComponent.attribute(STRING_XML_LOOKAHEADTIME).as_double();
        if (m_lookahead_time_s > 0.0)
        {
            m_daa.parameters.setLookaheadTime(m_lookahead_time_s, "s");
@@ -252,8 +253,8 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     }    
     if (!ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).empty())
     {
-       m_recovery_stability_time_s = ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).as_int();
-       if (m_recovery_stability_time_s >= 0)
+       m_recovery_stability_time_s = ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).as_double();
+       if (m_recovery_stability_time_s >= 0.0)
        {
            m_daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time_s, "s");
        }
@@ -341,11 +342,41 @@ bool DAIDALUS_WCV_Detection::initialize()
     return (true);
 }
 
-bool DAIDALUS_WCV_Detection::start()
+bool DAIDALUS_WCV_Detection::start() 
 {
     // perform any actions required at the time the service starts
     //std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
-    
+    std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
+    DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
+    DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
+    DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
+    DetectionConfiguration->setMaxGroundSpeed(m_daa.parameters.getMaxGroundSpeed("mps"));
+    DetectionConfiguration->setMinGroundSpeed(m_daa.parameters.getMinGroundSpeed("mps"));
+    DetectionConfiguration->setMaxVerticalSpeed(m_daa.parameters.getMaxVerticalSpeed("mps"));
+    DetectionConfiguration->setMinVerticalSpeed(m_daa.parameters.getMinVerticalSpeed("mps"));
+    DetectionConfiguration->setMaxAltitude(m_daa.parameters.getMaxAltitude("m"));
+    DetectionConfiguration->setMinAltitude(m_daa.parameters.getMinAltitude("m"));
+    DetectionConfiguration->setTrackStep(m_daa.parameters.getTrackStep("deg"));
+    DetectionConfiguration->setGroundSpeedStep(m_daa.parameters.getGroundSpeedStep("mps"));
+    DetectionConfiguration->setVerticalSpeedStep(m_daa.parameters.getVerticalSpeedStep("mps"));
+    DetectionConfiguration->setAltitudeStep(m_daa.parameters.getAltitudeStep("m"));
+    DetectionConfiguration->setHorizontalAcceleration(m_daa.parameters.getHorizontalAcceleration("m/s^2"));
+    DetectionConfiguration->setVerticalAcceleration(m_daa.parameters.getVerticalAcceleration("G"));
+    DetectionConfiguration->setTurnRate(m_daa.parameters.getTurnRate("deg/s"));
+    DetectionConfiguration->setBankAngle(m_daa.parameters.getBankAngle("deg"));
+    DetectionConfiguration->setVerticalRate(m_daa.parameters.getVerticalRate("mps"));
+    DetectionConfiguration->setRecoveryStabilityTime(m_daa.parameters.getRecoveryStabilityTime("s"));
+    DetectionConfiguration->setIsRecoveryTrackBands(m_daa.parameters.isEnabledRecoveryTrackBands());
+    DetectionConfiguration->setIsRecoveryGroundSpeedBands(m_daa.parameters.isEnabledRecoveryGroundSpeedBands());
+    DetectionConfiguration->setIsRecoveryVerticalSpeedBands(m_daa.parameters.isEnabledRecoveryVerticalSpeedBands());
+    DetectionConfiguration->setIsRecoveryAltitudeBands(m_daa.parameters.isEnabledRecoveryAltitudeBands());
+    DetectionConfiguration->setIsCollisionAvoidanceBands(m_daa.parameters.isEnabledCollisionAvoidanceBands());
+    DetectionConfiguration->setHorizontalNMAC(m_daa.parameters.getHorizontalNMAC("m"));
+    DetectionConfiguration->setMinHorizontalRecovery(m_daa.parameters.getMinHorizontalRecovery("m"));
+    DetectionConfiguration->setVerticalNMAC(m_daa.parameters.getVerticalNMAC("m"));
+    DetectionConfiguration->setMinVerticalRecovery(m_daa.parameters.getMinVerticalRecovery("m"));
+    DetectionConfiguration->setHorizontalContourThreshold(m_daa.parameters.getHorizontalContourThreshold("m"));
+    sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);   
     return (true);
 };
 
@@ -385,9 +416,9 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         makeVelocityXYZ(u_mps, v_mps, w_mps, n_Const::c_Convert::toRadians(Phi_deg), n_Const::c_Convert::toRadians(Theta_deg), 
                 n_Const::c_Convert::toRadians(Psi_deg), velocityX_mps, velocityY_mps, velocityZ_mps);
         // DAIDALUS expects ENUp reference while UxAS internally used NEDown--covert UxAS velocities to DAIDALUS velocities
-        auto daidalusVelocityZ_mps = -velocityZ_mps;    //add a comment for why
-        auto daidalusVelocityX_mps = velocityY_mps;
-        auto daidalusVelocityY_mps = velocityX_mps;
+        double daidalusVelocityZ_mps = -velocityZ_mps;    //add a comment for why
+        double daidalusVelocityX_mps = velocityY_mps;
+        double daidalusVelocityY_mps = velocityX_mps;
         vehicleInfo.m_daidalusVelocity = larcfm::Velocity::makeVxyz(daidalusVelocityX_mps, daidalusVelocityY_mps, "m/s", daidalusVelocityZ_mps, "m/s");
         vehicleInfo.m_daidalusTime_s = airVehicleState->getTime()*MILLISECONDTOSECOND; // conversion from UxAS representation of time in milliseconds to DAIDALUS representation fo time in seconds
         // DAIDALUS_WCV_Detection::m_entityId is the ID of the ownship   --TODO delete this comment before commiting to git repository     

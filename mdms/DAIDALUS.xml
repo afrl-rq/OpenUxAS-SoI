@@ -37,5 +37,68 @@
                 <!-- List of altitude intervals that will result in a WellClear violation within the detection window -->
                 <Field Name="WCVAlitudeIntervals" Type="AltitudeInterval[]" Units="None" />
             </Struct>
+            <!-- DAIDALUS configuration parameters -->
+            <Struct Name="DAIDALUSConfiguration">
+                <!-- Time horizon of all DAIDALUS functions -->
+                <Field Name="LookAheadTime" Type="real64" Units="seconds" />
+                <!-- Relative maximum horizontal direction maneuver to the left of current ownship direction -->
+                <Field Name="LeftTrack" Type="real64" Units="degrees" />
+                <!-- Relative maximum horizontal direction maneuver to the right of current ownship direction -->
+                <Field Name="RightTrack" Type="real64" Units="degrees" />
+                <!-- Absolute maximum horizontal speed maneuver -->
+                <Field Name="MaxGroundSpeed" Type="real64" Units="meters per second" />
+                <!-- Absolute minimum horizontal speed maneuver -->
+                <Field Name="MinGroundSpeed" Type="real64" Units="meters per second" />
+                <!-- Absolute maximum vertical speed maneuver -->
+                <Field Name="MaxVerticalSpeed" Type="real64" Units="meters per second" />
+                <!-- Absolute minimum verrtical speed maneuver -->
+                <Field Name="MinVerticalSpeed" Type="real64" Units="meters per second" />
+                <!-- Absolute maximum altitude maneuver -->
+                <Field Name="MaxAltitude" Type="real64" Units="meters" />
+                <!-- Absolute minimum altitude maneuver -->
+                <Field Name="MinAltitude" Type="real64" Units="meters" />
+                <!-- Granularity of horizontal direction maneuvers -->
+                <Field Name="TrackStep" Type="real64" Units="degrees" />
+                <!-- Granularity of horizontal speed maneuvers -->
+                <Field Name="GroundSpeedStep" Type="real64" Units="meters per second" />
+                <!-- Granularity of vertical speed maneuvers -->
+                <Field Name="VerticalSpeedStep" Type="real64" Units="meters per second" />
+                <!-- Granularity of altitude maneuvers -->
+                <Field Name="AltitudeStep" Type="real64" Units="meters" />
+                <!-- Horizontal acceleration used in the computation of horizontal speed maneuvers -->
+                <Field Name="HorizontalAcceleration" Type="real64" Units="meters per second per second" />
+                <!-- Vertical accelereation used in the computation of vertical speed maneuvers -->
+                <Field Name="VerticalAcceleration" Type="real64" Units="G" />
+                <!-- Turn rate used in the computation of horizontal direction maneuvers -->
+                <Field Name="TurnRate" Type="real64" Units="degrees per second" />
+                <!-- Bank angle used in the computation of horizontal direction maneuvers -->
+                <Field Name="BankAngle" Type="real64" Units="degrees" />
+                <!-- Vertical rate used in the computation of altitude maneuvers -->
+                <Field Name="VerticalRate" Type="real64" Units="meters per second" />
+                <!-- Time delay to stabilize recovery maneuvers -->
+                <Field Name="RecoveryStabilityTime" Type="real64" Units="seconds" />
+                <!-- Enable computation of horizontal direction recovery maneuvers -->
+                <Field Name="isRecoveryTrackBands" Type="bool" Units="None" />
+                <!-- Enable computation of horzontal speed recovery maneuvers -->
+                <Field Name="isRecoveryGroundSpeedBands" Type="bool" Units="None" />
+                <!-- Enable computation of vertical speed recovery maneuvers -->
+                <Field Name="isRecoveryVerticalSpeedBands" Type="bool" Units="None" />
+                <!-- Enable computation of altitude recovery maneuvers -->
+                <Field Name="isRecoveryAltitudeBands" Type="bool" Units="None" />
+                <!-- Enable computation of collision avoidance maneuvers -->
+                <Field Name="isCollisionAvoidanceBands" Type="bool" Units="None" />
+                <!-- Factor to reduce minimum horizontal/vertial recovery separation when computing avoidance maneuvers -->
+                <Field Name="CollisionAvoidanceBandsFactor" Type="bool" Units="None" />
+                <!-- Horizontal NMAC -->
+                <Field Name="HorizontalNMAC" Type="real64" Units="meters" />
+                <!-- Minimum horizontal separation used in the computation of recovery maneuvers -->
+                <Field Name="MinHorizontalRecovery" Type="real64" Units="meters" />
+                <!-- Vertical NMAC -->
+                <Field  Name="VerticalNMAC" Type="real64" Units="meters" />
+                <!-- Minimum vertical separation used in the computation of recovery maneuvers-->
+                <Field Name="MinVerticalRecovery" Type="real64" Units="meters" />
+                <!-- Threshold relative to ownship horizontal direction for the computation of horizontal contours -->
+                <Field Name="HorizontalContourThreshold" Type="real64" Units="meters" />
+            </Struct>
         </StructList>
     </MDM>
