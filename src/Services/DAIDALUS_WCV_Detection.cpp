@@ -27,6 +27,7 @@
 #include "Interval.h"
 #include "larcfm/DAIDALUS/DAIDALUSConfiguration.h"
 #include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
+#include "uxas/messages/uxnative/StartupComplete.h"
 
 #include <iostream>     // std::cout, cerr, etc
 #include <cmath>    //cmath::cos, sin, etc
@@ -327,7 +328,9 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     }
   
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
+    addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);
     std::cout << "Successfully subscribed to AirVehicleState from DAIDALUS_WCV_Detection." << std::endl;
+    std::cout << "Successfully subscribed to the StartupComplete from DAIDALUS_WCV_Detection." <<std::endl;
     
     return (isSuccess);
 }
@@ -346,37 +349,7 @@ bool DAIDALUS_WCV_Detection::start()
 {
     // perform any actions required at the time the service starts
     //std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
-    std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
-    DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
-    DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
-    DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
-    DetectionConfiguration->setMaxGroundSpeed(m_daa.parameters.getMaxGroundSpeed("mps"));
-    DetectionConfiguration->setMinGroundSpeed(m_daa.parameters.getMinGroundSpeed("mps"));
-    DetectionConfiguration->setMaxVerticalSpeed(m_daa.parameters.getMaxVerticalSpeed("mps"));
-    DetectionConfiguration->setMinVerticalSpeed(m_daa.parameters.getMinVerticalSpeed("mps"));
-    DetectionConfiguration->setMaxAltitude(m_daa.parameters.getMaxAltitude("m"));
-    DetectionConfiguration->setMinAltitude(m_daa.parameters.getMinAltitude("m"));
-    DetectionConfiguration->setTrackStep(m_daa.parameters.getTrackStep("deg"));
-    DetectionConfiguration->setGroundSpeedStep(m_daa.parameters.getGroundSpeedStep("mps"));
-    DetectionConfiguration->setVerticalSpeedStep(m_daa.parameters.getVerticalSpeedStep("mps"));
-    DetectionConfiguration->setAltitudeStep(m_daa.parameters.getAltitudeStep("m"));
-    DetectionConfiguration->setHorizontalAcceleration(m_daa.parameters.getHorizontalAcceleration("m/s^2"));
-    DetectionConfiguration->setVerticalAcceleration(m_daa.parameters.getVerticalAcceleration("G"));
-    DetectionConfiguration->setTurnRate(m_daa.parameters.getTurnRate("deg/s"));
-    DetectionConfiguration->setBankAngle(m_daa.parameters.getBankAngle("deg"));
-    DetectionConfiguration->setVerticalRate(m_daa.parameters.getVerticalRate("mps"));
-    DetectionConfiguration->setRecoveryStabilityTime(m_daa.parameters.getRecoveryStabilityTime("s"));
-    DetectionConfiguration->setIsRecoveryTrackBands(m_daa.parameters.isEnabledRecoveryTrackBands());
-    DetectionConfiguration->setIsRecoveryGroundSpeedBands(m_daa.parameters.isEnabledRecoveryGroundSpeedBands());
-    DetectionConfiguration->setIsRecoveryVerticalSpeedBands(m_daa.parameters.isEnabledRecoveryVerticalSpeedBands());
-    DetectionConfiguration->setIsRecoveryAltitudeBands(m_daa.parameters.isEnabledRecoveryAltitudeBands());
-    DetectionConfiguration->setIsCollisionAvoidanceBands(m_daa.parameters.isEnabledCollisionAvoidanceBands());
-    DetectionConfiguration->setHorizontalNMAC(m_daa.parameters.getHorizontalNMAC("m"));
-    DetectionConfiguration->setMinHorizontalRecovery(m_daa.parameters.getMinHorizontalRecovery("m"));
-    DetectionConfiguration->setVerticalNMAC(m_daa.parameters.getVerticalNMAC("m"));
-    DetectionConfiguration->setMinVerticalRecovery(m_daa.parameters.getMinVerticalRecovery("m"));
-    DetectionConfiguration->setHorizontalContourThreshold(m_daa.parameters.getHorizontalContourThreshold("m"));
-    sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);   
+    
     return (true);
 };
 
@@ -529,6 +502,40 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 }
             }
         }
+    }
+    if (uxas::messages::uxnative::isStartupComplete(receivedLmcpMessage->m_object))
+    {
+        std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
+        DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
+        DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
+        DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
+        DetectionConfiguration->setMaxGroundSpeed(m_daa.parameters.getMaxGroundSpeed("mps"));
+        DetectionConfiguration->setMinGroundSpeed(m_daa.parameters.getMinGroundSpeed("mps"));
+        DetectionConfiguration->setMaxVerticalSpeed(m_daa.parameters.getMaxVerticalSpeed("mps"));
+        DetectionConfiguration->setMinVerticalSpeed(m_daa.parameters.getMinVerticalSpeed("mps"));
+        DetectionConfiguration->setMaxAltitude(m_daa.parameters.getMaxAltitude("m"));
+        DetectionConfiguration->setMinAltitude(m_daa.parameters.getMinAltitude("m"));
+        DetectionConfiguration->setTrackStep(m_daa.parameters.getTrackStep("deg"));
+        DetectionConfiguration->setGroundSpeedStep(m_daa.parameters.getGroundSpeedStep("mps"));
+        DetectionConfiguration->setVerticalSpeedStep(m_daa.parameters.getVerticalSpeedStep("mps"));
+        DetectionConfiguration->setAltitudeStep(m_daa.parameters.getAltitudeStep("m"));
+        DetectionConfiguration->setHorizontalAcceleration(m_daa.parameters.getHorizontalAcceleration("m/s^2"));
+        DetectionConfiguration->setVerticalAcceleration(m_daa.parameters.getVerticalAcceleration("G"));
+        DetectionConfiguration->setTurnRate(m_daa.parameters.getTurnRate("deg/s"));
+        DetectionConfiguration->setBankAngle(m_daa.parameters.getBankAngle("deg"));
+        DetectionConfiguration->setVerticalRate(m_daa.parameters.getVerticalRate("mps"));
+        DetectionConfiguration->setRecoveryStabilityTime(m_daa.parameters.getRecoveryStabilityTime("s"));
+        DetectionConfiguration->setIsRecoveryTrackBands(m_daa.parameters.isEnabledRecoveryTrackBands());
+        DetectionConfiguration->setIsRecoveryGroundSpeedBands(m_daa.parameters.isEnabledRecoveryGroundSpeedBands());
+        DetectionConfiguration->setIsRecoveryVerticalSpeedBands(m_daa.parameters.isEnabledRecoveryVerticalSpeedBands());
+        DetectionConfiguration->setIsRecoveryAltitudeBands(m_daa.parameters.isEnabledRecoveryAltitudeBands());
+        DetectionConfiguration->setIsCollisionAvoidanceBands(m_daa.parameters.isEnabledCollisionAvoidanceBands());
+        DetectionConfiguration->setHorizontalNMAC(m_daa.parameters.getHorizontalNMAC("m"));
+        DetectionConfiguration->setMinHorizontalRecovery(m_daa.parameters.getMinHorizontalRecovery("m"));
+        DetectionConfiguration->setVerticalNMAC(m_daa.parameters.getVerticalNMAC("m"));
+        DetectionConfiguration->setMinVerticalRecovery(m_daa.parameters.getMinVerticalRecovery("m"));
+        DetectionConfiguration->setHorizontalContourThreshold(m_daa.parameters.getHorizontalContourThreshold("m"));
+        sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);   
     }
     return false;
 }
