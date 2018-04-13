@@ -7,24 +7,26 @@ endif
 
 dep_boost = dependency(
   'boost',
-  modules: ['filesystem', 'regex', 'system'],
-  static: true,
-  fallback: ['boost', 'dep_boost'],
+  modules: ['date_time'],
+  fallback: ['boost', 'dep'],
 )
 
 lib = static_library(
   'tinygps',
-  [
-    'TinyGPS.cpp',
-  ],
-  dependencies: [
-    dep_boost,
-  ],
+  'TinyGPS.cpp',
   cpp_args: [
     '-std=c++11',
   ],
+  dependencies: dep_boost,
   include_directories: include_directories(
-    '../../../src/Includes',
-    '../../../src/Utilities',
+    '../../src/Includes',
+    '../../src/Utilities',
+  ),
+)
+
+dep = declare_dependency(
+  link_with: lib,
+  include_directories: include_directories(
+    '.',
   ),
 )

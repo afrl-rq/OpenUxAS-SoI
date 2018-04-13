@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>5</Version>
+    <Version>7</Version>
     
     <StructList>
         
@@ -131,6 +131,10 @@
             <Field Name="GimbalEnabled" Type="bool" Default="true" />
             <!-- Time that this message was sent -->
             <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Overrides speed to this value if greater than zero -->
+            <Field Name="SpeedOverride" Type="real32" Units="meters/sec" Default="-1.0" />
+            <!-- Overrides altitude to this value (MSL) if greater than zero -->
+            <Field Name="AltOverride" Type="real32" Units="meters MSL" Default="-1.0" />
         </Struct>
     
         <!-- Message for reporting onboard status of UxAS -->
@@ -168,6 +172,15 @@
             <!-- Label of entity exiting network -->
             <Field Name="Label" Type="string" />
         </Struct>  
+        
+        <!-- Message for indicating that UxAS has handled an EntityState update
+             which allows an external simulation to pause until received -->
+        <Struct Name="SimulationTimeStepAcknowledgement" >
+            <!-- Vehicle for which the entity state update was handled -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Associated time from the handled entity state -->
+            <Field Name="ReportedTime" Type="int64" Units="milliseconds" />
+        </Struct>
 
  </StructList>
 </MDM>

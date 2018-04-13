@@ -1,7 +1,7 @@
 exe_WaterwaySearch_test01 = executable(
   'WaterwaySearch_test01',
   'WaterwaySearch_test01.cpp',
-  dependencies: deps,
+  dependencies: deps_test,
   cpp_args: cpp_args_test,
   include_directories: inc_test,
   link_with: libs_test,

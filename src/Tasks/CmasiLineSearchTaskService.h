@@ -163,7 +163,7 @@ private:
 
 public:
     const double m_defaultAzimuthLookAngle_rad = 45.0 * n_Const::c_Convert::dDegreesToRadians(); //10 deg
-    const double m_defaultElevationLookAngle_rad = -40.0 * n_Const::c_Convert::dDegreesToRadians(); //-60 deg
+    const double m_defaultElevationLookAngle_rad = -60.0 * n_Const::c_Convert::dDegreesToRadians(); //-60 deg
 
 public: //virtual
     virtual void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;

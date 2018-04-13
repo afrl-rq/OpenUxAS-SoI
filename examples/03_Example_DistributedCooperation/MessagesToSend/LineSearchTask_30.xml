@@ -13,7 +13,7 @@
   <ViewAngleList>
     <Wedge Series="CMASI">
       <AzimuthCenterline>30.0</AzimuthCenterline>
-      <VerticalCenterline>60.0</VerticalCenterline>
+      <VerticalCenterline>-60.0</VerticalCenterline>
       <AzimuthExtent>0.0</AzimuthExtent>
       <VerticalExtent>0.0</VerticalExtent>
     </Wedge>

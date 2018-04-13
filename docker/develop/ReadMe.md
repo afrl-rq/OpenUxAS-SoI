@@ -1,42 +1,37 @@
-The files in this directory are used to construct
-and deploy a Docker container that is used to build
-UxAS.
+The files in this directory are used to construct and deploy a Docker
+image that is used to build UxAS. The image is intended to be
+self-contained; once built, it should not need a network connection to
+build a cloned UxAS source tree.
 
-Note: at this time the image "steveras/uxas-build:x86_64"
-	is available on th Docker Hub, "https://hub.docker.com/", 
-	which Docker can download automatically, skipping step #1 
-	(01_buildImage_UxAS_build.sh). 
+### Before Building UxAS
+LmcpGen must be cloned into the same directory as this repository
+(OpenUxAS). OpenAMASE can also be cloned as a sibling of OpenUxAS and
+LmcpGen, but is optional:
 
+* `/`
+  * `LmcpGen/`
+  * `OpenAMASE/` (optional)
+  * `OpenUxAS/`
 
-BEFORE BUILDING UxAS:
-1) Must have the following file system layout:
-./
-  OpenAMASE (OPTIONAL)
-  LcmpGen
-  OpenUxAS
+### Directory contents
 
+- `01_buildImage_uxas_develop.sh` uses Docker commands to construct the
+  `uxas_develop` Docker image.
 
+- `02_buildUxAS_WithDocker.sh` uses the `uxas_develop` Docker image
+  to build UxAS.
 
-FILES:
+- `03_stopAndRemoveBuildContainer.sh` uses Docker commands to stop and
+  remove the `uxas_develop` Docker container.
 
-01_buildImage_UxAS_build.sh - this is a linux script that 
-	uses Docker commands to construct the "uxas/build" 
-	Docker image
+- `04_runUxAS_Tests.sh` runs the UxAS test suite within a `uxas_develop`
+  container.
 
-Dockerfile.UxAS_build - this is the DockerFile that defines
-	the "uxas/build" Docker image 
+- `Dockerfile.uxas_develop` is the DockerFile that defines the
+  `uxas_develop` Docker image.
 
-02_buildUxAS_WithDocker.sh - this is a linux script that
-	utilizes the "uxas/build" Docker container to build UxAS
+- `buildUxAS.sh` calls the appropriate Meson and Ninja from inside the
+  `uxas_develop` Docker image. Not meant to be used manually.
 
-buildUxAS.sh - this is a linux script that calls meson
-	and ninja from inside the "uxas/build" Docker image
-
-03_stopAndRemoveBuildContainer.sh - this is a linux script
-	that uses docker commands to stop and remove the 
-	"uxas/build" Docker container
-
-
-InstallLibraries - the files in this directory are used
-	to install UxAS prequisites that require installation
-	from source code
+- `InstallLibraries` contains scripts for installing UxAS prequisites
+  from source. Not meant to be used manually.
