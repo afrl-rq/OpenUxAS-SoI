@@ -333,8 +333,20 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                         optionIdRestart = -1;
                     }
                 }
+                else
+                {
+                    vehicleIdRestart = -1;
+                    waypointIdRestart = -1;
+                    optionIdRestart = -1;
+                }
 
-                if ((vehicleIdRestart > 0) && (optionIdRestart > 0))
+                // itOption->second->m_restartRoutePlan->getWaypoints().front()->clone()
+                if ((vehicleIdRestart > 0) && (optionIdRestart > 0)
+                    && itOption->second && itOption->second->m_taskOption
+                    && itOption->second->m_restartRoutePlan
+                    && !(itOption->second->m_restartRoutePlan->getWaypoints().empty())
+                    && itOption->second->m_restartRoutePlan->getWaypoints().front()
+                    && itOption->second->m_restartRoutePlan->getWaypoints().back() )
                 {
                     // restart plan where the restart vehicle left it
                     // create new option with only the restart vehicle eligible
