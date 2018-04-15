@@ -1,0 +1,31 @@
+<AutomationRequest Series="CMASI">
+    <EntityList>
+        <int64>1</int64>
+        <int64>2</int64>
+        <int64>3</int64>
+        <int64>4</int64>
+    </EntityList>
+    <TaskList>
+        <int64>1</int64>
+        <int64>2</int64>
+        <int64>3</int64>
+        <int64>4</int64>
+        <int64>5</int64>
+        <int64>6</int64>
+        <int64>7</int64>
+        <int64>8</int64>
+        <int64>9</int64>
+        <int64>10</int64>
+        <int64>11</int64>
+        <int64>12</int64>
+        <int64>13</int64>
+        <int64>14</int64>
+        <int64>15</int64>
+        <int64>16</int64>
+        <int64>17</int64>
+        <int64>18</int64>
+    </TaskList>
+    <TaskRelationships>|(p1-p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15 p16 p17 p18)</TaskRelationships>
+    <OperatingRegion>10</OperatingRegion>
+    <RedoAllTasks>false</RedoAllTasks>
+</AutomationRequest>
