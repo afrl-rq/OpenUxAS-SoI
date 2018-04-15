@@ -297,7 +297,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
     //std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
     if(taskImplementationResponse->getTimeThreshold() > 0){
         //create the loiter action for the task and set it to the first waypoint in the list
-        
+
         afrl::cmasi::LoiterAction lTask;
         lTask.setDuration(taskImplementationResponse->getTimeThreshold()); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
         lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
@@ -307,7 +307,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         locationToAdd.setLongitude(taskImplementationResponse->getTaskWaypoints().front()->getLongitude());
         locationToAdd.setAltitude(taskImplementationResponse->getTaskWaypoints().front()->getAltitude());
         locationToAdd.setAltitudeType(taskImplementationResponse->getTaskWaypoints().front()->getAltitudeType());
-        
+
         lTask.setLocation(locationToAdd.clone());
         //lTask.setLocation(m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone());
         //std::cout << lTask.getLocation()->toString() << std::endl;
@@ -331,29 +331,28 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         auto mish = new afrl::cmasi::MissionCommand;
         mish->setCommandID(m_commandId++);
         mish->setVehicleID(taskImplementationResponse->getVehicleID());
-        ///*
-        //This is in the hopes of eventually fixing the first point not loitering bug
-        //if(taskImplementationResponse->getTimeThreshold() > 0){
+        if(taskImplementationResponse->getTimeThreshold() > 0){
             afrl::cmasi::LoiterAction lTask;
-            lTask.setDuration(30);//taskImplementationResponse->getTimeThreshold()); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
+            //So an issue currently is that thesetDuration is wanting seconds, not ms.
+            //I added a cast from ms to seconds, but if/when this is fixed, the /1000 and cast to int should be removed
+            lTask.setDuration((int)taskImplementationResponse->getTimeThreshold()/1000);
             lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
             lTask.setLocation(m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone());
             taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().insert(taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().begin(), lTask.clone());
-            
+
             afrl::cmasi::Location3D * locationToAdd = m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone();
             taskImplementationResponse->getTaskWaypoints().front()->setLongitude(locationToAdd->getLongitude());
             taskImplementationResponse->getTaskWaypoints().front()->setLatitude(locationToAdd->getLatitude());
             taskImplementationResponse->getTaskWaypoints().front()->setAltitude(locationToAdd->getAltitude());
             taskImplementationResponse->getTaskWaypoints().front()->setAltitudeType(locationToAdd->getAltitudeType());
-            
+
             //std::cout << "Next waypoint: " << taskImplementationResponse->getTaskWaypoints().front()->getNextWaypoint() << std::endl;
-            
             afrl::cmasi::Waypoint * newWP = taskImplementationResponse->getTaskWaypoints().front()->clone();
-            
+
             //std::cout << newWP->toString() << std::endl;
             newWP->setNextWaypoint(2);
             taskImplementationResponse->getTaskWaypoints().insert(taskImplementationResponse->getTaskWaypoints().begin(), newWP->clone());
-            
+
             /* For bugfixing
             for(afrl::cmasi::Waypoint * wp : taskImplementationResponse->getTaskWaypoints()){
                 std::cout << wp->getNextWaypoint()-1 << "ActionList:" << std::endl;
@@ -362,15 +361,14 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
                 }
             }
             */
-        //}
-        //*/
+        }
         //std::cout << taskImplementationResponse->getTaskWaypoints().front()->toString() << std::endl;
         mish->setFirstWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
         for(auto wp : taskImplementationResponse->getTaskWaypoints())
             mish->getWaypointList().push_back(wp->clone());
         m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().push_back(mish);
     }
-    
+
     // update project state (m_projectedEntityStates)
     if(m_projectedEntityStates.find(uniqueRequestID) != m_projectedEntityStates.end())
     {
