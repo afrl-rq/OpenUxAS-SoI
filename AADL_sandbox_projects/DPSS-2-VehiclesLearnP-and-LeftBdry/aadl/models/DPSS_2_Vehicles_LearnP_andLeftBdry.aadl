@@ -320,6 +320,14 @@ public
 			lemma "UAV1 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV1 and pos_UAV1 <= RIGHT_ENDP_TRUTH;		
 			lemma "UAV2 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV2 and pos_UAV2 <= RIGHT_ENDP_TRUTH;
 							
+			--UAV perimLeft values are nonnegative
+			lemma "UAV1's perimLeft is nonnegative": UAV1.perimLeft >= 0.0;
+			lemma "UAV2's perimLeft is nonnegative": UAV2.perimLeft >= 0.0;
+			
+			--UAV perimRight values are nonnegative
+			lemma "UAV1's perimRight is nonnegative": UAV1.perimRight >= 0.0;
+			lemma "UAV2's perimRight is nonnegative": UAV2.perimRight >= 0.0;
+			
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;					
 													
