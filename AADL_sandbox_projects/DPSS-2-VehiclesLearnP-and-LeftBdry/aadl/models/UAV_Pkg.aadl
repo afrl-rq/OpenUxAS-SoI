@@ -193,9 +193,9 @@ public
 							 		0.0
 							 	else  
 								 	if pre_direction = 1 then
-								 		pre_perimRight - (pos - pre_pos)
+								 		DPSS_Node_Lib.max_real(0.0, pre_perimRight - (pos - pre_pos))
 								 	else --pre_direction = -1
-								 		pre_perimRight + (pre_pos - pos);
+								 		DPSS_Node_Lib.max_real(0.0, pre_perimRight + (pre_pos - pos));
 								 		
 			guarantee "perimLeft formula":
 				perimLeft = if meet_LN then
@@ -205,9 +205,9 @@ public
 									0.0
 								else
 									if pre_direction = 1 then
-										pre_perimLeft + (pos - pre_pos)
+										DPSS_Node_Lib.max_real(0.0, pre_perimLeft + (pos - pre_pos))
 									else --pre_direction = -1
-										pre_perimLeft - (pre_pos - pos);
+										DPSS_Node_Lib.max_real(0.0, pre_perimLeft - (pre_pos - pos));
 			
 --This should be a lemma in the higher level
 --			guarantee "ID in range":

@@ -12,6 +12,15 @@ public
 
 	annex agree {**
 
+	--Returns the maximum of two real numbers
+	node max_real(	a: real, 
+					b: real
+	) returns (out: real);
+		let
+			out = if a >= b then a else b;
+		tel;
+	
+	
 	--Returns the minimum of two inputs of Time_Type
 	node min_time(a: DPSS_Data_Types::Time_Type, 
 					b : DPSS_Data_Types::Time_Type

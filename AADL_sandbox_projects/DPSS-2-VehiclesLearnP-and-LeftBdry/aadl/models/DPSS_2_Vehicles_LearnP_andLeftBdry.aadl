@@ -33,8 +33,8 @@ public
 			-----------------------------------------------------
 			
 			--Constants that the vehicles don't know a priori (so they are only defined at the top-level)
-			const RIGHT_ENDP_TRUTH : real = 200.0;
-			const LEFT_ENDP_TRUTH  : real = -100.0;
+			const RIGHT_ENDP_TRUTH : real = 10.0;
+			const LEFT_ENDP_TRUTH  : real = 0.0;
 			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
 			const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
 	
