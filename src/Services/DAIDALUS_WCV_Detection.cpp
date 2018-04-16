@@ -116,216 +116,246 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     // process options from the XML configuration node:
     if (!ndComponent.attribute(STRING_XML_LOOKAHEADTIME).empty())
     {
-       m_lookahead_time_s = ndComponent.attribute(STRING_XML_LOOKAHEADTIME).as_double();
-       if (m_lookahead_time_s > 0.0)
+       double local_lookahead_time_s = ndComponent.attribute(STRING_XML_LOOKAHEADTIME).as_double();
+       if (local_lookahead_time_s > 0.0)
        {
-           m_daa.parameters.setLookaheadTime(m_lookahead_time_s, "s");
+           m_lookahead_time_s = local_lookahead_time_s;
        }
     }
     if (!ndComponent.attribute(STRING_XML_LEFTTRACK).empty())
     {
-       m_left_trk_deg = ndComponent.attribute(STRING_XML_LEFTTRACK).as_double();
-       if (m_left_trk_deg > 0.0 && m_left_trk_deg <= 180.0)
+       double local_left_trk_deg = ndComponent.attribute(STRING_XML_LEFTTRACK).as_double();
+       if (local_left_trk_deg > 0.0 && local_left_trk_deg <= 180.0)
        {
-           m_daa.parameters.setLeftTrack(m_left_trk_deg, "deg");
+           m_left_trk_deg = local_left_trk_deg;
        }
     }
     if (!ndComponent.attribute(STRING_XML_RIGHTTRACK).empty())
     {
-       m_right_trk_deg = ndComponent.attribute(STRING_XML_RIGHTTRACK).as_double();
-       if (m_right_trk_deg >0.0 && m_right_trk_deg <=180.0)
+       double local_right_trk_deg = ndComponent.attribute(STRING_XML_RIGHTTRACK).as_double();
+       if (local_right_trk_deg >0.0 && local_right_trk_deg <=180.0)
        {
-           m_daa.parameters.setRightTrack(m_right_trk_deg, "deg");
+           m_right_trk_deg = m_right_trk_deg;
        }
     }
     if (!ndComponent.attribute(STRING_XML_MAXGROUNDSPEED).empty())
     {
-       m_max_gs_mps = ndComponent.attribute(STRING_XML_MAXGROUNDSPEED).as_double();
-       if (m_max_gs_mps > 0.0)
+       double local_max_gs_mps = ndComponent.attribute(STRING_XML_MAXGROUNDSPEED).as_double();
+       if (local_max_gs_mps > 0.0)
        {
-           m_daa.parameters.setMaxGroundSpeed(m_max_gs_mps, "m/s");
+           m_max_gs_mps = local_max_gs_mps;
        }
     }
         if (!ndComponent.attribute(STRING_XML_MINGROUNDSPEED).empty())
     {
-       m_min_gs_mps = ndComponent.attribute(STRING_XML_MINGROUNDSPEED).as_double();
-       if (m_min_gs_mps >= 0.0 && m_min_gs_mps < m_max_gs_mps)
+       double local_min_gs_mps = ndComponent.attribute(STRING_XML_MINGROUNDSPEED).as_double();
+       if (local_min_gs_mps >= 0.0 && m_min_gs_mps < m_max_gs_mps)
        {
-           m_daa.parameters.setMinGroundSpeed(m_min_gs_mps, "m/s");
+           m_min_gs_mps = local_min_gs_mps;
        }
     }
     if (!ndComponent.attribute(STRING_XML_MAXVERTICALSPEED).empty())
     {
-       m_max_vs_mps = ndComponent.attribute(STRING_XML_MAXVERTICALSPEED).as_double();
-       m_daa.parameters.setMaxVerticalSpeed(m_max_vs_mps, "m/s");
+       double local_max_vs_mps = ndComponent.attribute(STRING_XML_MAXVERTICALSPEED).as_double();
+       m_max_vs_mps = local_max_vs_mps;
     }
         if (!ndComponent.attribute(STRING_XML_MINVERTICALSPEED).empty())
     {
-       m_min_vs_mps = ndComponent.attribute(STRING_XML_MINVERTICALSPEED).as_double();
-       if (m_min_vs_mps < m_max_vs_mps)
+       double local_min_vs_mps = ndComponent.attribute(STRING_XML_MINVERTICALSPEED).as_double();
+       if (local_min_vs_mps < m_max_vs_mps)
        {
-           m_daa.parameters.setMinVerticalSpeed(m_min_vs_mps, "m/s");
+           m_min_vs_mps = local_min_vs_mps;
        }
     }
     if (!ndComponent.attribute(STRING_XML_MAXALTITUDE).empty())
     {
-       m_max_alt_m = ndComponent.attribute(STRING_XML_MAXALTITUDE).as_double();
-       m_daa.parameters.setMaxAltitude(m_max_alt_m, "m");
+       double local_max_alt_m = ndComponent.attribute(STRING_XML_MAXALTITUDE).as_double();
+       m_max_alt_m = local_max_alt_m; 
     }
         if (!ndComponent.attribute(STRING_XML_MINALTITUDE).empty())
     {
-       m_min_alt_m = ndComponent.attribute(STRING_XML_MINALTITUDE).as_double();
-       if (m_min_alt_m < m_max_alt_m)
+       double local_min_alt_m = ndComponent.attribute(STRING_XML_MINALTITUDE).as_double();
+       if (local_min_alt_m < m_max_alt_m)
        {
-           m_daa.parameters.setMinAltitude(m_min_alt_m, "m");
+           m_min_alt_m = local_min_alt_m;
        }
     }
     if (!ndComponent.attribute(STRING_XML_TRACKSTEP).empty())
     {
-       m_trk_step_deg = ndComponent.attribute(STRING_XML_TRACKSTEP).as_double();
-       if (m_trk_step_deg > 0.0)
+       double local_trk_step_deg = ndComponent.attribute(STRING_XML_TRACKSTEP).as_double();
+       if (local_trk_step_deg > 0.0)
        {
-           m_daa.parameters.setTrackStep(m_trk_step_deg, "deg");
+           m_trk_step_deg = local_trk_step_deg;
        }
     }
     if (!ndComponent.attribute(STRING_XML_GROUNDSPEEDSTEP).empty())
     {
-       m_gs_step_mps = ndComponent.attribute(STRING_XML_GROUNDSPEEDSTEP).as_double();
-       if (m_gs_step_mps > 0.0)
+       double local_gs_step_mps = ndComponent.attribute(STRING_XML_GROUNDSPEEDSTEP).as_double();
+       if (local_gs_step_mps > 0.0)
        {
-           m_daa.parameters.setGroundSpeedStep(m_gs_step_mps, "m/s");
+           m_gs_step_mps = local_gs_step_mps;
        }
     }
     if (!ndComponent.attribute(STRING_XML_VERTICALSPEEDSTEP).empty())
     {
-       m_vs_step_mps = ndComponent.attribute(STRING_XML_VERTICALSPEEDSTEP).as_double();
-       if (m_vs_step_mps > 0.0)
+       double local_vs_step_mps = ndComponent.attribute(STRING_XML_VERTICALSPEEDSTEP).as_double();
+       if (local_vs_step_mps > 0.0)
        {
-           m_daa.parameters.setVerticalSpeedStep(m_vs_step_mps, "m/s");
+           m_vs_step_mps = local_vs_step_mps;
        }
     }
     if (!ndComponent.attribute(STRING_XML_ALTITUDESTEP).empty())
     {
-       m_alt_step_m = ndComponent.attribute(STRING_XML_ALTITUDESTEP).as_double();
-       if (m_alt_step_m > 0.0)
+       double local_alt_step_m = ndComponent.attribute(STRING_XML_ALTITUDESTEP).as_double();
+       if (local_alt_step_m > 0.0)
        {
-           m_daa.parameters.setAltitudeStep(m_alt_step_m, "m");
+           m_alt_step_m = local_alt_step_m;
        }
     }
     if (!ndComponent.attribute(STRING_XML_HORIZONTALACCELERATION).empty())
     {
-       m_horizontal_accel_mpsps = ndComponent.attribute(STRING_XML_HORIZONTALACCELERATION).as_double();
-       if (m_horizontal_accel_mpsps >= 0.0)
+       double local_horizontal_accel_mpsps = ndComponent.attribute(STRING_XML_HORIZONTALACCELERATION).as_double();
+       if (local_horizontal_accel_mpsps >= 0.0)
        {
-           m_daa.parameters.setHorizontalAcceleration(m_horizontal_accel_mpsps, "m/s^2");
+           m_horizontal_accel_mpsps = local_horizontal_accel_mpsps;
        }
     }
     if (!ndComponent.attribute(STRING_XML_VERTICALACCELERATION).empty())
     {
-       m_vertical_accel_G = ndComponent.attribute(STRING_XML_VERTICALACCELERATION).as_double();
-       if (m_vertical_accel_G >= 0.0)
+       double local_vertical_accel_G = ndComponent.attribute(STRING_XML_VERTICALACCELERATION).as_double();
+       if (local_vertical_accel_G >= 0.0)
        {
-           m_daa.parameters.setVerticalAcceleration(m_vertical_accel_G, "G");
+           m_vertical_accel_G = local_vertical_accel_G;
        }
     }
     if (!ndComponent.attribute(STRING_XML_TURNRATE).empty())
     {
-       m_turn_rate_degps = ndComponent.attribute(STRING_XML_TURNRATE).as_double();
-       if (m_turn_rate_degps >= 0.0)
+       double local_turn_rate_degps = ndComponent.attribute(STRING_XML_TURNRATE).as_double();
+       if (local_turn_rate_degps >= 0.0)
        {
-           m_daa.parameters.setTurnRate(m_turn_rate_degps, "deg/s");
+           m_turn_rate_degps = local_turn_rate_degps;
        }
     }
     if (!ndComponent.attribute(STRING_XML_BANKANGLE).empty())
     {
-       m_bank_angle_deg = ndComponent.attribute(STRING_XML_BANKANGLE).as_double();
-       if (m_bank_angle_deg >= 0.0 && m_turn_rate_degps != 0.0)
+       double local_bank_angle_deg = ndComponent.attribute(STRING_XML_BANKANGLE).as_double();
+       if (local_bank_angle_deg >= 0.0 && m_turn_rate_degps != 0.0)
        {
-           m_daa.parameters.setBankAngle(m_bank_angle_deg, "deg");
+           m_bank_angle_deg = local_bank_angle_deg;
        }
     }
     if (!ndComponent.attribute(STRING_XML_VERTICALRATE).empty())
     {
-       m_vertical_rate_mps = ndComponent.attribute(STRING_XML_VERTICALRATE).as_double();
-       if (m_vertical_rate_mps >= 0.0)
+       double local_vertical_rate_mps = ndComponent.attribute(STRING_XML_VERTICALRATE).as_double();
+       if (local_vertical_rate_mps >= 0.0)
        {
-           m_daa.parameters.setVerticalRate(m_vertical_rate_mps, "m/s");
+           m_vertical_rate_mps = local_vertical_rate_mps;
        }
     }    
     if (!ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).empty())
     {
-       m_recovery_stability_time_s = ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).as_double();
-       if (m_recovery_stability_time_s >= 0.0)
+       double local_recovery_stability_time_s = ndComponent.attribute(STRING_XML_RECOVERYSTABILITYTIME).as_double();
+       if (local_recovery_stability_time_s >= 0.0)
        {
-           m_daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time_s, "s");
+           m_recovery_stability_time_s = local_recovery_stability_time_s;
        }
     }
     if (!ndComponent.attribute(STRING_XML_ISRECOVERYTRACK).empty())
     {
-       m_recovery_trk_bool = ndComponent.attribute(STRING_XML_ISRECOVERYTRACK).as_bool();
-       m_daa.parameters.setRecoveryTrackBands(m_recovery_trk_bool);
+       bool local_recovery_trk_bool = ndComponent.attribute(STRING_XML_ISRECOVERYTRACK).as_bool();
+       m_recovery_trk_bool = local_recovery_trk_bool;
     }
     if (!ndComponent.attribute(STRING_XML_ISRECOVERYGROUNDSPEED).empty())
     {
-       m_recovery_gs_bool = ndComponent.attribute(STRING_XML_ISRECOVERYGROUNDSPEED).as_bool();
-       m_daa.parameters.setRecoveryGroundSpeedBands(m_recovery_gs_bool);
+       bool local_recovery_gs_bool = ndComponent.attribute(STRING_XML_ISRECOVERYGROUNDSPEED).as_bool();
+       m_recovery_gs_bool = local_recovery_gs_bool;
     }
     if (!ndComponent.attribute(STRING_XML_ISRECOVERYVERTICALSPEED).empty())
     {
-       m_recovery_vs_bool = ndComponent.attribute(STRING_XML_ISRECOVERYVERTICALSPEED).as_bool();
-       m_daa.parameters.setRecoveryVerticalSpeedBands(m_recovery_vs_bool);
+       bool local_recovery_vs_bool = ndComponent.attribute(STRING_XML_ISRECOVERYVERTICALSPEED).as_bool();
+       m_recovery_vs_bool = local_recovery_vs_bool;
     }
     if (!ndComponent.attribute(STRING_XML_ISRECOVERYALTITUDE).empty())
     {
-       m_recovery_alt_bool = ndComponent.attribute(STRING_XML_ISRECOVERYALTITUDE).as_bool();
-       m_daa.parameters.setRecoveryAltitudeBands(m_recovery_alt_bool);
+       bool local_recovery_alt_bool = ndComponent.attribute(STRING_XML_ISRECOVERYALTITUDE).as_bool();
+       m_recovery_alt_bool = local_recovery_alt_bool;
     }
     if (!ndComponent.attribute(STRING_XML_ISCOLLISIONAVOIDANCE).empty())
     {
-       m_ca_bands_bool = ndComponent.attribute(STRING_XML_ISCOLLISIONAVOIDANCE).as_bool();
-       m_daa.parameters.setCollisionAvoidanceBands(m_ca_bands_bool);
+       bool local_ca_bands_bool = ndComponent.attribute(STRING_XML_ISCOLLISIONAVOIDANCE).as_bool();
+       m_ca_bands_bool = local_ca_bands_bool;
     }
     if (!ndComponent.attribute(STRING_XML_COLLISIONAVOIDANCEFACTOR).empty())
     {
-       m_ca_factor = ndComponent.attribute(STRING_XML_COLLISIONAVOIDANCEFACTOR).as_double();
-       if (m_ca_factor > 0.0 && m_ca_factor <= 1.0)
+       double local_ca_factor = ndComponent.attribute(STRING_XML_COLLISIONAVOIDANCEFACTOR).as_double();
+       if (local_ca_factor > 0.0 && local_ca_factor <= 1.0)
        {
-           m_daa.parameters.setCollisionAvoidanceBandsFactor(m_ca_factor);
+           m_ca_factor = local_ca_factor;
        }
     }
     if (!ndComponent.attribute(STRING_XML_HORIZONTALNMAC).empty())
     {
-        m_horizontal_nmac_m = ndComponent.attribute(STRING_XML_HORIZONTALNMAC).as_double();
-       m_daa.parameters.setHorizontalNMAC(m_horizontal_nmac_m, "m");
+       double local_horizontal_nmac_m = ndComponent.attribute(STRING_XML_HORIZONTALNMAC).as_double();
+       m_horizontal_nmac_m = local_horizontal_nmac_m;
     }
         if (!ndComponent.attribute(STRING_XML_MINHORIZONTALRECOVERY).empty())
     {
-       m_min_horizontal_recovery_m = ndComponent.attribute(STRING_XML_MINHORIZONTALRECOVERY).as_double();
-       if (m_min_horizontal_recovery_m > 0.0 && m_min_horizontal_recovery_m >= m_horizontal_nmac_m)
+       double local_min_horizontal_recovery_m = ndComponent.attribute(STRING_XML_MINHORIZONTALRECOVERY).as_double();
+       if (local_min_horizontal_recovery_m > 0.0 && local_min_horizontal_recovery_m >= m_horizontal_nmac_m)
        {
-           m_daa.parameters.setMinHorizontalRecovery(m_min_horizontal_recovery_m, "m");
+           m_min_horizontal_recovery_m = local_min_horizontal_recovery_m;
        }
     }
     if (!ndComponent.attribute(STRING_XML_VERTICALNMAC).empty())
     {
-       m_vertical_nmac_m = ndComponent.attribute(STRING_XML_VERTICALNMAC).as_double();
-       m_daa.parameters.setVerticalNMAC(m_vertical_nmac_m, "m");
+       double local_vertical_nmac_m = ndComponent.attribute(STRING_XML_VERTICALNMAC).as_double();
+       m_vertical_nmac_m = local_vertical_nmac_m;
     }
         if (!ndComponent.attribute(STRING_XML_MINVERTICALRECOVERY).empty())
     {
-       m_min_vertical_recovery_m = ndComponent.attribute(STRING_XML_MINVERTICALRECOVERY).as_double();
-       if (m_min_vertical_recovery_m > 0.0 && m_min_vertical_recovery_m >= m_vertical_nmac_m)
+       double local_min_vertical_recovery_m = ndComponent.attribute(STRING_XML_MINVERTICALRECOVERY).as_double();
+       if (local_min_vertical_recovery_m > 0.0 && local_min_vertical_recovery_m >= m_vertical_nmac_m)
        {
-           m_daa.parameters.setMinVerticalRecovery(m_min_vertical_recovery_m, "m");
+           m_min_vertical_recovery_m = local_min_vertical_recovery_m;
        }
     }
 
     if (!ndComponent.attribute(STRING_XML_HORIZONTALCONTOURTHRESHOLD).empty())
     {
-       m_contour_thr_deg = ndComponent.attribute(STRING_XML_HORIZONTALCONTOURTHRESHOLD).as_double();
-       if (m_contour_thr_deg >= 0.0 && m_contour_thr_deg <= 180.0)
-       m_daa.parameters.setHorizontalContourThreshold(m_contour_thr_deg, "deg");
+       double local_contour_thr_deg = ndComponent.attribute(STRING_XML_HORIZONTALCONTOURTHRESHOLD).as_double();
+       if (local_contour_thr_deg >= 0.0 && local_contour_thr_deg <= 180.0)
+           m_contour_thr_deg = local_contour_thr_deg;
     }
+    m_daa.parameters.setLookaheadTime(m_lookahead_time_s, "s");
+    m_daa.parameters.setLeftTrack(m_left_trk_deg, "deg");
+    m_daa.parameters.setRightTrack(m_right_trk_deg, "deg");
+    m_daa.parameters.setMaxGroundSpeed(m_max_gs_mps, "m/s");
+    m_daa.parameters.setMinGroundSpeed(m_min_gs_mps, "m/s");
+    m_daa.parameters.setMaxVerticalSpeed(m_max_vs_mps, "m/s");
+    m_daa.parameters.setMinVerticalSpeed(m_min_vs_mps, "m/s");
+    m_daa.parameters.setMaxAltitude(m_max_alt_m, "m");
+    m_daa.parameters.setMinAltitude(m_min_alt_m, "m");
+    m_daa.parameters.setTrackStep(m_trk_step_deg, "deg");
+    m_daa.parameters.setGroundSpeedStep(m_gs_step_mps, "m/s");
+    m_daa.parameters.setVerticalSpeedStep(m_vs_step_mps, "m/s");
+    m_daa.parameters.setAltitudeStep(m_alt_step_m, "m");
+    m_daa.parameters.setHorizontalAcceleration(m_horizontal_accel_mpsps, "m/s^2");
+    m_daa.parameters.setVerticalAcceleration(m_vertical_accel_G, "G");
+    m_daa.parameters.setTurnRate(m_turn_rate_degps, "deg/s");
+    m_daa.parameters.setBankAngle(m_bank_angle_deg, "deg");
+    m_daa.parameters.setVerticalRate(m_vertical_rate_mps, "m/s");
+    m_daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time_s, "s");
+    m_daa.parameters.setRecoveryTrackBands(m_recovery_trk_bool);
+    m_daa.parameters.setRecoveryGroundSpeedBands(m_recovery_gs_bool);
+    m_daa.parameters.setRecoveryVerticalSpeedBands(m_recovery_vs_bool);
+    m_daa.parameters.setRecoveryAltitudeBands(m_recovery_alt_bool);
+    m_daa.parameters.setCollisionAvoidanceBands(m_ca_bands_bool);
+    m_daa.parameters.setCollisionAvoidanceBandsFactor(m_ca_factor);
+    m_daa.parameters.setHorizontalNMAC(m_horizontal_nmac_m, "m"); 
+    m_daa.parameters.setMinHorizontalRecovery(m_min_horizontal_recovery_m, "m");
+    m_daa.parameters.setVerticalNMAC(m_vertical_nmac_m, "m");
+    m_daa.parameters.setMinVerticalRecovery(m_min_vertical_recovery_m, "m");
+    m_daa.parameters.setHorizontalContourThreshold(m_contour_thr_deg, "deg");
   
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);
@@ -365,10 +395,6 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
 {
     if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
-        m_nogo_trk_deg.clear();
-        m_nogo_gs_mps.clear();
-        m_nogo_vs_mps.clear();
-        m_nogo_alt_m.clear();
         //receive message
         std::shared_ptr<afrl::cmasi::AirVehicleState> airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
         std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << 

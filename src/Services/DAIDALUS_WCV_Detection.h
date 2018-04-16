@@ -188,12 +188,7 @@ private:
     larcfm::Daidalus m_daa;
     std::unordered_map<int64_t, MydaidalusPackage> m_daidalusVehicleInfo;
     
-    std::vector<std::array<double,2>> m_nogo_trk_deg;
-    std::vector<std::array<double,2>> m_nogo_gs_mps;
-    std::vector<std::array<double,2>> m_nogo_vs_mps;
-    std::vector<std::array<double,2>> m_nogo_alt_m;
-
-};
+   };
 
 } //namespace service
 } //namespace uxas
