@@ -340,13 +340,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     optionIdRestart = -1;
                 }
 
-                // itOption->second->m_restartRoutePlan->getWaypoints().front()->clone()
-                if ((vehicleIdRestart > 0) && (optionIdRestart > 0)
-                    && itOption->second && itOption->second->m_taskOption
-                    && itOption->second->m_restartRoutePlan
-                    && !(itOption->second->m_restartRoutePlan->getWaypoints().empty())
-                    && itOption->second->m_restartRoutePlan->getWaypoints().front()
-                    && itOption->second->m_restartRoutePlan->getWaypoints().back() )
+                if ((vehicleIdRestart > 0) && (optionIdRestart > 0) && itOption->second && itOption->second->m_taskOption )
                 {
                     // restart plan where the restart vehicle left it
                     // create new option with only the restart vehicle eligible
@@ -439,24 +433,30 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                     {
                         //TODO ERROR:: could not find vehicle configuration or vehicleSpeed_ms <= 0.0
                     }
+                    
+                    if( !(itOption->second->m_restartRoutePlan->getWaypoints().empty()) )
+                    {             
+                        itOption->second->m_restartTaskOption->setCost(cost_ms);
+                        itOption->second->m_restartTaskOption->setStartLocation(itOption->second->m_restartRoutePlan->getWaypoints().front()->clone());
+                        itOption->second->m_restartTaskOption->setStartHeading(startHeading_deg);
+                        itOption->second->m_restartTaskOption->setEndLocation(itOption->second->m_restartRoutePlan->getWaypoints().back()->clone());
+                        itOption->second->m_restartTaskOption->setEndHeading(endHeading_deg);
+                        m_taskPlanOptions->getOptions().push_back(itOption->second->m_restartTaskOption->clone());
+                        
+                        std::string compositionString("+(");
+                        compositionString += "p";
+                        compositionString += std::to_string(optionIdRestart);
+                        compositionString += " ";
+                        compositionString += ")";
 
-                    itOption->second->m_restartTaskOption->setCost(cost_ms);
-                    itOption->second->m_restartTaskOption->setStartLocation(itOption->second->m_restartRoutePlan->getWaypoints().front()->clone());
-                    itOption->second->m_restartTaskOption->setStartHeading(startHeading_deg);
-                    itOption->second->m_restartTaskOption->setEndLocation(itOption->second->m_restartRoutePlan->getWaypoints().back()->clone());
-                    itOption->second->m_restartTaskOption->setEndHeading(endHeading_deg);
-
-                    m_taskPlanOptions->getOptions().push_back(itOption->second->m_restartTaskOption->clone());
-
-                    std::string compositionString("+(");
-                    compositionString += "p";
-                    compositionString += std::to_string(optionIdRestart);
-                    compositionString += " ";
-                    compositionString += ")";
-
-                    m_taskPlanOptions->setComposition(compositionString);
-                    auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(m_taskPlanOptions);
-                    sendSharedLmcpObjectBroadcastMessage(newResponse);
+                        m_taskPlanOptions->setComposition(compositionString);
+                        auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(m_taskPlanOptions);
+                        sendSharedLmcpObjectBroadcastMessage(newResponse);
+                    }
+                    else
+                    {
+                        // TODO ERROR: calculated that a restart route was in place, but no waypoints in plan
+                    }
                 }
                 else
                 {

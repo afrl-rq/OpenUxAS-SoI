@@ -105,17 +105,18 @@ void RendezvousTask::buildTaskPlanOptions()
     {
         for (auto v : itEligibleEntities->second)
         {
-            auto taskOption = new uxas::messages::task::TaskOption;
-            taskOption->setTaskID(taskId);
-            taskOption->setOptionID(v);
-            taskOption->getEligibleEntities().push_back(v);
-            taskOption->setStartLocation(rtask->getLocation()->clone());
-            taskOption->setStartHeading(rtask->getHeading());
-            taskOption->setEndLocation(rtask->getLocation()->clone());
-            taskOption->setEndHeading(rtask->getHeading());
-            m_taskPlanOptions->getOptions().push_back(taskOption);
-            auto topt = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
-            m_optionIdVsTaskOptionClass[taskOption->getOptionID()] = std::shared_ptr<TaskOptionClass>(new TaskOptionClass(topt));
+            auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+            auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+            pTaskOptionClass->m_taskOption->setTaskID(taskId);
+            pTaskOptionClass->m_taskOption->setOptionID(v);
+            pTaskOptionClass->m_taskOption->setCost(0);
+            pTaskOptionClass->m_taskOption->setStartLocation(rtask->getLocation()->clone());
+            pTaskOptionClass->m_taskOption->setStartHeading(rtask->getHeading());
+            pTaskOptionClass->m_taskOption->setEndLocation(rtask->getLocation()->clone());
+            pTaskOptionClass->m_taskOption->setEndHeading(rtask->getHeading());
+            pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
+            m_optionIdVsTaskOptionClass.insert(std::make_pair(v, pTaskOptionClass));
+            m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
         }
     }
 
