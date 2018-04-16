@@ -72,50 +72,7 @@ public
 --				(id - 1.0)*DPSS_Constants.P_TRUTH/N + DPSS_Constants.LEFT_ENDP_TRUTH;  
 --			eq S_R : DPSS_Data_Types::Position_Type = 
 --				id*DPSS_Constants.P_TRUTH/N + DPSS_Constants.LEFT_ENDP_TRUTH;	
-			
-			--Shared border positions -- LINEARIZED. ASSUMES N <= 7.
---			eq S_L : DPSS_Data_Types::Position_Type =
---				if N = 1.0 then 
---					(id - 1.0)*P/1.0 + left_endp_est
---				else 
---					if N = 2.0 then 
---						(id - 1.0)*P/2.0 + left_endp_est
---					else
---						if N = 3.0 then 
---							(id - 1.0)*P/3.0 + left_endp_est
---						else
---							if N = 4.0 then 
---								(id - 1.0)*P/4.0 + left_endp_est
---						 	else 
---						 		if N = 5.0 then 
---									(id - 1.0)*P/5.0 + left_endp_est
---								else 
---									if N = 6.0 then 
---										(id - 1.0)*P/6.0 + left_endp_est
---									else --N >= 7.0
---										(id - 1.0)*P/7.0 + left_endp_est;
---			
---			eq S_R : DPSS_Data_Types::Position_Type =
---				if N = 1.0 then 
---					id*P/1.0 + left_endp_est
---				else 
---					if N = 2.0 then 
---						id*P/2.0 + left_endp_est
---					else
---						if N = 3.0 then 
---							id*P/3.0 + left_endp_est
---						else
---							if N = 4.0 then 
---								id*P/4.0 + left_endp_est
---						 	else 
---						 		if N = 5.0 then 
---									id*P/5.0 + left_endp_est
---								else 
---									if N = 6.0 then 
---										id*P/6.0 + left_endp_est
---									else --N >= 7.0
---										id*P/7.0 + left_endp_est;
-
+	
 			--Shared border positions -- LINEARIZED BOTH N and id. ASSUMES N <= 4 and 1 <= id <= N.						
 			eq S_L : DPSS_Data_Types::Position_Type =
 				if N = 1.0 then 
@@ -309,7 +266,7 @@ public
 									else --pre_direction = -1
 										DPSS_Node_Lib.max_real(0.0, pre_perimLeft - (pre_pos - pos));
 			
---This should be a lemma in the higher level
+--This could be a lemma in the higher level
 --			guarantee "ID in range":
 --				id >= 1 and id <= N;
 			
