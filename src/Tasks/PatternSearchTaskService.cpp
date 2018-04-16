@@ -242,7 +242,7 @@ void PatternSearchTaskService::buildTaskPlanOptions()
     // construct a task option for each vehicle
     // note:: use only one vehicle per option
 
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
 
     std::string compositionString("+(");
 

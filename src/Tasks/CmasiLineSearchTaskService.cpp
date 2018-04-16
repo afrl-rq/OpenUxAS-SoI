@@ -115,7 +115,7 @@ void CmasiLineSearchTaskService::buildTaskPlanOptions()
     double wedgeAzimuthIncrement(n_Const::c_Convert::dPiO8());
     double wedgeElevationIncrement(n_Const::c_Convert::dPiO8());
 
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
     int64_t taskId(m_lineSearchTask->getTaskID());
 
     double groundAltitude_m{0.0};

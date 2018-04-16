@@ -150,7 +150,7 @@ void CommRelayTaskService::buildTaskPlanOptions()
 {
     bool isSuccessful{true};
 
-    int64_t optionId(1);
+    int64_t optionId(TaskOptionClass::m_firstOptionId);
     int64_t taskId(m_CommRelayTask->getTaskID());
 
     if (isCalculateOption(taskId, optionId))

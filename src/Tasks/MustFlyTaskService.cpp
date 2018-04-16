@@ -87,7 +87,7 @@ MustFlyTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::
 
 void MustFlyTaskService::buildTaskPlanOptions()
 {
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
 
     double wedgeDirectionIncrement(n_Const::c_Convert::dPiO8());
     double dHeadingCurrent_rad = 0.0;

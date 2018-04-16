@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>7</Version>
+    <Version>8</Version>
     
     <StructList>
         
@@ -72,6 +72,20 @@
             <Field Name="DesiredHeadingRate" Type="real32" Units="degrees/sec" />
             <!-- Flag indicating selecting between heading (false) or heading rate (true) commands -->
             <Field Name="UseHeadingRate" Type="bool" Default="false" />
+            <!-- Commanded Altitude valid if {@link UseAltitude} == true -->
+            <Field Name="Altitude" Type="real32" Units="meter"/>            
+            <!-- Altitude type for specified altitude -->
+            <Field Name="AltitudeType" Type="CMASI/AltitudeType" Default="MSL" />
+            <!-- Denotes whether altitude should be used in the  safe heading action. If false, the
+            {@link NominalAltitude} and {@link NominalType}  from the {@link CMASI/EntityConfiguration} will be used.
+            -->
+            <Field Name="UseAltitude" Type="bool" Default="false"/>
+            <!-- Commanded Speed valid if {@link UseSpeed} == true -->
+            <Field Name="Speed" Type="real32" Units="mps"/>            
+            <!-- Denotes whether speed should be used in the safe heading action. If false, the
+            {@link NominalSpeed} from the {@link CMASI/EntityConfiguration} will be used.
+            -->
+            <Field Name="UseSpeed" Type="bool" Default="false"/>
         </Struct>
     
         <!-- Simple location broadcast from entities for tracking -->
@@ -180,6 +194,14 @@
             <Field Name="VehicleID" Type="int64" />
             <!-- Associated time from the handled entity state -->
             <Field Name="ReportedTime" Type="int64" Units="milliseconds" />
+        </Struct>
+
+        <!-- Overrides speed commands from waypoints -->
+        <Struct Name="SpeedOverrideAction" Extends="CMASI/VehicleAction" >
+            <!-- ID of vehicle for which speed should be overridden -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Commanded Speed -->
+            <Field Name="Speed" Type="real32" Units="mps"/>
         </Struct>
 
  </StructList>

@@ -182,7 +182,9 @@ if os == 'darwin'
   glu_deps += [dependency('gl')]
   glu_deps += [dependency('glu', required: false)]
 elif os.startswith('linux')
-  glu_deps += [dependency('glu')]
+  if not (target_machine.cpu_family() == 'arm')
+    glu_deps += [dependency('glu')]
+  endif
 elif os == 'windows'
   glu_deps += [cpp.find_library('glu32')]
 endif
@@ -199,6 +201,7 @@ deps += glu_deps
 
 if get_option('afrl_internal')
   deps += deps_internal
+  link_args += link_args_internal
 endif
 
 

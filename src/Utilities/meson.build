@@ -4,6 +4,8 @@ srcs_utilities = [
   'FileSystemUtilities.cpp',
   'Permute.cpp',
   'TimeUtilities.cpp',
+  'FlatEarth.cpp',
+  'RouteExtension.cpp',
   'UnitConversions.cpp',
   'UxAS_ConfigurationManager.cpp',
   'UxAS_ConsoleLogger.cpp',
@@ -22,6 +24,7 @@ incs_utilities = [
   include_directories(
     '../../src/Includes',
   ),
+  incs_lmcp,
 ]
 
 if get_option('afrl_internal')
