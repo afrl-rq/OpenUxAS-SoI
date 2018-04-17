@@ -890,20 +890,23 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                 isProcessTaskImplementationRouteResponse(taskImplementationResponse, itTaskOptionClass->second, waypointId, pRoutePlan);
                                 if (!taskImplementationResponse->getTaskWaypoints().empty())
                                 {
-                                    taskImplementationResponse->getTaskWaypoints().back()->setNextWaypoint(0);
                                     if (taskImplementationResponse->getTaskWaypoints().back()->getAssociatedTasks().empty())
                                     {
                                         taskImplementationResponse->getTaskWaypoints().back()->getAssociatedTasks().push_back(m_task->getTaskID());
                                     }
+                                    
                                     // disassociate the last waypoint in the plan from the tasks, allows tasks to complete
-                                    auto waypointLast = taskImplementationResponse->getTaskWaypoints().back()->clone();
-                                    auto newNumber = waypointLast->getNumber() + 1;
-                                    waypointLast->setNumber(newNumber);
-                                    waypointLast->setNextWaypoint(newNumber);
-                                    taskImplementationResponse->getTaskWaypoints().back()->setNextWaypoint(newNumber);
-                                    waypointLast->getAssociatedTasks().clear();
-                                    taskImplementationResponse->getTaskWaypoints().push_back(waypointLast);
-                                    waypointLast = nullptr;
+                                    if( taskImplementationResponse->getTaskWaypoints().back()->getNextWaypoint() == 0 )
+                                    {
+                                        auto waypointLast = taskImplementationResponse->getTaskWaypoints().back()->clone();
+                                        auto newNumber = waypointLast->getNumber() + 1;
+                                        waypointLast->setNumber(newNumber);
+                                        waypointLast->setNextWaypoint(newNumber);
+                                        taskImplementationResponse->getTaskWaypoints().back()->setNextWaypoint(newNumber);
+                                        waypointLast->getAssociatedTasks().clear();
+                                        taskImplementationResponse->getTaskWaypoints().push_back(waypointLast);
+                                        waypointLast = nullptr;
+                                    }
 
                                     // send out the response
                                     auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(taskImplementationResponse);
