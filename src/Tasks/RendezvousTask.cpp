@@ -17,9 +17,9 @@
 // include header for this service
 #include "RendezvousTask.h"
 #include "FlatEarth.h"
+#include "RouteExtension.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "uxas/messages/task/RendezvousTask.h"
-#include "uxas/messages/task/TaskAssignmentSummary.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
 #include "uxas/messages/uxnative/SpeedOverrideAction.h"
 
@@ -52,6 +52,9 @@ RendezvousTask::configureTask(const pugi::xml_node& ndComponent)
     // set of vehicles assigned to this task
     addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
     
+    // add subscription to AssignmentCostMatrix to determine timing between options
+    addSubscriptionAddress(uxas::messages::task::AssignmentCostMatrix::Subscription);
+    
     return true;
 }
     
@@ -62,6 +65,12 @@ bool RendezvousTask::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp:
         UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling: ", receivedLmcpObject->getFullLmcpTypeName());
         auto assignSummary = std::static_pointer_cast<uxas::messages::task::TaskAssignmentSummary>(receivedLmcpObject);
         m_assignmentSummary[assignSummary->getCorrespondingAutomationRequestID()] = assignSummary;
+    }
+    else if(uxas::messages::task::isAssignmentCostMatrix(receivedLmcpObject))
+    {
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling: ", receivedLmcpObject->getFullLmcpTypeName());
+        auto assignCostMatrix = std::static_pointer_cast<uxas::messages::task::AssignmentCostMatrix>(receivedLmcpObject);
+        m_assignmentCostMatrix[assignCostMatrix->getCorrespondingAutomationRequestID()] = assignCostMatrix;
     }
     else if(uxas::messages::task::isTaskImplementationRequest(receivedLmcpObject))
     {
@@ -83,6 +92,7 @@ bool RendezvousTask::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp:
     }
     else if(uxas::messages::task::isUniqueAutomationResponse(receivedLmcpObject))
     {
+        // TODO, clear memory associated with interim calculations, ie AssignmentCostMatrix and AssigmentSummary
         UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task handling: ", receivedLmcpObject->getFullLmcpTypeName());
         auto uResp = std::static_pointer_cast<uxas::messages::task::UniqueAutomationResponse>(receivedLmcpObject);
         if(m_sandboxRequest.find(uResp->getResponseID()) != m_sandboxRequest.end())
@@ -242,8 +252,76 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
     auto wp = taskImplementationResponse->getTaskWaypoints().at(0);
     if(wp->getSpeed() < 1e-4) return false;
     double V = wp->getSpeed();
+    
+    // look up timing for each vehicle involved in the task
+    auto assignsummary = m_assignmentSummary.find(taskImplementationResponse->getCorrespondingAutomationRequestID());
+    if(assignsummary == m_assignmentSummary.end()) return false;
+    auto assignmatrix = m_assignmentCostMatrix.find(taskImplementationResponse->getCorrespondingAutomationRequestID());
+    if(assignmatrix == m_assignmentCostMatrix.end()) return false;
+    auto startTimes = m_taskStartTime.find(taskImplementationResponse->getCorrespondingAutomationRequestID());
+    if(startTimes == m_taskStartTime.end()) return false;
+    auto requestedStartTime = startTimes->second.find(taskImplementationResponse->getVehicleID());
+    if(requestedStartTime == startTimes->second.end()) return false;
+    
+    // identify vehicles involved in this task
+    std::unordered_map<int64_t, std::pair<int64_t, int64_t> > prevTaskOptionPair;
+    std::unordered_map<int64_t, int64_t> selectedOption;
+    for(auto ta : assignsummary->second->getTaskList())
+    {
+        if(ta->getTaskID() == m_task->getTaskID())
+        {
+            selectedOption[ta->getAssignedVehicle()] = ta->getOptionID();
+        }
+        else if(selectedOption.find(ta->getAssignedVehicle()) == selectedOption.end())
+        {
+            prevTaskOptionPair[ta->getAssignedVehicle()] = std::make_pair(ta->getTaskID(),ta->getOptionID());
+        }
+    }
+    
+    int64_t maxArrivalTime = 0;
+    int64_t maxArrivalVehicle = 0;
+    for(auto option : selectedOption)
+    {
+        auto prevOption = prevTaskOptionPair.find(option.first);
+        std::pair<int64_t,int64_t> optionPair = std::make_pair(0,0);
+        if(prevOption != prevTaskOptionPair.end())
+        {
+            optionPair = prevOption->second;
+        }
+        
+        for(auto optioncost : assignmatrix->second->getCostMatrix())
+        {
+            if(optioncost->getVehicleID() == option.first
+                && optioncost->getDestinationTaskID() == m_task->getTaskID()
+                && optioncost->getDestinationTaskOption() == option.second
+                && optioncost->getIntialTaskID() == optionPair.first
+                && optioncost->getIntialTaskOption() == optionPair.second)
+            {
+                int64_t arrivalTime = 0;
+                auto vehicleStartTime = startTimes->second.find(option.first);
+                if(vehicleStartTime == startTimes->second.end())
+                {
+                    // look up from state message
+                    auto avstate = m_entityStates.find(taskImplementationResponse->getVehicleID());
+                    if(avstate == m_entityStates.end()) continue;
+                    arrivalTime = optioncost->getTimeToGo() + avstate->second->getTime();
+                }
+                else
+                    arrivalTime = optioncost->getTimeToGo() + vehicleStartTime->second;
+                
+                if(arrivalTime > maxArrivalTime)
+                {
+                    maxArrivalTime = arrivalTime;
+                    maxArrivalVehicle = option.first;
+                }
+            }
+        }
+    }
+    
+    if(maxArrivalVehicle == taskImplementationResponse->getVehicleID())
+        return true;
 
-    /*
+    // need to extend path, calculate actual path length
     uxas::common::utilities::FlatEarth flatEarth;
     double north, east;
     flatEarth.ConvertLatLong_degToNorthEast_m(wp->getLatitude(), wp->getLongitude(), north, east);
@@ -259,20 +337,13 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
     }
 
     // calculate extension time
-    int64_t extendTime_ms = rtask->getTimeOfArrival() - static_cast<int64_t>(travelDist/V*1000) - avstate->second->getTime();
-    m_plannedToa[taskImplementationResponse->getVehicleID()] = rtask->getTimeOfArrival();
-    if(rtask->getTimeOfArrival() < 0)
-    {
-        m_plannedToa[taskImplementationResponse->getVehicleID()] = -rtask->getTimeOfArrival() + static_cast<int64_t>(travelDist/V*1000) + avstate->second->getTime();
-        extendTime_ms = -rtask->getTimeOfArrival();
-    }
-
+    int64_t extendTime_ms = maxArrivalTime - static_cast<int64_t>(travelDist/V*1000) - requestedStartTime->second;
+    m_plannedToa[taskImplementationResponse->getCorrespondingAutomationRequestID()][taskImplementationResponse->getVehicleID()] = maxArrivalTime;
+    
     if(extendTime_ms <= 1000) return true;
 
     // extend waypoints, hard-coded to 280m radius, 200m minimum segment size
     return uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), extendTime_ms, 280.0, 200.0);
-    */
-    return false;
 }
 
 void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)

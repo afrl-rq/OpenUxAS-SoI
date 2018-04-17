@@ -20,6 +20,7 @@
 #include "TaskServiceBase.h"
 #include "uxas/messages/task/TaskImplementationRequest.h"
 #include "uxas/messages/task/TaskAssignmentSummary.h"
+#include "uxas/messages/task/AssignmentCostMatrix.h"
 
 #include <unordered_map>
 
@@ -101,6 +102,9 @@ private:
     
     // key: unique automation request ID, value: task assignment summary 
     std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> > m_assignmentSummary;
+    
+    // key: unique automation request ID, value: assignment cost matrix
+    std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::AssignmentCostMatrix> > m_assignmentCostMatrix;
     
     // key: unique automation request ID, value: map
     //                     key: vehicle ID, value: absolute time at task start in ms
