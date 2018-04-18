@@ -380,7 +380,7 @@ cross-compiled binary and config files into place with `scp`, and then
 ## Incorporating buildroot updates
 
 The Docker-based cross compilation process depends on a [fork of
-buildroot](https://github.com/acfoltzer/buildroot). When this
+buildroot](https://github.com/GaloisInc/buildroot). When this
 repository is updated, you will need to trigger a full rebuild of the
 Docker image in order to incorporate the newest changes. In the step
 above, add a `-f` argument to the build script:
