@@ -575,7 +575,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
         if (nodeAssignment->m_staticAssignmentParameters->m_numberCompleteAssignments <= 0)
         {
             auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
-            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Warning);
+            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Error);
             auto keyValuePair = new afrl::cmasi::KeyValuePair;
             keyValuePair->setKey(std::string("No UniqueAutomationResponse"));
             keyValuePair->setValue(std::string("Assignment not found: ") + nodeAssignment->m_staticAssignmentParameters->m_reasonsForNoAssignment.str());
