@@ -1,0 +1,10 @@
+[package]
+name = "services_rs"
+version = "0.1.0"
+authors = ["Adam C. Foltzer <acfoltzer@galois.com>"]
+
+[dependencies]
+lmcp_rs = { path = "../../LMCP/rs" }
+
+[lib]
+path = "lib.rs"
