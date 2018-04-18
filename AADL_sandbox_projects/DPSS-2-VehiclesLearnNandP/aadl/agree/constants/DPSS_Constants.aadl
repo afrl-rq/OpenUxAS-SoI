@@ -3,11 +3,7 @@ public
 		
 	annex agree {**
 			
---		const RIGHT_ENDP_TRUTH : real = 10.0;
---		const LEFT_ENDP_TRUTH : real = 0.0;
---		const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
 		const V : real = 1.0; --velocity
---		const Time_to_travel_full_length : DPSS_Data_Types::Time_Type = P_TRUTH/V;
 		const LEFT : int = -1;
 		const RIGHT : int = 1;
 

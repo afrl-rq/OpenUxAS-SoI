@@ -34,8 +34,6 @@ public
 			-----------------------------------------------------
 			
 			--The true left and right endpoints are only used to determine whether the vehicle has reached them.
---			eq reach_right_endp_truth : bool = (pos >= DPSS_Constants.RIGHT_ENDP_TRUTH); 
---			eq reach_left_endp_truth : 	bool = (pos <= DPSS_Constants.LEFT_ENDP_TRUTH); 
 			eq reach_right_endp_truth : bool = (pos >= right_endp_truth); 
 			eq reach_left_endp_truth : 	bool = (pos <= left_endp_truth); 
 
