@@ -36,36 +36,66 @@ namespace service
 {
 
 /*! \class DAIDALUS_WCV_Detection
-    \brief This is a basic service that can be used as a template when 
- * constructing new services.
-
+    \brief This is a service that acts as an interface between UxAS and NASA's DAIDALUS.
  * 
  * 
- *  @par To add a new service:
- * <ul style="padding-left:1em;margin-left:0">
- * <li>Make copies of the source and header files of this template.</li>
- * <li>Search for the string DAIDALUS_WCV_Detection and Replace it with the new 
- * service name.</li>
- * <li>Change the unique include guard entries, in the header file, i.e. 
- * "UXAS_00_SERVICE_TEMPLATE_H" to match the new service name</li>
- * <li> include the new service header file in ServiceManager.cpp</li>
- * <li> add a dummy instance of the new service in ServiceManager.cpp, e.g.
- * {auto svc = uxas::stduxas::make_unique<uxas::service::MyNewService>();} 
- * Note: this is required to link the new service in when building UxAS</li>
- *  
- * </ul> @n
- * 
- * Configuration String: <Service Type="DAIDALUS_WCV_Detection" OptionString="Option_01" OptionInt="36" />
+ * Configuration String: <Service Type="DAIDALUS_WCV_Detection" LookAheadTime="180" LeftTrack="180" RightTrack="180" MinGroundSpeed="5" 
+ * MaxGroundSpeed="360.11 MinVerticalSpeed="xx" MaxVerticalSpeed="xx" MinAltitude="xx" MaxAltitude="xx" TrackStep="xx" GroundSpeedStep="xx" 
+ * VerticalSpeedStep="xx" AltitudeStep="xx" HorizontalAcceleration="xx" VerticalAcceleration="xx" TurnRate="xx" BankAngle="xx" VerticalRate="xx"
+ * RecoveryStabilityTime"xx" MinHorizontalRecovery="xx" MinVerticalRecovery="xx" isRecoveryTack="true" isRecoveryGroundTracK="true" 
+ * isRecoveryVerticalSpeed="true" isRecoveryAltitude="true" isCollisionAvoidance="false" CollisionAvoidanceFactor="xx"
+ * HorizontalNMAC="xx" VerticalNMAC="xx" HorizontalContourThreshold="xx"/>
  * 
  * Options:
- *  - OptionString - sample string option
- *  - OptionInt - sample integer option
+ *  - LookAheadTime - time horizon for all DAIDALUS functions
+ *  - LeftTrack - relative maximum horizontal direction maneuver to the left of current ownship direction 
+ *  - RightTrack - relative maximum horizontal direction maneuver to the right of the current ownship direction 
+ *  - MinGroundSpeed - absolute minimum horizontal speed maneuver 
+ *  - MaxGroundSpeed - absolute maximum horizontal speed maneuver
+ *  - MinVerticalSpeed - absolute minimum vertical speed maneuver
+ *  - MaxVerticalSpeed - absolute maximum vertical speed maneuver
+ *  - MinAltitude - absolute minimum altitude maneuver
+ *  - MaxAltitude - absolute maximum altitude maneuver
+ *  - TrackStep - granularity of horizontal direction maneuvers
+ *  - GroundSpeedStep - granularity of horizontal speed maneuvers
+ *  - VerticalSpeedStep - granularity of vertical speed maneuvers
+ *  - AltitudeStep - granularity of altitude speed maneuvers
+ *  - HorizontalAcceleration - horizontal acceleration used in the computation of horizontal speed maneuvers
+ *  - VerticalAcceleration - vertical acceleration use in the computation of vertical speed maneuvers
+ *  - TurnRate - turn rate used in the computation of horizontal direction maneuvers
+ *  - BankAngle - bank angle used in the computation of horizontal direction maneuvers
+ *  - VerticalRate - vertical rate used in the computation of altitude maneuvers
+ *  - RecoveryStabilityTime - time delay to stabilize recovery maneuvers
+ *  - MinHorizontalRecovery - minimum horizontal separation used in the computation of recovery maneuvers
+ *  - MinVerticalRecovery - minimum vertical separation used in the computation of recovery maneuvers
+ *  - isRecoveryTrack - enable computation of horizontal direction recovery maneuvers
+ *  - isRecoveryGroundTrack - enable computation of horizontal speed recovery maneuvers
+ *  - isRecoveryVerticalSpeed - enable computation of vertical speed recovery maneuvers
+ *  - isRecoveryAltitude - enable computation of altitude recovery maneuvers
+ *  - isCollisionAvoidance - enable computation of collision avoidance maneuvers
+ *  - CollisionAvoidanceFactor - factor to reduce min horizontal/vertical recovery separation when computing collision avoidance maneuvers
+ *  - HorizontalNMAC - horizontal NMAC
+ *  - VerticalNMAC - vertical NMAC 
+ *  - HorizontalContourThreshold - threshold relative to ownship horizontal direction for the computation off horizontal contours
  * 
+ * Design: The objective of DAIDALUS_WCV_Detection is interface with NASA's DAIDALUS code to detect projected violations of the well-clear volume for
+ *         the ownship.  This service then reports any detections of projected violations to other services along with the configuration parameters 
+ *         used by DAIDALUS to determine the violations.
+ * 
+ * Details: All AirVehicleState messages are used to populate state information in DAIDALUS for the ownship and the intruder aircraft.  Then based on 
+ *          the configuration parameters well-clear violations are checked.  DAIDALUS produces the time to violation if a projected violation of the 
+ *          ownship's well-clear volume.  DAIDALUS uses a projection of the ownship and the intruders for a given look-ahead time to determine 
+ *          violations.  DAIDALUS also provides maneuver guidance for ground track, ground speed, vertical speed, and altitude that would lead to a
+ *          well-clear violation assuming constant acceleration during the projection window.  DAIDALUS also reports a classification of the 
+ *          "region" of the violation.  This service provides vehicle information to DAIDALUS to set the ownship and the intruders and provides the
+ *          intervals of maneuvers that would lead to the violation if a possible violation is detected within the look-ahead window as configured.
  * Subscribed Messages:
- *  - afrl::cmasi::KeyValuePair
+ *  - afrl::cmasi::AirVehicleState
+ *  - uxas::messages::uxnative::StartupComplete
  * 
  * Sent Messages:
- *  - afrl::cmasi::KeyValuePair
+ *  - larcfm::DAIDALUS::DAIDALUSConfiguration
+ *  - larcfm::DAIDALUS:::WellClearViolationIntervals
  * 
  * 
  */
@@ -136,12 +166,7 @@ private:
 
 
 private:
-    // storage for the option entries
- //   std::string m_option01 = std::string("No Option 1");
-//    int32_t m_option02{0};
-    //DAIDALUS parameters
-    //to do  append the proper units to the variable name!!
-    
+    //DAIDALUS parameters   
     int32_t m_lookahead_time_s = {180};   // seconds--Time horizon of all DAIDALUS functions (time)
     double m_left_trk_deg = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())}; // degrees--relative maximum horizontal direction maneuver to the left of the current ownship direction (angle)
     double m_right_trk_deg = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())};    // degrees--relative maximum horizontal direction maneuver to the right of the current ownship direction (angle)
@@ -172,14 +197,9 @@ private:
     double m_horizontal_nmac_m = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters--Horizontal Near Mid-Air Collision (distance)
     double m_vertical_nmac_m = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters--Vertical Near Mid-Air Collision (distance)
     double m_contour_thr_deg = {180.0}; // degrees--threshold relative to ownship horizontal direction for the computation of horizontal contours aka. blobs (angle)
-    //double m_DMOD = {}; //meters
-    //double m_HMOD = {};   //meters
-    //int32_t m_TAUMOD = {35};  //seconds
-    //double m_ZTHR= {450*n_Const::c_Convert::dFeetToMeters()}; //meters
-    //-*/
-    
-    //
-     struct MydaidalusPackage{
+  
+    struct MydaidalusPackage
+    {
        larcfm::Position m_daidalusPosition;
         larcfm::Velocity m_daidalusVelocity;
         double m_daidalusTime_s;

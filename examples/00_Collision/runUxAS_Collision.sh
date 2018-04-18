@@ -50,3 +50,14 @@ cd ${RUN_DIR}
 /usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgCollision_$UAV.xml"
 # change back to the original directory
 cd $SAVE_DIR
+
+#location of OpenAMASE
+BIN2="../../../OpenAMASE/OpenAMASE"
+# run OpenAMASE in separate terminal.  Note: requires "gnome-terminal"
+#/usr/bin/gnome-terminal
+cd $BIN2
+java -Xmx2048m -splash:./data/amase_splash.png -classpath ./dist/*:./lib/*  avtas.app.Application --config config/amase --scenario "../../OpenUxAS/examples/00_Collision/MessagesToSend/collision_mkii.xml";
+sleep 5s
+#java -Xmx2048m -splash:./data/amase_splash.png -classpath ./dist/*:./lib/*  avtas.app.Application --config config/amase_headless --simrate = 1.0 --scenario "../../OpenUxAS/examples/00_Collision/MessagesToSend/collision_mk2.xml";
+# change back to original directory
+cd $SAVE_DIR
