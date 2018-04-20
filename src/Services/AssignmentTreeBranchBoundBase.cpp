@@ -546,12 +546,13 @@ namespace uxas
 			isError = !isInitializeAlgebra(assigmentPrerequisites, std::move(nodeAssignment));
 
 			std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
-			
-            std::cout << "Here 1" << std::endl;
-            uxas::common::utilities::Lex lex;
-            std::cout << "Here 2" << std::endl;            
-            lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString, &(nodeAssignment->m_tasksToTime));
-            std::cout << "Here 3" << std::endl;
+
+                        std::cout << "Here 1" << std::endl;
+                        uxas::common::utilities::Lex lex;
+                        std::cout << "Here 2" << std::endl;
+                        std::cout << "Test String: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+                        lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString, nodeAssignment->m_tasksToTime);
+                        std::cout << "Here 3" << std::endl;
 
 			if (!isError)
 			{
@@ -752,7 +753,8 @@ namespace uxas
 		c_Node_Base::c_Node_Base() //this is used for the root node
 		{
 			m_staticAssignmentParameters->m_numberNodesVisited++;
-            m_parentPointer = this;
+                        m_parentPointer = this;
+                        m_tasksToTime = std::make_shared<std::map<int, std::array<std::vector<std::vector<int> >, 2> > >();
 			//CERR_FILE_LINE_MSG("m_staticAssignmentParameters->m_numberNodesAdded[" << m_staticAssignmentParameters->m_numberNodesAdded << "]")
 		}
 
@@ -775,6 +777,8 @@ namespace uxas
 			m_isLeafNode(rhs.m_isLeafNode),
 			m_parentPointer(const_cast<c_Node_Base *>(&rhs))
 		{
+                        //std::cout << "this is m_tasksToTime: " << m_tasksToTime << std::endl;
+                        //std::cout << "this is rhs.m_tasksToTime: " << rhs.m_tasksToTime << std::endl;
 			m_staticAssignmentParameters->m_numberNodesVisited++;
 			for (auto itVehicleAssignmentState = rhs.m_vehicleIdVsAssignmentState.begin();
 				itVehicleAssignmentState != rhs.m_vehicleIdVsAssignmentState.end();

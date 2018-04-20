@@ -19,10 +19,10 @@ namespace uxas
             public:
                 Lex();
                 virtual ~Lex(){ };
-                std::map<int, std::array<std::vector<std::vector<int> >, 2>> parse(std::string algebraString);
-                std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2>> > cloneTasksToTime();
+                void parse(std::string algebraString, std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2> > > m_map);
             protected:
-                std::map<int, std::array<std::vector<std::vector<int> >, 2>> tasksToTime;
+                std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2> > > tasksToTime;
+                std::array<std::vector<std::vector<int> >,2> placeholder_arr;
                 int charClass;
                 std::string lexeme;
                 std::string algebraString;
@@ -44,7 +44,6 @@ namespace uxas
                 int lex();
                 int lookup(char ch);
                 void setTimingFlags();
-                bool isValidSyntax();
                 void skipToSectionEnd(bool isBackward);
                 bool deactivateFlagCheck(int *counter);
                 std::vector<int> prereqToVector(std::queue<int> tmp_queue);

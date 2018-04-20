@@ -258,7 +258,7 @@ public:
 #endif
     int64_t m_nodeCost{0};
     int64_t m_totalCost{0};
-    std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2>> > m_tasksToTime;
+    std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2> > > m_tasksToTime;
     
 protected: //member storage
     /*! \brief map of children of this node, sorted by cost */
