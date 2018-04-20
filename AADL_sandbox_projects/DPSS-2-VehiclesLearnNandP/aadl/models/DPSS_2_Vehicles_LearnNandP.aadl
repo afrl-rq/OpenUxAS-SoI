@@ -180,7 +180,7 @@ public
 			-----------------------------------------------------
 			
 			-- Main Theorem			
-			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
+			guarantee "Theorem 2 for Algorithm B for 2 Vehicles":
 				(time >= ((5.0*N_real - 1.0)/N_real)*T) =>
 					(stable	and deltaT = T/N_real);
 			
@@ -192,13 +192,13 @@ public
 				and pos_UAV2 = initial_pos_UAV2
 				) -> true;
 			
-			guarantee "Goals are in bounds":
-				--Goals are >= LEFT_ENDP_TRUTH
-					goal_UAV1 >= LEFT_ENDP_TRUTH
-				and goal_UAV2 >= LEFT_ENDP_TRUTH
-				--and goals are <= RIGHT_ENDP_TRUTH
-				and goal_UAV1 <= RIGHT_ENDP_TRUTH
-				and goal_UAV2 <= RIGHT_ENDP_TRUTH;	
+--			guarantee "Goals are in bounds":
+--				--Goals are >= LEFT_ENDP_TRUTH
+--					goal_UAV1 >= LEFT_ENDP_TRUTH
+--				and goal_UAV2 >= LEFT_ENDP_TRUTH
+--				--and goals are <= RIGHT_ENDP_TRUTH
+--				and goal_UAV1 <= RIGHT_ENDP_TRUTH
+--				and goal_UAV2 <= RIGHT_ENDP_TRUTH;	
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= LEFT_ENDP_TRUTH
@@ -294,7 +294,7 @@ public
 			
 			--Expected number of steps it takes to converge to the stable configuration
 --			eq steps_to_converge : int = 11; --This is the case when perimRight and perimLeft for the UAVs are initialized to 0.0
---			eq steps_to_converge : int = 13; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
+			eq steps_to_converge : int = 13; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
 			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
@@ -309,7 +309,7 @@ public
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.02)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = RIGHT_ENDP_TRUTH - 0.01)
-					--and UAV2 startS out thinking there is no perimeter to its right
+					--and UAVN startS out thinking there is no perimeter to its right
 					and DPSS_Node_Lib.initial_value_true(UAV2.perimRight = 0.0)
 				);
 
@@ -325,12 +325,9 @@ public
 					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
 					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
 				);
-		
---			lemma "Observer: Worst steps convergence (not yet stable after 10 steps)": 
---				steps >= 10 => stable;
-							
---			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
---				steps = steps_to_converge - 1 => stable;
+								
+			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+				steps = steps_to_converge - 1 => stable;
 							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -351,17 +348,8 @@ public
 			lemma "Once stable, stays stable":
 				true -> pre(stable)	=> stable;					
 													
---			lemma "Stable on and after steps_to_converge steps": 
---				steps >= steps_to_converge => stable;
-
---			lemma "Stable on and after 11 steps": 
---				steps >= 11 => stable;
-
-			lemma "Stable on and after 12 steps": 
-				steps >= 12 => stable;
-										
-			lemma "Stable on and after 13 steps": 
-				steps >= 13 => stable;							
+			lemma "Stable on and after steps_to_converge steps": 
+				steps >= steps_to_converge => stable;
 													
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_real;

@@ -179,7 +179,7 @@ public
 			-----------------------------------------------------
 			
 			-- Main Theorem			
-			guarantee "Theorem 2 for Algorithm B for 3 Vehicles (with known N)":
+			guarantee "Theorem 2 for Algorithm B for 2 Vehicles (with known N)":
 				(time >= ((5.0*DPSS_Constants.N_real - 1.0)/DPSS_Constants.N_real)*Time_to_travel_full_length) =>
 					(stable	and deltaT = Time_to_travel_full_length/DPSS_Constants.N_real);
 			
