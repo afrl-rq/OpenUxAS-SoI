@@ -19,6 +19,7 @@
 #define UXAS_SERVICE_ASSIGNMENT_TREE_BRANCH_BOUND_BASE_H
 
 #include "Algebra.h"
+#include "UxAS_LexicalAnalyzer.h"
 
 #include "ServiceBase.h"
 
@@ -199,6 +200,7 @@ public:
     int64_t m_taskOptionId = {0};
     /*! \brief  after this time, this task is assumed to be complete (-1 -> unassigned)*/
     int64_t m_taskCompletionTime_ms = {0};
+    int64_t m_taskBeginTime_ms = { -1 };
 
 private:
     /*! @name Private: No Copying*/
@@ -231,10 +233,6 @@ protected: //member functions - prototypes
                                             const int64_t& taskTime_ms, const int64_t& travelTime_ms,
                                             int64_t& nodeCost, int64_t& evaluationOrderCost){};
     virtual void calculateFinalAssignment(){};                                        
-
-    
-    c_Node_Base * rootNodePtr;
-    std::map<int, std::tuple<int, int, int>> * m_tasksToTime;
     
 public: // member functions - prototypes
     void PruneChildren();
@@ -260,6 +258,7 @@ public:
 #endif
     int64_t m_nodeCost{0};
     int64_t m_totalCost{0};
+    std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2>> > m_tasksToTime;
     
 protected: //member storage
     /*! \brief map of children of this node, sorted by cost */
@@ -280,10 +279,8 @@ protected: //member storage
     int m_relativeTime[2] { -1 -1 };
     int m_absoluteTime[2] { -1 -1 };
 
-    //int m_tasksToTime;
-
+    c_Node_Base * m_parentPointer;
 private:
-    const c_Node_Base *m_parentPointer;
     /*! @name Private: No Copying*/
     c_Node_Base& operator=(const c_Node_Base&) = delete; //no copying
 };
@@ -376,7 +373,7 @@ protected: //virtual
      * messages after they are processed by the base class. */
     virtual void processReceivedLmcpMessageAssignment(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage){};
     /** brief this function is called to initialize the algebra functions. */
-    virtual bool isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
+    virtual bool isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites, std::unique_ptr<uxas::service::c_Node_Base>);
     /** brief starts the branch and bound assignment from the base class. */
     virtual void runCalculateAssignment(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
     /** brief starts the branch and bound assignment. */
