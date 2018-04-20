@@ -39,15 +39,19 @@ public
 
 			--Previous numLeft
 			eq pre_numLeft : real = prev(numLeft, 0.0);
+--			eq pre_numLeft : real = pre(numLeft);
 			
 			--Previous numRight
 			eq pre_numRight : real = prev(numRight, 0.0);
+--			eq pre_numRight : real = pre(numRight);
 			
 			--Previous perimRight
-			eq pre_perimRight : real = prev(perimRight, 0.0);
-
-			--Previous preimLeft
-			eq pre_perimLeft : real = prev(perimLeft, 0.0);			
+--			eq pre_perimRight : real = prev(perimRight, 0.0);
+			eq pre_perimRight : real = pre(perimRight);
+			
+			--Previous perimLeft
+--			eq pre_perimLeft : real = prev(perimLeft, 0.0);			
+			eq pre_perimLeft : real = pre(perimLeft);
 			
 			--ID (will change during execution as this UAV meets its neighbors)
 			eq id : real = numLeft + 1.0;
