@@ -1,0 +1,515 @@
+package DPSS_4_Vehicles_Pkg
+public
+	with DPSS_Data_Types;
+	with DPSS_Node_Lib;
+	with DPSS_Constants;
+	with UAV_Pkg;
+	
+	system DPSS_4_Vehicles
+		features
+			-----------------------------------------------------
+			--INPUTS
+			-----------------------------------------------------
+			
+			--Initial positions
+			initial_pos_UAV1 : in data port DPSS_Data_Types::Position_Type;
+			initial_pos_UAV2 : in data port DPSS_Data_Types::Position_Type;
+			initial_pos_UAV3 : in data port DPSS_Data_Types::Position_Type;
+			initial_pos_UAV4 : in data port DPSS_Data_Types::Position_Type;
+						
+			--Suggested initial directions
+			suggested_initial_direction_UAV1 : in data port DPSS_Data_Types::Direction_Type;
+			suggested_initial_direction_UAV2 : in data port DPSS_Data_Types::Direction_Type;
+			suggested_initial_direction_UAV3 : in data port DPSS_Data_Types::Direction_Type;
+			suggested_initial_direction_UAV4 : in data port DPSS_Data_Types::Direction_Type;
+			
+			-----------------------------------------------------
+			--OUTPUTS
+			-----------------------------------------------------
+
+			pos_UAV1 : out data port DPSS_Data_Types::Position_Type;
+			pos_UAV2 : out data port DPSS_Data_Types::Position_Type;
+			pos_UAV3 : out data port DPSS_Data_Types::Position_Type;
+			pos_UAV4 : out data port DPSS_Data_Types::Position_Type;
+			 
+		annex agree {**
+			
+			-----------------------------------------------------
+			--CONSTANTS
+			-----------------------------------------------------
+			
+			--Constants that the vehicles don't know a priori (so they are only defined at the top-level)
+			const RIGHT_ENDP_TRUTH : real = 10.0;
+			const LEFT_ENDP_TRUTH  : real = 0.0;
+			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
+			const T : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
+			const N_real : real = 4.0; --Number of vehicles
+
+			-----------------------------------------------------
+			--EQ (STATE) VARIABLES
+			-----------------------------------------------------
+			
+			--Directions						 
+			eq direction_UAV1 : DPSS_Data_Types::Direction_Type;
+			eq direction_UAV2 : DPSS_Data_Types::Direction_Type;
+			eq direction_UAV3 : DPSS_Data_Types::Direction_Type;
+			eq direction_UAV4 : DPSS_Data_Types::Direction_Type;
+	
+			--Goals
+			eq goal_UAV1 : DPSS_Data_Types::Position_Type;
+			eq goal_UAV2 : DPSS_Data_Types::Position_Type;
+			eq goal_UAV3 : DPSS_Data_Types::Position_Type;
+			eq goal_UAV4 : DPSS_Data_Types::Position_Type;
+			
+			--Shared border positions
+			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;  
+			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;
+			eq S_34 : DPSS_Data_Types::Position_Type = 3.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;
+			
+			--Previous positions
+			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
+			eq pre_pos_UAV2 : DPSS_Data_Types::Position_Type = prev(pos_UAV2, initial_pos_UAV2);
+			eq pre_pos_UAV3 : DPSS_Data_Types::Position_Type = prev(pos_UAV3, initial_pos_UAV3);
+			eq pre_pos_UAV4 : DPSS_Data_Types::Position_Type = prev(pos_UAV4, initial_pos_UAV4);
+			
+			--Previous directions
+			eq pre_direction_UAV1 : DPSS_Data_Types::Direction_Type = prev(direction_UAV1, suggested_initial_direction_UAV1);
+			eq pre_direction_UAV2 : DPSS_Data_Types::Direction_Type = prev(direction_UAV2, suggested_initial_direction_UAV2);
+			eq pre_direction_UAV3 : DPSS_Data_Types::Direction_Type = prev(direction_UAV3, suggested_initial_direction_UAV3);
+			eq pre_direction_UAV4 : DPSS_Data_Types::Direction_Type = prev(direction_UAV4, suggested_initial_direction_UAV4);			
+			
+			--Previous goals
+			eq pre_goal_UAV1 : DPSS_Data_Types::Position_Type = prev(goal_UAV1, (if direction_UAV1 = 1 then RIGHT_ENDP_TRUTH else LEFT_ENDP_TRUTH));
+			eq pre_goal_UAV2 : DPSS_Data_Types::Position_Type = prev(goal_UAV2, (if direction_UAV2 = 1 then RIGHT_ENDP_TRUTH else LEFT_ENDP_TRUTH));									
+			eq pre_goal_UAV3 : DPSS_Data_Types::Position_Type = prev(goal_UAV3, (if direction_UAV3 = 1 then RIGHT_ENDP_TRUTH else LEFT_ENDP_TRUTH));
+			eq pre_goal_UAV4 : DPSS_Data_Types::Position_Type = prev(goal_UAV4, (if direction_UAV4 = 1 then RIGHT_ENDP_TRUTH else LEFT_ENDP_TRUTH));			
+			
+			--Times to reach neighbors													
+			eq time_to_reach_neighbor_12 : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_neighbor(
+														pre_direction_UAV1,
+														pre_direction_UAV2,
+														pre_pos_UAV1,
+														pre_pos_UAV2
+														);
+																		
+			eq time_to_reach_neighbor_23 : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_neighbor(
+														pre_direction_UAV2,
+														pre_direction_UAV3,
+														pre_pos_UAV2,
+														pre_pos_UAV3
+														);
+
+			eq time_to_reach_neighbor_34 : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_neighbor(
+														pre_direction_UAV3,
+														pre_direction_UAV4,
+														pre_pos_UAV3,
+														pre_pos_UAV4
+														);
+			
+			--Times to reach goals
+			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1, 
+					pre_pos_UAV1, 
+					pre_goal_UAV1
+				);
+				
+			eq time_until_UAV2_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV2, 
+					pre_pos_UAV2, 
+					pre_goal_UAV2
+				);
+				
+			eq time_until_UAV3_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV3, 
+					pre_pos_UAV3, 
+					pre_goal_UAV3
+				);
+
+			eq time_until_UAV4_reaches_goal : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV4, 
+					pre_pos_UAV4, 
+					pre_goal_UAV4
+				);
+			
+			--Time until UAVN reaches right endpoint	
+			eq time_until_UAVN_reaches_right_endp : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV4, 
+					pre_pos_UAV4, 
+					RIGHT_ENDP_TRUTH
+				);
+			
+			--Time until UAV1 reaches left endpoint	
+			eq time_until_UAV1_reaches_left_endp : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position(
+					pre_direction_UAV1,
+					pre_pos_UAV1,
+					LEFT_ENDP_TRUTH
+				);
+			
+			eq deltaT : DPSS_Data_Types::Time_Type =
+							--Added time_until_UAVN_reaches_right_endp and time_until_UAV1_reaches_left_endp since the UAVs don't know a priori where the left and right endpoints are located.
+							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
+							--Times to reach goals
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV4_reaches_goal,
+							--Times to reach neighbors
+							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_12,
+							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_23,
+														time_to_reach_neighbor_34))))))));
+			
+			eq stable : bool = 
+				--Either
+				(	--the UAVs are at LEFT_ENDP_TRUTH, S_23, S_23, and RIGHT_ENDP_TRUTH, respectively
+					(
+						pos_UAV1 = LEFT_ENDP_TRUTH and 
+						pos_UAV2 = S_23 and 
+						pos_UAV3 = S_23 and
+						pos_UAV4 = RIGHT_ENDP_TRUTH
+					)
+					--and were previously at S_12, S_12, S_34, S_34, respectively
+					and (
+						pre_pos_UAV1 = S_12 and 
+						pre_pos_UAV2 = S_12 and 
+						pre_pos_UAV3 = S_34 and
+						pre_pos_UAV4 = S_34
+					)
+				)
+				--or
+				or (--the UAVs are at S_12, S_12, S_34, and S_34, respectively
+					(
+						pos_UAV1 = S_12 and 
+						pos_UAV2 = S_12 and 
+						pos_UAV3 = S_34 and
+						pos_UAV4 = S_34
+					)
+					--and were previously at LEFT_ENDP_TRUTH, S_23, S_23, and RIGHT_ENDP_TRUTH, respectively
+					and (
+						pre_pos_UAV1 = LEFT_ENDP_TRUTH and 
+						pre_pos_UAV2 = S_23 and 
+						pre_pos_UAV3 = S_23 and
+						pre_pos_UAV4 = RIGHT_ENDP_TRUTH
+					)
+				);
+						
+			-----------------------------------------------------
+			--ASSUMPTIONS
+			-----------------------------------------------------
+			
+			assume "time update": time = (0.0 -> pre(time) + deltaT);
+			
+			assume "UAVs are numbered according to their position from left to right":
+				(	initial_pos_UAV1 <= initial_pos_UAV2
+				and initial_pos_UAV2 <= initial_pos_UAV3
+				and initial_pos_UAV3 <= initial_pos_UAV4)
+				-> true;
+				
+			--We need this when the vehicles don't know the boundaries; they can't start out co-located.
+			--Otherwise, they can end up bouncing back and forth between the boundaries together.
+			assume "UAVs are not co-located on the initial timestep":
+				(	initial_pos_UAV1 < initial_pos_UAV2 
+				and initial_pos_UAV2 < initial_pos_UAV3
+				and initial_pos_UAV3 < initial_pos_UAV4)
+				-> true;
+				
+			assume "Initial positions are between the left and right endpoints":
+				(--Initial positions are >= LEFT_ENDP_TRUTH
+					initial_pos_UAV1 >= LEFT_ENDP_TRUTH 
+				and	initial_pos_UAV2 >= LEFT_ENDP_TRUTH
+				and	initial_pos_UAV3 >= LEFT_ENDP_TRUTH
+				and	initial_pos_UAV4 >= LEFT_ENDP_TRUTH
+				--and initial positions are <= RIGHT_ENDP_TRUTH
+				and initial_pos_UAV1 <= RIGHT_ENDP_TRUTH
+				and initial_pos_UAV2 <= RIGHT_ENDP_TRUTH
+				and initial_pos_UAV3 <= RIGHT_ENDP_TRUTH
+				and initial_pos_UAV4 <= RIGHT_ENDP_TRUTH
+ 				)
+				-> true;
+				
+			assume "Suggested initial directions are LEFT or RIGHT":
+				((			suggested_initial_direction_UAV1 = DPSS_Constants.LEFT
+						or  suggested_initial_direction_UAV1 = DPSS_Constants.RIGHT)
+					and (	suggested_initial_direction_UAV2 = DPSS_Constants.LEFT
+						or 	suggested_initial_direction_UAV2 = DPSS_Constants.RIGHT)
+					and (	suggested_initial_direction_UAV3 = DPSS_Constants.LEFT
+						or 	suggested_initial_direction_UAV3 = DPSS_Constants.RIGHT)
+					and (	suggested_initial_direction_UAV4 = DPSS_Constants.LEFT
+						or 	suggested_initial_direction_UAV4 = DPSS_Constants.RIGHT)
+				)
+				-> true;
+
+			-----------------------------------------------------
+			--GUARANTEES
+			-----------------------------------------------------
+			
+			-- Main Theorem			
+			guarantee "Theorem 2 for Algorithm B for 4 Vehicles":
+				(time >= ((5.0*N_real - 1.0)/N_real)*T) =>
+					(stable	and deltaT = T/N_real);
+			
+			guarantee "deltaT is positive":
+				true -> deltaT > 0.0;
+			
+			guarantee "Initial positions are the input initial positions":
+				(	pos_UAV1 = initial_pos_UAV1
+				and pos_UAV2 = initial_pos_UAV2
+				and pos_UAV3 = initial_pos_UAV3
+				and pos_UAV4 = initial_pos_UAV4) -> true;
+
+			-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.			
+			guarantee "Goals are in bounds":
+				--Goals are >= LEFT_ENDP_TRUTH
+					goal_UAV1 >= LEFT_ENDP_TRUTH
+				and goal_UAV2 >= LEFT_ENDP_TRUTH
+				and goal_UAV3 >= LEFT_ENDP_TRUTH
+				and goal_UAV4 >= LEFT_ENDP_TRUTH
+				--and goals are <= RIGHT_ENDP_TRUTH
+				and goal_UAV1 <= RIGHT_ENDP_TRUTH
+				and goal_UAV2 <= RIGHT_ENDP_TRUTH
+				and goal_UAV3 <= RIGHT_ENDP_TRUTH
+				and goal_UAV4 <= RIGHT_ENDP_TRUTH;		
+			
+			guarantee "Positions are in bounds":
+				--Positions are >= LEFT_ENDP_TRUTH
+					pos_UAV1 >= LEFT_ENDP_TRUTH
+				and pos_UAV2 >= LEFT_ENDP_TRUTH
+				and pos_UAV3 >= LEFT_ENDP_TRUTH
+				and pos_UAV4 >= LEFT_ENDP_TRUTH
+				--and positions are <= RIGHT_ENDP_TRUTH
+				and pos_UAV1 <= RIGHT_ENDP_TRUTH
+				and pos_UAV2 <= RIGHT_ENDP_TRUTH
+				and pos_UAV3 <= RIGHT_ENDP_TRUTH
+				and pos_UAV4 <= RIGHT_ENDP_TRUTH;
+			
+			guarantee "UAVs stay in order":
+					pos_UAV1 <= pos_UAV2
+				and pos_UAV2 <= pos_UAV3
+				and pos_UAV3 <= pos_UAV4;
+			
+			guarantee "UAVs turn around at the borders":
+				--UAVs turn around at left endpoint
+					pos_UAV1 = LEFT_ENDP_TRUTH => direction_UAV1 = 1
+				and pos_UAV2 = LEFT_ENDP_TRUTH => direction_UAV2 = 1
+				and pos_UAV3 = LEFT_ENDP_TRUTH => direction_UAV3 = 1
+				and pos_UAV4 = LEFT_ENDP_TRUTH => direction_UAV4 = 1
+				--and UAVs turn around at right endpoint
+				and pos_UAV1 = RIGHT_ENDP_TRUTH => direction_UAV1 = -1
+				and pos_UAV2 = RIGHT_ENDP_TRUTH => direction_UAV2 = -1
+				and pos_UAV3 = RIGHT_ENDP_TRUTH => direction_UAV3 = -1
+				and pos_UAV4 = RIGHT_ENDP_TRUTH => direction_UAV4 = -1;
+				
+			guarantee "Directions are in bounds":
+				(	 direction_UAV1 = 1 or direction_UAV1 = -1)
+				and (direction_UAV2 = 1 or direction_UAV2 = -1)
+				and (direction_UAV3 = 1 or direction_UAV3 = -1)
+				and (direction_UAV4 = 1 or direction_UAV4 = -1);
+			
+		**};
+		
+	end DPSS_4_Vehicles;
+
+	system implementation DPSS_4_Vehicles.Impl
+		subcomponents
+			UAV1: system UAV_Pkg::UAV;
+			UAV2: system UAV_Pkg::UAV;
+			UAV3: system UAV_Pkg::UAV;
+			UAV4: system UAV_Pkg::UAV;
+			
+		connections
+			
+			--Suggested initial directions
+			sug_init_dir_UAV1: port	suggested_initial_direction_UAV1 -> UAV1.suggested_initial_direction;
+			sug_init_dir_UAV2: port	suggested_initial_direction_UAV2 -> UAV2.suggested_initial_direction;
+			sug_init_dir_UAV3: port	suggested_initial_direction_UAV3 -> UAV3.suggested_initial_direction;
+			sug_init_dir_UAV4: port	suggested_initial_direction_UAV4 -> UAV4.suggested_initial_direction;
+			
+			--Initial positions
+			init_pos_UAV1: port initial_pos_UAV1 -> UAV1.initial_position;
+			init_pos_UAV2: port initial_pos_UAV2 -> UAV2.initial_position;
+			init_pos_UAV3: port initial_pos_UAV3 -> UAV3.initial_position;
+			init_pos_UAV4: port initial_pos_UAV4 -> UAV4.initial_position;
+			
+			--Share perimRight with left neighbor (get right neighbor's perimRight)
+			perimRight_UAV2_to_UAV1 : port UAV2.perimRight -> UAV1.perimRight_RN;
+			perimRight_UAV3_to_UAV2 : port UAV3.perimRight -> UAV2.perimRight_RN;
+			perimRight_UAV4_to_UAV3 : port UAV4.perimRight -> UAV3.perimRight_RN;
+
+			--Share perimLeft with right neighbor (get left neighbor's perimLeft)
+			perimLeft_UAV1_to_UAV2 : port UAV1.perimLeft -> UAV2.perimLeft_LN;
+			perimLeft_UAV2_to_UAV3 : port UAV2.perimLeft -> UAV3.perimLeft_LN;
+			perimLeft_UAV3_to_UAV4 : port UAV3.perimLeft -> UAV4.perimLeft_LN;
+
+			--Share numRight with left neighbor (get right neighbor's numRight)
+			numRight_UAV2_to_UAV1 : port UAV2.numRight -> UAV1.numRight_RN;
+			numRight_UAV3_to_UAV2 : port UAV3.numRight -> UAV2.numRight_RN;
+			numRight_UAV4_to_UAV3 : port UAV4.numRight -> UAV3.numRight_RN;
+			
+			--Share numLeft with with right neighbor (get left neighbor's numLeft)
+			numLeft_UAV1_to_UAV2 : port UAV1.numLeft -> UAV2.numLeft_LN;
+			numLeft_UAV2_to_UAV3 : port UAV2.numLeft -> UAV3.numLeft_LN;
+			numLeft_UAV3_to_UAV4 : port UAV3.numLeft -> UAV4.numLeft_LN;
+
+						
+		annex agree {**
+
+			--Assign direction variables (used at the system level)
+			assign direction_UAV1 = UAV1.direction;
+			assign direction_UAV2 = UAV2.direction;			
+			assign direction_UAV3 = UAV3.direction;
+			assign direction_UAV4 = UAV4.direction;
+			
+			--Assign goal variables (used at the system level)
+			assign goal_UAV1 = UAV1.goal;
+			assign goal_UAV2 = UAV2.goal;
+			assign goal_UAV3 = UAV3.goal;			
+			assign goal_UAV4 = UAV4.goal;			
+			
+			--Assign positions
+			assign pos_UAV1 = (initial_pos_UAV1 -> (if pre_direction_UAV1 = 1 then pre_pos_UAV1 + DPSS_Constants.V*(time - pre(time)) else pre_pos_UAV1 - DPSS_Constants.V*(time - pre(time))));
+			assign pos_UAV2 = (initial_pos_UAV2 -> (if pre_direction_UAV2 = 1 then pre_pos_UAV2 + DPSS_Constants.V*(time - pre(time)) else pre_pos_UAV2 - DPSS_Constants.V*(time - pre(time))));
+			assign pos_UAV3 = (initial_pos_UAV3 -> (if pre_direction_UAV3 = 1 then pre_pos_UAV3 + DPSS_Constants.V*(time - pre(time)) else pre_pos_UAV3 - DPSS_Constants.V*(time - pre(time))));
+			assign pos_UAV4 = (initial_pos_UAV4 -> (if pre_direction_UAV4 = 1 then pre_pos_UAV4 + DPSS_Constants.V*(time - pre(time)) else pre_pos_UAV4 - DPSS_Constants.V*(time - pre(time))));
+		
+			--Set the meet_LN variables for each UAV
+			assert UAV1.meet_LN = false; --There is no left neighbor to UAV1
+			assert UAV2.meet_LN = (pos_UAV2 = pos_UAV1);
+			assert UAV3.meet_LN = (pos_UAV3 = pos_UAV2);
+			assert UAV4.meet_LN = (pos_UAV4 = pos_UAV3);
+			
+			--Set the meet_RN variables for each UAV
+			assert UAV1.meet_RN = (pos_UAV1 = pos_UAV2);
+			assert UAV2.meet_RN = (pos_UAV2 = pos_UAV3);
+			assert UAV3.meet_RN = (pos_UAV3 = pos_UAV4);
+			assert UAV4.meet_RN = false; --There is no right neighbor to UAVN
+		
+			--Tell the vehicles their current positions
+			assert UAV1.pos = pos_UAV1;	
+			assert UAV2.pos = pos_UAV2;
+			assert UAV3.pos = pos_UAV3;
+			assert UAV4.pos = pos_UAV4;
+			
+			--Tell the vehicles right_endp_truth (so they know when they hit the right endpoint)
+			assert UAV1.right_endp_truth = RIGHT_ENDP_TRUTH;	
+			assert UAV2.right_endp_truth = RIGHT_ENDP_TRUTH;
+			assert UAV3.right_endp_truth = RIGHT_ENDP_TRUTH;
+			assert UAV4.right_endp_truth = RIGHT_ENDP_TRUTH;
+		
+			--Tell the vehicles left_endp_truth (so they know when they hit the left endpoint)
+			assert UAV1.left_endp_truth = LEFT_ENDP_TRUTH;
+			assert UAV2.left_endp_truth = LEFT_ENDP_TRUTH;
+			assert UAV3.left_endp_truth = LEFT_ENDP_TRUTH;
+			assert UAV4.left_endp_truth = LEFT_ENDP_TRUTH;
+			
+			--Used in lemmas
+			eq steps : int = 1 -> pre(steps + 1);
+			
+			--Expected number of steps it takes to converge to the stable configuration
+			--These are conjectures for now (have not run analysis yet as of 4/20/18 at 14:43 PM Central)
+			eq steps_to_converge : int = 31; --This is the case when perimRight and perimLeft for the UAVs are initialized to 0.0
+			--eq steps_to_converge : int = 33; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
+			
+			----------------------------------------------------------------------------
+			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
+			----------------------------------------------------------------------------
+						
+			lemma "Observer: Nearly 3T convergence":
+				not (
+					stable
+					--Initially, all UAVs are heading to the left
+					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV4 = -1)
+					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.04)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = RIGHT_ENDP_TRUTH - 0.03)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = RIGHT_ENDP_TRUTH - 0.02)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01)
+					--and UAVN startS out thinking there is no perimeter to its right
+					and DPSS_Node_Lib.initial_value_true(UAV4.perimRight = 0.0)
+				);
+
+			lemma "Observer: Worst time (nearly 4T) convergence":
+				not (
+					stable
+					--Initially, all UAVs are heading to the right
+					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
+					and DPSS_Node_Lib.initial_value_true(direction_UAV4 = 1)
+					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = LEFT_ENDP_TRUTH + 0.02)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = LEFT_ENDP_TRUTH + 0.03)
+					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = LEFT_ENDP_TRUTH + 0.04)
+					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
+					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
+				);
+								
+			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+				steps = steps_to_converge - 1 => stable;
+			
+			----------------------------------------------------------------------------
+			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
+			----------------------------------------------------------------------------			
+
+			--UAVs stay in bounds (prove one at a time)	
+			lemma "UAV1 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV1 and pos_UAV1 <= RIGHT_ENDP_TRUTH;		
+			lemma "UAV2 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV2 and pos_UAV2 <= RIGHT_ENDP_TRUTH;
+			lemma "UAV3 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV3 and pos_UAV3 <= RIGHT_ENDP_TRUTH;
+			lemma "UAV4 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV4 and pos_UAV4 <= RIGHT_ENDP_TRUTH;
+							
+			--UAV perimLeft values are nonnegative
+			lemma "UAV1's perimLeft is nonnegative": UAV1.perimLeft >= 0.0;
+			lemma "UAV2's perimLeft is nonnegative": UAV2.perimLeft >= 0.0;
+			lemma "UAV3's perimLeft is nonnegative": UAV3.perimLeft >= 0.0;
+			lemma "UAV4's perimLeft is nonnegative": UAV4.perimLeft >= 0.0;
+			
+			--UAV perimRight values are nonnegative
+			lemma "UAV1's perimRight is nonnegative": UAV1.perimRight >= 0.0;
+			lemma "UAV2's perimRight is nonnegative": UAV2.perimRight >= 0.0;
+			lemma "UAV3's perimRight is nonnegative": UAV3.perimRight >= 0.0;
+			lemma "UAV4's perimRight is nonnegative": UAV4.perimRight >= 0.0;
+			
+			lemma "Once stable, stays stable":
+				true -> pre(stable)	=> stable;
+					
+			lemma "Stable on and after steps_to_converge steps":
+				steps >= steps_to_converge => stable;	
+			
+			lemma "Stable implies deltaT = T/N":
+				stable => deltaT = T/N_real;
+			
+			lemma "deltaT is between 0 and T":
+				true -> (
+					deltaT > 0.0 
+					and deltaT <= T
+					);
+
+			-- This is a good way to find the real time bound!	
+			-- Convergence time is < 3T when when perimRight and perimLeft for the UAVs are initialized to 0.0
+			lemma "Time to become stable is less than 3T":
+				(stable and not (pre(stable))) => 
+					(time < 3.0*T);
+
+			-- This is a good way to find the real time bound!
+			--This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)	
+--			lemma "Time to become stable is less than 4T":
+--				(stable and not (pre(stable))) => 
+--					(time < 4.0*T);
+			
+		**};
+		
+	end DPSS_4_Vehicles.Impl;
+
+end DPSS_4_Vehicles_Pkg;
