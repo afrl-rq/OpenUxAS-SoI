@@ -151,7 +151,7 @@ public
 				(	initial_pos_UAV1 <= initial_pos_UAV2)
 				-> true;
 			
-			--We need this when the vehicles don't know the boundaries, they can't start out co-located.
+			--We need this when the vehicles don't know the boundaries; they can't start out co-located.
 			--Otherwise, they can end up bouncing back and forth between the boundaries together.
 			assume "UAVs are not co-located on the initial timestep":
 				(	initial_pos_UAV1 < initial_pos_UAV2)
@@ -191,7 +191,8 @@ public
 				(	pos_UAV1 = initial_pos_UAV1
 				and pos_UAV2 = initial_pos_UAV2
 				) -> true;
-			
+
+-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.			
 --			guarantee "Goals are in bounds":
 --				--Goals are >= LEFT_ENDP_TRUTH
 --					goal_UAV1 >= LEFT_ENDP_TRUTH
