@@ -390,6 +390,29 @@ namespace uxas
 				//print statements to aid in bugfixing the parsing of the algebra string
 				//std::cout << "Algebra string before parsing (and after pulling out time stuff): " << taskRelationships << std::endl;
 				//std::cout << "Algebra string before parsing (and after pulling out time stuff): " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+                
+
+
+
+
+
+
+
+                std::cout << "Here 1" << std::endl;
+                nodeAssignment->m_tasksToTime = new std::map<int, std::array<std::vector<std::vector<int> >, 2> >;
+                std::cout << "Here 2" << std::endl;
+                uxas::common::utilities::Lex lex;                
+                lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString, nodeAssignment->m_tasksToTime);
+                std::cout << "Here 3" << std::endl;
+
+
+
+
+
+
+
+
+
 
 				bool isFinished(false);
 				while (!isFinished)
@@ -546,14 +569,6 @@ namespace uxas
 			isError = !isInitializeAlgebra(assigmentPrerequisites, std::move(nodeAssignment));
 
 			std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
-
-            std::cout << "Here 1" << std::endl;
-            nodeAssignment->lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString);
-            std::cout << "Here 2" << std::endl;
-
-
-
-
 
 			if (!isError)
 			{
@@ -771,7 +786,7 @@ namespace uxas
 		//copy constructor
 
 		c_Node_Base::c_Node_Base(const c_Node_Base & rhs) //copy constructor
-			:lex(rhs.lex),
+			:m_tasksToTime(rhs.m_tasksToTime),
 			m_travelTimeTotal_ms(rhs.m_travelTimeTotal_ms),
 			m_isPruneable(rhs.m_isPruneable),
 			m_isLeafNode(rhs.m_isLeafNode),
@@ -1041,28 +1056,28 @@ namespace uxas
 					int64_t maxTime_ms(-1);
 					int64_t prerequisiteTime_ms(0);
 
-					if (lex.tasksToTime->find(taskId) != lex.tasksToTime->end() && (!lex.tasksToTime->at(taskId)[0].at(0).empty() || !lex.tasksToTime->at(taskId)[1].at(0).empty())) //Has at least timing operator OR prerequisite
+					if (m_tasksToTime->find(taskId) != m_tasksToTime->end() && (!m_tasksToTime->at(taskId)[0].at(0).empty() || !m_tasksToTime->at(taskId)[1].at(0).empty())) //Has at least timing operator OR prerequisite
 					{
-						if (!lex.tasksToTime->at(taskId)[0].at(0).empty() && lex.tasksToTime->at(taskId)[0].at(0).at(0) == 14) //Absolute time
+						if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 14) //Absolute time
 						{
-							prerequisiteTime_ms = lex.tasksToTime->at(taskId)[0].at(0).at(1);
+							prerequisiteTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(1);
 						}
-						else if (!lex.tasksToTime->at(taskId)[0].at(0).empty() && lex.tasksToTime->at(taskId)[0].at(0).at(0) == 13) //Relative time
+						else if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13) //Relative time
 						{
 							c_Node_Base * backtraceCheck = m_parentPointer;
 							int64_t lowestAlternativePrerequisiteCost(INT64_MAX);
-							if (!lex.tasksToTime->at(taskId)[1].at(0).empty())
+							if (!m_tasksToTime->at(taskId)[1].at(0).empty())
 							{
-								for (unsigned int i = 0; i < lex.tasksToTime->at(taskId)[1].at(0).size(); i++)
+								for (unsigned int i = 0; i < m_tasksToTime->at(taskId)[1].at(0).size(); i++)
 								{
-									if (backtraceCheck->m_taskOptionID / 100000 == lex.tasksToTime->at(taskId)[1].at(0).at(i))
+									if (backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i))
 									{
 										auto itTaskAssignmentState = m_taskIdVsAssignmentState.find(backtraceCheck->m_taskOptionID);
 										if (itTaskAssignmentState != m_taskIdVsAssignmentState.end())
 										{
 											if (itTaskAssignmentState->second->m_taskBeginTime_ms > prerequisiteTime_ms)
 											{
-												int64_t prerequisiteOperator = lex.tasksToTime->at(taskId)[1].at(1).at(i);
+												int64_t prerequisiteOperator = m_tasksToTime->at(taskId)[1].at(1).at(i);
 												if (prerequisiteOperator == 11 && itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms) // '.' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskCompletionTime_ms;
@@ -1101,20 +1116,20 @@ namespace uxas
 						}
 					}
 
-					if (lex.tasksToTime->find(taskId) != lex.tasksToTime->end()) 
+					if (m_tasksToTime->find(taskId) != m_tasksToTime->end()) 
 					{
-						if (!lex.tasksToTime->at(taskId)[0].at(0).empty()) //Timing info is present
+						if (!m_tasksToTime->at(taskId)[0].at(0).empty()) //Timing info is present
 						{
 							//Check what time operator the info is for and find max time accordingly
-							if (lex.tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+							if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
 							{
 								//At this point, prerequisite time is just completion time of all prerequisites (no offset included)
 								maxTime_ms = prerequisiteTime_ms;
-								maxTime_ms += lex.tasksToTime->at(taskId)[0].at(0).at(2);
+								maxTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(2);
 							}
-							else if (lex.tasksToTime->at(taskId)[0].at(0).at(0) == 14)
+							else if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 14)
 							{
-								maxTime_ms = lex.tasksToTime->at(taskId)[0].at(0).at(2);
+								maxTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(2);
 							}
 						}
 					}
@@ -1133,9 +1148,9 @@ namespace uxas
 
 					//Set prerequisite time to be the actual time we need to loiter
 					//Add start window time so we don't go early; only necessary for relative time since absolute time is handled earlier
-					if (!lex.tasksToTime->at(taskId)[0].at(0).empty() && lex.tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+					if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
 					{
-						prerequisiteTime_ms += lex.tasksToTime->at(taskId)[0].at(0).at(1);
+						prerequisiteTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(1);
 					}
 					//Prerequisite time is actually treated as time to loiter, so set it to be loiter time needed
 					prerequisiteTime_ms -= travelTimeTotalToBegin_ms;

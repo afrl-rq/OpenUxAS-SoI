@@ -35,17 +35,14 @@ namespace uxas
              * Init variables and begin recursive descent
              * @param tmpAlgebraString //string: unexpanded algebra string
              */
-            void Lex::parse(std::string tmpAlgebraString) {//, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map, int * testingTemp) {
+            void Lex::parse(std::string tmpAlgebraString, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map) {
                 std::cout << "Entered Parse" << std::endl;
-                //std::cout << *testingTemp << std::endl;
                 /**
                  * TODO
                  * 1. Reduce level of initialization
                  */
                 //Init var
                 std::cout << "Algebra string transfer" << std::endl;
-                std::cout << tmpAlgebraString << std::endl;
-                //all things bellow are failing due to "=" being used, no idea major idea as to why
                 algebraString = tmpAlgebraString;
                 std::cout << "After Algebra string transfer" << std::endl;
                 lexeme = "";
@@ -56,7 +53,7 @@ namespace uxas
                 prereq_paren_count = 0;
                 add_all_paren_count = 0;
                 std::cout << "Before Map" << std::endl;
-                tasksToTime = new std::map<int, std::array<std::vector<std::vector<int> >, 2> >;
+                tasksToTime = m_map;
                 placeholder_arr = {};
 
                 //Start lex processing

@@ -19,7 +19,7 @@ namespace uxas
             public:
                 Lex();
                 virtual ~Lex(){ };
-                void parse(std::string algebraString);//, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map, int * testingTemp);
+                void parse(std::string algebraString, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map);
                 std::map<int, std::array<std::vector<std::vector<int> >, 2> > * tasksToTime;
             protected:
                 std::array<std::vector<std::vector<int> >,2> placeholder_arr;

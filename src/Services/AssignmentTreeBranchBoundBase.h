@@ -257,8 +257,7 @@ public:
 #endif
     int64_t m_nodeCost{0};
     int64_t m_totalCost{0};
-    //std::map<int, std::array<std::vector<std::vector<int> >, 2> > m_tasksToTime;
-    uxas::common::utilities::Lex lex;
+    std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_tasksToTime;
 
 protected: //member storage
     /*! \brief map of children of this node, sorted by cost */
@@ -275,9 +274,6 @@ protected: //member storage
     
     bool m_isPruneable = {true}; //can this node be pruned
     bool m_isLeafNode = {false}; //is this a leaf node
-
-    int m_relativeTime[2] { -1 -1 };
-    int m_absoluteTime[2] { -1 -1 };
 
     c_Node_Base * m_parentPointer;
 private:
