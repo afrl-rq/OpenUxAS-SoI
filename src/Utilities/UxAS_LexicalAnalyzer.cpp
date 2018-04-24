@@ -46,7 +46,7 @@ namespace uxas
                 std::cout << "Algebra string transfer" << std::endl;
                 std::cout << tmpAlgebraString << std::endl;
                 //all things bellow are failing due to "=" being used, no idea major idea as to why
-                //algebraString = tmpAlgebraString;
+                algebraString = tmpAlgebraString;
                 std::cout << "After Algebra string transfer" << std::endl;
                 lexeme = "";
                 std::cout << "After lexeme" << std::endl;                                
