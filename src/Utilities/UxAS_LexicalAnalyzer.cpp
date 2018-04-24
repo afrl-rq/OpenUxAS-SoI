@@ -35,26 +35,32 @@ namespace uxas
              * Init variables and begin recursive descent
              * @param tmpAlgebraString //string: unexpanded algebra string
              */
-            void Lex :: parse(std::string tmpAlgebraString, std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2> > > m_map) {
-                std::cout << "parse has run" << std::endl;
+            void Lex::parse(std::string tmpAlgebraString) {//, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map, int * testingTemp) {
+                std::cout << "Entered Parse" << std::endl;
+                //std::cout << *testingTemp << std::endl;
                 /**
                  * TODO
                  * 1. Reduce level of initialization
                  */
                 //Init var
-                std::cout << "test" << std::endl;
-                algebraString = tmpAlgebraString;
+                std::cout << "Algebra string transfer" << std::endl;
+                std::cout << tmpAlgebraString << std::endl;
+                //all things bellow are failing due to "=" being used, no idea major idea as to why
+                //algebraString = tmpAlgebraString;
+                std::cout << "After Algebra string transfer" << std::endl;
                 lexeme = "";
+                std::cout << "After lexeme" << std::endl;                                
                 pos = 0;
                 timing_pos = 0;
                 timingFlags.at(0) = 0;
                 prereq_paren_count = 0;
                 add_all_paren_count = 0;
-                tasksToTime = m_map;
+                std::cout << "Before Map" << std::endl;
+                tasksToTime = new std::map<int, std::array<std::vector<std::vector<int> >, 2> >;
                 placeholder_arr = {};
 
                 //Start lex processing
-                std::cout << "SetF Test Start of rDec()" << std::endl;
+                std::cout << "Start of rDec()" << std::endl;
                 rDec();
             }
 

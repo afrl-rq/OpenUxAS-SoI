@@ -216,7 +216,6 @@ private:
 class c_Node_Base
 {
 public: //constructors/destructors
-  
     c_Node_Base();
     virtual ~c_Node_Base();
 
@@ -258,8 +257,9 @@ public:
 #endif
     int64_t m_nodeCost{0};
     int64_t m_totalCost{0};
-    std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2> > > m_tasksToTime;
-    
+    //std::map<int, std::array<std::vector<std::vector<int> >, 2> > m_tasksToTime;
+    uxas::common::utilities::Lex lex;
+
 protected: //member storage
     /*! \brief map of children of this node, sorted by cost */
     std::multimap<int64_t, std::unique_ptr<c_Node_Base> > m_costVsChildren;
@@ -313,7 +313,6 @@ private:
 class AssignmentTreeBranchBoundBase : public ServiceBase
 {
 public:
-
     AssignmentTreeBranchBoundBase(const std::string& serviceType, const std::string& workDirectoryName);
 
     virtual
