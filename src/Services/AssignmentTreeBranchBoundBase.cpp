@@ -995,6 +995,23 @@ namespace uxas
 			m_isPruneable = isPruneParent;
 		}
 
+
+
+
+
+        //added function
+        //int64_t isFoundPrerequisite(int64_t taskId){
+            //go though parent pointer until the parrent pointer is yourself(this means you are at the root node)
+            //or can stop when whatever node that is being checked's task id is equal to backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i)
+            //basically it is stop when: backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i)
+            //should return -1 if the first condition, node code otherwise
+        //}
+
+
+
+
+
+
 		void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehicleAssignmentState, const int64_t& taskOptionId, const int64_t &hasPrerequisite)
 		{
 			if (((m_staticAssignmentParameters->m_numberNodesVisited % 100000) == 0) && (m_staticAssignmentParameters->m_numberNodesVisited > 0))
