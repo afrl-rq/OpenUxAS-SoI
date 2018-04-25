@@ -1086,6 +1086,9 @@ namespace uxas
 							{
 								for (unsigned int i = 0; i < m_tasksToTime->at(taskId)[1].at(0).size(); i++)
 								{
+                                    /*
+                                        Set an int to the new function, then next if is "if int is > 0"
+                                    */
 									if (backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i)) //Confirm we have a prerequisite
 									{
 										auto itTaskAssignmentState = m_taskIdVsAssignmentState.find(backtraceCheck->m_taskOptionID);
