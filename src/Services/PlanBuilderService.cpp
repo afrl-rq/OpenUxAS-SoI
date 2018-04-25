@@ -294,7 +294,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
     auto corrMish = std::find_if(m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().begin(), m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end(),
                                 [&](afrl::cmasi::MissionCommand* mish) { return mish->getVehicleID() == taskImplementationResponse->getVehicleID(); });
 
-    //std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
+    std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
     if(taskImplementationResponse->getTimeThreshold() > 0){
         //create the loiter action for the task and set it to the first waypoint in the list
 

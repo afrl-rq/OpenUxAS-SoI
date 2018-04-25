@@ -1107,6 +1107,20 @@ namespace uxas
 									}//End of prerequisite-confirmation if
 									backtraceCheck = backtraceCheck->m_parentPointer;
 								}//End of backtrace for loop
+
+                                //Set prerequisite time to be the actual time we need to loiter
+                                //Add start window time so we don't go early; only necessary for relative time since absolute time is handled earlier
+                                if (!m_tasksToTime->at(taskId)[0].empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+                                {
+	                                prerequisiteTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(1);
+                                }
+                                //Prerequisite time is actually treated as time to loiter, so set it to be loiter time needed
+                                prerequisiteTime_ms -= travelTimeTotalToBegin_ms;
+                                //Can't loiter for negative time
+                                if (prerequisiteTime_ms < 0)
+                                {
+	                                prerequisiteTime_ms = 0;
+                                }
 							}
                             else //Relative time without a prerequisite; treat as absolute
                             {
@@ -1126,7 +1140,7 @@ namespace uxas
 							if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
 							{
 								//At this point, prerequisite time is just completion time of all prerequisites (no offset included)
-								maxTime_ms = prerequisiteTime_ms;
+								maxTime_ms = travelTimeTotalToBegin_ms;
 								maxTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(2);
 							}
 							else if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 14)
@@ -1148,20 +1162,6 @@ namespace uxas
 						travelTime_ms += prerequisiteTime_ms;
 					}
 
-					//Set prerequisite time to be the actual time we need to loiter
-					//Add start window time so we don't go early; only necessary for relative time since absolute time is handled earlier
-					if (!m_tasksToTime->at(taskId)[0].empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
-					{
-						prerequisiteTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(1);
-					}
-					//Prerequisite time is actually treated as time to loiter, so set it to be loiter time needed
-					prerequisiteTime_ms -= travelTimeTotalToBegin_ms;
-					//Can't loiter for negative time
-					if (prerequisiteTime_ms < 0)
-					{
-						prerequisiteTime_ms = 0;
-					}
-
 					//Don't assign task if its completion time is greater than our maximum allowable
 					if (((travelTimeTotalToEnd_ms < maxTime_ms) || (maxTime_ms == -1)) && !isError) //TODO: split out isError into another "if." See next comment
 					{
@@ -1169,6 +1169,7 @@ namespace uxas
 						 *we weren't sure what error message you guys would want.
 						 */
 						//END ADDED CODE
+                        std::cout << prerequisiteTime_ms << std::endl;
 						if ((maxVehicleTravelTime_ms < 0) || (travelTimeTotalToEnd_ms < maxVehicleTravelTime_ms))
 						{
 							// create new child for cost calculation
