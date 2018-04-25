@@ -365,18 +365,22 @@ public
 			--Assign numLeft variables (used at the system level)
 			assign numLeft_UAV1 = UAV1.numLeft;
 			assign numLeft_UAV2 = UAV2.numLeft;
+			assign numLeft_UAV3 = UAV3.numLeft;
 			
 			--Assign numRight variables (used at the system level)
 			assign numRight_UAV1 = UAV1.numRight;
 			assign numRight_UAV2 = UAV2.numRight;
+			assign numRight_UAV3 = UAV3.numRight;
 			
 			--Assign perimLeft variables (used at the system level)
 			assign perimLeft_UAV1 = UAV1.perimLeft;
 			assign perimLeft_UAV2 = UAV2.perimLeft;
+			assign perimLeft_UAV3 = UAV3.perimLeft;
 
 			--Assign perimRight variables (used at the system level)
 			assign perimRight_UAV1 = UAV1.perimRight;
 			assign perimRight_UAV2 = UAV2.perimRight;
+			assign perimRight_UAV3 = UAV3.perimRight;
 			
 			--Assign positions
 			assign pos_UAV1 = (initial_pos_UAV1 -> (if pre_direction_UAV1 = 1 then pre_pos_UAV1 + DPSS_Constants.V*(time - pre(time)) else pre_pos_UAV1 - DPSS_Constants.V*(time - pre(time))));
@@ -489,10 +493,12 @@ public
 			--UAV numLeft values are nonnegative
 			lemma "UAV1's numLeft is nonnegative": UAV1.numLeft >= 0.0;
 			lemma "UAV2's numLeft is nonnegative": UAV2.numLeft >= 0.0;
+			lemma "UAV3's numLeft is nonnegative": UAV3.numLeft >= 0.0;
 			
 			--UAV numRight values are nonnegative
 			lemma "UAV1's numRight is nonnegative": UAV1.numRight >= 0.0;
 			lemma "UAV2's numRight is nonnegative": UAV2.numRight >= 0.0;
+			lemma "UAV3's numRight is nonnegative": UAV3.numRight >= 0.0;
 			
 			lemma "Once stable, stays stable (here 'stable' includes stability of the configuration parameters":
 				true -> pre(stable)	=> stable;
