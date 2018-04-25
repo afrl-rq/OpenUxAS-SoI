@@ -368,7 +368,7 @@ protected: //virtual
      * messages after they are processed by the base class. */
     virtual void processReceivedLmcpMessageAssignment(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage){};
     /** brief this function is called to initialize the algebra functions. */
-    virtual bool isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites, std::unique_ptr<uxas::service::c_Node_Base>);
+    virtual bool isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites, uxas::service::c_Node_Base * nodeAssignment);
     /** brief starts the branch and bound assignment from the base class. */
     virtual void runCalculateAssignment(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
     /** brief starts the branch and bound assignment. */

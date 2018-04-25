@@ -296,7 +296,7 @@ namespace uxas
 		//==================================================================================================================*/
 
 		bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites,
-			std::unique_ptr<c_Node_Base> nodeAssignment )
+			c_Node_Base * nodeAssignment )
 		{
 			bool isSuccess(true);
 
@@ -566,9 +566,9 @@ namespace uxas
 			nodeAssignment->m_isFinalAssignmentCalculated = false;
 
 			// ALGEBRA:: Initialization
-			isError = !isInitializeAlgebra(assigmentPrerequisites, std::move(nodeAssignment));
+			isError = !isInitializeAlgebra(assigmentPrerequisites, nodeAssignment.get());
 
-			std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+			//std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
 
 			if (!isError)
 			{
@@ -1055,34 +1055,33 @@ namespace uxas
 					//BEGIN ADDED CODE
 					int64_t maxTime_ms(-1);
 					int64_t prerequisiteTime_ms(0);
-
-					if (m_tasksToTime->find(taskId) != m_tasksToTime->end() && (!m_tasksToTime->at(taskId)[0].at(0).empty() || !m_tasksToTime->at(taskId)[1].at(0).empty())) //Has at least timing operator OR prerequisite
+					if (!m_tasksToTime->at(taskId)[0].empty()) //Has at least a timing operator       || !m_tasksToTime->at(taskId)[1].empty()
 					{
-						if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 14) //Absolute time
+						if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 14) //Absolute time
 						{
 							prerequisiteTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(1);
 						}
-						else if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13) //Relative time
+						else if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 13) //Relative time
 						{
 							c_Node_Base * backtraceCheck = m_parentPointer;
 							int64_t lowestAlternativePrerequisiteCost(INT64_MAX);
-							if (!m_tasksToTime->at(taskId)[1].at(0).empty())
+							if (!m_tasksToTime->at(taskId)[1].empty()) //Has some prerequisite
 							{
 								for (unsigned int i = 0; i < m_tasksToTime->at(taskId)[1].at(0).size(); i++)
 								{
-									if (backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i))
+									if (backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i)) //Confirm we have a prerequisite
 									{
 										auto itTaskAssignmentState = m_taskIdVsAssignmentState.find(backtraceCheck->m_taskOptionID);
 										if (itTaskAssignmentState != m_taskIdVsAssignmentState.end())
 										{
-											if (itTaskAssignmentState->second->m_taskBeginTime_ms > prerequisiteTime_ms)
+											if (itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms)
 											{
 												int64_t prerequisiteOperator = m_tasksToTime->at(taskId)[1].at(1).at(i);
-												if (prerequisiteOperator == 11 && itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms) // '.' operator
+												if (prerequisiteOperator == 11) // '.' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskCompletionTime_ms;
 												}
-												else if (prerequisiteOperator == 15) // '~' operator
+												else if (prerequisiteOperator == 15 && itTaskAssignmentState->second->m_taskBeginTime_ms > prerequisiteTime_ms) // '~' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskBeginTime_ms;
 												}
@@ -1093,7 +1092,7 @@ namespace uxas
 														lowestAlternativePrerequisiteCost = itTaskAssignmentState->second->m_taskCompletionTime_ms;
 													}
 												}
-												else if (prerequisiteOperator == 12 && itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms) // '|' operator
+												else if (prerequisiteOperator == 12) // '|' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskCompletionTime_ms;
 												}
@@ -1105,20 +1104,23 @@ namespace uxas
 											m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_ERROR:: potentially required prerequisite TaskOptionId[" << taskId << "] not found!" << std::endl;
 											isError = true;
 										}
-									}
+									}//End of prerequisite-confirmation if
 									backtraceCheck = backtraceCheck->m_parentPointer;
-								}
+								}//End of backtrace for loop
 							}
+                            else //Relative time without a prerequisite; treat as absolute
+                            {
+                                prerequisiteTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(1);
+                            }
 							if (lowestAlternativePrerequisiteCost > prerequisiteTime_ms && lowestAlternativePrerequisiteCost != INT64_MAX)
 							{
 								prerequisiteTime_ms = lowestAlternativePrerequisiteCost;
 							}
 						}
 					}
-
 					if (m_tasksToTime->find(taskId) != m_tasksToTime->end()) 
 					{
-						if (!m_tasksToTime->at(taskId)[0].at(0).empty()) //Timing info is present
+						if (!m_tasksToTime->at(taskId)[0].empty()) //Timing info is present
 						{
 							//Check what time operator the info is for and find max time accordingly
 							if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
@@ -1148,7 +1150,7 @@ namespace uxas
 
 					//Set prerequisite time to be the actual time we need to loiter
 					//Add start window time so we don't go early; only necessary for relative time since absolute time is handled earlier
-					if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+					if (!m_tasksToTime->at(taskId)[0].empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
 					{
 						prerequisiteTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(1);
 					}
