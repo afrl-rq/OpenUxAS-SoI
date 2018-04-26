@@ -1,7 +1,7 @@
 // ===============================================================================
 // Authors: AFRL/RQQA
 // Organization: Air Force Research Laboratory, Aerospace Systems Directorate, Power and Control Division
-//
+// 
 // Copyright (c) 2017 Government of the United State of America, as represented by
 // the Secretary of the Air Force.  No copyright is claimed in the United States under
 // Title 17, U.S. Code.  All Other Rights Reserved.
@@ -296,7 +296,7 @@ namespace uxas
 		//==================================================================================================================*/
 
 		bool AssignmentTreeBranchBoundBase::isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites,
-			c_Node_Base * nodeAssignment )
+			std::unique_ptr<c_Node_Base> nodeAssignment )
 		{
 			bool isSuccess(true);
 
@@ -376,7 +376,7 @@ namespace uxas
 			}
 
 
-			//Construct the requested algebra string
+			//Construct the requested algebra string    
 			std::string algebraString;
 			if (!assigmentPrerequisites->m_uniqueAutomationRequest->getOriginalRequest()->getTaskRelationships().empty())
 			{
@@ -390,29 +390,6 @@ namespace uxas
 				//print statements to aid in bugfixing the parsing of the algebra string
 				//std::cout << "Algebra string before parsing (and after pulling out time stuff): " << taskRelationships << std::endl;
 				//std::cout << "Algebra string before parsing (and after pulling out time stuff): " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
-
-
-
-
-
-
-
-
-                std::cout << "Here 1" << std::endl;
-                nodeAssignment->m_tasksToTime = new std::map<int, std::array<std::vector<std::vector<int> >, 2> >;
-                std::cout << "Here 2" << std::endl;
-                uxas::common::utilities::Lex lex;
-                lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString, nodeAssignment->m_tasksToTime);
-                std::cout << "Here 3" << std::endl;
-
-
-
-
-
-
-
-
-
 
 				bool isFinished(false);
 				while (!isFinished)
@@ -547,8 +524,6 @@ namespace uxas
 			calculateAssignment(std::move(nodeAssignment), assigmentPrerequisites);
 		}
 
-
-
 		void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_Base> nodeAssignment,
 			const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites)
 		{
@@ -568,9 +543,16 @@ namespace uxas
 			nodeAssignment->m_isFinalAssignmentCalculated = false;
 
 			// ALGEBRA:: Initialization
-			isError = !isInitializeAlgebra(assigmentPrerequisites, nodeAssignment.get());
+			isError = !isInitializeAlgebra(assigmentPrerequisites, std::move(nodeAssignment));
 
-			//std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+			std::cout << "Original Algebra String from c_Node_Base: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+
+                        std::cout << "Here 1" << std::endl;
+                        uxas::common::utilities::Lex lex;
+                        std::cout << "Here 2" << std::endl;
+                        std::cout << "Test String: " << AssignmentTreeBranchBoundBase::originalAlgebraString << std::endl;
+                        lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString, nodeAssignment->m_tasksToTime);
+                        std::cout << "Here 3" << std::endl;
 
 			if (!isError)
 			{
@@ -771,7 +753,11 @@ namespace uxas
 		c_Node_Base::c_Node_Base() //this is used for the root node
 		{
 			m_staticAssignmentParameters->m_numberNodesVisited++;
-            m_parentPointer = this;
+                        m_parentPointer = this;
+                        m_tasksToTime = std::make_shared<std::map<int, std::array<std::vector<std::vector<int> >, 2> > >();
+                        std::cout << "Test before" << std::endl;
+                        std::cout << "Test during: " << m_tasksToTime << std::endl; //access this somehow
+                        std::cout << "Test after" << std::endl;
 			//CERR_FILE_LINE_MSG("m_staticAssignmentParameters->m_numberNodesAdded[" << m_staticAssignmentParameters->m_numberNodesAdded << "]")
 		}
 
@@ -794,8 +780,6 @@ namespace uxas
 			m_isLeafNode(rhs.m_isLeafNode),
 			m_parentPointer(const_cast<c_Node_Base *>(&rhs))
 		{
-                        //std::cout << "this is m_tasksToTime: " << m_tasksToTime << std::endl;
-                        //std::cout << "this is rhs.m_tasksToTime: " << rhs.m_tasksToTime << std::endl;
 			m_staticAssignmentParameters->m_numberNodesVisited++;
 			for (auto itVehicleAssignmentState = rhs.m_vehicleIdVsAssignmentState.begin();
 				itVehicleAssignmentState != rhs.m_vehicleIdVsAssignmentState.end();
@@ -864,7 +848,7 @@ namespace uxas
 
 			if (!m_staticAssignmentParameters->m_isStopCondition)
 			{
-				//if there are valid assignments and there are child nodes, then expand them
+				//if there are valid assignments and there are child nodes, then expand them 
 				//if (bTaskAvailable && bVehicleAvailable)
 				if (!m_costVsChildren.empty())
 				{
@@ -997,27 +981,6 @@ namespace uxas
 			m_isPruneable = isPruneParent;
 		}
 
-
-
-
-
-        //added function
-        int64_t c_Node_Base::isFoundPrerequisites(int64_t prerequisiteTaskId){
-            c_Node_Base * backtraceCheck = this;
-            while(backtraceCheck != backtraceCheck->m_parentPointer){
-                if(backtraceCheck->m_taskOptionID / 100000 == prerequisiteTaskId){
-                    return backtraceCheck->m_taskOptionID;
-                }
-                backtraceCheck = backtraceCheck->m_parentPointer;
-            }
-            return -1;
-        }
-
-
-
-
-
-
 		void c_Node_Base::NodeAssignment(std::unique_ptr<c_VehicleAssignmentState>& vehicleAssignmentState, const int64_t& taskOptionId, const int64_t &hasPrerequisite)
 		{
 			if (((m_staticAssignmentParameters->m_numberNodesVisited % 100000) == 0) && (m_staticAssignmentParameters->m_numberNodesVisited > 0))
@@ -1078,40 +1041,34 @@ namespace uxas
 					//BEGIN ADDED CODE
 					int64_t maxTime_ms(-1);
 					int64_t prerequisiteTime_ms(0);
-					if (!m_tasksToTime->at(taskId)[0].empty() || !m_tasksToTime->at(taskId)[1].empty()) //Has at least a timing operator
+
+					if (m_tasksToTime->find(taskId) != m_tasksToTime->end() && (!m_tasksToTime->at(taskId)[0].at(0).empty() || !m_tasksToTime->at(taskId)[1].at(0).empty())) //Has at least timing operator OR prerequisite
 					{
-						std::cout << "Has a timing operator" << std::endl;
-						if (!m_tasksToTime->at(taskId)[0].empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 14) //Absolute time
+						if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 14) //Absolute time
 						{
-							std::cout << "Test" << std::endl;
 							prerequisiteTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(1);
 						}
-						else if (!m_tasksToTime->at(taskId)[1].empty() || (!m_tasksToTime->at(taskId)[0].empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)) //Relative time
+						else if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13) //Relative time
 						{
-							std::cout << "In relative time" << std::endl;
+							c_Node_Base * backtraceCheck = m_parentPointer;
 							int64_t lowestAlternativePrerequisiteCost(INT64_MAX);
-							if (!m_tasksToTime->at(taskId)[1].empty()) //Has some prerequisite
+							if (!m_tasksToTime->at(taskId)[1].at(0).empty())
 							{
-								std::cout << "Has prerequsite in relative" << std::endl;
 								for (unsigned int i = 0; i < m_tasksToTime->at(taskId)[1].at(0).size(); i++)
 								{
-									int64_t prerequisiteTaskOptionId = isFoundPrerequisites(m_tasksToTime->at(taskId)[1].at(0).at(i));
-									std::cout << "prerequisiteTaskId: " << prerequisiteTaskOptionId << std::endl;
-									if (prerequisiteTaskOptionId > 0) //Confirm we have a prerequisite
+									if (backtraceCheck->m_taskOptionID / 100000 == m_tasksToTime->at(taskId)[1].at(0).at(i))
 									{
-										auto itTaskAssignmentState = m_taskIdVsAssignmentState.find(prerequisiteTaskOptionId);
+										auto itTaskAssignmentState = m_taskIdVsAssignmentState.find(backtraceCheck->m_taskOptionID);
 										if (itTaskAssignmentState != m_taskIdVsAssignmentState.end())
 										{
-											std::cout << "This is a test 1" << std::endl;
-											if (itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms)
+											if (itTaskAssignmentState->second->m_taskBeginTime_ms > prerequisiteTime_ms)
 											{
-												std::cout << "This is a test 2" << std::endl;
 												int64_t prerequisiteOperator = m_tasksToTime->at(taskId)[1].at(1).at(i);
-												if (prerequisiteOperator == 11) // '.' operator
+												if (prerequisiteOperator == 11 && itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms) // '.' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskCompletionTime_ms;
 												}
-												else if (prerequisiteOperator == 15 && itTaskAssignmentState->second->m_taskBeginTime_ms > prerequisiteTime_ms) // '~' operator
+												else if (prerequisiteOperator == 15) // '~' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskBeginTime_ms;
 												}
@@ -1122,7 +1079,7 @@ namespace uxas
 														lowestAlternativePrerequisiteCost = itTaskAssignmentState->second->m_taskCompletionTime_ms;
 													}
 												}
-												else if (prerequisiteOperator == 12) // '|' operator
+												else if (prerequisiteOperator == 12 && itTaskAssignmentState->second->m_taskCompletionTime_ms > prerequisiteTime_ms) // '|' operator
 												{
 													prerequisiteTime_ms = itTaskAssignmentState->second->m_taskCompletionTime_ms;
 												}
@@ -1134,51 +1091,59 @@ namespace uxas
 											m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_ERROR:: potentially required prerequisite TaskOptionId[" << taskId << "] not found!" << std::endl;
 											isError = true;
 										}
-									}//End of prerequisite-confirmation if
-								}//End of backtrace for loop
-
-	              //Set prerequisite time to be the actual time we need to loiter
-	              //Add start window time so we don't go early; only necessary for relative time since absolute time is handled earlier
-	              if (!m_tasksToTime->at(taskId)[0].empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
-	              {
-	                prerequisiteTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(1);
-	              }
-	              //Prerequisite time is actually treated as time to loiter, so set it to be loiter time needed
-	              prerequisiteTime_ms -= travelTimeTotalToBegin_ms;
-	              //Can't loiter for negative time
-	              if (prerequisiteTime_ms < 0)
-	              {
-	                prerequisiteTime_ms = 0;
-	              }
+									}
+									backtraceCheck = backtraceCheck->m_parentPointer;
+								}
 							}
-              else if(!m_tasksToTime->at(taskId)[0].empty()) //Relative time without a prerequisite; treat as absolute
-              {
-                  prerequisiteTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(1);
-              }
 							if (lowestAlternativePrerequisiteCost > prerequisiteTime_ms && lowestAlternativePrerequisiteCost != INT64_MAX)
 							{
 								prerequisiteTime_ms = lowestAlternativePrerequisiteCost;
 							}
 						}
 					}
-					if (!m_tasksToTime->at(taskId)[0].empty()) //Timing info is present
+
+					if (m_tasksToTime->find(taskId) != m_tasksToTime->end()) 
 					{
-						//Check what time operator the info is for and find max time accordingly
-						if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+						if (!m_tasksToTime->at(taskId)[0].at(0).empty()) //Timing info is present
 						{
-							//At this point, prerequisite time is just completion time of all prerequisites (no offset included)
-							maxTime_ms = travelTimeTotalToBegin_ms;
-							maxTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(2);
-						}
-						else if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 14)
-						{
-							maxTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(2);
+							//Check what time operator the info is for and find max time accordingly
+							if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+							{
+								//At this point, prerequisite time is just completion time of all prerequisites (no offset included)
+								maxTime_ms = prerequisiteTime_ms;
+								maxTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(2);
+							}
+							else if (m_tasksToTime->at(taskId)[0].at(0).at(0) == 14)
+							{
+								maxTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(2);
+							}
 						}
 					}
+					else
+					{
+						UXAS_LOG_ERROR("ASSIGNMENT_ERROR:: required timing information for TaskOptionId[", taskId, "] not found!");
+						m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_ERROR:: required timing information for TaskOptionId[" << taskId << "] not found!" << std::endl;
+						isError = true;
+					}
+
 					//Make sure the new task doesn't get started before the prerequisite cost
 					if ((prerequisiteTime_ms > 0) && (travelTimeTotalToBegin_ms < prerequisiteTime_ms))
 					{
 						travelTime_ms += prerequisiteTime_ms;
+					}
+
+					//Set prerequisite time to be the actual time we need to loiter
+					//Add start window time so we don't go early; only necessary for relative time since absolute time is handled earlier
+					if (!m_tasksToTime->at(taskId)[0].at(0).empty() && m_tasksToTime->at(taskId)[0].at(0).at(0) == 13)
+					{
+						prerequisiteTime_ms += m_tasksToTime->at(taskId)[0].at(0).at(1);
+					}
+					//Prerequisite time is actually treated as time to loiter, so set it to be loiter time needed
+					prerequisiteTime_ms -= travelTimeTotalToBegin_ms;
+					//Can't loiter for negative time
+					if (prerequisiteTime_ms < 0)
+					{
+						prerequisiteTime_ms = 0;
 					}
 
 					//Don't assign task if its completion time is greater than our maximum allowable
@@ -1188,7 +1153,6 @@ namespace uxas
 						 *we weren't sure what error message you guys would want.
 						 */
 						//END ADDED CODE
-            //std::cout << prerequisiteTime_ms << std::endl;
 						if ((maxVehicleTravelTime_ms < 0) || (travelTimeTotalToEnd_ms < maxVehicleTravelTime_ms))
 						{
 							// create new child for cost calculation
@@ -1254,7 +1218,7 @@ namespace uxas
 					m_staticAssignmentParameters->m_reasonsForNoAssignment << "ASSIGNMENT_WARNING:: No TravelTime_ms[" << startingLocationId << "," << taskOptionId << "] found.!" << std::endl;
 				} //if (travelTime_ms > 0)
 			}
-			else //if ( !isError && (itVehicleAssignmentState != m_vehicleIdVsAssignmentState.end()) &&  ...
+			else //if ( !isError && (itVehicleAssignmentState != m_vehicleIdVsAssignmentState.end()) &&  ... 
 			{
 				if (itVehicleInformation == m_staticAssignmentParameters->m_vehicleIdVsInformation.end())
 				{

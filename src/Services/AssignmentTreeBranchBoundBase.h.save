@@ -216,13 +216,13 @@ private:
 class c_Node_Base
 {
 public: //constructors/destructors
+  
     c_Node_Base();
     virtual ~c_Node_Base();
 
     c_Node_Base(const c_Node_Base& rhs);
     
     int makeTimeMap(std::string sample);
-    int64_t isFoundPrerequisites(int64_t prerequisiteTaskId);
     
 public: //member functions - prototypes
     virtual void ExpandNode();
@@ -258,8 +258,8 @@ public:
 #endif
     int64_t m_nodeCost{0};
     int64_t m_totalCost{0};
-    std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_tasksToTime;
-
+    std::shared_ptr<std::map<int, std::array<std::vector<std::vector<int> >, 2>> > m_tasksToTime;
+    
 protected: //member storage
     /*! \brief map of children of this node, sorted by cost */
     std::multimap<int64_t, std::unique_ptr<c_Node_Base> > m_costVsChildren;
@@ -275,6 +275,9 @@ protected: //member storage
     
     bool m_isPruneable = {true}; //can this node be pruned
     bool m_isLeafNode = {false}; //is this a leaf node
+
+    int m_relativeTime[2] { -1 -1 };
+    int m_absoluteTime[2] { -1 -1 };
 
     c_Node_Base * m_parentPointer;
 private:
@@ -310,6 +313,7 @@ private:
 class AssignmentTreeBranchBoundBase : public ServiceBase
 {
 public:
+
     AssignmentTreeBranchBoundBase(const std::string& serviceType, const std::string& workDirectoryName);
 
     virtual
@@ -369,7 +373,7 @@ protected: //virtual
      * messages after they are processed by the base class. */
     virtual void processReceivedLmcpMessageAssignment(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage){};
     /** brief this function is called to initialize the algebra functions. */
-    virtual bool isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites, uxas::service::c_Node_Base * nodeAssignment);
+    virtual bool isInitializeAlgebra(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites, std::unique_ptr<uxas::service::c_Node_Base>);
     /** brief starts the branch and bound assignment from the base class. */
     virtual void runCalculateAssignment(const std::shared_ptr<AssigmentPrerequisites>& assigmentPrerequisites);
     /** brief starts the branch and bound assignment. */

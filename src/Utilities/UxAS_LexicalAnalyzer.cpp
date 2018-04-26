@@ -36,28 +36,28 @@ namespace uxas
              * @param tmpAlgebraString //string: unexpanded algebra string
              */
             void Lex::parse(std::string tmpAlgebraString, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map) {
-                std::cout << "Entered Parse" << std::endl;
+                //std::cout << "Entered Parse" << std::endl;
                 /**
                  * TODO
                  * 1. Reduce level of initialization
                  */
                 //Init var
-                std::cout << "Algebra string transfer" << std::endl;
+                //std::cout << "Algebra string transfer" << std::endl;
                 algebraString = tmpAlgebraString;
-                std::cout << "After Algebra string transfer" << std::endl;
+                //std::cout << "After Algebra string transfer" << std::endl;
                 lexeme = "";
-                std::cout << "After lexeme" << std::endl;                                
+                //std::cout << "After lexeme" << std::endl;
                 pos = 0;
                 timing_pos = 0;
                 timingFlags.at(0) = 0;
                 prereq_paren_count = 0;
                 add_all_paren_count = 0;
-                std::cout << "Before Map" << std::endl;
+                //std::cout << "Before Map" << std::endl;
                 tasksToTime = m_map;
                 placeholder_arr = {};
 
                 //Start lex processing
-                std::cout << "Start of rDec()" << std::endl;
+                //std::cout << "Start of rDec()" << std::endl;
                 rDec();
             }
 
@@ -65,7 +65,7 @@ namespace uxas
              * A recursive descent parser: processes the lex and checks for errors
              */
             void Lex :: rDec() {
-                std::cout << "rDec" << std::endl;
+                //std::cout << "rDec" << std::endl;
 
                 //While not EOF
                 while (lex() != 0) {
@@ -91,7 +91,7 @@ namespace uxas
              * @return //The character token type
              */
             int Lex :: lex() {
-                std::cout << "lex" << std::endl;
+                //std::cout << "lex" << std::endl;
 
                 //Reset lexeme
                 int err_char;
@@ -99,7 +99,7 @@ namespace uxas
 
                 //Get next character and add it to lexeme
                 if (getNonBlank() == 0) {
-                    std::cout << "lex_branch_EOF_1" << std::endl;
+                    //std::cout << "lex_branch_EOF_1" << std::endl;
                     return 0;
                 }
                 lookup(nextChar);
@@ -108,7 +108,7 @@ namespace uxas
                 //Check class of nextChar to process timing information
                 switch(charClass) {
                     case OPERAND:
-                        std::cout << "lex_branch_OPERAND" << std::endl;
+                        //std::cout << "lex_branch_OPERAND" << std::endl;
                         //Get task id as int
                         lexeme = "";
                         char tmp_char;
@@ -116,7 +116,7 @@ namespace uxas
                             addChar(tmp_char);
                         }
                         pos--;
-                        std::cout << "taskId: " << lexeme << std::endl;
+                        //std::cout << "taskId: " << lexeme << std::endl;
                         taskId = std::stoi(lexeme);
 
                         //Check if the task is in the map. If not, add a placeholder.
@@ -127,14 +127,14 @@ namespace uxas
 
                         //If prereq flags are set
                         if (set_prereq) {
-                            std::cout << "lex_branch_prereqTrue" << std::endl;
+                            //std::cout << "lex_branch_prereqTrue" << std::endl;
                             if (add_all_prereq) {
-                                std::cout << "lex_branch_OP_prereq-True_addAll-True" << std::endl;
+                                //std::cout << "lex_branch_OP_prereq-True_addAll-True" << std::endl;
                                 storePrereqInfo(taskId);
                                 prereq_q.push(taskId);
                             }
                             else {
-                                std::cout << "lex_branch_OP_prereq-True_addAll-False" << std::endl;
+                                //std::cout << "lex_branch_OP_prereq-True_addAll-False" << std::endl;
                                 storePrereqInfo(taskId);
                                 prereq_op_q.pop();
                                 prereq_v.clear();
@@ -143,21 +143,21 @@ namespace uxas
                         }
                         //If the timing flag is set
                         if (timingFlags.at(0)) {
-                            std::cout << "lex_branch_timingFlag-True" << std::endl;
+                            //std::cout << "lex_branch_timingFlag-True" << std::endl;
                             storeTimeInfo(taskId);
                         }
                         break;
                     case OPERATOR:
-                        std::cout << "lex_branch_OPERATOR" << std::endl;
+                        //std::cout << "lex_branch_OPERATOR" << std::endl;
                         //Check operator type to set prerequisite tasks
                         if((nextToken == SEQUENTIAL) || (nextToken == TILDE)) {
                             //Check if valid syntax and set flag to process task prerequisites
-                            std::cout << "lex_branch_SEQ-TILDE" << std::endl;
+                            //std::cout << "lex_branch_SEQ-TILDE" << std::endl;
                             set_prereq = true;
                             prereq_op_q.push(nextToken);
                         }
                         else if ((nextToken == PARALLEL) || (nextToken == ALTERNATIVE)) {
-                            std::cout << "lex_branch_PARA-ALT" << std::endl;
+                            //std::cout << "lex_branch_PARA-ALT" << std::endl;
                             //If the prerequisite flag is set, then set the add all flag
                             if (set_prereq) {
                                 add_all_prereq = true;
@@ -165,32 +165,32 @@ namespace uxas
                         }
                         break;
                     case TIME:
-                        std::cout << "lex_branch_TIME" << std::endl;
+                        //std::cout << "lex_branch_TIME" << std::endl;
                         //If relative or absolute, create timing flag
                         if ((nextToken == RELATIVE) || (nextToken == ABSOLUTE)) {
-                            std::cout << "lex_branch_REL-ABS" << std::endl;
+                            //std::cout << "lex_branch_REL-ABS" << std::endl;
                             //If the end of the timing space is reached, reset and exit
                             if (timing_pos == pos) {
-                                std::cout << "lex_branch_timing-over" << std::endl;
+                                //std::cout << "lex_branch_timing-over" << std::endl;
                                 timingFlags.at(0) = 0;
                                 while (((err_char = getNonBlank()) != ']') && (err_char != 0));
                                 if (err_char == 0) {
-                                    std::cout << "lex_branch_EOF_3" << std::endl;
+                                    //std::cout << "lex_branch_EOF_3" << std::endl;
                                     return 0;
                                 }
                             }
                             //Else set the timing flags and start traversing the space
                             else {
-                                std::cout << "lex_branch_setTimingFlags" << std::endl;
+                                //std::cout << "lex_branch_setTimingFlags" << std::endl;
                                 setTimingFlags();
                             }
                         }
                         break;
                     case UNKNOWN:
-                        std::cout << "lex_branch_UNKNOWN" << std::endl;
+                        //std::cout << "lex_branch_UNKNOWN" << std::endl;
                         //Ignore nested loops when processing timing
                         if (timingFlags.at(0) && (nextToken == PAREN_LEFT)) {
-                            std::cout << "lex_branch_timing_paren-left" << std::endl;
+                            //std::cout << "lex_branch_timing_paren-left" << std::endl;
                             skipToSectionEnd(true);
                         }
                         /**
@@ -198,7 +198,7 @@ namespace uxas
                          * Will init flags if not init
                          */
                         if (set_prereq) {
-                            std::cout << "lex_branch_UNKN_prereq-True" << std::endl;
+                            //std::cout << "lex_branch_UNKN_prereq-True" << std::endl;
                             if (deactivateFlagCheck(&prereq_paren_count)) {
                                 set_prereq = false;
                                 prereq_v.clear();
@@ -208,7 +208,7 @@ namespace uxas
                             }
                         }
                         if (add_all_prereq) {
-                            std::cout << "lex_branch_UNKN_addAdd-True" << std::endl;
+                            //std::cout << "lex_branch_UNKN_addAdd-True" << std::endl;
                             if (deactivateFlagCheck(&add_all_paren_count)) {
                                 add_all_prereq = false;
                                 prereq_v = prereqToVector(prereq_q);
@@ -227,7 +227,7 @@ namespace uxas
              * @return //int: the character token's class
              */
             int Lex :: lookup(char ch) {
-                std::cout << "lookup" << std::endl;
+                //std::cout << "lookup" << std::endl;
 
                 switch(ch) {
                     case '+':
@@ -296,13 +296,13 @@ namespace uxas
                         nextChar = (char) algebraString.at(pos++);
                     }
                     else {
-                        std::cout << "getNonBlank: END" << std::endl;
+                        //std::cout << "getNonBlank: END" << std::endl;
                         return 0; //EOF
                     }
                 }
                 while(isspace(nextChar));
 
-                std::cout << "getNonBlank: " << nextChar << std::endl;
+                //std::cout << "getNonBlank: " << nextChar << std::endl;
                 return nextChar;
             }
             /**
@@ -310,14 +310,14 @@ namespace uxas
              * @param ch //char: character to append
              */
             void Lex :: addChar(char ch) {
-                std::cout << "addChar" << std::endl;
+                //std::cout << "addChar" << std::endl;
                 lexeme.push_back(ch);
             }
             /**
              * Collect the timing data to append to task nodes
              */
             void Lex :: setTimingFlags() {
-                std::cout << "setTimingFlags" << std::endl;
+                //std::cout << "setTimingFlags" << std::endl;
 
                 /**
                  * TODO
@@ -340,11 +340,11 @@ namespace uxas
                 }
                 if (tmp_char == 0) {
                     //Error: EOF. Should never reach EOF here.
-                    std::cout << "setTiming_EOF" << std::endl;
+                    //std::cout << "setTiming_EOF" << std::endl;
                 }
-                std::cout << t1 << std::endl;
+                //std::cout << t1 << std::endl;
                 timingFlags.at(1) = std::stoi(t1);
-                std::cout << t2 << std::endl;
+                //std::cout << t2 << std::endl;
                 timingFlags.at(2) = std::stoi(t2);
 
                 //Set pos to beginning of this timing section
@@ -357,7 +357,7 @@ namespace uxas
              * @return //bool: if it is an operator, set true
              */
             bool isOperator(char ch) {
-                std::cout << "isOperator" << std::endl;
+                //std::cout << "isOperator" << std::endl;
 
                 //Will fall through to the last two cases
                 switch (ch) {
@@ -375,7 +375,7 @@ namespace uxas
              * @param goForward //bool: if processed from left to right, set true
              */
             void Lex :: skipToSectionEnd(bool goForward) {
-                std::cout << "skipToSectionEnd" << std::endl;
+                //std::cout << "skipToSectionEnd" << std::endl;
                 int paren_count;
 
                 //Process the string in a forward direction
@@ -405,7 +405,7 @@ namespace uxas
                 }
                 //Wrong # of parens
                 if ((pos >= algebraString.length()) && (paren_count != 0)) {
-                    std::cout << "skipToSectionEnd_EOF" << std::endl;
+                    //std::cout << "skipToSectionEnd_EOF" << std::endl;
                     //Error. Hit EOF with the wrong number of parens.
                 }
             }
@@ -415,7 +415,7 @@ namespace uxas
              * @return //bool: what value the flag should be set to this round
              */
             bool Lex :: deactivateFlagCheck(int *counter) {
-                std::cout << "deactivateFlagCheck" << std::endl;
+                //std::cout << "deactivateFlagCheck" << std::endl;
                 //Keep track of the parens to know when to deactivate the flag
                 if (nextToken == PAREN_LEFT) {
                     (*counter)++;
@@ -428,7 +428,7 @@ namespace uxas
             }
 
             std::vector<int> Lex :: prereqToVector(std::queue<int> tmp_queue) {
-                std::cout << "prereqToVector" << std::endl;
+                //std::cout << "prereqToVector" << std::endl;
                 std::vector<int> tmp_vector;
                 while (!tmp_queue.empty()) {
                     tmp_vector.push_back(tmp_queue.front());
@@ -438,7 +438,7 @@ namespace uxas
             }
 
             std::vector<int> Lex :: opToVector(int frontValue, int size) {
-                std::cout << "opToVector" << std::endl;
+                //std::cout << "opToVector" << std::endl;
 
                 std::vector<int> tmp_vector;
                 for (int i = 0; i < size; i++) {
@@ -448,7 +448,7 @@ namespace uxas
             }
 
             void Lex :: storeTimeInfo(int taskId) {
-                std::cout << "StoreTimeInfo" << std::endl;
+                //std::cout << "StoreTimeInfo" << std::endl;
 
                 std::vector<int> timing_op;
                 std::vector<std::vector<int> > timing;
@@ -464,7 +464,7 @@ namespace uxas
             };
 
             void Lex :: storePrereqInfo(int taskId) {
-                std::cout << "storePrereqInfo" << std::endl;
+                //std::cout << "storePrereqInfo" << std::endl;
 
                 std::vector<int> prereq_op_v = opToVector(prereq_op_q.front(), prereq_v.size());
                 std::vector<std::vector<int> > prereq;

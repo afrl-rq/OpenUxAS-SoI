@@ -1,22 +1,22 @@
 // ===============================================================================
 // Authors: AFRL/RQQA
 // Organization: Air Force Research Laboratory, Aerospace Systems Directorate, Power and Control Division
-// 
+//
 // Copyright (c) 2017 Government of the United State of America, as represented by
 // the Secretary of the Air Force.  No copyright is claimed in the United States under
 // Title 17, U.S. Code.  All Other Rights Reserved.
 // ===============================================================================
 
-/* 
+/*
  * File:   PlanBuilderService.cpp
  * Author: steve
- * 
+ *
  * Created on September 2, 2015, 6:17 PM
  */
 
 
 #include "PlanBuilderService.h"
-  
+
 #include "UnitConversions.h"
 #include "Constants/Convert.h"
 
@@ -32,7 +32,7 @@
 #include "afrl/cmasi/Waypoint.h"
 
 #include <sstream>
-#include <iostream>     // std::cout, cerr, etc
+#include <iostream>     // //std::cout, cerr, etc
 
 #define STRING_XML_ASSIGNMENT_START_POINT_LEAD_M "AssignmentStartPointLead_m"
 
@@ -60,7 +60,7 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
     addSubscriptionAddress(uxas::messages::task::TaskImplementationResponse::Subscription);
-    
+
     // ENTITY STATES
     addSubscriptionAddress(afrl::cmasi::EntityState::Subscription);
     std::vector< std::string > childstates = afrl::cmasi::EntityStateDescendants();
@@ -89,14 +89,14 @@ PlanBuilderService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
     {
         auto uniqueAutomationRequest = std::static_pointer_cast<uxas::messages::task::UniqueAutomationRequest>(receivedLmcpMessage->m_object);
         m_uniqueAutomationRequests[uniqueAutomationRequest->getRequestID()] = uniqueAutomationRequest;
-        
+
         // re-initialize state maps (possibly halt completion of over-ridden automation request)
         m_assignmentSummaries[uniqueAutomationRequest->getRequestID()] = std::shared_ptr<uxas::messages::task::TaskAssignmentSummary>(nullptr);
         m_projectedEntityStates[uniqueAutomationRequest->getRequestID()] = std::vector< std::shared_ptr<ProjectedState> >();
         m_remainingAssignments[uniqueAutomationRequest->getRequestID()] = std::deque< std::shared_ptr<uxas::messages::task::TaskAssignment> >();
         m_inProgressResponse[uniqueAutomationRequest->getRequestID()] = std::shared_ptr<uxas::messages::task::UniqueAutomationResponse>(nullptr);
     }
-    
+
     return (false); // always false implies never terminating service from here
 };
 
@@ -127,14 +127,14 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
         sendError(message);
         return;
     }
-    
+
     if (taskAssignmentSummary->getTaskList().empty())
     {
         std::string message = "No assignments found for request " + std::to_string(taskAssignmentSummary->getCorrespondingAutomationRequestID());
         sendError(message);
         return;
     }
-    
+
     // ensure that a valid state for each vehicle in the request has been received
     for(auto v : correspondingAutomationRequest->getOriginalRequest()->getEntityList())
     {
@@ -147,14 +147,14 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
             return;
         }
     }
-    
+
     // initialize state tracking maps with this corresponding request IDs
     m_assignmentSummaries[taskAssignmentSummary->getCorrespondingAutomationRequestID()] = taskAssignmentSummary;
     m_projectedEntityStates[taskAssignmentSummary->getCorrespondingAutomationRequestID()] = std::vector< std::shared_ptr<ProjectedState> >();
     m_remainingAssignments[taskAssignmentSummary->getCorrespondingAutomationRequestID()] = std::deque< std::shared_ptr<uxas::messages::task::TaskAssignment> >();
     m_inProgressResponse[taskAssignmentSummary->getCorrespondingAutomationRequestID()] = std::make_shared<uxas::messages::task::UniqueAutomationResponse>();
     m_inProgressResponse[taskAssignmentSummary->getCorrespondingAutomationRequestID()]->setResponseID(taskAssignmentSummary->getCorrespondingAutomationRequestID());
-    
+
     // list all participating vehicles in the assignment
     std::vector<int64_t> participatingVehicles = correspondingAutomationRequest->getOriginalRequest()->getEntityList();
     if(participatingVehicles.empty())
@@ -162,7 +162,7 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
         for(auto v: m_currentEntityStates)
             participatingVehicles.push_back(v.first);
     }
-    
+
     // load current participating vehicle states into projected state tracking
     for(auto vID : participatingVehicles)
     {
@@ -170,7 +170,7 @@ void PlanBuilderService::processTaskAssignmentSummary(const std::shared_ptr<uxas
         auto projectedState = std::make_shared<ProjectedState>();
         projectedState->finalWaypointID = 0;
         projectedState->time = entityState->getTime();
-        
+
         auto usePlanningState = std::find_if(correspondingAutomationRequest->getPlanningStates().begin(), correspondingAutomationRequest->getPlanningStates().end(),
                                             [&](uxas::messages::task::PlanningState* state) { return state->getEntityID() == vID; });
         if(usePlanningState != correspondingAutomationRequest->getPlanningStates().end())
@@ -232,7 +232,7 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
     if(!( (*planState)->state ) )
         return false;
 
-    std::cout << "taskAssignment->getOptionID(): " << taskAssignment->getOptionID() << std::endl;
+    //std::cout << "taskAssignment->getOptionID(): " << taskAssignment->getOptionID() << std::endl;
 
     auto taskImplementationRequest = std::make_shared<uxas::messages::task::TaskImplementationRequest>();
     taskImplementationRequest->setCorrespondingAutomationRequestID(uniqueRequestID);
@@ -256,7 +256,7 @@ bool PlanBuilderService::sendNextTaskImplementationRequest(int64_t uniqueRequest
             taskImplementationRequest->getNeighborLocations().push_back(neighbor->state->clone());
         }
     }
-    
+
     m_remainingAssignments[uniqueRequestID].pop_front();
     sendSharedLmcpObjectBroadcastMessage(taskImplementationRequest);
     return true;
@@ -267,7 +267,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
     // check response ID
     if(m_expectedResponseID.find(taskImplementationResponse->getResponseID()) == m_expectedResponseID.end())
         return;
-    int64_t uniqueRequestID = m_expectedResponseID[taskImplementationResponse->getResponseID()];    
+    int64_t uniqueRequestID = m_expectedResponseID[taskImplementationResponse->getResponseID()];
 
     // cache response (waypoints in m_inProgressResponse)
     if(m_inProgressResponse.find(uniqueRequestID) == m_inProgressResponse.end())
@@ -276,7 +276,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         return;
     if(!m_inProgressResponse[uniqueRequestID]->getOriginalResponse())
         return;
-    
+
     if(taskImplementationResponse->getTaskWaypoints().empty())
     {
         // task cannot be completed (e.g. inside a no-fly zone)
@@ -285,17 +285,17 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         errMsg += " assigned to vehicle [" + std::to_string(taskImplementationResponse->getVehicleID()) + "]";
         errMsg += " reported an empty waypoint list for implementation!";
         sendError(errMsg);
-        
+
         // legacy: still try to complete the request, just skipping this task
         checkNextTaskImplementationRequest(uniqueRequestID);
         return;
     }
-    
+
     auto corrMish = std::find_if(m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().begin(), m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end(),
                                 [&](afrl::cmasi::MissionCommand* mish) { return mish->getVehicleID() == taskImplementationResponse->getVehicleID(); });
 
-    std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
-    if(taskImplementationResponse->getTimeThreshold() > 0){
+    //std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
+    if((taskImplementationResponse->getTimeThreshold() > 0) && !(corrMish != m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end())){
         //create the loiter action for the task and set it to the first waypoint in the list
 
         afrl::cmasi::LoiterAction lTask;
@@ -310,9 +310,9 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
 
         lTask.setLocation(locationToAdd.clone());
         //lTask.setLocation(m_currentEntityStates.find(taskImplementationResponse->getVehicleID())->second->getLocation()->clone());
-        //std::cout << lTask.getLocation()->toString() << std::endl;
-        //std::cout << lTask.toString() << std::endl;
-        std::cout << "Vehicle Action List: " << taskImplementationResponse->toString() << std::endl;
+        ////std::cout << lTask.getLocation()->toString() << std::endl;
+        ////std::cout << lTask.toString() << std::endl;
+        //std::cout << "Vehicle Action List: " << taskImplementationResponse->toString() << std::endl;
         //taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().insert(taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().begin(), lTask.clone());
         taskImplementationResponse->getTaskWaypoints().front()->getVehicleActionList().push_back(lTask.clone());
     }
@@ -346,23 +346,23 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
             taskImplementationResponse->getTaskWaypoints().front()->setAltitude(locationToAdd->getAltitude());
             taskImplementationResponse->getTaskWaypoints().front()->setAltitudeType(locationToAdd->getAltitudeType());
 
-            //std::cout << "Next waypoint: " << taskImplementationResponse->getTaskWaypoints().front()->getNextWaypoint() << std::endl;
+            ////std::cout << "Next waypoint: " << taskImplementationResponse->getTaskWaypoints().front()->getNextWaypoint() << std::endl;
             afrl::cmasi::Waypoint * newWP = taskImplementationResponse->getTaskWaypoints().front()->clone();
 
-            //std::cout << newWP->toString() << std::endl;
+            ////std::cout << newWP->toString() << std::endl;
             newWP->setNextWaypoint(2);
             taskImplementationResponse->getTaskWaypoints().insert(taskImplementationResponse->getTaskWaypoints().begin(), newWP->clone());
 
             /* For bugfixing
             for(afrl::cmasi::Waypoint * wp : taskImplementationResponse->getTaskWaypoints()){
-                std::cout << wp->getNextWaypoint()-1 << "ActionList:" << std::endl;
+                //std::cout << wp->getNextWaypoint()-1 << "ActionList:" << std::endl;
                 for(afrl::cmasi::VehicleAction * vhac : wp->getVehicleActionList()){
-                    std::cout << vhac->toString() << std::endl;
+                    //std::cout << vhac->toString() << std::endl;
                 }
             }
             */
         }
-        //std::cout << taskImplementationResponse->getTaskWaypoints().front()->toString() << std::endl;
+        ////std::cout << taskImplementationResponse->getTaskWaypoints().front()->toString() << std::endl;
         mish->setFirstWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
         for(auto wp : taskImplementationResponse->getTaskWaypoints())
             mish->getWaypointList().push_back(wp->clone());
@@ -382,9 +382,9 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
             (*projectedState)->state->setPlanningHeading(taskImplementationResponse->getFinalHeading());
         }
     }
-                                
+
     checkNextTaskImplementationRequest(uniqueRequestID);
-    
+
 };
 
 void PlanBuilderService::checkNextTaskImplementationRequest(int64_t uniqueRequestID)
@@ -405,7 +405,7 @@ void PlanBuilderService::checkNextTaskImplementationRequest(int64_t uniqueReques
             }
             sendSharedLmcpObjectBroadcastMessage(m_inProgressResponse[uniqueRequestID]);
             m_inProgressResponse.erase(uniqueRequestID);
-            
+
             auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
             serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Information);
             auto keyValuePair = new afrl::cmasi::KeyValuePair;
