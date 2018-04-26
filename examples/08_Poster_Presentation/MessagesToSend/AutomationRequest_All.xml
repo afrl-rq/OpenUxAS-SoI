@@ -15,7 +15,7 @@
                 <int64>8</int64>
                 <int64>9</int64>
             </TaskList>
-            <TaskRelationships>.(|(p1 p2) |(p3 p4) |(p5 p6) |(p8 p9) p7)</TaskRelationships>
+            <TaskRelationships>.(p3 .(p4 .(p5 .(p6 .(p7 .(p8 p9))))))</TaskRelationships>
             <OperatingRegion>10</OperatingRegion>
             <RedoAllTasks>false</RedoAllTasks>
         </AutomationRequest>
