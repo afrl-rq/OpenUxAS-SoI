@@ -38,12 +38,14 @@ public
 			eq reach_left_endp_truth : 	bool = (pos <= left_endp_truth); 
 
 			--Previous numLeft
-			eq pre_numLeft : real = prev(numLeft, 0.0);
+--			eq pre_numLeft : real = prev(numLeft, 0.0);
 --			eq pre_numLeft : real = pre(numLeft);
+			eq pre_numLeft : real; --See guarantee for restrictions on pre_numLeft
 			
 			--Previous numRight
-			eq pre_numRight : real = prev(numRight, 0.0);
+--			eq pre_numRight : real = prev(numRight, 0.0);
 --			eq pre_numRight : real = pre(numRight);
+			eq pre_numRight : real; --See guarantee for restrictions on pre_numRight
 			
 			--Previous perimRight
 --			eq pre_perimRight : real = prev(perimRight, 0.0);
@@ -69,15 +71,16 @@ public
 			eq right_endp_est : DPSS_Data_Types::Position_Type = 
 				pos + perimRight;
 				
-			--Shared border positions
+			--Shared border positions (non-linearized formulas)
 --			eq S_L : DPSS_Data_Types::Position_Type = 
 --				(id - 1.0)*DPSS_Constants.P_TRUTH/N + DPSS_Constants.LEFT_ENDP_TRUTH;  
 --			eq S_R : DPSS_Data_Types::Position_Type = 
 --				id*DPSS_Constants.P_TRUTH/N + DPSS_Constants.LEFT_ENDP_TRUTH;	
 	
-			--Shared border positions -- LINEARIZED BOTH N and id. ASSUMES N <= 4 and 1 <= id <= N.						
+			--Shared border positions -- Linearized both N and id. Assumes N <= 4 and 1 <= id <= N. 
+			-- We go up to N = 7 because if N_TRUTH is 4, the vehicles can have numLeft and numRight each as high as N_TRUTH - 1, resulting in N = 2*N_TRUTH - 1. 						
 			eq S_L : DPSS_Data_Types::Position_Type =
-				if N = 1.0 then 
+				if N = 1.0 then --id = 1.0 
 					0.0*P/1.0 + left_endp_est
 				else 
 					if N = 2.0 then
@@ -94,17 +97,71 @@ public
 									1.0*P/3.0 + left_endp_est
 								else --id = 3.0
 									2.0*P/3.0 + left_endp_est
-						else --N >= 4.0
-							if id = 1.0 then 
-								0.0*P/4.0 + left_endp_est
-							else 
-								if id = 2.0 then
-									1.0*P/4.0 + left_endp_est
+						else 
+							if N = 4.0 then
+								if id = 1.0 then 
+									0.0*P/4.0 + left_endp_est
 								else 
-									if id = 3.0 then
-										2.0*P/4.0 + left_endp_est
-									else --id = 4.0
-										3.0*P/4.0 + left_endp_est;
+									if id = 2.0 then
+										1.0*P/4.0 + left_endp_est
+									else 
+										if id = 3.0 then
+											2.0*P/4.0 + left_endp_est
+										else --id = 4.0
+											3.0*P/4.0 + left_endp_est
+							else
+								if N = 5.0 then
+									if id = 1.0 then 
+										0.0*P/5.0 + left_endp_est
+									else 
+										if id = 2.0 then
+											1.0*P/5.0 + left_endp_est
+										else 
+											if id = 3.0 then
+												2.0*P/5.0 + left_endp_est
+											else 
+												if id = 4.0 then
+													3.0*P/5.0 + left_endp_est
+												else --id = 5.0
+													4.0*P/5.0 + left_endp_est
+								else 
+									if N = 6.0 then
+										if id = 1.0 then 
+											0.0*P/6.0 + left_endp_est
+										else 
+											if id = 2.0 then
+												1.0*P/6.0 + left_endp_est
+											else 
+												if id = 3.0 then
+													2.0*P/6.0 + left_endp_est
+												else 
+													if id = 4.0 then
+														3.0*P/6.0 + left_endp_est
+													else 
+														if id = 5.0 then
+															4.0*P/6.0 + left_endp_est
+														else --id = 6.0
+															5.0*P/6.0 + left_endp_est
+									else --N >= 7.0
+										if id = 1.0 then 
+											0.0*P/7.0 + left_endp_est
+										else 
+											if id = 2.0 then
+												1.0*P/7.0 + left_endp_est
+											else 
+												if id = 3.0 then
+													2.0*P/7.0 + left_endp_est
+												else 
+													if id = 4.0 then
+														3.0*P/7.0 + left_endp_est
+													else 
+														if id = 5.0 then
+															4.0*P/7.0 + left_endp_est
+														else 
+															if id = 6.0 then
+																5.0*P/7.0 + left_endp_est
+															else --id = 7.0
+																6.0*P/7.0 + left_endp_est;
 			
 			eq S_R : DPSS_Data_Types::Position_Type =
 				if N = 1.0 then 
@@ -124,17 +181,71 @@ public
 									2.0*P/3.0 + left_endp_est
 								else --id = 3.0
 									3.0*P/3.0 + left_endp_est
-						else --N >= 4.0
-							if id = 1.0 then 
-								1.0*P/4.0 + left_endp_est
-							else 
-								if id = 2.0 then
-									2.0*P/4.0 + left_endp_est
-								else 
-									if id = 3.0 then
-										3.0*P/4.0 + left_endp_est
-									else --id = 4.0
-										4.0*P/4.0 + left_endp_est;						
+						else 
+							if N = 4.0 then
+									if id = 1.0 then 
+										1.0*P/4.0 + left_endp_est
+									else 
+										if id = 2.0 then
+											2.0*P/4.0 + left_endp_est
+										else 
+											if id = 3.0 then
+												3.0*P/4.0 + left_endp_est
+											else --id = 4.0
+												4.0*P/4.0 + left_endp_est
+								else
+									if N = 5.0 then
+										if id = 1.0 then 
+											1.0*P/5.0 + left_endp_est
+										else 
+											if id = 2.0 then
+												2.0*P/5.0 + left_endp_est
+											else 
+												if id = 3.0 then
+													3.0*P/5.0 + left_endp_est
+												else 
+													if id = 4.0 then
+														4.0*P/5.0 + left_endp_est
+													else --id = 5.0
+														5.0*P/5.0 + left_endp_est
+									else 
+										if N = 6.0 then
+											if id = 1.0 then 
+												1.0*P/6.0 + left_endp_est
+											else 
+												if id = 2.0 then
+													2.0*P/6.0 + left_endp_est
+												else 
+													if id = 3.0 then
+														3.0*P/6.0 + left_endp_est
+													else 
+														if id = 4.0 then
+															4.0*P/6.0 + left_endp_est
+														else 
+															if id = 5.0 then
+																5.0*P/6.0 + left_endp_est
+															else --id = 6.0
+																6.0*P/6.0 + left_endp_est
+										else --N >= 7.0
+											if id = 1.0 then 
+												1.0*P/7.0 + left_endp_est
+											else 
+												if id = 2.0 then
+													2.0*P/7.0 + left_endp_est
+												else 
+													if id = 3.0 then
+														3.0*P/7.0 + left_endp_est
+													else 
+														if id = 4.0 then
+															4.0*P/7.0 + left_endp_est
+														else 
+															if id = 5.0 then
+																5.0*P/7.0 + left_endp_est
+															else 
+																if id = 6.0 then
+																	6.0*P/7.0 + left_endp_est
+																else --id = 7.0
+																	7.0*P/7.0 + left_endp_est;				
 		
 			--Previous direction
 			eq pre_direction : DPSS_Data_Types::Direction_Type = 
@@ -237,12 +348,45 @@ public
 										left_endp_est 
 				); 
 						
+			guarantee "pre_numLeft is pre(numLeft) after the initial timestep":
+				true -> pre_numLeft = pre(numLeft);
+			
+			guarantee "pre_numRight is pre(numRight) after the initial timestep":
+				true -> pre_numRight = pre(numRight);
+		
+			guarantee "pre_numLeft initial value restrictions":
+				DPSS_Node_Lib.initial_value_true(
+								pre_numLeft = 0.0 
+							or	pre_numLeft = 1.0
+						--	or 	pre_numLeft = 2.0
+						--	or 	pre_numLeft = 3.0
+				);
+				
+			guarantee "pre_numRight initial value restrictions":
+				DPSS_Node_Lib.initial_value_true(
+								pre_numRight = 0.0 
+							or	pre_numRight = 1.0
+						--	or 	pre_numRight = 2.0
+						--	or 	pre_numRight = 3.0
+				);
 		
 			guarantee "numLeft formula":
-				numLeft = if meet_LN then numLeft_LN + 1.0 else pre_numLeft;
+				numLeft = 	if meet_LN then 
+								numLeft_LN + 1.0 
+						 	else 
+						 		if reach_left_endp_truth then
+						 			0.0
+						 		else 
+						  			pre_numLeft;
 				
 			guarantee "numRight formula":
-				numRight = if meet_RN then numRight_RN + 1.0 else pre_numRight;
+				numRight = 	if meet_RN then 
+								numRight_RN + 1.0 
+							else 
+								if reach_right_endp_truth then
+									0.0
+								else
+									pre_numRight;				
 			
 			guarantee "perimRight formula":
 				perimRight = if meet_RN then 
