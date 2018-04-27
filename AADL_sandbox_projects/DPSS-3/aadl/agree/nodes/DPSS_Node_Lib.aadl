@@ -81,5 +81,47 @@ public
 	
 	tel;
 	
+	node after(a:bool) returns (out: bool);
+	var
+		pre_state : int;
+		state : int;
+	let
+		pre_state = prev(state, 0);
+		
+		state = 
+			if a
+			then 1
+			else pre_state;
+		
+		out = (state = 1);
+		
+	tel;
+	
+	node after_seq(a:bool, b:bool) returns (out : bool);
+	var
+		pre_state : int;
+		state : int;
+	let
+		pre_state = prev(state, 0);
+		
+		state = 
+			if (pre_state = 0) then
+				if a then
+					1
+				else
+					0
+			else
+				if (pre_state = 1) then
+					if b then
+						2
+					else 
+						1
+				else --pre_state = 2 then
+					2;
+		
+		out = (state = 2);
+		
+	tel;
+	
 	**};
 end DPSS_Node_Lib;
