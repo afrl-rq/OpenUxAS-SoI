@@ -1175,12 +1175,12 @@ namespace uxas
 							maxTime_ms = m_tasksToTime->at(taskId)[0].at(0).at(2);
 						}
 					}
-					//Make sure the new task doesn't get started before the prerequisite cost
-					if ((prerequisiteTime_ms > 0) && (travelTimeTotalToBegin_ms < prerequisiteTime_ms))
-					{
-						travelTime_ms += prerequisiteTime_ms;
-					}
 
+                    //Recalculate node costs
+					travelTime_ms += prerequisiteTime_ms;
+                    travelTimeTotalToBegin_ms += prerequisiteTime_ms;
+                    travelTimeTotalToEnd_ms += prerequisiteTime_ms;
+                    
 					//Don't assign task if its completion time is greater than our maximum allowable
 					if (((travelTimeTotalToEnd_ms < maxTime_ms) || (maxTime_ms == -1)) && !isError) //TODO: split out isError into another "if." See next comment
 					{
