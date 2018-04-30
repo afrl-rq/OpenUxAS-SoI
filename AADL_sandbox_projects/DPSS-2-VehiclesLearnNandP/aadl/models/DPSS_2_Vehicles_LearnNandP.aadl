@@ -227,7 +227,7 @@ public
 				and pos_UAV2 = initial_pos_UAV2
 				) -> true;
 
--- Can only guarantee goals are in bounds if the config parameters are initialized to 0.			
+			-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.			
 --			guarantee "Goals are in bounds":
 --				--Goals are >= LEFT_ENDP_TRUTH
 --					goal_UAV1 >= LEFT_ENDP_TRUTH
@@ -346,7 +346,7 @@ public
 			
 			--Expected number of steps it takes to converge to the stable configuration
 --			eq steps_to_converge : int = 11; --This is the case when perimRight, perimLeft, numLeft, and numRight for the UAVs are initialized to 0.0 (unless meeting neighbors)
---			eq steps_to_converge : int = 13; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
+--			eq steps_to_converge : int = 13; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them), and where numLeft and numRight are initialized to 0.0 (unless meeting neighbors)
 			eq steps_to_converge : int = 14; --This is the case when perimRight and perimLeft are initially unrestricted, and where numLeft and numRight are initially in the set {0,1,2,3}
 			
 			----------------------------------------------------------------------------
