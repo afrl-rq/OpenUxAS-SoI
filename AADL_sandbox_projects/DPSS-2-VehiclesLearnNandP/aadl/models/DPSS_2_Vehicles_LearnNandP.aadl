@@ -347,6 +347,7 @@ public
 			--Expected number of steps it takes to converge to the stable configuration
 --			eq steps_to_converge : int = 11; --This is the case when perimRight, perimLeft, numLeft, and numRight for the UAVs are initialized to 0.0 (unless meeting neighbors)
 --			eq steps_to_converge : int = 13; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
+			eq steps_to_converge : int = 14; --This is the case when perimRight and perimLeft are initially unrestricted, and where numLeft and numRight are initially in the set {0,1,2,3}
 			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
@@ -388,8 +389,8 @@ public
 					and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0.0)
 				);
 								
---			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
---				steps = steps_to_converge - 1 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+				steps = steps_to_converge - 1 => stable;
 							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -421,20 +422,8 @@ public
 			lemma "Once the configuration paramters are stable, they stay stable.":
 				true -> pre(stable_config_params) => stable_config_params;
 													
---			lemma "Stable on and after steps_to_converge steps": 
---				steps >= steps_to_converge => stable;
-				
-			lemma "(Experimental) Stable on and after 13 steps": 
-				steps >= 13 => stable;
-
-			lemma "(Experimental) Stable on and after 14 steps": 
-				steps >= 14 => stable;
-				
---			lemma "(Experimental) Stable on and after 15 steps": 
---				steps >= 15 => stable;
---				
---			lemma "(Experimental) Stable on and after 16 steps": 
---				steps >= 16 => stable;
+			lemma "Stable on and after steps_to_converge steps": 
+				steps >= steps_to_converge => stable;
 													
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_real;
@@ -446,13 +435,13 @@ public
 					);
 
 			-- This is a good way to find the real time bound!	
-			-- Convergence time is < 3T when when perimRight and perimLeft for the UAVs are initialized to 0.0
+			-- Convergence time is < 3T when configuration parameters are initialized to 0.0
 --			lemma "Time to become stable is less than 3T":
 --				(stable and not (pre(stable))) => 
 --					(time < 3.0*T);
 
 			-- This is a good way to find the real time bound!
-			--This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)	
+			--This is the case when perimRight and perimLeft are initially unrestricted, and where numLeft and numRight are initially in the set {0,1,2,3}
 			lemma "Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
 					(time < 4.0*T);
