@@ -491,21 +491,15 @@ public
 			lemma "UAV2's perimRight is nonnegative": UAV2.perimRight >= 0.0;
 			lemma "UAV3's perimRight is nonnegative": UAV3.perimRight >= 0.0;
 			
-			--UAV numLeft values are in the set 0, 1, ..., N + 2 (= (3 + (N-1))). This is case for flexible initial config parameters.
---			lemma "UAV1's numLeft is in the set 0, 1, ..., N + 2": UAV1.numLeft = 0.0 or UAV1.numLeft = 1.0 or UAV1.numLeft = 2.0 or UAV1.numLeft = 3.0 or UAV1.numLeft = 4.0 or UAV1.numLeft = 5.0;
---			lemma "UAV2's numLeft is in the set 0, 1, ..., N + 2": UAV2.numLeft = 0.0 or UAV2.numLeft = 1.0 or UAV2.numLeft = 2.0 or UAV2.numLeft = 3.0 or UAV2.numLeft = 4.0 or UAV2.numLeft = 5.0;
-			
-			--UAV numRight values are in the set 0, 1, ..., N + 2 (= (3 + (N-1))). This is case for flexible initial config parameters.
---			lemma "UAV1's numRight is in the set 0, 1, ..., N + 2": UAV1.numRight = 0.0 or UAV1.numRight = 1.0 or UAV1.numRight = 2.0 or UAV1.numRight = 3.0 or UAV1.numRight = 4.0  or UAV1.numRight = 5.0;
---			lemma "UAV2's numRight is in the set 0, 1, ..., N + 2": UAV2.numRight = 0.0 or UAV2.numRight = 1.0 or UAV2.numRight = 2.0 or UAV2.numRight = 3.0 or UAV2.numRight = 4.0  or UAV2.numRight = 5.0;
-
 			--UAV numLeft values are in the set 0, 1, ..., N - 1. This is the case when the configuration parameters are initialized to 0.
 			lemma "UAV1's numLeft is in the set 0, 1, ..., N - 1": UAV1.numLeft = 0.0 or UAV1.numLeft = 1.0 or UAV1.numLeft = 2.0;
 			lemma "UAV2's numLeft is in the set 0, 1, ..., N - 1": UAV2.numLeft = 0.0 or UAV2.numLeft = 1.0 or UAV2.numLeft = 2.0;
+			lemma "UAV3's numLeft is in the set 0, 1, ..., N - 1": UAV3.numLeft = 0.0 or UAV3.numLeft = 1.0 or UAV3.numLeft = 2.0;
 
 			--UAV numRight values are in the set 0, 1, ..., N - 1. This is the case when the configuration parameters are initialized to 0.
 			lemma "UAV1's numRight is in the set 0, 1, ..., N - 1": UAV1.numRight = 0.0 or UAV1.numRight = 1.0 or UAV1.numRight = 2.0;
 			lemma "UAV2's numRight is in the set 0, 1, ..., N - 1": UAV2.numRight = 0.0 or UAV2.numRight = 1.0 or UAV2.numRight = 2.0;
+			lemma "UAV3's numRight is in the set 0, 1, ..., N - 1": UAV3.numRight = 0.0 or UAV3.numRight = 1.0 or UAV3.numRight = 2.0;
 			
 			lemma "Once stable, stays stable (here 'stable' includes stability of the configuration parameters":
 				true -> pre(stable)	=> stable;
