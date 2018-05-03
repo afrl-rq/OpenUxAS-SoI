@@ -347,7 +347,7 @@ public
 			--Expected number of steps it takes to converge to the stable configuration
 --			eq steps_to_converge : int = 11; --This is the case when perimRight, perimLeft, numLeft, and numRight for the UAVs are initialized to 0.0 (unless meeting neighbors)
 --			eq steps_to_converge : int = 13; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them), and where numLeft and numRight are initialized to 0.0 (unless meeting neighbors)
-			eq steps_to_converge : int = 14; --This is the case when perimRight and perimLeft are initially unrestricted, and where numLeft and numRight are initially in the set {0,1,2,3}
+--			eq steps_to_converge : int = 14; --This is the case when perimRight and perimLeft are initially unrestricted, and where numLeft and numRight are initially in the set {0,1,2,3}
 			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
@@ -389,8 +389,11 @@ public
 					and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0.0)
 				);
 								
-			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
-				steps = steps_to_converge - 1 => stable;
+--			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+--				steps = steps_to_converge - 1 => stable;
+
+			lemma "Observer: Worst steps convergence (not yet stable after 13 steps)":
+				steps = 13 => stable;
 							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -422,8 +425,11 @@ public
 			lemma "Once the configuration paramters are stable, they stay stable.":
 				true -> pre(stable_config_params) => stable_config_params;
 													
-			lemma "Stable on and after steps_to_converge steps": 
-				steps >= steps_to_converge => stable;
+--			lemma "Stable on and after steps_to_converge steps": 
+--				steps >= steps_to_converge => stable;
+
+			lemma "Stable on and after 14 steps": 
+				steps >= 14 => stable;
 													
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_real;

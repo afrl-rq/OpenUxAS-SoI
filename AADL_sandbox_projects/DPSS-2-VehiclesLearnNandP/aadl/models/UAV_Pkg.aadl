@@ -39,11 +39,11 @@ public
 
 			--Previous numLeft
 --			eq pre_numLeft : real = prev(numLeft, 0.0);
-			eq pre_numLeft : real; --See guarantee for restrictions on pre_numLeft
+			eq pre_numLeft : real; --See guarantees for restrictions on pre_numLeft
 			
 			--Previous numRight
 --			eq pre_numRight : real = prev(numRight, 0.0);
-			eq pre_numRight : real; --See guarantee for restrictions on pre_numRight
+			eq pre_numRight : real; --See guarantees for restrictions on pre_numRight
 			
 			--Previous perimRight
 --			eq pre_perimRight : real = prev(perimRight, 0.0);
