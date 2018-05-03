@@ -37,7 +37,7 @@ public
 			const LEFT_ENDP_TRUTH  : real = 0.0;
 			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
 			const T : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
-			const N_real : real = 2.0;
+			const N_TRUTH : real = 2.0;
 
 			-----------------------------------------------------
 			--EQ (STATE) VARIABLES
@@ -69,7 +69,7 @@ public
 			
 			--Shared border positions
 			eq S_12 : DPSS_Data_Types::Position_Type = 
-				1.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;
+				1.0*P_TRUTH/N_TRUTH + LEFT_ENDP_TRUTH;
 				  		
 			--Previous positions
 			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
@@ -216,8 +216,8 @@ public
 			
 			-- Main Theorem			
 			guarantee "Theorem 2 for Algorithm B for 2 Vehicles":
-				(time >= ((5.0*N_real - 1.0)/N_real)*T) =>
-					(stable	and deltaT = T/N_real);
+				(time >= ((5.0*N_TRUTH - 1.0)/N_TRUTH)*T) =>
+					(stable	and deltaT = T/N_TRUTH);
 			
 			guarantee "deltaT is positive":
 				true -> deltaT > 0.0;
@@ -432,7 +432,7 @@ public
 				steps >= 14 => stable;
 													
 			lemma "Stable implies deltaT = T/N":
-				stable => deltaT = T/N_real;
+				stable => deltaT = T/N_TRUTH;
 			
 			lemma "deltaT is between 0 and T":
 				true -> (
