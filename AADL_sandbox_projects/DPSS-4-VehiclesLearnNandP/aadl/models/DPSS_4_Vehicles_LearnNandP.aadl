@@ -43,7 +43,7 @@ public
 			const LEFT_ENDP_TRUTH  : real = 0.0;
 			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
 			const T : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
-			const N_real : real = 4.0; --Number of vehicles
+			const N_TRUTH : real = 4.0; --Number of vehicles
 
 			-----------------------------------------------------
 			--EQ (STATE) VARIABLES
@@ -61,10 +61,34 @@ public
 			eq goal_UAV3 : DPSS_Data_Types::Position_Type;
 			eq goal_UAV4 : DPSS_Data_Types::Position_Type;
 			
+			--numLefts
+			eq numLeft_UAV1 : real;
+			eq numLeft_UAV2 : real;
+			eq numLeft_UAV3 : real;
+			eq numLeft_UAV4 : real;
+			
+			--numRights
+			eq numRight_UAV1 : real;
+			eq numRight_UAV2 : real; 
+			eq numRight_UAV3 : real;
+			eq numRight_UAV4 : real;
+			
+			--perimLefts
+			eq perimLeft_UAV1 : real;
+			eq perimLeft_UAV2 : real;
+			eq perimLeft_UAV3 : real;
+			eq perimLeft_UAV4 : real;
+			
+			--perimRights
+			eq perimRight_UAV1 : real;
+			eq perimRight_UAV2 : real;
+			eq perimRight_UAV3 : real;
+			eq perimRight_UAV4 : real;
+			
 			--Shared border positions
-			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;  
-			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;
-			eq S_34 : DPSS_Data_Types::Position_Type = 3.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;
+			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*P_TRUTH/N_TRUTH + LEFT_ENDP_TRUTH;  
+			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*P_TRUTH/N_TRUTH + LEFT_ENDP_TRUTH;
+			eq S_34 : DPSS_Data_Types::Position_Type = 3.0*P_TRUTH/N_TRUTH + LEFT_ENDP_TRUTH;
 			
 			--Previous positions
 			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
@@ -168,8 +192,36 @@ public
 							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_23,
 														time_to_reach_neighbor_34))))))));
 			
+			--Configuration parameters have converged
+			eq stable_config_params : bool =
+					--numLefts have converged
+						numLeft_UAV1 = 0.0
+					and numLeft_UAV2 = 1.0
+					and numLeft_UAV3 = 2.0
+					and numLeft_UAV3 = 3.0
+					--numRights have converged
+					and numRight_UAV1 = 3.0
+					and numRight_UAV2 = 2.0
+					and numRight_UAV3 = 1.0
+					and numRight_UAV4 = 0.0
+					--perimLefts have converged
+					and perimLeft_UAV1 = pos_UAV1 - LEFT_ENDP_TRUTH
+					and perimLeft_UAV2 = pos_UAV2 - LEFT_ENDP_TRUTH
+					and perimLeft_UAV3 = pos_UAV3 - LEFT_ENDP_TRUTH
+					and perimLeft_UAV4 = pos_UAV4 - LEFT_ENDP_TRUTH
+					--perimRights have converged
+					and perimRight_UAV1 = RIGHT_ENDP_TRUTH - pos_UAV1
+					and perimRight_UAV2 = RIGHT_ENDP_TRUTH - pos_UAV2
+					and perimRight_UAV3 = RIGHT_ENDP_TRUTH - pos_UAV3
+					and perimRight_UAV4 = RIGHT_ENDP_TRUTH - pos_UAV4; 
+			
+			
 			eq stable : bool = 
-				--Either
+				--Configuration parameters have converged
+				stable_config_params
+				--and
+				and (
+				--either
 				(	--the UAVs are at LEFT_ENDP_TRUTH, S_23, S_23, and RIGHT_ENDP_TRUTH, respectively
 					(
 						pos_UAV1 = LEFT_ENDP_TRUTH and 
@@ -200,7 +252,7 @@ public
 						pre_pos_UAV3 = S_23 and
 						pre_pos_UAV4 = RIGHT_ENDP_TRUTH
 					)
-				);
+				));
 						
 			-----------------------------------------------------
 			--ASSUMPTIONS
@@ -254,8 +306,8 @@ public
 			
 			-- Main Theorem			
 			guarantee "Theorem 2 for Algorithm B for 4 Vehicles":
-				(time >= ((5.0*N_real - 1.0)/N_real)*T) =>
-					(stable	and deltaT = T/N_real);
+				(time >= ((5.0*N_TRUTH - 1.0)/N_TRUTH)*T) =>
+					(stable	and deltaT = T/N_TRUTH);
 			
 			guarantee "deltaT is positive":
 				true -> deltaT > 0.0;
@@ -373,6 +425,30 @@ public
 			assign goal_UAV2 = UAV2.goal;
 			assign goal_UAV3 = UAV3.goal;			
 			assign goal_UAV4 = UAV4.goal;			
+
+			--Assign numLeft variables (used at the system level)
+			assign numLeft_UAV1 = UAV1.numLeft;
+			assign numLeft_UAV2 = UAV2.numLeft;
+			assign numLeft_UAV3 = UAV3.numLeft;
+			assign numLeft_UAV4 = UAV4.numLeft;
+			
+			--Assign numRight variables (used at the system level)
+			assign numRight_UAV1 = UAV1.numRight;
+			assign numRight_UAV2 = UAV2.numRight;
+			assign numRight_UAV3 = UAV3.numRight;
+			assign numRight_UAV4 = UAV4.numRight;
+			
+			--Assign perimLeft variables (used at the system level)
+			assign perimLeft_UAV1 = UAV1.perimLeft;
+			assign perimLeft_UAV2 = UAV2.perimLeft;
+			assign perimLeft_UAV3 = UAV3.perimLeft;
+			assign perimLeft_UAV4 = UAV4.perimLeft;
+
+			--Assign perimRight variables (used at the system level)
+			assign perimRight_UAV1 = UAV1.perimRight;
+			assign perimRight_UAV2 = UAV2.perimRight;
+			assign perimRight_UAV3 = UAV3.perimRight;
+			assign perimRight_UAV4 = UAV4.perimRight;
 			
 			--Assign positions
 			assign pos_UAV1 = (initial_pos_UAV1 -> (if pre_direction_UAV1 = 1 then pre_pos_UAV1 + DPSS_Constants.V*(time - pre(time)) else pre_pos_UAV1 - DPSS_Constants.V*(time - pre(time))));
@@ -414,10 +490,8 @@ public
 			eq steps : int = 1 -> pre(steps + 1);
 			
 			--Expected number of steps it takes to converge to the stable configuration
-			--These are conjectures for now (have not run analysis yet as of 4/20/18 at 14:43 PM Central)
-			eq steps_to_converge : int = 31; --This is the case when perimRight and perimLeft for the UAVs are initialized to 0.0
-			--eq steps_to_converge : int = 33; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
-			
+--			eq steps_to_converge : int = ?;
+						
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
 			----------------------------------------------------------------------------
@@ -437,6 +511,15 @@ public
 					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01)
 					--and UAVN startS out thinking there is no perimeter to its right
 					and DPSS_Node_Lib.initial_value_true(UAV4.perimRight = 0.0)
+					--and each UAV starts out thinking it is the only one
+					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0.0) 
+					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV4.numLeft = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV4.numRight = 0.0)
 				);
 
 			lemma "Observer: Worst time (nearly 4T) convergence":
@@ -454,10 +537,19 @@ public
 					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = LEFT_ENDP_TRUTH + 0.04)
 					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
 					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
+					--and each UAV starts out thinking it is the only one
+					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0.0) 
+					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV4.numLeft = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV4.numRight = 0.0)
 				);
 								
-			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
-				steps = steps_to_converge - 1 => stable;
+--			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
+--				steps = steps_to_converge - 1 => stable;
 			
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -481,14 +573,32 @@ public
 			lemma "UAV3's perimRight is nonnegative": UAV3.perimRight >= 0.0;
 			lemma "UAV4's perimRight is nonnegative": UAV4.perimRight >= 0.0;
 			
-			lemma "Once stable, stays stable":
+			--UAV numLeft values are in the set 0, 1, ..., N + 2 (= (3 + (N-1)))
+			lemma "UAV1's numLeft is in the set 0, 1, ..., N + 2": UAV1.numLeft = 0.0 or UAV1.numLeft = 1.0 or UAV1.numLeft = 2.0 or UAV1.numLeft = 3.0 or UAV1.numLeft = 4.0 or UAV1.numLeft = 5.0 or UAV1.numLeft = 6.0;
+			lemma "UAV2's numLeft is in the set 0, 1, ..., N + 2": UAV2.numLeft = 0.0 or UAV2.numLeft = 1.0 or UAV2.numLeft = 2.0 or UAV2.numLeft = 3.0 or UAV2.numLeft = 4.0 or UAV2.numLeft = 5.0 or UAV2.numLeft = 6.0;
+			lemma "UAV3's numLeft is in the set 0, 1, ..., N + 2": UAV3.numLeft = 0.0 or UAV3.numLeft = 1.0 or UAV3.numLeft = 2.0 or UAV3.numLeft = 3.0 or UAV3.numLeft = 4.0 or UAV3.numLeft = 5.0 or UAV3.numLeft = 6.0;
+			lemma "UAV4's numLeft is in the set 0, 1, ..., N + 2": UAV4.numLeft = 0.0 or UAV4.numLeft = 1.0 or UAV4.numLeft = 2.0 or UAV4.numLeft = 3.0 or UAV4.numLeft = 4.0 or UAV4.numLeft = 5.0 or UAV4.numLeft = 6.0;
+			
+			--UAV numRight values are in the set 0, 1, ..., N + 2 
+			lemma "UAV1's numRight is in the set 0, 1, ..., N + 2": UAV1.numRight = 0.0 or UAV1.numRight = 1.0 or UAV1.numRight = 2.0 or UAV1.numRight = 3.0 or UAV1.numRight = 4.0 or UAV1.numRight = 5.0 or UAV1.numRight = 6.0;
+			lemma "UAV2's numRight is in the set 0, 1, ..., N + 2": UAV2.numRight = 0.0 or UAV2.numRight = 1.0 or UAV2.numRight = 2.0 or UAV2.numRight = 3.0 or UAV2.numRight = 4.0 or UAV2.numRight = 5.0 or UAV2.numRight = 6.0;
+			lemma "UAV3's numRight is in the set 0, 1, ..., N + 2": UAV3.numRight = 0.0 or UAV3.numRight = 1.0 or UAV3.numRight = 2.0 or UAV3.numRight = 3.0 or UAV3.numRight = 4.0 or UAV3.numRight = 5.0 or UAV3.numRight = 6.0;
+			lemma "UAV4's numRight is in the set 0, 1, ..., N + 2": UAV4.numRight = 0.0 or UAV4.numRight = 1.0 or UAV4.numRight = 2.0 or UAV4.numRight = 3.0 or UAV4.numRight = 4.0 or UAV4.numRight = 5.0 or UAV4.numRight = 6.0;
+			
+			lemma "Once stable, stays stable (here 'stable' includes stability of the configuration parameters":
 				true -> pre(stable)	=> stable;
+				
+			lemma "Once the configuration paramters are stable, they stay stable.":
+				true -> pre(stable_config_params) => stable_config_params;
 					
-			lemma "Stable on and after steps_to_converge steps":
-				steps >= steps_to_converge => stable;	
+--			lemma "Stable on and after steps_to_converge steps":
+--				steps >= steps_to_converge => stable;	
+
+			lemma "(Experimental) Stable on and after 30 steps":
+				steps >= 30 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
-				stable => deltaT = T/N_real;
+				stable => deltaT = T/N_TRUTH;
 			
 			lemma "deltaT is between 0 and T":
 				true -> (
@@ -497,17 +607,21 @@ public
 					);
 
 			-- This is a good way to find the real time bound!	
-			-- Convergence time is < 3T when when perimRight and perimLeft for the UAVs are initialized to 0.0
-			lemma "Time to become stable is less than 3T":
-				(stable and not (pre(stable))) => 
-					(time < 3.0*T);
+			-- Convergence time is < 3T when configuration parameters are initialized to 0.0
+--			lemma "Time to become stable is less than 3T":
+--				(stable and not (pre(stable))) => 
+--					(time < 3.0*T);
 
 			-- This is a good way to find the real time bound!
-			--This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)	
---			lemma "Time to become stable is less than 4T":
---				(stable and not (pre(stable))) => 
---					(time < 4.0*T);
+			--This is the case when perimRight and perimLeft are initially unrestricted, and where numLeft and numRight are initially in the set {0,1,2,3}	
+			lemma "Time to become stable is less than 4T":
+				(stable and not (pre(stable))) => 
+					(time < 4.0*T);
 			
+			lemma "Time for configuration parameters to converge is less than 3T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time < 3.0*T);
+
 		**};
 		
 	end DPSS_4_Vehicles_LearnNandP.Impl;
