@@ -38,20 +38,20 @@ public
 			eq reach_left_endp_truth : 	bool = (pos <= left_endp_truth); 
 
 			--Previous numLeft
-			eq pre_numLeft : real = prev(numLeft, 0.0);
---			eq pre_numLeft : real = pre(numLeft);
+--			eq pre_numLeft : real = prev(numLeft, 0.0);
+			eq pre_numLeft : real; --See guarantees for restrictions on pre_numLeft
 			
 			--Previous numRight
-			eq pre_numRight : real = prev(numRight, 0.0);
---			eq pre_numRight : real = pre(numRight);
+--			eq pre_numRight : real = prev(numRight, 0.0);
+			eq pre_numRight : real; --See guarantees for restrictions on pre_numRight
 			
 			--Previous perimRight
-			eq pre_perimRight : real = prev(perimRight, 0.0);
---			eq pre_perimRight : real = pre(perimRight);
+--			eq pre_perimRight : real = prev(perimRight, 0.0);
+			eq pre_perimRight : real = pre(perimRight);
 			
 			--Previous perimLeft
-			eq pre_perimLeft : real = prev(perimLeft, 0.0);			
---			eq pre_perimLeft : real = pre(perimLeft);
+--			eq pre_perimLeft : real = prev(perimLeft, 0.0);			
+			eq pre_perimLeft : real = pre(perimLeft);
 			
 			--ID (will change during execution as this UAV meets its neighbors)
 			eq id : real = numLeft + 1.0;
@@ -68,74 +68,93 @@ public
 				
 			eq right_endp_est : DPSS_Data_Types::Position_Type = 
 				pos + perimRight;
-				
-			--Shared border positions
---			eq S_L : DPSS_Data_Types::Position_Type = 
---				(id - 1.0)*DPSS_Constants.P_TRUTH/N + DPSS_Constants.LEFT_ENDP_TRUTH;  
---			eq S_R : DPSS_Data_Types::Position_Type = 
---				id*DPSS_Constants.P_TRUTH/N + DPSS_Constants.LEFT_ENDP_TRUTH;	
-	
-			--Shared border positions -- LINEARIZED BOTH N and id. ASSUMES N <= 4 and 1 <= id <= N.						
-			eq S_L : DPSS_Data_Types::Position_Type =
-				if N = 1.0 then 
-					0.0*P/1.0 + left_endp_est
-				else 
-					if N = 2.0 then
-						if id = 1.0 then 
-							0.0*P/2.0 + left_endp_est
-						else --id = 2.0 
-							1.0*P/2.0 + left_endp_est
-					else
-						if N = 3.0 then
-							if id = 1.0 then 
-								0.0*P/3.0 + left_endp_est
+
+			--Assumes 1 <= id <= 13 (which should be the case for 1 <= N_TRUTH <= 4 since numLeft and numRight will be in the range 0, 1, ..., N_TRUTH + 2)	
+			eq id_lin : real = 
+				if id = 1.0 then
+					1.0
+				else
+					if id = 2.0 then
+						2.0
+					else 
+						if id = 3.0 then
+							3.0
+						else
+							if id = 4.0 then
+								4.0
 							else 
-								if id = 2.0 then
-									1.0*P/3.0 + left_endp_est
-								else --id = 3.0
-									2.0*P/3.0 + left_endp_est
-						else --N >= 4.0
-							if id = 1.0 then 
-								0.0*P/4.0 + left_endp_est
-							else 
-								if id = 2.0 then
-									1.0*P/4.0 + left_endp_est
-								else 
-									if id = 3.0 then
-										2.0*P/4.0 + left_endp_est
-									else --id = 4.0
-										3.0*P/4.0 + left_endp_est;
+								if id = 5.0 then
+									5.0
+								else
+									if id = 6.0 then
+										6.0
+									else 
+										if id = 7.0 then
+											7.0
+										else
+											if id = 8.0 then
+												8.0
+											else
+												if id = 9.0 then
+													9.0
+												else 
+													if id = 10.0 then
+														10.0
+													else
+														if id = 11.0 then
+															11.0
+														else 
+															if id = 12.0 then
+																12.0
+															else
+																13.0; 
 			
-			eq S_R : DPSS_Data_Types::Position_Type =
-				if N = 1.0 then 
-					1.0*P/1.0 + left_endp_est
+			--Assumes 1 <= N <= 13 (which should be the case for 1 <= N_TRUTH <= 4 since numLeft and numRight will be in the range 0, 1, ..., N_TRUTH + 2)			
+			eq N_lin : real = 
+				if N = 1.0 then
+					1.0
 				else 
 					if N = 2.0 then
-						if id = 1.0 then 
-							1.0*P/2.0 + left_endp_est
-						else --id = 2.0 
-							2.0*P/2.0 + left_endp_est
-					else
+						2.0
+					else 
 						if N = 3.0 then
-							if id = 1.0 then 
-								1.0*P/3.0 + left_endp_est
+							3.0
+						else
+							if N = 4.0 then
+								4.0
 							else 
-								if id = 2.0 then
-									2.0*P/3.0 + left_endp_est
-								else --id = 3.0
-									3.0*P/3.0 + left_endp_est
-						else --N >= 4.0
-							if id = 1.0 then 
-								1.0*P/4.0 + left_endp_est
-							else 
-								if id = 2.0 then
-									2.0*P/4.0 + left_endp_est
-								else 
-									if id = 3.0 then
-										3.0*P/4.0 + left_endp_est
-									else --id = 4.0
-										4.0*P/4.0 + left_endp_est;						
-		
+								if N = 5.0 then
+									5.0
+								else
+									if N = 6.0 then
+										6.0
+									else
+										if N = 7.0 then
+											7.0
+										else
+											if N = 8.0 then
+												8.0
+											else
+												if N = 9.0 then
+													9.0
+												else 
+													if N = 10.0 then
+														10.0
+													else
+														if N = 11.0 then
+															11.0
+														else 
+															if N = 12.0 then
+																12.0
+															else
+																13.0; 
+				
+			--Shared border positions (using linearized formulas for N and id)
+			eq S_L : DPSS_Data_Types::Position_Type = 
+				(id_lin - 1.0)*P/N_lin + left_endp_est;  
+			eq S_R : DPSS_Data_Types::Position_Type = 
+				id_lin*P/N_lin + left_endp_est;	
+					
 			--Previous direction
 			eq pre_direction : DPSS_Data_Types::Direction_Type = 
 				prev(direction, suggested_initial_direction);
@@ -161,12 +180,6 @@ public
 				(	   suggested_initial_direction = DPSS_Constants.LEFT
 					or suggested_initial_direction = DPSS_Constants.RIGHT)
 				-> true;
-			
---			assume "perimRight_RN is nonnegative":
---				meet_RN => (perimRight_RN >= 0.0);	
---			
---			assume "perimLeft_LN is nonnegative":
---				meet_LN => (perimLeft_LN >= 0.0);	
 			
 			-----------------------------------------------------
 			--GUARANTEES
@@ -237,12 +250,47 @@ public
 										left_endp_est 
 				); 
 						
+			guarantee "pre_numLeft is pre(numLeft) after the initial timestep":
+				true -> pre_numLeft = pre(numLeft);
+			
+			guarantee "pre_numRight is pre(numRight) after the initial timestep":
+				true -> pre_numRight = pre(numRight);
+
+			--We allow the initial value of pre_numLeft to range from 0 to 3 (We're assuming no more than 4 vehicles since our linearized formulas only support up to 4 vehicles)	
+			guarantee "pre_numLeft initial value restrictions":
+				DPSS_Node_Lib.initial_value_true(
+								pre_numLeft = 0.0 
+							or	pre_numLeft = 1.0
+							or 	pre_numLeft = 2.0
+							or 	pre_numLeft = 3.0
+				);
+			
+			--We allow the initial value of pre_numRight to range from 0 to 3 (We're assuming no more than 4 vehicles since our linearized formulas only support up to 4 vehicles)	
+			guarantee "pre_numRight initial value restrictions":
+				DPSS_Node_Lib.initial_value_true(
+								pre_numRight = 0.0 
+							or	pre_numRight = 1.0
+							or 	pre_numRight = 2.0
+							or 	pre_numRight = 3.0
+				);
 		
 			guarantee "numLeft formula":
-				numLeft = if meet_LN then numLeft_LN + 1.0 else pre_numLeft;
+				numLeft = 	if meet_LN then 
+								numLeft_LN + 1.0 
+						 	else 
+						 		if reach_left_endp_truth then
+						 			0.0
+						 		else 
+						  			pre_numLeft;
 				
 			guarantee "numRight formula":
-				numRight = if meet_RN then numRight_RN + 1.0 else pre_numRight;
+				numRight = 	if meet_RN then 
+								numRight_RN + 1.0 
+							else 
+								if reach_right_endp_truth then
+									0.0
+								else
+									pre_numRight;				
 			
 			guarantee "perimRight formula":
 				perimRight = if meet_RN then 
@@ -267,10 +315,6 @@ public
 										DPSS_Node_Lib.max_real(0.0, pre_perimLeft + (pos - pre_pos))
 									else --pre_direction = -1
 										DPSS_Node_Lib.max_real(0.0, pre_perimLeft - (pre_pos - pos));
-			
---This could be a lemma in the higher level
---			guarantee "ID in range":
---				id >= 1 and id <= N;
 			
 		**};
 		

@@ -40,7 +40,7 @@ public
 			const LEFT_ENDP_TRUTH  : real = 0.0;
 			const P_TRUTH : real = RIGHT_ENDP_TRUTH - LEFT_ENDP_TRUTH;
 			const T : DPSS_Data_Types::Time_Type = P_TRUTH/DPSS_Constants.V;
-			const N_real : real = 3.0; --Number of vehicles
+			const N_TRUTH : real = 3.0; --Number of vehicles
 
 			-----------------------------------------------------
 			--EQ (STATE) VARIABLES
@@ -77,8 +77,8 @@ public
 			eq perimRight_UAV3 : real;
 			
 			--Shared border positions
-			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;  
-			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*P_TRUTH/N_real + LEFT_ENDP_TRUTH;
+			eq S_12 : DPSS_Data_Types::Position_Type = 1.0*P_TRUTH/N_TRUTH + LEFT_ENDP_TRUTH;  
+			eq S_23 : DPSS_Data_Types::Position_Type = 2.0*P_TRUTH/N_TRUTH + LEFT_ENDP_TRUTH;
 			
 			--Previous positions
 			eq pre_pos_UAV1 : DPSS_Data_Types::Position_Type = prev(pos_UAV1, initial_pos_UAV1);
@@ -260,8 +260,8 @@ public
 			
 			-- Main Theorem			
 			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
-				(time >= ((5.0*N_real - 1.0)/N_real)*T) =>
-					(stable	and deltaT = T/N_real);
+				(time >= ((5.0*N_TRUTH - 1.0)/N_TRUTH)*T) =>
+					(stable	and deltaT = T/N_TRUTH);
 			
 			guarantee "deltaT is positive":
 				true -> deltaT > 0.0;
@@ -272,15 +272,15 @@ public
 				and pos_UAV3 = initial_pos_UAV3) -> true;
 
 			-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.			
-			guarantee "Goals are in bounds":
-				--Goals are >= LEFT_ENDP_TRUTH
-					goal_UAV1 >= LEFT_ENDP_TRUTH
-				and goal_UAV2 >= LEFT_ENDP_TRUTH
-				and goal_UAV3 >= LEFT_ENDP_TRUTH
-				--and goals are <= RIGHT_ENDP_TRUTH
-				and goal_UAV1 <= RIGHT_ENDP_TRUTH
-				and goal_UAV2 <= RIGHT_ENDP_TRUTH
-				and goal_UAV3 <= RIGHT_ENDP_TRUTH;		
+--			guarantee "Goals are in bounds":
+--				--Goals are >= LEFT_ENDP_TRUTH
+--					goal_UAV1 >= LEFT_ENDP_TRUTH
+--				and goal_UAV2 >= LEFT_ENDP_TRUTH
+--				and goal_UAV3 >= LEFT_ENDP_TRUTH
+--				--and goals are <= RIGHT_ENDP_TRUTH
+--				and goal_UAV1 <= RIGHT_ENDP_TRUTH
+--				and goal_UAV2 <= RIGHT_ENDP_TRUTH
+--				and goal_UAV3 <= RIGHT_ENDP_TRUTH;		
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= LEFT_ENDP_TRUTH
@@ -416,9 +416,7 @@ public
 			eq steps : int = 1 -> pre(steps + 1);
 			
 			--Expected number of steps it takes to converge to the stable configuration
-			--These are conjectures for now (have not run analysis yet as of 4/20/18 at 14:43 PM Central)
-			--eq steps_to_converge : int = 21; --This is the case when perimRight and perimLeft for the UAVs are initialized to 0.0
-			--eq steps_to_converge : int = 23; --This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)
+			--eq steps_to_converge : int = 20; --This is the case when the config parameters are initialized to 0
 			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
@@ -490,15 +488,15 @@ public
 			lemma "UAV2's perimRight is nonnegative": UAV2.perimRight >= 0.0;
 			lemma "UAV3's perimRight is nonnegative": UAV3.perimRight >= 0.0;
 			
-			--UAV numLeft values are nonnegative
-			lemma "UAV1's numLeft is nonnegative": UAV1.numLeft >= 0.0;
-			lemma "UAV2's numLeft is nonnegative": UAV2.numLeft >= 0.0;
-			lemma "UAV3's numLeft is nonnegative": UAV3.numLeft >= 0.0;
+			--UAV numLeft values are in the set 0, 1, ..., N + 2 (= (3 + (N-1)))
+			lemma "UAV1's numLeft is in the set 0, 1, ..., N + 2": UAV1.numLeft = 0.0 or UAV1.numLeft = 1.0 or UAV1.numLeft = 2.0 or UAV1.numLeft = 3.0 or UAV1.numLeft = 4.0 or UAV1.numLeft = 5.0;
+			lemma "UAV2's numLeft is in the set 0, 1, ..., N + 2": UAV2.numLeft = 0.0 or UAV2.numLeft = 1.0 or UAV2.numLeft = 2.0 or UAV2.numLeft = 3.0 or UAV2.numLeft = 4.0 or UAV2.numLeft = 5.0;
+			lemma "UAV3's numLeft is in the set 0, 1, ..., N + 2": UAV3.numLeft = 0.0 or UAV3.numLeft = 1.0 or UAV3.numLeft = 2.0 or UAV3.numLeft = 3.0 or UAV3.numLeft = 4.0 or UAV3.numLeft = 5.0;
 			
-			--UAV numRight values are nonnegative
-			lemma "UAV1's numRight is nonnegative": UAV1.numRight >= 0.0;
-			lemma "UAV2's numRight is nonnegative": UAV2.numRight >= 0.0;
-			lemma "UAV3's numRight is nonnegative": UAV3.numRight >= 0.0;
+			--UAV numRight values are in the set 0, 1, ..., N + 2 
+			lemma "UAV1's numRight is in the set 0, 1, ..., N + 2": UAV1.numRight = 0.0 or UAV1.numRight = 1.0 or UAV1.numRight = 2.0 or UAV1.numRight = 3.0 or UAV1.numRight = 4.0 or UAV1.numRight = 5.0;
+			lemma "UAV2's numRight is in the set 0, 1, ..., N + 2": UAV2.numRight = 0.0 or UAV2.numRight = 1.0 or UAV2.numRight = 2.0 or UAV2.numRight = 3.0 or UAV2.numRight = 4.0 or UAV2.numRight = 5.0;
+			lemma "UAV3's numRight is in the set 0, 1, ..., N + 2": UAV3.numRight = 0.0 or UAV3.numRight = 1.0 or UAV3.numRight = 2.0 or UAV3.numRight = 3.0 or UAV3.numRight = 4.0 or UAV3.numRight = 5.0;
 			
 			lemma "Once stable, stays stable (here 'stable' includes stability of the configuration parameters":
 				true -> pre(stable)	=> stable;
@@ -509,26 +507,32 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
 
-			lemma "(Experimental) Stable on and after 16 steps":
-				steps >= 16 => stable;
-
-			lemma "(Experimental) Stable on and after 17 steps":
-				steps >= 17 => stable;
-
-			lemma "(Experimental) Stable on and after 18 steps":
-				steps >= 18 => stable;
-
 			lemma "(Experimental) Stable on and after 19 steps":
 				steps >= 19 => stable;
 
 			lemma "(Experimental) Stable on and after 20 steps":
 				steps >= 20 => stable;
 
-			lemma "Stable on and after 21 steps":
+			lemma "(Experimental) Stable on and after 21 steps":
 				steps >= 21 => stable;
+
+			lemma "(Experimental) Stable on and after 22 steps":
+				steps >= 22 => stable;
+
+			lemma "(Experimental) Stable on and after 23 steps":
+				steps >= 23 => stable;
 			
+			lemma "(Experimental) Stable on and after 24 steps":
+				steps >= 24 => stable;
+				
+			lemma "(Experimental) Stable on and after 25 steps":
+				steps >= 25 => stable;
+
+			lemma "(Experimental) Stable on and after 26 steps":
+				steps >= 26 => stable;
+
 			lemma "Stable implies deltaT = T/N":
-				stable => deltaT = T/N_real;
+				stable => deltaT = T/N_TRUTH;
 			
 			lemma "deltaT is between 0 and T":
 				true -> (
@@ -538,15 +542,15 @@ public
 
 			-- This is a good way to find the real time bound!	
 			-- Convergence time is < 3T when when perimRight and perimLeft for the UAVs are initialized to 0.0
-			lemma "Time to become stable is less than 3T":
-				(stable and not (pre(stable))) => 
-					(time < 3.0*T);
+--			lemma "Time to become stable is less than 3T":
+--				(stable and not (pre(stable))) => 
+--					(time < 3.0*T);
 
 			-- This is a good way to find the real time bound!
 			--This is the case when perimRight and perimLeft are initially unrestricted (though subject to a >= 0 constraint by way of the formula to compute them)	
---			lemma "Time to become stable is less than 4T":
---				(stable and not (pre(stable))) => 
---					(time < 4.0*T);
+			lemma "Time to become stable is less than 4T":
+				(stable and not (pre(stable))) => 
+					(time < 4.0*T);
 
 			lemma "Time for configuration parameters to converge is less than 3T":
 				(stable_config_params and not (pre(stable_config_params))) => 
