@@ -1,11 +1,11 @@
-package DPSS_1_Vehicles_LearnNandP_Pkg
+package DPSS_1_Vehicles_LearnNandP_InitConfigTo0_Pkg
 public
 	with DPSS_Data_Types;
 	with DPSS_Node_Lib;
 	with DPSS_Constants;
 	with UAV_Pkg;
 	
-	system DPSS_1_Vehicles_LearnNandP
+	system DPSS_1_Vehicles_LearnNandP_InitConfigTo0
 		features
 			-----------------------------------------------------
 			--INPUTS
@@ -170,11 +170,11 @@ public
 				) -> true;
 				
 			-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.		
---			guarantee "Goals are in bounds":
---				--Goals are >= LEFT_ENDP_TRUTH
---					goal_UAV1 >= LEFT_ENDP_TRUTH
---				--and goals are <= RIGHT_ENDP_TRUTH
---				and goal_UAV1 <= RIGHT_ENDP_TRUTH;
+			guarantee "Goals are in bounds":
+				--Goals are >= LEFT_ENDP_TRUTH
+					goal_UAV1 >= LEFT_ENDP_TRUTH
+				--and goals are <= RIGHT_ENDP_TRUTH
+				and goal_UAV1 <= RIGHT_ENDP_TRUTH;
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= LEFT_ENDP_TRUTH
@@ -194,9 +194,9 @@ public
 			
 		**};
 		
-	end DPSS_1_Vehicles_LearnNandP;
+	end DPSS_1_Vehicles_LearnNandP_InitConfigTo0;
 
-	system implementation DPSS_1_Vehicles_LearnNandP.Impl
+	system implementation DPSS_1_Vehicles_LearnNandP_InitConfigTo0.Impl
 		subcomponents
 			UAV1: system UAV_Pkg::UAV;
 			
@@ -270,25 +270,25 @@ public
 					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0.0)
 				);
 
-			lemma "Observer: Worst time (nearly 4T) convergence":
-				not (
-					stable
-					--Initially, all UAVs are heading to the right
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
-					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
-					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
-					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0.0) 
-					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0.0)
-				);
+--			lemma "Observer: Worst time (nearly 4T) convergence":
+--				not (
+--					stable
+--					--Initially, all UAVs are heading to the right
+--					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+--					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
+--					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
+--					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
+--					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
+--					--and each UAV starts out thinking it is the only one
+--					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0.0) 
+--					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0.0)
+--				);
 								
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 
-			lemma "Observer: Worst steps convergence (not yet stable after 5 steps)":
-				steps = 5 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after 4 steps)":
+				steps = 4 => stable;
 							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -303,11 +303,11 @@ public
 			--UAV perimRight values are nonnegative
 			lemma "UAV1's perimRight is nonnegative": UAV1.perimRight >= 0.0;
 			
-			--UAV numLeft values are in the set 0, 1, ..., N + 2 (= (3 + (N-1)))
-			lemma "UAV1's numLeft is in the set 0, 1, ..., N + 2": UAV1.numLeft = 0.0 or UAV1.numLeft = 1.0 or UAV1.numLeft = 2.0 or UAV1.numLeft = 3.0;
-			
-			--UAV numRight values are in the set 0, 1, ..., N + 2 
-			lemma "UAV1's numRight is in the set 0, 1, ..., N + 2": UAV1.numRight = 0.0 or UAV1.numRight = 1.0 or UAV1.numRight = 2.0 or UAV1.numRight = 3.0;		
+			--UAV numLeft values are in the set 0, 1, ..., N - 1. This is the case when the configuration parameters are initialized to 0.
+			lemma "UAV1's numLeft is in the set 0, 1, ..., N - 1": UAV1.numLeft = 0.0;
+
+			--UAV numRight values are in the set 0, 1, ..., N - 1. This is the case when the configuration parameters are initialized to 0.
+			lemma "UAV1's numRight is in the set 0, 1, ..., N - 1": UAV1.numRight = 0.0;
 			
 			lemma "Once stable, stays stable (here 'stable' includes stability of the configuration parameters)":
 				true -> pre(stable)	=> stable;	
@@ -318,8 +318,8 @@ public
 --			lemma "Stable on and after steps_to_converge steps": 
 --				steps >= steps_to_converge => stable;
 
-			lemma "Stable on and after 6 steps": 
-				steps >= 6 => stable;
+			lemma "Stable on and after 5 steps": 
+				steps >= 5 => stable;
 																	
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_TRUTH;
@@ -348,6 +348,6 @@ public
 								
 		**};
 		
-	end DPSS_1_Vehicles_LearnNandP.Impl;
+	end DPSS_1_Vehicles_LearnNandP_InitConfigTo0.Impl;
 
-end DPSS_1_Vehicles_LearnNandP_Pkg;
+end DPSS_1_Vehicles_LearnNandP_InitConfigTo0_Pkg;
