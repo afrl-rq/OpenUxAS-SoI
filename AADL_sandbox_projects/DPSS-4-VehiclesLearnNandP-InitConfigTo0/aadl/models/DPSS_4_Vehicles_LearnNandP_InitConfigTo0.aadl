@@ -199,7 +199,7 @@ public
 						numLeft_UAV1 = 0
 					and numLeft_UAV2 = 1
 					and numLeft_UAV3 = 2
-					and numLeft_UAV3 = 3
+					and numLeft_UAV4 = 3
 					--numRights have converged
 					and numRight_UAV1 = 3
 					and numRight_UAV2 = 2
