@@ -169,13 +169,6 @@ public
 			guarantee "Initial positions are the input initial positions":
 				(	pos_UAV1 = initial_pos_UAV1
 				) -> true;
-				
-			-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.		
---			guarantee "Goals are in bounds":
---				--Goals are >= LEFT_ENDP_TRUTH
---					goal_UAV1 >= LEFT_ENDP_TRUTH
---				--and goals are <= RIGHT_ENDP_TRUTH
---				and goal_UAV1 <= RIGHT_ENDP_TRUTH;
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= LEFT_ENDP_TRUTH

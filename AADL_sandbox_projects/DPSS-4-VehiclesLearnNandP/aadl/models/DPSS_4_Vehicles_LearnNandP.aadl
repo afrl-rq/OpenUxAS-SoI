@@ -318,19 +318,6 @@ public
 				and pos_UAV2 = initial_pos_UAV2
 				and pos_UAV3 = initial_pos_UAV3
 				and pos_UAV4 = initial_pos_UAV4) -> true;
-
-			-- Can only guarantee goals are in bounds if the config parameters are initialized to 0.			
-			guarantee "Goals are in bounds":
-				--Goals are >= LEFT_ENDP_TRUTH
-					goal_UAV1 >= LEFT_ENDP_TRUTH
-				and goal_UAV2 >= LEFT_ENDP_TRUTH
-				and goal_UAV3 >= LEFT_ENDP_TRUTH
-				and goal_UAV4 >= LEFT_ENDP_TRUTH
-				--and goals are <= RIGHT_ENDP_TRUTH
-				and goal_UAV1 <= RIGHT_ENDP_TRUTH
-				and goal_UAV2 <= RIGHT_ENDP_TRUTH
-				and goal_UAV3 <= RIGHT_ENDP_TRUTH
-				and goal_UAV4 <= RIGHT_ENDP_TRUTH;		
 			
 			guarantee "Positions are in bounds":
 				--Positions are >= LEFT_ENDP_TRUTH
