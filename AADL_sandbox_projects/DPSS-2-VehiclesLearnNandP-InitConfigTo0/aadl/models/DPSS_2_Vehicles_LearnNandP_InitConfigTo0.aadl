@@ -52,12 +52,12 @@ public
 			eq goal_UAV2 : DPSS_Data_Types::Position_Type;
 			
 			--numLefts
-			eq numLeft_UAV1 : real;
-			eq numLeft_UAV2 : real;
+			eq numLeft_UAV1 : int;
+			eq numLeft_UAV2 : int;
 			
 			--numRights
-			eq numRight_UAV1 : real;
-			eq numRight_UAV2 : real; 
+			eq numRight_UAV1 : int;
+			eq numRight_UAV2 : int; 
 			
 			--perimLefts
 			eq perimLeft_UAV1 : real;
@@ -134,11 +134,11 @@ public
 			--Configuration parameters have converged
 			eq stable_config_params : bool =
 					--numLefts have converged
-						numLeft_UAV1 = 0.0
-					and numLeft_UAV2 = 1.0
+						numLeft_UAV1 = 0
+					and numLeft_UAV2 = 1
 					--numRights have converged
-					and numRight_UAV1 = 1.0
-					and numRight_UAV2 = 0.0
+					and numRight_UAV1 = 1
+					and numRight_UAV2 = 0
 					--perimLefts have converged
 					and perimLeft_UAV1 = pos_UAV1 - LEFT_ENDP_TRUTH
 					and perimLeft_UAV2 = pos_UAV2 - LEFT_ENDP_TRUTH
@@ -365,10 +365,10 @@ public
 					--and UAVN startS out thinking there is no perimeter to its right
 					and DPSS_Node_Lib.initial_value_true(UAV2.perimRight = 0.0)
 					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0.0) 
-					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0.0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0.0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0.0)
+					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) 
+					and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
+					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0)
+					and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0)
 				);
 -- This one converges in 3T when the config parameters are initialized to 0
 --			lemma "Observer: Worst time (nearly 4T) convergence":
@@ -420,12 +420,12 @@ public
 --			lemma "UAV2's numRight is in the set 0, 1, ..., N + 2": UAV2.numRight = 0.0 or UAV2.numRight = 1.0 or UAV2.numRight = 2.0 or UAV2.numRight = 3.0 or UAV2.numRight = 4.0;
 
 			--UAV numLeft values are in the set 0, 1, ..., N - 1. This is the case when the configuration parameters are initialized to 0.
-			lemma "UAV1's numLeft is in the set 0, 1, ..., N - 1": UAV1.numLeft = 0.0 or UAV1.numLeft = 1.0;
-			lemma "UAV2's numLeft is in the set 0, 1, ..., N - 1": UAV2.numLeft = 0.0 or UAV2.numLeft = 1.0;
+			lemma "UAV1's numLeft is in the set 0, 1, ..., N - 1": UAV1.numLeft >= 0 and UAV1.numLeft <= 1;
+			lemma "UAV2's numLeft is in the set 0, 1, ..., N - 1": UAV2.numLeft >= 0 and UAV2.numLeft <= 1;
 
 			--UAV numRight values are in the set 0, 1, ..., N - 1. This is the case when the configuration parameters are initialized to 0.
-			lemma "UAV1's numRight is in the set 0, 1, ..., N - 1": UAV1.numRight = 0.0 or UAV1.numRight = 1.0;
-			lemma "UAV2's numRight is in the set 0, 1, ..., N - 1": UAV2.numRight = 0.0 or UAV2.numRight = 1.0;
+			lemma "UAV1's numRight is in the set 0, 1, ..., N - 1": UAV1.numRight >= 0 or UAV1.numRight <= 1;
+			lemma "UAV2's numRight is in the set 0, 1, ..., N - 1": UAV2.numRight >= 0 or UAV2.numRight <= 1;
 			
 			lemma "Once stable, stays stable (here 'stable' includes stability of configuration parameters)":
 				true -> pre(stable)	=> stable;					
