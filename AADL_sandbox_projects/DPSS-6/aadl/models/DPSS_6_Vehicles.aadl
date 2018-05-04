@@ -467,8 +467,10 @@ public
 					and DPSS_Node_Lib.initial_value_true(pos_UAV6 = 0.05)
 				);
 
---We don't yet know how many steps it will take to converge for N = 6.			
---			lemma "Observer: Worst steps convergence (not yet stable after ?? steps)":
+			lemma "Observer: Worst steps convergence (not yet stable after 28 steps)":
+				steps >= 28 => stable;
+		
+--			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 			
 			----------------------------------------------------------------------------
@@ -485,9 +487,6 @@ public
 						
 			lemma "Once stable, stays stable":
 				true -> pre(stable) => stable;
-				
-			lemma "Stable on and after 28 steps":
-				steps >= 28 => stable;
 			
 			lemma "Stable on and after 29 steps":
 				steps >= 29 => stable;
