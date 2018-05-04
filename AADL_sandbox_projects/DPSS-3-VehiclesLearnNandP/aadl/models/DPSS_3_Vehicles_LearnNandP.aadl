@@ -556,7 +556,7 @@ public
 				(stable and not (pre(stable))) => 
 					(time < 4.0*T);
 
-			lemma "Time for configuration parameters to converge is less than 3T":
+			lemma "Time for configuration parameters to converge is less than or equal to 3T":
 				(stable_config_params and not (pre(stable_config_params))) => 
 					(time <= 3.0*T);
 			
