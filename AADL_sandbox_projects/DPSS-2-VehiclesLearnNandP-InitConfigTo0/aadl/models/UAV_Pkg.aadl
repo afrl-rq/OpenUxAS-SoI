@@ -39,19 +39,15 @@ public
 
 			--Previous numLeft
 			eq pre_numLeft : int = prev(numLeft, 0);
---			eq pre_numLeft : real; --See guarantees for restrictions on pre_numLeft
 			
 			--Previous numRight
 			eq pre_numRight : int = prev(numRight, 0);
---			eq pre_numRight : real; --See guarantees for restrictions on pre_numRight
 			
 			--Previous perimRight
 			eq pre_perimRight : real = prev(perimRight, 0.0);
---			eq pre_perimRight : real = pre(perimRight);
 			
 			--Previous perimLeft
 			eq pre_perimLeft : real = prev(perimLeft, 0.0);			
---			eq pre_perimLeft : real = pre(perimLeft);
 			
 			--ID (will change during execution as this UAV meets its neighbors)
 			eq id : int = numLeft + 1;
@@ -69,6 +65,8 @@ public
 			eq right_endp_est : DPSS_Data_Types::Position_Type = 
 				pos + perimRight;
 
+			--Make id a piecewise-constant real-valued variable. This, combined with N_lin, makes the shared border formulas piecewise linear and allows 
+			--     analysis to be successful at the top level.
 			--Assumes 1 <= N <= 4 (which should be the case for configuration parameters initialized to 0 and N_TRUTH <= 4)	
 			eq id_lin : real = 
 				if id = 1 then
@@ -81,7 +79,9 @@ public
 							3.0
 						else --id = 4
 								4.0;
-			
+
+			--Make N a piecewise-constant real-valued variable. This, combined with id_lin, makes the shared border formulas piecewise linear and allows 
+			--     analysis to be successful at the top level.			
 			--Assumes 1 <= N <= 4 (which should be the case for configuration parameters initialized to 0 and N_TRUTH <= 4)			
 			eq N_lin : real = 
 				if N = 1 then
@@ -195,31 +195,7 @@ public
 									else --direction = -1 
 										left_endp_est 
 				); 
-						
---			guarantee "pre_numLeft is pre(numLeft) after the initial timestep":
---				true -> pre_numLeft = pre(numLeft);
---			
---			guarantee "pre_numRight is pre(numRight) after the initial timestep":
---				true -> pre_numRight = pre(numRight);
---
---			--We allow the initial value of pre_numLeft to range from 0 to 3 (We're assuming no more than 4 vehicles since our linearized formulas only support up to 4 vehicles)	
---			guarantee "pre_numLeft initial value restrictions":
---				DPSS_Node_Lib.initial_value_true(
---								pre_numLeft = 0.0 
---							or	pre_numLeft = 1.0
---							or 	pre_numLeft = 2.0
---							or 	pre_numLeft = 3.0
---				);
---			
---			--We allow the initial value of pre_numRight to range from 0 to 3 (We're assuming no more than 4 vehicles since our linearized formulas only support up to 4 vehicles)	
---			guarantee "pre_numRight initial value restrictions":
---				DPSS_Node_Lib.initial_value_true(
---								pre_numRight = 0.0 
---							or	pre_numRight = 1.0
---							or 	pre_numRight = 2.0
---							or 	pre_numRight = 3.0
---				);
-		
+							
 			guarantee "numLeft formula":
 				numLeft = 	if meet_LN then 
 								numLeft_LN + 1 
