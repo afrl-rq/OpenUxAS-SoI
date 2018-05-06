@@ -565,6 +565,12 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
 
+			lemma "(Experimental) Stable on and after 28 steps":
+				steps >= 28 => stable;
+
+			lemma "(Experimental) Stable on and after 29 steps":
+				steps >= 29 => stable;
+
 			lemma "(Experimental) Stable on and after 30 steps":
 				steps >= 30 => stable;
 
