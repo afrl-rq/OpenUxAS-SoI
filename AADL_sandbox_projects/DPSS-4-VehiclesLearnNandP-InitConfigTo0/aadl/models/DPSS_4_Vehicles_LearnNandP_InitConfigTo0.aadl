@@ -351,15 +351,15 @@ public
 			
 			guarantee "UAVs turn around at the borders":
 				--UAVs turn around at left endpoint
-					pos_UAV1 = LEFT_ENDP_TRUTH => direction_UAV1 = 1
-				and pos_UAV2 = LEFT_ENDP_TRUTH => direction_UAV2 = 1
-				and pos_UAV3 = LEFT_ENDP_TRUTH => direction_UAV3 = 1
-				and pos_UAV4 = LEFT_ENDP_TRUTH => direction_UAV4 = 1
+					(pos_UAV1 = LEFT_ENDP_TRUTH => direction_UAV1 = 1)
+				and (pos_UAV2 = LEFT_ENDP_TRUTH => direction_UAV2 = 1)
+				and (pos_UAV3 = LEFT_ENDP_TRUTH => direction_UAV3 = 1)
+				and (pos_UAV4 = LEFT_ENDP_TRUTH => direction_UAV4 = 1)
 				--and UAVs turn around at right endpoint
-				and pos_UAV1 = RIGHT_ENDP_TRUTH => direction_UAV1 = -1
-				and pos_UAV2 = RIGHT_ENDP_TRUTH => direction_UAV2 = -1
-				and pos_UAV3 = RIGHT_ENDP_TRUTH => direction_UAV3 = -1
-				and pos_UAV4 = RIGHT_ENDP_TRUTH => direction_UAV4 = -1;
+				and (pos_UAV1 = RIGHT_ENDP_TRUTH => direction_UAV1 = -1)
+				and (pos_UAV2 = RIGHT_ENDP_TRUTH => direction_UAV2 = -1)
+				and (pos_UAV3 = RIGHT_ENDP_TRUTH => direction_UAV3 = -1)
+				and (pos_UAV4 = RIGHT_ENDP_TRUTH => direction_UAV4 = -1);
 				
 			guarantee "Directions are in bounds":
 				(	 direction_UAV1 = 1 or direction_UAV1 = -1)

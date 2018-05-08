@@ -246,13 +246,13 @@ public
 			
 			guarantee "UAVs turn around at the borders":
 				--UAVs turn around at 0
-					pos_UAV1 = 0.0 => direction_UAV1 = 1
-				and pos_UAV2 = 0.0 => direction_UAV2 = 1
-				and pos_UAV3 = 0.0 => direction_UAV3 = 1
+					(pos_UAV1 = 0.0 => direction_UAV1 = 1)
+				and (pos_UAV2 = 0.0 => direction_UAV2 = 1)
+				and (pos_UAV3 = 0.0 => direction_UAV3 = 1)
 				--and UAVs turn around at P
-				and pos_UAV1 = P_GLOBAL => direction_UAV1 = -1
-				and pos_UAV2 = P_GLOBAL => direction_UAV2 = -1
-				and pos_UAV3 = P_GLOBAL => direction_UAV3 = -1;
+				and (pos_UAV1 = P_GLOBAL => direction_UAV1 = -1)
+				and (pos_UAV2 = P_GLOBAL => direction_UAV2 = -1)
+				and (pos_UAV3 = P_GLOBAL => direction_UAV3 = -1);
 				
 			guarantee "Directions are in bounds":
 				(	 direction_UAV1 = 1 or direction_UAV1 = -1)

@@ -259,14 +259,14 @@ public
 				and pos_UAV3 <= pos_UAV4;
 			
 			guarantee "UAVs turn around at the borders":
-					pos_UAV1 = 0.0 => direction_UAV1 = 1
-				and pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1
-				and pos_UAV2 = 0.0 => direction_UAV2 = 1
-				and pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1
-				and pos_UAV3 = 0.0 => direction_UAV3 = 1
-				and pos_UAV3 = DPSS_Constants.P_GLOBAL => direction_UAV3 = -1
-				and pos_UAV4 = 0.0 => direction_UAV4 = 1
-				and pos_UAV4 = DPSS_Constants.P_GLOBAL => direction_UAV4 = -1;
+					(pos_UAV1 = 0.0 => direction_UAV1 = 1)
+				and (pos_UAV1 = DPSS_Constants.P_GLOBAL => direction_UAV1 = -1)
+				and (pos_UAV2 = 0.0 => direction_UAV2 = 1)
+				and (pos_UAV2 = DPSS_Constants.P_GLOBAL => direction_UAV2 = -1)
+				and (pos_UAV3 = 0.0 => direction_UAV3 = 1)
+				and (pos_UAV3 = DPSS_Constants.P_GLOBAL => direction_UAV3 = -1)
+				and (pos_UAV4 = 0.0 => direction_UAV4 = 1)
+				and (pos_UAV4 = DPSS_Constants.P_GLOBAL => direction_UAV4 = -1);
 				
 			guarantee "Directions are in bounds":
 				(	 direction_UAV1 = 1 or direction_UAV1 = -1)
