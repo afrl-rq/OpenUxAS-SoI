@@ -26,7 +26,7 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <!--Service Type="DAIDALUS_WCV_Detection"/ -->
-    <Service Type="DAIDALUS_WCV_Detection" LookAheadTime="30"/>
+    <Service Type="DAIDALUS_WCV_Detection" LookAheadTime="180" RTCAAlertLevels="3"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="1000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"

@@ -22,10 +22,16 @@
 
 #include "afrl/cmasi/AirVehicleState.h"
 #include "BandsRegion.h"
+#include "Detection3D.h"
 #include "Interval.h"
+#include "WCVTable.h"
+#include "WCV_TAUMOD.h"
+#include "WCV_TCPA.h"
+#include "WCV_TEP.h"
 #include "larcfm/DAIDALUS/DAIDALUSConfiguration.h"
 #include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
 #include "uxas/messages/uxnative/StartupComplete.h"
+#include "stdUniquePtr.h"
 
 #include <iostream>     // std::cout, cerr, etc
 #include <cmath>    //cmath::cos, sin, etc
@@ -63,7 +69,15 @@
 #define STRING_XML_HORIZONTALNMAC "HorizontalNMAC"
 #define STRING_XML_VERTICALNMAC "VerticalNMAC"
 #define STRING_XML_HORIZONTALCONTOURTHRESHOLD "HorizontalContourThreshold"
-
+#define STRING_XML_TTHR "TTHR"
+#define STRING_XML_RTCAALERTLEVELS "RTCAAlertLevels"
+#define STRING_XML_ALERTTIME1 "AlertingTime1"
+#define STRING_XML_EARLYALERTTIME1 "EarlyAlertingTime1"
+#define STRING_XML_ALERTTIME2 "AlertingTime2"
+#define STRING_XML_EARLYALERTTIME2 "EarlyAlertingTime2"
+#define STRING_XML_ALERTTIME3 "AlertingTime3"
+#define STRING_XML_EARLYALERTTIME3 "EarlyAlertingTime3"
+#define STRING_XML_HORIZONTALDETECTIONTYPE "HorizontalDetectionType"
 
 
 
@@ -82,6 +96,23 @@ namespace {
                 std::cos(Phi_rad)*std::cos(Psi_rad))*v + (std::cos(Phi_rad)*std::sin(Theta_rad)*std::sin(Psi_rad)- 
                 std::sin(Phi_rad)*std::cos(Psi_rad))*w;
         velocityZ = -std::sin(Theta_rad)*u + std::sin(Phi_rad)*std::cos(Theta_rad)*v + std::cos(Phi_rad)*std::cos(Theta_rad)*w;
+    }
+    std::unique_ptr<larcfm::Detection3D> makeDetectionPtr(const std::string type, const larcfm::WCVTable table)
+    {
+        std::unique_ptr<larcfm::Detection3D> ptr;
+        if (type == "TCPA")
+        {
+            ptr = uxas::stduxas::make_unique<larcfm::WCV_TCPA>(table);
+        }
+        else if (type == "TEP")
+        {
+            ptr = uxas::stduxas::make_unique<larcfm::WCV_TEP>(table);
+        }
+        else
+        {
+            ptr = uxas::stduxas::make_unique<larcfm::WCV_TAUMOD>(table);
+        }
+        return ptr;
     }
 }
 
@@ -319,6 +350,62 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
        if (local_contour_thr_deg >= 0.0 && local_contour_thr_deg <= 180.0)
            m_contour_thr_deg = local_contour_thr_deg;
     }
+    if (!ndComponent.attribute(STRING_XML_RTCAALERTLEVELS).empty())
+    {
+        int local_alert_levels = ndComponent.attribute(STRING_XML_RTCAALERTLEVELS).as_int();
+        if (local_alert_levels <=3 && local_alert_levels >0)
+            m_RTCA_alert_levels = local_alert_levels;
+    }
+    if (!ndComponent.attribute(STRING_XML_TTHR).empty())
+    {
+        double local_TTHR_s = ndComponent.attribute(STRING_XML_TTHR).as_double();
+        if (local_TTHR_s <= m_lookahead_time_s)
+            m_TTHR_s = local_TTHR_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME1).as_double())
+    {
+        double local_early_alert_time_1_s = ndComponent.attribute(STRING_XML_EARLYALERTTIME1).as_double();
+        if (local_early_alert_time_1_s <= m_lookahead_time_s)
+            m_early_alert_time_1_s = local_early_alert_time_1_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_ALERTTIME1).as_double())
+    {
+        double local_alert_time_1_s = ndComponent.attribute(STRING_XML_ALERTTIME1).as_double();
+        if (local_alert_time_1_s < m_early_alert_time_1_s)
+            m_alert_time_1_s = local_alert_time_1_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME2).as_double())
+    {
+        double local_early_alert_time_2_s = ndComponent.attribute(STRING_XML_EARLYALERTTIME2).as_double();
+        if (local_early_alert_time_2_s <= m_early_alert_time_1_s)
+            m_early_alert_time_2_s = local_early_alert_time_2_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_ALERTTIME2).as_double())
+    {
+        double local_alert_time_2_s = ndComponent.attribute(STRING_XML_ALERTTIME2).as_double();
+        if (local_alert_time_2_s < m_early_alert_time_2_s && local_alert_time_2_s <= m_alert_time_1_s)
+            m_alert_time_2_s = local_alert_time_2_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME3).as_double())
+    {
+        double local_early_alert_time_3_s = ndComponent.attribute(STRING_XML_EARLYALERTTIME3).as_double();
+        if (local_early_alert_time_3_s <= m_early_alert_time_2_s)
+            m_early_alert_time_3_s = local_early_alert_time_3_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_ALERTTIME3).as_double())
+    {
+        double local_alert_time_3_s = ndComponent.attribute(STRING_XML_ALERTTIME3).as_double();
+        if (local_alert_time_3_s < m_early_alert_time_3_s && local_alert_time_3_s <= m_alert_time_2_s)
+            m_alert_time_3_s = local_alert_time_3_s;
+    }
+    if (!ndComponent.attribute(STRING_XML_HORIZONTALDETECTIONTYPE).as_string())
+    {
+        std::string local_horizontal_detection_type = ndComponent.attribute(STRING_XML_HORIZONTALDETECTIONTYPE).as_string();
+        if (local_horizontal_detection_type == "TAUMOD" || local_horizontal_detection_type == "TCPA" || local_horizontal_detection_type == "TEP")
+        {
+            m_horizontal_detection_type == local_horizontal_detection_type;
+        }
+    }
     m_daa.parameters.setLookaheadTime(m_lookahead_time_s, "s");
     m_daa.parameters.setLeftTrack(m_left_trk_deg, "deg");
     m_daa.parameters.setRightTrack(m_right_trk_deg, "deg");
@@ -349,7 +436,36 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     m_daa.parameters.setVerticalNMAC(m_vertical_nmac_m, "m");
     m_daa.parameters.setMinVerticalRecovery(m_min_vertical_recovery_m, "m");
     m_daa.parameters.setHorizontalContourThreshold(m_contour_thr_deg, "deg");
-  
+    larcfm::WCVTable alert_level;
+    alert_level.setDTHR(m_DTHR_m,"m");
+    alert_level.setZTHR(m_ZTHR_m,"m");
+    alert_level.setTTHR(m_TTHR_s,"s");
+    alert_level.setTCOA(0,"s");
+    std::unique_ptr<larcfm::Detection3D> cd = makeDetectionPtr(m_horizontal_detection_type,alert_level);
+    larcfm::Detection3D* raw_ptr;
+    raw_ptr = cd.get();
+    m_daa.parameters.alertor.clear();
+    m_daa.parameters.alertor.setConflictAlertLevel(2);
+    if (m_RTCA_alert_levels == 3)
+    {
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_1_s,m_early_alert_time_1_s,larcfm::BandsRegion::FAR));
+        m_daa.parameters.alertor.setConflictAlertLevel(1);
+    }
+    else
+    {
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_1_s,m_early_alert_time_1_s,larcfm::BandsRegion::NONE));
+    }
+    if (m_RTCA_alert_levels == 1)
+    {
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_2_s,m_early_alert_time_2_s,larcfm::BandsRegion::NONE));
+        m_daa.parameters.alertor.setConflictAlertLevel(3);
+    }    
+    else
+    {
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_2_s,m_early_alert_time_2_s,larcfm::BandsRegion::MID));
+    }
+    m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_3_s,m_early_alert_time_3_s,larcfm::BandsRegion::NEAR));
+    raw_ptr = nullptr;
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);
     std::cout << "Successfully subscribed to AirVehicleState from DAIDALUS_WCV_Detection." << std::endl;
@@ -449,7 +565,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 if (!detectedViolations.empty())    //compute conflict bands and compose violation message only if violations are detected
                 {
                     //Create DAIDALUS bands object and compute conflict/peripheral bands
-                    larcfm::KinematicMultiBands m_daa_bands;
+                    larcfm::KinematicMultiBands m_daa_bands(m_daa.parameters);
                     m_daa.kinematicMultiBands(m_daa_bands);
                     std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
                             std::make_shared<larcfm::DAIDALUS::WellClearViolationIntervals>();  //Compose violations message

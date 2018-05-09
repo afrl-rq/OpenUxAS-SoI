@@ -25,7 +25,7 @@
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
-    <Service Type="DAIDALUS_WCV_Detection"/>
+    <Service Type="DAIDALUS_WCV_Detection" RTCAAlertLevels="1"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"

@@ -44,7 +44,8 @@ namespace service
  * VerticalSpeedStep="xx" AltitudeStep="xx" HorizontalAcceleration="xx" VerticalAcceleration="xx" TurnRate="xx" BankAngle="xx" VerticalRate="xx"
  * RecoveryStabilityTime"xx" MinHorizontalRecovery="xx" MinVerticalRecovery="xx" isRecoveryTack="true" isRecoveryGroundTracK="true" 
  * isRecoveryVerticalSpeed="true" isRecoveryAltitude="true" isCollisionAvoidance="false" CollisionAvoidanceFactor="xx"
- * HorizontalNMAC="xx" VerticalNMAC="xx" HorizontalContourThreshold="xx"/>
+ * HorizontalNMAC="xx" VerticalNMAC="xx" HorizontalContourThreshold="xx" TTHR="xx" RTCAAlertingLevels="x" AlertingTime1="xx" EarlyAlertingTime1="xx" 
+ * AlertingTime2="xx" EarlyAlertingTime2="xx" AlertingTime3="xx" EarlyAlertingTime3="xx" HorizontalDetectionType="TAUMOD" />
  * 
  * Options:
  *  - LookAheadTime - time horizon for all DAIDALUS functions
@@ -66,8 +67,9 @@ namespace service
  *  - BankAngle - bank angle used in the computation of horizontal direction maneuvers
  *  - VerticalRate - vertical rate used in the computation of altitude maneuvers
  *  - RecoveryStabilityTime - time delay to stabilize recovery maneuvers
- *  - MinHorizontalRecovery - minimum horizontal separation used in the computation of recovery maneuvers
- *  - MinVerticalRecovery - minimum vertical separation used in the computation of recovery maneuvers
+ *  - MinHorizontalRecovery - minimum horizontal separation used in the computation of recovery maneuvers-Also sets the horizontal threshold for 
+ *                            Well-ClearVolume (WCV) 
+ *  - MinVerticalRecovery - minimum vertical separation used in the computation of recovery maneuvers-Also sets the vertical threshold for WCV 
  *  - isRecoveryTrack - enable computation of horizontal direction recovery maneuvers
  *  - isRecoveryGroundTrack - enable computation of horizontal speed recovery maneuvers
  *  - isRecoveryVerticalSpeed - enable computation of vertical speed recovery maneuvers
@@ -77,6 +79,15 @@ namespace service
  *  - HorizontalNMAC - horizontal NMAC
  *  - VerticalNMAC - vertical NMAC 
  *  - HorizontalContourThreshold - threshold relative to ownship horizontal direction for the computation off horizontal contours
+ *  - TTHR - time threshold forWCVvolume
+ *  - RTCAAlertLevels - number of classification bins to be displayed in maneuver guidance processing-max 3
+ *  - AlertingTime1 - the time limit to determine if a WCV violation will occur before for the FAR classification
+ *  - EarlyAlertingTime1 - the time limit to determine if a WCV violation will occur before for an early FAR classification 
+ *  - AlertingTime2 - the time limit to determine if a WCV violation will occur before for the MID classification
+ *  - EarlyAlertingTime2 - the time limit to determine if a WCV violation will occur before for an early MID classification
+ *  - AlertingTime3 - the time limit to determine if a WCV violation will occur before for the NEAR classification
+ *  - EarlyAlertingTime3 - the time limit to determine if a WCV violation will occur before for an early NEAR classification
+ *  - HorizontalDetectionType - the type of time projection limit used in determination of WCV violation- TAUMOD, TCPA, or TEP
  * 
  * Design: The objective of DAIDALUS_WCV_Detection is interface with NASA's DAIDALUS code to detect projected violations of the well-clear volume for
  *         the ownship.  This service then reports any detections of projected violations to other services along with the configuration parameters 
@@ -167,7 +178,7 @@ private:
 
 private:
     //DAIDALUS parameters   
-    int32_t m_lookahead_time_s = {180};   // seconds--Time horizon of all DAIDALUS functions (time)
+    double m_lookahead_time_s = {180};   // seconds--Time horizon of all DAIDALUS functions (time)
     double m_left_trk_deg = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())}; // degrees--relative maximum horizontal direction maneuver to the left of the current ownship direction (angle)
     double m_right_trk_deg = {n_Const::c_Convert::toDegrees(n_Const::c_Convert::dPi())};    // degrees--relative maximum horizontal direction maneuver to the right of the current ownship direction (angle)
     double m_min_gs_mps = {5.1444}; // meters per second--absolute minimum horizontal speed maneuver (speed)
@@ -185,7 +196,7 @@ private:
     double m_turn_rate_degps = {0.0}; // degrees per second--turn rate used in the computation of horizontal direction maneuvers (angle)
     double m_bank_angle_deg = {0.0};    // degrees--bank angle used in the computation of horizontal direction maneuvers (angle)
     double m_vertical_rate_mps = {0.0}; //meters per second--vertical rate used in the computation of altitude maneuvers (speed)
-    int32_t m_recovery_stability_time_s = {0};  // seconds--time delay to stabilize recovery maneuvers 
+    double m_recovery_stability_time_s = {0};  // seconds--time delay to stabilize recovery maneuvers 
     double m_min_horizontal_recovery_m = {1222.32};   // meters--minimum horizontal separation used in the computation of recovery maneuvers (distance)
     double m_min_vertical_recovery_m = {450.0*n_Const::c_Convert::dFeetToMeters()}; // meters--minimum vertical separation used in the computation of recovery maneuvers (distance)
     bool m_recovery_trk_bool = {true};   // Boolean--enable computation of horizontal direction recovery maneuvers (boolean)
@@ -197,7 +208,18 @@ private:
     double m_horizontal_nmac_m = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters--Horizontal Near Mid-Air Collision (distance)
     double m_vertical_nmac_m = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters--Vertical Near Mid-Air Collision (distance)
     double m_contour_thr_deg = {180.0}; // degrees--threshold relative to ownship horizontal direction for the computation of horizontal contours aka. blobs (angle)
-  
+    double m_DTHR_m = {m_min_horizontal_recovery_m};    //meters--horizontal distance threshold for WCV volume definition
+    double m_ZTHR_m = {m_min_vertical_recovery_m};  //meters--vertical distance threshold for WCV volume definition
+    double m_TTHR_s = {35}; //seconds--time threshold for WCV voulume definition
+    double m_alert_time_1_s = {m_lookahead_time_s};  //seconds--alerting time for alert level 1
+    double m_early_alert_time_1_s = {m_lookahead_time_s+20};    //seconds--early alerting time for alert level 1
+    double m_alert_time_2_s = {55};  //seconds--alerting time for alert level 2
+    double m_early_alert_time_2_s = {75};    //seconds--early alerting time for alert level 2
+    double m_alert_time_3_s = {25};  //seconds--alerting time for alert level 3
+    double m_early_alert_time_3_s = {55};    //seconds--early alerting time for alert level 3
+    int m_RTCA_alert_levels = {3};   //number of alert levels reported for guidance processing--max 3
+    std::string m_horizontal_detection_type = {"TAUMOD"}; //string--horizontal detection type
+    
     struct MydaidalusPackage
     {
        larcfm::Position m_daidalusPosition;
