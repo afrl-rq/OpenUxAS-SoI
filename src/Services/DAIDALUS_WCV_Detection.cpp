@@ -24,6 +24,7 @@
 #include "BandsRegion.h"
 #include "Detection3D.h"
 #include "Interval.h"
+#include "TrafficState.h"
 #include "WCVTable.h"
 #include "WCV_TAUMOD.h"
 #include "WCV_TCPA.h"
@@ -71,12 +72,12 @@
 #define STRING_XML_HORIZONTALCONTOURTHRESHOLD "HorizontalContourThreshold"
 #define STRING_XML_TTHR "TTHR"
 #define STRING_XML_RTCAALERTLEVELS "RTCAAlertLevels"
-#define STRING_XML_ALERTTIME1 "AlertingTime1"
-#define STRING_XML_EARLYALERTTIME1 "EarlyAlertingTime1"
-#define STRING_XML_ALERTTIME2 "AlertingTime2"
-#define STRING_XML_EARLYALERTTIME2 "EarlyAlertingTime2"
-#define STRING_XML_ALERTTIME3 "AlertingTime3"
-#define STRING_XML_EARLYALERTTIME3 "EarlyAlertingTime3"
+#define STRING_XML_ALERTTIME1 "AlertTime1"
+#define STRING_XML_EARLYALERTTIME1 "EarlyAlertTime1"
+#define STRING_XML_ALERTTIME2 "AlertTime2"
+#define STRING_XML_EARLYALERTTIME2 "EarlyAlertTime2"
+#define STRING_XML_ALERTTIME3 "AlertTime3"
+#define STRING_XML_EARLYALERTTIME3 "EarlyAlertTime3"
 #define STRING_XML_HORIZONTALDETECTIONTYPE "HorizontalDetectionType"
 
 
@@ -569,6 +570,11 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     m_daa.kinematicMultiBands(m_daa_bands);
                     std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
                             std::make_shared<larcfm::DAIDALUS::WellClearViolationIntervals>();  //Compose violations message
+                    larcfm::TrafficState daa_own = m_daa.getOwnshipState();
+                    nogo_ptr->setCurrentHeading(daa_own.track("deg"));
+                    nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s"));
+                    nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));
+                    nogo_ptr->setCurrentAltitude(daa_own.altitude("m"));
                     for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)  //ground track bands
                     {
                         std::unique_ptr<larcfm::DAIDALUS::GroundHeadingInterval> pTempPtr (new larcfm::DAIDALUS::GroundHeadingInterval);
@@ -732,6 +738,15 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         DetectionConfiguration->setVerticalNMAC(m_daa.parameters.getVerticalNMAC("m"));
         DetectionConfiguration->setMinVerticalRecovery(m_daa.parameters.getMinVerticalRecovery("m"));
         DetectionConfiguration->setHorizontalContourThreshold(m_daa.parameters.getHorizontalContourThreshold("m"));
+        DetectionConfiguration->setTTHR(m_TTHR_s);
+        DetectionConfiguration->setRTCAAlertLevels(m_RTCA_alert_levels);
+        DetectionConfiguration->setAlertTime1(m_alert_time_1_s);
+        DetectionConfiguration->setEarlyAlertTime1(m_early_alert_time_1_s);
+        DetectionConfiguration->setAlertTime2(m_alert_time_2_s);
+        DetectionConfiguration->setEarlyAlertTime2(m_early_alert_time_2_s);
+        DetectionConfiguration->setAlertTime3(m_alert_time_3_s);
+        DetectionConfiguration->setEarlyAlertTime3(m_early_alert_time_3_s);
+        DetectionConfiguration->setHorizontalDetectionType(m_horizontal_detection_type);
         sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);   
     }
     return false;

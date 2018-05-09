@@ -81,12 +81,12 @@ namespace service
  *  - HorizontalContourThreshold - threshold relative to ownship horizontal direction for the computation off horizontal contours
  *  - TTHR - time threshold forWCVvolume
  *  - RTCAAlertLevels - number of classification bins to be displayed in maneuver guidance processing-max 3
- *  - AlertingTime1 - the time limit to determine if a WCV violation will occur before for the FAR classification
- *  - EarlyAlertingTime1 - the time limit to determine if a WCV violation will occur before for an early FAR classification 
- *  - AlertingTime2 - the time limit to determine if a WCV violation will occur before for the MID classification
- *  - EarlyAlertingTime2 - the time limit to determine if a WCV violation will occur before for an early MID classification
- *  - AlertingTime3 - the time limit to determine if a WCV violation will occur before for the NEAR classification
- *  - EarlyAlertingTime3 - the time limit to determine if a WCV violation will occur before for an early NEAR classification
+ *  - AlertTime1 - the time limit to determine if a WCV violation will occur before for the FAR classification
+ *  - EarlyAlerTime1 - the time limit to determine if a WCV violation will occur before for an early FAR classification 
+ *  - AlertTime2 - the time limit to determine if a WCV violation will occur before for the MID classification
+ *  - EarlyAlertTime2 - the time limit to determine if a WCV violation will occur before for an early MID classification
+ *  - AlertTime3 - the time limit to determine if a WCV violation will occur before for the NEAR classification
+ *  - EarlyAlertTime3 - the time limit to determine if a WCV violation will occur before for an early NEAR classification
  *  - HorizontalDetectionType - the type of time projection limit used in determination of WCV violation- TAUMOD, TCPA, or TEP
  * 
  * Design: The objective of DAIDALUS_WCV_Detection is interface with NASA's DAIDALUS code to detect projected violations of the well-clear volume for
