@@ -43,7 +43,8 @@ typedef enum _operatorType_t {
   OP_UNDEFINED = 0,
   OP_SEQUENTIAL,
   OP_ALTERNATIVE,
-  OP_PARALLEL
+  OP_PARALLEL,
+  OP_TILDE
 } operatorType_t;
 
 

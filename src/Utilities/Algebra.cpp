@@ -196,6 +196,27 @@ v_action_t operatorNode::nextActions(const v_action_t &executedActions, bool &en
             //    (ii) i == this->nodePointers.size () : no child node has an executable action left 
             break;
 
+        case OP_TILDE:
+            encounterExecutedOut = true; // The value of this variable takes effect when
+            //    i > 0 (including the case i == this->nodePointers.size()),
+            //    in which case at least one children node that has been fully executed
+            for (unsigned int i = 0; i < this->nodePointers.size(); i++)
+            {
+                bool encounterExecuted;
+                searchResultChildren[i] = this->nodePointers[i]->nextActions(executedActions, encounterExecuted);
+                if (searchResultChildren[i].size() > 0)
+                {
+                    searchResultThis = searchResultChildren[i];
+                    if (i == 0) // if the left most child has actions to be executed,  
+                        encounterExecutedOut = encounterExecuted; //   then return true if the child has encountered an executed action 
+                    break;
+                }
+            }
+            return searchResultThis; // notice that this is an empty std::vector if either one of the following hold
+            //    (i) this->nodePointers.size () == 0  : there are no children nodes of this operator
+            //    (ii) i == this->nodePointers.size () : no child node has an executable action left 
+            break;
+
         case OP_ALTERNATIVE:
             for (unsigned int i = 0; i < this->nodePointers.size(); i++)
             {
@@ -358,6 +379,16 @@ parseTreeNode *CAlgebraBase::parseFormula(const std::string formulaIn)
 
             break;
         }
+        if (formula[i] == '~')
+        {
+            operatorType = OP_TILDE;
+            formula = formula.substr(i + 2, formula.rfind(')') - i - 2);
+#ifdef PRINT_ALGEBRA_FULL
+            printf("SUBFORMULA: %s\n", formula.c_str());
+#endif        //#ifdef PRINT_ALGEBRA_FULL
+
+            break;
+        }
         if (formula[i] == '+')
         {
             operatorType = OP_ALTERNATIVE;
@@ -438,6 +469,7 @@ parseTreeNode *CAlgebraBase::parseFormula(const std::string formulaIn)
                 case '+':
                 case '.':
                 case '|':
+                case '~':
                     if (numParanthesis == 0)
                     {
                         unsigned int iEnd;
