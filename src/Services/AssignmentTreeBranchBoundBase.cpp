@@ -401,8 +401,8 @@ namespace uxas
                 std::cout << "Here 1" << std::endl;
                 nodeAssignment->m_tasksToTime = new std::map<int, std::array<std::vector<std::vector<int> >, 2> >;
                 std::cout << "Here 2" << std::endl;
-                uxas::common::utilities::Lex lex;
-                lex.parse(AssignmentTreeBranchBoundBase::originalAlgebraString, nodeAssignment->m_tasksToTime);
+                uxas::common::utilities::Lex lex(AssignmentTreeBranchBoundBase::originalAlgebraString, nodeAssignment->m_tasksToTime);
+                lex.parse();
                 std::cout << "Here 3" << std::endl;
 
 
@@ -854,6 +854,7 @@ namespace uxas
 
 				for (auto itVehicleAssignmentState = m_vehicleIdVsAssignmentState.begin(); itVehicleAssignmentState != m_vehicleIdVsAssignmentState.end(); itVehicleAssignmentState++)
 				{
+                    std::cout << "Vehicle ID: " << std::to_string(itVehicleAssignmentState->first) << " Obj ID: " << *itObjectiveID << std::endl;
 					NodeAssignment(itVehicleAssignmentState->second, *itObjectiveID, prerequisiteTaskOptionId);
 					if (!itVehicleAssignmentState->second->m_isAcceptingNewAssignments)
 					{

@@ -1,7 +1,3 @@
-//
-// Created by angela on 3/30/18.
-//
-
 #ifndef TEST_LEX_H
 #define TEST_LEX_H
 
@@ -17,9 +13,9 @@ namespace uxas
         {
             class Lex {
             public:
-                Lex();
+                Lex(std::string algebraString, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map);
                 virtual ~Lex(){ };
-                void parse(std::string algebraString, std::map<int, std::array<std::vector<std::vector<int> >, 2> > * m_map);
+                void parse();
                 std::map<int, std::array<std::vector<std::vector<int> >, 2> > * tasksToTime;
             protected:
                 std::array<std::vector<std::vector<int> >,2> placeholder_arr;
@@ -44,7 +40,8 @@ namespace uxas
                 int lex();
                 int lookup(char ch);
                 void setTimingFlags();
-                void skipToSectionEnd(bool isBackward);
+                bool skipToChar(char ch);
+                void skipToSectionEnd(bool goForward);
                 bool deactivateFlagCheck(int *counter);
                 std::vector<int> prereqToVector(std::queue<int> tmp_queue);
                 std::vector<int> opToVector(int frontValue, int size);
