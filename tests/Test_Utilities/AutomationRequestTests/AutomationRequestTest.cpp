@@ -130,11 +130,11 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AirVehicleState")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AreaSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationRequest")));
-    EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationResponse")));
+    EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationResponse")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeepOutZone")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.LineSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.OperatingRegion")));
-    EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
+    EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AngledAreaSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AreaOfInterest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.ImpactLineSearchTask")));
@@ -216,6 +216,7 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     EXPECT_EQ(24,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.AssignmentCostMatrix")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintRequests")));
+    EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskAssignmentSummary")));
     EXPECT_EQ(6,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskImplementationRequest")));
     EXPECT_EQ(6,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskImplementationResponse")));

@@ -24,6 +24,7 @@
 #include "afrl/cmasi/OperatingRegion.h"
 #include "afrl/cmasi/Task.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
+#include "uxas/messages/task/UniqueAutomationResponse.h"
 
 #include <memory>
 #include <deque>
@@ -160,6 +161,7 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
     void HandleAutomationRequest(std::shared_ptr<avtas::lmcp::Object>& autoRequest);
     void HandleAutomationResponse(std::shared_ptr<avtas::lmcp::Object>& autoResponse);
+    void SendResponse(std::shared_ptr<uxas::messages::task::UniqueAutomationResponse>& resp);
 
     ////////////////////////
     // TIMER CALLBACKS
@@ -198,6 +200,7 @@ private:
     // storage
     std::deque< std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_pendingRequests;
     std::deque< std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_requestsWaitingForTasks;
+    std::shared_ptr<uxas::messages::task::UniqueAutomationResponse> m_errorResponse;
     
     std::unordered_map<int64_t, RequestDetails> m_sandboxMap;
     
