@@ -295,11 +295,13 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
                                 [&](afrl::cmasi::MissionCommand* mish) { return mish->getVehicleID() == taskImplementationResponse->getVehicleID(); });
 
     //std::cout << "TimeThreshold: " << taskImplementationResponse->getTimeThreshold() << std::endl;
-    if((taskImplementationResponse->getTimeThreshold() > 0) && !(corrMish != m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end())){
+    std::cout << "Outside TimeThreshold for " << std::to_string(taskImplementationResponse->getTaskID()) << " is: " << taskImplementationResponse->getTimeThreshold() << std::endl;
+    if((taskImplementationResponse->getTimeThreshold() > 0) && (corrMish != m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end())){
+        std::cout << "Inside TimeThreshold for " << std::to_string(taskImplementationResponse->getTaskID()) << " is: " << taskImplementationResponse->getTimeThreshold() << std::endl;
         //create the loiter action for the task and set it to the first waypoint in the list
 
         afrl::cmasi::LoiterAction lTask;
-        lTask.setDuration(taskImplementationResponse->getTimeThreshold()); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
+        lTask.setDuration((int)taskImplementationResponse->getTimeThreshold()/1000); //THIS IS IN SECONDS, THE MDM IS WRONG!!!
         lTask.setLoiterType(afrl::cmasi::LoiterType::Circular);
 
         afrl::cmasi::Location3D locationToAdd;
@@ -319,6 +321,7 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
 
     if(corrMish != m_inProgressResponse[uniqueRequestID]->getOriginalResponse()->getMissionCommandList().end())
     {
+        std::cout << "Adding waypoints to an existing list" << std::endl;
         if(!(*corrMish)->getWaypointList().empty())
         {
             (*corrMish)->getWaypointList().back()->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
