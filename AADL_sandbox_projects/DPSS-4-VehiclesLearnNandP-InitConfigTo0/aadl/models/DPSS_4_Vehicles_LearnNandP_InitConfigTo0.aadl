@@ -525,36 +525,46 @@ public
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
 			----------------------------------------------------------------------------			
-
-			--UAVs stay in bounds (prove one at a time)	
-			lemma "UAV1 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV1 and pos_UAV1 <= RIGHT_ENDP_TRUTH;		
-			lemma "UAV2 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV2 and pos_UAV2 <= RIGHT_ENDP_TRUTH;
-			lemma "UAV3 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV3 and pos_UAV3 <= RIGHT_ENDP_TRUTH;
-			lemma "UAV4 stays in bounds": LEFT_ENDP_TRUTH <= pos_UAV4 and pos_UAV4 <= RIGHT_ENDP_TRUTH;
 							
 			--UAV perimLeft values are nonnegative
-			lemma "UAV1's perimLeft is nonnegative": UAV1.perimLeft >= 0.0;
-			lemma "UAV2's perimLeft is nonnegative": UAV2.perimLeft >= 0.0;
-			lemma "UAV3's perimLeft is nonnegative": UAV3.perimLeft >= 0.0;
-			lemma "UAV4's perimLeft is nonnegative": UAV4.perimLeft >= 0.0;
+			lemma "UAV perimLeft values are nonnegative": 
+						UAV1.perimLeft >= 0.0
+					and UAV2.perimLeft >= 0.0
+					and UAV3.perimLeft >= 0.0
+					and UAV4.perimLeft >= 0.0;	
 			
 			--UAV perimRight values are nonnegative
-			lemma "UAV1's perimRight is nonnegative": UAV1.perimRight >= 0.0;
-			lemma "UAV2's perimRight is nonnegative": UAV2.perimRight >= 0.0;
-			lemma "UAV3's perimRight is nonnegative": UAV3.perimRight >= 0.0;
-			lemma "UAV4's perimRight is nonnegative": UAV4.perimRight >= 0.0;
-			
-			--UAV numLeft values are between 0 and N - 1. This is the case when the configuration parameters are initialized to zero.
-			lemma "UAV1's numLeft is between 0 and N - 1": UAV1.numLeft >= 0 and UAV1.numLeft <= N_TRUTH_INT - 1;
-			lemma "UAV2's numLeft is between 0 and N - 1": UAV2.numLeft >= 0 and UAV2.numLeft <= N_TRUTH_INT - 1;
-			lemma "UAV3's numLeft is between 0 and N - 1": UAV3.numLeft >= 0 and UAV3.numLeft <= N_TRUTH_INT - 1;
-			lemma "UAV4's numLeft is between 0 and N - 1": UAV4.numLeft >= 0 and UAV4.numLeft <= N_TRUTH_INT - 1;
+			lemma "UAV perimRight values are nonnegative": 
+						UAV1.perimRight >= 0.0
+					and UAV2.perimRight >= 0.0
+					and UAV3.perimRight >= 0.0
+					and UAV4.perimRight >= 0.0;
 
-			--UAV numRight values are between 0 and N - 1. This is the case when the configuration parameters are initialized to zero.
-			lemma "UAV1's numRight is between 0 and N - 1": UAV1.numRight >= 0 and UAV1.numRight <= N_TRUTH_INT - 1;
-			lemma "UAV2's numRight is between 0 and N - 1": UAV2.numRight >= 0 and UAV2.numRight <= N_TRUTH_INT - 1;
-			lemma "UAV3's numRight is between 0 and N - 1": UAV3.numRight >= 0 and UAV3.numRight <= N_TRUTH_INT - 1;
-			lemma "UAV4's numRight is between 0 and N - 1": UAV4.numRight >= 0 and UAV4.numRight <= N_TRUTH_INT - 1;
+			--UAV perimLeft values are less than the distance to LEFT_ENDP_TRUTH
+			lemma "UAV perimLeft values are less than the distance to LEFT_ENDP_TRUTH": 
+						UAV1.perimLeft <= pos_UAV1 - LEFT_ENDP_TRUTH
+					and UAV2.perimLeft <= pos_UAV2 - LEFT_ENDP_TRUTH
+					and UAV3.perimLeft <= pos_UAV3 - LEFT_ENDP_TRUTH
+					and UAV4.perimLeft <= pos_UAV4 - LEFT_ENDP_TRUTH;
+			
+			--UAV perimRight values are less than the distance to RIGHT_ENDP_TRUTH
+			lemma "UAV perimRight values are less than the distance to RIGHT_ENDP_TRUTH": 
+						UAV1.perimRight <= RIGHT_ENDP_TRUTH - pos_UAV1
+					and UAV2.perimRight <= RIGHT_ENDP_TRUTH - pos_UAV2
+					and UAV3.perimRight <= RIGHT_ENDP_TRUTH - pos_UAV3
+					and UAV4.perimRight <= RIGHT_ENDP_TRUTH - pos_UAV4;
+			
+			--UAV numLeft values are in the expected range.
+			lemma "UAV1's numLeft is 0": UAV1.numLeft = 0;
+			lemma "UAV2's numLeft is between 0 and 1": UAV2.numLeft >= 0 and UAV2.numLeft <= 1;
+			lemma "UAV3's numLeft is between 0 and 2": UAV3.numLeft >= 0 and UAV3.numLeft <= 2;
+			lemma "UAV4's numLeft is between 0 and 3": UAV4.numLeft >= 0 and UAV4.numLeft <= 3;
+
+			--UAV numRight values are in the expected range.
+			lemma "UAV1's numRight is between 0 and 3": UAV1.numRight >= 0 and UAV1.numRight <= 3;
+			lemma "UAV2's numRight is between 0 and 2": UAV2.numRight >= 0 and UAV2.numRight <= 2;
+			lemma "UAV3's numRight is between 0 and 1": UAV3.numRight >= 0 and UAV3.numRight <= 1;
+			lemma "UAV4's numRight is 0": UAV4.numRight = 0;
 			
 			lemma "Once stable, stays stable (here 'stable' includes stability of the configuration parameters":
 				true -> pre(stable)	=> stable;
