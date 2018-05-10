@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>3</Version>
+    <Version>8</Version>
     
     <StructList>
         
@@ -51,9 +51,41 @@
         </Struct>
         
         <!-- Indicate to the waypoint manager to move to the next waypoint in the current list -->
-        <Struct Name="IncrementWaypoint" >
+        <Struct Name="IncrementWaypoint">
             <!-- ID of vehicle which should move to the next waypoint in its list -->
             <Field Name="VehicleID" Type="int64" />
+        </Struct>
+        
+        <!-- Translate from heading or heading-rate to a single leading waypoint that respects airspace constraints -->
+        <Struct Name="SafeHeadingAction" Extends="CMASI/VehicleAction" >
+            <!-- ID of vehicle which will be commanded to a safe waypoint that approximates the desired heading -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Operating region ID indicating airspace constraints that must be respected -->
+            <Field Name="OperatingRegion" Type="int64" />
+            <!-- Lead-ahead distance for waypoint placement -->
+            <Field Name="LeadAheadDistance" Type="real32" Default="1000.0" Units="meters" />
+            <!-- Loiter radius on lead-ahead waypoint. If zero or negative, uses calcuated minimum turn radius from vehicle configuration -->
+            <Field Name="LoiterRadius" Type="real32" Default="0.0" Units="meters" />
+            <!-- Desired heading that vehicle should attemtpt to reach in degress from true north -->
+            <Field Name="DesiredHeading" Type="real32" Units="degrees" />
+            <!-- Desired heading rate for the vehicle -->
+            <Field Name="DesiredHeadingRate" Type="real32" Units="degrees/sec" />
+            <!-- Flag indicating selecting between heading (false) or heading rate (true) commands -->
+            <Field Name="UseHeadingRate" Type="bool" Default="false" />
+            <!-- Commanded Altitude valid if {@link UseAltitude} == true -->
+            <Field Name="Altitude" Type="real32" Units="meter"/>            
+            <!-- Altitude type for specified altitude -->
+            <Field Name="AltitudeType" Type="CMASI/AltitudeType" Default="MSL" />
+            <!-- Denotes whether altitude should be used in the  safe heading action. If false, the
+            {@link NominalAltitude} and {@link NominalType}  from the {@link CMASI/EntityConfiguration} will be used.
+            -->
+            <Field Name="UseAltitude" Type="bool" Default="false"/>
+            <!-- Commanded Speed valid if {@link UseSpeed} == true -->
+            <Field Name="Speed" Type="real32" Units="mps"/>            
+            <!-- Denotes whether speed should be used in the safe heading action. If false, the
+            {@link NominalSpeed} from the {@link CMASI/EntityConfiguration} will be used.
+            -->
+            <Field Name="UseSpeed" Type="bool" Default="false"/>
         </Struct>
     
         <!-- Simple location broadcast from entities for tracking -->
@@ -106,19 +138,37 @@
         <Struct Name="AutopilotKeepAlive" >
             <!-- Enable communications between UxAS and the autopilot -->
             <Field Name="AutopilotEnabled" Type="bool" Default="true" />
+            <!-- Allow UxAS to send speed commands to the autopilot -->
+            <Field Name="SpeedAuthorized" Type="bool" Default="true" />
             <!-- Enable communications between UxAS and the Gimbal.
             Note: this does not effect the video stream. -->
             <Field Name="GimbalEnabled" Type="bool" Default="true" />
             <!-- Time that this message was sent -->
             <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- Overrides speed to this value if greater than zero -->
+            <Field Name="SpeedOverride" Type="real32" Units="meters/sec" Default="-1.0" />
+            <!-- Overrides altitude to this value (MSL) if greater than zero -->
+            <Field Name="AltOverride" Type="real32" Units="meters MSL" Default="-1.0" />
         </Struct>
     
-        <!-- Message reporting that the onboard processor is functioning -->
-        <Struct Name="OnboardProcessorIsAlive" >
-            <!-- ID of vehicle with onboard processor -->
+        <!-- Message for reporting onboard status of UxAS -->
+        <Struct Name="OnboardStatusReport">
+            <!-- ID of vehicle for status report -->
             <Field Name="VehicleID" Type="int64" />
-            <!-- Time that this message was sent -->
-            <Field Name="TimeSent" Type="int64" Units="milliseconds since 1 Jan 1970" />
+            <!-- List of entities in communication with vehicle (from join/exit message traffic) -->
+            <Field Name="ConnectedEntities" Type="int64[]" />
+            <!-- Current task list being carried out by vehicle -->
+            <Field Name="CurrentTaskList" Type="int64[]" />
+            <!-- Entity has valid state -->
+            <Field Name="ValidState" Type="bool" Default="false" />
+            <!-- Entity is authorized to act -->
+            <Field Name="ValidAuthorization" Type="bool" Default="false" />
+            <!-- Entity is authorized to change speed -->
+            <Field Name="SpeedAuthorization" Type="bool" Default="false" />
+            <!-- Entity is authorized to change payload/gimbal -->
+            <Field Name="GimbalAuthorization" Type="bool" Default="false" />
+            <!-- Time of last entity state message received -->
+            <Field Name="VehicleTime" Type="int64" Units="milliseconds since 1 Jan 1970" />
         </Struct>
         
         <!-- Entity Join -->
@@ -136,6 +186,23 @@
             <!-- Label of entity exiting network -->
             <Field Name="Label" Type="string" />
         </Struct>  
+        
+        <!-- Message for indicating that UxAS has handled an EntityState update
+             which allows an external simulation to pause until received -->
+        <Struct Name="SimulationTimeStepAcknowledgement" >
+            <!-- Vehicle for which the entity state update was handled -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Associated time from the handled entity state -->
+            <Field Name="ReportedTime" Type="int64" Units="milliseconds" />
+        </Struct>
+
+        <!-- Overrides speed commands from waypoints -->
+        <Struct Name="SpeedOverrideAction" Extends="CMASI/VehicleAction" >
+            <!-- ID of vehicle for which speed should be overridden -->
+            <Field Name="VehicleID" Type="int64" />
+            <!-- Commanded Speed -->
+            <Field Name="Speed" Type="real32" Units="mps"/>
+        </Struct>
 
  </StructList>
 </MDM>

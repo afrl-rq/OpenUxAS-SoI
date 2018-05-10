@@ -1,0 +1,54 @@
+<LineSearchTask Series="CMASI">
+            <PointList>
+                <Location3D Series="CMASI">
+                    <Latitude>25.31847346655291</Latitude>
+                    <Longitude>-80.52577037727255</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.30408747750344</Latitude>
+                    <Longitude>-80.5228963983301</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.29797423786537</Latitude>
+                    <Longitude>-80.51478400094064</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+                <Location3D Series="CMASI">
+                    <Latitude>25.295859614498685</Latitude>
+                    <Longitude>-80.50109516854623</Longitude>
+                    <Altitude>0.0</Altitude>
+                    <AltitudeType>MSL</AltitudeType>
+                </Location3D>
+            </PointList>
+            <ViewAngleList>
+                <Wedge Series="CMASI">
+                    <AzimuthCenterline>45.0</AzimuthCenterline>
+                    <VerticalCenterline>-70.0</VerticalCenterline>
+                    <AzimuthExtent>15.0</AzimuthExtent>
+                    <VerticalExtent>10.0</VerticalExtent>
+                </Wedge>
+            </ViewAngleList>
+            <UseInertialViewAngles>false</UseInertialViewAngles>
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>28</TaskID>
+            <Label />
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </LineSearchTask>
+        
+        
+        
+        
+        
+        
+        

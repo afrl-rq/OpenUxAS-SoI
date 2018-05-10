@@ -14,7 +14,7 @@ TEST(AutomationRequestTest, Test01_GoodRequest)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{5};
+    uint32_t duration_s{6};
     // testPath - relative path to the directory containing configration and othe test files
 	std::string testPath;
 	// configFileName - file name of the UxAS configuration file
@@ -77,7 +77,6 @@ TEST(AutomationRequestTest, Test01_GoodRequest)
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(5,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
-    //EXPECT_EQ(13,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService")));
     
 };
 
@@ -87,7 +86,7 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{3};
+    uint32_t duration_s{4};
     // testPath - relative path to the directory containing configration and othe test files
 	std::string testPath;
 	// configFileName - file name of the UxAS configuration file
@@ -131,11 +130,11 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AirVehicleState")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AreaSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationRequest")));
-    EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationResponse")));
+    EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationResponse")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.KeepOutZone")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.LineSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.OperatingRegion")));
-    EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
+    EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AngledAreaSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AreaOfInterest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.ImpactLineSearchTask")));
@@ -152,7 +151,6 @@ TEST(AutomationRequestTest, Test02_Missing_AirVehicleState)
     EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
     EXPECT_EQ(0,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(5,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
-    //EXPECT_EQ(13,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService")));
 };
 
 TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
@@ -161,7 +159,7 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     //  INITIALIZE TEST SETUP
     //**************************************************************************
     // duration_s - number of second to run UxAS
-    uint32_t duration_s{5};
+    uint32_t duration_s{6};
     // testPath - relative path to the directory containing configration and othe test files
 	std::string testPath;
 	//configFileName - file name of the UxAS configuration file
@@ -218,6 +216,7 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     EXPECT_EQ(24,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.AssignmentCostMatrix")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintRequests")));
+    EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskAssignmentSummary")));
     EXPECT_EQ(6,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskImplementationRequest")));
     EXPECT_EQ(6,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskImplementationResponse")));
@@ -226,7 +225,6 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationRequest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.UniqueAutomationResponse")));
     EXPECT_EQ(6,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.CreateNewService")));
-    //EXPECT_EQ(14,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.uxnative.KillService")));
     
 };
 

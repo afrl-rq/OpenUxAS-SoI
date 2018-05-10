@@ -1,21 +1,29 @@
-cpp_args = []
-cpp = meson.get_compiler('cpp')
+cpp_args_comms = cpp_args
 
 if cpp.get_id() == 'msvc'
-  cpp_args += [
-    '/std:c++14',
-    '-DZMQ_DEFINED_STDINT',
+  cpp_args_comms += [
     '-DZMQ_STATIC',
+    '-DCZMQ_STATIC',
+    '-DZYRE_STATIC',
+    '-DLIBZMQ_STATIC',
     '-DLIBCZMQ_STATIC',
     '-DLIBZYRE_STATIC',
   ]
 else
-  cpp_args += [
-    '-std=c++11',
+  cpp_args_comms += [
     '-Wno-unused-function',
     '-Wno-unused-variable',
   ]
 endif
+
+inc_dirs = [
+  include_directories(
+    '../../src/Includes',
+    '../../src/Utilities',
+    '../../src/Services',
+  ),
+  incs_lmcp,
+]
 
 lib_uxas_communications = static_library(
   'uxas_messages',
@@ -44,19 +52,14 @@ lib_uxas_communications = static_library(
     'ZeroMqSenderBase.cpp',
     'ZeroMqZyreBridge.cpp',
   ],
-  cpp_args: cpp_args,
-  include_directories: [
-    include_directories(
-      '../../src/Includes',
-      '../../src/Utilities',
-      '../../src/Services',
-      '../../3rd/cppzmq-4.2.1',
-      '../../3rd/zeromq-4.1.6/include',
-      '../../3rd/czmq-3.0.1/include',
-      '../../3rd/zyre-1.1.0/include',
-      '../../3rd/PugiXML/src',
-      '../../3rd/serial-1.2.1/include',
-    ),
-    incs_lmcp,
-  ]
+  cpp_args: cpp_args_comms,
+  dependencies: [
+    dep_czmq,
+    dep_cppzmq,
+    dep_pugixml,
+    dep_serial,
+    dep_zeromq,
+    dep_zyre,
+  ],
+  include_directories: inc_dirs,
 )

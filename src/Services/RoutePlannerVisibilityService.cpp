@@ -220,8 +220,8 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
         auto request = std::static_pointer_cast<uxas::messages::route::RoutePlanRequest>(receivedLmcpMessage->m_object);
         auto itEntityConfiguration = m_idVsEntityConfiguration.find(request->getVehicleID());
         if (itEntityConfiguration != m_idVsEntityConfiguration.end() &&
-                (afrl::cmasi::isAirVehicleConfiguration(itEntityConfiguration->second.get()) ||
-                afrl::vehicles::isSurfaceVehicleConfiguration(itEntityConfiguration->second.get())))
+                (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(itEntityConfiguration->second) ||
+                std::dynamic_pointer_cast<afrl::vehicles::SurfaceVehicleConfiguration>(itEntityConfiguration->second)))
         {
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             if (bProcessRoutePlanRequest(request, routePlanResponse))
@@ -235,6 +235,14 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
                         ),
                         message);
             }
+            else
+            {
+               CERR_FILE_LINE_MSG("Error processing route plan request")
+            }
+        }
+        else
+        {
+           CERR_FILE_LINE_MSG("No available air vehicle configurations")
         }
     }
     else
@@ -438,9 +446,15 @@ bool RoutePlannerVisibilityService::bProcessRoutePlanRequest(const std::shared_p
                 routePlan->setRouteCost(routeCost_ms);
                 if (!routePlanRequest->getIsCostOnlyRequest())
                 {
+                    n_FrameworkLib::CTrajectoryParameters::enPathType_t enpathType = n_FrameworkLib::CTrajectoryParameters::pathTurnStraightTurn;
+                    if((!(*itRequest)->getUseEndHeading()) && (!(*itRequest)->getUseStartHeading()))
+                    {
+                        enpathType = n_FrameworkLib::CTrajectoryParameters::pathEuclidean;
+                    }
+                    
                     isCalculateWaypoints(itOperatingVisibilityGraph->second, pathInformation, routePlanRequest->getVehicleID(),
                             (*itRequest)->getStartHeading(), (*itRequest)->getEndHeading(),
-                            routePlan->getWaypoints());
+                            routePlan->getWaypoints(),enpathType);
                 }
                 routePlanResponse->getRouteResponses().push_back(routePlan->clone());
             }
@@ -543,7 +557,8 @@ bool RoutePlannerVisibilityService::bFindPointsForAbstractGeometry(afrl::cmasi::
 bool RoutePlannerVisibilityService::isCalculateWaypoints(const n_FrameworkLib::PTR_VISIBILITYGRAPH_t& visibilityGraph,
         const std::shared_ptr<n_FrameworkLib::CPathInformation>& pathInformation,
         const int64_t& vehicleId, const double& startHeading_deg, const double& endHeading_deg,
-        std::vector<afrl::cmasi::Waypoint*>& planWaypoints)
+        std::vector<afrl::cmasi::Waypoint*>& planWaypoints,
+        const n_FrameworkLib::CTrajectoryParameters::enPathType_t& enpathType)
 {
     bool isSuccessful(true);
 
@@ -551,7 +566,6 @@ bool RoutePlannerVisibilityService::isCalculateWaypoints(const n_FrameworkLib::P
     if (itPlannerParameters != m_idVsPlannerParameters.end())
     {
         double turnRadius_m = itPlannerParameters->second->turnRadius_m;
-        n_FrameworkLib::CTrajectoryParameters::enPathType_t enpathType = n_FrameworkLib::CTrajectoryParameters::pathTurnStraightTurn;
         isSuccessful = visibilityGraph->isGenerateWaypoints(pathInformation, startHeading_deg, endHeading_deg, turnRadius_m, enpathType, m_minimumWaypointSeparation_m, planWaypoints);
     }
     else

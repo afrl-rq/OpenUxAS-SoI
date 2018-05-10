@@ -23,10 +23,18 @@ namespace communications
 {
 
 /** \class LmcpObjectNetworkSubscribePushBridge
-    \brief A service that connects an external entity to the internal message
+ *  \brief A service that connects an external entity to the internal message
  * bus using <I>ZMQ_SUB<I/> and <I>ZMQ_PUSH<I/> sockets.
-
  * 
+ * @par Example:
+ * <Bridge Type="LmcpObjectNetworkSubscribePushBridge"
+ *    AddressSUB="tcp://localhost:5555"
+ *    AddressPUSH="tcp://localhost:5556"
+ *    ConsiderSelfGenerated="false">
+ *
+ * AddressSUB: the address and port for the ZeroMQ subscription connection
+ * AddressPUSH: the address and port for the ZeroMQ push connection
+ * ConsiderSelfGenerated: boolean that when true sends local messages with bridge service ID
  * 
  *  @par Description:
  * The <B>Subscribe/Push Bridge<B/> component connects to external entities using
@@ -57,14 +65,7 @@ namespace communications
  * for the SUB socket, see @ref m_ptr_ZsckSubscribe. The attribute: <B><I>AddressPUSH<I/><B/>
  * is used to set the address of the PUSH socket, see @ref m_ptr_ZsckPush
  * 
- * <li> The <B>Server<B/> element in the configuration entry is set to <I>true<I/>
- * or <I>false<I/> and controls if the address are bound (bind) or connected
- * (connect) to the sockets. 
- * 
  * </ul> @n
- * 
- * 
- * 
  * 
  */
 
@@ -126,10 +127,9 @@ private:
 
     uxas::communications::LmcpObjectMessageSenderPipe m_externalLmcpObjectMessageSenderPipe;
 
-	std::string m_externalSubscribeSocketAddress = std::string("tcp://*:5555");
+    std::string m_externalSubscribeSocketAddress = std::string("tcp://*:5555");
     std::string m_externalPushSocketAddress = std::string("tcp://*:5556");
-    /** \brief  should the pub and pull sockects be set up as a server (default) or a client?*/
-    bool m_isServer{false};
+    bool m_isConsideredSelfGenerated{ false };
 };
 
 }; //namespace communications

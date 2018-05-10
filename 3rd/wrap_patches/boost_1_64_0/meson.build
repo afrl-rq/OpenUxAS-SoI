@@ -73,7 +73,7 @@ lib = static_library(
   include_directories: incs_boost,
 )
 
-dep_boost = declare_dependency(
+dep = declare_dependency(
   link_with: lib,
   include_directories: incs_boost,
 )

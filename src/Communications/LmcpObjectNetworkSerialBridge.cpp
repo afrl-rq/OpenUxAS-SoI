@@ -11,9 +11,6 @@
 
 #include "SerialHelper.h"
 
-//#include "avtas/lmcp/Factory.h"
-//#include "afrl/cmasi/ServiceStatus.h"
-
 #include "UxAS_Log.h"
 #include "Constants/UxAS_String.h"
 
@@ -48,6 +45,16 @@ LmcpObjectNetworkSerialBridge::configure(const pugi::xml_node& bridgeXmlNode)
     else
     {
         UXAS_LOG_INFORM(s_typeName(), "::configure failed to find serial port address in XML configuration");
+    }
+    
+    if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
+    {
+        m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
+        UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
+    }
+    else
+    {
+        UXAS_LOG_INFORM(s_typeName(), "::configure did not find 'ConsiderSelfGenerated' boolean in XML configuration; 'ConsiderSelfGenerated' boolean is ", m_isConsideredSelfGenerated);
     }
 
     if (isSuccess)
@@ -198,65 +205,50 @@ LmcpObjectNetworkSerialBridge::executeSerialReceiveProcessing()
                 {
                     UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", serialInput, "] before processing received serial string");
                     std::string recvdSerialDataSegment = m_receiveSerialDataBuffer.getNextPayloadString(serialInput);
-                    while (true)
+                    while (!recvdSerialDataSegment.empty())
                     {
-                        if (!recvdSerialDataSegment.empty())
+                        UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString, "] processing complete object string segment retrieved from serial buffer");
+                        std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
+                        if (recvdAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdSerialDataSegment)))
                         {
-                            UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing [", m_entityIdNetworkIdUnicastString, "] processing complete object string segment retrieved from serial buffer");
-                            std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdAddAttMsg = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
-                            if (recvdAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdSerialDataSegment)))
+                            if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
                             {
-                                // process messages from an external service (only)
-                                if (m_entityIdString != recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
+                                if(m_isConsideredSelfGenerated)
                                 {
-                                    if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
-                                    {
-                                        sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
-                                    }
-                                    else
-                                    {
-                                        UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
-                                    }
+                                    recvdAddAttMsg->updateSourceAttributes("SerialBridge", std::to_string(m_entityId), std::to_string(m_networkId));
                                 }
-                                else
-                                {
-                                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                                }
+                                sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
                             }
                             else
                             {
-                                UXAS_LOG_WARN(s_typeName(), "::executeSerialReceiveProcessing failed to create AddressedAttributedMessage object from serial data buffer string segment");
+                                UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring non-import message with address ", recvdAddAttMsg->getAddress(), ", source entity ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceEntityId(), " and source service ID ", recvdAddAttMsg->getMessageAttributesReference()->getSourceServiceId());
                             }
-                            recvdSerialDataSegment = m_receiveSerialDataBuffer.getNextPayloadString("");
                         }
                         else
                         {
-                            UXAS_LOG_DEBUGGING(s_typeName(), "::executeSerialReceiveProcessing serial buffer did not contain a complete object string segment");
-                            break;
+                            UXAS_LOG_WARN(s_typeName(), "::executeSerialReceiveProcessing failed to create AddressedAttributedMessage object from serial data buffer string segment");
                         }
+                        recvdSerialDataSegment = m_receiveSerialDataBuffer.getNextPayloadString("");
                     }
-                }
-                else
-                {
-                    UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing ignoring received serial message with empty payload string");
                 }
             }
             catch (std::exception& ex2)
             {
-                std::string errorMessage;
-                std::unique_ptr<avtas::lmcp::Object> lmcpServiceStatus = uxas::communications::data::SerialHelper
-                        ::createLmcpMessageObjectSerialConnectionFailure(s_typeName(), uxas::communications::data::SerialConnectionAction::READ, 
-                                                                         m_serialPortAddress, m_serialBaudRate, ex2, errorMessage);
-                sendLmcpObjectBroadcastMessage(std::move(lmcpServiceStatus));
-                UXAS_LOG_ERROR(errorMessage, " EXCEPTION: ", ex2.what());
+                std::cerr << "Serial exception: " << ex2.what() << std::endl;
+                //std::string errorMessage;
+                //std::unique_ptr<avtas::lmcp::Object> lmcpServiceStatus = uxas::communications::data::SerialHelper
+                //        ::createLmcpMessageObjectSerialConnectionFailure(s_typeName(), uxas::communications::data::SerialConnectionAction::READ, 
+                //                                                         m_serialPortAddress, m_serialBaudRate, ex2, errorMessage);
+                //sendLmcpObjectBroadcastMessage(std::move(lmcpServiceStatus));
+                //UXAS_LOG_ERROR(errorMessage, " EXCEPTION: ", ex2.what());
             }
-              
-//            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        std::cerr << "executeSerialReceiveProcessing exiting infinite loop thread" << std::endl;
         UXAS_LOG_INFORM(s_typeName(), "::executeSerialReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }
     catch (std::exception& ex)
     {
+        std::cerr << "executeSerialReceiveProcessing catching unknown exception: " << ex.what() << std::endl;
         UXAS_LOG_ERROR(s_typeName(), "::executeSerialReceiveProcessing EXCEPTION: ", ex.what());
     }
 };

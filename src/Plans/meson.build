@@ -11,16 +11,14 @@ lib_plans = static_library(
   ],
   dependencies: [
     dep_boost,
+    dep_pugixml,
   ],
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args,
   include_directories: [
     include_directories(
       '../../src/Includes',
       '../../src/Utilities',
       '../../src/VisilibityLib',
-      '../../3rd/PugiXML/src',
     ),
     incs_lmcp,
   ],

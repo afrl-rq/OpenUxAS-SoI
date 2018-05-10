@@ -1,3 +1,11 @@
+cpp_args_dpss = cpp_args
+
+if cpp.get_id() == 'msvc'
+  cpp_args_dpss += [
+    '-DDPSS_STATIC',
+  ]
+endif
+
 lib_dpss = static_library(
   'dpss',
   [
@@ -13,10 +21,7 @@ lib_dpss = static_library(
     'SegmentMap.cpp',
     'SensorSteering.cpp',
   ],
-  cpp_args: [
-    '-std=c++11',
-	'-DDPSS_STATIC',
-  ],
+  cpp_args: cpp_args_dpss,
   include_directories: include_directories(
     '../../src/Includes',
     '../../src/Utilities',

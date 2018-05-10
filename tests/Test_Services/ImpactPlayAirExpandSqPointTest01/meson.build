@@ -1,7 +1,6 @@
 exe_ImpactPlayAirExpandSqSpointTest01 = executable(
   'ImpactPlayAirExpandSqPointTest01',
   'ImpactPlayAirExpandSqPointTest01.cpp',
-  srcs_test,
   dependencies: deps_test,
   cpp_args: cpp_args_test,
   include_directories: inc_test,

@@ -1,6 +1,24 @@
 option(
+  'force_dep_download',
+  description: 'do not link os installed dependencies',
+  type: 'boolean',
+  value: false,
+)
+option(
   'afrl_internal',
   description: 'build with internal AFRL modules',
+  type: 'boolean',
+  value: false,
+)
+option(
+  'geo_libs',
+  description: 'build with extra ground height fidelity (requires gdal and GeographicLib)',
+  type: 'boolean',
+  value: false,
+)
+option(
+  'video_steam_detector',
+  description: 'include video stream detector service (requires additional libraries)',
   type: 'boolean',
   value: false,
 )

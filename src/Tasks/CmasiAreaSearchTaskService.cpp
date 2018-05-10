@@ -201,7 +201,7 @@ void CmasiAreaSearchTaskService::buildTaskPlanOptions()
     double wedgeAzimuthIncrement(n_Const::c_Convert::dPiO8());
     double wedgeElevationIncrement(n_Const::c_Convert::dPiO8());
 
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
 
     std::string compositionString("+(");
 

@@ -7,33 +7,28 @@
 
 # from the README.md, 2017-05-08:
 
-echo "Installing dependencies (pdflatex, firefox, sed, evince)..."
+echo "Installing dependencies (pdflatex, sed, evince)..."
 
 # references:
 # * http://stackoverflow.com/questions/3466166/how-to-check-if-running-in-cygwin-mac-or-linux/17072017#17072017
 # * https://serverfault.com/questions/501230/can-not-seem-to-get-expr-substr-to-work
 
 if [ "$(uname)" == "Darwin" ]; then
-#if [ "$($(uname -s) | cut -c 1-6)" == "Darwin" ]; then
-    echo " "
-    echo "Install basictex (provides pdflatex)..."
-    # ref: https://tex.stackexchange.com/questions/307483/setting-up-basictex-homebrew
-    brew cask install basictex
-    open /usr/local/Caskroom/basictex/*/mactex-basictex-*.pkg
-    echo "* In installation window, follow instructions to install basictex"
-    echo "  (Continue, Install, etc.)"
-    echo "Once you've done this..."
-    read -rs -p "Press any key to continue..." -n 1 # reference: https://ss64.com/bash/read.html
-    
-    echo " "
+    # Install doxygen and related packages: in terminal
+    brew install doxygen
+    brew install graphviz
+    brew cask install mactex
     # Install firefox, sed, evince (for pdf viewing)
     brew install firefox sed evince
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    sudo apt update
-    # Install texlive-full (provides dflatex), firefox, sed, evince (for pdf viewing)
-    sudo apt -y install texlive-full firefox sed evince
+    # Install doxygen and related packages: in terminal
+    sudo apt -y install doxygen
+    sudo apt -y install graphviz
+    sudo apt -y install texlive-full
+    # Install sed, evince (for pdf viewing)
+    sudo apt -y install sed evince
 else
-    echo "This is a Windows platform (Cygwin?) -- unsupported!"
+    echo "Unsupported platform! Script install only for Linux and Mac"
     exit 1
 fi
 
@@ -48,8 +43,8 @@ cd ../../doxygen
 sh RunDoxygen.sh
 echo "Opening ./doc/doxygen/html/index.html in firefox"
 firefox ./html/index.html &
-echo "Opening ./doc/LMCP/index.html in firefox"
-firefox ../LMCP/index.html &
+#echo "Opening ./doc/LMCP/index.html in firefox"
+#firefox ../LMCP/index.html &
 
 echo "Creating Doxygen PDF reference manual (post-RunDoxygen.sh run)..."
 # run this at: ./OpenUxAS/doc/doxygen

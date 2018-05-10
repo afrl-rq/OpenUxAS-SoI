@@ -24,6 +24,7 @@
 #include "afrl/cmasi/OperatingRegion.h"
 #include "afrl/cmasi/Task.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
+#include "uxas/messages/task/UniqueAutomationResponse.h"
 
 #include <memory>
 #include <deque>
@@ -43,7 +44,32 @@ namespace service
  *  <Service Type="AutomationRequestValidatorService" MaxResponseTime_ms="5000"/>
  * 
  * Options:
- *  - MaxResponseTime_ms
+ *  - MaxResponseTime_ms: waits for specified time before rejecting request and proceeding
+ * 
+ * Design: The objective of the Automation Request Validator is to ensure that a request
+ *         can be fulfilled given the current state of received messages. For example,
+ *         an Automation Request that includes a task that has not yet been defined. In 
+ *         addition to checking for appropriately formed requests, the Automation Request
+ *         Validator will abandon an attempt to fulfill a request if the system exceeds
+ *         a pre-defined time threshold.
+ * 
+ * Details: To accommodate the case when tasks are defined and immediately followed by an
+ *          automation request, a small grace period is needed to allow tasks to initialize
+ *          themselves in preparation for the coming request. To accommodate this, the
+ *          Automation Request Validator takes the following steps: (1) validate request; 
+ *          (2) check that each requested task is initialized; (3) send unique automation
+ *          request; (4) receive and publish response.
+ * 
+ *          If the request is valid, but tasks are not yet initialized, a timer is started
+ *          waiting for 'MaxResponseTime_ms' which terminates the request and returns an
+ *          error when it times out. When all relevant 'TaskInitialization' messages are
+ *          received, then the timer is disabled and the unique automation request sent.
+ * 
+ *          After the unique automation request is sent, the timer is again enabled such
+ *          that if 'MaxResponseTime_ms' elapses, the request will be abandoned and an
+ *          error reported. The incorporation of the time-outs ensures that in the event
+ *          of a task initialization or assignment pipeline failure, the system can still
+ *          respond to subsequent requests.
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::AutomationRequest
@@ -133,18 +159,26 @@ private:
 
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
+    void HandleAutomationRequest(std::shared_ptr<avtas::lmcp::Object>& autoRequest);
+    void HandleAutomationResponse(std::shared_ptr<avtas::lmcp::Object>& autoResponse);
+    void SendResponse(std::shared_ptr<uxas::messages::task::UniqueAutomationResponse>& resp);
 
     ////////////////////////
     // TIMER CALLBACKS
     /*! \brief this function gets called when the response timer expires */
     void OnResponseTimeout();
+    /*! \brief this function gets called when the tasks involved have not reported initialization in time */
+    void OnTasksReadyTimeout();
     
     bool isCheckAutomationRequestRequirements(const std::shared_ptr<uxas::messages::task::UniqueAutomationRequest>& uniqueAutomationRequest);
-    void checkToSendNextRequest();
+    void checkTasksInitialized();
+    void sendNextRequest();
     
-    /*! \brief  this timer is used to track time for the system to respond
-     * to automation requests*/
+    /*! \brief  this timer is used to track time for the system to respond to automation requests */
     uint64_t m_responseTimerId{0};
+    /*! \brief  this timer is used to track time for the system to wait for task initialization */
+    uint64_t m_taskInitTimerId{0};
+    
     /*! \brief  parameter indicating the maximum time to wait for a response (in ms)*/
     uint32_t m_maxResponseTime_ms = {5000}; // default: 5000 ms
 
@@ -155,13 +189,20 @@ private:
         TASK_AUTOMATION_REQUEST
     };
     
+    /*! \brief  data structure for tracking request type and associated play/solution IDs */
+    struct RequestDetails {
+        AutomationRequestType requestType{AUTOMATION_REQUEST};
+        int64_t playId{0};
+        int64_t solnId{0};
+        int64_t taskRequestId{0};
+    };
+    
     // storage
-    std::deque< std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_waitingRequests;
-    std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> m_waitingForResponse;
-    bool m_isAllClear{true};
-    std::unordered_map<int64_t, AutomationRequestType> m_sandboxMap;
-    std::unordered_map<int64_t, int64_t> m_playId;
-    std::unordered_map<int64_t, int64_t> m_solnId;
+    std::deque< std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_pendingRequests;
+    std::deque< std::shared_ptr<uxas::messages::task::UniqueAutomationRequest> > m_requestsWaitingForTasks;
+    std::shared_ptr<uxas::messages::task::UniqueAutomationResponse> m_errorResponse;
+    
+    std::unordered_map<int64_t, RequestDetails> m_sandboxMap;
     
     std::unordered_set<int64_t> m_availableConfigurationEntityIds;
     std::unordered_set<int64_t> m_availableStateEntityIds;
@@ -172,7 +213,7 @@ private:
     std::unordered_set<int64_t> m_availablePointOfInterestIds;
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::OperatingRegion> > m_availableOperatingRegions;
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::Task> > m_availableTasks;
-    std::unordered_set<int64_t> m_availableStartedTaskIds;
+    std::unordered_set<int64_t> m_availableInitializedTasks;
     
 };
 

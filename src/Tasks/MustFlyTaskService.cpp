@@ -87,26 +87,25 @@ MustFlyTaskService::processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::
 
 void MustFlyTaskService::buildTaskPlanOptions()
 {
-    int64_t optionId = 1;
+    int64_t optionId = TaskOptionClass::m_firstOptionId;
 
     double wedgeDirectionIncrement(n_Const::c_Convert::dPiO8());
     double dHeadingCurrent_rad = 0.0;
     double dHeadingTarget_rad = n_Const::c_Convert::dTwoPi() - wedgeDirectionIncrement;
     while (n_Const::c_Convert::bCompareDouble(dHeadingTarget_rad, dHeadingCurrent_rad, n_Const::c_Convert::enGreaterEqual))
-    {
-        auto taskOption = new uxas::messages::task::TaskOption;
-        taskOption->setEndHeading(dHeadingCurrent_rad * n_Const::c_Convert::dRadiansToDegrees());
-        taskOption->setStartHeading(dHeadingCurrent_rad * n_Const::c_Convert::dRadiansToDegrees());
-
-        taskOption->setTaskID(m_mustFlyTask->getTaskID());
-        taskOption->setOptionID(optionId);
-        taskOption->getEligibleEntities() = m_mustFlyTask->getEligibleEntities();
-        taskOption->setStartLocation(m_mustFlyTask->getPosition()->clone());
-        taskOption->setEndLocation(m_mustFlyTask->getPosition()->clone());
-        auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
-        m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
-        m_taskPlanOptions->getOptions().push_back(taskOption);
-        taskOption = nullptr; //just gave up ownership
+    {     
+        auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+        auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+        pTaskOptionClass->m_taskOption->setTaskID(m_mustFlyTask->getTaskID());
+        pTaskOptionClass->m_taskOption->setOptionID(optionId);
+        pTaskOptionClass->m_taskOption->setCost(0);
+        pTaskOptionClass->m_taskOption->setStartLocation(m_mustFlyTask->getPosition()->clone());
+        pTaskOptionClass->m_taskOption->setStartHeading(dHeadingCurrent_rad * n_Const::c_Convert::dRadiansToDegrees());
+        pTaskOptionClass->m_taskOption->setEndLocation(m_mustFlyTask->getPosition()->clone());
+        pTaskOptionClass->m_taskOption->setEndHeading(dHeadingCurrent_rad * n_Const::c_Convert::dRadiansToDegrees());
+        pTaskOptionClass->m_taskOption->getEligibleEntities() = m_mustFlyTask->getEligibleEntities();
+        m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+        m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
 
         optionId++;
         dHeadingCurrent_rad += wedgeDirectionIncrement;

@@ -96,6 +96,35 @@ public:
         m_isValid = true;
         return (m_isValid);
     };
+    
+    bool
+    updateSourceAttributes(const std::string sourceGroup, const std::string sourceEntityId, const std::string sourceServiceId)
+    {
+        m_sourceGroup = sourceGroup;
+        m_sourceEntityId = sourceEntityId;
+        m_sourceServiceId = sourceServiceId;
+        
+        if (sourceEntityId.length() < 1)
+        {
+            UXAS_LOG_ERROR(s_typeName(), "::setAttributes sourceEntityId must be non-empty");
+            m_isValid = false;
+            return (m_isValid);
+        }
+
+        if (sourceServiceId.length() < 1)
+        {
+            UXAS_LOG_ERROR(s_typeName(), "::setAttributes sourceServiceId must be non-empty");
+            m_isValid = false;
+            return (m_isValid);
+        }
+        
+        m_string = m_contentType + AddressedMessage::s_fieldDelimiter()
+                + m_descriptor + AddressedMessage::s_fieldDelimiter()
+                + m_sourceGroup + AddressedMessage::s_fieldDelimiter()
+                + m_sourceEntityId + AddressedMessage::s_fieldDelimiter()
+                + m_sourceServiceId;
+        return (m_isValid);
+    };
 
     bool
     setAttributesFromDelimitedString(const std::string delimitedString)

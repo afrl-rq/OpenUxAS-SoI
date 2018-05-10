@@ -2,6 +2,7 @@
 build
 build_debug
 build_odroid
+build_open
 
 # afrl internal directories
 UxAS-afrl_internal
@@ -34,3 +35,6 @@ examples/**/datawork/**
 # Visual Studio
 /.vs
 /regen-temp
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json

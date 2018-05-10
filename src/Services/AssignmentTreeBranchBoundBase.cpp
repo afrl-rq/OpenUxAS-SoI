@@ -575,7 +575,7 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
         if (nodeAssignment->m_staticAssignmentParameters->m_numberCompleteAssignments <= 0)
         {
             auto serviceStatus = std::make_shared<afrl::cmasi::ServiceStatus>();
-            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Warning);
+            serviceStatus->setStatusType(afrl::cmasi::ServiceStatusType::Error);
             auto keyValuePair = new afrl::cmasi::KeyValuePair;
             keyValuePair->setKey(std::string("No UniqueAutomationResponse"));
             keyValuePair->setValue(std::string("Assignment not found: ") + nodeAssignment->m_staticAssignmentParameters->m_reasonsForNoAssignment.str());
@@ -752,16 +752,15 @@ void c_Node_Base::printStatus(const std::string& Message)
     double timeSinceStart_s = static_cast<double> (uxas::common::utilities::c_TimeUtilities::getTimeNow_ms() -
             m_staticAssignmentParameters->m_assignmentStartTime_ms) / 1000.0;
     UXAS_LOG_INFORM(Message
-                  << "timeSinceStart_s[" << timeSinceStart_s
-                  << "] m_vehicleID[" << m_vehicleID
-                  << "] cost[" << m_staticAssignmentParameters->m_minimumAssignmentCostCandidate
-                  << "] numberNodesVisited[" << m_staticAssignmentParameters->m_numberNodesVisited
-                  << "] numberNodesRemoved[" << m_staticAssignmentParameters->m_numberNodesRemoved
-                  << "] Number Current Nodes[" << (m_staticAssignmentParameters->m_numberNodesVisited - m_staticAssignmentParameters->m_numberNodesRemoved)
-                  << "] numberNodesAdded[" << m_staticAssignmentParameters->m_numberNodesAdded
-                  << "] numberNodesPruned[" << m_staticAssignmentParameters->m_numberNodesPruned
-
-                  << "]" << std::endl)
+                  , "timeSinceStart_s[" , timeSinceStart_s
+                  , "] m_vehicleID[" , m_vehicleID
+                  , "] cost[" , m_staticAssignmentParameters->m_minimumAssignmentCostCandidate
+                  , "] numberNodesVisited[" , m_staticAssignmentParameters->m_numberNodesVisited
+                  , "] numberNodesRemoved[" , m_staticAssignmentParameters->m_numberNodesRemoved
+                  , "] Number Current Nodes[" , (m_staticAssignmentParameters->m_numberNodesVisited - m_staticAssignmentParameters->m_numberNodesRemoved)
+                  , "] numberNodesAdded[" , m_staticAssignmentParameters->m_numberNodesAdded
+                  , "] numberNodesPruned[" , m_staticAssignmentParameters->m_numberNodesPruned
+                  , "]" );
     UXAS_LOG_INFORM_ASSIGNMENT("timeSinceStart_s[", timeSinceStart_s,
                                   "] cost[", m_staticAssignmentParameters->m_minimumAssignmentCostCandidate,
                                   "] numberNodesVisited[", m_staticAssignmentParameters->m_numberNodesVisited, "]");

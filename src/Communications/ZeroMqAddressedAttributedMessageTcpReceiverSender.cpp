@@ -29,7 +29,16 @@ std::unique_ptr<uxas::communications::data::AddressedAttributedMessage>
 ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
 {
     std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> nextMsg;
-
+    
+    // just send the next message if one is available
+    if(!m_recvdMsgs.empty())
+    {
+        nextMsg = std::move(m_recvdMsgs[0]);
+        m_recvdMsgs.pop_front();
+        return nextMsg;
+    }
+    
+    // no messages in queue, attempt to read from TCP socket
     if (m_zmqSocket)
     {
         UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE zmq::pollitem_t");
@@ -64,35 +73,24 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
                     std::string framePayload(reinterpret_cast<const char*> (payloadData), payloadSize);
                     UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage TCP framePayload is: [", framePayload, "]");
                     std::string recvdTcpDataSegment = m_receiveTcpDataBuffer.getNextPayloadString(framePayload);
-                    if (!recvdTcpDataSegment.empty())
+                    while (!recvdTcpDataSegment.empty())
                     {
                         UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage processing complete object string segment");
                         std::unique_ptr<uxas::communications::data::AddressedAttributedMessage> recvdTcpAddAttMsg
                                 = uxas::stduxas::make_unique<uxas::communications::data::AddressedAttributedMessage>();
                         if (recvdTcpAddAttMsg->setAddressAttributesAndPayloadFromDelimitedString(std::move(recvdTcpDataSegment)))
                         {
-                            // process messages from an external service (only - since TCP stream is only used for bridging to other entities)
-                            if (m_entityIdString != recvdTcpAddAttMsg->getMessageAttributesReference()->getSourceEntityId())
-                            {
-                                nextMsg = std::move(recvdTcpAddAttMsg);
-                            }
-                            else
-                            {
-                                UXAS_LOG_INFORM("ZeroMqAddressedAttributedMessageReceiver::getNextMessage ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
-                            }
+                            m_recvdMsgs.push_back( std::move(recvdTcpAddAttMsg) );
                         }
                         else
                         {
                             UXAS_LOG_WARN("ZeroMqAddressedAttributedMessageReceiver::getNextMessage failed to create AddressedAttributedMessage object from TCP stream serial buffer string segment");
                         }
-                    }
-                    else
-                    {
-                        UXAS_LOG_DEBUGGING("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage data appended to serial buffer, but serial buffer does not yet contain a complete object string segment");
+                        recvdTcpDataSegment = m_receiveTcpDataBuffer.getNextPayloadString("");
                     }
                     UXAS_LOG_DEBUG_VERBOSE("ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage BEFORE zframe_destroy");
                     zframe_destroy(&frameData);
-                    if (nextMsg || uxas::common::ConfigurationManager::getZeroMqReceiveSocketPollWaitTime_ms() > -1)
+                    if (!m_recvdMsgs.empty() || uxas::common::ConfigurationManager::getZeroMqReceiveSocketPollWaitTime_ms() > -1)
                     {
                         break;
                     }
@@ -105,7 +103,12 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
         }
     } //if(m_zmqSocket)
 
-    return (nextMsg);
+    if(!m_recvdMsgs.empty())
+    {
+        nextMsg = std::move(m_recvdMsgs[0]);
+        m_recvdMsgs.pop_front();
+    }
+    return nextMsg; // blank if none received
 };
 
 void

@@ -21,6 +21,10 @@ For an Ubuntu 16.04 or Mac OS X system with prerequisites installed, UxAS should
 
 ## Configure System for UxAS Build
 
+For Linux and Mac systems, the [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (`bash install_prerequisites.sh`) automates the installation of all the necessary tools for compilation of *OpenUxAS*. Note, on Mac [XCode](https://developer.apple.com/xcode/) must first be installed before running the install script.
+
+Complete manual step-by-step instructions for each operating system are included below:
+
 - [Linux](#install-prerequisites-on-ubuntu-linux)
 - [Mac](#install-prerequisites-on-mac-os-x)
 - [Windows](#prep-and-build-on-windows)
@@ -39,7 +43,7 @@ Expected file system layout:
 1. Checkout *OpenUxAS*: `git clone https://github.com/afrl-rq/OpenUxAS.git`
 1. Checkout *LmcpGen*: `git clone https://github.com/afrl-rq/LmcpGen.git`
 1. Build *LmcpGen*: `cd LmcpGen; ant jar; cd ..`
-1. Auto-generate source code for LMCP libraries: `cd OpenUxAS; sh RunLmcpGen.sh; cd ..`
+1. Auto-generate source code for LMCP libraries: `cd OpenUxAS; bash RunLmcpGen.sh; cd ..`
 1. Prepare UxAS specific patches to external libraries: `cd OpenUxAS; ./prepare; cd ..`
 1. (**optional**) Checkout *OpenAMASE*: `git clone https://github.com/afrl-rq/OpenAMASE.git`
 1. (**optional**) Build *OpenAMASE*: `cd OpenAMASE/OpenAMASE; ant jar; cd ../..`
@@ -71,7 +75,11 @@ command: `ninja -C build clean`
 
 ### Compiling using NetBeans (Debug Mode)
 
-1. Open NetBeans
+1. Install [NetBeans and Oracle Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html)
+1. Enable C/C++ plug-in in NetBeans
+   - Choose Tools->Plugins from the top menu
+   - In the `Available Plugins` tab, search for `C++`
+   - Select `C/C++` and click `Install`
 1. Select File->New Project
 1. Choose `C/C++ Project with Existing Sources` and click `Next`
 1. Specify the `OpenUxAS` folder
@@ -103,8 +111,8 @@ The following is a bash script that helps to partially-automate the "building th
 
 This has been tested-working on Ubuntu 16.04, as of 2017-05-23.
 
-1. Download the script from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (build_documentation.sh) OR `cd` to your `git clone`d *OpenUxAS* directory
-1. Run the script at the terminal: `./build_documentation.sh`
+1. Download the [script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/build_documentation.sh) from the [*OpenUxAS* repository](https://github.com/afrl-rq/OpenUxAS/) (`bash build_documentation.sh`) OR `cd` to your `git clone`d *OpenUxAS* directory
+1. Run the script at the terminal: `bash build_documentation.sh`
 1. Follow the on-screen instructions
 
 Note that this will pop open two html files in your webbrowser and also the pdf manual when run.
@@ -204,9 +212,11 @@ in the `/3rd` directory by `./prepare`.
 
 
 # Detailed Prerequisite Steps
+The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) (`bash install_prerequisites.sh`) will automate the following steps.
 
 ## Install Prerequisites on Ubuntu Linux
-
+1. Ensure dependency search is supported: in terminal
+   * `sudo apt-get install pkg-config`
 1. Install `git`: in terminal
    * `sudo apt-get install git`
    * `sudo apt-get install gitk`
@@ -214,6 +224,8 @@ in the `/3rd` directory by `./prepare`.
    * `sudo apt-get install libglu1-mesa-dev`
 1. Install unique ID creation library: in terminal
    * `sudo apt-get install uuid-dev`
+1. Install BSD development library: in terminal
+   * `sudo apt-get install libbsd-dev`
 1. Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
    * `sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev`
 1. Install doxygen and related packages (**optional**): in terminal
@@ -228,8 +240,6 @@ in the `/3rd` directory by `./prepare`.
    * `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
    * `sudo -H pip3 install meson==0.42.1`
-1. Ensure dependency search for meson is supported: in terminal
-   * `sudo apt-get install pkg-config`
 1. Install python plotting capabilities (**optional**): in terminal
    * `sudo apt install python3-tk`
    * `sudo -H pip3 install matplotlib`
@@ -246,13 +256,15 @@ in the `/3rd` directory by `./prepare`.
    * Select `C/C++` and click `Install`
 1. Install Oracle Java run-time (required for *LmcpGen*): in terminal
    * `sudo add-apt-repository ppa:webupd8team/java`
-   * `sudo apt update; sudo apt install oracle-java8-installer`
-   * `sudo apt install oracle-java8-set-default`
+   * `sudo apt update; sudo apt install oracle-java9-installer`
+   * `sudo apt install oracle-java9-set-default`
 1. Install `ant` for command line build of java programs: in terminal
-   * `brew install ant`
+   * `sudo apt install ant`
 1. [Build](#build-uxas)
 
 ## Install Prerequisites on Mac OS X
+The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/OpenUxAS/develop/install_prerequisites.sh) will automate the following steps.
+
 1. Install [XCode](https://developer.apple.com/xcode/)
 1. Enable commandline tools: in terminal `xcode-select --install`
 1. Install `homebrew` (must be administrator): in terminal
@@ -316,9 +328,9 @@ in the `/3rd` directory by `./prepare`.
 1. (**optional**) Build OpenAMASE
    * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
-   * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.5.0/LmcpGen.jar)
+   * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.7.1/LmcpGen.jar)
    * Place `LmcpGen.jar` in `LmcpGen/dist` folder
-   * From the Git Bash shell in the root UxAS directory, run `sh RunLmcpGen.sh`
+   * From the Git Bash shell in the root UxAS directory, run `bash RunLmcpGen.sh`
    * Note: For simplicity, make sure the LMCPGen, OpenUxAS, and OpenAMASE repositories follow the folder structure labeled in the [Build UxAS](#build-uxas) section.
 1. Prepare build
    * Open VS command prompt (Tools -> Visual Studio Command Prompt)

@@ -1,0 +1,23 @@
+<ImpactLineSearchTask Series="IMPACT">
+            <LineID>129</LineID>
+            <ViewAngleList>
+                <Wedge Series="CMASI">
+                    <AzimuthCenterline>135.0</AzimuthCenterline>
+                    <VerticalCenterline>-70.0</VerticalCenterline>
+                    <AzimuthExtent>15.0</AzimuthExtent>
+                    <VerticalExtent>10.0</VerticalExtent>
+                </Wedge>
+            </ViewAngleList>
+            <UseInertialViewAngles>true</UseInertialViewAngles>
+            <DesiredWavelengthBands />
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>29</TaskID>
+            <Label>ILS29</Label>
+            <EligibleEntities />
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters />
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </ImpactLineSearchTask>
+        
