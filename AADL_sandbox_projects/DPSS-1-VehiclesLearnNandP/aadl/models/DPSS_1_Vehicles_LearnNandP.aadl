@@ -257,24 +257,25 @@ public
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.02)
-					--and UAVN startS out thinking there is no perimeter to its right
+					--and UAVN starts out thinking there is no perimeter to its right
 					and DPSS_Node_Lib.initial_value_true(UAV1.perimRight = 0.0)
 					--and each UAV starts out thinking it is the only one
 					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
 				);
 
-			lemma "Observer: Worst time (nearly 4T) convergence":
-				not (
-					stable
-					--Initially, all UAVs are heading to the right
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
-					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
-					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
-					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
-				);
+--This doesn't work for just one vehicle. 
+--			lemma "Observer: Worst time (nearly 4T) convergence":
+--				not (
+--					stable
+--					--Initially, all UAVs are heading to the right
+--					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
+--					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
+--					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
+--					--and UAV1 starts out thinking there is a segment of length RIGHT_ENDP_TRUTH to its left
+--					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = RIGHT_ENDP_TRUTH)
+--					--and each UAV starts out thinking it is the only one
+--					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
+--				);
 								
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
