@@ -510,7 +510,7 @@ public
 					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = RIGHT_ENDP_TRUTH - 0.03)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = RIGHT_ENDP_TRUTH - 0.02)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01)
-					--and UAVN startS out thinking there is no perimeter to its right
+					--and UAVN starts out thinking there is no perimeter to its right
 					and DPSS_Node_Lib.initial_value_true(UAV4.perimRight = 0.0)
 					--and each UAV starts out thinking it is the only one
 					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)

@@ -264,7 +264,7 @@ public
 					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
 					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.02)
-					--and UAVN startS out thinking there is no perimeter to its right
+					--and UAVN starts out thinking there is no perimeter to its right
 					and DPSS_Node_Lib.initial_value_true(UAV1.perimRight = 0.0)
 					--and each UAV starts out thinking it is the only one
 					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
