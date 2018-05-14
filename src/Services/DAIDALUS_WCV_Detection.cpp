@@ -329,6 +329,7 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
        if (local_min_horizontal_recovery_m > 0.0 && local_min_horizontal_recovery_m >= m_horizontal_nmac_m)
        {
            m_min_horizontal_recovery_m = local_min_horizontal_recovery_m;
+           m_DTHR_m = m_min_horizontal_recovery_m;
        }
     }
     if (!ndComponent.attribute(STRING_XML_VERTICALNMAC).empty())
@@ -342,6 +343,7 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
        if (local_min_vertical_recovery_m > 0.0 && local_min_vertical_recovery_m >= m_vertical_nmac_m)
        {
            m_min_vertical_recovery_m = local_min_vertical_recovery_m;
+           m_ZTHR_m = m_min_vertical_recovery_m;
        }
     }
 
@@ -571,6 +573,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
                             std::make_shared<larcfm::DAIDALUS::WellClearViolationIntervals>();  //Compose violations message
                     larcfm::TrafficState daa_own = m_daa.getOwnshipState();
+                    nogo_ptr->setEntityId(m_entityId);
                     nogo_ptr->setCurrentHeading(daa_own.track("deg"));
                     nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s"));
                     nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));
@@ -709,6 +712,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
     if (uxas::messages::uxnative::isStartupComplete(receivedLmcpMessage->m_object))
     {
         std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
+        DetectionConfiguration->setEntityId(m_entityId);
         DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
         DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
         DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
@@ -738,6 +742,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         DetectionConfiguration->setVerticalNMAC(m_daa.parameters.getVerticalNMAC("m"));
         DetectionConfiguration->setMinVerticalRecovery(m_daa.parameters.getMinVerticalRecovery("m"));
         DetectionConfiguration->setHorizontalContourThreshold(m_daa.parameters.getHorizontalContourThreshold("m"));
+        DetectionConfiguration->setDTHR(m_DTHR_m);
+        DetectionConfiguration->setZTHR(m_ZTHR_m);
         DetectionConfiguration->setTTHR(m_TTHR_s);
         DetectionConfiguration->setRTCAAlertLevels(m_RTCA_alert_levels);
         DetectionConfiguration->setAlertTime1(m_alert_time_1_s);
