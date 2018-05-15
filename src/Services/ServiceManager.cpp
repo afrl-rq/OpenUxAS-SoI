@@ -512,6 +512,18 @@ ServiceManager::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
         {
             xmlConfig += msg->toXML() + "\n";
         }
+        for (auto& msg : createNewService->getKeepInZones())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        for (auto& msg : createNewService->getKeepOutZones())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
+        for (auto& msg : createNewService->getOperatingRegions())
+        {
+            xmlConfig += msg->toXML() + "\n";
+        }
         xmlConfig += "</Service>";
         if (createService(xmlConfig,createNewService->getServiceID()))
         {

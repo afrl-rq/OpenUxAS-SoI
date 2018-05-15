@@ -148,7 +148,24 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
             pointOfInterest.reset(static_cast<afrl::impact::PointOfInterest*> (object->clone()));
             m_pointsOfInterest[pointOfInterest->getPointID()] = pointOfInterest;
         }
-
+        else if (afrl::cmasi::isKeepInZone(object))
+        {
+            std::shared_ptr<afrl::cmasi::KeepInZone> kiz;
+            kiz.reset(static_cast<afrl::cmasi::KeepInZone*>(object->clone()));
+            m_keepInZones[kiz->getZoneID()] = kiz;
+        }
+        else if (afrl::cmasi::isKeepOutZone(object))
+        {
+            std::shared_ptr<afrl::cmasi::KeepOutZone> koz;
+            koz.reset(static_cast<afrl::cmasi::KeepOutZone*>(object->clone()));
+            m_keepOutZones[koz->getZoneID()] = koz;
+        }
+        else if (afrl::cmasi::isOperatingRegion(object))
+        {
+            std::shared_ptr<afrl::cmasi::OperatingRegion> opr;
+            opr.reset(static_cast<afrl::cmasi::OperatingRegion*>(object->clone()));
+            m_OperatingRegions[opr->getID()] = opr;
+        }
         delete object;
     }
 
