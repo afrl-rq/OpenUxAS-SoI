@@ -133,7 +133,14 @@ public:
      */
     static const bool
     getIsLoggingThreadId() { return (s_isLoggingThreadId); };
-  
+    
+    /** \brief LogManager configuration to timestamp logs.
+     *
+     * @return true implies include a timestamp in log file names 
+     */
+    static const bool
+    getIsDataTimeStamp() { return s_isDataTimestamp; };
+
     /** \brief Zero MQ single-part/multi-part messaging boolean.
      * 
      * @return true if using Zero MQ multi-part messaging; false if using Zero MQ 
@@ -356,6 +363,7 @@ private:
     static uint32_t s_entityId;
     static std::string s_entityType;
     static bool s_isLoggingThreadId;
+    static bool s_isDataTimestamp;
     static bool s_isZeroMqMultipartMessage;
     static uint32_t s_runDuration_s;
     static uint32_t s_serialPortWaitTime_ms;

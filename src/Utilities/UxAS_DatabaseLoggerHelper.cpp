@@ -71,10 +71,8 @@ DatabaseLoggerHelper::openStream(std::string& logFilePath)
         if (dbFile.is_open())
         {
             dbFile.close();
-            m_db = uxas::stduxas::make_unique<SQLite::Database>(m_dbFilePath, SQLITE_OPEN_READWRITE);
+            remove(m_dbFilePath.c_str());
         }
-        else
-        {
             m_db = uxas::stduxas::make_unique<SQLite::Database>(m_dbFilePath, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 
             // begin transaction
@@ -83,7 +81,6 @@ DatabaseLoggerHelper::openStream(std::string& logFilePath)
 
             // commit transaction
             createTableTrans.commit();
-        }
         
         m_isDbOpened = true;
         isSuccess = true;

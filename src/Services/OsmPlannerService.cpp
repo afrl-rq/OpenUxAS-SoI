@@ -58,27 +58,21 @@ OsmPlannerService::ServiceBase::CreationRegistrar<OsmPlannerService>
 OsmPlannerService::s_registrar(OsmPlannerService::s_registryServiceTypeNames());
 
 OsmPlannerService::OsmPlannerService()
-: ServiceBase(OsmPlannerService::s_typeName(), OsmPlannerService::s_directoryName()) { };
+: ServiceBase(OsmPlannerService::s_typeName(), OsmPlannerService::s_directoryName())
+{
+    m_strSavePath = "OsmPlannerService";
+};
 
 OsmPlannerService::~OsmPlannerService() { };
 
 bool
 OsmPlannerService::configure(const pugi::xml_node& ndComponent)
-
 {
-    std::string strBasePath = m_workDirectoryPath;
     uint32_t ui32EntityID = m_entityId;
     uint32_t ui32LmcpMessageSize_max = 100000;
     std::stringstream sstrErrors;
 
     bool isSuccessful(true);
-
-    std::string strNewPathName;
-    std::stringstream sstrNewDirectoryPrefix;
-    sstrNewDirectoryPrefix << STRING_COMPONENT_NAME << "_ID" << std::setfill('0') << std::setw(4) << m_entityId;
-    std::string strComponentPath = strBasePath;
-    isSuccessful = uxas::common::utilities::c_FileSystemUtilities::bCreateUniqueDirectory(strComponentPath, std::string("OsmPlot"), strNewPathName, sstrErrors);
-    m_strSavePath = strNewPathName;
 
 
 
