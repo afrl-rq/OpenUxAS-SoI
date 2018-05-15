@@ -388,10 +388,10 @@ void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::Entity
         rtime = m_assignedToa[entityState->getID()] - entityState->getTime();
     }
 
-    if(rtime < 1000 or remainingDist < 1.0) return;
+    if(rtime < 1000 || remainingDist < 1.0) return;
 
     // speed to reach target on time
-    double desired_speed = std::max(speedMin_mps, std::min(speedMax_mps, remainingDist/(rtime/1000.0)));
+    double desired_speed = (std::max)(speedMin_mps, (std::min)(speedMax_mps, remainingDist/(rtime/1000.0)));
 
     auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
     vehicleActionCommand->setVehicleID(entityState->getID());
