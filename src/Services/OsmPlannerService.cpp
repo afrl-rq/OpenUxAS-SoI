@@ -171,16 +171,15 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
 
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             routePlanResponse->setResponseID(request->getRequestID());
-            if (bProcessRoutePlanRequest(request, routePlanResponse))
-            {
-                auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
-                sendSharedLmcpObjectLimitedCastMessage(
-                                                       getNetworkClientUnicastAddress(
-                                                                                      receivedLmcpMessage->m_attributes->getSourceEntityId(),
-                                                                                      receivedLmcpMessage->m_attributes->getSourceServiceId()
-                                                                                      ),
-                                                       newResponse);
-            }
+            bProcessRoutePlanRequest(request, routePlanResponse);
+            auto newResponse = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
+            sendSharedLmcpObjectLimitedCastMessage(
+                                                   getNetworkClientUnicastAddress(
+                                                                                  receivedLmcpMessage->m_attributes->getSourceEntityId(),
+                                                                                  receivedLmcpMessage->m_attributes->getSourceServiceId()
+                                                                                  ),
+                                                   newResponse);
+
         }
     }
     else if (uxas::messages::route::isRoadPointsRequest(receivedLmcpMessage->m_object))
@@ -216,11 +215,6 @@ OsmPlannerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicatio
     else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
     {
         auto config = std::static_pointer_cast<afrl::vehicles::GroundVehicleConfiguration>(receivedLmcpMessage->m_object);
-        m_entityConfigurations[config->getID()] = config;
-    }
-    else if (afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object))
-    {
-        auto config = std::static_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object);
         m_entityConfigurations[config->getID()] = config;
     }
     else
@@ -273,27 +267,32 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                                                  std::shared_ptr<uxas::messages::route::RoutePlanResponse>& routePlanResponse)
 {
     bool isSuccess(true);
+    routePlanResponse->setAssociatedTaskID(routePlanRequest->getAssociatedTaskID());
+    routePlanResponse->setOperatingRegion(routePlanRequest->getOperatingRegion());
+    routePlanResponse->setVehicleID(routePlanRequest->getVehicleID());
 
-    if (m_graph && m_planningIndexVsNodeId && m_idVsNode)
+
+
+    // extract route speed
+    double speed = 1.0; // default to just distance
+    if (m_entityConfigurations.find(routePlanRequest->getVehicleID()) != m_entityConfigurations.end())
     {
-        routePlanResponse->setAssociatedTaskID(routePlanRequest->getAssociatedTaskID());
-        routePlanResponse->setOperatingRegion(routePlanRequest->getOperatingRegion());
-        routePlanResponse->setVehicleID(routePlanRequest->getVehicleID());
-
-        // extract route speed
-        double speed = 1.0; // default to just distance
-        if (m_entityConfigurations.find(routePlanRequest->getVehicleID()) != m_entityConfigurations.end())
+        speed = m_entityConfigurations[routePlanRequest->getVehicleID()]->getNominalSpeed();
+        if (speed < 1.0)
         {
-            speed = m_entityConfigurations[routePlanRequest->getVehicleID()]->getNominalSpeed();
-            if (speed < 1.0)
-            {
-                speed = 1.0;
-            }
+            speed = 1.0;
         }
+    }
 
-        for (auto itRequest = routePlanRequest->getRouteRequests().begin();
-                itRequest != routePlanRequest->getRouteRequests().end();
-                itRequest++)
+    for (auto itRequest = routePlanRequest->getRouteRequests().begin();
+            itRequest != routePlanRequest->getRouteRequests().end();
+            itRequest++)
+    {
+        auto routePlan = new uxas::messages::route::RoutePlan;
+        routePlan->setRouteID((*itRequest)->getRouteID());
+        routePlan->setRouteCost(-1);
+
+        if (m_graph && m_planningIndexVsNodeId && m_idVsNode)
         {
             auto startTime = std::chrono::system_clock::now();
 
@@ -322,8 +321,6 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                 std::deque<int64_t> pathNodeIds;
                 if (isFindShortestRoute(nodeIdStart, nodeIdEnd, pathCost, pathNodeIds))
                 {
-                    auto routePlan = new uxas::messages::route::RoutePlan;
-                    routePlan->setRouteID((*itRequest)->getRouteID());
                     float routCost = (static_cast<float> (lengthFromStartToNode) +
                             static_cast<float> (lengthFromNodeToEnd) +
                             static_cast<float> (pathCost)) / speed;
@@ -451,8 +448,6 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
                         waypoint = nullptr; // gave up ownership
                     }
                     numberWaypoints = routePlan->getWaypoints().size();
-                    routePlanResponse->getRouteResponses().push_back(routePlan);
-                    routePlan = nullptr; //gave it up
                 }
                 else
                 {
@@ -522,11 +517,13 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
             }
             else //if(isFindClosestIndices(positionStart,positionEnd,indexIdStart,index ...
             {
-                UXAS_LOG_ERROR("bProcessRoutePlanRequest:: could not find graph indices for RouteRequestId[", (*itRequest)->getRouteID(), "].");
+                UXAS_LOG_WARN("bProcessRoutePlanRequest:: could not find graph indices for RouteRequestId[", (*itRequest)->getRouteID(), "].");
                 isSuccess = false;
             } //if(isFindClosestIndices(positionStart,positionEnd,indexIdStart,index  ...
-        } //for (auto itRequest = routePlanRequest->getRouteRequests()
-    } //if(m_graph && m_planningIndexVsNodeId && m_idVsNode)
+        } //if(m_graph && m_planningIndexVsNodeId && m_idVsNode)
+        routePlanResponse->getRouteResponses().push_back(routePlan);
+        routePlan = nullptr; //gave it up
+    } //for (auto itRequest = routePlanRequest->getRouteRequests()
 
     return (isSuccess);
 }
@@ -1561,7 +1558,7 @@ bool OsmPlannerService::isFindShortestRoute(const int64_t& startNodeId, const in
             m_searchTime_s = elapsed_seconds.count();
             UXAS_LOG_INFORM(" **** Finished running ASTAR search from startNodeId[", startNodeId, "] to endNodeId[", endNodeId, "] Elapsed Seconds[", elapsed_seconds.count(), "] ****");
 
-#define PRINT_SHORTEST_PATH
+//#define PRINT_SHORTEST_PATH
 #ifdef PRINT_SHORTEST_PATH
             UXAS_LOG_INFORM("isFindShortestRoute:: Shortest path from startNodeId[", startNodeId, "] to endNodeId[", endNodeId, "] ");
             for (auto itNode = pathNodes.begin(); itNode != pathNodes.end(); itNode++)
