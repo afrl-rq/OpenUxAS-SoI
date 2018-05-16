@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
-
 <AMASE>
+  <ScenarioData>
+    <SimulationView Latitude="39.0865" Longitude="-82.8683" LongExtent="0.12"/>
+    <ScenarioName>Collision Scenario</ScenarioName>
+    <ScenarioDuration>300</ScenarioDuration>
+  </ScenarioData>
   <ScenarioEventList>
     <KeepInZone Series="CMASI">
       <ZoneID>10</ZoneID>
@@ -493,5 +497,4 @@
       <KeepOutAreas/>
     </OperatingRegion>
   </ScenarioEventList>
-  <ScenarioData/>
 </AMASE>
