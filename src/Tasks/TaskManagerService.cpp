@@ -73,7 +73,7 @@ TaskManagerService::ServiceBase::CreationRegistrar<TaskManagerService>
 TaskManagerService::s_registrar(TaskManagerService::s_registryServiceTypeNames());
 
 TaskManagerService::TaskManagerService()
-	: ServiceBase(TaskManagerService::s_typeName(), TaskManagerService::s_directoryName())
+    : ServiceBase(TaskManagerService::s_typeName(), TaskManagerService::s_directoryName())
 {
 }
 
@@ -194,7 +194,7 @@ TaskManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
             auto message = std::static_pointer_cast<avtas::lmcp::Object>(killServiceMessage);
             sendSharedLmcpObjectBroadcastMessage(message);
             m_TaskIdVsServiceId.erase(itServiceId);
-            //COUT_INFO_MSG("Removed Task[" << taskId << "]")
+            UXAS_LOG_WARN("taskID ", taskId, " already exists. Killing previous task");
         }
         //COUT_INFO_MSG("Adding Task[" << taskId << "]")
 
@@ -247,7 +247,7 @@ TaskManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
         if (!taskOptions.empty())
         {
             xmlTaskOptions = "<" + TaskServiceBase::m_taskOptions_XmlTag + ">" + taskOptions + "</" + TaskServiceBase::m_taskOptions_XmlTag + ">";
-            COUT_INFO_MSG("INFO:: TaskId[" << taskId << "] xmlTaskOptions[" << xmlTaskOptions << "]")
+            //COUT_INFO_MSG("INFO:: TaskId[" << taskId << "] xmlTaskOptions[" << xmlTaskOptions << "]")
         }
 
         auto createNewServiceMessage = std::make_shared<uxas::messages::uxnative::CreateNewService>();
@@ -444,6 +444,7 @@ TaskManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
     else if (afrl::cmasi::isRemoveTasks(messageObject.get()))
     {
         auto removeTasks = std::static_pointer_cast<afrl::cmasi::RemoveTasks>(messageObject);
+        auto countBefore = m_TaskIdVsServiceId.size();
         for (auto itTaskId = removeTasks->getTaskList().begin(); itTaskId != removeTasks->getTaskList().end(); itTaskId++)
         {
                 auto itServiceId = m_TaskIdVsServiceId.find(*itTaskId);
@@ -455,13 +456,20 @@ TaskManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
                     auto message = std::static_pointer_cast<avtas::lmcp::Object>(killServiceMessage);
                     sendSharedLmcpObjectBroadcastMessage(message);
                     m_TaskIdVsServiceId.erase(itServiceId);
-                    COUT_INFO_MSG("Removed Task[" << *itTaskId << "]")
+                    UXAS_LOG_INFORM("Removed Task[" << *itTaskId << "]")
                 }
                 else
                 {
                     CERR_FILE_LINE_MSG("ERROR:: Tried to kill service, but could not find ServiceId for TaskId[" << *itTaskId << "]")
                 }
         }
+        std::string taskList = "[";
+        for (auto taskID : removeTasks->getTaskList())
+        {
+            taskList += std::to_string(taskID) + " ";
+        }
+        taskList += "]";
+        IMPACT_INFORM("Removed ", countBefore - m_TaskIdVsServiceId.size(), " tasks containing ", taskList, ". ", m_TaskIdVsServiceId.size(), " Still Exist.");
     }
     else
     {
