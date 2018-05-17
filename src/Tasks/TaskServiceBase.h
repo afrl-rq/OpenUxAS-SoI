@@ -41,6 +41,7 @@
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
 #include "afrl/cmasi/OperatingRegion.h"
+#include <afrl/cmasi/SearchTask.h>
 
 #include "pugixml.hpp"
 

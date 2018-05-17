@@ -80,16 +80,23 @@ bool TaskServiceBase::configure(const pugi::xml_node& serviceXmlNode)
         m_workDirectoryPath = "./";
     }
 
-    std::stringstream sstrErrors;
-
     m_task = generateTaskObject(serviceXmlNode);
     if (!m_task)
     {
+        std::stringstream sstrErrors;
         sstrErrors << "ERROR:: **Task_Base::bConfigure failed: could find a task in [" << serviceXmlNode.name() << "]" << std::endl;
         CERR_FILE_LINE_MSG(sstrErrors.str())
         isSuccessful = false;
     }
 
+    //double check sane Ground Sample Distance
+    auto searchTask = std::dynamic_pointer_cast<afrl::cmasi::SearchTask>(m_task);
+    if (searchTask) {
+        if (searchTask->getGroundSampleDistance() < 0.01) {
+            searchTask->setGroundSampleDistance(1000); 
+        }
+    }
+    
     for (pugi::xml_node currentXmlNode = serviceXmlNode.first_child(); currentXmlNode; currentXmlNode = currentXmlNode.next_sibling())
     {
         if (currentXmlNode.attribute("Series").empty())
@@ -888,7 +895,7 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                         isFirstWaypoint = false;
 
                                         // add task active waypoints
-                                        if ((!isRouteFromLastToTask || m_isMakeTransitionWaypointsActive) && !currentAutomationRequest->getSandBoxRequest())
+                                        if ((!isRouteFromLastToTask || m_isMakeTransitionWaypointsActive))
                                         {
                                             waypoint->getAssociatedTasks().push_back(m_task->getTaskID());
                                             if ((itTaskOptionClass->second->m_firstTaskActiveWaypointID < 0) && (!isRouteFromLastToTask) && (!currentAutomationRequest->getSandBoxRequest()))
