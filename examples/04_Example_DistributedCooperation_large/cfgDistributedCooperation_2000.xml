@@ -21,6 +21,8 @@
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
         <SubscribeToMessage MessageType="afrl.cmasi.KeepOutZone" />
+        <SubscribeToMessage MessageType="larcfm.DAIDALUS.DAIDALUSConfiguration" />
+        <SubscribeToMessage MessageType="larcfm.DAIDALUS.WellClearViolationIntervals" />
     </Bridge>
 
     <Service Type="Test_SimulationTime"/>
@@ -32,7 +34,7 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
-    <Service Type="DAIDALUS_WCV_Detection"/>
+    <Service Type="DAIDALUS_WCV_Detection" RTCAAlertLevels="3"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
@@ -71,6 +73,7 @@
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="larcfm" NumberMessagesToSkip="0"/>
     </Service>
 </UxAS>
 

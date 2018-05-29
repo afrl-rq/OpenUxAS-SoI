@@ -8,13 +8,14 @@
 	-->
     <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="enp0s3">
         <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
-        <SubscribeToExternalMessage MessageType="uxas.messages.task.AssignmentCoordination"/>
     </Bridge>
 
     <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
     <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9800" Server="FALSE" ConsiderSelfGenerated="TRUE">
         <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
         <SubscribeToMessage MessageType="afrl.cmasi.PointSearchTask"/>
+        <SubscribeToMessage MessageType="larcfm.DAIDALUS.DAIDALUSConfiguration" />
+        <SubscribeToMessage MessageType="larcfm.DAIDALUS.WellClearViolationIntervals" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
 
@@ -25,8 +26,7 @@
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
-    <!--Service Type="DAIDALUS_WCV_Detection"/ -->
-    <Service Type="DAIDALUS_WCV_Detection" LookAheadTime="180" RTCAAlertLevels="3"/>
+    <Service Type="DAIDALUS_WCV_Detection" LookAheadTime="180" RTCAAlertLevels="3" EarlyAlertTime1="250"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="1000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"

@@ -365,43 +365,43 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
         if (local_TTHR_s <= m_lookahead_time_s)
             m_TTHR_s = local_TTHR_s;
     }
-    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME1).as_double())
+    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME1).empty())
     {
         double local_early_alert_time_1_s = ndComponent.attribute(STRING_XML_EARLYALERTTIME1).as_double();
-        if (local_early_alert_time_1_s <= m_lookahead_time_s)
+        if (local_early_alert_time_1_s >= m_lookahead_time_s)
             m_early_alert_time_1_s = local_early_alert_time_1_s;
     }
-    if (!ndComponent.attribute(STRING_XML_ALERTTIME1).as_double())
+    if (!ndComponent.attribute(STRING_XML_ALERTTIME1).empty())
     {
         double local_alert_time_1_s = ndComponent.attribute(STRING_XML_ALERTTIME1).as_double();
         if (local_alert_time_1_s < m_early_alert_time_1_s)
             m_alert_time_1_s = local_alert_time_1_s;
     }
-    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME2).as_double())
+    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME2).empty())
     {
         double local_early_alert_time_2_s = ndComponent.attribute(STRING_XML_EARLYALERTTIME2).as_double();
         if (local_early_alert_time_2_s <= m_early_alert_time_1_s)
             m_early_alert_time_2_s = local_early_alert_time_2_s;
     }
-    if (!ndComponent.attribute(STRING_XML_ALERTTIME2).as_double())
+    if (!ndComponent.attribute(STRING_XML_ALERTTIME2).empty())
     {
         double local_alert_time_2_s = ndComponent.attribute(STRING_XML_ALERTTIME2).as_double();
         if (local_alert_time_2_s < m_early_alert_time_2_s && local_alert_time_2_s <= m_alert_time_1_s)
             m_alert_time_2_s = local_alert_time_2_s;
     }
-    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME3).as_double())
+    if (!ndComponent.attribute(STRING_XML_EARLYALERTTIME3).empty())
     {
         double local_early_alert_time_3_s = ndComponent.attribute(STRING_XML_EARLYALERTTIME3).as_double();
         if (local_early_alert_time_3_s <= m_early_alert_time_2_s)
             m_early_alert_time_3_s = local_early_alert_time_3_s;
     }
-    if (!ndComponent.attribute(STRING_XML_ALERTTIME3).as_double())
+    if (!ndComponent.attribute(STRING_XML_ALERTTIME3).empty())
     {
         double local_alert_time_3_s = ndComponent.attribute(STRING_XML_ALERTTIME3).as_double();
         if (local_alert_time_3_s < m_early_alert_time_3_s && local_alert_time_3_s <= m_alert_time_2_s)
             m_alert_time_3_s = local_alert_time_3_s;
     }
-    if (!ndComponent.attribute(STRING_XML_HORIZONTALDETECTIONTYPE).as_string())
+    if (!ndComponent.attribute(STRING_XML_HORIZONTALDETECTIONTYPE).empty())
     {
         std::string local_horizontal_detection_type = ndComponent.attribute(STRING_XML_HORIZONTALDETECTIONTYPE).as_string();
         if (local_horizontal_detection_type == "TAUMOD" || local_horizontal_detection_type == "TCPA" || local_horizontal_detection_type == "TEP")
@@ -507,6 +507,56 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
 {
     if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
+        static bool bFirst = true;
+        
+        if (bFirst)
+        {
+            std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
+            DetectionConfiguration->setEntityId(m_entityId);
+            DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
+            DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
+            DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
+            DetectionConfiguration->setMaxGroundSpeed(m_daa.parameters.getMaxGroundSpeed("mps"));
+            DetectionConfiguration->setMinGroundSpeed(m_daa.parameters.getMinGroundSpeed("mps"));
+            DetectionConfiguration->setMaxVerticalSpeed(m_daa.parameters.getMaxVerticalSpeed("mps"));
+            DetectionConfiguration->setMinVerticalSpeed(m_daa.parameters.getMinVerticalSpeed("mps"));
+            DetectionConfiguration->setMaxAltitude(m_daa.parameters.getMaxAltitude("m"));
+            DetectionConfiguration->setMinAltitude(m_daa.parameters.getMinAltitude("m"));
+            DetectionConfiguration->setTrackStep(m_daa.parameters.getTrackStep("deg"));
+            DetectionConfiguration->setGroundSpeedStep(m_daa.parameters.getGroundSpeedStep("mps"));
+            DetectionConfiguration->setVerticalSpeedStep(m_daa.parameters.getVerticalSpeedStep("mps"));
+            DetectionConfiguration->setAltitudeStep(m_daa.parameters.getAltitudeStep("m"));
+            DetectionConfiguration->setHorizontalAcceleration(m_daa.parameters.getHorizontalAcceleration("m/s^2"));
+            DetectionConfiguration->setVerticalAcceleration(m_daa.parameters.getVerticalAcceleration("G"));
+            DetectionConfiguration->setTurnRate(m_daa.parameters.getTurnRate("deg/s"));
+            DetectionConfiguration->setBankAngle(m_daa.parameters.getBankAngle("deg"));
+            DetectionConfiguration->setVerticalRate(m_daa.parameters.getVerticalRate("mps"));
+            DetectionConfiguration->setRecoveryStabilityTime(m_daa.parameters.getRecoveryStabilityTime("s"));
+            DetectionConfiguration->setIsRecoveryTrackBands(m_daa.parameters.isEnabledRecoveryTrackBands());
+            DetectionConfiguration->setIsRecoveryGroundSpeedBands(m_daa.parameters.isEnabledRecoveryGroundSpeedBands());
+            DetectionConfiguration->setIsRecoveryVerticalSpeedBands(m_daa.parameters.isEnabledRecoveryVerticalSpeedBands());
+            DetectionConfiguration->setIsRecoveryAltitudeBands(m_daa.parameters.isEnabledRecoveryAltitudeBands());
+            DetectionConfiguration->setIsCollisionAvoidanceBands(m_daa.parameters.isEnabledCollisionAvoidanceBands());
+            DetectionConfiguration->setHorizontalNMAC(m_daa.parameters.getHorizontalNMAC("m"));
+            DetectionConfiguration->setMinHorizontalRecovery(m_daa.parameters.getMinHorizontalRecovery("m"));
+            DetectionConfiguration->setVerticalNMAC(m_daa.parameters.getVerticalNMAC("m"));
+            DetectionConfiguration->setMinVerticalRecovery(m_daa.parameters.getMinVerticalRecovery("m"));
+            DetectionConfiguration->setHorizontalContourThreshold(m_daa.parameters.getHorizontalContourThreshold("m"));
+            DetectionConfiguration->setDTHR(m_DTHR_m);
+            DetectionConfiguration->setZTHR(m_ZTHR_m);
+            DetectionConfiguration->setTTHR(m_TTHR_s);
+            DetectionConfiguration->setRTCAAlertLevels(m_RTCA_alert_levels);
+            DetectionConfiguration->setAlertTime1(m_alert_time_1_s);
+            DetectionConfiguration->setEarlyAlertTime1(m_early_alert_time_1_s);
+            DetectionConfiguration->setAlertTime2(m_alert_time_2_s);
+            DetectionConfiguration->setEarlyAlertTime2(m_early_alert_time_2_s);
+            DetectionConfiguration->setAlertTime3(m_alert_time_3_s);
+            DetectionConfiguration->setEarlyAlertTime3(m_early_alert_time_3_s);
+            DetectionConfiguration->setHorizontalDetectionType(m_horizontal_detection_type);
+            sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);
+            bFirst = false;
+        }
+        
         //receive message
         std::shared_ptr<afrl::cmasi::AirVehicleState> airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
         //Screen output for debugging 
@@ -711,7 +761,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
     //Compose and send DAIDALUS configuration message
     if (uxas::messages::uxnative::isStartupComplete(receivedLmcpMessage->m_object))
     {
-        std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
+        /*std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
         DetectionConfiguration->setEntityId(m_entityId);
         DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
         DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
@@ -753,7 +803,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         DetectionConfiguration->setAlertTime3(m_alert_time_3_s);
         DetectionConfiguration->setEarlyAlertTime3(m_early_alert_time_3_s);
         DetectionConfiguration->setHorizontalDetectionType(m_horizontal_detection_type);
-        sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);   
+        sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);   */
     }
     return false;
 }
