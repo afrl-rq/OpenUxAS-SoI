@@ -331,6 +331,15 @@ public
 				
 			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 				steps = steps_to_converge - 1 => stable;
+				
+			lemma "Observer: Vehicles start out co-located with UAV2 in the middle of its segment":
+				not ((DPSS_Node_Lib.initial_value_true(
+						UAV2.meet_LN and UAV2.meet_RN and pos_UAV2 > S_12 and pos_UAV2 < S_23
+					)
+					and
+					stable
+					)
+				);
 			
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -416,6 +425,10 @@ public
 				=> 
 				(	(pos_UAV2 <= S_23)
 				and	(pos_UAV2 >= S_12));
+				
+			lemma "UAV2 can only be 'pulled' in two directions if it is the initial timestep (i.e., if the 3 vehicles start out co-located)":
+				(UAV2.meet_LN and UAV2.meet_RN and pos_UAV2 > S_12 and pos_UAV2 < S_23) =>
+					steps = 1;
 			
 			--This doesn't say much. If the extreme UAVs are headed away from their respective endpoints, then this 
 			-- lemma just says the convergence time is <= 2T, which we already know.
