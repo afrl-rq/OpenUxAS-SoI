@@ -488,6 +488,53 @@ public
 				
 			lemma "Once the configuration paramters are stable, they stay stable.":
 				true -> pre(stable_config_params) => stable_config_params;
+				
+			lemma "Stable implies deltaT = T/N":
+				stable => deltaT = T/N_TRUTH_REAL;
+			
+			lemma "deltaT is between 0 and T":
+				true -> (
+					deltaT > 0.0 
+					and deltaT <= T
+					);
+
+			lemma "(Experimental) Configuration parameters stable on and after 16 steps":
+				steps >= 16 => stable_config_params;
+
+			lemma "(Experimental) Configuration parameters stable on and after 17 steps":
+				steps >= 17 => stable_config_params;
+
+			lemma "(Experimental) Configuration parameters stable on and after 18 steps":
+				steps >= 18 => stable_config_params;
+			
+			lemma "(Experimental) Configuration parameters stable on and after 19 steps":
+				steps >= 19 => stable_config_params;
+			
+			lemma "(Experimental) Configuration parameters stable on and after 20 steps":
+				steps >= 20 => stable_config_params;
+				
+			lemma "(Experimental) Configuration parameters stable on and after 21 steps":
+				steps >= 21 => stable_config_params;
+								
+			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to (3 + 1/3)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time <= (3.0 + 1.0/3.0)*T);
+
+			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to (3 + 1/2)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time <= (3.0 + 1.0/2.0)*T);
+
+			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to 4T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time <= 4.0*T);
+
+--			lemma "(Invalid) Time for configuration parameters to converge is less than or equal to 3T":
+--				(stable_config_params and not (pre(stable_config_params))) => 
+--					(time <= 3.0*T);
+
+--			lemma "(Invalid) Time for configuration parameters to converge is less than 3T":
+--				(stable_config_params and not (pre(stable_config_params))) => 
+--					(time < 3.0*T);
 					
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
@@ -516,15 +563,6 @@ public
 			lemma "(Experimental) Stable on and after 26 steps":
 				steps >= 26 => stable;
 
-			lemma "Stable implies deltaT = T/N":
-				stable => deltaT = T/N_TRUTH_REAL;
-			
-			lemma "deltaT is between 0 and T":
-				true -> (
-					deltaT > 0.0 
-					and deltaT <= T
-					);
-
 			-- This is a good way to find the real time bound!	
 			lemma "(Experimental) Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
@@ -533,26 +571,6 @@ public
 			lemma "(Experimental) Time to become stable is less than 5T":
 				(stable and not (pre(stable))) => 
 					(time < 5.0*T);
-
-			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to (3 + 1/3)T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= (3.0 + 1.0/3.0)*T);
-
-			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to (3 + 1/2)T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= (3.0 + 1.0/2.0)*T);
-
-			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to 4T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= 4.0*T);
-
---			lemma "(Invalid) Time for configuration parameters to converge is less than or equal to 3T":
---				(stable_config_params and not (pre(stable_config_params))) => 
---					(time <= 3.0*T);
-
---			lemma "(Invalid) Time for configuration parameters to converge is less than 3T":
---				(stable_config_params and not (pre(stable_config_params))) => 
---					(time < 3.0*T);
 			
 		**};
 		
