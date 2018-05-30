@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <UxAS EntityID="2000" FormatVersion="1.0" EntityType="Aircraft">
+<<<<<<< HEAD
 	
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
     <!-- on Linux and Mac, type 'ifconfig' to find interface name -->
@@ -18,21 +19,19 @@
         <SubscribeToMessage MessageType="larcfm.DAIDALUS.WellClearViolationIntervals" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
-
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
     <Service Type="SensorManagerService"/>
     <Service Type="RouteAggregatorService"/>
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
-    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>
     <Service Type="PlanBuilderService"/>
     <Service Type="DAIDALUS_WCV_Detection" RTCAAlertLevels="1"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
-             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1" />
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
-
         <Message MessageFileName="AirVehicleConfiguration_1000.xml" SendTime_ms="50"/>
         <Message MessageFileName="AirVehicleConfiguration_2000.xml" SendTime_ms="60"/>
         <Message MessageFileName="AirVehicleConfiguration_4208.xml" SendTime_ms="70"/>
@@ -45,12 +44,9 @@
         <Message MessageFileName="PointSearchTask_0.xml" SendTime_ms="300"/>
         <Message MessageFileName="PointSearchTask_1.xml" SendTime_ms="310"/>
         <Message MessageFileName="PointSearchTask_2.xml" SendTime_ms="320"/>
-        <!-- Message MessageFileName="AirVehicleState_1000.xml" SendTime_ms="500"/ -->
-        <!-- Message MessageFileName="AirVehicleState_2000.xml" SendTime_ms="510"/ -->
-        <!-- Message MessageFileName="AirVehicleState_4208.xml" SendTime_ms="520"/ -->
         <Message MessageFileName="AutomationRequest.xml" SendTime_ms="1000"/>        
     </Service>
-    
+
     <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000" LogFileName="testfile">
         <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
         <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
@@ -58,5 +54,3 @@
         <LogMessage MessageType="larcfm" NumberMessagesToSkip="0"/>
     </Service>
 </UxAS>
-
-

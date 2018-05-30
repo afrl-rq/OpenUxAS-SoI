@@ -60,4 +60,3 @@ cd ${RUN_DIR}
 /usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgCollision_$UAV.xml"
 # change back to the original directory
 cd $SAVE_DIR
-
