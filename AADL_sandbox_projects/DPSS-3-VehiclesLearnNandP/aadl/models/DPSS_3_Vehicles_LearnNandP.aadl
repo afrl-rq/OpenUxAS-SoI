@@ -450,7 +450,7 @@ public
 					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0)
 				);		
 
-			lemma "Observer: Configuration parameters are not yet converged after (3 + 1/6)T":
+			lemma "Observer: Config params are not yet converged after (3 + 1/6)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
 					(time <= (3.0 + 1.0/6.0)*T);
 							
@@ -498,35 +498,35 @@ public
 					and deltaT <= T
 					);
 
-			lemma "(Experimental) Configuration parameters stable on and after 16 steps":
+			lemma "(Experimental) Config params stable on and after 16 steps":
 				steps >= 16 => stable_config_params;
 
-			lemma "(Experimental) Configuration parameters stable on and after 17 steps":
+			lemma "(Experimental) Config params stable on and after 17 steps":
 				steps >= 17 => stable_config_params;
 
-			lemma "(Experimental) Configuration parameters stable on and after 18 steps":
+			lemma "(Experimental) Config params stable on and after 18 steps":
 				steps >= 18 => stable_config_params;
 			
-			lemma "(Experimental) Configuration parameters stable on and after 19 steps":
+			lemma "(Experimental) Config params stable on and after 19 steps":
 				steps >= 19 => stable_config_params;
 			
-			lemma "(Experimental) Configuration parameters stable on and after 20 steps":
+			lemma "(Experimental) Config params stable on and after 20 steps":
 				steps >= 20 => stable_config_params;
 				
-			lemma "(Experimental) Configuration parameters stable on and after 21 steps":
+			lemma "(Experimental) Config params stable on and after 21 steps":
 				steps >= 21 => stable_config_params;
 								
-			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to (3 + 1/3)T":
+			lemma "(Experimental) Time for config params to converge is < (3 + 1/3)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= (3.0 + 1.0/3.0)*T);
+					(time < (3.0 + 1.0/3.0)*T);
 
-			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to (3 + 1/2)T":
+			lemma "(Experimental) Time for config params to converge is < (3 + 1/2)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= (3.0 + 1.0/2.0)*T);
+					(time < (3.0 + 1.0/2.0)*T);
 
-			lemma "(Experimental) Time for configuration parameters to converge is less than or equal to 4T":
+			lemma "(Experimental) Time for config params to converge is < 4T":
 				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= 4.0*T);
+					(time < 4.0*T);
 
 --			lemma "(Invalid) Time for configuration parameters to converge is less than or equal to 3T":
 --				(stable_config_params and not (pre(stable_config_params))) => 
