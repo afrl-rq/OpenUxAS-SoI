@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <UxAS EntityID="1000" FormatVersion="1.0" EntityType="Aircraft">
-<<<<<<< HEAD
 	
     <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
     <!-- on Linux and Mac, type 'ifconfig' to find interface name -->
