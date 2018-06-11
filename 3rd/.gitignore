@@ -14,6 +14,7 @@
 /zeromq-4.2.3
 /zlib-1.2.8
 /zyre-2.0.0
+/WellClear-1.0.1b
 
 # generated .wrap files from .wrap.tmpl
 /boost.wrap
@@ -27,3 +28,4 @@
 /zeromq.wrap
 /zlib.wrap
 /zyre.wrap
+/wellclear.wrap

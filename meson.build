@@ -36,6 +36,7 @@ if get_option('force_dep_download')
   dep_sqlitecpp = subproject('sqlitecpp').get_variable('dep')
   dep_zlib      = subproject('zlib').get_variable('dep')
   dep_minizip   = subproject('minizip').get_variable('dep')
+  dep_wellclear = subproject('wellclear').get_variable('dep')
 else
   # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
   dep_zeromq = dependency(
@@ -93,6 +94,8 @@ else
     'minizip',
     fallback: ['minizip', 'dep'],
   )
+
+  dep_wellclear = subproject('wellclear').get_variable('dep')
 endif
 
 # handle boost carefully
@@ -133,6 +136,7 @@ deps = [
   dep_tinygps,
   dep_serial,
   dep_pugixml,
+  dep_wellclear,
 ]
 
 subdir('src/DPSS')
@@ -153,8 +157,6 @@ subdir('src/Utilities')
 
 subdir('src/Plans')
 
-subdir('src/DAIDALUS')
-
 libs = [
   lib_services,
   lib_tasks,
@@ -164,7 +166,6 @@ libs = [
   lib_visilibity,
   lib_plans,
   lib_dpss,
-  lib_daidalus,
 ]
 
 if get_option('afrl_internal')

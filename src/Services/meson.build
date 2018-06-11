@@ -34,7 +34,6 @@ incs_services = [
     '../../src/Includes',
     '../../src/Services',
     '../../src/VisilibityLib',
-    '../DAIDALUS/include', #compilation fails if after Plans inclusion
     '../../src/Plans',
     '../../src/DPSS',
     '../../src/Tasks',
@@ -49,6 +48,7 @@ deps_services = [
   dep_sqlite3,
   dep_sqlitecpp,
   dep_zeromq,
+  dep_wellclear,
 ]
 
 if get_option('afrl_internal')
