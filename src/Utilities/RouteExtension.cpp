@@ -78,6 +78,7 @@ std::vector<afrl::cmasi::Waypoint*> RouteExtension::DiscretizeExtension(std::vec
     // convert to standard cmasi waypoints with appropriate discretization
     std::vector<afrl::cmasi::Waypoint*> extension;
     double lat, lon;
+    int64_t index = 1;
     for(auto dwp : dubins_extension)
     {
         if(dwp.turndir != 0)
@@ -106,6 +107,8 @@ std::vector<afrl::cmasi::Waypoint*> RouteExtension::DiscretizeExtension(std::vec
                     auto cwp = baseWp->clone();
                     cwp->setLatitude(lat);
                     cwp->setLongitude(lon);
+                    cwp->setNumber(index);
+                    cwp->setNextWaypoint(++index);
                     extension.push_back(cwp);
                 }
             }
@@ -116,6 +119,8 @@ std::vector<afrl::cmasi::Waypoint*> RouteExtension::DiscretizeExtension(std::vec
         flatEarth.ConvertNorthEast_mToLatLong_deg(dwp.y, dwp.x, lat, lon);
         fwp->setLatitude(lat);
         fwp->setLongitude(lon);
+        fwp->setNumber(index);
+        fwp->setNextWaypoint(++index);
         extension.push_back(fwp);
     }
 

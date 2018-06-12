@@ -434,6 +434,7 @@ namespace task
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
         std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_currentMissions;
+
         /*! \brief  all <B><i>KeepInZone</i></B> objects.
         * NOTE: Object received before task creation are only available when
         * configured in the @ref c_Component_TaskManager*/
@@ -447,6 +448,10 @@ namespace task
         * configured in the @ref c_Component_TaskManager*/
         std::unordered_map < int64_t, std::shared_ptr<afrl::cmasi::OperatingRegion> > m_OperatingRegions;
 
+        /*! \brief Map from waypoint Ids from implemented option and final way[point Ids.
+         * This map is constructed during 'processImplementationRoutePlanResponseBase' */
+        std::unordered_map<int64_t,int64_t> m_optionWaypointIdVsFinalWaypointId;
+        
         int64_t m_uniqueRouteRequestId{1};
     };
 

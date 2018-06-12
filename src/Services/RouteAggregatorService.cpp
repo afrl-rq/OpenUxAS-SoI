@@ -289,7 +289,7 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
             // create a new route plan request
             std::shared_ptr<uxas::messages::route::RoutePlanRequest> planRequest(new uxas::messages::route::RoutePlanRequest);
             planRequest->setAssociatedTaskID(0); // mapping from routeID to proper task
-            planRequest->setIsCostOnlyRequest(true);
+            planRequest->setIsCostOnlyRequest(false);  // request full path for more accurate timing information
             planRequest->setOperatingRegion(areq->getOriginalRequest()->getOperatingRegion());
             planRequest->setVehicleID(vehicleId);
             //planRequest->setRouteID(m_planrequestId);
