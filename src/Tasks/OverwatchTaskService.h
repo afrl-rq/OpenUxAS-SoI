@@ -31,6 +31,7 @@
 #include <cstdint> // int64_t
 #include <unordered_set>
 #include <unordered_map>
+#include <deque>
 
 namespace uxas
 {
@@ -121,25 +122,25 @@ public:
     s_typeName() {
         static std::string s_string("OverwatchTaskService");
         return (s_string);
-    };
+    }
 
     static const std::vector<std::string>
     s_registryServiceTypeNames()
     {
         std::vector<std::string> registryServiceTypeNames = {s_typeName(), "afrl.impact.WatchTask"};
         return (registryServiceTypeNames);
-    };
+    }
     
     static const std::string&
     s_directoryName() {
-        static std::string s_string("");
+        static std::string s_string("TargetLogs");
         return (s_string);
-    };
+    }
 
     static ServiceBase*
     create() {
         return new OverwatchTaskService;
-    };
+    }
 
     OverwatchTaskService();
 
@@ -170,12 +171,15 @@ private:
 private:
     std::shared_ptr<afrl::impact::WatchTask> m_watchTask;
     std::shared_ptr<afrl::cmasi::EntityState> m_watchedEntityStateLast;
-    double m_loiterRadius_m = {200.0};
+    std::deque< std::shared_ptr<afrl::cmasi::EntityState> > m_watchedEntityWindow;
+    size_t m_windowSize{4};
+    double m_loiterRadius_m = {305.0}; // 1000ft
+    bool m_estimateTargetMotion{true};
 };
 
-}; //namespace task
-}; //namespace service
-}; //namespace uxas
+} //namespace task
+} //namespace service
+} //namespace uxas
 
 #endif /* UXAS_SERVICE_TASK_OVERWATCH_TASK_SERVICE_H */
 
