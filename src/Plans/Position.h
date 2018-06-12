@@ -29,7 +29,8 @@
 #endif // _MSC_VER > 1000
 
 //#include "GlobalDefines.h"
-#include "UnitConversions.h"
+#include "UnitConversions.h"    // static linearization point, but can be changed
+#include "FlatEarth.h"  // non-static linearization point
 
 #include <ostream>
 #include <vector>
@@ -69,6 +70,16 @@ namespace n_FrameworkLib
         {
             uxas::common::utilities::CUnitConversions unitConversions;
             unitConversions.ConvertLatLong_radToNorthEast_m(latitude_rad, longitude_rad, m_north_m, m_east_m);
+        };
+
+        CPosition(const double& latitude_rad,
+                const double& longitude_rad,
+                const double& altitude_m,
+                uxas::common::utilities::FlatEarth& flatEarth
+                )
+        : m_altitude_m(altitude_m),m_latitude_rad(latitude_rad),m_longitude_rad(longitude_rad)
+        {
+            flatEarth.ConvertLatLong_radToNorthEast_m(latitude_rad, longitude_rad, m_north_m, m_east_m);
         };
 
         CPosition(){};
