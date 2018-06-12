@@ -32,6 +32,7 @@
 #include <cstdint> // int64_t
 #include <unordered_set>
 #include <unordered_map>
+#include "DynamicTaskServiceBase.h"
 
 namespace uxas
 {
@@ -131,7 +132,7 @@ namespace task
  * 
  */
 
-class CommRelayTaskService : public TaskServiceBase
+class CommRelayTaskService : public DynamicTaskServiceBase
 {
 public:
 
@@ -179,23 +180,19 @@ private:
     void operator=(CommRelayTaskService const&) = delete;
 
     bool
-    configureTask(const pugi::xml_node& serviceXmlNode) override;
+    configureDynamicTask(const pugi::xml_node& serviceXmlNode) override;
     
     bool
-    processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
+    processRecievedLmcpMessageDynamicTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
 
-    virtual void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;
-    virtual void buildTaskPlanOptions() override;
+    virtual std::shared_ptr<afrl::cmasi::Location3D> calculateTargetLocation(const std::shared_ptr<afrl::cmasi::EntityState> entityState) override;
+
 
 private:
-    bool isCalculateOption(const int64_t& taskId, int64_t& optionId);
-    std::shared_ptr<afrl::cmasi::VehicleActionCommand> CalculateGimbalActions(const std::shared_ptr<afrl::cmasi::EntityState>& entityState, double lat, double lon);
+    void moveToHalfWayPoint(const std::shared_ptr<afrl::cmasi::Location3D>& supportedEntityStateLocation);
 private:
     std::shared_ptr<afrl::impact::CommRelayTask> m_CommRelayTask;
-    std::shared_ptr<afrl::cmasi::EntityState> m_supportedEntityStateLast;
-    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_idVsEntityState;
-    double m_loiterRadius_m = {200.0};
-    std::unordered_map<int64_t, int64_t> m_throttle;
+    std::shared_ptr<afrl::cmasi::Location3D> m_supportedEntityStateLast;
 public:
 
 };

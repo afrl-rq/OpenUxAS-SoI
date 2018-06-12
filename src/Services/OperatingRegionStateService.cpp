@@ -49,7 +49,7 @@ OperatingRegionStateService::configure(const pugi::xml_node& serviceXmlNode)
     addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::RemoveZones::Subscription);
-	addSubscriptionAddress(afrl::impact::WaterZone::Subscription);
+    addSubscriptionAddress(afrl::impact::WaterZone::Subscription);
 
 
     m_region.reset(new afrl::cmasi::OperatingRegion);
@@ -60,13 +60,14 @@ OperatingRegionStateService::configure(const pugi::xml_node& serviceXmlNode)
 
 bool
 OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
-//example: if (afrl::cmasi::isServiceStatus(receivedLmcpMessage->m_object.get()))
 {
+    bool addZone = false;
+    bool removeZone = false;
     if (afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
     {
-		IMPACT_INFORM("Recieved Keep In Zone");
         auto kzone = std::static_pointer_cast<afrl::cmasi::KeepInZone>(receivedLmcpMessage->m_object);
-        bool addZone = true;
+
+        addZone = true;
         for (auto z : m_region->getKeepInAreas())
         {
             if (z == kzone->getZoneID())
@@ -75,18 +76,29 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 break;
             }
         }
-        if (addZone)
+        removeZone = kzone->getStartTime() == -1 && kzone->getEndTime() == -1;
+        if (addZone && !removeZone)
         {
             m_region->getKeepInAreas().push_back(kzone->getZoneID());
-            auto sendMsg = std::static_pointer_cast<avtas::lmcp::Object>(m_region);
-            sendSharedLmcpObjectBroadcastMessage(sendMsg);
+            IMPACT_INFORM("Added Keep In Zone ", kzone->getZoneID(), " ", kzone->getLabel());
+
+        }
+        if (removeZone)
+        {
+            std::vector<int64_t>& ki = m_region->getKeepInAreas();
+            std::vector<int64_t>::iterator ki_end = std::remove_if(ki.begin(), ki.end(),
+                [&](int64_t val) {
+                return (val == kzone->getZoneID()); });
+            ki.erase(ki_end, ki.end());
+            IMPACT_INFORM("Removed Keep In Zone ", kzone->getZoneID(), " ", kzone->getLabel());
+
         }
     }
     else if (afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
     {
-		IMPACT_INFORM("Recieved Keep Out Zone");
         auto kzone = std::static_pointer_cast<afrl::cmasi::KeepOutZone>(receivedLmcpMessage->m_object);
-        bool addZone = true;
+
+        addZone = true;
         for (auto z : m_region->getKeepOutAreas())
         {
             if (z == kzone->getZoneID())
@@ -95,44 +107,61 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 break;
             }
         }
-        if (addZone)
+        removeZone = kzone->getStartTime() == -1 && kzone->getEndTime() == -1;
+
+        if (addZone && !removeZone)
         {
             m_region->getKeepOutAreas().push_back(kzone->getZoneID());
-            auto sendMsg = std::static_pointer_cast<avtas::lmcp::Object>(m_region);
-            sendSharedLmcpObjectBroadcastMessage(sendMsg);
+            IMPACT_INFORM("Added Keep Out Zone ", kzone->getZoneID(), " ", kzone->getLabel());
+        }
+
+        if (removeZone)
+        {
+            std::vector<int64_t>& ko = m_region->getKeepOutAreas();
+            std::vector<int64_t>::iterator ko_end = std::remove_if(ko.begin(), ko.end(),
+                [&](int64_t val) {
+                return (val == kzone->getZoneID()); });
+            ko.erase(ko_end, ko.end());
+            IMPACT_INFORM("Removed Keep In Zone ", kzone->getZoneID(), " ", kzone->getLabel());
         }
     }
-	else if (afrl::impact::isWaterZone(receivedLmcpMessage->m_object.get()))
-	{
-		IMPACT_INFORM("Received WaterZone");
-		auto sendMsg = std::static_pointer_cast<avtas::lmcp::Object>(m_region);
-		sendSharedLmcpObjectBroadcastMessage(sendMsg);
-	}
+    else if (afrl::impact::isWaterZone(receivedLmcpMessage->m_object.get()))
+    {
+        auto wzone = std::static_pointer_cast<afrl::impact::WaterZone>(receivedLmcpMessage->m_object);
+        IMPACT_INFORM("Recieved Water Zone ", wzone->getZoneID(), " ", wzone->getLabel());
+    }
     else if (afrl::cmasi::isRemoveZones(receivedLmcpMessage->m_object.get()))
     {
         auto rzones = std::static_pointer_cast<afrl::cmasi::RemoveZones>(receivedLmcpMessage->m_object);
+        removeZone = true; //assume
         for (auto z : rzones->getZoneList())
         {
             // keep in zone removal
             std::vector<int64_t>& ki = m_region->getKeepInAreas();
             std::vector<int64_t>::iterator ki_end = std::remove_if(ki.begin(), ki.end(),
-                    [&](int64_t val) {
-                        return (val == z); });
+                [&](int64_t val) {
+                return (val == z); });
             ki.erase(ki_end, ki.end());
+            IMPACT_INFORM("Removed Keep In Zone ", z);
 
             // keep out zone removal
             std::vector<int64_t>& ko = m_region->getKeepOutAreas();
             std::vector<int64_t>::iterator ko_end = std::remove_if(ko.begin(), ko.end(),
-                    [&](int64_t val) {
-                        return (val == z); });
+                [&](int64_t val) {
+                return (val == z); });
             ko.erase(ko_end, ko.end());
-        }
+            IMPACT_INFORM("Removed Keep Out Zone ", z);
 
+        }
+    }
+
+    if (addZone || removeZone) {
         auto sendMsg = std::static_pointer_cast<avtas::lmcp::Object>(m_region);
         sendSharedLmcpObjectBroadcastMessage(sendMsg);
+        IMPACT_INFORM("Working Operating Region KIZs ", m_region->getKeepInAreas().size(), " KOZs ", m_region->getKeepOutAreas().size());
     }
+
     return (false); // always false implies never terminating service from here
 }
-
 }; //namespace service
 }; //namespace uxas

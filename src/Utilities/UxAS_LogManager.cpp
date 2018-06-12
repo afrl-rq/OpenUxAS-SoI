@@ -80,7 +80,7 @@ LogManager::addLogger(const std::string& name, const std::string& loggerType, Lo
     {
         try
         {
-            if (newLogger->configure(configuration, true, uxas::common::ConfigurationManager::getIsLoggingThreadId()))
+            if (newLogger->configure(configuration, uxas::common::ConfigurationManager::getIsDataTimeStamp(), uxas::common::ConfigurationManager::getIsLoggingThreadId()))
             {
                 if (newLogger->openStream(logFilePath))
                 {

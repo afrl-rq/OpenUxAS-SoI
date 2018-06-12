@@ -26,11 +26,15 @@ ZeroMqSenderBase::~ZeroMqSenderBase()
 {
 //    UXAS_LOG_INFORM_ASSIGNMENT("~ZeroMqSenderBase() -Begin");
     uint32_t lingerDuration_ms(0);
-    m_zmqSocket->setsockopt(ZMQ_LINGER, &lingerDuration_ms, sizeof (lingerDuration_ms));
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    m_zmqSocket->close();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    m_zmqSocket.reset();
+    if (m_zmqSocket)
+    {
+        m_zmqSocket->setsockopt(ZMQ_LINGER, &lingerDuration_ms, sizeof(lingerDuration_ms));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        m_zmqSocket->close();
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        m_zmqSocket.reset();
+    }
+
 //    UXAS_LOG_INFORM_ASSIGNMENT("~ZeroMqSenderBase()- End");
 };
 

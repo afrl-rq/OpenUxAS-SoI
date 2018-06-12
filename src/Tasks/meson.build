@@ -20,6 +20,7 @@ srcs_tasks = [
   'TaskManagerService.cpp',
   'TaskServiceBase.cpp',
   'TaskTrackerService.cpp',
+  'DynamicTaskServiceBase.cpp'
 ]
 
 incs_tasks = [
