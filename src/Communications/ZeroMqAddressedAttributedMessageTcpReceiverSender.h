@@ -11,11 +11,12 @@
 #define UXAS_MESSAGE_TRANSPORT_ZERO_MQ_ADDRESSED_ATTRIBUTED_MESSAGE_TCP_RECEIVER_SENDER_H
 
 #include <deque>
+#include <vector>
+#include "czmq.h"
 #include "ZeroMqReceiverBase.h"
-
 #include "AddressedAttributedMessage.h"
-
 #include "UxAS_SentinelSerialBuffer.h"
+#include <boost/thread/mutex.hpp>
 
 namespace uxas
 {
@@ -50,7 +51,7 @@ public:
     ZeroMqAddressedAttributedMessageTcpReceiverSender()
     : ZeroMqReceiverBase() { };
     
-    ~ZeroMqAddressedAttributedMessageTcpReceiverSender() { };
+    ~ZeroMqAddressedAttributedMessageTcpReceiverSender();
 
 private:
 
@@ -78,8 +79,10 @@ private:
     std::string m_sourceGroup;
     
     // for return sending for zeromq tcp sockets
-    size_t m_idSize{0};
-    uint8_t m_id[256];
+    std::vector< zframe_t* > m_clients;
+    
+    // guard for accessing m_clients to carefully manage memory of zframes
+    boost::mutex m_data_guard;
 
 };
 
