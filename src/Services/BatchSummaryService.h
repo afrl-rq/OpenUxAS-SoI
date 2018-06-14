@@ -77,8 +77,10 @@ namespace uxas
             virtual
                 ~BatchSummaryService();
 
-            static void UpdateSummaryUtil(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
-
+            static void UpdateSummaryUtil(afrl::impact::VehicleSummary * sum, const std::vector<afrl::cmasi::Waypoint*>::iterator& task_begin, const std::vector<afrl::cmasi::Waypoint*>::iterator& task_end);
+            static void UpdateTaskSummariesUtil(std::vector<afrl::impact::TaskSummary*> taskSummaries, std::vector<afrl::cmasi::MissionCommand*> missions);
+            static std::shared_ptr<VisiLibity::Polygon> FromAbstractGeometry(afrl::cmasi::AbstractGeometry* geom);
+            static bool LinearizeBoundary(afrl::cmasi::AbstractGeometry* boundary, std::shared_ptr<VisiLibity::Polygon>& poly);
 
         private:
 
@@ -107,28 +109,20 @@ namespace uxas
 
             void HandleBatchSummaryRequest(std::shared_ptr<afrl::impact::BatchSummaryRequest>);
             void HandleEgressRouteResponse(std::shared_ptr<uxas::messages::route::EgressRouteResponse>);
-            void UpdateSummary(afrl::impact::VehicleSummary* sum, std::vector<afrl::cmasi::Waypoint*> waypoints);
+            void UpdateVehicleSummary(afrl::impact::VehicleSummary * vehicleSum);
             bool FinalizeBatchRequest(int64_t);
-            void BuildSummaryOptions(int64_t, std::shared_ptr<afrl::impact::BatchSummaryResponse>&, std::vector<std::shared_ptr<afrl::impact::VehicleSummary> >&, int64_t);
             void HandleTaskAutomationResponse(const std::shared_ptr<messages::task::TaskAutomationResponse>& object);
-            std::shared_ptr<VisiLibity::Polygon> FromAbstractGeometry(afrl::cmasi::AbstractGeometry* geom);
-            bool LinearizeBoundary(afrl::cmasi::AbstractGeometry* boundary, std::shared_ptr<VisiLibity::Polygon>& poly);
+
 
             // parameters
             bool m_fastPlan{ false };
-            float m_laneSpacing{ 300.0f };
 
             // storage
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_entityStates;
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityConfiguration> > m_entityConfigs;
-            std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::Task> > m_multiVehicleTasks;
             std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::Location3D> > m_towerLocations;
             std::unordered_map<int64_t, std::pair<float, bool> > m_towerRanges;
 
-            //        task ID
-            std::deque<int64_t> m_pendingEgressRequests;
-            //                task ID
-            std::unordered_map<int64_t, std::shared_ptr<uxas::messages::route::EgressRouteResponse> > m_egressPoints;
 
             int64_t m_responseId = 1; // internal tracking of numerous batch requests
             int64_t m_taskAutomationRequestId = 1;
@@ -138,10 +132,7 @@ namespace uxas
             std::unordered_map<int64_t, std::shared_ptr<afrl::impact::BatchSummaryRequest> > m_workingRequests;
 
             std::unordered_map<int64_t, std::shared_ptr<messages::task::TaskAutomationRequest>> m_pendingTaskAutomationRequests;
-            std::unordered_map<int64_t, std::shared_ptr<messages::task::TaskAutomationResponse>> m_workingTaskAutomationResponses;
 
-            //                route id, response id
-            std::unordered_map<int64_t, int64_t> m_pendingRouteResponses;
             std::unordered_map<int64_t, std::shared_ptr<VisiLibity::Polygon> > m_keepOutZones;
 
 

@@ -10,7 +10,7 @@
 <MDM>
     <SeriesName>UXNATIVE</SeriesName>
     <Namespace>uxas/messages/uxnative</Namespace>
-    <Version>8</Version>
+    <Version>9</Version>
     
     <StructList>
         
@@ -42,6 +42,12 @@
             <Field Name="Lines" Type="IMPACT/LineOfInterest[]" MaxArrayLength="64" />
             <!-- Defined points of interest at time of service creation -->
             <Field Name="Points" Type="IMPACT/PointOfInterest[]" MaxArrayLength="64" />
+            <!-- Defined keep in zones at time of service creation -->
+            <Field Name="KeepInZones" Type="CMASI/KeepInZone[]" MaxArrayLength="64" />
+            <!-- Defined keep out zones at time of service creation -->
+            <Field Name="KeepOutZones" Type="CMASI/KeepOutZone[]" MaxArrayLength="64" />
+            <!-- Defined opearting regions at time of service creation -->
+            <Field Name="OperatingRegions" Type="CMASI/OperatingRegion[]" MaxArrayLength="32" />
         </Struct>
         
         <!-- Remove an existing service from UxAS -->

@@ -22,7 +22,6 @@
 
 #include "afrl/cmasi/ServiceStatus.h"
 #include "uxas/messages/task/TaskAssignmentSummary.h"
-#include "uxas/messages/task/UniqueAutomationResponse.h"
 #ifdef AFRL_INTERNAL_ENABLED
 #include "uxas/project/pisr/PSIR_AssignmentType.h"
 #endif
@@ -619,16 +618,10 @@ void AssignmentTreeBranchBoundBase::calculateAssignment(std::unique_ptr<c_Node_B
             }
             auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(taskAssignmentSummary);
             sendSharedLmcpObjectBroadcastMessage(newMessage);
-			UXAS_LOG_INFORM("ASSIGNMENT COMPLETE!");
+            UXAS_LOG_INFORM("ASSIGNMENT COMPLETE!");
         }
         else
         {
-            auto failedAutomationRequest = assigmentPrerequisites->m_uniqueAutomationRequest;
-            //make a UniqueAutomationResponse with time -1
-            auto ures = std::make_shared<messages::task::UniqueAutomationResponse>();
-            ures->setResponseID(failedAutomationRequest->getRequestID());
-
-            sendSharedLmcpObjectBroadcastMessage(ures);
             std::string errMsg = "ASSIGNMENT FAILED!";
             UXAS_LOG_INFORM(errMsg);
             sendErrorMsg(errMsg);
