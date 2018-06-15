@@ -72,7 +72,102 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
 
     // subscribe to messages::
     addSubscriptionAddress(afrl::cmasi::KeyValuePair::Subscription);
+    
+    //Begin manually-created code. Currently, this section creates a socket and allows a single client (currently closed-source) to connect.
+    //Each side will essentially print a "Hello World" message saying they connected to the other, and then write another "Hello World 2"
+    //message that the other will read and print. This is done simply to prove connectivity from UxAS.
+    //
+    //Future work: loop reading/writing, send LMCP messages, publish received LMCP messages, and allow UxAS to
+    //continue with calculating waypoints before CRATOUS connects
+    //Additionally, use UxAS log function calls rather than fprintf's to stderr
+    //
+    //This code ONLY works on Linux, since it uses Linux function calls
+    
+    //Protocol constants for 3-way CRATOUS authentication handshake
+    const char *protocol1 = "CRATOUS-UxAS_LMCP";
+    const char *protocol2 = "ok ";
+    const char *sharedSecret = "28a4b77b86aa32715e4c271415b28447b8c08d704fd9ffb1258bced7b7167fe0";
+    const char *err = "error";
+    
+    //Setup server socket
+    socklen_t server_len;
+    struct sockaddr_in server_address;
+    int server_sockfd = -2;
+    server_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    if(server_sockfd <= 0){
+        fprintf(stderr, "Fatal error, socket could not be made!\n");
+        return (false);
+    }
+    //Configure server socket so the port isn't held by OS after program termination
+    int i = 1;
+    if((setsockopt(server_sockfd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i))) == -1){
+        fprintf(stderr, "Fatal error, socket could not be set up!\n");
+        return (false);
+    }
+    //Resolve endianness issues
+    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_address.sin_port = htons(PORT);
+    
+    //Bind server socket as TCP
+    server_address.sin_family = AF_INET;
+    server_len = sizeof(server_address);
+    if((bind(server_sockfd, (struct sockaddr *)&server_address, server_len)) == -1){
+        fprintf(stderr, "Fatal error, socket could not be bound!\n");
+        return (false);
+    }
 
+    //Wait for a single connection (CRATOUS)
+    listen(server_sockfd, 1);
+    fprintf(stdout, "Waiting for CRATOUS connection.\n");
+    int client_sockfd = accept(server_sockfd, NULL, NULL);
+    
+    //Begin 3-way handshake with CRATOUS
+    if((write(client_sockfd, protocol1, strlen(protocol1))) <= 0){
+        fprintf(stderr, "Fatal error, write communication protocol name to CRATOUS failed!\n");
+        close(client_sockfd);
+        return (false);
+    }
+
+    int nread;
+    char buffer[strlen(sharedSecret) + 1];
+    buffer[strlen(sharedSecret)] = '\0';
+    if((nread = read(client_sockfd, buffer, strlen(sharedSecret))) <= 0){
+        fprintf(stderr, "Fatal error, could not read CRATOUS password!\n");
+        close(client_sockfd);
+        return (false);
+    }
+    else if(!strcmp(buffer, sharedSecret)){ //!strcmp==true indicates the strings are the same
+        if((write(client_sockfd, protocol2, strlen(protocol2))) <= 0){
+          fprintf(stderr, "Fatal error, write confirmation to CRATOUS failed!\n");
+          close(client_sockfd);
+          return (false);
+        }
+
+          //CRATOUS has been accepted, begin communication
+          fprintf(stdout, "CRATOUS has connected to UxAS!\n");
+          
+          //TODO: send waypoint list to CRATOUS, possibly divided out by UAV?
+          while(strcmp(buffer, "acknowledged"))
+          {
+              write(client_sockfd, "TEST_STRING_UXAS_TEST", strlen("TEST_STRING_UXAS_TEST"));
+              int nread = read(client_sockfd, buffer, strlen("acknowledged"));
+              buffer[nread] = '\0';
+              fprintf(stdout, "%s\n", buffer);
+              if(!strcmp(buffer, "stop"))
+              {
+                  fprintf(stderr, "CRATOUS sent error!");
+                  exit(EXIT_FAILURE);
+              }
+          }
+          fprintf(stdout, "Acknowledged by CRATOUS!\n");
+        
+    }
+    else{
+        write(client_sockfd, err, strlen(err));
+        close(client_sockfd);
+        return (false);
+    }
+    
     return (isSuccess);
 }
 
@@ -89,93 +184,7 @@ bool IcarousCommunicationService::start()
     // perform any actions required at the time the service starts
     std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
     
-    //Begin manually-created code. Currently, this section creates a socket and allows a single client (currently closed-source) to connect.
-    //Each side will essentially print a "Hello World" message saying they connected to the other, and then write another "Hello World 2"
-    //message that the other will read and print. This is done simply to prove connectivity from UxAS.
-    //
-    //Future work: loop reading/writing, send LMCP messages, publish received LMCP messages, and allow UxAS to
-    //continue with calculating waypoints before CRATOUS connects
-    //Additionally, use UxAS log function calls rather than fprintf's to stderr
-    //
-    //This code ONLY works on Linux, since it uses Linux function calls
     
-    //Protocol constants for 3-way handshake on top of TCP
-    const char *protocol1 = "CRATOUS-UxAS_LMCP";
-    const char *protocol2 = "ok ";
-    const char *sharedSecret = "28a4b77b86aa32715e4c271415b28447b8c08d704fd9ffb1258bced7b7167fe0";
-    const char *err = "error";
-    
-    //Setup server socket
-    socklen_t server_len;
-    struct sockaddr_in server_address;
-    int server_sockfd = -2;
-    server_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if(server_sockfd <= 0){
-      fprintf(stderr, "Fatal error, socket could not be made!\n");
-      return (false);
-    }
-    //Configure server socket so the port isn't held by OS after program termination
-    int i = 1;
-    if((setsockopt(server_sockfd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i))) == -1){
-      fprintf(stderr, "Fatal error, socket could not be set up!\n");
-      return (false);
-    }
-    //Resolve endianness issues
-    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_address.sin_port = htons(PORT);
-    
-    //Bind server socket as TCP
-    server_address.sin_family = AF_INET;
-    server_len = sizeof(server_address);
-    if((bind(server_sockfd, (struct sockaddr *)&server_address, server_len)) == -1){
-      fprintf(stderr, "Fatal error, socket could not be bound!\n");
-      return (false);
-    }
-
-    //Wait for a single connection (CRATOUS)
-    listen(server_sockfd, 1);
-    int client_sockfd = accept(server_sockfd, NULL, NULL);
-    
-    //Begin 3-way handshake with CRATOUS
-    if((write(client_sockfd, protocol1, strlen(protocol1))) <= 0){
-        fprintf(stderr, "Fatal error, write communication protocol name failed!\n");
-        close(client_sockfd);
-        return (false);
-    }
-
-    int nread;
-    char buffer[strlen(sharedSecret) + 1];
-    buffer[strlen(sharedSecret)] = '\0';
-    if((nread = read(client_sockfd, buffer, strlen(sharedSecret))) <= 0){
-        fprintf(stderr, "Fatal error, could not read CRATOUS password!\n");
-        close(client_sockfd);
-        return (false);
-    }
-    else if(!strcmp(buffer, sharedSecret)){ //!strcmp==true indicates the strings are the same
-        if((write(client_sockfd, protocol2, strlen(protocol2))) <= 0){
-            fprintf(stderr, "Fatal error, write confirmation to CRATOUS failed!\n");
-            close(client_sockfd);
-            return (false);
-        }
-
-        //Client accepted, begin communication
-        fprintf(stdout, "CRATOUS has connected to UxAS!\n");
-        
-        char inputBuff[4097];
-        inputBuff[4096] = '\0';
-        read(client_sockfd, inputBuff, strlen("Hello World CRATOUS 2"));
-        fprintf(stdout, "%s\n", inputBuff);
-
-        write(client_sockfd, "Hello World UxAS 2", strlen("Hello World UxAS 2"));
-        
-        //communication code goes here
-        
-    }
-    else{
-        write(client_sockfd, err, strlen(err));
-        close(client_sockfd);
-        return (false);
-    }
     return (true);
 };
 
@@ -202,7 +211,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         sendSharedLmcpObjectBroadcastMessage(keyValuePairOut);
         
     }
-    return false;
+    bool isSuccess = 1;
+    return isSuccess;
 }
 
 }; //namespace service
