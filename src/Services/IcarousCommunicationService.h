@@ -9,11 +9,12 @@
 
 /* 
  * File:   IcarousCommunicationService.h
- * Author: Paul Coen & Winston Smith
+ * Authors: Paul Coen & Winston Smith
  *
- * Created on March 17, 2017, 5:55 PM
- * This file is meant to connect to the cFS module called CRATOUS in the ICAROUS system
+ * Created on June 14, 2018, 3:55 PM
+ * This file allows connectivity with the CRATOUS system
  * (CRoss Application Translator of Operational Unmanned Systems) 
+ * CRATOUS allows cooperative mission planning between UxAS and ICAROUS
  *
  */
 
@@ -46,22 +47,7 @@ namespace service
  * constructing new services.
 
  * 
- * 
- 
-
-Known vulnerabilities:
- 1. Man-in-the-middle attacks
- 2. DOS attacks
- 3. Malicious connections that never send a reply
- 4. Single plain-text password. Unfeasible to guess but may be easy to intercept if sent over an unsecured network. System vulnerable if untrusted people gain access to this file
- 5. Traffic is sent unencrypted and may be readable if sent over an unsecured network
-
-Features:
- 1. Allows communications to be received by UxAS from ICAROUS across any connection (same computer, LAN, Internet, etc.)
- 2. Likelihood of malicious connection is low if ICAROUS is started at roughly the same time as UxAS, since only one connection is allowed
-
-
- 
+ *  
  *  @par To add a new service:
  * <ul style="padding-left:1em;margin-left:0">
  * <li>Make copies of the source and header files of this template.</li>
