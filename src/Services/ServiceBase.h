@@ -107,9 +107,7 @@ protected:
 
     /** \brief  */
     std::string m_workDirectoryPath;
-    
-    bool m_isDataTimestamp{true};
-    
+        
     uxas::communications::LmcpObjectNetworkClientBase::ReceiveProcessingType m_receiveProcessingType{uxas::communications::LmcpObjectNetworkClientBase::ReceiveProcessingType::LMCP};
 
     // <editor-fold defaultstate="collapsed" desc="Static Service Registry">    

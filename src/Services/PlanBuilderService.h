@@ -27,11 +27,17 @@
 #include "uxas/messages/task/TaskImplementationResponse.h"
 #include "uxas/messages/task/PlanningState.h"
 #include "afrl/cmasi/EntityState.h"
+#include "afrl/cmasi/GimbalState.h"
+#include "afrl/cmasi/GimbalAngleAction.h"
+#include "afrl/impact/SpeedAltPair.h"
+#include <afrl/cmasi/LoiterAction.h>
+#include <afrl/impact/ImpactAutomationRequest.h>
+#include <afrl/impact/ImpactAutomationResponse.h>
 
 #include <cstdint> // int64_t
 #include <deque>
 #include <unordered_map>
-
+#include <list>
 namespace uxas
 {
 namespace service
@@ -131,7 +137,7 @@ private:
     
     bool sendNextTaskImplementationRequest(int64_t uniqueRequestID);
     void checkNextTaskImplementationRequest(int64_t uniqueRequestID);
-    
+    void AddLoitersToMissionCommands(std::shared_ptr<uxas::messages::task::UniqueAutomationResponse> response);
     /*! \brief  nested class for tracking projected state of an entity during the plan building process */
     class ProjectedState {
     public:
@@ -168,6 +174,7 @@ private:
     /*! \brief  latest entity states (used to get starting heading, position, and time) with key of entity ID */
     std::unordered_map< int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_currentEntityStates;
 
+    std::unordered_map< int64_t, std::list<std::shared_ptr<afrl::impact::SpeedAltPair>>> m_reqeustIDVsOverrides;
 
     /*! \brief  this stores the next unique ID to be used when requesting task
      *          implementations. Incremented by one after use. */
@@ -182,6 +189,10 @@ private:
      * new plans. Can be changed in XML configuration. */
     double m_assignmentStartPointLead_m{50.0};
 
+    /*! \brief define end behavior for missions to prevent chaotic flight paths.*/
+    bool m_addLoiterToEndOfMission = false;
+
+    double m_deafultLoiterRadius{ 300.0 };
 };
 
 

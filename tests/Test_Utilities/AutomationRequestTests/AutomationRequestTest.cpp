@@ -65,8 +65,8 @@ TEST(AutomationRequestTest, Test01_GoodRequest)
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AreaOfInterest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.ImpactLineSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.LineOfInterest")));
-    EXPECT_EQ(22,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanRequest")));
-    EXPECT_EQ(23,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanResponse")));
+    EXPECT_EQ(25,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanRequest")));
+    EXPECT_EQ(26,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.AssignmentCostMatrix")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintRequests")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.TaskAssignmentSummary")));
@@ -212,8 +212,8 @@ TEST(AutomationRequestTest, Test03_TaskInsideKeepOutVisibility_WrongAnswer)
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.AreaOfInterest")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.ImpactLineSearchTask")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.LineOfInterest")));
-    EXPECT_EQ(23,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanRequest")));
-    EXPECT_EQ(24,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanResponse")));
+    EXPECT_EQ(26,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanRequest")));
+    EXPECT_EQ(27,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanResponse")));
     EXPECT_EQ(1,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.AssignmentCostMatrix")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintRequests")));
     EXPECT_EQ(2,CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.SensorFootprintResponse")));

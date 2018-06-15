@@ -25,7 +25,9 @@
 #include "afrl/impact/LineOfInterest.h"
 #include "afrl/impact/PointOfInterest.h"
 #include "afrl/cmasi/MissionCommand.h"
-
+#include "afrl/cmasi/KeepInZone.h"
+#include "afrl/cmasi/KeepOutZone.h"
+#include "afrl/cmasi/OperatingRegion.h"
 #include <set>
 #include <cstdint> // int64_t
 
@@ -141,6 +143,9 @@ private:
     std::unordered_map<int64_t, std::shared_ptr<afrl::impact::LineOfInterest> > m_idVsLineOfInterest;
     std::unordered_map<int64_t, std::shared_ptr<afrl::impact::PointOfInterest> > m_idVsPointOfInterest;
     std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_vehicleIdVsCurrentMission;
+    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::KeepInZone> > m_idVsKeepInZone;
+    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::KeepOutZone> > m_idVsKeepOutZone;
+    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::OperatingRegion> > m_idVsOperatingRegion;
     /*! \brief container for managing task options read in from the XML configuration file.
      *  If there is no TaskId, then 0 is used. If there is no TaskType, then the string "NoTaskType" is used.
      * 

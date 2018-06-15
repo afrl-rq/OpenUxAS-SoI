@@ -97,7 +97,7 @@ public:
     static const std::string&
     s_directoryName()
     {
-        static std::string s_string("OsmPlannerService");
+        static std::string s_string("");
         return (s_string);
     };
 

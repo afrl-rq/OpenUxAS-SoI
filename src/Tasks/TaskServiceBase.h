@@ -38,6 +38,10 @@
 #include "uxas/messages/route/RoutePlan.h"
 #include "uxas/messages/route/RoutePlanRequest.h"
 #include "uxas/messages/route/RoutePlanResponse.h"
+#include "afrl/cmasi/KeepInZone.h"
+#include "afrl/cmasi/KeepOutZone.h"
+#include "afrl/cmasi/OperatingRegion.h"
+#include <afrl/cmasi/SearchTask.h>
 
 #include "pugixml.hpp"
 
@@ -430,6 +434,23 @@ namespace task
          * NOTE: Object received before task creation are only available when 
          * configured in the @ref c_Component_TaskManager*/
         std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::MissionCommand> > m_currentMissions;
+
+        /*! \brief  all <B><i>KeepInZone</i></B> objects.
+        * NOTE: Object received before task creation are only available when
+        * configured in the @ref c_Component_TaskManager*/
+        std::unordered_map < int64_t, std::shared_ptr<afrl::cmasi::KeepInZone> > m_keepInZones;
+        /*! \brief  all <B><i>KeepOutZone</i></B> objects.
+        * NOTE: Object received before task creation are only available when
+        * configured in the @ref c_Component_TaskManager*/
+        std::unordered_map < int64_t, std::shared_ptr<afrl::cmasi::KeepOutZone> > m_keepOutZones;
+        /*! \brief  all <B><i>OperatingRegion</i></B> objects.
+        * NOTE: Object received before task creation are only available when
+        * configured in the @ref c_Component_TaskManager*/
+        std::unordered_map < int64_t, std::shared_ptr<afrl::cmasi::OperatingRegion> > m_OperatingRegions;
+
+        /*! \brief Map from waypoint Ids from implemented option and final way[point Ids.
+         * This map is constructed during 'processImplementationRoutePlanResponseBase' */
+        std::unordered_map<int64_t,int64_t> m_optionWaypointIdVsFinalWaypointId;
         
         int64_t m_uniqueRouteRequestId{1};
     };
