@@ -15,9 +15,32 @@ In addition to surveillance pattern automation, UxAS contains services that auto
 
 A core functionality provided by UxAS is the mechanism to calculate near-optimal task allocation across teams of unmanned vehicles. With a collection of tasks that require servicing and a pool of vehicles available to service those tasks, UxAS is able to determine which vehicle should do which task in the proper order. This task assignment pipeline is carried out by a series of services working together in a complex sequence.
 
+# What is different about the timing branch?
+
+The timing branch is a modification to UxAS to include temporal operators to the process algebra UxAS uses to define a mission. 
+
+## Changes:
+
+The '.' operator was changed to mean that given a string such as ".(p1 p2)" p2 will not start until p1 finishes. This was an issue in base UxAS that given some sets of .(p1 p2) in examples, p2 would start before p1 can finish.
+
+## Added Operators:
+
+### '\~' - Tilde Operator
+
+This operator is used in a similar fashion to '.', however the second task can start at the beginning of the first task rather then at the end. In an algebra string such as "~(p1 p2)" p2 can start as soon as p1 has started.
+
+### '\_\[\<time1>,\<time2>\]' - Absolute Timing
+
+This is used to denote a time requirement in milliseconds from the start of the mission clock. Given a string such as "|(p1 p2)\_\[10000,300000\]" this means that p1 and p2 cannot start until 10 seconds into the mission. (Note* Travel time is considered and if the UAV would not make it to p1 or p2 in ten seconds, then it is allowed to head toward the task as it will not violate the timing requirements.) It also means that the mission must finish before 5 minutes have passed from the start.
+
+### '\-\[\<time1>,\<time2>\]' - Relative Timing
+
+The relative timing operator is used to denote timimg relative to a task in milliseconds. The meaning of this can changed based on the operator that is tagged on the front of the applied algebra string. Given the parallel operator '|', it has the exact same meaning as the absolute timing operator. Given ".(p1 p2)\-\[10000,300000\]" p2 must start between 10 and 300 seconds from the end of p1. Given "~(p1 p2)\-\[10000,300000\]" p2 must start between 10 and 300 seconds from the start of p1.
+
 # Supported Operating Systems
 
 For an Ubuntu 16.04 or Mac OS X system with prerequisites installed, UxAS should build from source without issue. Support for Windows is available on Windows 7 and 10 using Visual Studio.
+
 
 ## Configure System for UxAS Build
 
