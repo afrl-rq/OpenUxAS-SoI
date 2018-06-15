@@ -13,6 +13,8 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
+
+    <Service Type="IcarousCommunicationService" OptionString="Option_01" OptionInt="36" />
     
     <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="512" NumberWaypointsOverlap="5"
     param.turnType="FlyOver" GimbalPayloadId="101"/>

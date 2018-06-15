@@ -1,4 +1,5 @@
 srcs_services = [
+  'IcarousCommunicationService.cpp',
   '00_ServiceTemplate.cpp',
   '01_HelloWorld.cpp',
   'AssignmentTreeBranchBoundBase.cpp',
