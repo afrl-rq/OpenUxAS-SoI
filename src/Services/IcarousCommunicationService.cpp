@@ -9,23 +9,28 @@
 
 /* 
  * File:   IcarousCommunicationService.cpp
- * Author: Paul Coen & Winston Smith
+ * Authors: Paul Coen & Winston Smith
  *
- * Created on March 17, 2017, 5:55 PM
+ * Created on June 14, 2018, 3:55 PM
  *
  * <Service Type="IcarousCommunicationService" OptionString="Option_01" OptionInt="36" />
  * 
- * This file is meant to connect to the cFS module called CRATOUS in the ICAROUS system
+ * This file allows connectivity with the CRATOUS system
  * (CRoss Application Translator of Operational Unmanned Systems) 
+ * CRATOUS allows cooperative mission planning between UxAS and ICAROUS
  * 
  */
+ 
+ /***********************************************************************************************/
+ /*IMPORTANT: There are several known security vulnerabilities in this file. The fixes for      */
+ /*these may be closed-source. Do not use this code for real applications without modifications!*/
+ /***********************************************************************************************/
 
 // include header for this service
 #include "IcarousCommunicationService.h"
 
 //include for KeyValuePair LMCP Message
 #include "afrl/cmasi/KeyValuePair.h"
-
 
 #include <iostream>     // std::cout, cerr, etc
 
@@ -84,15 +89,23 @@ bool IcarousCommunicationService::start()
     // perform any actions required at the time the service starts
     std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
     
-        
-    //START ADDED CODE
-    const char *protocol1 = "ICAROUS-UxAS_LMCP";
+    //Begin manually-created code. Currently, this section creates a socket and allows a single client (currently closed-source) to connect.
+    //Each side will essentially print a "Hello World" message saying they connected to the other, and then write another "Hello World 2"
+    //message that the other will read and print. This is done simply to prove connectivity from UxAS.
+    //
+    //Future work: loop reading/writing, send LMCP messages, publish received LMCP messages, and allow UxAS to
+    //continue with calculating waypoints before CRATOUS connects
+    //Additionally, use UxAS log function calls rather than fprintf's to stderr
+    //
+    //This code ONLY works on Linux, since it uses Linux function calls
+    
+    //Protocol constants for 3-way handshake on top of TCP
+    const char *protocol1 = "CRATOUS-UxAS_LMCP";
     const char *protocol2 = "ok ";
     const char *sharedSecret = "28a4b77b86aa32715e4c271415b28447b8c08d704fd9ffb1258bced7b7167fe0";
     const char *err = "error";
     
-    
-    
+    //Setup server socket
     socklen_t server_len;
     struct sockaddr_in server_address;
     int server_sockfd = -2;
@@ -101,22 +114,29 @@ bool IcarousCommunicationService::start()
       fprintf(stderr, "Fatal error, socket could not be made!\n");
       return (false);
     }
+    //Configure server socket so the port isn't held by OS after program termination
     int i = 1;
     if((setsockopt(server_sockfd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i))) == -1){
       fprintf(stderr, "Fatal error, socket could not be set up!\n");
       return (false);
     }
-    server_address.sin_family = AF_INET;
+    //Resolve endianness issues
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(PORT);
+    
+    //Bind server socket as TCP
+    server_address.sin_family = AF_INET;
     server_len = sizeof(server_address);
     if((bind(server_sockfd, (struct sockaddr *)&server_address, server_len)) == -1){
       fprintf(stderr, "Fatal error, socket could not be bound!\n");
       return (false);
     }
 
+    //Wait for a single connection (CRATOUS)
     listen(server_sockfd, 1);
     int client_sockfd = accept(server_sockfd, NULL, NULL);
+    
+    //Begin 3-way handshake with CRATOUS
     if((write(client_sockfd, protocol1, strlen(protocol1))) <= 0){
         fprintf(stderr, "Fatal error, write communication protocol name failed!\n");
         close(client_sockfd);
@@ -127,28 +147,28 @@ bool IcarousCommunicationService::start()
     char buffer[strlen(sharedSecret) + 1];
     buffer[strlen(sharedSecret)] = '\0';
     if((nread = read(client_sockfd, buffer, strlen(sharedSecret))) <= 0){
-        fprintf(stderr, "Fatal error, could not read ICAROUS password!\n");
+        fprintf(stderr, "Fatal error, could not read CRATOUS password!\n");
         close(client_sockfd);
         return (false);
     }
     else if(!strcmp(buffer, sharedSecret)){ //!strcmp==true indicates the strings are the same
         if((write(client_sockfd, protocol2, strlen(protocol2))) <= 0){
-            fprintf(stderr, "Fatal error, write confirmation to ICAROUS failed!\n");
+            fprintf(stderr, "Fatal error, write confirmation to CRATOUS failed!\n");
             close(client_sockfd);
             return (false);
         }
 
-        //Begin communication protocol
-        fprintf(stdout, "ICAROUS has connected to UxAS!\n");
-
-        //communication code goes here
+        //Client accepted, begin communication
+        fprintf(stdout, "CRATOUS has connected to UxAS!\n");
         
         char inputBuff[4097];
         inputBuff[4096] = '\0';
-        read(client_sockfd, inputBuff, strlen("Hello World ICAROUS 2"));
+        read(client_sockfd, inputBuff, strlen("Hello World CRATOUS 2"));
         fprintf(stdout, "%s\n", inputBuff);
 
         write(client_sockfd, "Hello World UxAS 2", strlen("Hello World UxAS 2"));
+        
+        //communication code goes here
         
     }
     else{
@@ -156,8 +176,6 @@ bool IcarousCommunicationService::start()
         close(client_sockfd);
         return (false);
     }
-    
-    //std::cout << "ICAROUS has dissconnected unexpectedly" << std::endl;
     return (true);
 };
 
