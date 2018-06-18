@@ -17,7 +17,7 @@ using namespace std;
 Plot_Element::Plot_Element():
 m_color("blue"),
 m_lineStyle(""),
-m_thickness(2.0),
+m_thickness(""),
 m_arrow(0)
 {
 
@@ -36,12 +36,13 @@ Plot_Polygon::Plot_Polygon(VisiLibity::Polygon x): Plot_Element()
     m_polygon = x;
 }
 
-Plot_Polygon::Plot_Polygon(VisiLibity::Polygon polygon, int arrow, std::string color, std::string lineStyle)
+Plot_Polygon::Plot_Polygon(VisiLibity::Polygon polygon, int arrow, std::string color, std::string lineStyle, std::string thickness)
 {
     m_polygon = polygon;
     m_arrow = arrow;
     m_color = color;
     m_lineStyle = lineStyle;
+    m_thickness = thickness;
 }
 
 Plot::Plot()
@@ -73,9 +74,11 @@ Report::Report(std::string x)
 {
     m_testName = x;
     m_content = "% Preamble\n% ---\n\\documentclass{article}\n";
-    m_content += "% Packages\n% ---\n\\usepackage{tikz}\n\n\\begin{document}\n";
+    m_content += "% Packages\n% ---\n\\usepackage{tikz}\n\\usepackage{float}\n\\usepackage{xcolor}\n\n\\begin{document}\n";
     m_content += "\\title{Test}\n\\maketitle\n";
-    m_content += m_testName + " Test\n";
+    m_content += "\\begin{center}\n";
+    m_content += m_testName + " Test\n\\linebreak\n";
+    m_content += "\\end{center}\n";
 }
 
 bool Report::render()
@@ -91,7 +94,7 @@ bool Report::render()
 
 bool Report::addPlot(Plot x)
 {
-    m_content += "\\begin{figure}\n\\begin{tikzpicture}[scale=1]\n";
+    m_content += "\\begin{figure}[H]\n\\begin{tikzpicture}[scale=1]\n";
 
     
     //for each polygon in plot_polygon vector
@@ -101,6 +104,11 @@ bool Report::addPlot(Plot x)
         if(!poly.m_lineStyle.empty())
         {
             m_content += "[" + poly.m_lineStyle + "]";
+        }
+        
+        if(!poly.m_thickness.empty())
+        {
+            m_content += "[" + poly.m_thickness + "]";
         }
         
         if(poly.m_arrow == -1)
@@ -140,5 +148,19 @@ bool Report::close()
 
 void Report::addText(std::string x)
 {
-    m_content += x + '\n';
+    m_content += x + "\n";
+}
+
+void Report::addLine(std::string x)
+{
+    m_content += "\\begin{flushleft}\n";
+    m_content += x + "\n\\linebreak\n";
+    m_content +="\\end{flushleft}\n";
+}
+
+void Report::addLine(std::string content, std::string color)
+{
+    m_content += "\\begin{flushleft}\n";
+    m_content += "\\textcolor{" + color + "}{" + content + "}\n\\linebreak\n";
+    m_content +="\\end{flushleft}\n";
 }

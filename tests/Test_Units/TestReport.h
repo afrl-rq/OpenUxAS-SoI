@@ -32,7 +32,7 @@ namespace test
             std::string m_color;
             std::string m_lineStyle;
             ///TODO: should this be float, double, int?
-            float m_thickness;
+            std::string m_thickness;
             int m_arrow;
         };
         
@@ -47,7 +47,7 @@ namespace test
         public:
             Plot_Polygon();
             Plot_Polygon(VisiLibity::Polygon x);
-            Plot_Polygon(VisiLibity::Polygon polygon, int arrow, std::string color, std::string lineStyle);
+            Plot_Polygon(VisiLibity::Polygon polygon, int arrow, std::string color, std::string lineStyle, std::string thickness);
             bool addPoint(VisiLibity::Point x);
             std::vector<VisiLibity::Point> m_points;
             VisiLibity::Polygon m_polygon;
@@ -88,6 +88,8 @@ namespace test
             bool close();
             bool render();
             void addText(std::string x);
+            void addLine(std::string x);
+            void addLine(std::string content, std::string color);
             
             std::vector<Plot> m_plots;
             std::string m_content;
