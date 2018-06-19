@@ -31,6 +31,7 @@
 #include <cstdint> // int64_t
 #include <unordered_set>
 #include <unordered_map>
+#include "DynamicTaskServiceBase.h"
 
 namespace uxas
 {
@@ -119,7 +120,7 @@ namespace task
 
 //class cc_Task_EscortTask : public TaskBase
 
-class EscortTaskService : public TaskServiceBase
+class EscortTaskService : public DynamicTaskServiceBase
 {
 public:
 
@@ -167,27 +168,20 @@ private:
     void operator=(EscortTaskService const&) = delete;
 
     bool
-    configureTask(const pugi::xml_node& serviceXmlNode) override;
+    configureDynamicTask(const pugi::xml_node& serviceXmlNode) override;
 
-    bool
-    processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
+    virtual bool processRecievedLmcpMessageDynamicTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
 
-    virtual void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;
-    virtual void buildTaskPlanOptions() override;
+    virtual std::shared_ptr<afrl::cmasi::Location3D> calculateTargetLocation(const std::shared_ptr<afrl::cmasi::EntityState> entityState) override;
+
 
 private:
-    bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const std::vector<int64_t>& eligibleEntities);
     void CalculateTargetPoint(std::shared_ptr<afrl::cmasi::Location3D>& targetLocation, double targetHeading, double targetSpeed, std::shared_ptr<afrl::impact::EscortTask>& task);
-    std::shared_ptr<afrl::cmasi::VehicleActionCommand> CalculateGimbalActions(const std::shared_ptr<afrl::cmasi::EntityState>& entityState, double lat, double lon);
     double DistanceToLine(std::shared_ptr<afrl::cmasi::Location3D>& loc, std::shared_ptr<afrl::impact::LineOfInterest>& path);
     bool FlipLine(std::shared_ptr<afrl::cmasi::Location3D>& loc, double heading, std::shared_ptr<afrl::impact::LineOfInterest>& path);
 private:
     std::shared_ptr<afrl::impact::EscortTask> m_escortTask;
     std::shared_ptr<afrl::cmasi::EntityState> m_supportedEntityStateLast;
-    std::unordered_map<int64_t, std::shared_ptr<afrl::cmasi::EntityState> > m_idVsEntityState;
-    double m_loiterRadius_m = {200.0};
-    std::unordered_map<int64_t, int64_t> m_throttle;
-
 };
 
 }; //namespace task

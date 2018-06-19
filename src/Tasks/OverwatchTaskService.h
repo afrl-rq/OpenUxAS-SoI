@@ -31,6 +31,8 @@
 #include <cstdint> // int64_t
 #include <unordered_set>
 #include <unordered_map>
+#include "DynamicTaskServiceBase.h"
+#include <deque>
 
 namespace uxas
 {
@@ -113,7 +115,7 @@ namespace task
  */
 
 
-class OverwatchTaskService : public TaskServiceBase
+class OverwatchTaskService : public DynamicTaskServiceBase
 {
 public:
 
@@ -121,25 +123,25 @@ public:
     s_typeName() {
         static std::string s_string("OverwatchTaskService");
         return (s_string);
-    };
+    }
 
     static const std::vector<std::string>
     s_registryServiceTypeNames()
     {
         std::vector<std::string> registryServiceTypeNames = {s_typeName(), "afrl.impact.WatchTask"};
         return (registryServiceTypeNames);
-    };
+    }
     
     static const std::string&
     s_directoryName() {
-        static std::string s_string("");
+        static std::string s_string("TargetLogs");
         return (s_string);
-    };
+    }
 
     static ServiceBase*
     create() {
         return new OverwatchTaskService;
-    };
+    }
 
     OverwatchTaskService();
 
@@ -157,25 +159,25 @@ private:
     /** brief Copy assignment operation not permitted */
     void operator=(OverwatchTaskService const&) = delete;
 
-    bool
-    configureTask(const pugi::xml_node& serviceXmlNode) override;
-    bool
-    processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
-    
-    virtual void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;
-    virtual void buildTaskPlanOptions() override;
+    virtual bool configureDynamicTask(const pugi::xml_node& serviceXmlNode);
+    virtual bool processRecievedLmcpMessageDynamicTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
 
-private:
-    bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const std::vector<int64_t>& eligibleEntities);
+    virtual std::shared_ptr<afrl::cmasi::Location3D> calculateTargetLocation(const std::shared_ptr<afrl::cmasi::EntityState> entityState) override;
+
+
 private:
     std::shared_ptr<afrl::impact::WatchTask> m_watchTask;
     std::shared_ptr<afrl::cmasi::EntityState> m_watchedEntityStateLast;
-    double m_loiterRadius_m = {200.0};
+
+    std::deque< std::shared_ptr<afrl::cmasi::EntityState> > m_watchedEntityWindow;
+    size_t m_windowSize{4};
+    double m_loiterRadius_m = {305.0}; // 1000ft
+    bool m_estimateTargetMotion{true};
 };
 
-}; //namespace task
-}; //namespace service
-}; //namespace uxas
+} //namespace task
+} //namespace service
+} //namespace uxas
 
 #endif /* UXAS_SERVICE_TASK_OVERWATCH_TASK_SERVICE_H */
 

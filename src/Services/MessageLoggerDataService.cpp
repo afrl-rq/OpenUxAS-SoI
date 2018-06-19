@@ -85,10 +85,12 @@ bool
 MessageLoggerDataService::initialize()
 {
     bool isDatabaseLoggerSuccess{true};
+    auto isTimeStamp = uxas::common::ConfigurationManager::getIsDataTimeStamp();
+
     if (isDatabaseLogger)
     {
         m_databaseLogger = uxas::common::log::LoggerBase::instantiateLogger(uxas::common::log::DatabaseLogger::s_typeName());
-        isDatabaseLoggerSuccess = m_databaseLogger->configure(m_workDirectoryPath + "messageLog", m_isDataTimestamp, false, m_logDatabaseMessageCountLimit);
+        isDatabaseLoggerSuccess = m_databaseLogger->configure(m_workDirectoryPath + "messageLog", isTimeStamp, false, m_logDatabaseMessageCountLimit);
 
         if (isDatabaseLoggerSuccess)
         {
@@ -127,7 +129,7 @@ MessageLoggerDataService::initialize()
     if (isFileLogger)
     {
         m_fileLogger = uxas::common::log::LoggerBase::instantiateLogger(uxas::common::log::FileLogger::s_typeName());
-        isFileLoggerSuccess = m_fileLogger->configure(m_workDirectoryPath + "messageLog", m_isDataTimestamp, m_logFileMessageCountLimit);
+        isFileLoggerSuccess = m_fileLogger->configure(m_workDirectoryPath + "messageLog", isTimeStamp, m_logFileMessageCountLimit);
 
         if (isFileLoggerSuccess)
         {
