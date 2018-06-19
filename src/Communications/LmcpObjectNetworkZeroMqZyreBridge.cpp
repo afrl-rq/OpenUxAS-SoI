@@ -76,6 +76,19 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
     {
         UXAS_LOG_INFORM(s_typeName(), "::configure setting Zyre network device value to ", m_zyreNetworkDevice, " default value");
     }
+    
+    if (isSuccess)
+    {
+        if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
+        {
+            m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
+            UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
+        }
+        else
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::configure did not find 'ConsiderSelfGenerated' boolean in XML configuration; 'ConsiderSelfGenerated' boolean is ", m_isConsideredSelfGenerated);
+        }
+    }
 
     std::set<std::string> extSubAddDupChk; // prevent dup external address subscription
     std::string delimitedExtSubAddresses{""};
@@ -393,6 +406,10 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreWhisperMessageHandler(const std::string& 
                 {
                     if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
                     {
+                        if(m_isConsideredSelfGenerated)
+                        {
+                            recvdAddAttMsg->updateSourceAttributes("ZyreBridge", std::to_string(m_entityId), std::to_string(m_networkId));
+                        }
                         sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
                     }
                     else
