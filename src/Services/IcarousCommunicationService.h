@@ -27,6 +27,21 @@
 #include "CallbackTimer.h"
 #include "TypeDefs/UxAS_TypeDefs_Timer.h"
 
+
+
+
+#include "ServiceBase.h"
+#include "TypeDefs/UxAS_TypeDefs_String.h"
+#include "CallbackTimer.h"
+
+
+#include "afrl/cmasi/Waypoint.h"
+#include "afrl/cmasi/TurnType.h"
+#include "afrl/cmasi/MissionCommand.h"
+
+
+
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -34,6 +49,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <memory>
 
 #define PORT 5557
 
@@ -43,22 +59,7 @@ namespace service
 {
 
 /*! \class IcarousCommunicationService
-    \brief This is a basic service that can be used as a template when 
- * constructing new services.
-
- * 
- *  
- *  @par To add a new service:
- * <ul style="padding-left:1em;margin-left:0">
- * <li>Make copies of the source and header files of this template.</li>
- * <li>Search for the string IcarousCommunicationService and Replace it with the new 
- * service name.</li>
- * <li>Change the unique include guard entries, in the header file, i.e. 
- * "UXAS_ICAROUSCOMMUNICATIONSERVICE_H" to match the new service name</li>
- * <li> include the new service header file in ServiceManager.cpp</li>
- * <li> add a dummy instance of the new service in ServiceManager.cpp, e.g.
- * {auto svc = uxas::stduxas::make_unique<uxas::service::MyNewService>();} 
- * Note: this is required to link the new service in when building UxAS</li>
+ *  \brief This service handles communication with ICAROUS for integration of the two pieces of software.
  *  
  * </ul> @n
  * 
@@ -111,6 +112,7 @@ public:
     };
 
     IcarousCommunicationService();
+    bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand);
 
     virtual
     ~IcarousCommunicationService();
@@ -140,6 +142,8 @@ private:
 
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
+    
+    int client_sockfd;
 
 
 private:
