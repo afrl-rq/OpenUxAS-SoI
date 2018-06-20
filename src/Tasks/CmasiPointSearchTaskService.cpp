@@ -146,9 +146,10 @@ void CmasiPointSearchTaskService::buildTaskPlanOptions()
         }
         else
         {
-            // no set wedge, so standoff from any angle
-            double dHeadingCurrent_rad = 0.0;
-            double dHeadingTarget_rad = n_Const::c_Convert::dTwoPi() - wedgeDirectionIncrement;
+            // no set wedge, so standoff from evenly spaced angles (number based on discretization level). Similar logic could be placed in wedge logic (evenlyish spaced headings checked in wedge)
+            wedgeDirectionIncrement = n_Const::c_Convert::dTwoPi() / m_pointSearchTask->getDiscretizationLevel();
+            double dHeadingCurrent_rad = 0.0; //start from true north
+            double dHeadingTarget_rad = n_Const::c_Convert::dTwoPi() - wedgeDirectionIncrement; // the target (2pi - increment) so we dont double check angle 0.0
             while (n_Const::c_Convert::bCompareDouble(dHeadingTarget_rad, dHeadingCurrent_rad, n_Const::c_Convert::enGreaterEqual))
             {
                 if (isCalculateOption(taskId, optionId, dHeadingCurrent_rad))
