@@ -121,7 +121,7 @@ bool IcarousCommunicationService::initialize()
     //Resolve endianness issues
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(PORT);
-            
+
     //Bind server socket as TCP
     server_address.sin_family = AF_INET;
     server_len = sizeof(server_address);
@@ -131,40 +131,42 @@ bool IcarousCommunicationService::initialize()
     }
 
     //Wait for a single connection (ICAROUS)
-    listen(server_sockfd, 1);
+    listen(server_sockfd, ICAROUS_CONNECTIONS);
     fprintf(stdout, "Waiting for ICAROUS connection.\n");
-    client_sockfd = accept(server_sockfd, NULL, NULL);
-                
-    //Perform 3-way handshake with ICAROUS
-    if((write(client_sockfd, protocol1, strlen(protocol1))) <= 0){
-        fprintf(stderr, "Fatal error, write communication protocol name to ICAROUS failed!\n");
-        close(client_sockfd);
-        return false;
-    }
 
-    int nread;
-    char buffer[strlen(sharedSecret) + 1];
-    buffer[strlen(sharedSecret)] = '\0';
-    if((nread = read(client_sockfd, buffer, strlen(sharedSecret))) <= 0){
-        fprintf(stderr, "Fatal error, could not read ICAROUS password!\n");
-        close(client_sockfd);
-        return false;
-    }
-    else if(!strcmp(sharedSecret, buffer)){ //!compare==true indicates the strings are the same
-        if((write(client_sockfd, protocol2, strlen(protocol2))) <= 0){
-          fprintf(stderr, "Fatal error, write confirmation to ICAROUS failed!\n");
-          close(client_sockfd);
-          return false;
+    for(int connectionNum = 0; connectionNum < ICAROUS_CONNECTIONS; connectionNum++){    
+        client_sockfd[connectionNum] = accept(server_sockfd, NULL, NULL);
+
+        //Perform 3-way handshake with ICAROUS
+        if((write(client_sockfd[connectionNum], protocol1, strlen(protocol1))) <= 0){
+            fprintf(stderr, "Fatal error, write communication protocol name to ICAROUS failed!\n");
+            close(client_sockfd[connectionNum]);
+            return false;
         }
-        //ICAROUS has been accepted, begin communication
-        fprintf(stdout, "ICAROUS has connected to UxAS!\n");
+
+        int nread;
+        char buffer[strlen(sharedSecret) + 1];
+        buffer[strlen(sharedSecret)] = '\0';
+        if((nread = read(client_sockfd[connectionNum], buffer, strlen(sharedSecret))) <= 0){
+            fprintf(stderr, "Fatal error, could not read ICAROUS password!\n");
+            close(client_sockfd[connectionNum]);
+            return false;
+        }
+        else if(!strcmp(sharedSecret, buffer)){ //!compare==true indicates the strings are the same
+            if((write(client_sockfd[connectionNum], protocol2, strlen(protocol2))) <= 0){
+              fprintf(stderr, "Fatal error, write confirmation to ICAROUS failed!\n");
+              close(client_sockfd[connectionNum]);
+              return false;
+            }
+            //ICAROUS has been accepted, begin communication
+            fprintf(stdout, "ICAROUS has connected to UxAS!\n");
+        }
+        else{
+            write(client_sockfd[connectionNum], err, strlen(err));
+            close(client_sockfd[connectionNum]);
+            return false;
+        }
     }
-    else{
-        write(client_sockfd, err, strlen(err));
-        close(client_sockfd);
-        return false;
-    }
-    
     return true;
 }
 
@@ -198,17 +200,18 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         if (true)//isInitializePlan(ptr_MissionCommand))
         {
             //TODO: send received waypoint list to ICAROUS, probably as a byte stream
-            std::string messageToSend = ptr_MissionCommand->toString();
+            std::string messageToSend = ptr_MissionCommand->toXML();
+            int lengthOfMessage = messageToSend.length();
             char buffer[20];
             buffer[19] = '\0';
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {
-                write(client_sockfd, "TEST_STRING_UXAS_TEST", strlen("TEST_STRING_UXAS_TEST"));
-                int nread = read(client_sockfd, buffer, strlen("acknowledged"));
+                write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                int nread = read(client_sockfd[vehicleID-1], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
-                if(!strcmp(buffer, "stop"))
+                if(!strcmp(buffer, "quit"))
                 {
                     fprintf(stderr, "ICAROUS sent error!");
                     return false;

@@ -52,6 +52,7 @@
 #include <memory>
 
 #define PORT 5557
+#define ICAROUS_CONNECTIONS 3
 
 namespace uxas
 {
@@ -143,7 +144,8 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
     
-    int client_sockfd;
+    //This is the number of ICAROUS clients that are permitted
+    int client_sockfd[ICAROUS_CONNECTIONS];
 
 
 private:
