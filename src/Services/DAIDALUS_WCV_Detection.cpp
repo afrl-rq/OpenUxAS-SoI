@@ -137,7 +137,7 @@ DAIDALUS_WCV_Detection::~DAIDALUS_WCV_Detection() { };
 bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
-
+    bool useBankAngle = false;
     // process options from the XML configuration node:
     if (!ndComponent.attribute(STRING_XML_LOOKAHEADTIME).empty())
     {
@@ -263,6 +263,7 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     }
     if (!ndComponent.attribute(STRING_XML_BANKANGLE).empty())
     {
+       useBankAngle = true;
        double local_bank_angle_deg = ndComponent.attribute(STRING_XML_BANKANGLE).as_double();
        if (local_bank_angle_deg >= 0.0 && m_turn_rate_degps != 0.0)
        {
@@ -425,7 +426,10 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     m_daa.parameters.setHorizontalAcceleration(m_horizontal_accel_mpsps, "m/s^2");
     m_daa.parameters.setVerticalAcceleration(m_vertical_accel_G, "G");
     m_daa.parameters.setTurnRate(m_turn_rate_degps, "deg/s");
-    m_daa.parameters.setBankAngle(m_bank_angle_deg, "deg");
+    if (useBankAngle==true)
+    {
+        m_daa.parameters.setBankAngle(m_bank_angle_deg, "deg");
+    }
     m_daa.parameters.setVerticalRate(m_vertical_rate_mps, "m/s");
     m_daa.parameters.setRecoveryStabilityTime(m_recovery_stability_time_s, "s");
     m_daa.parameters.setRecoveryTrackBands(m_recovery_trk_bool);
@@ -516,21 +520,21 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
             DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
             DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
-            DetectionConfiguration->setMaxGroundSpeed(m_daa.parameters.getMaxGroundSpeed("mps"));
-            DetectionConfiguration->setMinGroundSpeed(m_daa.parameters.getMinGroundSpeed("mps"));
-            DetectionConfiguration->setMaxVerticalSpeed(m_daa.parameters.getMaxVerticalSpeed("mps"));
-            DetectionConfiguration->setMinVerticalSpeed(m_daa.parameters.getMinVerticalSpeed("mps"));
+            DetectionConfiguration->setMaxGroundSpeed(m_daa.parameters.getMaxGroundSpeed("m/s"));
+            DetectionConfiguration->setMinGroundSpeed(m_daa.parameters.getMinGroundSpeed("m/s"));
+            DetectionConfiguration->setMaxVerticalSpeed(m_daa.parameters.getMaxVerticalSpeed("m/s"));
+            DetectionConfiguration->setMinVerticalSpeed(m_daa.parameters.getMinVerticalSpeed("m/s"));
             DetectionConfiguration->setMaxAltitude(m_daa.parameters.getMaxAltitude("m"));
             DetectionConfiguration->setMinAltitude(m_daa.parameters.getMinAltitude("m"));
             DetectionConfiguration->setTrackStep(m_daa.parameters.getTrackStep("deg"));
-            DetectionConfiguration->setGroundSpeedStep(m_daa.parameters.getGroundSpeedStep("mps"));
-            DetectionConfiguration->setVerticalSpeedStep(m_daa.parameters.getVerticalSpeedStep("mps"));
+            DetectionConfiguration->setGroundSpeedStep(m_daa.parameters.getGroundSpeedStep("m/s"));
+            DetectionConfiguration->setVerticalSpeedStep(m_daa.parameters.getVerticalSpeedStep("m/s"));
             DetectionConfiguration->setAltitudeStep(m_daa.parameters.getAltitudeStep("m"));
             DetectionConfiguration->setHorizontalAcceleration(m_daa.parameters.getHorizontalAcceleration("m/s^2"));
             DetectionConfiguration->setVerticalAcceleration(m_daa.parameters.getVerticalAcceleration("G"));
             DetectionConfiguration->setTurnRate(m_daa.parameters.getTurnRate("deg/s"));
             DetectionConfiguration->setBankAngle(m_daa.parameters.getBankAngle("deg"));
-            DetectionConfiguration->setVerticalRate(m_daa.parameters.getVerticalRate("mps"));
+            DetectionConfiguration->setVerticalRate(m_daa.parameters.getVerticalRate("m/s"));
             DetectionConfiguration->setRecoveryStabilityTime(m_daa.parameters.getRecoveryStabilityTime("s"));
             DetectionConfiguration->setIsRecoveryTrackBands(m_daa.parameters.isEnabledRecoveryTrackBands());
             DetectionConfiguration->setIsRecoveryGroundSpeedBands(m_daa.parameters.isEnabledRecoveryGroundSpeedBands());
