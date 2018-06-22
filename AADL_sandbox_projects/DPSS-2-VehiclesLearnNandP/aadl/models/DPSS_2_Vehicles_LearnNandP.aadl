@@ -334,7 +334,7 @@ public
 			assert UAV2.left_endp_truth = LEFT_ENDP_TRUTH;
 		
 			--Used in lemmas
-			eq steps : int = 1 -> pre(steps + 1);
+			eq steps : int = 1 -> pre(steps) + 1;
 			
 			--Expected number of steps it takes to converge to the stable configuration
 --			eq steps_to_converge : int = 11; --This is the case when perimRight, perimLeft, numLeft, and numRight for the UAVs are initialized to zero (unless meeting neighbors)
@@ -390,6 +390,9 @@ public
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 
+			lemma "Observer: Config params not yet stable after 11 steps":
+				steps >= 11 => stable_config_params;
+
 			lemma "Observer: Worst steps convergence (not yet stable after 13 steps)":
 				steps = 13 => stable;
 							
@@ -420,13 +423,7 @@ public
 
 			lemma "Once the configuration paramters are stable, they stay stable.":
 				true -> pre(stable_config_params) => stable_config_params;
-													
---			lemma "Stable on and after steps_to_converge steps": 
---				steps >= steps_to_converge => stable;
 
-			lemma "Stable on and after 14 steps": 
-				steps >= 14 => stable;
-													
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_TRUTH_REAL;
 			
@@ -435,15 +432,24 @@ public
 					deltaT > 0.0 
 					and deltaT <= T
 					);
+													
+--			lemma "Stable on and after steps_to_converge steps": 
+--				steps >= steps_to_converge => stable;
+
+			lemma "Config params stable on and after 12 steps":
+				steps >= 12 => stable_config_params;
+
+			lemma "Stable on and after 14 steps": 
+				steps >= 14 => stable;
+
+			lemma "Time for configuration parameters to converge is less than 3T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time < 3.0*T);
 
 			-- This is a good way to find the real time bound!	
 			lemma "Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
 					(time < 4.0*T);
-			
-			lemma "Time for configuration parameters to converge is less than 3T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time < 3.0*T);
 			
 		**};
 		

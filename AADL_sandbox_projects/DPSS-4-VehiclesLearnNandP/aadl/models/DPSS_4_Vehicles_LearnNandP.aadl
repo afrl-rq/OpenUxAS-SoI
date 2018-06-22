@@ -487,46 +487,52 @@ public
 			lemma "Observer: Nearly 3T convergence":
 				not (
 					stable
-					--Initially, all UAVs are heading to the left
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV4 = -1)
+					and
+					--Initially, ...
+					DPSS_Node_Lib.initial_value_true(
+					--all UAVs are heading to the left
+						direction_UAV1 = -1
+					and direction_UAV2 = -1
+					and direction_UAV3 = -1
+					and direction_UAV4 = -1
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.04)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = RIGHT_ENDP_TRUTH - 0.03)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = RIGHT_ENDP_TRUTH - 0.02)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01)
+					and pos_UAV1 = RIGHT_ENDP_TRUTH - 0.04
+					and pos_UAV2 = RIGHT_ENDP_TRUTH - 0.03
+					and pos_UAV3 = RIGHT_ENDP_TRUTH - 0.02
+					and pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01
 					--and UAVN starts out thinking there is no perimeter to its right
-					and DPSS_Node_Lib.initial_value_true(UAV4.perimRight = 0.0)
+					and UAV4.perimRight = 0.0
 					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV4.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV4.numRight = 0)
-				);
+					and UAV1.numLeft = 0 and UAV1.numRight = 0
+					and UAV2.numLeft = 0 and UAV2.numRight = 0
+					and UAV3.numLeft = 0 and UAV3.numRight = 0
+					and UAV4.numLeft = 0 and UAV4.numRight = 0
+				));
 
 			lemma "Observer: Worst time (nearly 4T) convergence":
 				not (
 					stable
-					--Initially, all UAVs are heading to the right
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV4 = 1)
+					and
+					--Initially, ...
+					DPSS_Node_Lib.initial_value_true(
+					--all UAVs are heading to the right
+						direction_UAV1 = 1
+					and direction_UAV2 = 1
+					and direction_UAV3 = 1
+					and direction_UAV4 = 1
 					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = LEFT_ENDP_TRUTH + 0.02)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = LEFT_ENDP_TRUTH + 0.03)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = LEFT_ENDP_TRUTH + 0.04)
+					and pos_UAV1 = LEFT_ENDP_TRUTH + 0.01
+					and pos_UAV2 = LEFT_ENDP_TRUTH + 0.02
+					and pos_UAV3 = LEFT_ENDP_TRUTH + 0.03
+					and pos_UAV4 = LEFT_ENDP_TRUTH + 0.04
 					--and UAV1 starts out thinking there is a segment of length (N-1)*RIGHT_ENDP_TRUTH to its left
-					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = (N_TRUTH_REAL - 1.0) * RIGHT_ENDP_TRUTH)
+					and UAV1.perimLeft = (N_TRUTH_REAL - 1.0) * RIGHT_ENDP_TRUTH
 					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV4.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV4.numRight = 0)
-				);
+					and UAV1.numLeft = 0 and UAV1.numRight = 0
+					and UAV2.numLeft = 0 and UAV2.numRight = 0
+					and UAV3.numLeft = 0 and UAV3.numRight = 0
+					and UAV4.numLeft = 0 and UAV4.numRight = 0
+				));
 								
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;

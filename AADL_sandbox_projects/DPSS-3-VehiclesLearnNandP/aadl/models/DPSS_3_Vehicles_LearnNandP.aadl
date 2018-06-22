@@ -403,7 +403,7 @@ public
 			assert UAV3.left_endp_truth = LEFT_ENDP_TRUTH;
 			
 			--Used in lemmas
-			eq steps : int = 1 -> pre(steps + 1);
+			eq steps : int = 1 -> pre(steps) + 1;
 			
 			--Expected number of steps it takes to converge to the stable configuration
 			--eq steps_to_converge : int = 20; --This is the case when the config parameters are initialized to 0
@@ -415,40 +415,50 @@ public
 			lemma "Observer: Nearly 3T convergence":
 				not (
 					stable
-					--Initially, all UAVs are heading to the left
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
+					and
+					steps = 14 --I know through experimentation how many steps it takes. Adding this constraint reduces the time it takes the model checker to find the CE.
+					and
+					--Initially, ...
+					DPSS_Node_Lib.initial_value_true(
+					--all UAVs are heading to the left
+						direction_UAV1 = -1
+					and direction_UAV2 = -1
+					and direction_UAV3 = -1
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.03)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = RIGHT_ENDP_TRUTH - 0.02)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = RIGHT_ENDP_TRUTH - 0.01)
+					and pos_UAV1 = RIGHT_ENDP_TRUTH - 0.03
+					and pos_UAV2 = RIGHT_ENDP_TRUTH - 0.02
+					and pos_UAV3 = RIGHT_ENDP_TRUTH - 0.01
 					--and UAVN starts out thinking there is no perimeter to its right
-					and DPSS_Node_Lib.initial_value_true(UAV3.perimRight = 0.0)
+					and UAV3.perimRight = 0.0
 					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0)
-				);
+					and UAV1.numLeft = 0 and UAV1.numRight = 0
+					and UAV2.numLeft = 0 and UAV2.numRight = 0
+					and UAV3.numLeft = 0 and UAV3.numRight = 0
+				));
 
 			lemma "Observer: Worst time (nearly 4T) convergence":
 				not (
 					stable
-					--Initially, all UAVs are heading to the right
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = 1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = 1)
+					and
+					steps = 14 --I know through experimentation how many steps it takes. Adding this constraint reduces the time it takes the model checker to find the CE.
+					and 
+					--Initially, ...
+					DPSS_Node_Lib.initial_value_true(
+					--all UAVs are heading to the right
+						direction_UAV1 = 1
+					and direction_UAV2 = 1
+					and direction_UAV3 = 1
 					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = LEFT_ENDP_TRUTH + 0.01)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = LEFT_ENDP_TRUTH + 0.02)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = LEFT_ENDP_TRUTH + 0.03)
+					and pos_UAV1 = LEFT_ENDP_TRUTH + 0.01
+					and pos_UAV2 = LEFT_ENDP_TRUTH + 0.02
+					and pos_UAV3 = LEFT_ENDP_TRUTH + 0.03
 					--and UAV1 starts out thinking there is a segment of length (N-1)*RIGHT_ENDP_TRUTH to its left
-					and DPSS_Node_Lib.initial_value_true(UAV1.perimLeft = (N_TRUTH_REAL - 1.0) * RIGHT_ENDP_TRUTH)
+					and UAV1.perimLeft = (N_TRUTH_REAL - 1.0) * RIGHT_ENDP_TRUTH
 					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0)
-				);		
+					and UAV1.numLeft = 0 and UAV1.numRight = 0
+					and UAV2.numLeft = 0 and UAV2.numRight = 0
+					and UAV3.numLeft = 0 and UAV3.numRight = 0
+				));		
 
 			lemma "Observer: Config params are not yet converged after (3 + 1/6)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
@@ -456,7 +466,14 @@ public
 							
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
+
+			lemma "Observer: Config params not yet stable after 21 steps":
+				steps = 21 => stable_config_params;
+				
+			lemma "Observer: Not yet stable after 23 steps":
+				steps >= 23 => stable;
 			
+				
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
 			----------------------------------------------------------------------------			
@@ -497,24 +514,18 @@ public
 					deltaT > 0.0 
 					and deltaT <= T
 					);
-
-			lemma "(Experimental) Config params stable on and after 16 steps":
-				steps >= 16 => stable_config_params;
-
-			lemma "(Experimental) Config params stable on and after 17 steps":
-				steps >= 17 => stable_config_params;
-
-			lemma "(Experimental) Config params stable on and after 18 steps":
-				steps >= 18 => stable_config_params;
 			
-			lemma "(Experimental) Config params stable on and after 19 steps":
-				steps >= 19 => stable_config_params;
+			lemma "(Experimental) Config params stable on and after 22 steps":
+				steps >= 22 => stable_config_params;
 			
-			lemma "(Experimental) Config params stable on and after 20 steps":
-				steps >= 20 => stable_config_params;
+			lemma "(Experimental) Config params stable on and after 23 steps":
+				steps >= 23 => stable_config_params;
 				
-			lemma "(Experimental) Config params stable on and after 21 steps":
-				steps >= 21 => stable_config_params;
+			lemma "(Experimental) Config params stable on and after 24 steps":
+				steps >= 24 => stable_config_params;
+
+			lemma "(Experimental) Config params stable on and after 25 steps":
+				steps >= 25 => stable_config_params;
 								
 			lemma "(Experimental) Time for config params to converge is < (3 + 1/3)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
@@ -539,20 +550,6 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
 
-			lemma "(Experimental) Stable on and after 19 steps":
-				steps >= 19 => stable;
-
-			lemma "(Experimental) Stable on and after 20 steps":
-				steps >= 20 => stable;
-
-			lemma "(Experimental) Stable on and after 21 steps":
-				steps >= 21 => stable;
-
-			lemma "(Experimental) Stable on and after 22 steps":
-				steps >= 22 => stable;
-
-			lemma "(Experimental) Stable on and after 23 steps":
-				steps >= 23 => stable;
 			
 			lemma "(Experimental) Stable on and after 24 steps":
 				steps >= 24 => stable;
@@ -562,7 +559,16 @@ public
 
 			lemma "(Experimental) Stable on and after 26 steps":
 				steps >= 26 => stable;
-
+				
+			lemma "(Experimental) Stable on and after 27 steps":
+				steps >= 27 => stable;
+				
+			lemma "(Experimental) Stable on and after 28 steps":
+				steps >= 28 => stable;
+				
+			lemma "(Experimental) Stable on and after 29 steps":
+				steps >= 29 => stable;
+					
 			-- This is a good way to find the real time bound!	
 			lemma "(Experimental) Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
