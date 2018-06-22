@@ -88,12 +88,9 @@ bool IcarousCommunicationService::initialize()
     // perform any required initialization before the service is started
     std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
         
-    //Begin manually-created code. Currently, this section creates a socket and allows a single client (currently closed-source) to connect.
-    //Each side will essentially print a "Hello World" message saying they connected to the other, and then write another "Hello World 2"
-    //message that the other will read and print. This is done simply to prove connectivity from UxAS.
+    //Begin manually-created code. Currently, this section creates a socket and allows several instances of a modified ICAROUS to connect.
     //
-    //Future work: loop reading/writing, send LMCP messages, publish received LMCP messages, and allow UxAS to
-    //continue with calculating waypoints before ICAROUS connects
+    //Future work: translate received messages to LMCP, publish translated LMCP messages
     //Additionally, use UxAS log function calls rather than fprintf's to stderr
     //
     //This code ONLY works on Linux, since it uses Linux function calls    
@@ -199,7 +196,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
         if (true)//isInitializePlan(ptr_MissionCommand))
         {
-            //TODO: send received waypoint list to ICAROUS, probably as a byte stream
             std::string messageToSend = ptr_MissionCommand->toXML();
             int lengthOfMessage = messageToSend.length();
             char buffer[20];

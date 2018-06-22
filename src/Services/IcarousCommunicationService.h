@@ -52,7 +52,9 @@
 #include <memory>
 
 #define PORT 5557
-#define ICAROUS_CONNECTIONS 3
+
+//Number of unique UAVs in the scenario
+#define ICAROUS_CONNECTIONS 1
 
 namespace uxas
 {
