@@ -79,7 +79,18 @@ public
 					pre_pos_UAV1, 
 					pre_goal_UAV1
 				);
-		
+
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, replace with -1.0.
+			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
+									time_until_UAV1_reaches_goal,
+									pre_pos_UAV1,
+									pre(perimLeft_UAV1),
+									pre(perimRight_UAV1),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
+				);
+						
 			--Time until UAVN reaches right endpoint	
 			eq time_until_UAVN_reaches_right_endp : DPSS_Data_Types::Time_Type = 
 				DPSS_Node_Lib.time_to_reach_target_position(
@@ -101,7 +112,7 @@ public
 							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
 							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
 							--Times to reach goals
-							time_until_UAV1_reaches_goal
+							time_until_UAV1_reaches_goal_trimmed
 							--Times to reach neighbors
 							));
 			
@@ -257,24 +268,28 @@ public
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
 			----------------------------------------------------------------------------
 						
-			lemma "Observer: Nearly 3T convergence":
+			lemma "Observer: Nearly 2T convergence":
 				not (
 					stable
-					--Initially, all UAVs are heading to the left
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
-					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.02)
-					--and UAVN starts out thinking there is no perimeter to its right
-					and DPSS_Node_Lib.initial_value_true(UAV1.perimRight = 0.0)
-					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
+					and
+					--Initially, ...
+					DPSS_Node_Lib.initial_value_true(
+						--all UAVs are heading to the left
+							direction_UAV1 = -1
+						--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
+						and pos_UAV1 = RIGHT_ENDP_TRUTH - 0.02
+						--and UAVN starts out thinking there is no perimeter to its right
+						and UAV1.perimRight = 0.0
+						--and each UAV starts out thinking it is the only one
+						and UAV1.numLeft = 0 and UAV1.numRight = 0
+						)
 				);
 								
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 
-			lemma "Observer: Worst steps convergence (not yet stable after 4 steps)":
-				steps = 4 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after 2 steps)":
+				steps = 2 => stable;
 							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -311,8 +326,8 @@ public
 --			lemma "Stable on and after steps_to_converge steps": 
 --				steps >= steps_to_converge => stable;
 
-			lemma "Stable on and after 5 steps": 
-				steps >= 5 => stable;
+			lemma "Stable on and after 3 steps": 
+				steps >= 3 => stable;
 																	
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_TRUTH_REAL;
