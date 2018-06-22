@@ -96,5 +96,21 @@ public
 	
 	tel;
 	
+	node if_fake_endp_set_time_to_neg1(in_time: DPSS_Data_Types::Time_Type,
+							pos: DPSS_Data_Types::Position_Type,
+							perimLeft : real,
+							perimRight : real,
+							true_left_endp : real,
+							true_right_endp : real
+							) returns (out : DPSS_Data_Types::Time_Type);
+		let out = if (perimLeft < pos - true_left_endp) then
+					-1.0
+				  else
+				  	if (perimRight < true_right_endp - pos) then
+				  		-1.0
+				  	else 
+				  		in_time;
+		tel;
+	
 	**};
 end DPSS_Node_Lib;

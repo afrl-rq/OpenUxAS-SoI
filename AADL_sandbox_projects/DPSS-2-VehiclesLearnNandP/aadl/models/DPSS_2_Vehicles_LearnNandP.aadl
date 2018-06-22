@@ -106,6 +106,27 @@ public
 					pre_goal_UAV2
 				);
 			
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, replace with -1.0.
+			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
+									time_until_UAV1_reaches_goal,
+									pre_pos_UAV1,
+									pre(perimLeft_UAV1),
+									pre(perimRight_UAV1),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
+				);
+				
+			eq time_until_UAV2_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
+									time_until_UAV2_reaches_goal,
+									pre_pos_UAV2,
+									pre(perimLeft_UAV2),
+									pre(perimRight_UAV2),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
+				);
+			
 			--Time until UAVN reaches right endpoint	
 			eq time_until_UAVN_reaches_right_endp : DPSS_Data_Types::Time_Type = 
 				DPSS_Node_Lib.time_to_reach_target_position(
@@ -127,8 +148,8 @@ public
 							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
 							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
 							--Times to reach goals
-							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal_trimmed,
 							--Times to reach neighbors
 														time_to_reach_neighbor_12))));
 			
@@ -349,7 +370,7 @@ public
 				not (
 					stable
 					and
-					steps = 9 --I know through experimentation how many steps it takes. Adding this constraint reduces the time it takes the model checker to find the CE.
+					steps = 6 --I know through experimentation how many steps it takes. Adding this constraint reduces the time it takes the model checker to find the CE.
 					and
 					--Initially, ...
 					DPSS_Node_Lib.initial_value_true(
@@ -390,11 +411,11 @@ public
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 
-			lemma "Observer: Config params not yet stable after 11 steps":
-				steps >= 11 => stable_config_params;
+			lemma "Observer: Config params not yet stable after 6 steps":
+				steps >= 6 => stable_config_params;
 
-			lemma "Observer: Worst steps convergence (not yet stable after 13 steps)":
-				steps = 13 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after 8 steps)":
+				steps = 8 => stable;
 							
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -436,11 +457,11 @@ public
 --			lemma "Stable on and after steps_to_converge steps": 
 --				steps >= steps_to_converge => stable;
 
-			lemma "Config params stable on and after 12 steps":
-				steps >= 12 => stable_config_params;
-
-			lemma "Stable on and after 14 steps": 
-				steps >= 14 => stable;
+			lemma "Config params stable on and after 7 steps":
+				steps >= 7 => stable_config_params;
+				
+			lemma "Stable on and after 9 steps": 
+				steps >= 9 => stable;
 
 			lemma "Time for configuration parameters to converge is less than 3T":
 				(stable_config_params and not (pre(stable_config_params))) => 
