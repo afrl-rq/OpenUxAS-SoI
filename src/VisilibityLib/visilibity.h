@@ -84,6 +84,10 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>     //string class
 #include <cassert>    //assertions
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -123,6 +127,12 @@ namespace VisiLibity
   class Guards;
   class Visibility_Polygon;
   class Visibility_Graph;
+    
+  namespace bg = boost::geometry;
+  // 2-dimensional boost point
+  typedef bg::model::d2::point_xy<double> boost_point;
+  //boost polygon based on points, with counterclockwise orientation
+  typedef bg::model::polygon<boost_point, false> boost_polygon;
 
 
   /** \brief  floating-point display precision.
@@ -152,7 +162,6 @@ namespace VisiLibity
    */  
   double uniform_random_sample(double lower_bound, double upper_bound);
 
-
   /** \brief  rectangle with sides parallel to the x- and y-axes
    *
    * \author  Karl J. Obermeyer
@@ -160,6 +169,33 @@ namespace VisiLibity
    */
   struct Bounding_Box { double x_min, x_max, y_min, y_max; };
 
+  /** \brief  convert VisiLibity polygon to Boost polygon
+   *
+   * \author  Amanda Cinnamon
+   * Written for use within Polygon union_ method
+   */
+    boost_polygon to_boost(Polygon x);
+    
+    /** \brief  convert VisilLibity polygon to Boost polygon
+     *
+     * \author  Amanda Cinnamon
+     * Written for use within Polygon union_ method
+     */
+    Polygon to_visiLibity(boost_polygon x);
+    
+    /** \brief  convert VisiLibity polygon to Boost polygon
+     *
+     * \author  Amanda Cinnamon
+     * Written for use within Polygon union_ method
+     */
+    boost_point to_boost(Point visPoint);
+    
+    /** \brief  convert VisilLibity polygon to Boost polygon
+     *
+     * \author  Amanda Cinnamon
+     * Written for use within Polygon union_ method
+     */
+    Point to_visiLibity(boost_point x);
 
   /// Point in the plane represented by Cartesian coordinates
   class Point
@@ -1327,6 +1363,14 @@ namespace VisiLibity
      * \remarks Will return false if an error occurs (e.g. OpenGL tessellation errors).
      */
     static bool union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
+      /** \brief  merges a list of simple polygons oriented ccw using boost union
+       *
+       * \pre polygonList contains only simple ccw oriented polygons, but for
+       *      efficiency, simplicity and orientation are not asserted
+       * \author  Derek Kingston
+       * \remarks Will return false if an error occurs (e.g. OpenGL tessellation errors).
+       */
+      static bool boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
     //Mutators
     /** \brief  access with automatic wrap-around in forward direction
      *

@@ -50,6 +50,7 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>       //assertions
 #include <iso646.h>      //aliases for boolean operators
 
+#include <boost/geometry/geometries/polygon.hpp>
 
 ///Hide helping functions in unnamed namespace (local to .C file).
 namespace
@@ -2076,8 +2077,7 @@ namespace VisiLibity
         resultingPolygons.assign(openGlPolygons_.begin(), openGlPolygons_.end());
         return true;
     }
-
-
+    
   void Polygon::enforce_standard_form()
   {
     int point_count=vertices_.size();
@@ -4064,4 +4064,153 @@ namespace VisiLibity
     return outs;
   }
 
+    boost_point to_boost(Point vis_point)
+    {
+        bg::model::d2::point_xy<double> b_point(vis_point.x(), vis_point.y());
+        return b_point;
+    }
+    
+    Point to_visiLibity(boost_point b_point)
+    {
+        double x = bg::get<0>(b_point);
+        double y = bg::get<1>(b_point);
+        Point visPoint(x,y);
+        return (visPoint);
+    }
+    
+    boost_polygon to_boost(Polygon visPoly)
+    {
+        boost_polygon b_poly;
+        //for each point in VisiLibity polygon
+        for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
+        {
+            auto b_point = to_boost(visPoly[pointIdx]);
+            bg::append(b_poly.outer(), b_point);
+        }
+        
+        //std::cout << "Check validity of converted boost poly" << std::endl;
+        bg::validity_failure_type failure;
+        if(!bg::is_valid(b_poly, failure))
+        {
+            //std::cout << to_visiLibity(b_poly) << std::endl;
+            //attempt to correct - for orientation and closed vs unclosed
+            bg::correct(b_poly);
+            if(!bg::is_valid(b_poly, failure))
+            {
+                if(failure == bg::failure_not_closed)
+                {
+                    std::cout << "Not closed" << std::endl;
+                }
+                else if(failure == bg::failure_wrong_orientation)
+                {
+                    std::cout << "Wrong orientation" << std::endl;
+                }
+                //std::cout << to_visiLibity(b_poly) << std::endl;
+                //std::cout << "Could not fix invalid polygon with reason " << failure << std::endl;
+            }
+            else
+            {
+                //std::cout << "fixed invalid polygon" << std::endl;
+            }
+            
+        }
+        
+        return b_poly;
+    }
+
+    Polygon to_visiLibity(boost_polygon b_poly)
+    {
+        Polygon visPoly;
+        //for each point in boost polygon
+        std::vector<boost_point> const& points = b_poly.outer();
+        for (auto &b_point : points)
+        {
+            auto visPoint = to_visiLibity(b_point);
+            visPoly.push_back(visPoint);
+        }
+        
+        //boost polygon may have some vertex at beginning and end
+        visPoly.eliminate_redundant_vertices(0);
+        return visPoly;
+    }
+
+    // note: static function
+    bool Polygon::boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon)
+    {
+        //vector to store results
+        std::vector<boost_polygon> output;
+        
+        //make sure we have at least two polygons to merge
+        if(polygonList.size() > 1)
+        {
+            //create a polygon to iteratively merge polygons with and set it to the first input polygon (converted to boost format)
+            boost_polygon merged = to_boost(polygonList[0]);
+            
+            //iteratively merge into merged
+            for (int polyIdx = 1; polyIdx < polygonList.size(); polyIdx++)
+            {
+                //convert to boost polygon to use boost union
+                auto b_poly = to_boost(polygonList[polyIdx]);
+                bg::validity_failure_type failure;
+                if(bg::is_valid(b_poly, failure))
+                {
+                    bg::union_(b_poly, merged, output);
+                    
+                    //case where multiple boost polygons are returned from union
+                    //not handled yet
+                    if(output.size() > 1)
+                    {
+                        merged = output[0];
+                        std::cout << "Multiple polygons returned from union - only first one used";
+                    }
+                    //else just one polygon returned
+                    else if(output.size() > 0)
+                    {
+                        //save for use for next input polygon
+                        merged = output[0];
+                    }
+    //                //else no polygons were returned from union
+    //                else
+    //                {
+    //                    //if we didn't get any output, set merged to
+    //                    std::cout << "No output\n";
+    //                }
+                }
+                else
+                {
+                    //TODO: I don't really want to return in the middle of this loop, do I?
+                    std::cout << "Invalid polygon - reason: " << failure << std::endl;
+//                    std::cout << to_visiLibity(b_poly);
+                    if(failure == bg::failure_not_closed)
+                    {
+                        std::cout << "Not closed" << std::endl;
+                    }
+                    else if(failure == bg::failure_wrong_orientation)
+                    {
+                        std::cout << "Wrong orientation" << std::endl;
+                    }
+                    return false;
+                }
+            }
+            
+            for (auto &b_poly : output)
+            {
+                auto visPoly = to_visiLibity(b_poly);
+                resultingPolygons.push_back(visPoly);
+            }
+            return true;
+        }
+        //else less than two input polygons
+        else
+        {
+            //if we received only one input polygon, make this the output polygon
+            if(polygonList.size() == 1)
+            {
+                resultingPolygons.push_back(polygonList[0]);
+            }
+            //if the input polygon vector is empty, the output polygon vector will come back empty
+            //return false any time we did not do any actual merging
+            return false;
+        }
+    }
 }
