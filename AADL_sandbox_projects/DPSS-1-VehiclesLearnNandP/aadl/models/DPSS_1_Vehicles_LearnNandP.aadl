@@ -72,19 +72,12 @@ public
 						
 			--Times to reach neighbors													
 
-			--Times to reach goals
-			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV1, 
-					pre_pos_UAV1, 
-					pre_goal_UAV1
-				);
-				
-			--"Trimmed" times to reach goals. If reaching a fake endpoint, replace with -1.0.
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, return value is -1.0.
 			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
-									time_until_UAV1_reaches_goal,
-									pre_pos_UAV1,
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV1, 
+									pre_pos_UAV1, 
+									pre_goal_UAV1,
 									pre(perimLeft_UAV1),
 									pre(perimRight_UAV1),
 									LEFT_ENDP_TRUTH,
