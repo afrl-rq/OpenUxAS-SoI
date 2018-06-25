@@ -209,7 +209,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {
-                write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                int bytesSent = 0;
+                while(bytesSent < lengthOfMessage)
+                {
+                    bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                }
                 int nread = read(client_sockfd[vehicleID-1], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
@@ -231,12 +235,16 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         char buffer[20];
         /*for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
+            int bytesSent = 0;
             buffer[19] = '\0';
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {*/
                 write(1, messageToSend.c_str(), lengthOfMessage);/*
-                write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
+                while(bytesSent < lengthOfMessage)
+                {
+                    bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                }
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
@@ -258,12 +266,16 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         char buffer[20];
         /*for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
+            int bytesSent = 0;
             buffer[19] = '\0';
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {*/
                 write(1, messageToSend.c_str(), lengthOfMessage);/*
-                write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
+                while(bytesSent < lengthOfMessage)
+                {
+                    bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                }
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
