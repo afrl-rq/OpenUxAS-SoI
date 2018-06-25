@@ -231,18 +231,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         std::string messageToSend = ptr_Zone->toXML();
         int lengthOfMessage = messageToSend.length();
         char buffer[20];
-        /*for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+        for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
             int bytesSent = 0;
             buffer[19] = '\0';
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
-            {*/
-                /*write(1, messageToSend.c_str(), lengthOfMessage);/*
-                while(bytesSent < lengthOfMessage)
-                {
-                    bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
-                }
+            {
+                write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
@@ -253,7 +249,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 }
             }
             fprintf(stdout, "IcarousCommunicationService::KeepInZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
-        }*/
+        }
     }
     else if(afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
     {
@@ -262,18 +258,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         std::string messageToSend = ptr_Zone->toXML();
         int lengthOfMessage = messageToSend.length();
         char buffer[20];
-        /*for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+        for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
             int bytesSent = 0;
             buffer[19] = '\0';
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
-            {*/
-                /*write(1, messageToSend.c_str(), lengthOfMessage);/*
-                while(bytesSent < lengthOfMessage)
-                {
-                    bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
-                }
+            {
+                bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
@@ -284,7 +276,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 }
             }
             fprintf(stdout, "IcarousCommunicationService::KeepOutZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
-        }*/
+        }
     }
     
     return false;
