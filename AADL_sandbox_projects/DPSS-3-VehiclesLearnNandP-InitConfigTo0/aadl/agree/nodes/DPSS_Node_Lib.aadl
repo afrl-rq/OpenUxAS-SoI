@@ -77,6 +77,29 @@ public
 							-1.0; --We'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
 		tel;
 	
+	node time_to_reach_target_position_trim_phony_endpoints(direction: DPSS_Data_Types::Direction_Type, 
+								UAV_pos: DPSS_Data_Types::Position_Type, 
+								target_pos : DPSS_Data_Types::Position_Type,
+								perimLeft : real,
+								perimRight : real,
+								true_left_endp : real,
+								true_right_endp : real
+								) returns (out : DPSS_Data_Types::Time_Type);
+		let	
+			out = 	if (perimLeft < UAV_pos - true_left_endp and target_pos = UAV_pos - perimLeft) then
+						-1.0
+				  	else
+				  		if (perimRight < true_right_endp - UAV_pos and target_pos = UAV_pos + perimRight) then
+				  			-1.0
+				  		else
+				  			if target_pos > UAV_pos and direction = 1 then
+								(target_pos - UAV_pos)/DPSS_Constants.V 
+							else if target_pos < UAV_pos and direction = -1 then
+									(UAV_pos - target_pos)/DPSS_Constants.V
+								 else --We're traveling away from the target position, or we're at it but are only interested in the NEXT time we reach the target position
+									-1.0; --We'll reach an endpoint or another neighbor first, so just use the max time to reach an endpoint
+		tel;
+	
 	node initial_value_true(a : bool) returns (out : bool);
 	var
 	  pre_state : int;
@@ -95,23 +118,6 @@ public
 	  out = ((state = 0) or (state = 1));
 	
 	tel;
-	
-	node if_fake_endp_set_time_to_neg1(in_time: DPSS_Data_Types::Time_Type,
-							goal: DPSS_Data_Types::Position_Type,
-							pos: DPSS_Data_Types::Position_Type,
-							perimLeft : real,
-							perimRight : real,
-							true_left_endp : real,
-							true_right_endp : real
-							) returns (out : DPSS_Data_Types::Time_Type);
-		let out = if (perimLeft < pos - true_left_endp and goal = pos - perimLeft) then
-					-1.0
-				  else
-				  	if (perimRight < true_right_endp - pos and goal = pos + perimRight) then
-				  		-1.0
-				  	else 
-				  		in_time;
-		tel;
 	
 	**};
 end DPSS_Node_Lib;

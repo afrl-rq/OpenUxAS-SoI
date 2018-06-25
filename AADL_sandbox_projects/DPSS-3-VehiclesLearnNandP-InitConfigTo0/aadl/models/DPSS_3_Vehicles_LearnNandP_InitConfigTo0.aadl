@@ -110,35 +110,13 @@ public
 														pre_pos_UAV2,
 														pre_pos_UAV3
 														);
-			
-			--Times to reach goals
-			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV1, 
-					pre_pos_UAV1, 
-					pre_goal_UAV1
-				);
-				
-			eq time_until_UAV2_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV2, 
-					pre_pos_UAV2, 
-					pre_goal_UAV2
-				);
-				
-			eq time_until_UAV3_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV3, 
-					pre_pos_UAV3, 
-					pre_goal_UAV3
-				);
 
-			--"Trimmed" times to reach goals. If reaching a fake endpoint, replace with -1.0.
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, return value is -1.0.
 			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
-									time_until_UAV1_reaches_goal,
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV1, 
+									pre_pos_UAV1, 
 									pre_goal_UAV1,
-									pre_pos_UAV1,
 									pre(perimLeft_UAV1),
 									pre(perimRight_UAV1),
 									LEFT_ENDP_TRUTH,
@@ -146,10 +124,10 @@ public
 				);
 				
 			eq time_until_UAV2_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
-									time_until_UAV2_reaches_goal,
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV2, 
+									pre_pos_UAV2, 
 									pre_goal_UAV2,
-									pre_pos_UAV2,
 									pre(perimLeft_UAV2),
 									pre(perimRight_UAV2),
 									LEFT_ENDP_TRUTH,
@@ -157,10 +135,10 @@ public
 				);
 
 			eq time_until_UAV3_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
-									time_until_UAV3_reaches_goal,
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV3, 
+									pre_pos_UAV3, 
 									pre_goal_UAV3,
-									pre_pos_UAV3,
 									pre(perimLeft_UAV3),
 									pre(perimRight_UAV3),
 									LEFT_ENDP_TRUTH,
@@ -483,8 +461,8 @@ public
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 			
---			lemma "Observer: Worst steps convergence (not yet stable after 15 steps)":
---				steps >= 15 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after 15 steps)":
+				steps >= 15 => stable;
 			
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -533,13 +511,7 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
 
-			lemma "(Experimental) Stable on and after 14 steps":
-				steps >= 14 => stable;
-
-			lemma "(Experimental) Stable on and after 15 steps":
-				steps >= 15 => stable;
-
-			lemma "(Experimental) Stable on and after 16 steps":
+			lemma "Stable on and after 16 steps":
 				steps >= 16 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
@@ -551,14 +523,14 @@ public
 					and deltaT <= T
 					);
 
-			-- This is a good way to find the real time bound!	
+			lemma "Time for configuration parameters to converge is less than 3T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time < 3.0*T);
+
+			-- This is a good way to find the real time bound, by experimenting with lower bounds!	
 			-- Convergence time is < 3T when configuration parameters are initialized to zero
 			lemma "Time to become stable is less than 3T":
 				(stable and not (pre(stable))) => 
-					(time < 3.0*T);
-
-			lemma "Time for configuration parameters to converge is less than 3T":
-				(stable_config_params and not (pre(stable_config_params))) => 
 					(time < 3.0*T);
 			
 		**};
