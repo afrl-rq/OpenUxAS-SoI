@@ -134,33 +134,49 @@ public
 														pre_pos_UAV4
 														);
 			
-			--Times to reach goals
-			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV1, 
-					pre_pos_UAV1, 
-					pre_goal_UAV1
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, return value is -1.0.
+			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV1, 
+									pre_pos_UAV1, 
+									pre_goal_UAV1,
+									pre(perimLeft_UAV1),
+									pre(perimRight_UAV1),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
 				);
 				
-			eq time_until_UAV2_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV2, 
-					pre_pos_UAV2, 
-					pre_goal_UAV2
-				);
-				
-			eq time_until_UAV3_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV3, 
-					pre_pos_UAV3, 
-					pre_goal_UAV3
+			eq time_until_UAV2_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV2, 
+									pre_pos_UAV2, 
+									pre_goal_UAV2,
+									pre(perimLeft_UAV2),
+									pre(perimRight_UAV2),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
 				);
 
-			eq time_until_UAV4_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV4, 
-					pre_pos_UAV4, 
-					pre_goal_UAV4
+			eq time_until_UAV3_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV3, 
+									pre_pos_UAV3, 
+									pre_goal_UAV3,
+									pre(perimLeft_UAV3),
+									pre(perimRight_UAV3),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
+				);
+				
+			eq time_until_UAV4_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV4, 
+									pre_pos_UAV4, 
+									pre_goal_UAV4,
+									pre(perimLeft_UAV4),
+									pre(perimRight_UAV4),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
 				);
 			
 			--Time until UAVN reaches right endpoint	
@@ -184,10 +200,10 @@ public
 							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
 							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
 							--Times to reach goals
-							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV4_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV4_reaches_goal_trimmed,
 							--Times to reach neighbors
 							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_12,
 							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_23,
@@ -500,23 +516,26 @@ public
 			lemma "Observer: Nearly 3T convergence":
 				not (
 					stable
-					--Initially, all UAVs are heading to the left
-					and DPSS_Node_Lib.initial_value_true(direction_UAV1 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV2 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV3 = -1)
-					and DPSS_Node_Lib.initial_value_true(direction_UAV4 = -1)
+					--Initially, ...
+					and DPSS_Node_Lib.initial_value_true(
+					--all UAVs are heading to the left
+						direction_UAV1 = -1
+					and direction_UAV2 = -1
+					and direction_UAV3 = -1
+					and direction_UAV4 = -1
 					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV1 = RIGHT_ENDP_TRUTH - 0.04)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV2 = RIGHT_ENDP_TRUTH - 0.03)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV3 = RIGHT_ENDP_TRUTH - 0.02)
-					and DPSS_Node_Lib.initial_value_true(pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01)
+					and pos_UAV1 = RIGHT_ENDP_TRUTH - 0.04
+					and pos_UAV2 = RIGHT_ENDP_TRUTH - 0.03
+					and pos_UAV3 = RIGHT_ENDP_TRUTH - 0.02
+					and pos_UAV4 = RIGHT_ENDP_TRUTH - 0.01
 					--and UAVN starts out thinking there is no perimeter to its right
-					and DPSS_Node_Lib.initial_value_true(UAV4.perimRight = 0.0)
+					and UAV4.perimRight = 0.0
 					--and each UAV starts out thinking it is the only one
-					and DPSS_Node_Lib.initial_value_true(UAV1.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV1.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV2.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV2.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV3.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV3.numRight = 0)
-					and DPSS_Node_Lib.initial_value_true(UAV4.numLeft = 0) and DPSS_Node_Lib.initial_value_true(UAV4.numRight = 0)
+					and UAV1.numLeft = 0 and UAV1.numRight = 0
+					and UAV2.numLeft = 0 and UAV2.numRight = 0
+					and UAV3.numLeft = 0 and UAV3.numRight = 0
+					and UAV4.numLeft = 0 and UAV4.numRight = 0
+					)
 				);
 								
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
@@ -575,32 +594,20 @@ public
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
 
-			lemma "(Experimental) Stable on and after 28 steps":
-				steps >= 28 => stable;
+			lemma "(Experimental) Stable on and after 23 steps":
+				steps >= 23 => stable;
 
-			lemma "(Experimental) Stable on and after 29 steps":
-				steps >= 29 => stable;
+			lemma "(Experimental) Stable on and after 24 steps":
+				steps >= 24 => stable;
 
-			lemma "(Experimental) Stable on and after 30 steps":
-				steps >= 30 => stable;
+			lemma "(Experimental) Stable on and after 25 steps":
+				steps >= 25 => stable;
 
-			lemma "(Experimental) Stable on and after 31 steps":
-				steps >= 31 => stable;
+			lemma "(Experimental) Stable on and after 26 steps":
+				steps >= 26 => stable;
 
-			lemma "(Experimental) Stable on and after 32 steps":
-				steps >= 32 => stable;
-
-			lemma "(Experimental) Stable on and after 33 steps":
-				steps >= 33 => stable;
-
-			lemma "(Experimental) Stable on and after 34 steps":
-				steps >= 34 => stable;
-
-			lemma "(Experimental) Stable on and after 35 steps":
-				steps >= 35 => stable;
-
-			lemma "(Experimental) Stable on and after 36 steps":
-				steps >= 36 => stable;
+			lemma "(Experimental) Stable on and after 27 steps":
+				steps >= 27 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_TRUTH_REAL;
@@ -610,16 +617,17 @@ public
 					deltaT > 0.0 
 					and deltaT <= T
 					);
-
-			-- This is a good way to find the real time bound!	
-			-- Convergence time is < 3T when configuration parameters are initialized to zero
-			lemma "Time to become stable is less than 3T":
-				(stable and not (pre(stable))) => 
-					(time < 3.0*T);
 			
 			lemma "Time for configuration parameters to converge is less than 3T":
 				(stable_config_params and not (pre(stable_config_params))) => 
 					(time < 3.0*T);
+
+			-- This is a good way to find the real time bound, by experimenting with lower bounds!	
+			-- Convergence time is < 3T when configuration parameters are initialized to zero
+			lemma "Time to become stable is less than 3T":
+				(stable and not (pre(stable))) => 
+					(time < 3.0*T);
+
 
 		**};
 		
