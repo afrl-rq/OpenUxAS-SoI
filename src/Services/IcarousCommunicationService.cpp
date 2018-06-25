@@ -238,7 +238,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {
-                write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
@@ -265,7 +265,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {
-                bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                bytesSent += write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
