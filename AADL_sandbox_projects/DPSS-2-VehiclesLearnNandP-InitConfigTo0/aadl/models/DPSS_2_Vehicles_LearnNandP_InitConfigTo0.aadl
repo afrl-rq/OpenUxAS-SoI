@@ -91,26 +91,12 @@ public
 														pre_pos_UAV1,
 														pre_pos_UAV2
 														);
-			--Times to reach goals
-			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV1, 
-					pre_pos_UAV1, 
-					pre_goal_UAV1
-				);
-			
-			eq time_until_UAV2_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV2, 
-					pre_pos_UAV2, 
-					pre_goal_UAV2
-				);
-			
-			--"Trimmed" times to reach goals. If reaching a fake endpoint, replace with -1.0.
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, return value is -1.0.
 			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
-									time_until_UAV1_reaches_goal,
-									pre_pos_UAV1,
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV1, 
+									pre_pos_UAV1, 
+									pre_goal_UAV1,
 									pre(perimLeft_UAV1),
 									pre(perimRight_UAV1),
 									LEFT_ENDP_TRUTH,
@@ -118,9 +104,10 @@ public
 				);
 				
 			eq time_until_UAV2_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.if_fake_endp_set_time_to_neg1(
-									time_until_UAV2_reaches_goal,
-									pre_pos_UAV2,
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV2, 
+									pre_pos_UAV2, 
+									pre_goal_UAV2,
 									pre(perimLeft_UAV2),
 									pre(perimRight_UAV2),
 									LEFT_ENDP_TRUTH,
@@ -394,8 +381,8 @@ public
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 
-			lemma "Observer: Worst steps convergence (not yet stable after 6 steps)":
-				steps = 6 => stable;
+			lemma "Observer: Worst steps convergence (not yet stable after 8 steps)":
+				steps = 8 => stable;
 											
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -438,8 +425,8 @@ public
 --			lemma "Stable on and after steps_to_converge steps": 
 --				steps >= steps_to_converge => stable;
 			
-			lemma "Stable on and after 7 steps": 
-				steps >= 7 => stable;
+			lemma "Stable on and after 9 steps": 
+				steps >= 9 => stable;
 													
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_TRUTH_REAL;
