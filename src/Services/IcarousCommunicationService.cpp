@@ -207,12 +207,17 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             char buffer[20];
             buffer[19] = '\0';
             buffer[0] = 'e';
+            char *charMessage = (char *)malloc(sizeof(char) * lengthOfMessage);
+            strcpy(charMessage, messageToSend.c_str());
             while(strcmp(buffer, "acknowledged"))
             {
-                int bytesSent = 0;
-                while(bytesSent < lengthOfMessage)
+                int totalBytesSent = 0;
+                int bytesSent;
+                while(totalBytesSent < lengthOfMessage)
                 {
-                    bytesSent += write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+                    bytesSent = write(client_sockfd[vehicleID-1], charMessage, lengthOfMessage);
+                    totalBytesSent += bytesSent;
+                    charMessage = &charMessage[totalBytesSent];
                 }
                 int nread = read(client_sockfd[vehicleID-1], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
