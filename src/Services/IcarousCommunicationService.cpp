@@ -93,7 +93,13 @@ bool IcarousCommunicationService::initialize()
     //Future work: translate received messages to LMCP, publish translated LMCP messages
     //Additionally, use UxAS log function calls rather than fprintf's to stderr
     //
-    //This code ONLY works on Linux, since it uses Linux function calls    
+    //This code ONLY works on Linux, since it uses Linux function calls  
+    
+    //Initialize has_gotten_waypoints[]
+    for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+    {
+        has_gotten_waypoints[i] = false;
+    }  
     
     //Protocol constants for 3-way ICAROUS authentication handshake    
     const char *protocol1 = "ICAROUS-UxAS_LMCP";
@@ -193,9 +199,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         auto ptr_MissionCommand = std::shared_ptr<afrl::cmasi::MissionCommand>((afrl::cmasi::MissionCommand*)receivedLmcpMessage->m_object->clone());
         auto vehicleID = ptr_MissionCommand->getVehicleID();
         std::cout << "Vehicle ID is " << vehicleID << "\n";
-        //TODO:: initialize plan should intialize and get an std::string(n_Const::c_Constant_Strings::strGetPrepend_lmcp() + ":UXNATIVE:IncrementWaypoint")intial plan
-        if (true)//isInitializePlan(ptr_MissionCommand))
+        if (!has_gotten_waypoints[vehicleID - 1])
         {
+            has_gotten_waypoints[vehicleID - 1] = true;
             std::string messageToSend = ptr_MissionCommand->toXML();
             int lengthOfMessage = messageToSend.length();
             char buffer[20];
@@ -209,11 +215,45 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 fprintf(stdout, "%s\n", buffer);
                 if(!strcmp(buffer, "quit"))
                 {
-                    fprintf(stderr, "ICAROUS sent error!");
+                    fprintf(stderr, "IcarousCommunicationService::MissionCommandMessage: ICAROUS #%i sent error!", vehicleID);
                     return false;
                 }
             }
-            fprintf(stdout, "Acknowledged by ICAROUS!\n");
+            fprintf(stdout, "IcarousCommunicationService::MissionCommandMessage: Acknowledged by ICAROUS #%i!\n", vehicleID);
+        }
+    }
+    else if ((afrl::cmase::isKeepInZone(receivedLmcpMessage->m_object.get())) || (afrl::cmase::isKeepOutZone(receivedLmcpMessage->m_object.get())))
+    {
+        if(afrl::cmase::isKeepInZone(receivedLmcpMessage->m_object.get()))
+        {
+            auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receiveedLmcpMessage->m_object->clone());
+        }
+        else //if(afrl::cmase::isKeepOutZone(receivedLmcpMessage->m_object.get()))
+        {
+            auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receiveedLmcpMessage->m_object->clone());
+        }
+        
+        std::string messageToSend = ptr_MissionCommand->toXML();
+        int lengthOfMessage = messageToSend.length();
+        char buffer[20];
+        buffer[19] = '\0';
+        buffer[0] = 'e';
+        for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+        {
+            while(strcmp(buffer, "acknowledged"))
+            {
+                write(stdout, messageToSend.c_str(), lengthOfMessage);
+                write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
+                int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
+                buffer[nread] = '\0';
+                fprintf(stdout, "%s\n", buffer);
+                if(!strcmp(buffer, "quit"))
+                {
+                    fprintf(stderr, "IcarousCommunicationService::MissionCommandMessage: ICAROUS #%i sent error!", i);
+                    return false;
+                }
+            }
+            fprintf(stdout, "IcarousCommunicationService::MissionCommandMessage: Acknowledged by ICAROUS #%i!\n", i);
         }
     }
     

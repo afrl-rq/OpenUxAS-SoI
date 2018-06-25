@@ -148,6 +148,9 @@ private:
     
     //This is the number of ICAROUS clients that are permitted
     int client_sockfd[ICAROUS_CONNECTIONS];
+    
+    //This is an array keeping track of which ICAROUS instances have gotten vehicle waypoint information
+    bool has_gotten_waypoints[ICAROUS_CONNECTIONS];
 
 
 private:
