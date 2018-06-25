@@ -78,6 +78,8 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
 
     // subscribe to messages::
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
+    addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
+    addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
     
     
     return (isSuccess);
@@ -191,9 +193,7 @@ bool IcarousCommunicationService::terminate()
 }
     
 bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
-{
-    bool isSuccess = 1;
-    
+{    
     if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
     {
         auto ptr_MissionCommand = std::shared_ptr<afrl::cmasi::MissionCommand>((afrl::cmasi::MissionCommand*)receivedLmcpMessage->m_object->clone());
@@ -222,42 +222,62 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             fprintf(stdout, "IcarousCommunicationService::MissionCommandMessage: Acknowledged by ICAROUS #%i!\n", vehicleID);
         }
     }
-    else if ((afrl::cmase::isKeepInZone(receivedLmcpMessage->m_object.get())) || (afrl::cmase::isKeepOutZone(receivedLmcpMessage->m_object.get())))
+    else if(afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
     {
-        if(afrl::cmase::isKeepInZone(receivedLmcpMessage->m_object.get()))
-        {
-            auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receiveedLmcpMessage->m_object->clone());
-        }
-        else //if(afrl::cmase::isKeepOutZone(receivedLmcpMessage->m_object.get()))
-        {
-            auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receiveedLmcpMessage->m_object->clone());
-        }
-        
-        std::string messageToSend = ptr_MissionCommand->toXML();
+        fprintf(stdout, "In\n");
+        auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receivedLmcpMessage->m_object->clone());
+        std::string messageToSend = ptr_Zone->toXML();
         int lengthOfMessage = messageToSend.length();
         char buffer[20];
-        buffer[19] = '\0';
-        buffer[0] = 'e';
-        for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+        /*for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
+            buffer[19] = '\0';
+            buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
-            {
-                write(stdout, messageToSend.c_str(), lengthOfMessage);
+            {*/
+                write(1, messageToSend.c_str(), lengthOfMessage);/*
                 write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
                 if(!strcmp(buffer, "quit"))
                 {
-                    fprintf(stderr, "IcarousCommunicationService::MissionCommandMessage: ICAROUS #%i sent error!", i);
+                    fprintf(stderr, "IcarousCommunicationService::KeepInZoneMessage: ICAROUS #%i sent error!", i + 1);
                     return false;
                 }
             }
-            fprintf(stdout, "IcarousCommunicationService::MissionCommandMessage: Acknowledged by ICAROUS #%i!\n", i);
-        }
+            fprintf(stdout, "IcarousCommunicationService::KeepInZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
+        }*/
+    }
+    else if(afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
+    {
+        fprintf(stdout, "Out\n");
+        auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receivedLmcpMessage->m_object->clone());
+        std::string messageToSend = ptr_Zone->toXML();
+        int lengthOfMessage = messageToSend.length();
+        char buffer[20];
+        /*for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+        {
+            buffer[19] = '\0';
+            buffer[0] = 'e';
+            while(strcmp(buffer, "acknowledged"))
+            {*/
+                write(1, messageToSend.c_str(), lengthOfMessage);/*
+                write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
+                int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
+                buffer[nread] = '\0';
+                fprintf(stdout, "%s\n", buffer);
+                if(!strcmp(buffer, "quit"))
+                {
+                    fprintf(stderr, "IcarousCommunicationService::KeepOutZoneMessage: ICAROUS #%i sent error!", i + 1);
+                    return false;
+                }
+            }
+            fprintf(stdout, "IcarousCommunicationService::KeepOutZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
+        }*/
     }
     
-    return isSuccess;
+    return false;
 }
 
 /*

@@ -38,6 +38,8 @@
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/TurnType.h"
 #include "afrl/cmasi/MissionCommand.h"
+#include "afrl/cmasi/KeepInZone.h"
+#include "afrl/cmasi/KeepOutZone.h"
 
 
 
