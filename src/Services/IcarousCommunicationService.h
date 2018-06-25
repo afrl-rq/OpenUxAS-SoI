@@ -56,7 +56,7 @@
 #define PORT 5557
 
 //Number of unique UAVs in the scenario
-#define ICAROUS_CONNECTIONS 1
+#define ICAROUS_CONNECTIONS 2
 
 namespace uxas
 {
