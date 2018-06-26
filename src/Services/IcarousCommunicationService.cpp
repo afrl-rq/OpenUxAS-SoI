@@ -240,6 +240,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             while(strcmp(buffer, "acknowledged"))
             {
                 write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
+                fprintf(stdout, "%s\n", messageToSend.c_str());
                 int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
                 buffer[nread] = '\0';
                 fprintf(stdout, "%s\n", buffer);
