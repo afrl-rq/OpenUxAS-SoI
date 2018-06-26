@@ -209,6 +209,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             buffer[0] = 'e';
             while(strcmp(buffer, "acknowledged"))
             {
+                fprintf(stdout, "Sending Waypoints to ICAROUS instance %i\n", vehicleID);
                 int totalBytesSent = 0;
                 int bytesSent;
                 bytesSent = write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
