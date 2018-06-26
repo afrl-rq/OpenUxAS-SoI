@@ -463,7 +463,9 @@ public
 			
 			lemma "Observer: Worst steps convergence (not yet stable after 15 steps)":
 				steps >= 15 => stable;
-			
+
+--			lemma "Observer: UAV2 'pulled' in two directions once config params are stable":
+--				not (stable_config_params and UAV2.meet_LN and UAV2.meet_RN and pos_UAV2 > S_12 and pos_UAV2 < S_23);			
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
 			----------------------------------------------------------------------------			
