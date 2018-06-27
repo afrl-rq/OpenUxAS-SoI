@@ -188,6 +188,7 @@ AutomationDiagramDataService::processReceivedLmcpMessage(std::unique_ptr<uxas::c
         auto uniqueAutomationResponse = std::dynamic_pointer_cast<uxas::messages::task::UniqueAutomationResponse>(receivedLmcpMessage->m_object);
         if (uniqueAutomationResponse)
         {
+            sleep(2);
             auto itassigmentTime_ms = m_idVsTimeAutomationRequest_ms.find(uniqueAutomationResponse->getResponseID());
             if (itassigmentTime_ms != m_idVsTimeAutomationRequest_ms.end())
             {
