@@ -80,6 +80,7 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
+    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     
     
     return (isSuccess);
@@ -278,6 +279,29 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 }
             }
             fprintf(stdout, "IcarousCommunicationService::KeepOutZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
+        }
+    }
+    else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
+    {
+        auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState*)receivedLmcpMessage->m_object->clone());
+        int vehicleID = ptr_AirVehicleState->getID();
+        std::string messageToSend = ptr_AirVehicleState->toXML();
+        int lengthOfMessage = messageToSend.length();
+        char buffer[20];
+        buffer[19] = '\0';
+        buffer[0] = 'e';
+        while(strcmp(buffer, "acknowledged"))
+        {
+            int totalBytesSent = 0;
+            int bytesSent;
+            bytesSent = write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
+            int nread = read(client_sockfd[vehicleID-1], buffer, strlen("acknowledged"));
+            buffer[nread] = '\0';
+            if(!strcmp(buffer, "quit"))
+            {
+                fprintf(stderr, "IcarousCommunicationService::AirVehicleStateMessage: ICAROUS #%i sent error!", vehicleID);
+                return false;
+            }
         }
     }
     
