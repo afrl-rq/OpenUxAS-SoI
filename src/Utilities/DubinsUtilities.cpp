@@ -31,7 +31,6 @@ namespace uxas {
             };
 
             void DubinsPath::calculateDubinsWaypoints() {
-                DubinsConfiguration(1.0, 1.0, 1.0);
                 //calculate the Dubin's path
                 //first translate the aircraft coordinates to standard coordinates
                 VisiLibity::Point startLocation = VisiLibity::Point(startDubinsConfiguration.getX(), startDubinsConfiguration.getY());
@@ -83,10 +82,11 @@ namespace uxas {
                     if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
                         dubinsWaypoints = tmpDubinsWaypoints;
                     }
+                    //reset tmp waypoints for next tested path
+                    tmpDubinsWaypoints.clear();
+                    tmpDubinsWaypoints.push_back(startWaypoint);
+
                 }
-                //reset tmp waypoints for next tested path
-                tmpDubinsWaypoints.clear();
-                tmpDubinsWaypoints.push_back(startWaypoint);
 
                 //path 2, RLR path
                 distance = VisiLibity::distance(startRightCircle, endRightCircle);
@@ -113,10 +113,11 @@ namespace uxas {
                     if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
                         dubinsWaypoints = tmpDubinsWaypoints;
                     }
+                    //reset tmpDubinsWaypoints for next path
+                    tmpDubinsWaypoints.clear();
+                    tmpDubinsWaypoints.push_back(startWaypoint);
+
                 }
-                //reset tmpDubinsWaypoints for next path
-                tmpDubinsWaypoints.clear();
-                tmpDubinsWaypoints.push_back(startWaypoint);
 
                 //path 3, LSL
                 v = endLeftCircle - startLeftCircle;
@@ -169,11 +170,12 @@ namespace uxas {
                     if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
                         dubinsWaypoints = tmpDubinsWaypoints;
                     }
+                    //reset tmpDubinsWaypoints for next tested path
+                    tmpDubinsWaypoints.clear();
+                    tmpDubinsWaypoints.push_back(startWaypoint);
+
                 }
 
-                //reset tmpDubinsWaypoints for next tested path
-                tmpDubinsWaypoints.clear();
-                tmpDubinsWaypoints.push_back(startWaypoint);
 
                 //path 5, RSL
                 distance = VisiLibity::distance(startRightCircle, endLeftCircle);
@@ -197,10 +199,11 @@ namespace uxas {
                     if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
                         dubinsWaypoints = tmpDubinsWaypoints;
                     }
+                    //reset the tmpDubinsWaypoints for next tested path
+                    tmpDubinsWaypoints.clear();
+                    tmpDubinsWaypoints.push_back(startWaypoint);
+
                 }
-                //reset the tmpDubinsWaypoints for next tested path
-                tmpDubinsWaypoints.clear();
-                tmpDubinsWaypoints.push_back(startWaypoint);
 
                 //path 6, RSR
                 v = endRightCircle - startRightCircle;
