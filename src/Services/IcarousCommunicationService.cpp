@@ -166,6 +166,14 @@ bool IcarousCommunicationService::initialize()
             }
             //ICAROUS has been accepted, begin communication
             fprintf(stdout, "ICAROUS has connected to UxAS!\n");
+            for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+            {
+                icarous_sockets[i] = fdopen(client_sockfd[i], "w");
+                if(icarous_sockets[i] == NULL)
+                {
+                    fprintf(stderr, "Test error\n");
+                }
+            }
         }
         else{
             write(client_sockfd[connectionNum], err, strlen(err));
@@ -204,26 +212,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         {
             has_gotten_waypoints[vehicleID - 1] = true;
             std::string messageToSend = ptr_MissionCommand->toXML();
-            int lengthOfMessage = messageToSend.length();
-            char buffer[20];
-            buffer[19] = '\0';
-            buffer[0] = 'e';
-            while(strcmp(buffer, "acknowledged"))
-            {
-                fprintf(stdout, "Sending Waypoints to ICAROUS instance %i\n", vehicleID);
-                int totalBytesSent = 0;
-                int bytesSent;
-                bytesSent = write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
-                int nread = read(client_sockfd[vehicleID-1], buffer, strlen("acknowledged"));
-                buffer[nread] = '\0';
-                fprintf(stdout, "%s\n", buffer);
-                if(!strcmp(buffer, "quit"))
-                {
-                    fprintf(stderr, "IcarousCommunicationService::MissionCommandMessage: ICAROUS #%i sent error!", vehicleID);
-                    return false;
-                }
-            }
-            fprintf(stdout, "IcarousCommunicationService::MissionCommandMessage: Acknowledged by ICAROUS #%i!\n", vehicleID);
+            fprintf(stdout, "Sending Waypoints to ICAROUS instance %i\n", vehicleID);
+            fprintf(icarous_sockets[vehicleID-1], "%s\n", messageToSend.c_str());
         }
     }
     else if(afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
@@ -231,27 +221,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         fprintf(stdout, "In\n");
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receivedLmcpMessage->m_object->clone());
         std::string messageToSend = ptr_Zone->toXML();
-        int lengthOfMessage = messageToSend.length();
-        char buffer[20];
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            int bytesSent = 0;
-            buffer[19] = '\0';
-            buffer[0] = 'e';
-            while(strcmp(buffer, "acknowledged"))
-            {
-                write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
-                fprintf(stdout, "%s\n", messageToSend.c_str());
-                int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
-                buffer[nread] = '\0';
-                fprintf(stdout, "%s\n", buffer);
-                if(!strcmp(buffer, "quit"))
-                {
-                    fprintf(stderr, "IcarousCommunicationService::KeepInZoneMessage: ICAROUS #%i sent error!", i + 1);
-                    return false;
-                }
-            }
-            fprintf(stdout, "IcarousCommunicationService::KeepInZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
+            fprintf(icarous_sockets[i], "%s\n", messageToSend.c_str());
         }
     }
     else if(afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
@@ -259,26 +231,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         fprintf(stdout, "Out\n");
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receivedLmcpMessage->m_object->clone());
         std::string messageToSend = ptr_Zone->toXML();
-        int lengthOfMessage = messageToSend.length();
-        char buffer[20];
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            int bytesSent = 0;
-            buffer[19] = '\0';
-            buffer[0] = 'e';
-            while(strcmp(buffer, "acknowledged"))
-            {
-                bytesSent += write(client_sockfd[i], messageToSend.c_str(), lengthOfMessage);
-                int nread = read(client_sockfd[i], buffer, strlen("acknowledged"));
-                buffer[nread] = '\0';
-                fprintf(stdout, "%s\n", buffer);
-                if(!strcmp(buffer, "quit"))
-                {
-                    fprintf(stderr, "IcarousCommunicationService::KeepOutZoneMessage: ICAROUS #%i sent error!", i + 1);
-                    return false;
-                }
-            }
-            fprintf(stdout, "IcarousCommunicationService::KeepOutZoneMessage: Acknowledged by ICAROUS #%i!\n", i + 1);
+            fprintf(icarous_sockets[i], "%s\n", messageToSend.c_str());
         }
     }
     else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
@@ -286,23 +241,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState*)receivedLmcpMessage->m_object->clone());
         int vehicleID = ptr_AirVehicleState->getID();
         std::string messageToSend = ptr_AirVehicleState->toXML();
-        int lengthOfMessage = messageToSend.length();
-        char buffer[20];
-        buffer[19] = '\0';
-        buffer[0] = 'e';
-        while(strcmp(buffer, "acknowledged"))
-        {
-            int totalBytesSent = 0;
-            int bytesSent;
-            bytesSent = write(client_sockfd[vehicleID-1], messageToSend.c_str(), lengthOfMessage);
-            int nread = read(client_sockfd[vehicleID-1], buffer, strlen("acknowledged"));
-            buffer[nread] = '\0';
-            if(!strcmp(buffer, "quit"))
-            {
-                fprintf(stderr, "IcarousCommunicationService::AirVehicleStateMessage: ICAROUS #%i sent error!", vehicleID);
-                return false;
-            }
-        }
+        fprintf(icarous_sockets[vehicleID-1], "%s\n", messageToSend.c_str());
     }
     
     return false;

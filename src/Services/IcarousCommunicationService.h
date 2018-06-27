@@ -159,6 +159,7 @@ private:
     // storage for the option entries
     std::string m_option01 = std::string("No Option 1");
     int32_t m_option02{0};
+    FILE *icarous_sockets[ICAROUS_CONNECTIONS];
 };
 
 }; //namespace service
