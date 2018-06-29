@@ -34,6 +34,9 @@
 
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/AirVehicleStateDescendants.h"
+#include "afrl/cmasi/Polygon.h"
+#include "afrl/cmasi/AbstractGeometry.h"
+
 
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
@@ -165,15 +168,14 @@ bool IcarousCommunicationService::initialize()
               return false;
             }
             //ICAROUS has been accepted, begin communication
-            fprintf(stdout, "ICAROUS has connected to UxAS!\n");
-            for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+            fprintf(stdout, "ICAROUS[%i] has connected to UxAS!\n", client_sockfd[connectionNum]);
+            //icarous_sockets[connectionNum] = fdopen(client_sockfd[connectionNum], "w");
+            /*
+            if(icarous_sockets[connectionNum] == NULL)
             {
-                icarous_sockets[i] = fdopen(client_sockfd[i], "w");
-                if(icarous_sockets[i] == NULL)
-                {
-                    fprintf(stderr, "Test error\n");
-                }
+                fprintf(stderr, "Error opening socket as a file!\n");
             }
+            */
         }
         else{
             write(client_sockfd[connectionNum], err, strlen(err));
@@ -202,7 +204,7 @@ bool IcarousCommunicationService::terminate()
 }
     
 bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
-{    
+{
     if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
     {
         auto ptr_MissionCommand = std::shared_ptr<afrl::cmasi::MissionCommand>((afrl::cmasi::MissionCommand*)receivedLmcpMessage->m_object->clone());
@@ -212,37 +214,66 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         {
             has_gotten_waypoints[vehicleID - 1] = true;
             std::string messageToSend = ptr_MissionCommand->toXML();
-            fprintf(stdout, "Sending Waypoints to ICAROUS instance %i\n", vehicleID);
-            fprintf(icarous_sockets[vehicleID-1], "%s\n", messageToSend.c_str());
+            fprintf(stdout, "Sending waypoints to ICAROUS instance %i\n", vehicleID);
+
+            int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
+            int totalNumberOfWaypoints = ptr_MissionCommand->getWaypointList().size() - 1;
+            int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
+
+            while(nextWaypoint != ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber()){
+                //fprintf(stdout, "WaypointIndex: %i | nextWaypoint: %i\n", waypointIndex, nextWaypoint);
+                //fprintf(stdout, "Sending Waypoint: %i\n", ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
+                //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
+                
+                dprintf(client_sockfd[vehicleID-1], "WAYPT,total%i,speed%f,lat%f,long%f,alt%f,index%i,\n",
+                    totalNumberOfWaypoints,
+                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(),
+                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(), 
+                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
+                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
+                    (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - 1));
+                //*/
+                //fprintf(stdout, "total%i,index%i,speed%f,lat%f,long%f,alt%f,\n", totalNumberOfWaypoints, (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(), ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(), ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude());
+
+                waypointIndex = (nextWaypoint - 1);
+                nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
+            }
         }
     }
     else if(afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
     {
-        fprintf(stdout, "In\n");
+        fprintf(stdout, "Keep In Geofence\n");
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receivedLmcpMessage->m_object->clone());
-        std::string messageToSend = ptr_Zone->toXML();
+        int lengthOfZone = ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints().size();
+        fprintf(stdout, "Length of KeepIn:%i\n", lengthOfZone);
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            fprintf(icarous_sockets[i], "%s\n", messageToSend.c_str());
+            //ptr_Zone;
+            for(int j = 0; j < lengthOfZone; j++){
+                //need to add the actual values here
+                dprintf(client_sockfd[i], "GEOFN,index%i,type%i,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,\n");
+            }
         }
     }
     else if(afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
     {
-        fprintf(stdout, "Out\n");
+        fprintf(stdout, "Keep Out Geofence\n");
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receivedLmcpMessage->m_object->clone());
-        std::string messageToSend = ptr_Zone->toXML();
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            fprintf(icarous_sockets[i], "%s\n", messageToSend.c_str());
+            //ptr_Zone;
+            
+            
+            
+            dprintf(client_sockfd[i], "GEOFN,\n");
         }
     }
-    else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
+    /*else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
         auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState*)receivedLmcpMessage->m_object->clone());
         int vehicleID = ptr_AirVehicleState->getID();
-        std::string messageToSend = ptr_AirVehicleState->toXML();
         fprintf(icarous_sockets[vehicleID-1], "%s\n", messageToSend.c_str());
-    }
+    }*/
     
     return false;
 }
