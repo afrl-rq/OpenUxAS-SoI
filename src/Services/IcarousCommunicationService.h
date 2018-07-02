@@ -9,7 +9,7 @@
 
 /* 
  * File:   IcarousCommunicationService.h
- * Authors: Paul Coen & Winston Smith
+ * Authors: Winston Smith & Paul Coen
  *
  * Created on June 14, 2018, 3:55 PM
  * This file allows connectivity with the CRATOUS system
@@ -27,22 +27,15 @@
 #include "CallbackTimer.h"
 #include "TypeDefs/UxAS_TypeDefs_Timer.h"
 
-
-
-
 #include "ServiceBase.h"
 #include "TypeDefs/UxAS_TypeDefs_String.h"
 #include "CallbackTimer.h"
-
 
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/TurnType.h"
 #include "afrl/cmasi/MissionCommand.h"
 #include "afrl/cmasi/KeepInZone.h"
 #include "afrl/cmasi/KeepOutZone.h"
-
-
-
 
 #include <sys/types.h>
 #include <sys/socket.h>
