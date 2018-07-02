@@ -220,7 +220,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             int totalNumberOfWaypoints = ptr_MissionCommand->getWaypointList().size() - 1;
             int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
 
-            while(nextWaypoint != ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber()){
+            while(nextWaypoint != ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber())
+            {
                 //fprintf(stdout, "WaypointIndex: %i | nextWaypoint: %i\n", waypointIndex, nextWaypoint);
                 //fprintf(stdout, "Sending Waypoint: %i\n", ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
                 //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
@@ -246,12 +247,20 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receivedLmcpMessage->m_object->clone());
         int lengthOfZone = ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints().size();
         fprintf(stdout, "Length of KeepIn:%i\n", lengthOfZone);
+
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            //ptr_Zone;
-            for(int j = 0; j < lengthOfZone; j++){
-                //need to add the actual values here
-                dprintf(client_sockfd[i], "GEOFN,index%i,type%i,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,\n");
+            for(int j = 0; j < lengthOfZone; j++)
+            {
+                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%i,index%i,\n",
+                "__KEEPIN__",
+                lengthOfZone,
+                (lengthOfZone + 1),
+                ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints()[j]->getLatitude(),
+                ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints()[j]->getLongitude(),
+                ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints()[j]->getAltitude(),
+                100000,
+                ptr_Zone->getZoneID());
             }
         }
     }
@@ -259,13 +268,23 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
     {
         fprintf(stdout, "Keep Out Geofence\n");
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receivedLmcpMessage->m_object->clone());
+        int lengthOfZone = ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints().size();
+        fprintf(stdout, "Length of KeepOut:%i\n", lengthOfZone);
+
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            //ptr_Zone;
-            
-            
-            
-            dprintf(client_sockfd[i], "GEOFN,\n");
+            for(int j = 0; j < lengthOfZone; j++)
+            {
+                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%i,index%i,\n",
+                "__KEEPOUT__",
+                lengthOfZone,
+                (lengthOfZone + 1),
+                ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints()[j]->getLatitude(),
+                ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints()[j]->getLongitude(),
+                ((afrl::cmasi::Polygon*)ptr_Zone->getBoundary())->getBoundaryPoints()[j]->getAltitude(),
+                100000,
+                ptr_Zone->getZoneID());
+            }
         }
     }
     /*else if(afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
