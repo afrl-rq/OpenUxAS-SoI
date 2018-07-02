@@ -307,7 +307,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 //fprintf(stdout, "WaypointIndex: %i | nextWaypoint: %i\n", waypointIndex, nextWaypoint);
                 //fprintf(stdout, "Sending Waypoint: %i\n", ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
                 //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
-                
+
                 // Actually set up the message to send using dprintf and send along the socket
                 dprintf(client_sockfd[vehicleID-1], "WAYPT,total%i,speed%f,lat%f,long%f,alt%f,index%i,\n",
                     totalNumberOfWaypoints,
@@ -398,7 +398,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
 
         // Send the position of the UAV to ICAROUS every time it updates from AMASE
         // TODO - un-hardcode the number of sats
-        dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i,\n",
+        dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i,id%i,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
             ptr_AirVehicleState->getLocation()->getLongitude(),
@@ -409,7 +409,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             ptr_AirVehicleState->getW(),
             0.1,// TODO - actual horizontal accuracy
             0.1,// TODO - actual vertical accuracy
-            25);
+            25,
+            vehicleID);
 
 
         // Send the attitude of the UAV (roll,pitch,yaw) every time it updates from AMASE
