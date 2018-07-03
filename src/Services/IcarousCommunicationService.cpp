@@ -327,6 +327,10 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // Grab the next waypoint's next waypoint to check if it is the end
                 nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
             }
+            
+            //Send a message to ICAROUS telling it to start the mission
+            dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,\n",
+            "START_MISSION");
         }
     }// End of MissionCommand
     // Process a KeepInZone
