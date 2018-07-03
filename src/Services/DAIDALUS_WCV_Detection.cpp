@@ -627,6 +627,11 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
                             std::make_shared<larcfm::DAIDALUS::WellClearViolationIntervals>();  //Compose violations message
                     larcfm::TrafficState daa_own = m_daa.getOwnshipState();
+                    for (auto itViolations = detectedViolations.cbegin(); itViolations !=detectedViolations.cend(); itViolations++)
+                    {
+                        nogo_ptr->getEntityList().push_back(itViolations->first);
+                        nogo_ptr->getTimeToViolationList().push_back(itViolations->second);
+                    }
                     nogo_ptr->setEntityId(m_entityId);
                     nogo_ptr->setCurrentHeading(daa_own.track("deg"));
                     nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s"));

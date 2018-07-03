@@ -39,6 +39,10 @@
         </Struct>
         <!-- List of  intervals that will result in a WellClear violation within the detection window -->
         <Struct Name="WellClearViolationIntervals">
+            <!-- List of Entities involved in Well Clear Violations -->
+            <Field Name="EntityList" Type="int64[]" Units="None" />
+            <!-- List of times to violation -->
+            <Field Name="TimeToViolationList" Type="real64[]" Units="seconds" />
             <!-- Entity Id that generated this message -->
             <Field Name="EntityId" Type="uint32" Units="None" />
             <!-- Ownship Heading -->

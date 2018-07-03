@@ -24,6 +24,7 @@ srcs_services = [
   'Test_SimulationTime.cpp',
   'WaypointPlanManagerService.cpp',
   'DAIDALUS_WCV_Detection.cpp',
+  'DAIDALUS_WCV_Response.cpp'
 ]
 
 incs_services = [
