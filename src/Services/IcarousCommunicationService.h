@@ -48,8 +48,7 @@
 
 #define PORT 5557
 
-//Number of unique UAVs in the scenario
-#define ICAROUS_CONNECTIONS 2
+#define STRING_XML_ICAROUS_CONNECTIONS "NumberOfUAVs"
 
 namespace uxas
 {
@@ -79,7 +78,6 @@ namespace service
 class IcarousCommunicationService : public ServiceBase
 {
 public:
-
     /** \brief This string is used to identify this service in XML configuration
      * files, i.e. Service Type="IcarousCommunicationService". It is also entered into
      * service registry and used to create new instances of this service. */
@@ -140,19 +138,17 @@ private:
 
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
-    
-    //This is the number of ICAROUS clients that are permitted
-    int client_sockfd[ICAROUS_CONNECTIONS];
-    
-    //This is an array keeping track of which ICAROUS instances have gotten vehicle waypoint information
-    bool has_gotten_waypoints[ICAROUS_CONNECTIONS];
 
 
 private:
-    // storage for the option entries
-    std::string m_option01 = std::string("No Option 1");
-    int32_t m_option02{0};
-    FILE *icarous_sockets[ICAROUS_CONNECTIONS];
+    //Number of unique UAVs in the scenario
+    int32_t ICAROUS_CONNECTIONS{-1};
+    
+    //This is the number of ICAROUS clients that are permitted
+    std::vector<int> client_sockfd;
+    
+    //This is an array keeping track of which ICAROUS instances have gotten vehicle waypoint information
+    std::vector<bool> has_gotten_waypoints;
 };
 
 }; //namespace service

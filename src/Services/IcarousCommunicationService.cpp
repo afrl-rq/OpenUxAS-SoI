@@ -97,17 +97,17 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
 
-    // Process options from the XML configuration node:
-    // option 1 (TODO - actually use and error check)
-    if (!ndComponent.attribute(STRING_XML_OPTION_STRING).empty())
-    {
-        m_option01 = ndComponent.attribute(STRING_XML_OPTION_STRING).value();
-    }
-    
+// <Service Type="IcarousCommunicationService" NumberOfUAVs="2" />
+
     // option 2 (TODO - actually use and error check)
-    if (!ndComponent.attribute(STRING_XML_OPTION_INT).empty())
+    if (!ndComponent.attribute(STRING_XML_ICAROUS_CONNECTIONS).empty())
     {
-        m_option02 = ndComponent.attribute(STRING_XML_OPTION_INT).as_int();
+        ICAROUS_CONNECTIONS = ndComponent.attribute(STRING_XML_ICAROUS_CONNECTIONS).as_int();
+    }
+    else
+    {
+        fprintf(stderr, "Number of UAVs not specified!\nTry to use a string such as:\t<Service Type=\"IcarousCommunicationService\" NumberOfUAVs=\"2\" /> in the XML.\n");
+        isSuccess = false;
     }
 
 
@@ -138,12 +138,14 @@ bool IcarousCommunicationService::initialize()
 {
     // Perform any required initialization before the service is started
     std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
+
+
+    //Set both vectors to the Number of UAVs specified in the XML
+    client_sockfd.resize(ICAROUS_CONNECTIONS);
+    has_gotten_waypoints.resize(ICAROUS_CONNECTIONS);
     
     // Initialize has_gotten_waypoints[] to the number of UAVs that is planned on being used
-    for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
-    {
-        has_gotten_waypoints[i] = false;
-    }
+    has_gotten_waypoints.assign(ICAROUS_CONNECTIONS,false);    
     
     
     // Variable set-up
@@ -157,6 +159,7 @@ bool IcarousCommunicationService::initialize()
     int server_sockfd = -2;
     int i = 1;
     int nread;
+    int nwrite;
     char buffer[strlen(sharedSecret) + 1];
         
     // Set up an IPv4 socket & make it stream-based and close on exec
@@ -241,7 +244,8 @@ bool IcarousCommunicationService::initialize()
         {
             // Password was incorrect or another error was encountered
             
-            write(client_sockfd[connectionNum], err, strlen(err));
+            nwrite = write(client_sockfd[connectionNum], err, strlen(err));
+            fprintf(stderr, "Able to write %i bytes to ICAROUS reporting an error.\n", nwrite);
             close(client_sockfd[connectionNum]);
             return false;
         }
@@ -293,11 +297,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         {
             // Set the variable to ensure we only send one vehicle one MissionCommand
             has_gotten_waypoints[vehicleID - 1] = true;
-            fprintf(stdout, "Sending waypoints to ICAROUS instance %i\n", vehicleID);
+            fprintf(stdout, "Sending waypoints to ICAROUS instance %lld\n", vehicleID);
 
             // Set up variable to be used
             int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
-            int totalNumberOfWaypoints = ptr_MissionCommand->getWaypointList().size() - 1;
+            int totalNumberOfWaypoints = (ptr_MissionCommand->getWaypointList().size() - 1);
             int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
 
             // For each waypoint in the mission command, send each as its own message to ICAROUS
@@ -309,7 +313,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
 
                 // Actually set up the message to send using dprintf and send along the socket
-                dprintf(client_sockfd[vehicleID-1], "WAYPT,total%i,speed%f,lat%f,long%f,alt%f,index%i,\n",
+                dprintf(client_sockfd[vehicleID - 1], "WAYPT,total%i,speed%f,lat%f,long%f,alt%f,index%lld,\n",
                     totalNumberOfWaypoints,
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(),
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(), 
@@ -345,7 +349,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // TODO - Condense this with the newest ICAROUS refactor
             for(int j = 0; j < lengthOfZone; j++)
             {
-                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,index%i,\n",
+                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,index%lli,\n",
                     "_KEEPIN_",
                     lengthOfZone,
                     (lengthOfZone + 1),
@@ -377,7 +381,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // TODO - Condense this with the newest ICAROUS refactor
             for(int j = 0; j < lengthOfZone; j++)
             {
-                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,index%i,\n",
+                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,index%lld,\n",
                     "_KEEPOUT_",
                     lengthOfZone,
                     (lengthOfZone + 1),
