@@ -84,7 +84,24 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
 {
     if (larcfm::DAIDALUS::isDAIDALUSConfiguration(receivedLmcpMessage->m_object))
     {
-        
+        std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> configuration = std::static_pointer_cast<larcfm::DAIDALUS::DAIDALUSConfiguration>(receivedLmcpMessage->m_object);
+        m_action_time_threshold_s = configuration->getAlertTime3();
+        m_isReadyToAct = true;
+    }
+    if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
+    {
+        std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> WCVIntervals = std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
+        for (size_t i = 0; i < WCVIntervals->getEntityList().size(); i++)
+        {
+            if (WCVIntervals->getTimeToViolationList()[i] < m_action_time_threshold_s)
+            {
+                m_ConflictResolutionList.push_back(WCVIntervals->getEntityList()[i]);
+            }
+        }
+        if (!m_isConflict)
+        {
+            
+        }
     }
     return false;
 }

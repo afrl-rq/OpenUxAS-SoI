@@ -120,6 +120,7 @@ public:
 
 private:
     bool m_isConflict {false};
+    bool m_isReadyToAct {false};
     double m_action_time_threshold_s;   // time threshold to determine taking action
     std::vector<int64_t> m_ConflictResolutionList;
     bool SetisConflict(bool& val);
