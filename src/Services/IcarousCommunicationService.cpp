@@ -313,7 +313,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
 
                 // Actually set up the message to send using dprintf and send along the socket
-                dprintf(client_sockfd[vehicleID - 1], "WAYPT,total%i,speed%f,lat%f,long%f,alt%f,index%lld,\n",
+                dprintf(client_sockfd[vehicleID - 1], "WAYPT,total%i.0,speed%f,lat%f,long%f,alt%f,index%lld.0,\n",
                     totalNumberOfWaypoints,
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(),
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(), 
@@ -353,7 +353,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // TODO - Condense this with the newest ICAROUS refactor
             for(int j = 0; j < lengthOfZone; j++)
             {
-                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,index%lli,\n",
+                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i.0,vertIndex%i,lat%f,long%f,floor%f,ceil%f,index%lli.0,\n",
                     "_KEEPIN_",
                     lengthOfZone,
                     (lengthOfZone + 1),
@@ -385,7 +385,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // TODO - Condense this with the newest ICAROUS refactor
             for(int j = 0; j < lengthOfZone; j++)
             {
-                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i,vertindex%i,lat%f,long%f,floor%f,ceil%f,index%lld,\n",
+                dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i.0,vertIndex%i.0,lat%f,long%f,floor%f,ceil%f,index%lld.0,\n",
                     "_KEEPOUT_",
                     lengthOfZone,
                     (lengthOfZone + 1),
@@ -406,7 +406,21 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
 
         // Send the position of the UAV to ICAROUS every time it updates from AMASE
         // TODO - un-hardcode the number of sats
-        dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i,id%i,\n",
+        dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
+            ((double)ptr_AirVehicleState->getTime()/1000),
+            ptr_AirVehicleState->getLocation()->getLatitude(),
+            ptr_AirVehicleState->getLocation()->getLongitude(),
+            ptr_AirVehicleState->getLocation()->getAltitude(),
+            ptr_AirVehicleState->getLocation()->getAltitude(),// TODO - come back to this, rel altitude != abs altitude
+            ptr_AirVehicleState->getU(),
+            ptr_AirVehicleState->getV(),
+            ptr_AirVehicleState->getW(),
+            0.1,// TODO - actual horizontal accuracy
+            0.1,// TODO - actual vertical accuracy
+            25,
+            vehicleID);
+            
+        dprintf(1, "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
             ptr_AirVehicleState->getLocation()->getLongitude(),
@@ -431,11 +445,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // For all other ICAROUS connections, send the UAV as a traffic obsticle to avoid
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            // Do not send ICAROUS its own UAV information
+            // Do not send ICAROUS its own UAV information TODO(This is sending to itself)
             if(i != (vehicleID - 1))
             {
                 // Send the UAV obsticle along the socket as other air traffic
-                dprintf(client_sockfd[i], "OBJCT,type%s,lat%f,long%f,alt%f,vx%f,vy%f,vz%f,index%i,\n",
+                dprintf(client_sockfd[i], "OBJCT,type%s,lat%f,long%f,alt%f,vx%f,vy%f,vz%f,index%i.0,\n",
                     "_TRAFFIC_",//either _TRAFFIC_ or _OBSTACLE_
                     ptr_AirVehicleState->getLocation()->getLatitude(),
                     ptr_AirVehicleState->getLocation()->getLongitude(),
