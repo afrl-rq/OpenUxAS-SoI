@@ -364,16 +364,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_Zone->getZoneID());
             }
             
-            //send an end of geofence message to indicate the end of a geofence (-2 index)
-            dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i.0,vertIndex%i,lat%f,long%f,floor%f,ceil%f,index%i.0,\n",
-                    "_KEEPIN_",
-                    lengthOfZone,
-                    (lengthOfZone + 1),
-                    0.0,
-                    0.0,
-                    0.0,
-                    100000.0,
-                    -2);            
+            //Send a message to ICAROUS telling it to start the mission
+            dprintf(client_sockfd[i], "COMND,type%s,\n",
+            "GEOFN_SEND");
         }
     }// End of KeepInZone
     // Process a KeepOutZone
@@ -407,16 +400,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_Zone->getZoneID());
             }
             
-            //send an end of geofence message to indicate the end of a geofence (-2 index)
-            dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i.0,vertIndex%i,lat%f,long%f,floor%f,ceil%f,index%i.0,\n",
-                    "_KEEPOUT_",
-                    lengthOfZone,
-                    (lengthOfZone + 1),
-                    0.0,
-                    0.0,
-                    0.0,
-                    100000.0,
-                    -2);
+            //Send a message to ICAROUS telling it to start the mission
+            dprintf(client_sockfd[i], "COMND,type%s,\n",
+            "GEOFN_SEND");
         }
     }// End of KeepOutZone Check
     // Process an AirVehicleState from OpenAMASE
