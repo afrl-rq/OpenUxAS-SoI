@@ -4078,126 +4078,198 @@ namespace VisiLibity
         return (visPoint);
     }
     
-    boost_polygon to_boost(Polygon visPoly)
+    boost_polygon to_boost(std::vector<Polygon> visPolyList)
     {
         boost_polygon b_poly;
-        //for each point in VisiLibity polygon
-        for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
+        ///first polygon should be CCW and is outer ring
+        if(visPolyList.size() > 0)
         {
-            auto b_point = to_boost(visPoly[pointIdx]);
-            bg::append(b_poly.outer(), b_point);
+            auto visPoly  = visPolyList[0];
+            //for each point in VisiLibity polygon
+            for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
+            {
+                auto b_point = to_boost(visPoly[pointIdx]);
+                bg::append(b_poly.outer(), b_point);
+            }
         }
         
-        //std::cout << "Check validity of converted boost poly" << std::endl;
+        std::cout << "original size " << visPolyList.size() << std::endl;
+        ///any additional rings should be CW and are used as inner rings/ holes
+        if(visPolyList.size() > 1)
+        {
+            //resize list of inner rings from 0 to size of remaining rings in list
+            b_poly.inners().resize(visPolyList.size() - 1);
+            //for each inner (CW) ring
+            for(int polyIdx = 1; polyIdx < visPolyList.size(); polyIdx++)
+            {
+                auto visPoly = visPolyList[polyIdx];
+                //for each point in VisiLibity polygon
+                for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
+                {
+                    auto b_point = to_boost(visPoly[pointIdx]);
+                    //subtract 1 because index is for VisiLibity polygon list, where the first element is the outer ring
+                    bg::append(b_poly.inners()[polyIdx - 1], b_point);
+                }
+            }
+        }
+        
         bg::validity_failure_type failure;
         if(!bg::is_valid(b_poly, failure))
         {
+            std::cout << "invalid boost polygon\n";
             //std::cout << to_visiLibity(b_poly) << std::endl;
             //attempt to correct - for orientation and closed vs unclosed
-            bg::correct(b_poly);
-            if(!bg::is_valid(b_poly, failure))
-            {
-                if(failure == bg::failure_not_closed)
-                {
-                    std::cout << "Not closed" << std::endl;
-                }
-                else if(failure == bg::failure_wrong_orientation)
-                {
-                    std::cout << "Wrong orientation" << std::endl;
-                }
-                //std::cout << to_visiLibity(b_poly) << std::endl;
-                //std::cout << "Could not fix invalid polygon with reason " << failure << std::endl;
-            }
-            else
-            {
-                //std::cout << "fixed invalid polygon" << std::endl;
-            }
+            //bg::correct(b_poly);
+//            if(!bg::is_valid(b_poly, failure))
+//            {
+//                if(failure == bg::failure_not_closed)
+//                {
+//                    std::cout << "Not closed" << std::endl;
+//                }
+//                else if(failure == bg::failure_wrong_orientation)
+//                {
+//                    std::cout << "Wrong orientation" << std::endl;
+//                }
+//                //std::cout << to_visiLibity(b_poly) << std::endl;
+//                //std::cout << "Could not fix invalid polygon with reason " << failure << std::endl;
+//            }
+//            else
+//            {
+//                //std::cout << "fixed invalid polygon" << std::endl;
+//            }
             
         }
         
         return b_poly;
     }
 
-    Polygon to_visiLibity(boost_polygon b_poly)
+    std::vector<Polygon> to_visiLibity(boost_polygon b_poly)
     {
+        std::vector<Polygon> visPolyList;
         Polygon visPoly;
-        //for each point in boost polygon
+        //for each point in outer ring
         std::vector<boost_point> const& points = b_poly.outer();
         for (auto &b_point : points)
         {
+            ///convert boost point to VisiLibity point
             auto visPoint = to_visiLibity(b_point);
+            ///Add to visiLibity polygon
             visPoly.push_back(visPoint);
         }
+        ///Add new VisiLibity polygon to list
+        visPolyList.push_back(visPoly);
         
-        //boost polygon may have some vertex at beginning and end
-        visPoly.eliminate_redundant_vertices(0);
-        return visPoly;
+        //get boost polygon inner rings/ holes
+        auto holes = b_poly.inners();
+        ///for each hole in boost polygon
+        for(auto &hole : holes)
+        {
+            visPoly.clear();
+            ///for each point in ring/hole
+            for (auto &b_point : hole)
+            {
+                ///convert boost point to VisiLibity point
+                auto visPoint = to_visiLibity(b_point);
+                ///Add to visiLibity polygon
+                visPoly.push_back(visPoint);
+            }
+            
+            //add hole to VisiLibity polygon list
+            visPolyList.push_back(visPoly);
+        }
+        
+        return visPolyList;
     }
 
     // note: static function
     bool Polygon::boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon)
     {
-        //vector to store results
-        std::vector<boost_polygon> output;
+
+        //create list to store any polygons that are not merged
+        std::vector<boost_polygon> unmerged;
         
         //make sure we have at least two polygons to merge
         if(polygonList.size() > 1)
         {
             //create a polygon to iteratively merge polygons with and set it to the first input polygon (converted to boost format)
-            boost_polygon merged = to_boost(polygonList[0]);
+            boost_polygon merged = to_boost(std::vector<Polygon>(1,polygonList[0]));
             
             //iteratively merge into merged
             for (int polyIdx = 1; polyIdx < polygonList.size(); polyIdx++)
+            //for (int polyIdx = 1; polyIdx < 2; polyIdx++)
             {
                 //convert to boost polygon to use boost union
-                auto b_poly = to_boost(polygonList[polyIdx]);
-                bg::validity_failure_type failure;
-                if(bg::is_valid(b_poly, failure))
+                auto b_poly = to_boost(std::vector<Polygon>(1,polygonList[polyIdx]));
+                //vector to store results in boost format
+                std::vector<boost_polygon> output;
+                
+                //check to see if these two polygons are overlapping
+                if( bg::distance(b_poly, merged) > 0 == false)
                 {
-                    bg::union_(b_poly, merged, output);
-                    
-                    //case where multiple boost polygons are returned from union
-                    //not handled yet
-                    if(output.size() > 1)
+                    bg::validity_failure_type failure;
+                    if(bg::is_valid(b_poly, failure))
                     {
-                        merged = output[0];
-                        std::cout << "Multiple polygons returned from union - only first one used";
+                        std::cout << "merged\n" << merged << "with\n" << b_poly << std::endl;
+                        bg::union_(merged, b_poly, output);
+                        
+                        for (auto &result : output)
+                        {
+                            std::cout << "result\n" << result << std::endl;
+                        }
+                        
+                        
+                        //case where multiple boost polygons are returned from union
+                        //not handled yet
+                        if(output.size() == 1)
+                        {
+                            merged = output[0];
+
+                        }
+                        //else just one polygon returned
+                        else
+                        {
+                            std::cerr << "Invalid results from polygon merge. Expected 1 polygon, received " << output.size();
+                        }
+    
                     }
-                    //else just one polygon returned
-                    else if(output.size() > 0)
+                    //else invalid polygon
+                    else
                     {
-                        //save for use for next input polygon
-                        merged = output[0];
+                        //TODO: I don't really want to return in the middle of this loop, do I?
+                        std::cout << "Invalid polygon - reason: " << failure << std::endl;
+    //                    std::cout << to_visiLibity(b_poly);
+                        if(failure == bg::failure_not_closed)
+                        {
+                            std::cout << "Not closed" << std::endl;
+                        }
+                        else if(failure == bg::failure_wrong_orientation)
+                        {
+                            std::cout << "Wrong orientation" << std::endl;
+                        }
+                        return false;
                     }
-    //                //else no polygons were returned from union
-    //                else
-    //                {
-    //                    //if we didn't get any output, set merged to
-    //                    std::cout << "No output\n";
-    //                }
                 }
+                //polygons are not overlapping
                 else
                 {
-                    //TODO: I don't really want to return in the middle of this loop, do I?
-                    std::cout << "Invalid polygon - reason: " << failure << std::endl;
-//                    std::cout << to_visiLibity(b_poly);
-                    if(failure == bg::failure_not_closed)
-                    {
-                        std::cout << "Not closed" << std::endl;
-                    }
-                    else if(failure == bg::failure_wrong_orientation)
-                    {
-                        std::cout << "Wrong orientation" << std::endl;
-                    }
-                    return false;
+                    //keep list of polygons that were not able to be merged
+                    unmerged.push_back(b_poly);
                 }
             }
             
-            for (auto &b_poly : output)
+            //go back through the unmergeable polygons because we may be able to merge them now
+            for (int unmergedIdx = 0; unmergedIdx < unmerged.size(); unmergedIdx++)
             {
-                auto visPoly = to_visiLibity(b_poly);
-                resultingPolygons.push_back(visPoly);
+                if(bg::distance(unmerged[unmergedIdx], merged[0]) > 0 ==false)
+                {
+                    
+                auto visPolyList = to_visiLibity(b_poly);
+                for (auto &visPoly : visPolyList)
+                {
+                    resultingPolygons.push_back(visPoly);
+                }
             }
+            resultingPolygons = to_visiLibity(merged);
             return true;
         }
         //else less than two input polygons
@@ -4212,5 +4284,34 @@ namespace VisiLibity
             //return false any time we did not do any actual merging
             return false;
         }
+    }
+    
+    std::ostream& operator << (std::ostream& outs, boost_polygon b_poly)
+    {
+        std::vector<boost_point> const& points = b_poly.outer();
+        outs << "Outer:\n";
+        for (auto &b_point : points)
+        {
+            double x = bg::get<0>(b_point);
+            double y = bg::get<1>(b_point);
+            outs << x << " " << y << std::endl;
+        }
+        
+        //get boost polygon inner rings/ holes
+        auto holes = b_poly.inners();
+        outs << "Inner:\n";
+        ///for each hole in boost polygon
+        for(auto &hole : holes)
+        {
+            for (auto &b_point : hole)
+            {
+            
+                double x = bg::get<0>(b_point);
+                double y = bg::get<1>(b_point);
+                outs << x << " " << y << std::endl;
+            }
+            
+        }
+        return outs;
     }
 }

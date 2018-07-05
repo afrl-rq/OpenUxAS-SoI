@@ -131,8 +131,8 @@ namespace VisiLibity
   namespace bg = boost::geometry;
   // 2-dimensional boost point
   typedef bg::model::d2::point_xy<double> boost_point;
-  //boost polygon based on points, with counterclockwise orientation
-  typedef bg::model::polygon<boost_point, false> boost_polygon;
+  //boost polygon based on points, with counterclockwise orientation and not closed (ie last point != first point
+  typedef bg::model::polygon<boost_point, false, false> boost_polygon;
 
 
   /** \brief  floating-point display precision.
@@ -174,14 +174,14 @@ namespace VisiLibity
    * \author  Amanda Cinnamon
    * Written for use within Polygon union_ method
    */
-    boost_polygon to_boost(Polygon x);
+    boost_polygon to_boost(std::vector<Polygon> x);
     
     /** \brief  convert VisilLibity polygon to Boost polygon
      *
      * \author  Amanda Cinnamon
      * Written for use within Polygon union_ method
      */
-    Polygon to_visiLibity(boost_polygon x);
+    std::vector<Polygon> to_visiLibity(boost_polygon x);
     
     /** \brief  convert VisiLibity polygon to Boost polygon
      *
@@ -1368,7 +1368,7 @@ namespace VisiLibity
        * \pre polygonList contains only simple ccw oriented polygons, but for
        *      efficiency, simplicity and orientation are not asserted
        * \author  Derek Kingston
-       * \remarks Will return false if an error occurs (e.g. OpenGL tessellation errors).
+       * \remarks Will return false if an error occurs (e.g. XXX).
        */
       static bool boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
     //Mutators
@@ -2330,6 +2330,7 @@ namespace VisiLibity
   std::ostream& operator << (std::ostream& outs,
                  const Visibility_Graph& visibility_graph);
 
+    std::ostream& operator << (std::ostream& outs, const boost_polygon b_poly);
 }
   
 #endif //VISILIBITY_H
