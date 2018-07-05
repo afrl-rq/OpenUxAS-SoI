@@ -445,7 +445,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // For all other ICAROUS connections, send the UAV as a traffic obsticle to avoid
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
-            // Do not send ICAROUS its own UAV information TODO(This is sending to itself)
             if(i != (vehicleID - 1))
             {
                 // Send the UAV obsticle along the socket as other air traffic
