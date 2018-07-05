@@ -62,6 +62,7 @@ bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
 bool DAIDALUS_WCV_Response::initialize()
 {
     // perform any required initialization before the service is started
+    //TODO: Add configuration handling to determine which mode of response to use, i.e. heading/track, horizontal speed, vertical speed, or altitude 
     
     return (true);
 }
@@ -84,27 +85,73 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
 {
     if (larcfm::DAIDALUS::isDAIDALUSConfiguration(receivedLmcpMessage->m_object))
     {
-        std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> configuration = std::static_pointer_cast<larcfm::DAIDALUS::DAIDALUSConfiguration>(receivedLmcpMessage->m_object);
+        std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> configuration = 
+                std::static_pointer_cast<larcfm::DAIDALUS::DAIDALUSConfiguration>(receivedLmcpMessage->m_object);
         m_action_time_threshold_s = configuration->getAlertTime3();
-        m_isReadyToAct = true;
+        m_vertical_rate_mps = configuration->getVerticalRate();
+        m_horizontal_accel_mpsps = configuration->getHorizontalAcceleration();
+        m_vertical_accel_mpsps = configuration->getVerticalAcceleration();
+        m_isReadyToAct = true;  //boolean to determine when ready to act; determined by having a threshold time set.
     }
     if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
     {
-        std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> WCVIntervals = std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
-        for (size_t i = 0; i < WCVIntervals->getEntityList().size(); i++)
+        std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> WCVIntervals = 
+                std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
+        if (m_isReadyToAct)
         {
-            if (WCVIntervals->getTimeToViolationList()[i] < m_action_time_threshold_s)
+            for (size_t i = 0; i < WCVIntervals->getEntityList().size(); i++)
             {
-                m_ConflictResolutionList.push_back(WCVIntervals->getEntityList()[i]);
+                if (WCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
+                {
+                    m_ConflictResolutionList.push_back(WCVIntervals->getEntityList()[i]);
+                }
+            }
+            if (!m_isConflict && m_ConflictResolutionList.size() > 0)
+            {
+                m_isConflict = true;//bool t = SetisConflict(true);
+            }
+            if (m_isConflict)
+            {
+                uint32_t RoW = m_entityId;
+                // determine the vehicle that has the Right of Way
+                for (int i : m_ConflictResolutionList)
+                //for (size_t i = m_ConflictResolutionList.cbegin();  i < m_ConflictResolutionList.size(); i++)
+                {
+                    if (m_ConflictResolutionList[i] < RoW)
+                    {
+                        RoW = m_ConflictResolutionList[i];
+                    }                    
+                }
+                if (m_entityId == RoW)
+                {
+                    //Ownship has Right of Way and therefore should take no action 
+                    m_isConflict = false;
+                }
+                else
+                {
+                    if (!m_isTakenAction)
+                    {
+                        //TODO: send vehicle action command
+                        m_isTakenAction = true;
+                    }
+                    else
+                    {
+                        //TODO: hold conflict until elapsed time for maneuver has passed or until desired state attained
+                        //TODO: Compare desired "mode value" to current nogo band and if outside mode value send action command to desired and set isConflict to false
+
+                    }
+                }
             }
         }
-        if (!m_isConflict)
-        {
-            
-        }
     }
+
     return false;
 }
-
-}; //namespace service
-}; //namespace uxas
+bool DAIDALUS_WCV_Response::SetisConflict(bool& val)
+{
+    //set m_isConflict to value passed in
+    m_isConflict = val;
+    return true;
+}
+} //namespace service
+} //namespace uxas

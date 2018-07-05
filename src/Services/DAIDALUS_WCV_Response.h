@@ -119,12 +119,24 @@ public:
     
 
 private:
-    bool m_isConflict {false};
-    bool m_isReadyToAct {false};
+    bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
+    bool m_isReadyToAct {false};    //boolean stating whether or not service has received configuration parameters in order to process violation messages
+    bool m_isTakenAction {false};   //boolean stating whether or not the service has issued a vehicle action command to the ownship.
     double m_action_time_threshold_s;   // time threshold to determine taking action
+    double m_vertical_rate_mps; //DAIDALUS configuration vertical rate used for estimation of time to perform altitude maneuver
+    double m_turn_rate_degps;   //DAIDALUS configuration turn rate used for estimation of time to perform heading/track maneuver
+    double m_horizontal_accel_mpsps;    //DAIDALUS configuration horizontal acceleration used for estimation of time to perform a horizontal speed maneuver
+    double m_vertical_accel_mpsps;  //DAIDALUS configuration vertical 
     std::vector<int64_t> m_ConflictResolutionList;
     bool SetisConflict(bool& val);
     bool GetisConflict();
+    struct m_DesiredState
+    {
+        double altitude_m;
+        double horizontal_speed_mps;
+        double vertical_speed_mps;
+        double heading_deg;
+    };
     
 
     
