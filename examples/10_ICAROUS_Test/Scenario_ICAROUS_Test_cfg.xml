@@ -27,10 +27,10 @@
         <Message MessageFileName="AirVehicleState_V1.xml" SendTime_ms="170"/>
         <Message MessageFileName="AirVehicleState_V2.xml" SendTime_ms="180"/>
 
-        <Message MessageFileName="KeepInZone_5.xml" SendTime_ms="200"/>
-        <Message MessageFileName="KeepOutZone_1.xml" SendTime_ms="210"/>
-        <Message MessageFileName="KeepOutZone_2.xml" SendTime_ms="220"/>
-        <Message MessageFileName="KeepOutZone_3.xml" SendTime_ms="230"/>
+        <Message MessageFileName="KeepInZone_1.xml" SendTime_ms="200"/>
+        <Message MessageFileName="KeepOutZone_2.xml" SendTime_ms="210"/>
+        <Message MessageFileName="KeepOutZone_3.xml" SendTime_ms="220"/>
+        <Message MessageFileName="KeepOutZone_4.xml" SendTime_ms="230"/>
 
         <Message MessageFileName="OperatingRegion_10.xml" SendTime_ms="240"/>
 

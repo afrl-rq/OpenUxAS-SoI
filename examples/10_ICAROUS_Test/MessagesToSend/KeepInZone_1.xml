@@ -1,5 +1,5 @@
         <KeepInZone Series="CMASI">
-            <ZoneID>5</ZoneID>
+            <ZoneID>1</ZoneID>
             <MinAltitude>0.0</MinAltitude>
             <MinAltitudeType>AGL</MinAltitudeType>
             <MaxAltitude>5000.0</MaxAltitude>
