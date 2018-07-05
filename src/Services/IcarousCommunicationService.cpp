@@ -457,7 +457,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_AirVehicleState->getU(),
                     ptr_AirVehicleState->getV(),
                     ptr_AirVehicleState->getW(),
-                    (i + 1)); // ICAROUS indexes start at 1 normally
+                    vehicleID); // ICAROUS indexes start at 1 normally
             }
         }
     }// End of AirVehicleState
