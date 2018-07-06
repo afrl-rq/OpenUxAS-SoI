@@ -1,0 +1,54 @@
+        <KeepInZone Series="CMASI">
+            <ZoneID>1</ZoneID>
+            <MinAltitude>0.0</MinAltitude>
+            <MinAltitudeType>AGL</MinAltitudeType>
+            <MaxAltitude>5000.0</MaxAltitude>
+            <MaxAltitudeType>MSL</MaxAltitudeType>
+            <AffectedAircraft/>
+            <StartTime>0</StartTime>
+            <EndTime>0</EndTime>
+            <Padding>0.0</Padding>
+            <Label/>
+            <Boundary>
+                <Polygon Series="CMASI">
+                    <BoundaryPoints>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.455735599856148</Latitude>
+                            <Longitude>-80.81759322412967</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.403123327006753</Latitude>
+                            <Longitude>-80.85018704629134</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.351235076260792</Latitude>
+                            <Longitude>-80.816257411746</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.353165801869945</Latitude>
+                            <Longitude>-80.74973395503905</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.406260756121625</Latitude>
+                            <Longitude>-80.71847594526112</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>25.45597694055729</Latitude>
+                            <Longitude>-80.75267274228312</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </BoundaryPoints>
+                </Polygon>
+            </Boundary>
+        </KeepInZone>
