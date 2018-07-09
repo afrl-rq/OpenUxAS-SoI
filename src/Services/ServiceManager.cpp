@@ -488,6 +488,8 @@ ServiceManager::processReceivedLmcpMessage(std::unique_ptr<uxas::communications:
     {
         auto createNewService = std::static_pointer_cast<uxas::messages::uxnative::CreateNewService>(receivedLmcpMessage->m_object);
         std::string xmlConfig = createNewService->getXmlConfiguration() + "\n";
+        uxas::common::StringUtil::ReplaceAll(xmlConfig, "&lt;", "<");
+        uxas::common::StringUtil::ReplaceAll(xmlConfig, "&gt;", ">");
         for (auto& msg : createNewService->getEntityConfigurations())
         {
             xmlConfig += msg->toXML() + "\n";

@@ -253,8 +253,11 @@ TaskManagerService::processReceivedLmcpMessage(std::unique_ptr<uxas::communicati
         auto createNewServiceMessage = std::make_shared<uxas::messages::uxnative::CreateNewService>();
         auto serviceId = ServiceBase::getUniqueServceId();
         createNewServiceMessage->setServiceID(serviceId);
-        createNewServiceMessage->setXmlConfiguration("<Service Type=\"" + baseTask->getFullLmcpTypeName() + "\">" +
-                " <TaskRequest>" + baseTask->toXML() + "</TaskRequest>\n" + xmlTaskOptions);
+        std::string xmlConfigStr = "<Service Type=\"" + baseTask->getFullLmcpTypeName() + "\">" +
+                " <TaskRequest>" + baseTask->toXML() + "</TaskRequest>\n" + xmlTaskOptions;
+        uxas::common::StringUtil::ReplaceAll(xmlConfigStr, "<", "&lt;");
+        uxas::common::StringUtil::ReplaceAll(xmlConfigStr, ">", "&gt;");
+        createNewServiceMessage->setXmlConfiguration(xmlConfigStr);
 
         // add all existing entities for new service initialization
         for (auto& entityConfiguration : m_idVsEntityConfiguration)
