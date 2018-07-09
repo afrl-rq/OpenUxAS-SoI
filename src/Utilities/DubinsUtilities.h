@@ -28,6 +28,8 @@ namespace uxas {
             class DubinsConfiguration {
             public:
 
+                DubinsConfiguration(){};
+                
                 DubinsConfiguration(double northPosition, double eastPosition, double heading) : northPosition(northPosition), eastPosition(eastPosition), heading(heading) {
                 }
 
@@ -45,11 +47,11 @@ namespace uxas {
 
             private:
                 //the north position of the constrained vehicle
-                double northPosition;
+                double northPosition{0.0};
                 //the east position of the constrained vehicle
-                double eastPosition;
+                double eastPosition{0.0};
                 //the orientation of the constrained vehicle [radians]
-                double heading;
+                double heading{0.0};
             };
 
             
@@ -129,7 +131,7 @@ namespace uxas {
                  *        Think of this as x % y with decimals in the remainder.
                  * @param x: the number of interest
                  * @param y: the divisor
-                 * @return the ramainder
+                 * @return the remainder
                  */
                 double realMod(double x, double y);
 

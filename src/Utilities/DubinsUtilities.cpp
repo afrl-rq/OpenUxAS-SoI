@@ -247,7 +247,7 @@ namespace uxas {
             }
 
             double DubinsPath::realMod(double x, double y) {
-                double ans = fmod(x, y);
+                double ans = std::fmod(x, y);
                 return ans >= 0 ? ans : ans + y;
             }
 
