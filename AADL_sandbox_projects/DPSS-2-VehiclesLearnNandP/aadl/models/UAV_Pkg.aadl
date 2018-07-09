@@ -67,7 +67,9 @@ public
 
 			--Make id a piecewise-constant real-valued variable. This, combined with N_lin, makes the shared border formulas piecewise linear and allows 
 			--     analysis to be successful at the top level.
-			--Assumes 1 <= id <= 13 (which should be the case for 1 <= N_TRUTH <= 4 since numLeft and numRight will be in the range 0, 1, ..., N_TRUTH + 2)	
+			--Assumes 1 <= id <= 7
+			--Notes: (1) numLeft will be in the range 0, 1, ..., N_TRUTH - 1 + max(initial numLeft))
+			--       (2) id = numLeft + 1	
 			eq id_lin : real = 
 				if id = 1 then
 					1.0
@@ -87,29 +89,16 @@ public
 									if id = 6 then
 										6.0
 									else 
-										if id = 7 then
-											7.0
-										else
-											if id = 8 then
-												8.0
-											else
-												if id = 9 then
-													9.0
-												else 
-													if id = 10 then
-														10.0
-													else
-														if id = 11 then
-															11.0
-														else 
-															if id = 12 then
-																12.0
-															else
-																13.0; 
+										7.0; 
 			
 			--Make N a piecewise-constant real-valued variable. This, combined with id_lin, makes the shared border formulas piecewise linear and allows 
 			--     analysis to be successful at the top level.
-			--Assumes 1 <= N <= 13 (which should be the case for 1 <= N_TRUTH <= 4 since numLeft and numRight will be in the range 0, 1, ..., N_TRUTH + 2)			
+			--Assumes 1 <= N <= 13		
+			--Notes: (1) numRight will be in the range 0, 1, ..., N_TRUTH - 1 + max(initial numRight))
+			--       (2) numLeft  will be in the range 0, 1, ..., N_TRUTH - 1 + max(initial numLeft ))
+			--       (3) N = numRight + numLeft + 1
+			--       (4) Therefore, 1 <= N <= 2*N_TRUTH + max(initial numRight) + max(initial numLeft) - 1
+			--       (5) We could improve this bound since numRight and numLeft will not be maximized at the same time, but we'll keep the generous bound for now.			
 			eq N_lin : real = 
 				if N = 1 then
 					1.0
