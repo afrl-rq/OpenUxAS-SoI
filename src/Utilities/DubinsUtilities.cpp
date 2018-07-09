@@ -33,14 +33,14 @@ namespace uxas {
             void DubinsPath::calculateDubinsWaypoints() {
                 //calculate the Dubin's path
                 //first translate the aircraft coordinates to standard coordinates
-                VisiLibity::Point startLocation = VisiLibity::Point(startDubinsConfiguration.getX(), startDubinsConfiguration.getY());
+                VisiLibity::Point startLocation = VisiLibity::Point(startDubinsConfiguration.getEastPosition(), startDubinsConfiguration.getNorthPosition());
                 double psi1 = wrapAngle(n_Const::c_Convert::dPiO2() - wrapAngle(startDubinsConfiguration.getHeading()));
 
-                VisiLibity::Point endLocation = VisiLibity::Point(endDubinsConfiguration.getX(), endDubinsConfiguration.getY());
+                VisiLibity::Point endLocation = VisiLibity::Point(endDubinsConfiguration.getEastPosition(), endDubinsConfiguration.getNorthPosition());
                 double psi2 = wrapAngle(n_Const::c_Convert::dPiO2() - wrapAngle(endDubinsConfiguration.getHeading()));
 
                 //make the start waypoint
-                DubinsWaypoint startWaypoint = DubinsWaypoint(startDubinsConfiguration.getX(), startDubinsConfiguration.getY(), 0.0, startDubinsConfiguration.getX(), startDubinsConfiguration.getY(), 0);
+                DubinsWaypoint startWaypoint = DubinsWaypoint(startDubinsConfiguration.getEastPosition(), startDubinsConfiguration.getNorthPosition(), 0.0, startDubinsConfiguration.getEastPosition(), startDubinsConfiguration.getNorthPosition(), 0);
                 std::vector<DubinsWaypoint> tmpDubinsWaypoints;
                 //make a very expensive waypoint
                 DubinsWaypoint maxCostWaypoint = DubinsWaypoint(0, 0, DBL_MAX, 0, 0, 0);

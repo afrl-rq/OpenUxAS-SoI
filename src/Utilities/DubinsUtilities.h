@@ -33,11 +33,11 @@ namespace uxas {
                 DubinsConfiguration(double northPosition, double eastPosition, double heading) : northPosition(northPosition), eastPosition(eastPosition), heading(heading) {
                 }
 
-                double getX() {
+                double getEastPosition() {
                     return eastPosition;
                 }
 
-                double getY() {
+                double getNorthPosition() {
                     return northPosition;
                 }
 
@@ -50,13 +50,14 @@ namespace uxas {
                 double northPosition{0.0};
                 //the east position of the constrained vehicle
                 double eastPosition{0.0};
-                //the orientation of the constrained vehicle [radians]
+                //the orientation of the constrained vehicle in radians (ccw+)
                 double heading{0.0};
             };
 
             
             /*! \class DubinsWaypoint
-             *  \brief This class represents a dubins waypoint
+             *  \brief This class represents a dubins waypoint. This was copied from RouteExtension.h. 
+             * Variable names were not changed for consistency.
              *
              */
             class DubinsWaypoint {
@@ -92,8 +93,8 @@ namespace uxas {
             class DubinsPath {
             public:
 
-                DubinsPath(double x1, double y1, double heading1, double x2, double y2, double heading2, double radius) :
-                startDubinsConfiguration(y1, x1, heading1), endDubinsConfiguration(y2, x2, heading2), radius(radius) {
+                DubinsPath(double eastPosition1, double northPosition1, double heading1, double eastPosition2, double northPosition2, double heading2, double radius) :
+                startDubinsConfiguration(northPosition1, eastPosition1, heading1), endDubinsConfiguration(northPosition2, eastPosition2, heading2), radius(radius) {
                 }
 
                 DubinsPath(DubinsConfiguration startConfiguration, DubinsConfiguration endConfiguration, double radius) : startDubinsConfiguration(startConfiguration), endDubinsConfiguration(endConfiguration), radius(radius) {
