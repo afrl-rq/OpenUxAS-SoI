@@ -1,0 +1,12 @@
+<CameraConfiguration Series="CMASI">
+    <PayloadID>10001</PayloadID>
+    <PayloadKind/>
+    <Parameters/>
+    <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+    <FieldOfViewMode>Continuous</FieldOfViewMode>
+    <MinHorizontalFieldOfView>5.0</MinHorizontalFieldOfView>
+    <MaxHorizontalFieldOfView>50.0</MaxHorizontalFieldOfView>
+    <DiscreteHorizontalFieldOfViewList/>
+    <VideoStreamHorizontalResolution>1024</VideoStreamHorizontalResolution>
+    <VideoStreamVerticalResolution>768</VideoStreamVerticalResolution>
+</CameraConfiguration>

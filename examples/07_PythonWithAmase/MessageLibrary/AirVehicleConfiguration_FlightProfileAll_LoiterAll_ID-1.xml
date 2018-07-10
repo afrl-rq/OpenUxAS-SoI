@@ -1,0 +1,65 @@
+<AirVehicleConfiguration Series="CMASI">
+    <ID>1</ID>
+    <Label></Label>
+    <MinimumSpeed>15.0</MinimumSpeed>
+    <MaximumSpeed>35.0</MaximumSpeed>
+    <NominalSpeed>30.0</NominalSpeed>
+    <NominalFlightProfile>
+        <FlightProfile Series="CMASI">
+            <Name>Cruise</Name>
+            <Airspeed>30.0</Airspeed>
+            <PitchAngle>0.0</PitchAngle>
+            <VerticalSpeed>0.0</VerticalSpeed>
+            <MaxBankAngle>30.0</MaxBankAngle>
+            <EnergyRate>0.05</EnergyRate>
+        </FlightProfile>
+    </NominalFlightProfile>
+    <AlternateFlightProfiles>
+        <FlightProfile Series="CMASI">
+            <Name>Climb</Name>
+            <Airspeed>25.0</Airspeed>
+            <PitchAngle>10.0</PitchAngle>
+            <VerticalSpeed>5.0</VerticalSpeed>
+            <MaxBankAngle>30.0</MaxBankAngle>
+            <EnergyRate>0.1</EnergyRate>
+        </FlightProfile>
+        <FlightProfile Series="CMASI">
+            <Name>Descent</Name>
+            <Airspeed>25.0</Airspeed>
+            <PitchAngle>-5.0</PitchAngle>
+            <VerticalSpeed>-5.0</VerticalSpeed>
+            <MaxBankAngle>30.0</MaxBankAngle>
+            <EnergyRate>0.005</EnergyRate>
+        </FlightProfile>
+        <FlightProfile Series="CMASI">
+            <Name>Loiter</Name>
+            <Airspeed>20.0</Airspeed>
+            <PitchAngle>5.0</PitchAngle>
+            <VerticalSpeed>0.0</VerticalSpeed>
+            <MaxBankAngle>30.0</MaxBankAngle>
+            <EnergyRate>0.025</EnergyRate>
+        </FlightProfile>
+        <FlightProfile Series="CMASI">
+            <Name>Dash</Name>
+            <Airspeed>35.0</Airspeed>
+            <PitchAngle>-2.0</PitchAngle>
+            <VerticalSpeed>0.0</VerticalSpeed>
+            <MaxBankAngle>30.0</MaxBankAngle>
+            <EnergyRate>0.1</EnergyRate>
+        </FlightProfile>
+    </AlternateFlightProfiles>
+    <PayloadConfigurationList/>
+    <AvailableLoiterTypes>
+        <LoiterType>Circular</LoiterType>
+        <LoiterType>Racetrack</LoiterType>
+        <LoiterType>FigureEight</LoiterType>
+    </AvailableLoiterTypes>
+    <AvailableTurnTypes>
+        <TurnType>TurnShort</TurnType>
+        <TurnType>FlyOver</TurnType>
+    </AvailableTurnTypes>
+    <MinimumAltitude>0.0</MinimumAltitude>
+    <NominalAltitude>500.0</NominalAltitude>
+    <MaximumAltitude>1000000.0</MaximumAltitude>
+    <MinAltAboveGround>0.0</MinAltAboveGround>
+</AirVehicleConfiguration>

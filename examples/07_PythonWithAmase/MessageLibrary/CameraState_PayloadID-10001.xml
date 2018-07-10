@@ -1,0 +1,12 @@
+<CameraState Series="CMASI">
+    <PayloadID>10001</PayloadID>
+    <Parameters/>
+    <PointingMode>Unknown</PointingMode>
+    <Azimuth>0</Azimuth>
+    <Elevation>0</Elevation>
+    <Rotation>0</Rotation>
+    <HorizontalFieldOfView>20.0</HorizontalFieldOfView>
+    <VerticalFieldOfView>0</VerticalFieldOfView>
+    <Footprint/>
+    <Centerpoint/>
+</CameraState>

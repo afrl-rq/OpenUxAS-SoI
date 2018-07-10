@@ -1,0 +1,7 @@
+<GimbalState Series="CMASI">
+    <PointingMode>AirVehicleRelativeAngle</PointingMode>
+        <Azimuth>0.0</Azimuth>
+        <Elevation>-45.0</Elevation>
+        <Rotation>0.0</Rotation>
+        <PayloadID>1001</PayloadID>
+</GimbalState>
