@@ -4093,7 +4093,7 @@ namespace VisiLibity
             }
         }
         
-        std::cout << "original size " << visPolyList.size() << std::endl;
+        //std::cout << "original size " << visPolyList.size() << std::endl;
         ///any additional rings should be CW and are used as inner rings/ holes
         if(visPolyList.size() > 1)
         {
@@ -4184,107 +4184,218 @@ namespace VisiLibity
     // note: static function
     bool Polygon::boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon)
     {
-
-        //create list to store any polygons that are not merged
-        std::vector<boost_polygon> unmerged;
-        
-        //make sure we have at least two polygons to merge
-        if(polygonList.size() > 1)
+        std::vector<boost_polygon> bPolyList;
+        //convert polygon list from visiLibity to boost
+        for (auto &visPoly : polygonList)
         {
-            //create a polygon to iteratively merge polygons with and set it to the first input polygon (converted to boost format)
-            boost_polygon merged = to_boost(std::vector<Polygon>(1,polygonList[0]));
+            auto b_poly = to_boost(std::vector<Polygon>(1,visPoly));
+            bPolyList.push_back(b_poly);
+        }
+        
+        //vector where we will save polygons that cannot be merged any further
+        std::vector<boost_polygon> merged;
             
-            //iteratively merge into merged
-            for (int polyIdx = 1; polyIdx < polygonList.size(); polyIdx++)
-            //for (int polyIdx = 1; polyIdx < 2; polyIdx++)
+        std::vector<boost_polygon>::iterator iter1;
+        size_t outer = 1;
+        //for each VisiLibity polygon in list - manually control incrementing of iterators because we are deleting elements
+        for (iter1 = bPolyList.begin(); iter1 != bPolyList.end(); )
+        {
+            //std::cout << "outer loop" << outer << std::endl;
+            //attempt to merge with each of the rest of the polygons
+            std::vector<boost_polygon>::iterator iter2;
+            auto inner = 2;
+            //start with polygon after outer loop - manually control incrementing of iterators because we are deleting elements
+            for (iter2 = iter1++; iter2 != bPolyList.end(); )
             {
-                //convert to boost polygon to use boost union
-                auto b_poly = to_boost(std::vector<Polygon>(1,polygonList[polyIdx]));
-                //vector to store results in boost format
-                std::vector<boost_polygon> output;
-                
+                //std::cout << "inner loop " << inner << std::endl;
                 //check to see if these two polygons are overlapping
-                if( bg::distance(b_poly, merged) > 0 == false)
+                if( bg::distance(*iter1, *iter2) > 0 == false)
                 {
-                    bg::validity_failure_type failure;
-                    if(bg::is_valid(b_poly, failure))
+                    //std::cout << "union\n";
+                    //vector to store results in boost format
+                    std::vector<boost_polygon> output;
+                    bg::union_(*iter1, *iter2, output);
+                    //std::cout << "output size :" << output.size() << std::endl;
+                    //if we were able to merge these two
+                    if(output.size() == 1)
                     {
-                        std::cout << "merged\n" << merged << "with\n" << b_poly << std::endl;
-                        bg::union_(merged, b_poly, output);
-                        
-                        for (auto &result : output)
+                        //std::cout << "merged " << inner << " with " << outer << ". removing " << inner <<std::endl;
+                        //std::cout << "merged " << *iter1 << " with " << *iter2 << ". removing " << inner <<std::endl;
+                        //use the new merged polygon as the comparison
+                        *iter1 = output[0];
+                        //std::cout << "result" << *iter1 << std::endl;
+                        //remove the polygon we just merged, this will increment iter2
+                        iter2 = bPolyList.erase(iter2);
+                        if(bPolyList.size() ==1)
                         {
-                            std::cout << "result\n" << result << std::endl;
+                            iter2 = bPolyList.end();
                         }
-                        
-                        
-                        //case where multiple boost polygons are returned from union
-                        //not handled yet
-                        if(output.size() == 1)
-                        {
-                            merged = output[0];
-
-                        }
-                        //else just one polygon returned
-                        else
-                        {
-                            std::cerr << "Invalid results from polygon merge. Expected 1 polygon, received " << output.size();
-                        }
-    
+                        inner++;
+                        //std::cout << "inner " << inner <<std::endl;
+                        //std::cout << "end iterator? " << (iter2 == bPolyList.end()) << std::endl;
+                        //std::cout << "vector size " << bPolyList.size() << std::endl;
+                        //std::cout << "iter2 " << *iter2 << std::endl;
                     }
-                    //else invalid polygon
                     else
                     {
-                        //TODO: I don't really want to return in the middle of this loop, do I?
-                        std::cout << "Invalid polygon - reason: " << failure << std::endl;
-    //                    std::cout << to_visiLibity(b_poly);
-                        if(failure == bg::failure_not_closed)
-                        {
-                            std::cout << "Not closed" << std::endl;
-                        }
-                        else if(failure == bg::failure_wrong_orientation)
-                        {
-                            std::cout << "Wrong orientation" << std::endl;
-                        }
-                        return false;
+                        //do nothing, but increment inner loop incrementer
+                        //std::cout << "incrementing inner loop because of merge\n";
+                        iter2++;
                     }
                 }
-                //polygons are not overlapping
                 else
                 {
-                    //keep list of polygons that were not able to be merged
-                    unmerged.push_back(b_poly);
+                    //std::cout << "incrementing inner loop because of distance\n";
+                    //do nothing, but increment inner loop incrementer
+                    iter2++;
                 }
             }
-            
-            //go back through the unmergeable polygons because we may be able to merge them now
-            for (int unmergedIdx = 0; unmergedIdx < unmerged.size(); unmergedIdx++)
+               
+            //if we have reached the end of the inner loop we can't merge the outer loop polygon any further
+            //std::cout << "adding outer loop result to merged output\n";
+            //std::cout << "*iter1 " <<*iter1 << std::endl;
+            merged.push_back(*(--iter1));
+            if(iter1 != bPolyList.end())
             {
-                if(bg::distance(unmerged[unmergedIdx], merged[0]) > 0 ==false)
-                {
-                    
-                auto visPolyList = to_visiLibity(b_poly);
-                for (auto &visPoly : visPolyList)
-                {
-                    resultingPolygons.push_back(visPoly);
-                }
+            //std::cout << "merged size: " << merged.size() << std::endl;
+            //std::cout << "outer at end? " << (iter1 == bPolyList.end()) <<std::endl;
+                ++iter1;
+                outer++;
+                //std::cout << "iterator updated\n";
             }
-            resultingPolygons = to_visiLibity(merged);
-            return true;
         }
-        //else less than two input polygons
-        else
+        
+        //std::cout << "merged size: " <<  merged.size() << std::endl;
+        //std::cout << "merged" << merged[0] << std::endl;
+        //convert merged boost polygons to VisiLibity polygons
+        for (auto &bPoly : merged)
         {
-            //if we received only one input polygon, make this the output polygon
-            if(polygonList.size() == 1)
-            {
-                resultingPolygons.push_back(polygonList[0]);
-            }
-            //if the input polygon vector is empty, the output polygon vector will come back empty
-            //return false any time we did not do any actual merging
-            return false;
+            //std::cout << "boost poly output: " << bPoly << std::endl;
+            //std::cout << "adding to output vector" << std::endl;
+            auto visPoly = to_visiLibity(bPoly);
+            //std::cout  << "visPoly " << visPoly[0] << std::endl;
+            resultingPolygons.push_back(visPoly[0]);
         }
+        return true;
     }
+//        if(polygonList.size() > 1)
+//        {
+//            //convert to boost polygon to use boost union
+//            auto b_poly = to_boost(std::vector<Polygon>(1,polygonList[0]));
+////        std::vector<Polygon>::iterator iter1;
+////        //for each polygon in list
+////        for (iter1 = polygonList.begin(); iter1 != polygonList.end(); )
+////        {
+////            //attempt to merge
+////            //for each of the rest of the polygons
+////            std::vector<Polygon>::iterator iter2;
+////            for (iter2 = iter1++; iter2 != polygonList.end(); iter2++)
+////            {
+////                distance += bg::distance(iter1, iter2);
+////
+////            if ()
+////                iter1 = polygonList.erase(iter1);
+////            else
+////                iter1++;
+////        }
+//
+//
+//            //create a polygon to iteratively merge polygons with and set it to the first input polygon (converted to boost format)
+//            boost_polygon merged = to_boost(std::vector<Polygon>(1,polygonList[0]));
+//
+//            //iteratively merge into merged
+//            for (int polyIdx = 1; polyIdx < polygonList.size(); polyIdx++)
+//            //for (int polyIdx = 1; polyIdx < 2; polyIdx++)
+//            {
+//                //convert to boost polygon to use boost union
+//                auto b_poly = to_boost(std::vector<Polygon>(1,polygonList[polyIdx]));
+//                //vector to store results in boost format
+//                std::vector<boost_polygon> output;
+//
+//                //check to see if these two polygons are overlapping
+//                if( bg::distance(b_poly, merged) > 0 == false)
+//                {
+//                     bg::union_(iter1, iter2, output);
+//
+//                    bg::validity_failure_type failure;
+//                    if(bg::is_valid(b_poly, failure))
+//                    {
+//                        std::cout << "merged\n" << merged << "with\n" << b_poly << std::endl;
+//                        bg::union_(merged, b_poly, output);
+//
+//                        for (auto &result : output)
+//                        {
+//                            std::cout << "result\n" << result << std::endl;
+//                        }
+//
+//
+//                        //case where multiple boost polygons are returned from union
+//                        //not handled yet
+//                        if(output.size() == 1)
+//                        {
+//                            merged = output[0];
+//
+//                        }
+//                        //else just one polygon returned
+//                        else
+//                        {
+//                            std::cerr << "Invalid results from polygon merge. Expected 1 polygon, received " << output.size();
+//                        }
+//
+//                    }
+//                    //else invalid polygon
+//                    else
+//                    {
+//                        //TODO: I don't really want to return in the middle of this loop, do I?
+//                        std::cout << "Invalid polygon - reason: " << failure << std::endl;
+//    //                    std::cout << to_visiLibity(b_poly);
+//                        if(failure == bg::failure_not_closed)
+//                        {
+//                            std::cout << "Not closed" << std::endl;
+//                        }
+//                        else if(failure == bg::failure_wrong_orientation)
+//                        {
+//                            std::cout << "Wrong orientation" << std::endl;
+//                        }
+//                        return false;
+//                    }
+//                }
+//                //polygons are not overlapping
+//                else
+//                {
+//                    //keep list of polygons that were not able to be merged
+//                    unmerged.push_back(b_poly);
+//                }
+//            }
+//
+//            //go back through the unmergeable polygons because we may be able to merge them now
+//            for (int unmergedIdx = 0; unmergedIdx < unmerged.size(); unmergedIdx++)
+//            {
+//                if(bg::distance(unmerged[unmergedIdx], merged) > 0 ==false)
+//                {
+//
+//                auto visPolyList = to_visiLibity(b_poly);
+//                for (auto &visPoly : visPolyList)
+//                {
+//                    resultingPolygons.push_back(visPoly);
+//                }
+//            }
+//            resultingPolygons = to_visiLibity(merged);
+//            return true;
+//        }
+//        //else less than two input polygons
+//        else
+//        {
+//            //if we received only one input polygon, make this the output polygon
+//            if(polygonList.size() == 1)
+//            {
+//                resultingPolygons.push_back(polygonList[0]);
+//            }
+//            //if the input polygon vector is empty, the output polygon vector will come back empty
+//            //return false any time we did not do any actual merging
+//            return false;
+//        }
+//    }
     
     std::ostream& operator << (std::ostream& outs, boost_polygon b_poly)
     {
