@@ -553,9 +553,6 @@ public
 			lemma "Experimental Observer: Config params are not yet converged after (3 + 1/8)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
 					(time <= (3.0 + 1.0/8.0)*T);
-								
---			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
---				steps = steps_to_converge - 1 => stable;
 			
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -619,7 +616,7 @@ public
 								
 			lemma "(Experimental) Time for config params to converge is < (3 + 1/4)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
-					(time < (3.0 + 1.0/3.0)*T);
+					(time < (3.0 + 1.0/4.0)*T);
 
 			lemma "(Experimental) Stable on and after 29 steps":
 				steps >= 29 => stable;
