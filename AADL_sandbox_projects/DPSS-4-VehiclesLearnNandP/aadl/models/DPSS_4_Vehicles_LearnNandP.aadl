@@ -134,35 +134,51 @@ public
 														pre_pos_UAV4
 														);
 			
-			--Times to reach goals
-			eq time_until_UAV1_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV1, 
-					pre_pos_UAV1, 
-					pre_goal_UAV1
+			--"Trimmed" times to reach goals. If reaching a fake endpoint, return value is -1.0.
+			eq time_until_UAV1_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV1, 
+									pre_pos_UAV1, 
+									pre_goal_UAV1,
+									pre(perimLeft_UAV1),
+									pre(perimRight_UAV1),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
 				);
 				
-			eq time_until_UAV2_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV2, 
-					pre_pos_UAV2, 
-					pre_goal_UAV2
-				);
-				
-			eq time_until_UAV3_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV3, 
-					pre_pos_UAV3, 
-					pre_goal_UAV3
+			eq time_until_UAV2_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV2, 
+									pre_pos_UAV2, 
+									pre_goal_UAV2,
+									pre(perimLeft_UAV2),
+									pre(perimRight_UAV2),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
 				);
 
-			eq time_until_UAV4_reaches_goal : DPSS_Data_Types::Time_Type = 
-				DPSS_Node_Lib.time_to_reach_target_position(
-					pre_direction_UAV4, 
-					pre_pos_UAV4, 
-					pre_goal_UAV4
+			eq time_until_UAV3_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV3, 
+									pre_pos_UAV3, 
+									pre_goal_UAV3,
+									pre(perimLeft_UAV3),
+									pre(perimRight_UAV3),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
 				);
-			
+
+			eq time_until_UAV4_reaches_goal_trimmed : DPSS_Data_Types::Time_Type = 
+				DPSS_Node_Lib.time_to_reach_target_position_trim_phony_endpoints(
+									pre_direction_UAV4, 
+									pre_pos_UAV4, 
+									pre_goal_UAV4,
+									pre(perimLeft_UAV4),
+									pre(perimRight_UAV4),
+									LEFT_ENDP_TRUTH,
+									RIGHT_ENDP_TRUTH
+				);
+							
 			--Time until UAVN reaches right endpoint	
 			eq time_until_UAVN_reaches_right_endp : DPSS_Data_Types::Time_Type = 
 				DPSS_Node_Lib.time_to_reach_target_position(
@@ -184,10 +200,10 @@ public
 							DPSS_Node_Lib.min_pos_time(time_until_UAVN_reaches_right_endp,
 							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_left_endp,
 							--Times to reach goals
-							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_goal,
-							DPSS_Node_Lib.min_pos_time(time_until_UAV4_reaches_goal,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV1_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV2_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV3_reaches_goal_trimmed,
+							DPSS_Node_Lib.min_pos_time(time_until_UAV4_reaches_goal_trimmed,
 							--Times to reach neighbors
 							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_12,
 							DPSS_Node_Lib.min_pos_time(time_to_reach_neighbor_23,
@@ -533,6 +549,10 @@ public
 					and UAV3.numLeft = 0 and UAV3.numRight = 0
 					and UAV4.numLeft = 0 and UAV4.numRight = 0
 				));
+
+			lemma "Experimental Observer: Config params are not yet converged after (3 + 1/8)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time <= (3.0 + 1.0/8.0)*T);
 								
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
@@ -572,12 +592,6 @@ public
 				
 			lemma "Once the configuration paramters are stable, they stay stable.":
 				true -> pre(stable_config_params) => stable_config_params;
-					
---			lemma "Stable on and after steps_to_converge steps":
---				steps >= steps_to_converge => stable;	
-
-			lemma "(Experimental) Stable on and after 30 steps":
-				steps >= 30 => stable;
 			
 			lemma "Stable implies deltaT = T/N":
 				stable => deltaT = T/N_TRUTH_REAL;
@@ -588,18 +602,52 @@ public
 					and deltaT <= T
 					);
 
+			lemma "(Experimental) Config params stable on and after 25 steps":
+				steps >= 25 => stable_config_params;
+
+			lemma "(Experimental) Config params stable on and after 26 steps":
+				steps >= 26 => stable_config_params;
+
+			lemma "(Experimental) Config params stable on and after 27 steps":
+				steps >= 27 => stable_config_params;
+				
+			lemma "(Experimental) Config params stable on and after 28 steps":
+				steps >= 28 => stable_config_params;
+
+			lemma "(Experimental) Config params stable on and after 29 steps":
+				steps >= 29 => stable_config_params;
+								
+			lemma "(Experimental) Time for config params to converge is < (3 + 1/4)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time < (3.0 + 1.0/3.0)*T);
+
+			lemma "(Experimental) Stable on and after 29 steps":
+				steps >= 29 => stable;
+
+			lemma "(Experimental) Stable on and after 30 steps":
+				steps >= 30 => stable;
+
+			lemma "(Experimental) Stable on and after 31 steps":
+				steps >= 31 => stable;
+
+			lemma "(Experimental) Stable on and after 32 steps":
+				steps >= 32 => stable;
+
+			lemma "(Experimental) Stable on and after 33 steps":
+				steps >= 33 => stable;
+
 			-- This is a good way to find the real time bound!	
 			lemma "Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
 					(time < 4.0*T);
 			
-			lemma "(Expect Invalid) Time for configuration parameters to converge is less than or equal to 3T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= 3.0*T);
-
-			lemma "(Expect Invalid) Time for configuration parameters to converge is less than 3T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time < 3.0*T);
+--			lemma "(Expect Invalid) Time for configuration parameters to converge is less than or equal to 3T":
+--				(stable_config_params and not (pre(stable_config_params))) => 
+--					(time <= 3.0*T);
+--
+--			lemma "(Expect Invalid) Time for configuration parameters to converge is less than 3T":
+--				(stable_config_params and not (pre(stable_config_params))) => 
+--					(time < 3.0*T);
 
 		**};
 		
