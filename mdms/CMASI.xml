@@ -1313,7 +1313,7 @@
             -->
             <Field Name="ViewAngleList" Type="Wedge[]" MaxArrayLength="64" />
 
-            <!--The discretization level represents the number of headings to consider during the task plan options phase. This is only considered if the ViewAngleList is empty-->
+            <!--The discretization level represents the number of headings to consider during the task plan options phase-->
             <Field Name="DiscretizationLevel" Type="int64" Default="1"/>
 
         </Struct>
