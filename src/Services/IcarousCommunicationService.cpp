@@ -364,7 +364,10 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
                 tempMessageBuffer = fieldEnd;
                 tempMessageBuffer++;
             }else{
-                fprintf(stderr,"Error, unknown message type!\n");
+                //fprintf(stderr,"Error, unknown message type!\n");
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
                 //exit(EXIT_FAILURE);
             }
         }
