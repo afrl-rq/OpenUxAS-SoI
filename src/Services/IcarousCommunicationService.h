@@ -46,6 +46,7 @@
 #include <unistd.h>
 #include <memory>
 
+
 #define PORT 5557
 
 #define STRING_XML_ICAROUS_CONNECTIONS "NumberOfUAVs"
@@ -110,6 +111,9 @@ public:
     IcarousCommunicationService();
     bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand);
 
+    /** brief Listen to ICAROUS clients for commands*/
+    bool ICAROUS_listener(int64_t icarousClientFd);
+
     virtual
     ~IcarousCommunicationService();
 
@@ -139,8 +143,9 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-
 private:
+    pid_t readIcarousID;
+    
     //Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};
     

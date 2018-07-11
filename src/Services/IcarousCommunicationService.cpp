@@ -34,7 +34,8 @@
  *   TODO processReceivedLmcpMessage - Locate a place where horizonal accuracy is defined (hdop)
  *   TODO processReceivedLmcpMessage - Locate a place where vertical accuracy is defined (vdop)
  *   TODO processReceivedLmcpMessage - Find a way to get the yaw from AMASE for a given UAV (not default included in the message)
- *
+ *   
+ *   TODO scan for waypoint reached from AirVehicleState
  *
  *  Notes:
  *   This code ONLY works on Linux, since it uses Linux function calls  
@@ -263,9 +264,57 @@ bool IcarousCommunicationService::start()
     // perform any actions required at the time the service starts
     std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
 
+    // Start children here to begin reading from ICAROUS instances
+    for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+    {
+        fprintf(stdout, "Creating a child to read from ICAROUS; Child #%i\n", (i+1));
+        if((readIcarousID = fork()) == 0){
+            ICAROUS_listener(client_sockfd[i]);
+            
+            // If the child gets here, there was a major error
+            fprintf(stderr, "Error with a child reading from ICAROUS!\n");
+            terminate();
+        }
+        else if(readIcarousID == -1)
+        {
+            fprintf(stderr, "Error with creating a child to read from ICAROUS!\n");
+            terminate();
+        }
+    }
+    
     return (true);
 };
 
+
+// Listener for ICAROUS command messages
+bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
+{
+    fprintf(stdout, "Child created for icarousClientFd: %lli\n", icarousClientFd);
+    
+    const int max_message_length = 87040;
+    char messageBuffer[10000000];
+    
+    // Listen to ICAROUS forever
+    while(true){
+        fprintf(stdout, "Child listening to icarousClientFd: %lli\n", icarousClientFd);        
+        
+        messageBuffer[0] = '\0';
+        int nread = max_message_length;
+        int bytesReceived = 0;
+        errno = 0;
+        
+        //listen to each client socket
+        //Read any messages ICAROUS has posted
+        while(nread == max_message_length && !errno){
+            //fprintf(stdout, "Read call made\n"); //Sanity check
+            nread = read(icarousClientFd, messageBuffer, max_message_length);
+            bytesReceived += nread;
+        }
+        messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
+        
+        fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
+    }
+}
 
 
 // This function is performed to cleanly terminate the service
@@ -467,6 +516,12 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     vehicleID); // ICAROUS indexes start at 1 normally
             }
         }
+
+        // TODO scan for waypoint reached from AirVehicleState
+        // Order does not matter as long as we save the list and use the indexing
+        // 1.) Save the MissionCommand for each UAV
+        // 2.) When the current waypoint changes, send the older one as completed
+
     }// End of AirVehicleState
 
 
