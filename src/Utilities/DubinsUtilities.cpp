@@ -26,16 +26,27 @@ namespace uxas {
     namespace common {
         namespace utilities {
 
-            std::vector<DubinsWaypoint> DubinsPath::getDubinsWaypoints() {
-                if (dubinsWaypoints.empty()) {
-                    calculateDubinsWaypoints();
-                }
-                return dubinsWaypoints;
-            };
+            DubinsPath::DubinsPath(double eastPosition1, double northPosition1, double heading1, double eastPosition2, double northPosition2, double heading2, double radius)
+            : startDubinsConfiguration(northPosition1, eastPosition1, heading1), endDubinsConfiguration(northPosition2, eastPosition2, heading2), radius(radius)
+            {
+                calculateDubinsWaypoints();
+            }
+
+            DubinsPath::DubinsPath(DubinsConfiguration startConfiguration, DubinsConfiguration endConfiguration, double radius)
+            : startDubinsConfiguration(startConfiguration), endDubinsConfiguration(endConfiguration), radius(radius) 
+            {
+                calculateDubinsWaypoints();
+            }
+
+            std::vector<DubinsWaypoint> DubinsPath::getShortestPath() {
+                return shortestDubinsPath;
+            }
+            
+            std::unordered_map<std::string, std::vector<DubinsWaypoint> > DubinsPath::getAllPaths(){
+                return calculatedPaths;
+            }
 
             void DubinsPath::calculateDubinsWaypoints() {
-                //calculate the Dubin's path
-                
                 //first translate the aircraft coordinates to standard coordinates
                 VisiLibity::Point startLocation = VisiLibity::Point(startDubinsConfiguration.getEastPosition(), startDubinsConfiguration.getNorthPosition());
                 double psi1 = wrapAngle(n_Const::c_Convert::dPiO2() - wrapAngle(startDubinsConfiguration.getHeading()));
@@ -48,7 +59,7 @@ namespace uxas {
                 std::vector<DubinsWaypoint> tmpDubinsWaypoints;
                 //make a very expensive waypoint
                 DubinsWaypoint maxCostWaypoint = DubinsWaypoint(0, 0, DBL_MAX, 0, 0, 0);
-                dubinsWaypoints.push_back(maxCostWaypoint); //create a max cost waypoint list
+                shortestDubinsPath.push_back(maxCostWaypoint); //create a max cost waypoint list
                 //set up waypoint list
                 tmpDubinsWaypoints.push_back(startWaypoint);
 
@@ -83,9 +94,10 @@ namespace uxas {
                     tmpDubinsWaypoints.push_back(DubinsWaypoint(endLocation.x(), endLocation.y(), radius * gamma, endLeftCircle.x(), endLeftCircle.y(), 1));
 
                     //assign tmpDubinsWaypoints to dubinsWaypoints if it has a lower path cost
-                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
-                        dubinsWaypoints = tmpDubinsWaypoints;
+                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(shortestDubinsPath)) {
+                        shortestDubinsPath = tmpDubinsWaypoints;
                     }
+                    calculatedPaths["LRL"] = tmpDubinsWaypoints;
                     //reset tmp waypoints for next tested path
                     tmpDubinsWaypoints.clear();
                     tmpDubinsWaypoints.push_back(startWaypoint);
@@ -114,9 +126,10 @@ namespace uxas {
                     //push back the fourth waypoint
                     tmpDubinsWaypoints.push_back(DubinsWaypoint(endLocation.x(), endLocation.y(), radius * gamma, endRightCircle.x(), endRightCircle.y(), -1));
                     //assign tmpDubinsWaypoints to dubinsWaypoints if it has a lower path cost
-                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
-                        dubinsWaypoints = tmpDubinsWaypoints;
+                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(shortestDubinsPath)) {
+                        shortestDubinsPath = tmpDubinsWaypoints;
                     }
+                    calculatedPaths["RLR"] = tmpDubinsWaypoints;
                     //reset tmpDubinsWaypoints for next path
                     tmpDubinsWaypoints.clear();
                     tmpDubinsWaypoints.push_back(startWaypoint);
@@ -143,9 +156,10 @@ namespace uxas {
                 tmpDubinsWaypoints.push_back(DubinsWaypoint(endLocation.x(), endLocation.y(), radius * gamma, endLeftCircle.x(), endLeftCircle.y(), 1));
 
                 //assign tmpDubinsWaypoints to dubinsWaypoints if it has a lower path cost
-                if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
-                    dubinsWaypoints = tmpDubinsWaypoints;
+                if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(shortestDubinsPath)) {
+                    shortestDubinsPath = tmpDubinsWaypoints;
                 }
+                calculatedPaths["LSL"] = tmpDubinsWaypoints;
                 //reset tmpDubinsWaypints for next path
                 tmpDubinsWaypoints.clear();
                 tmpDubinsWaypoints.push_back(startWaypoint);
@@ -171,9 +185,10 @@ namespace uxas {
                     tmpDubinsWaypoints.push_back(DubinsWaypoint(endLocation.x(), endLocation.y(), radius * gamma, endRightCircle.x(), endRightCircle.y(), -1));
 
                     //assign tmpDubinsWaypoints to dubinsWaypoints if it has a lower path cost
-                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
-                        dubinsWaypoints = tmpDubinsWaypoints;
+                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(shortestDubinsPath)) {
+                        shortestDubinsPath = tmpDubinsWaypoints;
                     }
+                    calculatedPaths["LSR"] = tmpDubinsWaypoints;
                     //reset tmpDubinsWaypoints for next tested path
                     tmpDubinsWaypoints.clear();
                     tmpDubinsWaypoints.push_back(startWaypoint);
@@ -200,9 +215,10 @@ namespace uxas {
                     //push back the fourth waypoint
                     tmpDubinsWaypoints.push_back(DubinsWaypoint(endLocation.x(), endLocation.y(), radius * gamma, endLeftCircle.x(), endLeftCircle.y(), 1));
                     //assign tmpDubinsWaypoints to dubinsWaypoints if it has a lower path cost
-                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
-                        dubinsWaypoints = tmpDubinsWaypoints;
+                    if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(shortestDubinsPath)) {
+                        shortestDubinsPath = tmpDubinsWaypoints;
                     }
+                    calculatedPaths["RSL"] = tmpDubinsWaypoints;
                     //reset the tmpDubinsWaypoints for next tested path
                     tmpDubinsWaypoints.clear();
                     tmpDubinsWaypoints.push_back(startWaypoint);
@@ -226,9 +242,9 @@ namespace uxas {
                 tmpDubinsWaypoints.push_back(DubinsWaypoint(nextPosition.x(), nextPosition.y(), distance, nextPosition.x(), nextPosition.y(), 0));
                 //push back the fourth waypoint
                 tmpDubinsWaypoints.push_back(DubinsWaypoint(endLocation.x(), endLocation.y(), radius * gamma, endRightCircle.x(), endRightCircle.y(), -1));
-
-                if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(dubinsWaypoints)) {
-                    dubinsWaypoints = tmpDubinsWaypoints;
+                calculatedPaths["RSR"] = tmpDubinsWaypoints;
+                if (calcPathCost(tmpDubinsWaypoints) < calcPathCost(shortestDubinsPath)) {
+                    shortestDubinsPath = tmpDubinsWaypoints;
                 }
             };
 

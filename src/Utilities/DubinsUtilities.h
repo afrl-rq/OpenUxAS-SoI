@@ -15,6 +15,7 @@
  */
 
 #include <vector>
+#include <unordered_map>
 
 #ifndef DUBINSUTILITIES_H
 #define DUBINSUTILITIES_H
@@ -24,7 +25,7 @@ namespace uxas {
         namespace utilities {
 
             /*! \class DubinsConfiguration
-             *  \brief This class represents the configuration of a start or end point of a dubins path. This is used to configure the DubinsPath
+             *  \brief This class represents the configuration of a start or end point of a Dubin's path. This is used to configure the DubinsPath
              *
              */
             class DubinsConfiguration {
@@ -95,16 +96,19 @@ namespace uxas {
             class DubinsPath {
             public:
 
-                DubinsPath(double eastPosition1, double northPosition1, double heading1, double eastPosition2, double northPosition2, double heading2, double radius) :
-                startDubinsConfiguration(northPosition1, eastPosition1, heading1), endDubinsConfiguration(northPosition2, eastPosition2, heading2), radius(radius) {
-                }
-
-                DubinsPath(DubinsConfiguration startConfiguration, DubinsConfiguration endConfiguration, double radius) : startDubinsConfiguration(startConfiguration), endDubinsConfiguration(endConfiguration), radius(radius) {
-                }
+                DubinsPath(double eastPosition1, double northPosition1, double heading1, double eastPosition2, double northPosition2, double heading2, double radius);
+                
+                DubinsPath(DubinsConfiguration startConfiguration, DubinsConfiguration endConfiguration, double radius);
 
             public:
-                std::vector<DubinsWaypoint> getDubinsWaypoints();
-
+                /**\brief Returns the shortest calculated Dubin's path
+                 */
+                std::vector<DubinsWaypoint> getShortestPath();
+                
+                /**\ Returns all of the Dubin's paths
+                 */
+                std::unordered_map<std::string, std::vector<DubinsWaypoint> > getAllPaths();
+                
             private:
                 /**\brief A method that is called the first time getDubinsWaypoints is called.
                  *        This creates the Dubin's path between two heading/position pairs.
@@ -118,7 +122,7 @@ namespace uxas {
                 void calculateDubinsWaypoints();
 
                 /**\brief A helper function for wrapping an angle
-                 * @param theat: angle being wrapped
+                 * @param theta: angle being wrapped
                  * @return wrapped angle
                  */                
                 double wrapAngle(double theta);
@@ -129,7 +133,7 @@ namespace uxas {
                  */
                 double calcPathCost(const std::vector<DubinsWaypoint> &waypoints);
 
-                /**\brief A helper function for a floating point modulo operatio.
+                /**\brief A helper function for a floating point modulo operation.
                  *        This is the equivalent of MATLAB's mod function.
                  *        Think of this as x % y with decimals in the remainder.
                  * @param x: the number of interest
@@ -149,8 +153,14 @@ namespace uxas {
                 //the turn radius for the Dubin's waypoints
                 double radius;
 
-                //An ordered list of Dubin's waypoints for the Dubin's path.
-                std::vector<DubinsWaypoint> dubinsWaypoints;
+                //An ordered list of Dubin's waypoints for the shortest calculated Dubin's path.
+                std::vector<DubinsWaypoint> shortestDubinsPath;
+                
+                /*A dictionary of all the ordered lists of Dubin's waypoints.
+                 * key: directionality of path
+                 * value: ordered list of Dubin's waypoints
+                 */
+                std::unordered_map<std::string, std::vector<DubinsWaypoint> > calculatedPaths;
             };
 
 
