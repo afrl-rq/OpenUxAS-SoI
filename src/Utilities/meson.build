@@ -1,6 +1,7 @@
 srcs_utilities = [
   'Algebra.cpp',
   'CallbackTimer.cpp',
+  'DubinsUtilities.cpp',
   'FileSystemUtilities.cpp',
   'Permute.cpp',
   'TimeUtilities.cpp',
@@ -23,6 +24,7 @@ srcs_utilities = [
 incs_utilities = [
   include_directories(
     '../../src/Includes',
+    '../VisilibityLib',
   ),
   incs_lmcp,
 ]
