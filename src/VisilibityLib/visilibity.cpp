@@ -4181,9 +4181,56 @@ namespace VisiLibity
         return visPolyList;
     }
 
-    // note: static function
+    bool any_overlap(std::vector<boost_polygon> polygonList)
+    {
+        //for each polygon, calculate distance to each other polygon, return true if any are overlapping
+        //outer loop is first polygon for distance calculation
+        for (auto iter1 = polygonList.begin(); iter1 != polygonList.end(); iter1++)
+        {
+            
+            //start with polygon after outer loop so we don't compare a polygon to itself
+            for (auto iter2 = iter1++; iter2 != polygonList.end(); iter2++)
+            {
+                //if these polygons overlap
+                if( bg::distance(*iter1, *iter2) > 0 == false)
+                {
+                    return true;
+                }
+            }
+        }
+        //no overlapping found
+        return false;
+                
+    }
+    
+    std::vector<std::pair<int, int> > find_overlap(std::vector<boost_polygon> polygonList)
+    {
+        std::cout << "calling find overlap on list of size " << polygonList.size() << std::endl;
+        std::vector<std::pair<int, int> > result;
+        //for each polygon, calculate distance to each other polygon, return true if any are overlapping
+        //outer loop is first polygon for distance calculation
+        for (int idx1 = 0; idx1 < polygonList.size(); idx1++)
+        {
+            
+            //start with polygon after outer loop so we don't compare a polygon to itself
+            for (int idx2 = idx1+1; idx2 < polygonList.size(); idx2++)
+            {
+                //if these polygons overlap
+                std::cout << "distance between " <<idx1 << " and " << idx2 << " " << bg::distance(polygonList[idx1], polygonList[idx2]) << std::endl;
+                if( bg::distance(polygonList[idx1], polygonList[idx2]) > 0 == false)
+                {
+                    result.push_back(std::pair<int, int>(idx1, idx2));
+                }
+            }
+        }
+        //no overlapping found
+        return result;
+        
+    }
+    
     bool Polygon::boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon)
     {
+        bool success = true;
         std::vector<boost_polygon> bPolyList;
         //convert polygon list from visiLibity to boost
         for (auto &visPoly : polygonList)
@@ -4192,89 +4239,80 @@ namespace VisiLibity
             bPolyList.push_back(b_poly);
         }
         
-        //vector where we will save polygons that cannot be merged any further
-        std::vector<boost_polygon> merged;
-            
-        std::vector<boost_polygon>::iterator iter1;
-        size_t outer = 1;
-        //for each VisiLibity polygon in list - manually control incrementing of iterators because we are deleting elements
-        for (iter1 = bPolyList.begin(); iter1 != bPolyList.end(); )
+        auto overlapping = find_overlap(bPolyList);
+        // iterate as long as any 2 polygons overlap
+        while(overlapping.size() > 0)
         {
-            //std::cout << "outer loop" << outer << std::endl;
-            //attempt to merge with each of the rest of the polygons
-            std::vector<boost_polygon>::iterator iter2;
-            auto inner = 2;
-            //start with polygon after outer loop - manually control incrementing of iterators because we are deleting elements
-            for (iter2 = iter1++; iter2 != bPolyList.end(); )
+            //keep a list of polygons to remove
+            std::vector<int> toRemove;
+            //iterate backwards over list of overlapping polygon pairs so that we don't have to worry about invalidating iterators as we go
+            for (auto revIt = overlapping.rbegin(); revIt != overlapping.rend(); revIt++)
             {
-                //std::cout << "inner loop " << inner << std::endl;
-                //check to see if these two polygons are overlapping
-                if( bg::distance(*iter1, *iter2) > 0 == false)
+
+                //vector to store results in boost format
+                std::vector<boost_polygon> output;
+        
+                std::pair<int, int> indices = *revIt;
+                bg::union_(bPolyList[indices.first], bPolyList[indices.second], output);
+//                //if we were able to merge these two
+                if(output.size() == 1)
                 {
-                    //std::cout << "union\n";
-                    //vector to store results in boost format
-                    std::vector<boost_polygon> output;
-                    bg::union_(*iter1, *iter2, output);
-                    //std::cout << "output size :" << output.size() << std::endl;
-                    //if we were able to merge these two
-                    if(output.size() == 1)
+//                    //use the new merged polygon as the comparison
+                    bPolyList[indices.first]= output[0];
+                    //check to see if we are already planning to remove the second polygon
+                    if(std::find(std::begin(toRemove), std::end(toRemove), indices.second) == std::end(toRemove))
                     {
-                        //std::cout << "merged " << inner << " with " << outer << ". removing " << inner <<std::endl;
-                        //std::cout << "merged " << *iter1 << " with " << *iter2 << ". removing " << inner <<std::endl;
-                        //use the new merged polygon as the comparison
-                        *iter1 = output[0];
-                        //std::cout << "result" << *iter1 << std::endl;
-                        //remove the polygon we just merged, this will increment iter2
-                        iter2 = bPolyList.erase(iter2);
-                        if(bPolyList.size() ==1)
-                        {
-                            iter2 = bPolyList.end();
-                        }
-                        inner++;
-                        //std::cout << "inner " << inner <<std::endl;
-                        //std::cout << "end iterator? " << (iter2 == bPolyList.end()) << std::endl;
-                        //std::cout << "vector size " << bPolyList.size() << std::endl;
-                        //std::cout << "iter2 " << *iter2 << std::endl;
-                    }
-                    else
-                    {
-                        //do nothing, but increment inner loop incrementer
-                        //std::cout << "incrementing inner loop because of merge\n";
-                        iter2++;
+                        //keep a list, but don't remove anything yet, because it might be needed for later merges this pass
+                        toRemove.push_back(indices.second);
                     }
                 }
                 else
                 {
-                    //std::cout << "incrementing inner loop because of distance\n";
-                    //do nothing, but increment inner loop incrementer
-                    iter2++;
+                    //something went wrong if we tried to merge two overlapping polygons and didn't get exactly 1 resulting polygon
+                    success = false;
+
                 }
+            
+//
+//                //if we have reached the end of the inner loop we can't merge the outer loop polygon any further
+//                std::cout << "adding outer loop result to merged output\n";
+//                //std::cout << "*iter1 " <<*iter1 << std::endl;
+//                //merged.push_back(*(--iter1));
+//                if(iter1 != bPolyList.end())
+//                {
+//                    //std::cout << "merged size: " << merged.size() << std::endl;
+//                    std::cout << "outer at end? " << (iter1 == bPolyList.end()) <<std::endl;
+//                    ++iter1;
+//                    outer++;
+//                    std::cout << "iterator updated\n";
+//                }
             }
-               
-            //if we have reached the end of the inner loop we can't merge the outer loop polygon any further
-            //std::cout << "adding outer loop result to merged output\n";
-            //std::cout << "*iter1 " <<*iter1 << std::endl;
-            merged.push_back(*(--iter1));
-            if(iter1 != bPolyList.end())
+            //remove all merged polygons at end of this pass
+            for (auto idx : toRemove)
             {
-            //std::cout << "merged size: " << merged.size() << std::endl;
-            //std::cout << "outer at end? " << (iter1 == bPolyList.end()) <<std::endl;
-                ++iter1;
-                outer++;
-                //std::cout << "iterator updated\n";
+                std::cout << "Removing " << idx << std::endl;
+                bPolyList.erase(bPolyList.begin() + idx);
             }
+            //check to see if there are still merges possible
+            overlapping = find_overlap(bPolyList);
+            std::cout << "List size: " << bPolyList.size() << std::endl;
+            std::cout << "Overlapping size: " << overlapping.size() << std::endl;
         }
         
         //std::cout << "merged size: " <<  merged.size() << std::endl;
         //std::cout << "merged" << merged[0] << std::endl;
         //convert merged boost polygons to VisiLibity polygons
-        for (auto &bPoly : merged)
+        for (auto &bPoly : bPolyList)
         {
-            //std::cout << "boost poly output: " << bPoly << std::endl;
-            //std::cout << "adding to output vector" << std::endl;
+            std::cout << "boost poly output: " << bPoly << std::endl;
+            std::cout << "adding to output vector" << std::endl;
             auto visPoly = to_visiLibity(bPoly);
             //std::cout  << "visPoly " << visPoly[0] << std::endl;
-            resultingPolygons.push_back(visPoly[0]);
+            //visPoly may include inner rings
+            for ( auto vPoly : visPoly)
+            {
+                resultingPolygons.push_back(vPoly);
+            }
         }
         return true;
     }
