@@ -309,7 +309,7 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
         //Read any messages ICAROUS has posted
         
         while(nread == max_message_length && !errno){
-            fprintf(stdout, "Read call made\n");
+            fprintf(stdout, "Read call made in icarousClientFd %lli\n", icarousClientFd);
             nread = read(icarousClientFd, messageBuffer, max_message_length);
             bytesReceived += nread;
         }
@@ -322,48 +322,141 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
         
         while(strlen(tempMessageBuffer)){
         
-            //Necessary variables
+            // Necessary variables
             char *fieldEnd;
-            char throwaway[400]; //used simply to fill necessary (but useless) arguments in function calls
+            char throwaway[400]; // Used simply to fill necessary (but useless) arguments in function calls
             int fieldLength;
             char *trackingHelper;
             
-            // SETMOD,type~,\n
-            // SETPOS,lat~,long~,alt~,\n
-            // SETVEL,u~,v~,w~,\n
-            // GOTOWP,id~,\n
-            
-            if(!strncmp(tempMessageBuffer, "SETMOD", 6)){ //waypoints (waypoint_t)
-                fprintf(stdout, "SETMOD message received!\n");
+            if(!strncmp(tempMessageBuffer, "SETMOD", 6)) // Set Mode (has ICAROUS taken over?)
+            {
+                // SETMOD,type~,\n
+                fprintf(stdout, "icarousClientFd %lli|SETMOD message received!\n", icarousClientFd);
                 
-                //The following section of code finds several fields by their tags.
-                //It's fairly difficult to follow, so here's a comment section explaining each line.            
+                // The following section of code finds several fields by their tags.
+                // It's fairly difficult to follow, so here's a comment section explaining each line.            
                 /* 1. strstr returns a pointer to the first occurence of our tag in the message
                  * 2. Use pointer arithmetic to skip past the tag
                  * 3. Find the end of the field (they're variable length) using the ',' delimiter
                  * 4. Get the length of the field via pointer arithmetic (end - beginning)
                  * 5. Convert the field to a usable number and store it into the message to be published to cFS
                  */
-                //Note: We tried to functionize this code. We spent 4 hours and had the strangest
-                //issue we've ever seen, with a passed-in pointer being invalid memory to access.
-                //Possible it was a unique issue.
+                // Note: We tried to functionize this code. We spent 4 hours and had the strangest
+                // issue we've ever seen, with a passed-in pointer being invalid memory to access.
+                // Possible it was a unique issue.
                 
-                //Total # of waypoints
+                // Mode type
                 trackingHelper            = strstr(tempMessageBuffer, "type");
-                trackingHelper           += 4; //skip past "type"
+                trackingHelper           += 4; // skip past "type"
                 fieldEnd                  = strchr(trackingHelper, ',');
                 fieldLength               = fieldEnd - trackingHelper;
                 int modeType     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
-                fprintf(stdout, "SETMOD|modeType|%i\n", modeType);
 
-                //possible sleep here??? (shouldn't need to UxAS)
+                fprintf(stdout, "%lli|SETMOD|modeType|%i\n", icarousClientFd, modeType);
 
-                //Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
                 tempMessageBuffer = fieldEnd;
                 tempMessageBuffer++;
-            }else{
+            }
+            else if(!strncmp(tempMessageBuffer, "SETPOS", 6))
+            {
+                // SETPOS,lat~,long~,alt~,\n
+                fprintf(stdout, "SETPOS message received in icarousClientFd %lli!\n", icarousClientFd);
+                
+                // Get latitude
+                trackingHelper            = strstr(tempMessageBuffer, "lat");
+                trackingHelper           += 3; //skip past "lat"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                float latitude     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+                // Get longitude
+                trackingHelper            = strstr(tempMessageBuffer, "long");
+                trackingHelper           += 4; //skip past "long"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                float longitude     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+                // Get altitude
+                trackingHelper            = strstr(tempMessageBuffer, "alt");
+                trackingHelper           += 3; //skip past "alt"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                float altitude     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+
+                fprintf(stdout, "%lli|SETMOD|latitude|%f\n", icarousClientFd, latitude);
+                fprintf(stdout, "%lli|SETMOD|longitude|%f\n", icarousClientFd, longitude);
+                fprintf(stdout, "%lli|SETMOD|altitude|%f\n", icarousClientFd, altitude);
+                
+
+                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
+            }
+            else if(!strncmp(tempMessageBuffer, "SETVEL", 6))
+            {
+                // SETVEL,u~,v~,w~,\n
+                fprintf(stdout, "SETVEL message received in icarousClientFd %lli!\n", icarousClientFd);
+                
+                // Get u
+                trackingHelper            = strstr(tempMessageBuffer, "u");
+                trackingHelper           += 1; //skip past "u"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                float u     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+                // Get v
+                trackingHelper            = strstr(tempMessageBuffer, "v");
+                trackingHelper           += 1; //skip past "v"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                float v     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+                // Get w
+                trackingHelper            = strstr(tempMessageBuffer, "w");
+                trackingHelper           += 1; //skip past "w"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                float w     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+                
+                fprintf(stdout, "%lli|SETVEL|u|%f\n", icarousClientFd, u);
+                fprintf(stdout, "%lli|SETVEL|v|%f\n", icarousClientFd, v);
+                fprintf(stdout, "%lli|SETVEL|w|%f\n", icarousClientFd, w);
+                
+                
+                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
+            }
+            else if(!strncmp(tempMessageBuffer, "GOTOWP", 6))
+            {
+                // GOTOWP,id~,\n
+                fprintf(stdout, "GOTOWP message received in icarousClientFd!\n", icarousClientFd);
+                
+                // Get id
+                trackingHelper            = strstr(tempMessageBuffer, "id");
+                trackingHelper           += 2; //skip past "id"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                int id     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                
+                
+                fprintf(stdout, "%lli|GOTOWP|id|%i\n", icarousClientFd, id);
+                
+                
+                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
+            }            
+            else
+            {
                 //fprintf(stderr,"Error, unknown message type!\n");
                 fieldEnd = strchr(tempMessageBuffer, '\n');
                 tempMessageBuffer = fieldEnd;
