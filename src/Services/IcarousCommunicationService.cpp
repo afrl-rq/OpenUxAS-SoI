@@ -62,7 +62,9 @@
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/GimbalAngleAction.h"
 #include "afrl/cmasi/LoiterAction.h"
+#include "afrl/cmasi/FlightDirectorAction.h"
 #include "uxas/messages/uxnative/IncrementWaypoint.h"
+
 
 // Convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
@@ -314,7 +316,60 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
         
         messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
         
-        fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
+        //fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
+        
+        char *tempMessageBuffer = messageBuffer;
+        
+        while(strlen(tempMessageBuffer)){
+        
+            //Necessary variables
+            char *fieldEnd;
+            char throwaway[400]; //used simply to fill necessary (but useless) arguments in function calls
+            int fieldLength;
+            char *trackingHelper;
+            
+            // SETMOD,type~,\n
+            // SETPOS,lat~,long~,alt~,\n
+            // SETVEL,u~,v~,w~,\n
+            // GOTOWP,id~,\n
+            
+            if(!strncmp(tempMessageBuffer, "SETMOD", 6)){ //waypoints (waypoint_t)
+                fprintf(stdout, "SETMOD message received!\n");
+                
+                //The following section of code finds several fields by their tags.
+                //It's fairly difficult to follow, so here's a comment section explaining each line.            
+                /* 1. strstr returns a pointer to the first occurence of our tag in the message
+                 * 2. Use pointer arithmetic to skip past the tag
+                 * 3. Find the end of the field (they're variable length) using the ',' delimiter
+                 * 4. Get the length of the field via pointer arithmetic (end - beginning)
+                 * 5. Convert the field to a usable number and store it into the message to be published to cFS
+                 */
+                //Note: We tried to functionize this code. We spent 4 hours and had the strangest
+                //issue we've ever seen, with a passed-in pointer being invalid memory to access.
+                //Possible it was a unique issue.
+                
+                //Total # of waypoints
+                trackingHelper            = strstr(tempMessageBuffer, "type");
+                trackingHelper           += 4; //skip past "type"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                int modeType     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+
+                fprintf(stdout, "SETMOD|modeType|%i\n", modeType);
+
+                //possible sleep here??? (shouldn't need to UxAS)
+
+                //Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
+            }else{
+                fprintf(stderr,"Error, unknown message type!\n");
+                //exit(EXIT_FAILURE);
+            }
+        }
+        
+        
     }
 }
 
