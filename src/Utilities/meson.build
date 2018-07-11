@@ -24,6 +24,7 @@ srcs_utilities = [
 incs_utilities = [
   include_directories(
     '../../src/Includes',
+    '../VisilibityLib',
   ),
   incs_lmcp,
 ]

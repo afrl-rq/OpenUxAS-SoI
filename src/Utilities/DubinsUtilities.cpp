@@ -17,7 +17,7 @@
 #include "DubinsUtilities.h"
 #include "Constants/Convert.h"
 #include <math.h>
-#include "../VisilibityLib/visilibity.h"
+#include "visilibity.h"
 #include "Constants/Constant_Strings.h"
 #include <float.h>
 
@@ -35,6 +35,7 @@ namespace uxas {
 
             void DubinsPath::calculateDubinsWaypoints() {
                 //calculate the Dubin's path
+                
                 //first translate the aircraft coordinates to standard coordinates
                 VisiLibity::Point startLocation = VisiLibity::Point(startDubinsConfiguration.getEastPosition(), startDubinsConfiguration.getNorthPosition());
                 double psi1 = wrapAngle(n_Const::c_Convert::dPiO2() - wrapAngle(startDubinsConfiguration.getHeading()));

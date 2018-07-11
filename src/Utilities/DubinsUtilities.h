@@ -15,7 +15,6 @@
  */
 
 #include <vector>
-#include "../VisilibityLib/visilibity.h"
 
 #ifndef DUBINSUTILITIES_H
 #define DUBINSUTILITIES_H
