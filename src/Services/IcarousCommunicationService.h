@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <memory>
+#include <errno.h>
 
 
 #define PORT 5557

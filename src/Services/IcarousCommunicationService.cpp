@@ -292,7 +292,7 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
     fprintf(stdout, "Child created for icarousClientFd: %lli\n", icarousClientFd);
     
     const int max_message_length = 87040;
-    char messageBuffer[10000000];
+    char messageBuffer[max_message_length + 1];
     
     // Listen to ICAROUS forever
     while(true){
@@ -305,11 +305,13 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
         
         //listen to each client socket
         //Read any messages ICAROUS has posted
+        
         while(nread == max_message_length && !errno){
-            //fprintf(stdout, "Read call made\n"); //Sanity check
+            fprintf(stdout, "Read call made\n");
             nread = read(icarousClientFd, messageBuffer, max_message_length);
             bytesReceived += nread;
         }
+        
         messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
         
         fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
@@ -476,7 +478,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             0.1,// TODO - actual vertical accuracy
             25,
             vehicleID);
-            
+
+        /*
         dprintf(1, "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
@@ -490,7 +493,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             0.1,// TODO - actual vertical accuracy
             25,
             vehicleID);
-
+        */
 
         // Send the attitude of the UAV (roll,pitch,yaw) every time it updates from AMASE
         dprintf(client_sockfd[vehicleID - 1], "ATTUD,roll%f,pitch%f,yaw%f,\n",
