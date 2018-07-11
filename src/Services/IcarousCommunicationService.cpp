@@ -437,7 +437,7 @@ bool IcarousCommunicationService::ICAROUS_listener(int64_t icarousClientFd)
             else if(!strncmp(tempMessageBuffer, "GOTOWP", 6))
             {
                 // GOTOWP,id~,\n
-                fprintf(stdout, "GOTOWP message received in icarousClientFd!\n", icarousClientFd);
+                fprintf(stdout, "GOTOWP message received in icarousClientFd %lli!\n", icarousClientFd);
                 
                 // Get id
                 trackingHelper            = strstr(tempMessageBuffer, "id");
