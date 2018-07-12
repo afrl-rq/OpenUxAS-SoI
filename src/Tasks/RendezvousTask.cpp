@@ -126,11 +126,11 @@ void RendezvousTask::updateStartTimes(std::shared_ptr<uxas::messages::task::Task
     
     if(!alreadyEncountered)
     {
-    m_taskStartTime[rID][vID] = implReq->getStartTime();
+        m_taskStartTime[rID][vID] = implReq->getStartTime();
         if(implReq->getTaskID() == m_task->getTaskID())
             m_taskEncountered[rID][vID] = true;
     }
-
+    
     // ensure that a corresponding assignment summary has previously been sent
     if(m_assignmentSummary.find(rID) == m_assignmentSummary.end()) return;
     
@@ -246,7 +246,7 @@ void RendezvousTask::buildTaskPlanOptions()
                 break;
             }
         }
-        }
+    }
 
     // must be consistent, otherwise return empty
     if(!isConsistent)
@@ -296,19 +296,19 @@ void RendezvousTask::buildTaskPlanOptions()
 
         compositionString = "+( ";
         do {
-        // technique: permute bitmask of 'involved' vehicles
-        // see https://rosettacode.org/wiki/Combinations#C.2B.2B
-        std::string bitmask(K, 1); // K leading 1's
-        bitmask.resize(N, 0);      // N-K trailing 0's
-        do {
-            compositionString += ".( ";
+            // technique: permute bitmask of 'involved' vehicles
+            // see https://rosettacode.org/wiki/Combinations#C.2B.2B
+            std::string bitmask(K, 1); // K leading 1's
+            bitmask.resize(N, 0);      // N-K trailing 0's
+            do {
+                compositionString += ".( ";
                 int k = 0;
                 for(int v=0; v<N; v++)
                     if(bitmask[v])
                         compositionString += "p" + std::to_string(optionMap[optionIndex.at(v)].at(korder.at(k++))) + " ";
-            compositionString += ") ";
-            t++;
-        } while (std::prev_permutation(bitmask.begin(), bitmask.end()) && t < T);
+                compositionString += ") ";
+                t++;
+            } while (std::prev_permutation(bitmask.begin(), bitmask.end()) && t < T);
         } while (std::next_permutation(korder.begin(), korder.end()) && t < T);
         compositionString += ") ";
     }
@@ -418,12 +418,32 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
 
     std::cout << "Extending route for " << taskImplementationResponse->getVehicleID() << " by amount (ms) " << extendTime_ms << std::endl;
     
-    // extend waypoints   TODO: not hard-coded
-    bool e = uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), extendTime_ms, 300.0, 200.0);
+    // determine turn radius of extension maneuver
+    double R = 300.0; // default for SUAS
+    auto entconfig = m_entityConfigurations.find(taskImplementationResponse->getVehicleID());
+    if(entconfig != m_entityConfigurations.end())
+    {
+        auto avconfig = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(entconfig->second);
+        if(avconfig)
+        {
+            // update loiter radius and lead-ahead distance based on configuration
+            double g = n_Const::c_Convert::dGravity_mps2();
+            // speed from waypoint
+            //double V = avconfig->getNominalSpeed();
+            double phi = fabs(avconfig->getNominalFlightProfile()->getMaxBankAngle());
+            if(phi < 1.0) phi = 1.0; // bounded away from 0
+            R = V*V/g/tan(phi*n_Const::c_Convert::dDegreesToRadians());
+            R = 1.2*R; // 20% buffer
+        }
+    }
+    
+    // extend waypoints
+    double minseg = 2.0*n_Const::c_Convert::dPi()*R/8.0; // approx circle by octogon
+    bool e = uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), extendTime_ms, R, minseg);
     if(!e)
     {
         std::cout << "  extension failed, trying full circle" << std::endl;
-        uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), 1000*2*3.1415*250/V+1000, 300.0, 200.0);
+        uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), 1000*minseg*8.0/V+1000, R, minseg);
     }
     return true;    
 }
