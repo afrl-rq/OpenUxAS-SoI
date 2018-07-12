@@ -37,7 +37,7 @@
 
 #define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "CMPS-CMPS-CMPS-CMPS:: CmasiPointSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
 #define CERR_FILE_LINE_MSG(MESSAGE) std::cerr << "CMPS-CMPS-CMPS-CMPS:: CmasiPointSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cerr.flush();
-
+#define STRING_XML_POINT_SEARCH_DISCRETIZATION_LEVEL "DiscretizationLevel"
 
 namespace uxas
 {
