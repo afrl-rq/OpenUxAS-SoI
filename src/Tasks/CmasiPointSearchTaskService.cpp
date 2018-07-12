@@ -75,6 +75,22 @@ CmasiPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
                 sstrErrors << "ERROR:: **c_Task_CmasiLineSearch::bConfigure failed to cast a PointSearchTask from the task pointer." << std::endl;
                 CERR_FILE_LINE_MSG(sstrErrors.str())
                 isSuccessful = false;
+            } else {
+                {
+                    //////////////////////////////////////////////
+                    //////////// PROCESS OPTIONS /////////////////
+                    pugi::xml_node ndTaskOptions = ndComponent.child(m_taskOptions_XmlTag.c_str());
+                    if (ndTaskOptions) {
+                        for(pugi::xml_node ndTaskOption = ndTaskOptions.first_child(); ndTaskOption; ndTaskOption = ndTaskOption.next_sibling())
+                        {
+                            if(std::string(STRING_XML_POINT_SEARCH_DISCRETIZATION_LEVEL) == ndTaskOption.name())
+                            {
+                                //get the value attribute of the discretizationlevel
+                                m_discretizationLevel = atoi(ndTaskOption.child_value());
+                            }
+                        }
+                    }
+                }
             }
         }
         else
@@ -147,7 +163,7 @@ void CmasiPointSearchTaskService::buildTaskPlanOptions()
         else
         {
             // no set wedge, so standoff from evenly spaced angles (number based on discretization level). Similar logic could be placed in wedge logic (evenlyish spaced headings checked in wedge)
-            wedgeDirectionIncrement = n_Const::c_Convert::dTwoPi() / m_pointSearchTask->getDiscretizationLevel();
+            wedgeDirectionIncrement = n_Const::c_Convert::dTwoPi() / m_discretizationLevel;
             double dHeadingCurrent_rad = 0.0; //start from true north
             double dHeadingTarget_rad = n_Const::c_Convert::dTwoPi() - wedgeDirectionIncrement; // the target (2pi - increment) so we dont double check angle 0.0
             while (n_Const::c_Convert::bCompareDouble(dHeadingTarget_rad, dHeadingCurrent_rad, n_Const::c_Convert::enGreaterEqual))
