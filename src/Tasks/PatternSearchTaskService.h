@@ -22,6 +22,7 @@
 #include "TaskServiceBase.h"
 #include "UnitConversions.h"
 #include "Dpss.h"    //from OHARA
+#include "SensorSteering.h"
 
 #include "uxas/messages/task/SensorFootprint.h"
 #include "uxas/messages/task/SensorFootprintRequests.h"
@@ -126,10 +127,10 @@ private:
     /** brief Copy assignment operation not permitted */
     void operator=(PatternSearchTaskService const&) = delete;
 
-    bool
-    configureTask(const pugi::xml_node& serviceXmlNode) override;
-    bool
-    processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
+    bool configureTask(const pugi::xml_node& serviceXmlNode) override;
+    bool processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
+    bool isProcessTaskImplementationRouteResponse(std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse, std::shared_ptr<TaskOptionClass>& taskOptionClass,
+                                                          int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route) override;
 
 
 public:
@@ -154,7 +155,7 @@ private:
     bool isCalculatePatternScanRoute_Sweep(std::shared_ptr<TaskOptionClass>& pTaskOptionClass,
                                            const std::unique_ptr<uxas::messages::task::SensorFootprint>& sensorFootprint,
                                            std::shared_ptr<uxas::messages::route::RoutePlanRequest>& routePlanRequest);
-
+    bool isAddDpssSteering(std::shared_ptr<TaskOptionClass>& pTaskOptionClass, std::vector<Dpss_Data_n::xyPoint>& vxyTrueRoadPoints, std::vector<Dpss_Data_n::xyPoint>& vxyWaypoints);
 private:
 
     struct s_SearchLeg
@@ -169,10 +170,19 @@ private:
 private:
     std::shared_ptr<afrl::impact::PatternSearchTask> m_patternSearchTask;
     std::shared_ptr<afrl::impact::PointOfInterest> m_pointOfInterest;
-    double m_waypointSpacing_m = {100.0};
+    double m_waypointSpacing_m = {50.0};
+    double m_spiralCenterRadius_m{200.0};
     bool m_isUseDpss = {false};
     std::unordered_multimap<int64_t, std::shared_ptr<Dpss> > m_optionIdVsDpss;
     std::shared_ptr<Dpss> m_activeDpss;
+
+    std::unordered_map<int64_t,std::shared_ptr<uxas::common::utilities::SensorSteeringSegments> > m_optionIdVsSensorSteeringSegments;
+    std::shared_ptr<uxas::common::utilities::SensorSteeringSegments> m_activeSensorSteeringSegments;
+    bool m_isVideoStreamActionSent{false};
+    
+    /*! \brief  local copy of flatearth to allow storage of north/east coordinates*/
+    uxas::common::utilities::FlatEarth m_flatEarth;
+
 
 public:
 
