@@ -467,7 +467,7 @@ void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::Entity
             rtime += t;
         rtime /= desiredTimes.size();
         // clamp to feasible window
-        rtime = std::max(mintime, std::min(maxtime, rtime));
+        rtime = (std::max)(mintime, (std::min)(maxtime, rtime));
     }
     
     if(entityState->getID() == m_entityId)
@@ -485,13 +485,13 @@ void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::Entity
     // if we're within one second of the target just coast at nominal,
     // as it's too late for fine adjustments
     if(rtime > 1000 && remainingDist > speedNom_mps)
-        desired_speed = std::max(speedInterval.first, std::min(speedInterval.second, remainingDist/(rtime/1000.0)));
+        desired_speed = (std::max)(speedInterval.first, (std::min)(speedInterval.second, remainingDist/(rtime/1000.0)));
     
     // desired speed will get to the target at the rendezvous time, assuming
     // nothing changes; but, would like to make progress towards nominal speed,
     // use proportional control to converge to nominal speed
     desired_speed += 2.0*(desired_speed - speedNom_mps);
-    desired_speed = std::max(speedInterval.first, std::min(speedInterval.second, desired_speed));
+    desired_speed = (std::max)(speedInterval.first, (std::min)(speedInterval.second, desired_speed));
     
     if(entityState->getID() == m_entityId)
         std::cout << "Commanding [" << m_entityId << "] to speed: " << desired_speed << " with current speed: " << entityState->getGroundspeed() << std::endl;
