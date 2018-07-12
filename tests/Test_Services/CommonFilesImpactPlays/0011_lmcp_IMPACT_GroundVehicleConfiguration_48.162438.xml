@@ -1,4 +1,4 @@
-<GroundVehicleConfiguration Series="IMPACT">
+<GroundVehicleConfiguration Series="VEHICLES">
   <RoadGraphID>31991985</RoadGraphID>
   <MinimumSpeed>0</MinimumSpeed>
   <MaximumSpeed>13.4099998474121</MaximumSpeed>
@@ -65,18 +65,6 @@
      <Parameters>
      </Parameters>
    </CameraConfiguration>
-   <ImpactPayloadConfiguration Series="IMPACT">
-     <AvailablePayloads>
-     <ImpactPayloadType>Taser</ImpactPayloadType>
-     <ImpactPayloadType>Track</ImpactPayloadType>
-     <ImpactPayloadType>Tag</ImpactPayloadType>
-     <ImpactPayloadType>SearchLight</ImpactPayloadType>
-     </AvailablePayloads>
-     <PayloadID>153</PayloadID>
-     <PayloadKind></PayloadKind>
-     <Parameters>
-     </Parameters>
-   </ImpactPayloadConfiguration>
    <RadioConfiguration Series="IMPACT">
      <Range>2500</Range>
      <RallyPoint>

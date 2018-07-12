@@ -1,4 +1,4 @@
-<GroundVehicleConfiguration Series="IMPACT">
+<GroundVehicleConfiguration Series="VEHICLES">
   <RoadGraphID>31991985</RoadGraphID>
   <MinimumSpeed>0</MinimumSpeed>
   <MaximumSpeed>6.69999980926514</MaximumSpeed>
@@ -65,21 +65,6 @@
      <Parameters>
      </Parameters>
    </CameraConfiguration>
-   <ImpactPayloadConfiguration Series="IMPACT">
-     <AvailablePayloads>
-     <ImpactPayloadType>M240B</ImpactPayloadType>
-     <ImpactPayloadType>Flashbang</ImpactPayloadType>
-     <ImpactPayloadType>TearGas</ImpactPayloadType>
-     <ImpactPayloadType>HeatBeam</ImpactPayloadType>
-     <ImpactPayloadType>Track</ImpactPayloadType>
-     <ImpactPayloadType>Megaphone</ImpactPayloadType>
-     <ImpactPayloadType>Siren</ImpactPayloadType>
-     </AvailablePayloads>
-     <PayloadID>143</PayloadID>
-     <PayloadKind></PayloadKind>
-     <Parameters>
-     </Parameters>
-   </ImpactPayloadConfiguration>
    <RadioConfiguration Series="IMPACT">
      <Range>2500</Range>
      <RallyPoint>

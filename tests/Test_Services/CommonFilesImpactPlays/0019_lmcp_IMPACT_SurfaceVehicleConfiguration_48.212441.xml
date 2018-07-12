@@ -1,4 +1,4 @@
-<SurfaceVehicleConfiguration Series="IMPACT">
+<SurfaceVehicleConfiguration Series="VEHICLES">
   <WaterArea>0</WaterArea>
   <MinimumSpeed>0</MinimumSpeed>
   <MaximumSpeed>25.5</MaximumSpeed>
@@ -67,17 +67,6 @@
      <Parameters>
      </Parameters>
    </CameraConfiguration>
-   <ImpactPayloadConfiguration Series="IMPACT">
-     <AvailablePayloads>
-     <ImpactPayloadType>Track</ImpactPayloadType>
-     <ImpactPayloadType>Tag</ImpactPayloadType>
-     <ImpactPayloadType>SearchLight</ImpactPayloadType>
-     </AvailablePayloads>
-     <PayloadID>193</PayloadID>
-     <PayloadKind></PayloadKind>
-     <Parameters>
-     </Parameters>
-   </ImpactPayloadConfiguration>
    <RadioConfiguration Series="IMPACT">
      <Range>6500</Range>
      <RallyPoint>

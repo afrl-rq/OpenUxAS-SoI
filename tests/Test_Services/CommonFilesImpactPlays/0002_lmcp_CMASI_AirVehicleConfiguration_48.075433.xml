@@ -112,18 +112,6 @@
      <Parameters>
      </Parameters>
    </GimbalConfiguration>
-   <ImpactPayloadConfiguration Series="IMPACT">
-     <AvailablePayloads>
-     <ImpactPayloadType>SEGM</ImpactPayloadType>
-     <ImpactPayloadType>CommRelay</ImpactPayloadType>
-     <ImpactPayloadType>GMTI</ImpactPayloadType>
-     <ImpactPayloadType>Track</ImpactPayloadType>
-     </AvailablePayloads>
-     <PayloadID>104</PayloadID>
-     <PayloadKind></PayloadKind>
-     <Parameters>
-     </Parameters>
-   </ImpactPayloadConfiguration>
    <RadioConfiguration Series="IMPACT">
      <Range>10000</Range>
      <RallyPoint>
