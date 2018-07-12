@@ -39,7 +39,13 @@ StatusReportService::s_registrar(StatusReportService::s_registryServiceTypeNames
 
 // service constructor
 StatusReportService::StatusReportService()
-: ServiceBase(StatusReportService::s_typeName(), StatusReportService::s_directoryName()) { };
+: ServiceBase(StatusReportService::s_typeName(), StatusReportService::s_directoryName())
+{
+    m_report.setValidState(false);
+    m_report.setValidAuthorization(false);
+    m_report.setSpeedAuthorization(false);
+    m_report.setGimbalAuthorization(false);
+};
 
 // service destructor
 StatusReportService::~StatusReportService()
@@ -121,8 +127,6 @@ bool StatusReportService::initialize()
 
 bool StatusReportService::start()
 {
-    // start periodic reporting timer
-    uxas::common::TimerManager::getInstance().startPeriodicTimer(m_reportTimerId, m_reportPeriod_ms, m_reportPeriod_ms);
     return (true);
 }
 
@@ -137,8 +141,15 @@ bool StatusReportService::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
         m_report.setVehicleTime(entityState->getTime());
         m_report.getCurrentTaskList() = entityState->getAssociatedTasks();
         m_report.setValidState(true);
+        
         // reset timer to detect stale state (fresh now, timeout indicates stale)
         uxas::common::TimerManager::getInstance().startSingleShotTimer(m_staleStateTimerId, m_staleStateTime_ms);
+        
+        if(!uxas::common::TimerManager::getInstance().isTimerActive(m_reportTimerId))
+        {
+            // start periodic reporting timer
+            uxas::common::TimerManager::getInstance().startPeriodicTimer(m_reportTimerId, m_reportPeriod_ms, m_reportPeriod_ms);
+        }
     }
     else if(uxas::messages::uxnative::isEntityJoin(receivedLmcpMessage->m_object))
     {

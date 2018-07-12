@@ -114,7 +114,22 @@ void RendezvousTask::updateStartTimes(std::shared_ptr<uxas::messages::task::Task
     // Update this vehicles' start time
     int64_t rID = implReq->getCorrespondingAutomationRequestID();
     int64_t vID = implReq->getVehicleID();
+    
+    bool alreadyEncountered = false;
+    auto checkEncountered = m_taskEncountered.find(rID);
+    if(checkEncountered != m_taskEncountered.end())
+    {
+        auto checkVehicleEncountered = checkEncountered->second.find(vID);
+        if(checkVehicleEncountered != checkEncountered->second.end())
+            alreadyEncountered = checkVehicleEncountered->second;
+    }
+    
+    if(!alreadyEncountered)
+    {
     m_taskStartTime[rID][vID] = implReq->getStartTime();
+        if(implReq->getTaskID() == m_task->getTaskID())
+            m_taskEncountered[rID][vID] = true;
+    }
 
     // ensure that a corresponding assignment summary has previously been sent
     if(m_assignmentSummary.find(rID) == m_assignmentSummary.end()) return;
@@ -134,7 +149,15 @@ void RendezvousTask::updateStartTimes(std::shared_ptr<uxas::messages::task::Task
     // that task implementation proceeds in order of assignment
     int64_t rID = implResp->getCorrespondingAutomationRequestID();
     int64_t vID = implResp->getVehicleID();
-    if(implResp->getTaskID() != m_task->getTaskID())
+    bool alreadyEncountered = false;
+    auto checkEncountered = m_taskEncountered.find(rID);
+    if(checkEncountered != m_taskEncountered.end())
+    {
+        auto checkVehicleEncountered = checkEncountered->second.find(vID);
+        if(checkVehicleEncountered != checkEncountered->second.end())
+            alreadyEncountered = checkVehicleEncountered->second;
+    }
+    if(implResp->getTaskID() != m_task->getTaskID() && !alreadyEncountered)
         m_taskStartTime[rID][vID] = implResp->getFinalTime();
 }
 
@@ -152,8 +175,8 @@ void RendezvousTask::buildTaskPlanOptions()
     // location and orientation of the rendezvous - extensions to routes
     // to meet timing synchronization will be handled after assignment
     // during the implementation phase
-    for (auto itEligibleEntities = m_speedAltitudeVsEligibleEntityIds.begin();
-            itEligibleEntities != m_speedAltitudeVsEligibleEntityIds.end();
+    for (auto itEligibleEntities = m_speedAltitudeVsEligibleEntityIdsRequested.begin();
+            itEligibleEntities != m_speedAltitudeVsEligibleEntityIdsRequested.end();
             itEligibleEntities++)
     {
         for (auto v : itEligibleEntities->second)
@@ -205,30 +228,48 @@ void RendezvousTask::buildTaskPlanOptions()
         }
     }
     
-    // build options for each vehicle
-    std::vector< std::string > vehicleOptionStr;
+    // check for self-consistency:
+    //   a. all vehicles have a single option -OR-
+    //   b. all vehicles have the same number of options AND
+    //      that number is equal to the desired number of participants
+    size_t rStateSize = 1;
+    bool isConsistent = true;
     for(auto vID : optionMap)
     {
-        std::string voptions = "";
-        if(vID.second.size() > 1) voptions += "+( ";
-        for(auto oID : vID.second)
+        if(rStateSize != vID.second.size())
         {
-            voptions += "p";
-            voptions += std::to_string(oID);
-            voptions += " ";
+            if(rStateSize == 1 && vID.second.size() == rtask->getNumberOfParticipants())
+                rStateSize = vID.second.size();
+            else
+            {
+                isConsistent = false;
+                break;
+            }
         }
-        if(vID.second.size() > 1) voptions += ") ";
-        vehicleOptionStr.push_back(voptions);
+        }
+
+    // must be consistent, otherwise return empty
+    if(!isConsistent)
+    {
+        for(auto option : m_taskPlanOptions->getOptions())
+            if(option) delete option;
+        m_taskPlanOptions->getOptions().clear();
+        m_taskPlanOptions->setComposition("");
+        sendSharedLmcpObjectBroadcastMessage(m_taskPlanOptions);
+        return;
     }
+    
+    // check for special case of direct assignment
+    bool isSimpleAssignment = (rStateSize == 1) && (rtask->getNumberOfParticipants() == optionMap.size());
     
     // format composition string to ensure proper groups of vehicles are considered
     std::string compositionString;
-    if(rtask->getNumberOfParticipants() >= optionMap.size())
+    if(isSimpleAssignment)
     {
         // all vehicles are involved, simply iterate through each
         compositionString = ".( ";
-        for(auto vs : vehicleOptionStr)
-            compositionString += vs;
+        for(auto vID : optionMap)
+            compositionString += "p" + std::to_string(vID.second.front()) + " ";
         compositionString += ")";
     }
     else
@@ -238,25 +279,37 @@ void RendezvousTask::buildTaskPlanOptions()
         // note: for repeatability, deterministically list through combinations
         // even though random choices may lead to better performance when
         // limiting the number of combinations considered
-        uint8_t N = vehicleOptionStr.size();          // available vehicles
+        uint8_t N = optionMap.size();                 // available vehicles
         uint8_t K = rtask->getNumberOfParticipants(); // desired set size
         uint8_t T = 64; // max limit of returned combinations
         uint8_t t = 0;  // current number of combinations
         
+        // re-map from vehicle id to optionMap index
+        std::unordered_map<uint8_t, int64_t> optionIndex;
+        uint8_t idx = 0;
+        for(auto vID : optionMap)
+            optionIndex[idx++] = vID.first;
+        
+        std::vector<int> korder(K,0);
+        for(int k=1; k<K; k++)
+            korder[k] = k;
+
+        compositionString = "+( ";
+        do {
         // technique: permute bitmask of 'involved' vehicles
         // see https://rosettacode.org/wiki/Combinations#C.2B.2B
         std::string bitmask(K, 1); // K leading 1's
         bitmask.resize(N, 0);      // N-K trailing 0's
-
-        compositionString = "+( ";
         do {
             compositionString += ".( ";
-            for(int i=0; i < N; i++)
-                if(bitmask[i])
-                    compositionString += vehicleOptionStr[i];
+                int k = 0;
+                for(int v=0; v<N; v++)
+                    if(bitmask[v])
+                        compositionString += "p" + std::to_string(optionMap[optionIndex.at(v)].at(korder.at(k++))) + " ";
             compositionString += ") ";
             t++;
         } while (std::prev_permutation(bitmask.begin(), bitmask.end()) && t < T);
+        } while (std::next_permutation(korder.begin(), korder.end()) && t < T);
         compositionString += ") ";
     }
     
@@ -365,12 +418,12 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
 
     std::cout << "Extending route for " << taskImplementationResponse->getVehicleID() << " by amount (ms) " << extendTime_ms << std::endl;
     
-    // extend waypoints, hard-coded to 280m radius, 200m minimum segment size
-    bool e = uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), extendTime_ms, 200.0, 150.0);
+    // extend waypoints   TODO: not hard-coded
+    bool e = uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), extendTime_ms, 300.0, 200.0);
     if(!e)
     {
         std::cout << "  extension failed, trying full circle" << std::endl;
-        uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), 1000*2*3.1415*200/V+1000, 200.0, 150.0);
+        uxas::common::utilities::RouteExtension::ExtendPath(taskImplementationResponse->getTaskWaypoints(), 1000*2*3.1415*250/V+1000, 300.0, 200.0);
     }
     return true;    
 }
@@ -449,7 +502,7 @@ void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::Entity
     }
     
     // if no feasible window, just get as close to center of 'infeasible' area
-    int64_t rtime = (mintime - maxtime)/2;
+    int64_t rtime = (mintime - maxtime)/2 + mintime;
     if(mintime <= maxtime)
     {
         // there is a feasible window, so optimize rendezvous time to be

@@ -75,7 +75,7 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
     {
         try
         {
-            boost::mutex::scoped_lock lock(m_data_guard);
+            std::lock_guard<std::mutex> lock(m_data_guard);
             
             // ZMQ_STREAM sockets always return two frames, the first identifying the sender
             // (see http://api.zeromq.org/4-1:zmq-socket)
@@ -224,7 +224,7 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::sendAddressedAttributedMessag
     static uint8_t serverid[256];
     static size_t serveridsize{256};
 
-    boost::mutex::scoped_lock lock(m_data_guard);
+    std::lock_guard<std::mutex> lock(m_data_guard);
     if (m_zmqSocket)
     {
         std::string sentinelStr = uxas::common::SentinelSerialBuffer::createSentinelizedString(message->getString());

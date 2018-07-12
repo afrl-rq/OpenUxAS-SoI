@@ -12,11 +12,11 @@
 
 #include <deque>
 #include <vector>
+#include <mutex>
 #include "czmq.h"
 #include "ZeroMqReceiverBase.h"
 #include "AddressedAttributedMessage.h"
 #include "UxAS_SentinelSerialBuffer.h"
-#include <boost/thread/mutex.hpp>
 
 namespace uxas
 {
@@ -82,7 +82,7 @@ private:
     std::vector< zframe_t* > m_clients;
     
     // guard for accessing m_clients to carefully manage memory of zframes
-    boost::mutex m_data_guard;
+    std::mutex m_data_guard;
 
 };
 

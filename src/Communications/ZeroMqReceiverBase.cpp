@@ -47,7 +47,15 @@ ZeroMqReceiverBase::initialize(uint32_t entityId, uint32_t serviceId, SocketConf
     m_serviceIdString = std::to_string(serviceId);
 
     m_zeroMqSocketConfiguration = static_cast<ZeroMqSocketConfiguration&> (zeroMqSocketConfiguration);
-    m_zmqSocket = ZeroMqFabric::getInstance().createSocket(m_zeroMqSocketConfiguration);
+    try
+    {
+        m_zmqSocket = ZeroMqFabric::getInstance().createSocket(m_zeroMqSocketConfiguration);
+    }
+    catch (std::exception& ex)
+    {
+        UXAS_LOG_ERROR("ZeroMqReceiverBase::initialize, create socket EXCEPTION: ", ex.what());
+        m_zmqSocket = nullptr;
+    }
 };
 
 bool

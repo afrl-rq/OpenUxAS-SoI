@@ -54,7 +54,6 @@ lib_uxas_communications = static_library(
   ],
   cpp_args: cpp_args_comms,
   dependencies: [
-    dep_boost,
     dep_czmq,
     dep_cppzmq,
     dep_pugixml,

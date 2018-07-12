@@ -253,6 +253,11 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
         isSuccess = false;
         UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::EntityID(), " key/value pair in the Zyre header map");
     }
+    else if(std::stoull(entityIdKvPairIt->second) == m_entityId)
+    {
+        isSuccess = false;
+        UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler self entity ID tried to join [", m_entityId, "]");
+    }
     
     auto entityTypeKvPairIt = headerKeyValuePairs.find(uxas::common::StringConstant::EntityType());
     if (entityTypeKvPairIt == headerKeyValuePairs.end())
@@ -320,7 +325,7 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
     // broadcast entity join message
     UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler broadcasting EntityJoin for type [", entityTypeKvPairIt->second, "] ID [", entityIdKvPairIt->second, "]");
     std::unique_ptr<uxas::messages::uxnative::EntityJoin> entityJoin = uxas::stduxas::make_unique<uxas::messages::uxnative::EntityJoin>();
-    entityJoin->setEntityID(std::stoi(entityIdKvPairIt->second));
+    entityJoin->setEntityID(std::stoull(entityIdKvPairIt->second));
     entityJoin->setLabel(entityTypeKvPairIt->second);
     sendLmcpObjectBroadcastMessage(std::move(entityJoin));
 
