@@ -46,11 +46,15 @@
 #include <unistd.h>
 #include <memory>
 #include <errno.h>
-
+#include <cmath>
+#include <math.h>
+#include <thread>
 
 #define PORT 5557
 
 #define STRING_XML_ICAROUS_CONNECTIONS "NumberOfUAVs"
+
+#define M_PI 3.14159265358979323846
 
 namespace uxas
 {
@@ -113,7 +117,7 @@ public:
     bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand);
 
     /** brief Listen to ICAROUS clients for commands*/
-    bool ICAROUS_listener(int64_t icarousClientFd);
+    void ICAROUS_listener(int id);
 
     virtual
     ~IcarousCommunicationService();
@@ -145,14 +149,24 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
 private:
-    pid_t readIcarousID;
-    
+    std::vector<std::thread> icarousID;
+
+    std::vector<std::vector<afrl::cmasi::Waypoint>> icarousClientWaypointLists;
+
+    std::vector<std::vector<int64_t>> entityTasks;
+
+    std::vector<bool> icarousTakeoverActive;
+
+    // Dimention 1: ICAROUS instance
+    // Dimention 2: Heading | Lat | Long | Alt
+    std::vector<std::vector<float>> currentInformation;
+
     //Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};
-    
+
     //This is the number of ICAROUS clients that are permitted
     std::vector<int> client_sockfd;
-    
+
     //This is an array keeping track of which ICAROUS instances have gotten vehicle waypoint information
     std::vector<bool> has_gotten_waypoints;
 };
