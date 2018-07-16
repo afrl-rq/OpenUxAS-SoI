@@ -20,8 +20,13 @@
 #include "larcfm/DAIDALUS/DAIDALUSConfiguration.h"
 #include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
 #include "DAIDALUS_WCV_Response.h"
-
+//#include "stdUniquePtr.h"
+#include "afrl/cmasi/MissionCommand.h"
+#include "afrl/cmasi/AutomationResponse.h"
+#include "afrl/cmasi/AirVehicleState.h"
+#include <algorithm>
 #include <cmath>
+#include <memory>
 #include <vector>
 #include <iostream>     // std::cout, cerr, etc
 
@@ -53,6 +58,9 @@ bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
 
  
     // subscribe to messages::
+    addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
+    addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
+    addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(larcfm::DAIDALUS::WellClearViolationIntervals::Subscription);
     addSubscriptionAddress(larcfm::DAIDALUS::DAIDALUSConfiguration::Subscription);
 
@@ -83,6 +91,45 @@ bool DAIDALUS_WCV_Response::terminate()
 
 bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
+    if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object))
+    {
+        std::shared_ptr<afrl::cmasi::AutomationResponse> pAutoResponse = 
+                std::static_pointer_cast<afrl::cmasi::AutomationResponse>(receivedLmcpMessage->m_object);
+        for (uint32_t i = 0; i < pAutoResponse->getMissionCommandList().size(); i++)
+        {
+            if (pAutoResponse->getMissionCommandList()[i]->getVehicleID() == m_entityId)
+            {
+                m_MissionCommand = std::make_shared<afrl::cmasi::MissionCommand>(*(pAutoResponse->getMissionCommandList()[i]->clone()));    //why doesn't this cause memory leaks from not getting cleaned up?
+                break;
+            }
+        }
+        //m_MissionCommand = pAutoResponse->getMissionCommandList()[it_MyMissionCommand];
+        //auto it_AutomationResponse = std::find_if(pAutoResponse->getMissionCommandList().cbegin(), pAutoResponse->getMissionCommandList().cend(), 
+         //       [&] (const afrl::cmasi::MissionCommand* pMission){ return pMission->getVehicleID() == m_entityId; } );
+                
+                
+        m_isReadyToActMissionCommand = true;
+    }
+    else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
+    {
+        std::shared_ptr<afrl::cmasi::MissionCommand> pMissionCommand = 
+                std::static_pointer_cast<afrl::cmasi::MissionCommand>(receivedLmcpMessage->m_object);
+        if (pMissionCommand->getVehicleID() == m_entityId)
+        {
+            m_MissionCommand = std::make_shared<afrl::cmasi::MissionCommand>(*(pMissionCommand->clone()));  //why doesn't this cause memory leaks from not getting cleaned up?
+        }
+        m_isReadyToActMissionCommand = true;
+    }
+    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
+    {
+        std::shared_ptr<afrl::cmasi::AirVehicleState> pAirVehicleState = 
+                std::static_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
+        if (!m_isTakenAction)
+        {
+            m_NextWaypoint = pAirVehicleState->getCurrentWaypoint();
+        }
+        m_isReadyToActWaypoint = true;
+    }
     if (larcfm::DAIDALUS::isDAIDALUSConfiguration(receivedLmcpMessage->m_object))
     {
         std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> configuration = 
@@ -91,19 +138,23 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         m_vertical_rate_mps = configuration->getVerticalRate();
         m_horizontal_accel_mpsps = configuration->getHorizontalAcceleration();
         m_vertical_accel_mpsps = configuration->getVerticalAcceleration();
-        m_isReadyToAct = true;  //boolean to determine when ready to act; determined by having a threshold time set.
+        m_isReadyToActConfiguration = true;  //boolean indicating if a threshold time is set from reading a DAIDALUS configuration parameter.
     }
     if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
     {
-        std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> WCVIntervals = 
+        if (m_isReadyToActWaypoint && m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
+        {
+            m_isReadyToAct = true;  //boolean to determine when ready to act; by having a threshold time set, a desired waypoint, and a missioncommand waypoint list
+        }
+        std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> pWCVIntervals = 
                 std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
         if (m_isReadyToAct)
         {
-            for (size_t i = 0; i < WCVIntervals->getEntityList().size(); i++)
+            for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
             {
-                if (WCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
+                if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
                 {
-                    m_ConflictResolutionList.push_back(WCVIntervals->getEntityList()[i]);
+                    m_ConflictResolutionList.push_back(pWCVIntervals->getEntityList()[i]);
                 }
             }
             if (!m_isConflict && m_ConflictResolutionList.size() > 0)
@@ -112,6 +163,8 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             }
             if (m_isConflict)
             {
+                //Get conflict bands
+                
                 uint32_t RoW = m_entityId;
                 // determine the vehicle that has the Right of Way
                 for (int i : m_ConflictResolutionList)
@@ -131,6 +184,8 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 {
                     if (!m_isTakenAction)
                     {
+                        //TODO: Determine recommended action from DAIDALUS
+                        //TODO: set action response to aforementioned recommended action
                         //TODO: send vehicle action command
                         m_isTakenAction = true;
                     }

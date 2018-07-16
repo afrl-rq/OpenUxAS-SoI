@@ -21,7 +21,10 @@
 
 #include "Constants/Convert.h"
 #include "ServiceBase.h"
+#include "afrl/cmasi/Waypoint.h"
+#include "afrl/cmasi/MissionCommand.h"
 
+#include <memory>
 #include <vector>
 namespace uxas
 {
@@ -120,13 +123,18 @@ public:
 
 private:
     bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
-    bool m_isReadyToAct {false};    //boolean stating whether or not service has received configuration parameters in order to process violation messages
+    bool m_isReadyToAct {false};    //boolean stating whether or not service has all necessary prerequisites in order to react to an imminent collision.
     bool m_isTakenAction {false};   //boolean stating whether or not the service has issued a vehicle action command to the ownship.
+    bool m_isReadyToActWaypoint {false};    //boolean stating whether or not the service has received a waypoint designating the goal location
+    bool m_isReadyToActMissionCommand {false};  //boolean stating whether or not the service has received a mission command that lists all waypoints.
+    bool m_isReadyToActConfiguration {false};  //boolean stating whether or not service has received configuration parameters in order to process violation messages
     double m_action_time_threshold_s;   // time threshold to determine taking action
     double m_vertical_rate_mps; //DAIDALUS configuration vertical rate used for estimation of time to perform altitude maneuver
     double m_turn_rate_degps;   //DAIDALUS configuration turn rate used for estimation of time to perform heading/track maneuver
     double m_horizontal_accel_mpsps;    //DAIDALUS configuration horizontal acceleration used for estimation of time to perform a horizontal speed maneuver
     double m_vertical_accel_mpsps;  //DAIDALUS configuration vertical 
+    int64_t  m_NextWaypoint;// {nullptr};
+    std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand;// {nullptr};
     std::vector<int64_t> m_ConflictResolutionList;
     bool SetisConflict(bool& val);
     bool GetisConflict();
