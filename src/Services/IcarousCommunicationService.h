@@ -49,6 +49,7 @@
 #include <cmath>
 #include <math.h>
 #include <thread>
+#include <mutex>
 
 #define PORT 5557
 
@@ -148,7 +149,7 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-private:
+private:    
     std::vector<std::thread> icarousID;
 
     std::vector<std::vector<afrl::cmasi::Waypoint>> icarousClientWaypointLists;
@@ -160,6 +161,8 @@ private:
     // Dimention 1: ICAROUS instance
     // Dimention 2: Heading | Lat | Long | Alt
     std::vector<std::vector<float>> currentInformation;
+    // One mutex for each ICAROUS instance
+    std::mutex *currentInformationMutexes;
 
     //Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};

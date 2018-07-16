@@ -150,7 +150,7 @@ bool IcarousCommunicationService::initialize()
     std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
 
 
-    //Set both vectors to the Number of UAVs specified in the XML
+    // Set both vectors to the Number of UAVs specified in the XML
     client_sockfd.resize(ICAROUS_CONNECTIONS);
     has_gotten_waypoints.resize(ICAROUS_CONNECTIONS);
     icarousClientWaypointLists.resize(ICAROUS_CONNECTIONS);
@@ -158,12 +158,16 @@ bool IcarousCommunicationService::initialize()
     icarousTakeoverActive.resize(ICAROUS_CONNECTIONS);
     currentInformation.resize(ICAROUS_CONNECTIONS);
     icarousID.resize(ICAROUS_CONNECTIONS);
-    
+
+    // Mutexes must be set like this and not in a vector
+    // This is because a vector of mutexes is non-resizable
+    currentInformationMutexes = new std::mutex[ICAROUS_CONNECTIONS];
+
     for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
     {
         currentInformation[i].resize(4); // This is to set the size of heading, lat, long, and alt for each instance
     }
-    
+
     // Initialize has_gotten_waypoints[] to the number of UAVs that is planned on being used
     has_gotten_waypoints.assign(ICAROUS_CONNECTIONS,false);    
     icarousTakeoverActive.assign(ICAROUS_CONNECTIONS, false);
@@ -425,20 +429,20 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 fprintf(stdout, "%lli|SETPOS|longitude|%f\n", icarousClientFd, longitude);
                 fprintf(stdout, "%lli|SETPOS|altitude|%f\n", icarousClientFd, altitude);
 
-                
+
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
-                
+
                 auto loiterAction = new afrl::cmasi::LoiterAction;
                 auto location3d = new afrl::cmasi::Location3D;
                 location3d->setLatitude(latitude);
                 location3d->setLongitude(longitude);
                 location3d->setAltitude(altitude);
                 loiterAction->setLocation(location3d);
-                
+
                 vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
-                
+
 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
@@ -486,9 +490,11 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     fprintf(stdout, "Start of LoiterAction construction\n");
                     auto loiterAction =  new afrl::cmasi::LoiterAction;
                     auto location3d = new afrl::cmasi::Location3D;
+                    currentInformationMutexes[instanceIndex].lock();
                     location3d->setLatitude(currentInformation[instanceIndex][1]);
                     location3d->setLongitude(currentInformation[instanceIndex][2]);
                     location3d->setAltitude((w / 2) + currentInformation[instanceIndex][3]);
+                    currentInformationMutexes[instanceIndex].unlock();
                     loiterAction->setLocation(location3d);
                     
                     vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
@@ -522,6 +528,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     {
                         deltaHeading = atan(v / u) * (180 / M_PI);
                     }
+                    currentInformationMutexes[instanceIndex].lock();
                     fprintf(stdout, "Setting Heading | Current Heading: %f\n", currentInformation[instanceIndex][0]);
                     float newHeading = fmod((currentInformation[instanceIndex][0] + deltaHeading), 360);
                     if(newHeading > 180) // If the new heading is past 180, make it within -180 and 0
@@ -531,6 +538,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     flightDirectorAction->setHeading(newHeading);
                     fprintf(stdout, "Heading Set | Current Altitude: %f | Setting Altitude\n", currentInformation[instanceIndex][3]);
                     flightDirectorAction->setAltitude((w / 2) + currentInformation[instanceIndex][3]);
+                    currentInformationMutexes[instanceIndex].unlock();
                     fprintf(stdout, "Altitude Set | Adding to VehicleActionCommand\n");
                     
                     vehicleActionCommand->getVehicleActionList().push_back(flightDirectorAction);
@@ -773,9 +781,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         if(icarousTakeoverActive[vehicleID - 1] == false){
             entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
         }
-        
-        
-        // TODO - lock mutex here
+
+
+        currentInformationMutexes[vehicleID - 1].lock();
         fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
             vehicleID,
             ptr_AirVehicleState->getHeading(),
@@ -791,8 +799,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         currentInformation[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
         currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
         currentInformation[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
-        // TODO - unlock mutex here
-        
+        currentInformationMutexes[vehicleID - 1].unlock();
+
+
         dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
