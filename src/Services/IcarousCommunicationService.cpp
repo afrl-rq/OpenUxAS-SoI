@@ -761,9 +761,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             }
             
             //Send a message to ICAROUS telling it to start the mission
-            dprintf(client_sockfd[i], "COMND,type%s,id%lld.0,\n",
-            "GEOFN_SEND",
-            ptr_Zone->getZoneID());
+            dprintf(client_sockfd[i], "COMND,type%s,\n",//,id%lld.0,\n",
+            "GEOFN_SEND");//,
+            //ptr_Zone->getZoneID());
         }
     }// End of KeepOutZone Check
     // Process an AirVehicleState from OpenAMASE
