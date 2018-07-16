@@ -330,7 +330,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
         
         messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
         
-        //fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
+        fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
         
         char *tempMessageBuffer = messageBuffer;
         
@@ -598,8 +598,6 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 //exit(EXIT_FAILURE);
             }
         }
-        
-        
     }
 }
 
@@ -763,8 +761,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             }
             
             //Send a message to ICAROUS telling it to start the mission
-            dprintf(client_sockfd[i], "COMND,type%s,\n",
-            "GEOFN_SEND");
+            dprintf(client_sockfd[i], "COMND,type%s,id%f,\n",
+            "GEOFN_SEND",
+            ptr_Zone->getZoneID());
         }
     }// End of KeepOutZone Check
     // Process an AirVehicleState from OpenAMASE
@@ -784,6 +783,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
 
 
         currentInformationMutexes[vehicleID - 1].lock();
+        /*
         fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
             vehicleID,
             ptr_AirVehicleState->getHeading(),
@@ -794,7 +794,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             currentInformation[vehicleID - 1][1],
             currentInformation[vehicleID - 1][2],
             currentInformation[vehicleID - 1][3]);
-
+        */
         currentInformation[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
         currentInformation[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
         currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
