@@ -153,6 +153,9 @@ private:
     std::vector<std::thread> icarousID;
 
     std::vector<std::vector<afrl::cmasi::Waypoint>> icarousClientWaypointLists;
+    std::vector<int> currentWaypointIndex;
+    std::vector<int> lastWaypoint;
+    std::vector<bool> isLastWaypointInitialized;
 
     std::vector<std::vector<int64_t>> entityTasks;
 
