@@ -376,7 +376,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 fprintf(stdout, "%lli|SETMOD|modeType|%s\n", icarousClientFd, modeType);
 
 
-                if(!strcmp(modeType, "_ACTIVE_")) // ICAROUS has taken over, pause all tasks
+                if(!strncmp(modeType, "_ACTIVE_", strlen("_ACTIVE_"))) // ICAROUS has taken over, pause all tasks
                 {
                     fprintf(stderr, "UAV %i's last waypoint saved as: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
                     icarousTakeoverActive[instanceIndex] = true;
@@ -388,7 +388,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                         sendSharedLmcpObjectBroadcastMessage(pauseTask);
                     }
                 }
-                else if(!strcmp(modeType, "_PASSIVE_")) // ICAROUS has handed back control, resume all tasks
+                else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks
                 {
                     fprintf(stderr, "Sending UAV %i to its last waypoint: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
@@ -860,7 +860,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         double uEast;
         double vEast;
         // TODO - May need to fiddle with this to be correct (Not sure if implemented positive up or down in ICAROUS)
-        double wDown = ptr_AirVehicleState->getW() * -1;
+        double wDown = ptr_AirVehicleState->getW();
         
         
         uNorth = (1 - ((fmod(uHeading, 90.0)) / 90)) * ptr_AirVehicleState->getU();
