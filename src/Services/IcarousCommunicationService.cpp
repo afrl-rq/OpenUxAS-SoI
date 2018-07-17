@@ -378,14 +378,15 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
 
                 if(!strcmp(modeType, "_ACTIVE_")) // ICAROUS has taken over, pause all tasks
                 {
+                    fprintf(stderr, "UAV %i's last waypoint saved as: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
                     icarousTakeoverActive[instanceIndex] = true;
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
+                        fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
                         auto pauseTask = std::make_shared<uxas::messages::task::TaskPause>();
                         pauseTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
                         sendSharedLmcpObjectBroadcastMessage(pauseTask);
                     }
-                    
                 }
                 else if(!strcmp(modeType, "_PASSIVE_")) // ICAROUS has handed back control, resume all tasks
                 {
@@ -408,8 +409,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     vehicleActionCommand->getVehicleActionList().push_back(goToWaypointAction);
                     sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
                 }
-
-
+                
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
                 tempMessageBuffer = fieldEnd;
@@ -615,6 +615,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 //exit(EXIT_FAILURE);
             }
         }
+        
+        fprintf(stderr, "About to read again\n");
     }
 }
 
@@ -946,14 +948,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             if(i != (vehicleID - 1))
             {
                 // Send the UAV obsticle along the socket as other air traffic
-                dprintf(client_sockfd[i], "OBJCT,type%s,lat%f,long%f,alt%f,vx%f,vy%f,vz%f,index%i.0,\n",
+                dprintf(client_sockfd[i], "OBJCT,type%s,lat%f,long%f,alt%f,north%f,east%f,down%f,index%i.0,\n",
                     "_TRAFFIC_",//either _TRAFFIC_ or _OBSTACLE_
                     ptr_AirVehicleState->getLocation()->getLatitude(),
                     ptr_AirVehicleState->getLocation()->getLongitude(),
                     ptr_AirVehicleState->getLocation()->getAltitude(),
-                    ptr_AirVehicleState->getU(),
-                    ptr_AirVehicleState->getV(),
-                    ptr_AirVehicleState->getW(),
+                    northTotal,
+                    eastTotal,
+                    downTotal,
                     vehicleID); // ICAROUS indexes start at 1 normally
             }
         }
