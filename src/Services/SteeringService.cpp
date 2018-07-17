@@ -492,6 +492,7 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                 speed_mps = pCurrentWp->getSpeed();
                 speedType = pCurrentWp->getSpeedType();
             }
+#define USE_FLIGHT_DIRECTOR_ACTION
 #ifdef USE_FLIGHT_DIRECTOR_ACTION
             auto pAction = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
             pAction->setSpeed(speed_mps);

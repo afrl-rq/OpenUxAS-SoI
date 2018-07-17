@@ -64,6 +64,18 @@ namespace n_Const
             static double dValue(2.23694);
             return (dValue);
         };
+        
+        /*! \brief convert from MetersPerSecond to MilesPerHour  */
+        static const double& dMetersPerSecondToKnots() {
+            static double dValue(1.94384);
+            return (dValue);
+        };
+        
+        /*! \brief convert from MetersPerSecond to MilesPerHour  */
+        static const double& dKnotsToMetersPerSecond() {
+            static double dValue(0.514444);
+            return (dValue);
+        };
 
         /*! \brief convert from meters to feet  */
         static const double& dMetersToFeet() {
