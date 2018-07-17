@@ -376,7 +376,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 fprintf(stdout, "%lli|SETMOD|modeType|%s\n", icarousClientFd, modeType);
 
 
-                if(strcmp(modeType, "_ACTIVE_")) // ICAROUS has taken over, pause all tasks
+                if(!strcmp(modeType, "_ACTIVE_")) // ICAROUS has taken over, pause all tasks
                 {
                     icarousTakeoverActive[instanceIndex] = true;
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
@@ -387,7 +387,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     }
                     
                 }
-                else if(strcmp(modeType, "_PASSIVE_")) // ICAROUS has handed back control, resume all tasks
+                else if(!strcmp(modeType, "_PASSIVE_")) // ICAROUS has handed back control, resume all tasks
                 {
                     fprintf(stderr, "Sending UAV %i to its last waypoint: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
