@@ -800,17 +800,87 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
         currentInformation[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
         currentInformationMutexes[vehicleID - 1].unlock();
+        
+        
+        
+        // ptr_AirVehicleState->getU()
+        // ptr_AirVehicleState->getV()
+        // ptr_AirVehicleState->getW()
+        
+        // heading = (ptr_AirVehicleState->getHeading() + 360) % 360
+        
+        // u's heading: heading
+        // u's north contribution: [0, u] Continuous
+        // u's north sign: [-1, 1] Discrete
+        // u's east contribution: [0, u] Continuous
+        // u's east sign: [-1, 1] Discrete
+        
+        // v's heading: (heading + 90) % 360
+        // v's north contribution: [0, u] Continuous
+        // v's north sign: [-1, 1] Discrete
+        // v's east contribution: [0, u] Continuous
+        // v's east sign: [-1, 1] Discrete
+        
+        double uHeading = fmod((ptr_AirVehicleState->getHeading() + 360), 360.0);
+        double vHeading = fmod((uHeading + 90), 360.0);
+        double uNorth;
+        double vNorth;
+        double uEast;
+        double vEast;
+        // TODO - May need to fiddle with this to be correct (Not sure if implemented positive up or down in ICAROUS)
+        double wDown = ptr_AirVehicleState->getW() * -1;
+        
+        
+        uNorth = (1 - ((fmod(uHeading, 90.0)) / 90)) * ptr_AirVehicleState->getU();
+        uEast = ((fmod(uHeading, 90)) / 90.0) * ptr_AirVehicleState->getU();
+        
+        vNorth = (1 - ((fmod(vHeading, 90.0)) / 90)) * ptr_AirVehicleState->getV();
+        vEast = ((fmod(vHeading, 90.0)) / 90) * ptr_AirVehicleState->getV();
+        
+        if(uHeading < 90){
+            uNorth = fabs(uNorth);
+            uEast = fabs(uEast);
+            vNorth = fabs(vNorth) * -1;
+            vEast = fabs(vEast);
+        }else if(uHeading >= 90 && uHeading < 180){
+            uNorth = fabs(uNorth) * -1;
+            uEast = fabs(uEast);
+            vNorth = fabs(vNorth) * -1;
+            vEast = fabs(vEast) * -1;
+        }else if(uHeading >= 180 && uHeading < 270){
+            uNorth = fabs(uNorth) * -1;
+            uEast = fabs(uEast) * -1;
+            vNorth = fabs(vNorth);
+            vEast = fabs(vEast) * -1;
+        }else{
+            uNorth = fabs(uNorth);
+            uEast = fabs(uEast) * -1;
+            vNorth = fabs(vNorth);
+            vEast = fabs(vEast);
+        }
+        
+        double northTotal = uNorth + vNorth;
+        double eastTotal = uEast + vEast;
+        double downTotal = wDown;
+        
+        fprintf(stdout, "UAV: %i\n", vehicleID);
+        fprintf(stdout, "North is: %f\n", northTotal);
+        fprintf(stdout, "East is: %f\n", eastTotal);
+        fprintf(stdout, "Down is: %f\n", downTotal);
+        fprintf(stderr, "\n");
 
 
+
+        // TODO - north, east, down need to take the place of vx, vy, vz
         dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,vx%f,vy%f,vz%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
             ptr_AirVehicleState->getLocation()->getLongitude(),
             ptr_AirVehicleState->getLocation()->getAltitude(),
             ptr_AirVehicleState->getLocation()->getAltitude(),// TODO - come back to this, rel altitude != abs altitude
-            ptr_AirVehicleState->getU(),
-            ptr_AirVehicleState->getV(),
-            ptr_AirVehicleState->getW(),
+            northTotal,
+            eastTotal,
+            downTotal,
             0.1,// TODO - actual horizontal accuracy
             0.1,// TODO - actual vertical accuracy
             25,
@@ -868,6 +938,5 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
     // False indicates that we are ready to process more messages
     return false;
 }
-
 }; //namespace service
 }; //namespace uxas
