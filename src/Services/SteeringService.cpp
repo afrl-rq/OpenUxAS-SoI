@@ -25,6 +25,7 @@
 #include "uxas/messages/uxnative/SafeHeadingAction.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
 #include "uxas/messages/task/UniqueAutomationResponse.h"
+#include "uxas/messages/uxnative/SpeedOverrideAction.h"
 
 #include "Constants/Convert.h"
 #include "Constants/UxAS_String.h"
@@ -52,6 +53,7 @@ namespace
 
 // #define STRING_XML_ALPHA "Alpha"
 
+#define STRING_XML_USE_SAFE_HEADING_ACTION "UseSafeHeadingAction"
 #define STRING_XML_ACCEPTANCE_TIME "AcceptanceTime_ms"
 #define STRING_XML_MAXIMUM_COURSE_ANGLE_DEG "MaxCourseAngleDeg"
 #define STRING_XML_K_LINE "KLine"
@@ -232,6 +234,11 @@ bool SteeringService::configure(const pugi::xml_node& ndComponent)
         m_acceptanceTimeToArrive_ms = ndComponent.attribute(STRING_XML_ACCEPTANCE_TIME).as_uint(0);
     }
     
+    if (!ndComponent.attribute(STRING_XML_USE_SAFE_HEADING_ACTION).empty())
+    {
+        m_useSafeHeadingAction = ndComponent.attribute(STRING_XML_USE_SAFE_HEADING_ACTION).as_bool(false);
+    }
+    
     if (!ndComponent.attribute("OverrideRegion").empty())
     {
         m_overrideRegion = true;
@@ -273,6 +280,7 @@ bool SteeringService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(uxas::common::MessageGroup::PartialAirVehicleState());
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
+    addSubscriptionAddress(uxas::messages::uxnative::SpeedOverrideAction::Subscription);
     
     // update operating region
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -352,6 +360,7 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
         if (it_mission != missionCommands.cend())
         {
+            m_isSpeedOverridden = false;
             reset(*it_mission);
         }
     }
@@ -361,7 +370,17 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
         if (pMission->getVehicleID() == m_vehicleID)
         {
+            m_isSpeedOverridden = false;
             reset(pMission.get());
+        }
+    }
+    else if (uxas::messages::uxnative::isSpeedOverrideAction(receivedLmcpMessage->m_object.get()))
+    {
+        auto speed_override = std::static_pointer_cast<uxas::messages::uxnative::SpeedOverrideAction>(receivedLmcpMessage->m_object);
+        if(speed_override->getVehicleID() == m_vehicleID)
+        {
+            m_isSpeedOverridden = true;
+            m_overrideSpeed = speed_override->getSpeed();
         }
     }
     else if (pState && pState->getID() == m_vehicleID) // aliased version of AirVehicleState
@@ -492,39 +511,47 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                 speed_mps = pCurrentWp->getSpeed();
                 speedType = pCurrentWp->getSpeedType();
             }
-#define USE_FLIGHT_DIRECTOR_ACTION
-#ifdef USE_FLIGHT_DIRECTOR_ACTION
-            auto pAction = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
-            pAction->setSpeed(speed_mps);
-            pAction->setSpeedType(speedType);
-            pAction->setHeading(static_cast<float>(desiredHeading_deg)); // true heading in degrees
-            pAction->setAltitude(pCurrentWp->getAltitude());
-            pAction->setAltitudeType(pCurrentWp->getAltitudeType());
-            pAction->setClimbRate(pCurrentWp->getClimbRate());
+            
+            if(m_isSpeedOverridden)
+            {
+                speed_mps = m_overrideSpeed;
+            }
 
-            auto pCommand = uxas::stduxas::make_unique<afrl::cmasi::VehicleActionCommand>();
-            pCommand->setCommandID(getUniqueEntitySendMessageId());
-            pCommand->setVehicleID(m_vehicleID);
-            pCommand->getVehicleActionList().push_back(pAction.release());
-            pCommand->setStatus(afrl::cmasi::CommandStatusType::Approved);
+            if(m_useSafeHeadingAction)
+            {
+                auto safeHeadingAction = uxas::stduxas::make_unique<uxas::messages::uxnative::SafeHeadingAction>();
+                safeHeadingAction->setVehicleID(pState->getID());
+                safeHeadingAction->setOperatingRegion(m_operatingRegion);
+                safeHeadingAction->setLeadAheadDistance(m_leadAheadDistance_m);
+                safeHeadingAction->setLoiterRadius(m_loiterRadius_m);
+                safeHeadingAction->setDesiredHeading(static_cast<float>(desiredHeading_deg));
+                safeHeadingAction->setDesiredHeadingRate(0.0);
+                safeHeadingAction->setUseHeadingRate(false);
+                safeHeadingAction->setAltitude(pCurrentWp->getAltitude());
+                safeHeadingAction->setAltitudeType(pCurrentWp->getAltitudeType());
+                safeHeadingAction->setUseAltitude(true);
+                safeHeadingAction->setSpeed(speed_mps);
+                safeHeadingAction->setUseSpeed(true);
+                sendSharedLmcpObjectBroadcastMessage(std::move(safeHeadingAction));
+            }
+            else
+            {
+                auto pAction = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
+                pAction->setSpeed(speed_mps);
+                pAction->setSpeedType(speedType);
+                pAction->setHeading(static_cast<float>(desiredHeading_deg)); // true heading in degrees
+                pAction->setAltitude(pCurrentWp->getAltitude());
+                pAction->setAltitudeType(pCurrentWp->getAltitudeType());
+                pAction->setClimbRate(pCurrentWp->getClimbRate());
 
-            sendLmcpObjectBroadcastMessage(std::move(pCommand));
-#else
-            auto safeHeadingAction = uxas::stduxas::make_unique<uxas::messages::uxnative::SafeHeadingAction>();
-            safeHeadingAction->setVehicleID(pState->getID());
-            safeHeadingAction->setOperatingRegion(m_operatingRegion);
-            safeHeadingAction->setLeadAheadDistance(m_leadAheadDistance_m);
-            safeHeadingAction->setLoiterRadius(m_loiterRadius_m);
-            safeHeadingAction->setDesiredHeading(static_cast<float>(desiredHeading_deg));
-            safeHeadingAction->setDesiredHeadingRate(0.0);
-            safeHeadingAction->setUseHeadingRate(false);
-            safeHeadingAction->setAltitude(pCurrentWp->getAltitude());
-            safeHeadingAction->setAltitudeType(pCurrentWp->getAltitudeType());
-            safeHeadingAction->setUseAltitude(true);
-            safeHeadingAction->setSpeed(speed_mps);
-            safeHeadingAction->setUseSpeed(true);
-            sendSharedLmcpObjectBroadcastMessage(std::move(safeHeadingAction));
-#endif
+                auto pCommand = uxas::stduxas::make_unique<afrl::cmasi::VehicleActionCommand>();
+                pCommand->setCommandID(getUniqueEntitySendMessageId());
+                pCommand->setVehicleID(m_vehicleID);
+                pCommand->getVehicleActionList().push_back(pAction.release());
+                pCommand->setStatus(afrl::cmasi::CommandStatusType::Approved);
+
+                sendLmcpObjectBroadcastMessage(std::move(pCommand));
+            }
         }
 
         // Always send out the corresponding AirVehicleState with its waypoint number and associated task list correctly populated
