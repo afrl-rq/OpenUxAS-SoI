@@ -179,6 +179,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 {
                     //Ownship has Right of Way and therefore should take no action 
                     m_isConflict = false;
+                    m_ConflictResolutionList.clear();   //Ownship is not in conflict, thus ConflictResolutionList should be cleared.
                 }
                 else
                 {
@@ -187,12 +188,16 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         //TODO: Determine recommended action from DAIDALUS
                         //TODO: set action response to aforementioned recommended action
                         //TODO: send vehicle action command
+                        //TODO: remove RoW vehicle from the ConflictResolutionList
                         m_isTakenAction = true;
                     }
                     else
                     {
                         //TODO: hold conflict until elapsed time for maneuver has passed or until desired state attained
                         //TODO: Compare desired "mode value" to current nogo band and if outside mode value send action command to desired and set isConflict to false
+                        //TODO: Evaluate the size of the ConflictResolutionList: if empty do nothing else, if empty and maneuver obtained, flag m_isTakenAction to false
+                        //TODO: remove RoW vehicle from the ConflictResolutionList
+                        
 
                     }
                 }
