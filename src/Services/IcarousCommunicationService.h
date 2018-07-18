@@ -155,9 +155,9 @@ private:
     std::vector<std::shared_ptr<afrl::cmasi::MissionCommand>> missionCommands;
     
     // This is to keep an array of translated waypoint indexes to an ordered list
-    std::vector<std::vector<int>> icarousClientWaypointLists;
-    std::vector<int> currentWaypointIndex;
-    std::vector<int> lastWaypoint;
+    std::vector<std::vector<int64_t>> icarousClientWaypointLists;
+    std::vector<int64_t> currentWaypointIndex;
+    std::vector<int64_t> lastWaypoint;
     std::vector<bool> isLastWaypointInitialized;
 
     std::vector<std::vector<int64_t>> entityTasks;

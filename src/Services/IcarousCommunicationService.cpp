@@ -381,7 +381,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
 
                 if(!strncmp(modeType, "_ACTIVE_", strlen("_ACTIVE_"))) // ICAROUS has taken over, pause all tasks
                 {
-                    fprintf(stderr, "UAV %i's last waypoint saved as: %i\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
+                    fprintf(stderr, "UAV %i's last waypoint saved as: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     icarousTakeoverActive[instanceIndex] = true;
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
@@ -393,7 +393,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 }
                 else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks
                 {
-                    fprintf(stderr, "Sending UAV %i to its last waypoint: %i\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
+                    fprintf(stderr, "Sending UAV %i to its last waypoint: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
                         fprintf(stderr, "UAV %i resuming task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
@@ -403,12 +403,12 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     }
                     icarousTakeoverActive[instanceIndex] = false;
                     
-                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-                    // TODO - Possibly just construct a new MissionCommand message here and send it to the UAV - TODO
-                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-                    
                     auto MissionCommand = missionCommands[instanceIndex];
                     MissionCommand->setFirstWaypoint(icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
+                    
+                    // Before sending on the mission command, save the lat and long of the last place the UAV was
+                    // before the takeover and then add it as a waypoint in place of the current one it was told to go to
+                    // This would be the better solution for a take-over scenario
                     
                     sendSharedLmcpObjectBroadcastMessage(MissionCommand);
                     // Construct the new mission command here
@@ -808,9 +808,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         if(icarousTakeoverActive[vehicleID - 1] == false){
             entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
             
+            // Updates the current waypoint to the waypoint the UAV is currently doing
+            // Also saves this waypoint to be compared to the next to ensure that a change of waypoints is seen
             if(isLastWaypointInitialized[vehicleID - 1] && (lastWaypoint[vehicleID - 1] != ptr_AirVehicleState->getCurrentWaypoint()))
             {
-                dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%i.0,\n",
+                dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
                     currentWaypointIndex[vehicleID - 1]);
                 currentWaypointIndex[vehicleID - 1]++;
             }
