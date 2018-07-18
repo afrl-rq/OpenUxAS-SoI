@@ -66,8 +66,10 @@
 #include "afrl/cmasi/GoToWaypointAction.h"
 #include "afrl/cmasi/Location3D.h"
 #include "afrl/cmasi/LoiterAction.h"
+#include "afrl/cmasi/MissionCommand.h"
 #include "afrl/cmasi/NavigationMode.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
+
 #include "uxas/messages/uxnative/IncrementWaypoint.h"
 #include "uxas/messages/task/TaskPause.h"
 #include "uxas/messages/task/TaskResume.h"
@@ -161,7 +163,8 @@ bool IcarousCommunicationService::initialize()
     currentWaypointIndex.resize(ICAROUS_CONNECTIONS);
     lastWaypoint.resize(ICAROUS_CONNECTIONS);
     isLastWaypointInitialized.resize(ICAROUS_CONNECTIONS);
-
+    missionCommands.resize(ICAROUS_CONNECTIONS);
+    
     // Mutexes must be set like this and not in a vector
     // This is because a vector of mutexes is non-resizable
     currentInformationMutexes = new std::mutex[ICAROUS_CONNECTIONS];
@@ -347,12 +350,12 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             char throwaway[400]; // Used simply to fill necessary (but useless) arguments in function calls
             int fieldLength;
             char *trackingHelper;
-            
+
             if(!strncmp(tempMessageBuffer, "SETMOD", 6)) // Set Mode (has ICAROUS taken over?)
             {
                 // SETMOD,type~,\n
                 fprintf(stdout, "icarousClientFd %lli|SETMOD message received!\n", icarousClientFd);
-                
+
                 // The following section of code finds several fields by their tags.
                 // It's fairly difficult to follow, so here's a comment section explaining each line.            
                 /* 1. strstr returns a pointer to the first occurence of our tag in the message
@@ -364,7 +367,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 // Note: We tried to functionize this code. We spent 4 hours and had the strangest
                 // issue we've ever seen, with a passed-in pointer being invalid memory to access.
                 // Possible it was a unique issue.
-                
+
                 // Mode type
                 trackingHelper            = strstr(tempMessageBuffer, "type");
                 trackingHelper           += 4; // skip past "type"
@@ -378,7 +381,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
 
                 if(!strncmp(modeType, "_ACTIVE_", strlen("_ACTIVE_"))) // ICAROUS has taken over, pause all tasks
                 {
-                    fprintf(stderr, "UAV %i's last waypoint saved as: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
+                    fprintf(stderr, "UAV %i's last waypoint saved as: %i\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     icarousTakeoverActive[instanceIndex] = true;
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
@@ -390,7 +393,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 }
                 else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks
                 {
-                    fprintf(stderr, "Sending UAV %i to its last waypoint: %lli\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
+                    fprintf(stderr, "Sending UAV %i to its last waypoint: %i\n", (instanceIndex + 1), icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
                         fprintf(stderr, "UAV %i resuming task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
@@ -400,14 +403,27 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     }
                     icarousTakeoverActive[instanceIndex] = false;
                     
+                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                    // TODO - Possibly just construct a new MissionCommand message here and send it to the UAV - TODO
+                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                    
+                    auto MissionCommand = missionCommands[instanceIndex];
+                    MissionCommand->setFirstWaypoint(icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
+                    
+                    sendSharedLmcpObjectBroadcastMessage(MissionCommand);
+                    // Construct the new mission command here
+                    // Create a waypoint list fromt the waypoints
+                    // The current waypoint list will need to be changed back to icarous order to work better.
+                    /*
                     auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                     vehicleActionCommand->setVehicleID(instanceIndex + 1);
                     
                     auto goToWaypointAction = new afrl::cmasi::GoToWaypointAction;
-                    goToWaypointAction->setWaypointNumber(icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]].getNumber());
+                    goToWaypointAction->setWaypointNumber(icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
                     vehicleActionCommand->getVehicleActionList().push_back(goToWaypointAction);
                     sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
+                    */
                 }
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
@@ -595,7 +611,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
                 
                 auto goToWaypointAction = new afrl::cmasi::GoToWaypointAction;
-                goToWaypointAction->setWaypointNumber(icarousClientWaypointLists[instanceIndex][id].getNumber());
+                goToWaypointAction->setWaypointNumber(icarousClientWaypointLists[instanceIndex][id]);
                 
                 vehicleActionCommand->getVehicleActionList().push_back(goToWaypointAction);
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
@@ -658,13 +674,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // Set the variable to ensure we only send one vehicle one MissionCommand
             has_gotten_waypoints[vehicleID - 1] = true;
             fprintf(stdout, "Sending waypoints to ICAROUS instance %lld\n", vehicleID);
-
+            
             // Set up variable to be used
             int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
             int totalNumberOfWaypoints = 0;
             int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
 
             icarousClientWaypointLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
+            missionCommands[vehicleID - 1] = ptr_MissionCommand;
 
             // For each waypoint in the mission command, send each as its own message to ICAROUS
             // The last waypoint's next value will be equal to itself (This indicates the end)
@@ -688,16 +705,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // Need to convert numbers to the indexes
                 // Then store the lat long and alt of each waypoint
                 // This is to put them all into an ordered list
-                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].setLatitude(
-                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude());
-                    
-                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].setLongitude(
-                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude());
-                    
-                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].setAltitude(
-                    ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude());
-
-                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].setNumber(waypointIndex);
+                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = waypointIndex;
 
                 //fprintf(stdout, "WP|%lli\n", icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].getNumber());
 
