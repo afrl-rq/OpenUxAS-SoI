@@ -94,6 +94,7 @@ private:
     bool m_useSafeHeadingAction{false};
     double m_overrideSpeed{0.0};
     bool m_isSpeedOverridden{false};
+    bool m_isHeadingControlledByTask{false};
 
     std::unique_ptr<afrl::cmasi::Location3D> m_previousLocation;
 

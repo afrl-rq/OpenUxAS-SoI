@@ -281,6 +281,7 @@ bool SteeringService::configure(const pugi::xml_node& ndComponent)
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::SpeedOverrideAction::Subscription);
+    addSubscriptionAddress(afrl::cmasi::VehicleActionCommand::Subscription); // to detect task override
     
     // update operating region
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -360,6 +361,7 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
         if (it_mission != missionCommands.cend())
         {
+            m_isHeadingControlledByTask = false;
             m_isSpeedOverridden = false;
             reset(*it_mission);
         }
@@ -370,6 +372,7 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
         if (pMission->getVehicleID() == m_vehicleID)
         {
+            m_isHeadingControlledByTask = false;
             m_isSpeedOverridden = false;
             reset(pMission.get());
         }
@@ -381,6 +384,21 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
         {
             m_isSpeedOverridden = true;
             m_overrideSpeed = speed_override->getSpeed();
+        }
+    }
+    else if (afrl::cmasi::isVehicleActionCommand(receivedLmcpMessage->m_object.get()))
+    {
+        auto vehicleActionCommand = std::static_pointer_cast<afrl::cmasi::VehicleActionCommand>(receivedLmcpMessage->m_object);
+        if(vehicleActionCommand->getVehicleID() == m_vehicleID)
+        {
+            for(auto action : vehicleActionCommand->getVehicleActionList())
+            {
+                auto hsa_action = dynamic_cast<afrl::cmasi::FlightDirectorAction*>(action);
+                if(hsa_action)
+                {
+                    m_isHeadingControlledByTask = true;
+                }
+            }
         }
     }
     else if (pState && pState->getID() == m_vehicleID) // aliased version of AirVehicleState
@@ -517,7 +535,7 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                 speed_mps = m_overrideSpeed;
             }
 
-            if(m_useSafeHeadingAction)
+            if(m_useSafeHeadingAction && !m_isHeadingControlledByTask)
             {
                 auto safeHeadingAction = uxas::stduxas::make_unique<uxas::messages::uxnative::SafeHeadingAction>();
                 safeHeadingAction->setVehicleID(pState->getID());
@@ -534,7 +552,7 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                 safeHeadingAction->setUseSpeed(true);
                 sendSharedLmcpObjectBroadcastMessage(std::move(safeHeadingAction));
             }
-            else
+            else if(!m_isHeadingControlledByTask)
             {
                 auto pAction = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
                 pAction->setSpeed(speed_mps);
@@ -556,13 +574,12 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
 
         // Always send out the corresponding AirVehicleState with its waypoint number and associated task list correctly populated
         pState->setCurrentWaypoint(m_currentWpID);
-        auto associatedTasks = pState->getAssociatedTasks();
-        associatedTasks.clear();
+        pState->getAssociatedTasks().clear();
 
         if (pCurrentWp != nullptr)
         {
             // Note: only waypoint associated tasks are included, not those from other actions
-            associatedTasks = pCurrentWp->getAssociatedTasks();
+            pState->getAssociatedTasks().assign(pCurrentWp->getAssociatedTasks().begin(), pCurrentWp->getAssociatedTasks().end());
         }
 
         sendSharedLmcpObjectBroadcastMessage(pState);
@@ -578,7 +595,7 @@ void SteeringService::reset(const afrl::cmasi::MissionCommand* pMissionCmd)
     m_pMissionCmd.reset(pMissionCmd->clone());
     m_currentWpID = m_pMissionCmd->getFirstWaypoint();
     m_currentStartTimestamp_ms = uxas::common::Time::getInstance().getUtcTimeSinceEpoch_ms();
-    m_isLastWaypoint = false;
+    m_isLastWaypoint = (m_pMissionCmd->getWaypointList().size() == 1);
     m_previousLocation.reset(nullptr);
     
     // look for waypoint previous to the "FirstWaypoint" to form original segment to track
