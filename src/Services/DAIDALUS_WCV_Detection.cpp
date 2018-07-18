@@ -587,6 +587,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         double daidalusVelocityY_mps = velocityX_mps;
         vehicleInfo.m_daidalusVelocity = larcfm::Velocity::makeVxyz(daidalusVelocityX_mps, daidalusVelocityY_mps, "m/s", daidalusVelocityZ_mps, "m/s");
         vehicleInfo.m_daidalusTime_s = airVehicleState->getTime()*MILLISECONDTOSECOND; // conversion from UxAS representation of time in milliseconds to DAIDALUS representation fo time in seconds
+        vehicleInfo.latitude_deg = airVehicleState->getLocation()->getLatitude();
+        vehicleInfo.longitude_deg = airVehicleState->getLocation()->getLongitude();
         m_daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
         // Conditional check for appropriateness off a well clear violation check-- 2 known vehicle states including the ownship
         if (m_daidalusVehicleInfo.size()>1 && m_daidalusVehicleInfo.count(m_entityId)>0)    
@@ -596,7 +598,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
             for (const auto& vehiclePackagedInfo : m_daidalusVehicleInfo)
             {
                 //add intruder traffic state to DAIDALUS object
-                if (vehiclePackagedInfo.first!=m_entityId) //--TODO add staleness check to this statement or put check on outer most if
+                if ((vehiclePackagedInfo.first!=m_entityId) && 
+                        (std::abs(m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s - vehiclePackagedInfo.second.m_daidalusTime_s) <= m_staleness_time_s)) //--TODO add staleness check to this statement or put check on outer most if
                     {
                         m_daa.addTrafficState(std::to_string(vehiclePackagedInfo.first), vehiclePackagedInfo.second.m_daidalusPosition, 
                                 vehiclePackagedInfo.second.m_daidalusVelocity, vehiclePackagedInfo.second.m_daidalusTime_s);
@@ -632,11 +635,13 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                         nogo_ptr->getEntityList().push_back(itViolations->first);
                         nogo_ptr->getTimeToViolationList().push_back(itViolations->second);
                     }
-                    nogo_ptr->setEntityId(m_entityId);
-                    nogo_ptr->setCurrentHeading(daa_own.track("deg"));
-                    nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s"));
-                    nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));
-                    nogo_ptr->setCurrentAltitude(daa_own.altitude("m"));
+                    nogo_ptr->setEntityId(m_entityId);  //Ownship Id
+                    nogo_ptr->setCurrentHeading(daa_own.track("deg"));  //DAIDALUS current heading--0deg = TrueNorth
+                    nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s")); //DAIDALUS current ground speed
+                    nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));    //DAIDALUS current vertical speed
+                    nogo_ptr->setCurrentAltitude(daa_own.altitude("m"));    //DAIDALUS current altitude
+                    nogo_ptr->setCurrentLatitude(m_daidalusVehicleInfo[m_entityId].latitude_deg);    //Current ownship latitude
+                    nogo_ptr->setCurrentLongitude(m_daidalusVehicleInfo[m_entityId].longitude_deg);  //Current ownship longitude
                     for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)  //ground track bands
                     {
                         std::unique_ptr<larcfm::DAIDALUS::GroundHeadingInterval> pTempPtr (new larcfm::DAIDALUS::GroundHeadingInterval);

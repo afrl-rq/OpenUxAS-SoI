@@ -138,14 +138,22 @@ private:
     std::vector<int64_t> m_ConflictResolutionList;
     bool SetisConflict(bool& val);
     bool GetisConflict();
-    struct m_DesiredState
+    struct DesiredState
     {
         double altitude_m;
         double horizontal_speed_mps;
         double vertical_speed_mps;
         double heading_deg;
-    };
-    
+    }m_DesiredState;
+    struct CurrentState
+    {
+        double altitude_m;
+        double horizontal_speed_mps;
+        double vertical_speed_mps;
+        double heading_deg;
+        double latitude_deg;
+        double longitude_deg;
+    }m_CurrentState;
 
     
     

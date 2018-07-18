@@ -219,12 +219,15 @@ private:
     double m_early_alert_time_3_s = {55};    //seconds--early alerting time for alert level 3
     int m_RTCA_alert_levels = {3};   //number of alert levels reported for guidance processing--max 3
     std::string m_horizontal_detection_type = {"TAUMOD"}; //string--horizontal detection type
+    double m_staleness_time_s = m_lookahead_time_s;
     
     struct MydaidalusPackage
     {
        larcfm::Position m_daidalusPosition;
         larcfm::Velocity m_daidalusVelocity;
         double m_daidalusTime_s;
+        double latitude_deg;
+        double longitude_deg;
     };
     
     larcfm::Daidalus m_daa;

@@ -24,6 +24,8 @@
 #include "afrl/cmasi/MissionCommand.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/FlightDirectorAction.h"
+#include "afrl/cmasi/GoToWaypointAction.h"
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -150,6 +152,12 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
         if (m_isReadyToAct)
         {
+            m_CurrentState.altitude_m = pWCVIntervals->getCurrentAltitude();
+            m_CurrentState.heading_deg = pWCVIntervals->getCurrentHeading();
+            m_CurrentState.horizontal_speed_mps = pWCVIntervals->getCurrentGoundSpeed();
+            m_CurrentState.vertical_speed_mps = pWCVIntervals->getCurrentVerticalSpeed();
+            m_CurrentState.latitude_deg = pWCVIntervals->getCurrentLatitude();
+            m_CurrentState.longitude_deg = pWCVIntervals->getCurrentLongitude();
             for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
             {
                 if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
@@ -189,6 +197,8 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         //TODO: set action response to aforementioned recommended action
                         //TODO: send vehicle action command
                         //TODO: remove RoW vehicle from the ConflictResolutionList
+                        std::unique_ptr<afrl::cmasi::FlightDirectorAction> pDivertThisWay;
+                        pDivertThisWay->setHeading(m_CurrentState.heading_deg+90);
                         m_isTakenAction = true;
                     }
                     else
