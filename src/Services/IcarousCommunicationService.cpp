@@ -700,7 +700,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(),
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
-                    (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - 1));
+                    (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
 
                 // Need to convert numbers to the indexes
                 // Then store the lat long and alt of each waypoint
