@@ -812,7 +812,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // Also saves this waypoint to be compared to the next to ensure that a change of waypoints is seen
             if(isLastWaypointInitialized[vehicleID - 1] && (lastWaypoint[vehicleID - 1] != ptr_AirVehicleState->getCurrentWaypoint()))
             {
-                // TODO - So the currentWaypoint that shows up from an AirVehicleState may skip passed some waypoints
+                //        So the currentWaypoint that shows up from an AirVehicleState may skip passed some waypoints
                 //        provided that they are close enough together. This causes an issue with the bellow code because
                 //        it needs to:
                 //        1.) Send all reached waypoints to ICAROUS so that ICAROUS does not route back to an old waypoint
@@ -930,7 +930,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         */
 
 
-        // TODO - north, east, down need to take the place of vx, vy, vz
         dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,north%f,east%f,down%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
@@ -985,12 +984,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     vehicleID); // ICAROUS indexes start at 1 normally
             }
         }
-
-        // TODO scan for waypoint reached from AirVehicleState
-        // Order does not matter as long as we save the list and use the indexing
-        // 1.) Save the MissionCommand for each UAV
-        // 2.) When the current waypoint changes, send the older one as completed
-
     }// End of AirVehicleState
 
 
