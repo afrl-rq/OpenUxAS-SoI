@@ -50,6 +50,7 @@
 #include <math.h>
 #include <thread>
 #include <mutex>
+#include <semaphore.h>
 
 #define PORT 5557
 
@@ -164,11 +165,15 @@ private:
 
     std::vector<bool> icarousTakeoverActive;
 
+    std::vector<bool> softResetFlag;
+    sem_t *softResetSemaphores;
+
     // Dimention 1: ICAROUS instance
     // Dimention 2: Heading | Lat | Long | Alt
     std::vector<std::vector<float>> currentInformation;
     // One mutex for each ICAROUS instance
     std::mutex *currentInformationMutexes;
+
 
     //Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};

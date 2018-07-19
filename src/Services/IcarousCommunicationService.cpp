@@ -164,14 +164,18 @@ bool IcarousCommunicationService::initialize()
     lastWaypoint.resize(ICAROUS_CONNECTIONS);
     isLastWaypointInitialized.resize(ICAROUS_CONNECTIONS);
     missionCommands.resize(ICAROUS_CONNECTIONS);
+    softResetFlag.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes must be set like this and not in a vector
     // This is because a vector of mutexes is non-resizable
     currentInformationMutexes = new std::mutex[ICAROUS_CONNECTIONS];
-
+    
+    softResetSemaphores = new sem_t[ICAROUS_CONNECTIONS];
+    
     for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
     {
         currentInformation[i].resize(4); // This is to set the size of heading, lat, long, and alt for each instance
+        sem_init(&softResetSemaphores[i], 0, 0);
     }
 
     // Initialize has_gotten_waypoints[] to the number of UAVs that is planned on being used
@@ -180,6 +184,7 @@ bool IcarousCommunicationService::initialize()
     currentWaypointIndex.assign(ICAROUS_CONNECTIONS, 0);
     lastWaypoint.assign(ICAROUS_CONNECTIONS, -1);
     isLastWaypointInitialized.assign(ICAROUS_CONNECTIONS, false);
+    softResetFlag.assign(ICAROUS_CONNECTIONS, false);
     
     // Variable set-up
     // Protocol constants for 3-way ICAROUS authentication handshake    
@@ -394,6 +399,13 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks
                 {
                     fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
+                    
+                    // SOFT RESET ICAROUS (RESET_SFT)
+                    // Send a message to ICAROUS to ensure that it soft-resets
+                    // Possibly set a variable here to true to do that
+                    softResetFlag[instanceIndex] = true;
+                    sem_wait(&softResetSemaphores[instanceIndex]);
+                    
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
                         fprintf(stderr, "UAV %i resuming task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
@@ -983,6 +995,62 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     downTotal,
                     vehicleID); // ICAROUS indexes start at 1 normally
             }
+        }
+
+        if(softResetFlag[vehicleID - 1] == true)
+        {
+            // Tell ICAROUS to initiate a soft-reset
+            dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                "RESET_SFT",
+                ptr_AirVehicleState->getLocation()->getLatitude(),
+                ptr_AirVehicleState->getLocation()->getLongitude(),
+                ptr_AirVehicleState->getLocation()->getAltitude());
+            
+            // Set new waypoint information
+            
+            // At this point, the last waypoint is actually the current waypoint.
+            // Thus, we need to subtract one to make it the last waypoint.
+            missionCommands[vehicleID - 1]->setFirstWaypoint((lastWaypoint[vehicleID - 1] - 1));
+            
+            int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][lastWaypoint[vehicleID]];
+            
+            missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setLatitude(
+                currentInformation[vehicleID - 1][1]);
+                
+            missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setLongitude(
+                currentInformation[vehicleID - 1][2]);
+                
+            missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setAltitude(
+                currentInformation[vehicleID - 1][3]);
+            
+            int waypointIndex = (missionCommands[vehicleID - 1]->getFirstWaypoint() - 1);
+            int totalNumberOfWaypoints = 0;
+            int nextWaypoint = missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNextWaypoint();
+
+            icarousClientWaypointLists[vehicleID - 1].resize(missionCommands[vehicleID - 1]->getWaypointList().size());
+
+            // For each waypoint in the mission command, send each as its own message to ICAROUS
+            // The last waypoint's next value will be equal to itself (This indicates the end)
+            while(nextWaypoint != missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNumber())
+            {
+                totalNumberOfWaypoints++;
+
+                // Need to convert numbers to the indexes
+                // Then store the lat long and alt of each waypoint
+                // This is to put them all into an ordered list
+                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = waypointIndex;
+                fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), waypointIndex);
+                //fprintf(stdout, "WP|%lli\n", icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].getNumber());
+
+                // Set the index of the next waypoint
+                waypointIndex = (nextWaypoint - 1);
+
+                // Grab the next waypoint's next waypoint to check if it is the end
+                nextWaypoint = missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNextWaypoint();
+            }
+            
+            // replace waypoint information in the MissionCommand
+            sem_post(&softResetSemaphores[vehicleID - 1]);
         }
     }// End of AirVehicleState
 
