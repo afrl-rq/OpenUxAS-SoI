@@ -326,7 +326,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
     
     // Listen to ICAROUS forever
     while(true){
-        fprintf(stdout, "Child listening to icarousClientFd: %lli\n", icarousClientFd);        
+        //fprintf(stdout, "Child listening to icarousClientFd: %lli\n", icarousClientFd);        
         
         messageBuffer[0] = '\0';
         int nread = max_message_length;
@@ -337,14 +337,14 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
         //Read any messages ICAROUS has posted
         
         while(nread == max_message_length && !errno){
-            fprintf(stdout, "Read call made in icarousClientFd %lli\n", icarousClientFd);
+            //fprintf(stdout, "Read call made in icarousClientFd %lli\n", icarousClientFd);
             nread = read(icarousClientFd, messageBuffer, max_message_length);
             bytesReceived += nread;
         }
         
         messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
         
-        fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
+        //fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
         
         char *tempMessageBuffer = messageBuffer;
         
@@ -470,9 +470,9 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 float altitude     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
 
-                fprintf(stdout, "%lli|SETPOS|latitude|%f\n", icarousClientFd, latitude);
-                fprintf(stdout, "%lli|SETPOS|longitude|%f\n", icarousClientFd, longitude);
-                fprintf(stdout, "%lli|SETPOS|altitude|%f\n", icarousClientFd, altitude);
+                //fprintf(stdout, "%lli|SETPOS|latitude|%f\n", icarousClientFd, latitude);
+                //fprintf(stdout, "%lli|SETPOS|longitude|%f\n", icarousClientFd, longitude);
+                //fprintf(stdout, "%lli|SETPOS|altitude|%f\n", icarousClientFd, altitude);
 
 
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
@@ -497,7 +497,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             else if(!strncmp(tempMessageBuffer, "SETVEL", 6))
             {
                 // SETVEL,u~,v~,w~,\n
-                fprintf(stdout, "SETVEL message received in icarousClientFd %lli!\n", icarousClientFd);
+                //fprintf(stdout, "SETVEL message received in icarousClientFd %lli!\n", icarousClientFd);
                 
                 // Get u
                 trackingHelper            = strstr(tempMessageBuffer, "u");
@@ -521,18 +521,18 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 float w     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
                 
-                fprintf(stdout, "%lli|SETVEL|u|%f\n", icarousClientFd, u);
-                fprintf(stdout, "%lli|SETVEL|v|%f\n", icarousClientFd, v);
-                fprintf(stdout, "%lli|SETVEL|w|%f\n", icarousClientFd, w);
+                //fprintf(stdout, "%lli|SETVEL|u|%f\n", icarousClientFd, u);
+                //fprintf(stdout, "%lli|SETVEL|v|%f\n", icarousClientFd, v);
+                //fprintf(stdout, "%lli|SETVEL|w|%f\n", icarousClientFd, w);
 
                 
-                fprintf(stdout, "Starting creationg of VehicleActionCommand message\n");                
+                //fprintf(stdout, "Starting creationg of VehicleActionCommand message\n");                
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
                 
                 if((u == 0) && (v == 0)) // loiter at this location
                 {
-                    fprintf(stdout, "Start of LoiterAction construction\n");
+                    //fprintf(stdout, "Start of LoiterAction construction\n");
                     auto loiterAction =  new afrl::cmasi::LoiterAction;
                     auto location3d = new afrl::cmasi::Location3D;
                     currentInformationMutexes[instanceIndex].lock();
@@ -543,11 +543,11 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     loiterAction->setLocation(location3d);
                     
                     vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
-                    fprintf(stdout, "End of LoiterAction setup\n");
+                    //fprintf(stdout, "End of LoiterAction setup\n");
                 }
                 else // otherwise set a FlightDirectorAction to move in a certain direction
                 {
-                    fprintf(stdout, "Start of FlightDirectorAction construction");
+                    //fprintf(stdout, "Start of FlightDirectorAction construction");
                     auto flightDirectorAction = new afrl::cmasi::FlightDirectorAction;
                     double actualSpeed = sqrt(pow(u,2)+pow(v,2));
                     flightDirectorAction->setSpeed(actualSpeed);
@@ -574,26 +574,26 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                         deltaHeading = atan(v / u) * (180 / M_PI);
                     }
                     currentInformationMutexes[instanceIndex].lock();
-                    fprintf(stdout, "Setting Heading | Current Heading: %f\n", currentInformation[instanceIndex][0]);
+                    //fprintf(stdout, "Setting Heading | Current Heading: %f\n", currentInformation[instanceIndex][0]);
                     float newHeading = fmod((currentInformation[instanceIndex][0] + deltaHeading), 360);
                     if(newHeading > 180) // If the new heading is past 180, make it within -180 and 0
                     {
                         newHeading -= 360;
                     }
                     flightDirectorAction->setHeading(newHeading);
-                    fprintf(stdout, "Heading Set | Current Altitude: %f | Setting Altitude\n", currentInformation[instanceIndex][3]);
+                    //fprintf(stdout, "Heading Set | Current Altitude: %f | Setting Altitude\n", currentInformation[instanceIndex][3]);
                     flightDirectorAction->setAltitude((w / 2) + currentInformation[instanceIndex][3]);
                     currentInformationMutexes[instanceIndex].unlock();
-                    fprintf(stdout, "Altitude Set | Adding to VehicleActionCommand\n");
+                    //fprintf(stdout, "Altitude Set | Adding to VehicleActionCommand\n");
                     
                     vehicleActionCommand->getVehicleActionList().push_back(flightDirectorAction);
-                    fprintf(stdout, "End of FlightDirectorAction setup\n");
+                    //fprintf(stdout, "End of FlightDirectorAction setup\n");
                 }
                 
-                std::cout << vehicleActionCommand->getVehicleActionList().front()->toString() << std::endl;;
+                //std::cout << vehicleActionCommand->getVehicleActionList().front()->toString() << std::endl;;
                 
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
-                fprintf(stdout, "VehicleActionCommand sent\n");
+                //fprintf(stdout, "VehicleActionCommand sent\n");
                 
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
@@ -644,7 +644,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             }
         }
         
-        fprintf(stderr, "About to read again\n");
+        //fprintf(stderr, "About to read again\n");
     }
 }
 
@@ -999,6 +999,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
 
         if(softResetFlag[vehicleID - 1] == true)
         {
+            // TODO - Make it so it was the last place the UAV was before ICAROUS took over
             // Tell ICAROUS to initiate a soft-reset
             dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
                 "RESET_SFT",
@@ -1012,7 +1013,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // Thus, we need to subtract one to make it the last waypoint.
             missionCommands[vehicleID - 1]->setFirstWaypoint((lastWaypoint[vehicleID - 1] - 1));
             
-            int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][lastWaypoint[vehicleID]];
+            int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][lastWaypoint[vehicleID - 1] - 2];
+            
+            fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, lastWaypoint[vehicleID - 1] - 2);
             
             missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setLatitude(
                 currentInformation[vehicleID - 1][1]);
@@ -1039,7 +1042,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // Then store the lat long and alt of each waypoint
                 // This is to put them all into an ordered list
                 icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = waypointIndex;
-                fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), waypointIndex);
+                fprintf(stderr, "UAV %i | Stored index %i as %i\n", vehicleID, (totalNumberOfWaypoints - 1), waypointIndex);
                 //fprintf(stdout, "WP|%lli\n", icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].getNumber());
 
                 // Set the index of the next waypoint
