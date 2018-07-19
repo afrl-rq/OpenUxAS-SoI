@@ -23,7 +23,7 @@ srcs_services = [
   'StatusReportService.cpp',
   'Test_SimulationTime.cpp',
   'WaypointPlanManagerService.cpp',
-  'SteeringService.cpp'
+  'SteeringService.cpp',
   'DAIDALUS_WCV_Detection.cpp',
   'DAIDALUS_WCV_Response.cpp'
 ]
