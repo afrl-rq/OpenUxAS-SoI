@@ -17,15 +17,17 @@
  */
 
 // include header for this service
+#include "DAIDALUS_WCV_Response.h"
 #include "larcfm/DAIDALUS/DAIDALUSConfiguration.h"
 #include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
-#include "DAIDALUS_WCV_Response.h"
-//#include "stdUniquePtr.h"
-#include "afrl/cmasi/MissionCommand.h"
+#include "stdUniquePtr.h"
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/AirVehicleState.h"
 #include "afrl/cmasi/FlightDirectorAction.h"
+#include "afrl/cmasi/CommandStatusType.h"
 #include "afrl/cmasi/GoToWaypointAction.h"
+#include "afrl/cmasi/MissionCommand.h"
+
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -216,7 +218,17 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         pDivertThisWay->setSpeed(m_CurrentState.horizontal_speed_mps);
                         pDivertThisWay->setAltitudeType(m_CurrentState.altitude_type);
                         pDivertThisWay->setClimbRate(m_CurrentState.vertical_speed_mps);
-                        m_isTakenAction = true;
+                        
+                        std::shared_ptr<afrl::cmasi::VehicleActionCommand> pAvoidViolation;
+                        pAvoidViolation->setCommandID(getUniqueEntitySendMessageId());
+                        pAvoidViolation->setVehicleID(m_entityId);
+                        pAvoidViolation->setStatus(afrl::cmasi::CommandStatusType::Approved);
+                        pAvoidViolation->getVehicleActionList().push_back(pDivertThisWay.release());
+                        
+                        m_isTakenAction = true;                        
+                        //sendLmcpObjectBroadcastMessage(static_cast<avtas::lmcp::Object*>(pAvoidViolation));                
+                        sendSharedLmcpObjectBroadcastMessage(pAvoidViolation);
+                        
                     }
                     else
                     {
