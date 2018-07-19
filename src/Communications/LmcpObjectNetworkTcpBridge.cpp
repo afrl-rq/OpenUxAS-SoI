@@ -95,6 +95,16 @@ LmcpObjectNetworkTcpBridge::configure(const pugi::xml_node& bridgeXmlNode)
                     addSubscriptionAddress(lmcpSubscribeAddress);
                 }
             }
+            else if (std::string(uxas::common::StringConstant::TransformReceivedMessage().c_str()) == currentXmlNode.name())
+            {
+                const std::string lmcpAddress = currentXmlNode.attribute(uxas::common::StringConstant::MessageType().c_str()).value();
+                const std::string alias = currentXmlNode.attribute(uxas::common::StringConstant::Alias().c_str()).value();
+
+                if (!lmcpAddress.empty() && !alias.empty())
+                {
+                    m_messageAddressToAlias[lmcpAddress] = alias;
+                }
+            }
         }
 
         //
@@ -218,6 +228,13 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
                     {
                         receivedTcpMessage->updateSourceAttributes("TcpBridge", std::to_string(m_entityId), std::to_string(m_networkId));
                     }
+
+                    const auto it = m_messageAddressToAlias.find(receivedTcpMessage->getAddress());
+                    if (it != m_messageAddressToAlias.cend())
+                    {
+                        receivedTcpMessage->updateAddress(it->second);
+                    }
+
                     sendSerializedLmcpObjectMessage(std::move(receivedTcpMessage));
                 }
                 else

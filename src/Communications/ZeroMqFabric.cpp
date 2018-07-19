@@ -59,17 +59,38 @@ ZeroMqFabric::~ZeroMqFabric()
 std::unique_ptr<zmq::socket_t>
 ZeroMqFabric::createSocket(ZeroMqSocketConfiguration& socketConfiguration)
 {
+    UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket method START");
+    if(!m_zmqContext)
+    {
+        UXAS_LOG_ERROR("ZeroMqFabric::createSocket ZMQ context has not been created");
+        return std::unique_ptr<zmq::socket_t>(nullptr);
+    }
+    
+    UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket attempting to build socket of type ", socketConfiguration.m_zmqSocketType);
     std::unique_ptr<zmq::socket_t> zmqSocket = uxas::stduxas::make_unique<zmq::socket_t>(*m_zmqContext, socketConfiguration.m_zmqSocketType);
+    
+    if(!zmqSocket)
+    {
+        UXAS_LOG_ERROR("ZeroMqFabric::createSocket ZMQ socket could not be created with type ", socketConfiguration.m_zmqSocketType);
+        return std::unique_ptr<zmq::socket_t>(nullptr);
+    }
+    
+    UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket new ZMQ socket successfully created with type ", socketConfiguration.m_zmqSocketType);
     if (socketConfiguration.m_isServerBind)
     {
+        UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket BINDING socket to ", socketConfiguration.m_socketAddress.c_str());
         zmqSocket->bind(socketConfiguration.m_socketAddress.c_str());
     }
     else
     {
+        UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket CONNECTING socket to ", socketConfiguration.m_socketAddress.c_str());
         zmqSocket->connect(socketConfiguration.m_socketAddress.c_str());
     }
+    UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket setting RCV high-water mark for socket to ", socketConfiguration.m_receiveHighWaterMark);
     zmqSocket->setsockopt(ZMQ_RCVHWM, &socketConfiguration.m_receiveHighWaterMark, sizeof (socketConfiguration.m_receiveHighWaterMark));
+    UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket setting SEND high-water mark for socket to ", socketConfiguration.m_sendHighWaterMark);
     zmqSocket->setsockopt(ZMQ_SNDHWM, &socketConfiguration.m_sendHighWaterMark, sizeof (socketConfiguration.m_sendHighWaterMark));
+    UXAS_LOG_DEBUGGING("ZeroMqFabric::createSocket method END");
     return (zmqSocket);
 };
 

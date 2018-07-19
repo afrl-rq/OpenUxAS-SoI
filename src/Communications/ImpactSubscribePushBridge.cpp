@@ -141,12 +141,30 @@ ImpactSubscribePushBridge::initialize()
     auto pushConfig = transport::ZeroMqSocketConfiguration(uxas::communications::transport::NETWORK_NAME::zmqLmcpNetwork(),
         m_externalPushSocketAddress, ZMQ_PUSH, false, false, zmqhighWaterMark, zmqhighWaterMark);
 
-    sender = transport::ZeroMqFabric::getInstance().createSocket(pushConfig);
+    try
+    {
+        sender = transport::ZeroMqFabric::getInstance().createSocket(pushConfig);
+    }
+    catch (std::exception& ex)
+    {
+        UXAS_LOG_ERROR("ImpactSubscribePushBridge::initialize, create push socket EXCEPTION: ", ex.what());
+        sender = nullptr;
+        return false;
+    }
 
     // sub socket
     auto subConfig = transport::ZeroMqSocketConfiguration(uxas::communications::transport::NETWORK_NAME::zmqLmcpNetwork(),
         m_externalSubscribeSocketAddress, ZMQ_SUB, false, true, zmqhighWaterMark, zmqhighWaterMark);
-    subscriber = transport::ZeroMqFabric::getInstance().createSocket(subConfig);
+    try
+    {
+        subscriber = transport::ZeroMqFabric::getInstance().createSocket(subConfig);
+    }
+    catch (std::exception& ex)
+    {
+        UXAS_LOG_ERROR("ImpactSubscribePushBridge::initialize, create subscribe socket EXCEPTION: ", ex.what());
+        subscriber = nullptr;
+        return false;
+    }
     
     // loop through m_externalSubscriptionAddresses and subscribe following IMPACT message addressing
     for (auto externalSubscription : m_externalSubscriptionAddresses)

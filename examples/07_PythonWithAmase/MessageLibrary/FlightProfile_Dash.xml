@@ -1,0 +1,8 @@
+<FlightProfile Series="CMASI">
+    <Name>Dash</Name>
+    <Airspeed>35.0</Airspeed>
+    <PitchAngle>-2.0</PitchAngle>
+    <VerticalSpeed>0.0</VerticalSpeed>
+    <MaxBankAngle>30.0</MaxBankAngle>
+    <EnergyRate>0.1</EnergyRate>
+</FlightProfile>

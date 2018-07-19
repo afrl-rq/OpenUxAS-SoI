@@ -20,6 +20,8 @@
 #include "afrl/cmasi/LoiterAction.h"
 
 #define STRING_XML_VEHICLE_ID "VehicleID"
+#define STRING_XML_RADIUS_BUFFER "RadiusBuffer"
+#define STRING_XML_LEAD_DISTANCE "LeadDistance"
 
 #define COUT_INFO(MESSAGE) std::cout << "<>LoiterLeash:: " << MESSAGE << std::endl;std::cout.flush();
 #define COUT_FILE_LINE() std::cout << "<>LoiterLeash:: " << __FILE__ << ":" << __LINE__ << std::endl;std::cout.flush();
@@ -50,6 +52,15 @@ bool LoiterLeash::configure(const pugi::xml_node& ndComponent)
     if (!ndComponent.attribute(STRING_XML_VEHICLE_ID).empty())
     {
         m_vehicleID = ndComponent.attribute(STRING_XML_VEHICLE_ID).as_uint();
+    }
+    if (!ndComponent.attribute(STRING_XML_RADIUS_BUFFER).empty())
+    {
+        m_radiusBuffer = ndComponent.attribute(STRING_XML_RADIUS_BUFFER).as_double(m_radiusBuffer);
+        if(m_radiusBuffer < 1e-4) m_radiusBuffer = 0.0;
+    }
+    if (!ndComponent.attribute(STRING_XML_LEAD_DISTANCE).empty())
+    {
+        m_leadDistance = ndComponent.attribute(STRING_XML_LEAD_DISTANCE).as_double(m_leadDistance);
     }
 
     // subscribe to messages
@@ -136,8 +147,11 @@ bool LoiterLeash::processReceivedLmcpMessage(std::unique_ptr<uxas::communication
             {
                 // use DesiredHeading
                 // calculate desired loiter position
-                double loiterCenterEast_m = vehicleEast_m + safeHeadingAction->getLeadAheadDistance() * sin(n_Const::c_Convert::toRadians(safeHeadingAction->getDesiredHeading()));
-                double loiterCenterNorth_m = vehicleNorth_m + safeHeadingAction->getLeadAheadDistance() * cos(n_Const::c_Convert::toRadians(safeHeadingAction->getDesiredHeading()));
+                double leadDistance = safeHeadingAction->getLeadAheadDistance();
+                if(m_leadDistance > 1e-4)
+                    leadDistance = m_leadDistance; // override from config
+                double loiterCenterEast_m = vehicleEast_m + leadDistance * sin(n_Const::c_Convert::toRadians(safeHeadingAction->getDesiredHeading()));
+                double loiterCenterNorth_m = vehicleNorth_m + leadDistance * cos(n_Const::c_Convert::toRadians(safeHeadingAction->getDesiredHeading()));
                 cUnitConversions.ConvertNorthEast_mToLatLong_deg(loiterCenterNorth_m, loiterCenterEast_m, loiterCenterLatitude_deg, loiterCenterLongitude_deg);
             }
 
@@ -187,7 +201,9 @@ bool LoiterLeash::processReceivedLmcpMessage(std::unique_ptr<uxas::communication
             
             m_currentRouteId++;
             
-            double safeDistance_m =  safeHeadingAction->getLeadAheadDistance() + 3.0 * safeHeadingAction->getLoiterRadius();
+            double safeDistance_m =  safeHeadingAction->getLeadAheadDistance() + m_radiusBuffer*safeHeadingAction->getLoiterRadius();
+            if(m_leadDistance > 1e-4)
+                safeDistance_m = m_leadDistance + m_radiusBuffer*safeHeadingAction->getLoiterRadius(); // override from config
             double safePointEast_m = vehicleEast_m + safeDistance_m * sin(n_Const::c_Convert::toRadians(safeHeadingAction->getDesiredHeading()));
             double safePointNorth_m = vehicleNorth_m + safeDistance_m * cos(n_Const::c_Convert::toRadians(safeHeadingAction->getDesiredHeading()));
             double safePointLatitude_deg{0.0};

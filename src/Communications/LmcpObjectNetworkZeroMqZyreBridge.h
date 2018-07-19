@@ -244,12 +244,6 @@ private:
     std::set<std::string> m_initialPersistentLocalSubscriptionAddresses;
     std::set<std::string> m_nonImportForwardAddresses;
     std::set<std::string> m_nonExportForwardAddresses;
-    
-    /** \brief  If this is set to `true`, the ZyreBridge service will report all received
-     * messages as if they originated from the vehicle hosting the ZyreBridge rather
-     * than the external sender. This can be used when connected directly to a vehicle 
-     * simulation where the messages received would be considered self-generated in
-     * normal operation. */
     bool m_isConsideredSelfGenerated{false};
 };
 
