@@ -577,7 +577,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         float w_mps = airVehicleState->getW();
         float Phi_deg = airVehicleState->getRoll();
         float Theta_deg = airVehicleState->getPitch();
-        float Psi_deg = airVehicleState->getHeading();
+        float Psi_deg = airVehicleState->getHeading();  //currently does not account for wind.
         double velocityX_mps, velocityY_mps, velocityZ_mps;
         makeVelocityXYZ(u_mps, v_mps, w_mps, n_Const::c_Convert::toRadians(Phi_deg), n_Const::c_Convert::toRadians(Theta_deg), 
                 n_Const::c_Convert::toRadians(Psi_deg), velocityX_mps, velocityY_mps, velocityZ_mps);
@@ -636,9 +636,9 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                         nogo_ptr->getTimeToViolationList().push_back(itViolations->second);
                     }
                     nogo_ptr->setEntityId(m_entityId);  //Ownship Id
-                    nogo_ptr->setCurrentHeading(daa_own.track("deg"));  //DAIDALUS current heading--0deg = TrueNorth
-                    nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s")); //DAIDALUS current ground speed
-                    nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));    //DAIDALUS current vertical speed
+                    nogo_ptr->setCurrentHeading(daa_own.track("deg"));  //DAIDALUS current heading--0deg = TrueNorth Currently does not account for wind
+                    nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s")); //DAIDALUS current ground speed--does not account for wind
+                    nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));    //DAIDALUS current vertical speed--does not account for wind
                     nogo_ptr->setCurrentAltitude(daa_own.altitude("m"));    //DAIDALUS current altitude
                     nogo_ptr->setCurrentLatitude(m_daidalusVehicleInfo[m_entityId].latitude_deg);    //Current ownship latitude
                     nogo_ptr->setCurrentLongitude(m_daidalusVehicleInfo[m_entityId].longitude_deg);  //Current ownship longitude

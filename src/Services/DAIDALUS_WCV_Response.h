@@ -23,6 +23,8 @@
 #include "ServiceBase.h"
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/MissionCommand.h"
+#include "afrl/cmasi/AltitudeType.h"
+#include "afrl/cmasi/SpeedType.h"
 
 #include <memory>
 #include <vector>
@@ -153,6 +155,8 @@ private:
         double heading_deg;
         double latitude_deg;
         double longitude_deg;
+        afrl::cmasi::AltitudeType::AltitudeType altitude_type;
+        afrl::cmasi::SpeedType::SpeedType speed_type;
     }m_CurrentState;
 
     

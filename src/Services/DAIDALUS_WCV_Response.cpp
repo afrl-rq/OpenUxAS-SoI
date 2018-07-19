@@ -126,11 +126,22 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     {
         std::shared_ptr<afrl::cmasi::AirVehicleState> pAirVehicleState = 
                 std::static_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
-        if (!m_isTakenAction)
+        if (pAirVehicleState->getID() == m_entityId)
         {
-            m_NextWaypoint = pAirVehicleState->getCurrentWaypoint();
+            m_CurrentState.altitude_m = pAirVehicleState->getLocation()->getAltitude();
+            m_CurrentState.heading_deg = pAirVehicleState->getCourse();
+            m_CurrentState.horizontal_speed_mps = pAirVehicleState->getGroundspeed();
+            m_CurrentState.vertical_speed_mps = pAirVehicleState->getVerticalSpeed();
+            m_CurrentState.latitude_deg = pAirVehicleState->getLocation()->getLatitude();
+            m_CurrentState.longitude_deg = pAirVehicleState->getLocation()->getLongitude();
+            m_CurrentState.altitude_type = pAirVehicleState->getLocation()->getAltitudeType();
+            m_CurrentState.speed_type = afrl::cmasi::SpeedType::Groundspeed;
+            if (!m_isTakenAction)
+            {
+                m_NextWaypoint = pAirVehicleState->getCurrentWaypoint();
+                m_isReadyToActWaypoint = true;
+            }
         }
-        m_isReadyToActWaypoint = true;
     }
     if (larcfm::DAIDALUS::isDAIDALUSConfiguration(receivedLmcpMessage->m_object))
     {
@@ -152,12 +163,14 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
         if (m_isReadyToAct)
         {
+            /*
             m_CurrentState.altitude_m = pWCVIntervals->getCurrentAltitude();
             m_CurrentState.heading_deg = pWCVIntervals->getCurrentHeading();
             m_CurrentState.horizontal_speed_mps = pWCVIntervals->getCurrentGoundSpeed();
             m_CurrentState.vertical_speed_mps = pWCVIntervals->getCurrentVerticalSpeed();
             m_CurrentState.latitude_deg = pWCVIntervals->getCurrentLatitude();
             m_CurrentState.longitude_deg = pWCVIntervals->getCurrentLongitude();
+             * */
             for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
             {
                 if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
@@ -198,7 +211,11 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         //TODO: send vehicle action command
                         //TODO: remove RoW vehicle from the ConflictResolutionList
                         std::unique_ptr<afrl::cmasi::FlightDirectorAction> pDivertThisWay;
-                        pDivertThisWay->setHeading(m_CurrentState.heading_deg+90);
+                        pDivertThisWay->setHeading(static_cast<float>(m_CurrentState.heading_deg+90));
+                        pDivertThisWay->setAltitude(m_CurrentState.altitude_m);
+                        pDivertThisWay->setSpeed(m_CurrentState.horizontal_speed_mps);
+                        pDivertThisWay->setAltitudeType(m_CurrentState.altitude_type);
+                        pDivertThisWay->setClimbRate(m_CurrentState.vertical_speed_mps);
                         m_isTakenAction = true;
                     }
                     else
