@@ -54,7 +54,7 @@ public:
      */
     static bool ExtendPath(std::vector<afrl::cmasi::Waypoint*>& wplist, int64_t extendTime_ms, double R, double d);
     static double RequiredSegmentLength(double extendlen, double R);
-
+    static std::vector<afrl::cmasi::Waypoint*> DiscretizeExtension(std::vector<DubinsWaypoint>& dubins_extension, double d, FlatEarth& flatEarth, afrl::cmasi::Waypoint* baseWp);
 
 private:
     /**\brief Extends a single segment by a prescribed amount of time using the technique in [].
@@ -70,8 +70,6 @@ private:
      * @return vector of dubins waypoints that replace the segment with an extended manuever
      */
     static std::vector<DubinsWaypoint> ExtendSegment(DubinsWaypoint& startwp, DubinsWaypoint& endwp, double extendlen, double R);
-
-    static std::vector<afrl::cmasi::Waypoint*> DiscretizeExtension(std::vector<DubinsWaypoint>& dubins_extension, double d, FlatEarth& flatEarth, afrl::cmasi::Waypoint* baseWp);
     static std::vector<DubinsWaypoint> BuildRaceTrack(int32_t N, double tracklen, double R, DubinsWaypoint& startwp, DubinsWaypoint& endwp);
     static std::vector<DubinsWaypoint> BuildSingleBubble(double th, double R, DubinsWaypoint& startwp, DubinsWaypoint& endwp);
     static std::vector<DubinsWaypoint> BuildSlideBack(double th, double R, DubinsWaypoint& startwp, DubinsWaypoint& endwp);

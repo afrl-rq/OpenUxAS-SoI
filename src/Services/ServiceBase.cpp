@@ -55,20 +55,10 @@ ServiceBase::configureService(const std::string& parentWorkDirectory, const pugi
 
     if (!m_workDirectoryName.empty())
     {
-        if (!serviceXmlNode.attribute(uxas::common::StringConstant::isDataTimestamp().c_str()).empty())
-        {
-            m_isDataTimestamp = serviceXmlNode.attribute(uxas::common::StringConstant::isDataTimestamp().c_str()).as_bool();
-            UXAS_LOG_INFORM(m_serviceType, "::configureService setting timestamp boolean to [", m_isDataTimestamp, "] from XML configuration");
-        }
-        else
-        {
-            UXAS_LOG_INFORM(m_serviceType, "::configureService did not find ", uxas::common::StringConstant::isDataTimestamp(), " in XML; retaining default value m_isDataTimestamp [", m_isDataTimestamp, "]");
-        }
         
         m_workDirectoryPath = parentWorkDirectory + ((*(parentWorkDirectory.rbegin()) == '/') ? "" : "/")
                 + m_workDirectoryName + ((*(m_workDirectoryName.rbegin()) == '/') ? "" : "/");
-//20160125 rjt: work directory timestamp naming disabled 
-//                + (m_isDataTimestamp ? std::to_string(uxas::common::ConfigurationManager::getEntityStartTimeSinceEpoch_ms()) + "/" : "");
+
     }
     else
     {

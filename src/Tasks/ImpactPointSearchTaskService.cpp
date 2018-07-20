@@ -32,6 +32,9 @@
 
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
+#include <afrl/cmasi/GimbalConfiguration.h>
+#include <avtas/lmcp/LmcpXMLReader.h>
+#include <BatchSummaryService.h>
 
 
 #define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "IMPCT_PS-IMPCT_PS-IMPCT_PS-IMPCT_PS:: ImpactPointSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
@@ -86,6 +89,18 @@ ImpactPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
                     CERR_FILE_LINE_MSG(sstrErrors.str())
                     isSuccessful = false;
                 }
+            }
+            if (m_pointSearchTask->getDesiredAction() == nullptr)
+            {
+                sstrErrors << "ERROR:: **ImpactPointSearchTaskService::bConfigure PointOfInterest. Missing Loiter Action " << std::endl;
+                CERR_FILE_LINE_MSG(sstrErrors.str())
+                isSuccessful = false;
+            }
+
+            for (auto koz : m_keepOutZones)
+            {
+                auto poly = BatchSummaryService::FromAbstractGeometry(koz.second->getBoundary());
+                m_KeepOutZoneIDVsPolygon[koz.second->getZoneID()] = poly;
             }
         }
         else
@@ -201,20 +216,82 @@ bool ImpactPointSearchTaskService::isCalculateOption(const int64_t& taskId, int6
     auto startEndHeading_deg = n_Const::c_Convert::dNormalizeAngleRad((wedgeHeading_rad + n_Const::c_Convert::dPi()), 0.0) * n_Const::c_Convert::dRadiansToDegrees(); // [0,2PI) 
     taskOption->setStartHeading(startEndHeading_deg);
     taskOption->setEndHeading(startEndHeading_deg);
+    VisiLibity::Point newEnd;
+    bool newEndSet = false;
+    for (auto koz : m_KeepOutZoneIDVsPolygon)
+    {
+        VisiLibity::Point p;
+        double north, east;
+        unitConversions.ConvertLatLong_degToNorthEast_m(m_pointSearchTask->getDesiredAction()->getLocation()->getLatitude(),
+                                                        m_pointSearchTask->getDesiredAction()->getLocation()->getLongitude(), north, east);
+        p.set_x(east);
+        p.set_y(north);
+
+        //use an extra offset to avoid jagged KOZs
+        auto bufferMultiplier = 1.5;
+
+        //check for point inside koz case
+        if (p.in(*koz.second))
+        {
+            UXAS_LOG_WARN("ImpactPointSearchTask Loiter Inside of KeepOutZone. Attempting to move point.");
+            //move the location outside the koz
+            auto bounderyPoint = p.projection_onto_boundary_of(*koz.second);
+            auto vector = VisiLibity::Point::normalize(bounderyPoint - p) * m_pointSearchTask->getDesiredAction()->getRadius() * bufferMultiplier;
+            newEnd = bounderyPoint + vector;
+            newEndSet = true;
+
+            break;
+        }
+        afrl::cmasi::Polygon *poly = new afrl::cmasi::Polygon();
+        auto length = m_pointSearchTask->getDesiredAction()->getRadius();
+        for (double rad = 0; rad < n_Const::c_Convert::dTwoPi(); rad += n_Const::c_Convert::dPiO10())
+        {
+            double lat_deg, lon_deg;
+            
+            unitConversions.ConvertNorthEast_mToLatLong_deg(north + length * sin(rad), east + length * cos(rad), lat_deg, lon_deg);
+            auto loc = new afrl::cmasi::Location3D();
+            loc->setLatitude(lat_deg);
+            loc->setLongitude(lon_deg);
+            poly->getBoundaryPoints().push_back(loc);
+        }
+        auto loiterArea = BatchSummaryService::FromAbstractGeometry(poly);
+
+        //check if loiter intersects the perimiter of the koz case
+        if ( loiterArea->n() > 0 && koz.second->n() > 0 &&
+            boundary_distance(*loiterArea, *koz.second) < .1)
+        {
+            UXAS_LOG_WARN("ImpactPointSearchTask Loiter Intersects KeepOutZone. Attempting to move point.");
+            //move the location outside the koz
+            auto bounderyPoint = p.projection_onto_boundary_of(*koz.second);
+            //the loiter center point is outside of the koz because of the checks above
+            auto vector = VisiLibity::Point::normalize(p - bounderyPoint) * m_pointSearchTask->getDesiredAction()->getRadius() * bufferMultiplier;
+            newEnd = bounderyPoint + vector;
+            newEndSet = true;
+
+            break;
+        }
+    }
+    if (newEndSet)
+    {
+        double latitude_deg(0.0);
+        double longitude_deg(0.0);
+        unitConversions.ConvertNorthEast_mToLatLong_deg(newEnd.y(), newEnd.x(), latitude_deg, longitude_deg);
+        m_pointSearchTask->getDesiredAction()->getLocation()->setLatitude(latitude_deg);
+        m_pointSearchTask->getDesiredAction()->getLocation()->setLongitude(longitude_deg);
+    }
+
 
     if (n_Const::c_Convert::bCompareDouble(standoffDistance, 0.0, n_Const::c_Convert::enLessEqual))
     {
         taskOption->setTaskID(taskId);
         taskOption->setOptionID(optionId);
         //taskOption->setCost();    // defaults to 0.0
-        taskOption->setStartLocation(m_pointSearchTask->getSearchLocation()->clone());
-        taskOption->setEndLocation(m_pointSearchTask->getSearchLocation()->clone());
-        //            for(auto itEligibleEntities=m_speedAltitudeVsEligibleEntitesRequested.begin();itEligibleEntities!=m_speedAltitudeVsEligibleEntitesRequested.end();itEligibleEntities++)
-        //            {
-        //                taskOption->getEligibleEntities().insert(taskOption->getEligibleEntities().end(),itEligibleEntities->second.begin(),itEligibleEntities->second.end());
-        //            }
-        //taskOption->getEligibleEntities();    // defaults to all entities eligible
-        //taskOption->setCost(0);
+        taskOption->setStartLocation(m_pointSearchTask->getDesiredAction()->getLocation()->clone());
+        taskOption->setEndLocation(m_pointSearchTask->getDesiredAction()->getLocation()->clone());
+        for (auto itEligibleEntities : m_speedAltitudeVsEligibleEntityIdsRequested)
+            for (auto id : itEligibleEntities.second)
+                taskOption->getEligibleEntities().push_back(id);
+        taskOption->setCost(0);
         auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
         m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
         m_taskPlanOptions->getOptions().push_back(taskOption);
@@ -226,8 +303,8 @@ bool ImpactPointSearchTaskService::isCalculateOption(const int64_t& taskId, int6
         taskOption->setOptionID(optionId);
 
         //find standoff (start) location/
-        n_FrameworkLib::CPosition position(m_pointSearchTask->getSearchLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
-                                           m_pointSearchTask->getSearchLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
+        n_FrameworkLib::CPosition position(m_pointSearchTask->getDesiredAction()->getLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
+                                           m_pointSearchTask->getDesiredAction()->getLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
                                            0.0, 0.0);
         double newNorth_m = standoffDistance * cos(wedgeHeading_rad) + position.m_north_m;
         double newEast_m = standoffDistance * sin(wedgeHeading_rad) + position.m_east_m;
@@ -240,7 +317,7 @@ bool ImpactPointSearchTaskService::isCalculateOption(const int64_t& taskId, int6
         startLocation->setLongitude(longitude_rad * n_Const::c_Convert::dRadiansToDegrees());
         taskOption->setStartLocation(startLocation);
         startLocation = nullptr; // just gave up ownership
-        taskOption->setEndLocation(m_pointSearchTask->getSearchLocation()->clone());
+        taskOption->setEndLocation(m_pointSearchTask->getDesiredAction()->getLocation()->clone());
 
         auto routePlan = std::make_shared<uxas::messages::route::RoutePlan>();
 
@@ -306,27 +383,60 @@ bool ImpactPointSearchTaskService::isProcessTaskImplementationRouteResponse(std:
                                                                             int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route)
 {
     //add the desired action, if any
-    if (!taskImplementationResponse->getTaskWaypoints().empty() && (m_pointSearchTask->getDesiredAction() != nullptr))
+    if (!taskImplementationResponse->getTaskWaypoints().empty())
     {
-        taskImplementationResponse->getTaskWaypoints().back()->getVehicleActionList().push_back(m_pointSearchTask->getDesiredAction()->clone());
+        if (m_entityStates.find(taskImplementationResponse.get()->getVehicleID()) != m_entityStates.end())
+        {
+
+            auto action = m_pointSearchTask->getDesiredAction();
+
+            //make sure the action has this task associated with it.
+            if (std::find(action->getAssociatedTaskList().begin(), action->getAssociatedTaskList().end(), m_task->getTaskID()) == action->getAssociatedTaskList().end())
+            {
+                action->getAssociatedTaskList().push_back(m_task->getTaskID());
+            }
+            auto state = m_entityStates[taskImplementationResponse.get()->getVehicleID()];
+            auto cast = static_cast<std::shared_ptr<avtas::lmcp::Object>>(state);
+
+            auto finalWaypoint = taskImplementationResponse->getTaskWaypoints().back();
+            //hotfix for surface vehicles staying in place if the next waypoint has a loiter 
+            if (afrl::vehicles::isSurfaceVehicleState(cast))
+            {
+                auto newFinalWp = finalWaypoint->clone();
+                auto newFinalWaypointNumber = finalWaypoint->getNumber() + 1;
+                finalWaypoint->setNextWaypoint(newFinalWaypointNumber);
+                newFinalWp->setNumber(newFinalWaypointNumber);
+                newFinalWp->setNextWaypoint(newFinalWaypointNumber);
+                taskImplementationResponse->getTaskWaypoints().push_back(newFinalWp);
+                finalWaypoint = newFinalWp;
+            }
+            action->getLocation()->setAltitude(finalWaypoint->getAltitude());
+            finalWaypoint->getVehicleActionList().push_back(action->clone());
+            finalWaypoint->setTurnType(afrl::cmasi::TurnType::TurnShort);
+
+            //set up a gimbal stare action
+            auto gimbalStareAction = std::make_shared<afrl::cmasi::GimbalStareAction>();
+            gimbalStareAction->setStarepoint(m_pointSearchTask->getSearchLocation()->clone());
+            if (m_entityConfigurations.find(taskImplementationResponse.get()->getVehicleID()) != m_entityConfigurations.end())
+            {
+                auto config = m_entityConfigurations[taskImplementationResponse.get()->getVehicleID()];
+                for (auto payload : config->getPayloadConfigurationList())
+                {
+                    if (afrl::cmasi::isGimbalConfiguration(payload))
+                    {
+                        gimbalStareAction->setPayloadID(payload->getPayloadID());
+                    }
+                }
+            }
+			auto firstWaypoint = taskImplementationResponse->getTaskWaypoints().front();
+			firstWaypoint->getVehicleActionList().push_back(gimbalStareAction->clone());
+        }
     }
     return (false); // want the base class to build the response
 }
 
 void ImpactPointSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)
 {
-    // point the camera at the search point
-    auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
-    //vehicleActionCommand->setCommandID();
-    vehicleActionCommand->setVehicleID(entityState->getID());
-    //vehicleActionCommand->setStatus();
-    auto gimbalStareAction = new afrl::cmasi::GimbalStareAction;
-    gimbalStareAction->setStarepoint(m_pointSearchTask->getSearchLocation()->clone());
-    vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction);
-    gimbalStareAction = nullptr; //gave up ownership
-    // send out the response
-    auto newMessage = std::static_pointer_cast<avtas::lmcp::Object>(vehicleActionCommand);
-    sendSharedLmcpObjectBroadcastMessage(newMessage);
 }
 
 

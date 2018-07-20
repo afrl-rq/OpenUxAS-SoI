@@ -92,6 +92,14 @@ public:
    };
 
     bool
+    updateAddress(const std::string address)
+    {
+        m_address = address;
+        m_string = m_address + s_addressAttributesDelimiter() + m_messageAttributes->getString() + s_addressAttributesDelimiter() + m_payload;
+        return (m_isValid);
+    }
+
+    bool
     setAddressAttributesAndPayloadFromDelimitedString(const std::string delimitedString)
     {
         if (delimitedString.length() >= s_minimumDelimitedAddressAttributeMessageStringLength)

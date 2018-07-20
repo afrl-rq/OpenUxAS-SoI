@@ -244,6 +244,7 @@ private:
     std::set<std::string> m_initialPersistentLocalSubscriptionAddresses;
     std::set<std::string> m_nonImportForwardAddresses;
     std::set<std::string> m_nonExportForwardAddresses;
+    bool m_isConsideredSelfGenerated{false};
 };
 
 }; //namespace communications

@@ -1,0 +1,18 @@
+<GimbalConfiguration Series="CMASI">
+    <SupportedPointingModes/>
+    <MinAzimuth>-160.0</MinAzimuth>
+    <MaxAzimuth>160.0</MaxAzimuth>
+    <IsAzimuthClamped>true</IsAzimuthClamped>
+    <MinElevation>-130.0</MinElevation>
+    <MaxElevation>40.0</MaxElevation>
+    <IsElevationClamped>true</IsElevationClamped>
+    <MinRotation>-90.0</MinRotation>
+    <MaxRotation>90.0</MaxRotation>
+    <IsRotationClamped>true</IsRotationClamped>
+    <MaxAzimuthSlewRate>30.0</MaxAzimuthSlewRate>
+    <MaxElevationSlewRate>30.0</MaxElevationSlewRate>
+    <MaxRotationRate>30.0</MaxRotationRate>
+    <ContainedPayloadList/>
+    <PayloadID>1001</PayloadID>
+    <PayloadKind/>
+</GimbalConfiguration>

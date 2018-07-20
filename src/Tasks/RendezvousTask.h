@@ -18,6 +18,7 @@
 #define UXAS_RENDEZVOUS_TASK_H
 
 #include "TaskServiceBase.h"
+#include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "uxas/messages/task/TaskImplementationRequest.h"
 #include "uxas/messages/task/TaskAssignmentSummary.h"
 #include "uxas/messages/task/AssignmentCostMatrix.h"
@@ -88,6 +89,8 @@ private:
     virtual bool processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
     void updateStartTimes(std::shared_ptr<uxas::messages::task::TaskImplementationRequest>& implReq);
     void updateStartTimes(std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& implResp);
+    double ArrivalDistance(const std::shared_ptr<afrl::cmasi::EntityState>& state);
+    std::pair<double, double> SpeedClip(const std::shared_ptr<afrl::cmasi::AirVehicleConfiguration>& avconfig, double& nomSpeed);
 
     void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;
     size_t FindWaypointIndex(const std::vector<afrl::cmasi::Waypoint*> wplist, int64_t wpid);
@@ -98,9 +101,6 @@ private:
                 int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route) override;
     
     // key: unique automation request ID, value: task assignment summary 
-    std::unordered_map<int64_t, bool > m_sandboxRequest;
-    
-    // key: unique automation request ID, value: task assignment summary 
     std::unordered_map<int64_t, std::shared_ptr<uxas::messages::task::TaskAssignmentSummary> > m_assignmentSummary;
     
     // key: unique automation request ID, value: assignment cost matrix
@@ -109,13 +109,10 @@ private:
     // key: unique automation request ID, value: map
     //                     key: vehicle ID, value: absolute time at task start in ms
     std::unordered_map<int64_t, std::unordered_map<int64_t, int64_t> > m_taskStartTime;
+    std::unordered_map<int64_t, std::unordered_map<int64_t, bool> > m_taskEncountered;
     
-    // key: unique automation request ID, value: map
-    //                     key: vehicle ID, value: absolute time of planned arrival in ms
-    std::unordered_map<int64_t, std::unordered_map<int64_t, int64_t> > m_plannedToa;
-    
-    // key: vehicle ID, value: absolute time of assigned arrival in ms
-    std::unordered_map<int64_t, int64_t> m_assignedToa;
+    // key: vehicle ID, value: pair (time of valuation, remaining distance)
+    std::unordered_map<int64_t, std::pair<int64_t, double> > m_distanceRemaining;
 };
 
 

@@ -138,6 +138,9 @@ private:
     int64_t m_currentRouteId = {0};
     /*! \brief  vehicle action command to send out if route request returns route with 2 points. */
     std::shared_ptr<afrl::cmasi::VehicleActionCommand> m_nextVehicleActionCommand;
+    
+    double m_radiusBuffer{2.0};
+    double m_leadDistance{0.0};
 };
 
 }; //namespace service

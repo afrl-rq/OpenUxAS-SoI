@@ -1,0 +1,19 @@
+<CameraConfiguration Series="CMASI">
+    <PayloadID>10001</PayloadID>
+    <PayloadKind/>
+    <Parameters/>
+    <SupportedWavelengthBand>AllAny</SupportedWavelengthBand>
+    <FieldOfViewMode>Discrete</FieldOfViewMode>
+    <MinHorizontalFieldOfView>0.11</MinHorizontalFieldOfView>
+    <MaxHorizontalFieldOfView>45.0</MaxHorizontalFieldOfView>
+    <DiscreteHorizontalFieldOfViewList>
+        <real32>45.0</real32>
+        <real32>22.0</real32>
+        <real32>7.6</real32>
+        <real32>3.7</real32>
+        <real32>0.63</real32>
+        <real32>0.11</real32>
+    </DiscreteHorizontalFieldOfViewList>
+    <VideoStreamHorizontalResolution>1024</VideoStreamHorizontalResolution>
+    <VideoStreamVerticalResolution>768</VideoStreamVerticalResolution>
+</CameraConfiguration>

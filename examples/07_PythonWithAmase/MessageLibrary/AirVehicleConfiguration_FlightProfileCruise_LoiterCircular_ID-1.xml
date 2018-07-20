@@ -1,0 +1,31 @@
+<AirVehicleConfiguration Series="CMASI">
+    <ID>1</ID>
+    <Label></Label>
+    <MinimumSpeed>20.0</MinimumSpeed>
+    <MaximumSpeed>35.0</MaximumSpeed>
+    <NominalSpeed>27.5</NominalSpeed>
+    <NominalAltitude>700.0</NominalAltitude>
+    <NominalAltitudeType>MSL</NominalAltitudeType>
+    <NominalFlightProfile>
+        <FlightProfile Series="CMASI">
+            <Name>Cruise</Name>
+            <Airspeed>27.5</Airspeed>
+            <PitchAngle>0</PitchAngle>
+            <VerticalSpeed>0</VerticalSpeed>
+            <MaxBankAngle>20</MaxBankAngle>
+            <EnergyRate>0.03</EnergyRate>
+        </FlightProfile>
+    </NominalFlightProfile>
+    <AlternateFlightProfiles/>
+    <PayloadConfigurationList/>
+    <AvailableLoiterTypes>
+        <LoiterType>Circular</LoiterType>
+    </AvailableLoiterTypes>
+    <AvailableTurnTypes>
+        <TurnType>TurnShort</TurnType>
+        <TurnType>FlyOver</TurnType>
+    </AvailableTurnTypes>
+    <MinimumAltitude>0</MinimumAltitude>
+    <MaximumAltitude>1000000</MaximumAltitude>
+    <MinAltAboveGround>0</MinAltAboveGround>
+</AirVehicleConfiguration>
