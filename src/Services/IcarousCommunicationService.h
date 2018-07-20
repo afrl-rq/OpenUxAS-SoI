@@ -160,6 +160,8 @@ private:
     std::vector<int64_t> currentWaypointIndex;
     std::vector<int64_t> lastWaypoint;
     std::vector<bool> isLastWaypointInitialized;
+    
+    std::vector<bool> resumePointSet;
 
     std::vector<std::vector<int64_t>> entityTasks;
 
@@ -171,6 +173,7 @@ private:
     // Dimention 1: ICAROUS instance
     // Dimention 2: Heading | Lat | Long | Alt
     std::vector<std::vector<float>> currentInformation;
+    std::vector<std::vector<float>> positionBeforeTakeover;
     // One mutex for each ICAROUS instance
     std::mutex *currentInformationMutexes;
 
