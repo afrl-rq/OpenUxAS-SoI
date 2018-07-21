@@ -196,6 +196,8 @@ namespace VisiLibity
      * Written for use within Polygon union_ method
      */
     Point to_visiLibity(boost_point x);
+    
+    std::vector<std::pair<int, int> > find_overlap(std::vector<boost_polygon> polygonList);
 
   /// Point in the plane represented by Cartesian coordinates
   class Point
@@ -1362,7 +1364,7 @@ namespace VisiLibity
      * \author  Derek Kingston
      * \remarks Will return false if an error occurs (e.g. OpenGL tessellation errors).
      */
-    static bool union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
+//    static bool union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
       /** \brief  merges a list of simple polygons oriented ccw using boost union
        *
        * \pre polygonList contains only simple ccw oriented polygons, but for
@@ -1370,7 +1372,7 @@ namespace VisiLibity
        * \author  Derek Kingston
        * \remarks Will return false if an error occurs (e.g. XXX).
        */
-      static bool boost_union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
+      static bool boost_union(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
     //Mutators
     /** \brief  access with automatic wrap-around in forward direction
      *
