@@ -564,8 +564,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         //receive message
         std::shared_ptr<afrl::cmasi::AirVehicleState> airVehicleState = std::static_pointer_cast<afrl::cmasi::AirVehicleState> (receivedLmcpMessage->m_object);
         //Screen output for debugging 
-        std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << 
-                airVehicleState->getID() << std::endl;
+        //std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << 
+        //        airVehicleState->getID() << std::endl; 
         //handle message
         std::unordered_map<int64_t, double> detectedViolations;        
         //add air vehicle message state to the Daidalus Object
@@ -758,6 +758,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     //Screen output for debugging --TODO: DELETE LOOP AND SCREEN OUTPUT
                     for (auto itViolations = detectedViolations.cbegin(); itViolations != detectedViolations.cend(); itViolations++)
                     {
+                        if (itViolations->second <= 25)
                         std::cout << "Entity " << m_entityId << "'s well clear volume will be violated by Entity " << itViolations->first << " in " 
                                 << itViolations->second <<" seconds!!" << std::endl<<std::endl; //--TODO delete
                        // std::cout << m_nogo_trk_deg <<  std::endl;--TODO delete

@@ -16,6 +16,7 @@
         <SubscribeToMessage MessageType="afrl.cmasi.PointSearchTask"/>
         <SubscribeToMessage MessageType="larcfm.DAIDALUS.DAIDALUSConfiguration" />
         <SubscribeToMessage MessageType="larcfm.DAIDALUS.WellClearViolationIntervals" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
     </Bridge>
     <Service Type="Test_SimulationTime"/>
     <Service Type="TaskManagerService"/>
@@ -26,6 +27,7 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>
     <Service Type="PlanBuilderService"/>
     <Service Type="DAIDALUS_WCV_Detection" RTCAAlertLevels="3"/>
+    <Service Type="DAIDALUS_WCV_Response" />   
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"

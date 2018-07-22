@@ -111,7 +111,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         //auto it_AutomationResponse = std::find_if(pAutoResponse->getMissionCommandList().cbegin(), pAutoResponse->getMissionCommandList().cend(), 
          //       [&] (const afrl::cmasi::MissionCommand* pMission){ return pMission->getVehicleID() == m_entityId; } );
                 
-                
+        //std::cout << "Response has Mission Command from Automation Response" << std::endl;        
         m_isReadyToActMissionCommand = true;
     }
     else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
@@ -142,6 +142,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             {
                 m_NextWaypoint = pAirVehicleState->getCurrentWaypoint();
                 m_isReadyToActWaypoint = true;
+                //std::cout << "DAIDALUS Response has the next waypoint" << std::endl;
             }
         }
     }
@@ -154,9 +155,11 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         m_horizontal_accel_mpsps = configuration->getHorizontalAcceleration();
         m_vertical_accel_mpsps = configuration->getVerticalAcceleration();
         m_isReadyToActConfiguration = true;  //boolean indicating if a threshold time is set from reading a DAIDALUS configuration parameter.
+        //std::cout << "DAIDALUS Response has received the DAIDALUS configuration used for detection." << std::endl;
     }
     if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
     {
+        //std::cout << "DAIDALUS Response has received a violation message." << std::endl;
         if (m_isReadyToActWaypoint && m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
         {
             m_isReadyToAct = true;  //boolean to determine when ready to act; by having a threshold time set, a desired waypoint, and a missioncommand waypoint list
@@ -173,29 +176,34 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             m_CurrentState.latitude_deg = pWCVIntervals->getCurrentLatitude();
             m_CurrentState.longitude_deg = pWCVIntervals->getCurrentLongitude();
              * */
-            for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
+            //std::cout << "DAIDALUS Response has received a violation message and is ready to act on it" << std::endl;
+            if (!m_isConflict)
             {
-                if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
+                for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
                 {
-                    m_ConflictResolutionList.push_back(pWCVIntervals->getEntityList()[i]);
+                    if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
+                    {
+                        m_ConflictResolutionList.push_back(pWCVIntervals->getEntityList()[i]);
+                    }
                 }
-            }
+            }    
             if (!m_isConflict && m_ConflictResolutionList.size() > 0)
             {
                 m_isConflict = true;//bool t = SetisConflict(true);
             }
             if (m_isConflict)
             {
-                //Get conflict bands
+                //TODO: Get conflict bands and store
+                std::cout << "I HAVE DETERMINED THAT A CONFLICT MUST BE RESOLVED" << std::endl;
                 
-                uint32_t RoW = m_entityId;
+                uint64_t RoW = m_entityId;
                 // determine the vehicle that has the Right of Way
-                for (int i : m_ConflictResolutionList)
+                for (auto i : m_ConflictResolutionList)
                 //for (size_t i = m_ConflictResolutionList.cbegin();  i < m_ConflictResolutionList.size(); i++)
                 {
-                    if (m_ConflictResolutionList[i] < RoW)
+                    if (i < RoW)
                     {
-                        RoW = m_ConflictResolutionList[i];
+                        RoW = i;
                     }                    
                 }
                 if (m_entityId == RoW)
@@ -203,23 +211,34 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     //Ownship has Right of Way and therefore should take no action 
                     m_isConflict = false;
                     m_ConflictResolutionList.clear();   //Ownship is not in conflict, thus ConflictResolutionList should be cleared.
+                    std::cout << "I HAS THE RIGHT OF WAY--NOT DOING ANYTHING TO AVOID COLLISION" << std::endl;
                 }
                 else
                 {
+                    std::vector<uint64_t>::iterator expunge;
+                    for (auto ii = m_ConflictResolutionList.begin(); ii != m_ConflictResolutionList.end(); ii++)
+                    {                         
+                        if (*ii == RoW)
+                        {
+                            expunge = ii;
+                            break;
+                        }                        
+                    }
+                    m_ConflictResolutionList.erase(expunge);
                     if (!m_isTakenAction)
                     {
                         //TODO: Determine recommended action from DAIDALUS
                         //TODO: set action response to aforementioned recommended action
                         //TODO: send vehicle action command
                         //TODO: remove RoW vehicle from the ConflictResolutionList
-                        std::unique_ptr<afrl::cmasi::FlightDirectorAction> pDivertThisWay;
-                        pDivertThisWay->setHeading(static_cast<float>(m_CurrentState.heading_deg+90));
+                        std::unique_ptr<afrl::cmasi::FlightDirectorAction> pDivertThisWay = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
+                        pDivertThisWay->setHeading(static_cast<float>(m_CurrentState.heading_deg-90.0)); //make sure heading is from 0 to 360;
                         pDivertThisWay->setAltitude(m_CurrentState.altitude_m);
                         pDivertThisWay->setSpeed(m_CurrentState.horizontal_speed_mps);
                         pDivertThisWay->setAltitudeType(m_CurrentState.altitude_type);
                         pDivertThisWay->setClimbRate(m_CurrentState.vertical_speed_mps);
                         
-                        std::shared_ptr<afrl::cmasi::VehicleActionCommand> pAvoidViolation;
+                        std::shared_ptr<afrl::cmasi::VehicleActionCommand> pAvoidViolation = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                         pAvoidViolation->setCommandID(getUniqueEntitySendMessageId());
                         pAvoidViolation->setVehicleID(m_entityId);
                         pAvoidViolation->setStatus(afrl::cmasi::CommandStatusType::Approved);
@@ -228,15 +247,23 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         m_isTakenAction = true;                        
                         //sendLmcpObjectBroadcastMessage(static_cast<avtas::lmcp::Object*>(pAvoidViolation));                
                         sendSharedLmcpObjectBroadcastMessage(pAvoidViolation);
+                        std::cout << "ENTITY " << m_entityId << " IS DIVERTING IN AN EFFORT TO AVOID AN IMMINENT COLLISION" << std::endl;
                         
                     }
                     else
                     {
                         //TODO: hold conflict until elapsed time for maneuver has passed or until desired state attained
                         //TODO: Compare desired "mode value" to current nogo band and if outside mode value send action command to desired and set isConflict to false
+                        m_isActionCompleted = true;
+                        
                         //TODO: Evaluate the size of the ConflictResolutionList: if empty do nothing else, if empty and maneuver obtained, flag m_isTakenAction to false
                         //TODO: remove RoW vehicle from the ConflictResolutionList
-                        
+                        if (m_isActionCompleted && (m_ConflictResolutionList.size() == 0))
+                        {
+                            m_isTakenAction = false;
+                            m_isActionCompleted = false;
+                        }
+                        std::cout << "STILL PERFORMING COLLISION AVOIDANCE MANUEVER" << std::endl;
 
                     }
                 }
