@@ -90,6 +90,11 @@ private:
     double m_loiterRadius_m{250.0};
     int64_t m_acceptanceTimeToArrive_ms{0};
     double m_acceptanceDistance{0.0};
+    
+    bool m_useSafeHeadingAction{false};
+    double m_overrideSpeed{0.0};
+    bool m_isSpeedOverridden{false};
+    bool m_isHeadingControlledByTask{false};
 
     std::unique_ptr<afrl::cmasi::Location3D> m_previousLocation;
 
