@@ -125,6 +125,11 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
 
     // Subscribe to messages::
     // MissionCommand messages are used to determine where a singular UAV is going to go during a mission
+    // TODO - semaphores are system-wide, since they're implemented as files. Lock a semaphore in this thread when
+    // we don't want to re-run UxAS, and unlock it when we do. Additionally, in the terminate function for this service,
+    // delete the semaphore file.
+    // TODO TODO - Instead of going through all that, try setting the troublesome service to only send its troublesome
+    // message once, ever
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     
     // KeepInZone messages are used to define all zones to stay within
@@ -426,6 +431,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     if(resumePointSet[instanceIndex] == false){
                         //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, missionCommands->getFirstWaypoint());
                         std::cout << missionCommands[instanceIndex]->toString() << std::endl;
+                        fprintf(stderr, "SENDING NEW MISSION COMMAND TO UAV %i!!!\n", instanceIndex + 1);
                         sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
                         resumePointSet[instanceIndex] = true;
                     }
@@ -849,20 +855,22 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
                        currentWaypointIndex[vehicleID - 1]);
                     
-                    dprintf(1, "UAV %i | WPRCH,id%lli.0,\n",
-                        vehicleID,
-                        currentWaypointIndex[vehicleID - 1]);
+                    //dprintf(1, "UAV %i | WPRCH,id%lli.0,\n",
+                    //    vehicleID,
+                    //    currentWaypointIndex[vehicleID - 1]);
                     
                     currentWaypointIndex[vehicleID - 1]++;
                     
                     if(truncateWaypoint[vehicleID - 1] == true){
+                        fprintf(stderr, "UAV %i | Truncating waypoint index [%lli]\n", vehicleID, currentWaypointIndex[vehicleID - 1]);
                         newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
                     }else{
+                        fprintf(stderr, "UAV %i | Skipping truncation\n", vehicleID);
                         truncateWaypoint[vehicleID - 1] = true;
                     }
                     
                     if(lastWaypoint[vehicleID - 1] == ptr_AirVehicleState->getCurrentWaypoint()){
-                        fprintf(stdout, "UAV %i | lastwaypoint indicates task is finished?\n", vehicleID);
+                        fprintf(stdout, "UAV %i | lastwaypoint indicates task is finished\n", vehicleID);
                     }else{
                         //fprintf(stdout, "UAV %i | lastwaypoint is moving up one\n", vehicleID);
                         lastWaypoint[vehicleID - 1]++;
@@ -1082,7 +1090,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             
             fprintf(stderr, "UAV %i | current %lli | last %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], lastWaypoint[vehicleID - 1]);
             
-            isLastWaypointInitialized[vehicleID - 1] = false;
+            //isLastWaypointInitialized[vehicleID - 1] = false;
             softResetFlag[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
