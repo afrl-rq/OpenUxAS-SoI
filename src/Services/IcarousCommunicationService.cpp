@@ -508,27 +508,27 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 //fprintf(stdout, "SETVEL message received in icarousClientFd %lli!\n", icarousClientFd);
                 
                 // Get u
-                trackingHelper            = strstr(tempMessageBuffer, "u");
-                trackingHelper           += 1; //skip past "u"
+                trackingHelper            = strstr(tempMessageBuffer, "north");
+                trackingHelper           += 5; //skip past "north"
                 fieldEnd                  = strchr(trackingHelper, ',');
                 fieldLength               = fieldEnd - trackingHelper;
-                float u     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                float north     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
                 // Get v
-                trackingHelper            = strstr(tempMessageBuffer, "v");
-                trackingHelper           += 1; //skip past "v"
+                trackingHelper            = strstr(tempMessageBuffer, "east");
+                trackingHelper           += 4; //skip past "east"
                 fieldEnd                  = strchr(trackingHelper, ',');
                 fieldLength               = fieldEnd - trackingHelper;
-                float v     = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                float east     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
                 // Get w
-                trackingHelper            = strstr(tempMessageBuffer, "w");
-                trackingHelper           += 1; //skip past "w"
+                trackingHelper            = strstr(tempMessageBuffer, "down");
+                trackingHelper           += 4; //skip past "down"
                 fieldEnd                  = strchr(trackingHelper, ',');
                 fieldLength               = fieldEnd - trackingHelper;
-                float w     = atof(strncpy(throwaway, trackingHelper, fieldLength));
-
+                float down     = atof(strncpy(throwaway, trackingHelper, fieldLength));
                 
+                /*
                 //fprintf(stdout, "%lli|SETVEL|u|%f\n", icarousClientFd, u);
                 //fprintf(stdout, "%lli|SETVEL|v|%f\n", icarousClientFd, v);
                 //fprintf(stdout, "%lli|SETVEL|w|%f\n", icarousClientFd, w);
@@ -602,7 +602,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
                 //fprintf(stdout, "VehicleActionCommand sent\n");
-                
+                */
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
