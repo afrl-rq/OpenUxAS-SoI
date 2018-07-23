@@ -211,10 +211,6 @@ ImpactSubscribePushBridge::processReceivedSerializedLmcpMessage(
         "having address ", receivedLmcpMessage->getAddress(),
         " and size ", receivedLmcpMessage->getPayload().size());
 
-    // process messages from a local service (only)
-    if (m_entityIdString != receivedLmcpMessage->getMessageAttributesReference()->getSourceEntityId())
-      return false;
-
     // do not forward uni-cast messages (or any address on blocked list)
     if (m_nonExportForwardAddresses.find(receivedLmcpMessage->getAddress()) == m_nonExportForwardAddresses.end())
     {

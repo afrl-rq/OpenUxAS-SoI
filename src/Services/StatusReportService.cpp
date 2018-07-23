@@ -127,6 +127,8 @@ bool StatusReportService::initialize()
 
 bool StatusReportService::start()
 {
+    // start periodic reporting timer
+    uxas::common::TimerManager::getInstance().startPeriodicTimer(m_reportTimerId, m_reportPeriod_ms, m_reportPeriod_ms);
     return (true);
 }
 
