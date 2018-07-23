@@ -165,8 +165,10 @@ bool IcarousCommunicationService::initialize()
     lastWaypoint.resize(ICAROUS_CONNECTIONS);
     isLastWaypointInitialized.resize(ICAROUS_CONNECTIONS);
     missionCommands.resize(ICAROUS_CONNECTIONS);
+    newWaypointLists.resize(ICAROUS_CONNECTIONS);
     softResetFlag.resize(ICAROUS_CONNECTIONS);
     resumePointSet.resize(ICAROUS_CONNECTIONS);
+    truncateWaypoint.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes must be set like this and not in a vector
     // This is because a vector of mutexes is non-resizable
@@ -189,6 +191,7 @@ bool IcarousCommunicationService::initialize()
     isLastWaypointInitialized.assign(ICAROUS_CONNECTIONS, false);
     softResetFlag.assign(ICAROUS_CONNECTIONS, false);
     resumePointSet.assign(ICAROUS_CONNECTIONS, false);
+    truncateWaypoint.assign(ICAROUS_CONNECTIONS, false);
     
     // Variable set-up
     // Protocol constants for 3-way ICAROUS authentication handshake    
@@ -392,6 +395,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 {
                     fprintf(stderr, "UAV %i's last waypoint saved currentWaypointIndex[instanceIndex] = %lli as: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     icarousTakeoverActive[instanceIndex] = true;
+                    truncateWaypoint[instanceIndex] = false;
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
                         //fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
@@ -420,11 +424,9 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     icarousTakeoverActive[instanceIndex] = false;
                     
                     if(resumePointSet[instanceIndex] == false){
-                        auto MissionCommand = missionCommands[instanceIndex];
-                        //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, MissionCommand->getFirstWaypoint());
-                        MissionCommand->setCommandID(0);
+                        //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, missionCommands->getFirstWaypoint());
                         std::cout << missionCommands[instanceIndex]->toString() << std::endl;
-                        sendSharedLmcpObjectBroadcastMessage(MissionCommand);
+                        sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
                         resumePointSet[instanceIndex] = true;
                     }
                     
@@ -699,6 +701,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
 
             icarousClientWaypointLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
+            
             missionCommands[vehicleID - 1] = ptr_MissionCommand;
 
             // For each waypoint in the mission command, send each as its own message to ICAROUS
@@ -723,6 +726,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // Then store the lat long and alt of each waypoint
                 // This is to put them all into an ordered list
                 icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
+                newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
                 fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
                 //fprintf(stdout, "WP|%lli\n", icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].getNumber());
                 
@@ -857,21 +861,26 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                   resumePointSet[vehicleID - 1] = false;
                     dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
                        currentWaypointIndex[vehicleID - 1]);
-                    /*
+                    
                     dprintf(1, "UAV %i | WPRCH,id%lli.0,\n",
                         vehicleID,
                         currentWaypointIndex[vehicleID - 1]);
-                    */
+                    
                     currentWaypointIndex[vehicleID - 1]++;
+                    
+                    if(truncateWaypoint[vehicleID - 1] == true){
+                        newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
+                    }else{
+                        truncateWaypoint[vehicleID - 1] = true;
+                    }
                     
                     if(lastWaypoint[vehicleID - 1] == ptr_AirVehicleState->getCurrentWaypoint()){
                         fprintf(stdout, "UAV %i | lastwaypoint indicates task is finished?\n", vehicleID);
                     }else{
-                        fprintf(stdout, "UAV %i | lastwaypoint is moving up one\n", vehicleID);
+                        //fprintf(stdout, "UAV %i | lastwaypoint is moving up one\n", vehicleID);
                         lastWaypoint[vehicleID - 1]++;
                     }
                 }
-                
                 //fprintf(stdout, "UAV %i | currentWaypointIndex %lli | getCurrentWaypoint() %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint()));
                 //currentWaypointIndex[vehicleID - 1] = (ptr_AirVehicleState->getCurrentWaypoint() - missionCommands[vehicleID - 1]->getFirstWaypoint());
             }
@@ -879,11 +888,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             {
                 fprintf(stdout, "Reseting lastWaypoint and currentWaypointIndex\n");
                 isLastWaypointInitialized[vehicleID - 1] = true;
-                lastWaypoint[vehicleID - 1] = ptr_AirVehicleState->getCurrentWaypoint();
+                lastWaypoint[vehicleID - 1] = 0;//ptr_AirVehicleState->getCurrentWaypoint();
                 currentWaypointIndex[vehicleID - 1] = 0;
             }
             
-            fprintf(stderr, "UAV %i | lastWaypoint: %lli | currentWaypointIndex: %lli\n", vehicleID, lastWaypoint[vehicleID - 1], currentWaypointIndex[vehicleID - 1]);
+            //fprintf(stderr, "UAV %i | lastWaypoint: %lli | currentWaypointIndex: %lli\n", vehicleID, lastWaypoint[vehicleID - 1], currentWaypointIndex[vehicleID - 1]);
         }
 
 
@@ -925,6 +934,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // v's north sign: [-1, 1] Discrete
         // v's east contribution: [0, u] Continuous
         // v's east sign: [-1, 1] Discrete
+        
+        // TODO - This needs re-worked to account for pitch angle
         
         double uHeading = fmod((ptr_AirVehicleState->getHeading() + 360), 360.0);
         double vHeading = fmod((uHeading + 90), 360.0);
@@ -1049,65 +1060,43 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // Thus, we need to subtract one to make it the last waypoint.
             
             //std::cout << missionCommands[vehicleID - 1]->toString() << std::endl;
-            missionCommands[vehicleID - 1]->setFirstWaypoint(icarousClientWaypointLists[vehicleID - 1][lastWaypoint[vehicleID - 1]]);
+            //missionCommands[vehicleID - 1]->setFirstWaypoint(icarousClientWaypointLists[vehicleID - 1][lastWaypoint[vehicleID - 1]]);
             //std::cout << missionCommands[vehicleID - 1]->toString() << std::endl;
-            
-            int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1];
+            /*
+            for(unsigned int i = 0; i < icarousClientWaypointLists[vehicleID - 1].size(); i++){
+                fprintf(stderr, "UAV %i | icarousClientWaypointLists %lli\n", vehicleID, icarousClientWaypointLists[vehicleID - 1][i]);
+            }
+            */
+            int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
             
             fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, currentWaypointIndex[vehicleID - 1] - 1);
             
-            missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setLatitude(
+            newWaypointLists[vehicleID - 1][0]->setLatitude(
                 positionBeforeTakeover[vehicleID - 1][1]);
-                
-            missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setLongitude(
+            
+            newWaypointLists[vehicleID - 1][0]->setLongitude(
                 positionBeforeTakeover[vehicleID - 1][2]);
-                
-            missionCommands[vehicleID - 1]->getWaypointList().at(indexOfWaypointToReplace)->setAltitude(
+            
+            newWaypointLists[vehicleID - 1][0]->setAltitude(
                 positionBeforeTakeover[vehicleID - 1][3]);
             
-            int waypointIndex = (missionCommands[vehicleID - 1]->getFirstWaypoint() - 1);
-            int totalNumberOfWaypoints = 0;
-            int nextWaypoint = missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNextWaypoint();
-
-            icarousClientWaypointLists[vehicleID - 1].resize(missionCommands[vehicleID - 1]->getWaypointList().size());
-
-            // Need to re-create the icarousClientWaypointList for a vehicle to use it for accessing
-            while(nextWaypoint != (missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNumber()))
-            {
-                totalNumberOfWaypoints++;
-
-                // Need to convert numbers to the indexes
-                // Then store the lat long and alt of each waypoint
-                // This is to put them all into an ordered list
-                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNumber();
-                
-                fprintf(stderr, "UAV %i | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNumber());
-                
-                //fprintf(stderr, "UAV %i | Stored index %i as %i\n", vehicleID, (totalNumberOfWaypoints - 1), waypointIndex);
-                //fprintf(stdout, "WP|%lli\n", icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].getNumber());
-
-                // Set the index of the next waypoint
-                waypointIndex = (nextWaypoint - 1);
-
-                // Grab the next waypoint's next waypoint to check if it is the end
-                nextWaypoint = missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNextWaypoint();
+            missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][0]->getNumber());
+            
+            missionCommands[vehicleID - 1]->setCommandID(0);
+            
+            missionCommands[vehicleID - 1]->getWaypointList().clear();
+            
+            for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++){
+                fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
+                missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
             }
             
-            // Need to ensure the last one is also sent
-            totalNumberOfWaypoints++;
-            icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNumber();
-            fprintf(stderr, "UAV %i | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), missionCommands[vehicleID - 1]->getWaypointList()[waypointIndex]->getNumber());
+            std::cout << missionCommands[vehicleID - 1]->toString() << std::endl;
             
-            
-            // Set these to one lower to ensure they actually have the propper value
             fprintf(stderr, "UAV %i | current %lli | last %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], lastWaypoint[vehicleID - 1]);
-            //currentWaypointIndex[vehicleID - 1]--;
-            //lastWaypoint[vehicleID - 1] = icarousClientWaypointLists[vehicleID - 1][(currentWaypointIndex[vehicleID - 1] - 1)];
             
             isLastWaypointInitialized[vehicleID - 1] = false;
-            
             softResetFlag[vehicleID - 1] = false;
-            
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
     }// End of AirVehicleState

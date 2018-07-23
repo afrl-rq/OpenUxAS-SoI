@@ -154,6 +154,9 @@ private:
     std::vector<std::thread> icarousID;
     
     std::vector<std::shared_ptr<afrl::cmasi::MissionCommand>> missionCommands;
+    std::vector<std::vector<afrl::cmasi::Waypoint*>> newWaypointLists;
+    
+    std::vector<bool> truncateWaypoint;
     
     // This is to keep an array of translated waypoint indexes to an ordered list
     std::vector<std::vector<int64_t>> icarousClientWaypointLists;
