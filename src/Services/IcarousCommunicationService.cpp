@@ -528,17 +528,17 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 fieldLength               = fieldEnd - trackingHelper;
                 float down     = atof(strncpy(throwaway, trackingHelper, fieldLength));
                 
-                /*
-                //fprintf(stdout, "%lli|SETVEL|u|%f\n", icarousClientFd, u);
-                //fprintf(stdout, "%lli|SETVEL|v|%f\n", icarousClientFd, v);
-                //fprintf(stdout, "%lli|SETVEL|w|%f\n", icarousClientFd, w);
+                
+                //fprintf(stdout, "%lli|SETVEL|north|%f\n", icarousClientFd, north);
+                //fprintf(stdout, "%lli|SETVEL|east|%f\n", icarousClientFd, east);
+                //fprintf(stdout, "%lli|SETVEL|down|%f\n", icarousClientFd, down);
 
                 
                 //fprintf(stdout, "Starting creationg of VehicleActionCommand message\n");                
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
                 
-                if((u == 0) && (v == 0)) // loiter at this location
+                if((north == 0) && (east == 0)) // loiter at this location
                 {
                     //fprintf(stdout, "Start of LoiterAction construction\n");
                     auto loiterAction =  new afrl::cmasi::LoiterAction;
@@ -546,7 +546,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     currentInformationMutexes[instanceIndex].lock();
                     location3d->setLatitude(currentInformation[instanceIndex][1]);
                     location3d->setLongitude(currentInformation[instanceIndex][2]);
-                    location3d->setAltitude((w / 2) + currentInformation[instanceIndex][3]);
+                    location3d->setAltitude(down + currentInformation[instanceIndex][3]);
                     currentInformationMutexes[instanceIndex].unlock();
                     loiterAction->setLocation(location3d);
                     
@@ -557,41 +557,29 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 {
                     //fprintf(stdout, "Start of FlightDirectorAction construction");
                     auto flightDirectorAction = new afrl::cmasi::FlightDirectorAction;
-                    double actualSpeed = sqrt(pow(u,2)+pow(v,2));
+                    double actualSpeed = sqrt(pow(north,2)+pow(east,2));
                     flightDirectorAction->setSpeed(actualSpeed);
-                    double deltaHeading = 0;
-                    
-                    if((u == 0) && (v > 0)) // u is zero | v is positive
-                    {
-                        deltaHeading = 90;
+                    double heading = acos(north / sqrt(pow(north, 2) + pow(east, 2)));
+
+                    if((north > 0) && (east > 0)){
+                        heading = 90 - heading;
                     }
-                    else if((u == 0) && (v < 0)) // u is zero | v is negative
+                    else if((north > 0) && (east < 0))
                     {
-                        deltaHeading = 270;
+                        heading = -90 + heading;
                     }
-                    else if((u > 0) && (v == 0)) // u is positive | v is zero
+                    else if((north < 0) && (east < 0))
                     {
-                        deltaHeading = 0; // Maintain current heading
+                        heading = -180 + heading;
                     }
-                    else if((u < 0) && (v == 0)) // u is negative | v is zero
+                    else if((north < 0) && (east > 0))
                     {
-                        deltaHeading = 180;
+                        heading = 180 - heading;
                     }
-                    else
-                    {
-                        deltaHeading = atan(v / u) * (180 / M_PI);
-                    }
-                    currentInformationMutexes[instanceIndex].lock();
-                    //fprintf(stdout, "Setting Heading | Current Heading: %f\n", currentInformation[instanceIndex][0]);
-                    float newHeading = fmod((currentInformation[instanceIndex][0] + deltaHeading), 360);
-                    if(newHeading > 180) // If the new heading is past 180, make it within -180 and 0
-                    {
-                        newHeading -= 360;
-                    }
-                    flightDirectorAction->setHeading(newHeading);
+
                     //fprintf(stdout, "Heading Set | Current Altitude: %f | Setting Altitude\n", currentInformation[instanceIndex][3]);
-                    flightDirectorAction->setAltitude((w / 2) + currentInformation[instanceIndex][3]);
-                    currentInformationMutexes[instanceIndex].unlock();
+                    flightDirectorAction->setHeading(heading);
+                    flightDirectorAction->setClimbRate(-down);
                     //fprintf(stdout, "Altitude Set | Adding to VehicleActionCommand\n");
                     
                     vehicleActionCommand->getVehicleActionList().push_back(flightDirectorAction);
@@ -602,7 +590,6 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
                 //fprintf(stdout, "VehicleActionCommand sent\n");
-                */
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
