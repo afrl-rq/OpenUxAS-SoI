@@ -131,24 +131,18 @@ private:
     bool m_isReadyToActMissionCommand {false};  //boolean stating whether or not the service has received a mission command that lists all waypoints.
     bool m_isReadyToActConfiguration {false};  //boolean stating whether or not service has received configuration parameters in order to process violation messages
     bool m_isActionCompleted {false}; //boolean stating whether or not service has completed taking action for the violation under consideration.
-    double m_action_time_threshold_s;   // time threshold to determine taking action
+    double m_action_time_threshold_s;   // time threshold to hold when taking action
+    double m_action_hold_release_time_s;  //time at which an action hold must be released
     double m_vertical_rate_mps; //DAIDALUS configuration vertical rate used for estimation of time to perform altitude maneuver
     double m_turn_rate_degps;   //DAIDALUS configuration turn rate used for estimation of time to perform heading/track maneuver
     double m_horizontal_accel_mpsps;    //DAIDALUS configuration horizontal acceleration used for estimation of time to perform a horizontal speed maneuver
     double m_vertical_accel_mpsps;  //DAIDALUS configuration vertical 
     int64_t  m_NextWaypoint;// {nullptr};
+    int64_t m_RoW;
     std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand;// {nullptr};
-    std::vector<uint64_t> m_ConflictResolutionList;
-    bool SetisConflict(bool& val);
-    bool GetisConflict();
-    struct DesiredState
-    {
-        double altitude_m;
-        double horizontal_speed_mps;
-        double vertical_speed_mps;
-        double heading_deg;
-    }m_DesiredState;
-    struct CurrentState
+    std::vector<int64_t> m_ConflictResolutionList;
+
+    struct State
     {
         double altitude_m;
         double horizontal_speed_mps;
@@ -156,9 +150,11 @@ private:
         double heading_deg;
         double latitude_deg;
         double longitude_deg;
+        double time_s;
         afrl::cmasi::AltitudeType::AltitudeType altitude_type;
         afrl::cmasi::SpeedType::SpeedType speed_type;
-    }m_CurrentState;
+    }m_CurrentState, m_DivertState, m_ReturnState;
+    void ResetResponse();
 
     
     

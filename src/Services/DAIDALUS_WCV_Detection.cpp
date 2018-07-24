@@ -622,7 +622,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 }
                 //send out response
                 //std::cout << "Number of aircraft according to DAIDALUS: " << m_daa.numberOfAircraft() << std::endl;--TODO delete
-                if (!detectedViolations.empty())    //compute conflict bands and compose violation message only if violations are detected
+                //if (!detectedViolations.empty())    //compute conflict bands and compose violation message only if violations are detected
                 {
                     //Create DAIDALUS bands object and compute conflict/peripheral bands
                     larcfm::KinematicMultiBands m_daa_bands(m_daa.parameters);
@@ -642,6 +642,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     nogo_ptr->setCurrentAltitude(daa_own.altitude("m"));    //DAIDALUS current altitude
                     nogo_ptr->setCurrentLatitude(m_daidalusVehicleInfo[m_entityId].latitude_deg);    //Current ownship latitude
                     nogo_ptr->setCurrentLongitude(m_daidalusVehicleInfo[m_entityId].longitude_deg);  //Current ownship longitude
+                    nogo_ptr->setCurrentTime(m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s);
+                    
                     for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)  //ground track bands
                     {
                         std::unique_ptr<larcfm::DAIDALUS::GroundHeadingInterval> pTempPtr (new larcfm::DAIDALUS::GroundHeadingInterval);
@@ -765,9 +767,9 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     }
                     sendSharedLmcpObjectBroadcastMessage(nogo_ptr);
                 }
-                else //Screen output for debugging --
+                //else //Screen output for debugging --
                 {
-                    std::cout << "No violation of well clear volume detected :^)" << std::endl; //--TODO delete
+                    //std::cout << "No violation of well clear volume detected :^)" << std::endl; //--TODO delete
                     //--TODO figure out what the appropriate action should be when there is no violation detected
                 }
             }

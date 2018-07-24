@@ -57,6 +57,8 @@
             <Field Name="CurrentLatitude" Type="real64" Units="degrees" />
             <!-- Ownship Longitude -->
             <Field Name="CurrentLongitude" Type="real64" Units="degrees" />
+            <!-- Time of the current detection -->
+            <Field Name="CurrentTime" Type="real64" Units="seconds" />
             <!-- List of ground heading intervals that will result in a WellClear violation within the detection window -->
             <Field Name="WCVGroundHeadingIntervals" Type="GroundHeadingInterval[]" Units="None" />
             <!-- List of the region types associated with detected ground heading violations -->

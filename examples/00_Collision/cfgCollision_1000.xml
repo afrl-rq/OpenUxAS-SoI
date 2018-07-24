@@ -13,6 +13,7 @@
     <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
     <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9800" Server="FALSE" ConsiderSelfGenerated="TRUE">
         <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
         <SubscribeToMessage MessageType="afrl.cmasi.PointSearchTask"/>
         <SubscribeToMessage MessageType="larcfm.DAIDALUS.DAIDALUSConfiguration" />
         <SubscribeToMessage MessageType="larcfm.DAIDALUS.WellClearViolationIntervals" />
