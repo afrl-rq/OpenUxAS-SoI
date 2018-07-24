@@ -1062,7 +1062,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 fprintf(stderr, "UAV %i | icarousClientWaypointLists %lli\n", vehicleID, icarousClientWaypointLists[vehicleID - 1][i]);
             }
             */
-            int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
+            //int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
             
             //fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, currentWaypointIndex[vehicleID - 1] - 1);
             
