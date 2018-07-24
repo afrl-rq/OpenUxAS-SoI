@@ -14,7 +14,7 @@ using namespace test;
 using namespace report;
 using namespace std;
 
-Plot_Element::Plot_Element():
+PlotElement::PlotElement():
 m_color("blue"),
 m_lineStyle(""),
 m_thickness(""),
@@ -23,20 +23,20 @@ m_arrow(0)
 
 }
 
-Plot_Line::Plot_Line(): Plot_Element::Plot_Element()
+PlotLine::PlotLine(): PlotElement::PlotElement()
 {
 }
 
-Plot_Polygon::Plot_Polygon(): Plot_Element()
+PlotPolygon::PlotPolygon(): PlotElement()
 {
 }
 
-Plot_Polygon::Plot_Polygon(VisiLibity::Polygon x): Plot_Element()
+PlotPolygon::PlotPolygon(VisiLibity::Polygon x): PlotElement()
 {
     m_polygon = x;
 }
 
-Plot_Polygon::Plot_Polygon(VisiLibity::Polygon polygon, int arrow, std::string color, std::string lineStyle, std::string thickness)
+PlotPolygon::PlotPolygon(VisiLibity::Polygon polygon, int arrow, std::string color, std::string lineStyle, std::string thickness)
 {
     m_polygon = polygon;
     m_arrow = arrow;
@@ -54,12 +54,12 @@ Plot::Plot(std::vector<VisiLibity::Point> x)
     m_points = x;
 }
 
-Plot::Plot(std::vector<Plot_Line> x)
+Plot::Plot(std::vector<PlotLine> x)
 {
     m_lines = x;
 }
 
-Plot::Plot(std::vector<Plot_Polygon> polyList, std::string caption)
+Plot::Plot(std::vector<PlotPolygon> polyList, std::string caption)
 {
     m_polygons = polyList;
     m_caption = caption;

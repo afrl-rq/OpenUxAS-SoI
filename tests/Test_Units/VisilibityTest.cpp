@@ -1,3 +1,20 @@
+// ===============================================================================
+// Authors: AFRL/RQQA
+// Organization: Air Force Research Laboratory, Aerospace Systems Directorate, Power and Control Division
+// 
+// Copyright (c) 2017 Government of the United State of America, as represented by
+// the Secretary of the Air Force.  No copyright is claimed in the United States under
+// Title 17, U.S. Code.  All Other Rights Reserved.
+// ===============================================================================
+
+/* 
+ * File:   VisilibityTest.cpp
+ * Author: Mandy Cinnamon
+ *
+ * Created on June 17, 2018, 2:34 PM
+ *
+ * 
+ */
 #include "gtest/gtest.h"
 
 #include <boost/foreach.hpp>
@@ -7,6 +24,15 @@
 
 using namespace VisiLibity;
 using namespace test;
+
+/** \class TestShape
+ * 
+ * \par Description:
+ * Helper class for VisiLibity polygon merge (boost_union) tests - takes original and expected lists of polygons,
+ * performs the merge, then compares the output to the expected values and adds results to latex test report
+ * 
+ * \n
+ */
 
 class TestShape
 {
@@ -47,34 +73,34 @@ public:
         m_report_static.addLine(description);
 
         //Expected Results
-        std::vector<report::Plot_Polygon> expectedPolyList;
+        std::vector<report::PlotPolygon> expectedPolyList;
         for (auto &poly : m_originalPolygonList)
         {
             // old polygons are red
-            expectedPolyList.push_back(report::Plot_Polygon(poly, 1, "red", "solid", "thick"));
+            expectedPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
         }
 
         for (auto &poly : m_expectedPolygonList)
         {
             //new polygons are blue
-            expectedPolyList.push_back(report::Plot_Polygon(poly, 1, "blue", "dashed", "ultra thick"));
+            expectedPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
         }
 
         report::Plot expectedPlot(expectedPolyList, "Expected Result");
         m_report_static.addPlot(expectedPlot);
 
         //Actual Results
-        std::vector<report::Plot_Polygon> actualPolyList;
+        std::vector<report::PlotPolygon> actualPolyList;
         for (auto &poly : m_originalPolygonList)
         {
             // old polygons are red
-            actualPolyList.push_back(report::Plot_Polygon(poly, 1, "red", "solid", "thick"));
+            actualPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
         }
 
         for (auto &poly : actualPolygonList)
         {
             //new polygons are blue
-            actualPolyList.push_back(report::Plot_Polygon(poly, 1, "blue", "dashed", "ultra thick"));
+            actualPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
         }
         report::Plot actualPlot(actualPolyList, "Actual Result");
         m_report_static.addPlot(actualPlot);
@@ -87,53 +113,50 @@ public:
 ///TODO - standardize style
 ///TODO - doxygen
 ///TODO - standardize visilibity capitalization - see file name
-///TODO - concave test
-///TODO - offset polygons
-///TODO - handle epsilon
 
-//TEST(VisiLibityTest, Polygon_union_overlapping)
-//{
-//    /// First test is two overlapping polygons that result in a single polygon
-//    // basic shape (not to scale):
-//    //              _______
-//    //             |       |
-//    //             |      _|_______
-//    //             |     | |       |
-//    //              -------        |
-//    //                   |         |
-//    //                   |_________|
-//
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
-//
-//    //expected new polygon after merge - CCW
-//    VisiLibity::Polygon newPolygon(std::vector<Point>{Point(3.0, 3.0), Point(3.0, 5.0), Point(0.0, 5.0), Point(0.0, 2.0), Point(2.0, 2.0), Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0)});
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 1: Merging two overlapping polygons");
-//    EXPECT_TRUE(success);
-//
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
+TEST(VisiLibityTest, Polygon_union_overlapping)
+{
+    /// First test is two overlapping polygons that result in a single polygon
+    // basic shape (not to scale):
+    //              _______
+    //             |       |
+    //             |      _|_______
+    //             |     | |       |
+    //              -------        |
+    //                   |         |
+    //                   |_________|
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+
+    //expected new polygon after merge - CCW
+    VisiLibity::Polygon newPolygon(std::vector<Point>{Point(3.0, 3.0), Point(3.0, 5.0), Point(0.0, 5.0), Point(0.0, 2.0), Point(2.0, 2.0), Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0)});
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging two overlapping polygons");
+    EXPECT_TRUE(success);
+
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
 
 TEST(VisiLibityTest, Polygon_union_tangent)
 {
@@ -168,7 +191,7 @@ TEST(VisiLibityTest, Polygon_union_tangent)
     originalPolygonList.push_back(polygon2);
     
     TestShape ts(originalPolygonList, expPolygonList);
-    auto success = ts.runTest("Test 1: Merging two overlapping polygons");
+    auto success = ts.runTest("Attempt to merge two tangent polygons (non-adjacent)");
     EXPECT_TRUE(success);
     
     if(Test::HasNonfatalFailure())
@@ -181,373 +204,415 @@ TEST(VisiLibityTest, Polygon_union_tangent)
     }
 };
 
-//TEST(VisiLibityTest, Polygon_union_keepout_hole)
-//{
-//    ///Second test is merging two overlapping keep-in polygons that create a single keep-out "hole"
-//    //Basic shape: (not to scale)
-//    //          _____
-//    //         |     |
-//    //         |     |
-//    //  _______|__   |
-//    // |          |  |
-//    // |          |  |
-//    // |      ____|  |
-//    // |     | |     |
-//    // |     | |     |
-//    // |     | |     |
-//    // |     |_|__   |
-//    // |          |  |
-//    // |          |  |
-//    // |          |  |
-//    // |__________|  |
-//    //         |_____|
-//    //
-//
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(4.0, 0.0),Point(4.0, 5.0),Point(2.0, 5.0)});
-//
-//    //expected new polygon after merge - defined CW
-//    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 1.0), Point(0.0, 4.0), Point(2.0, 4.0), Point(2.0, 5.0), Point(4.0, 5.0), Point(4.0, 00), Point(2.0, 0.0), Point(2.0, 1.0)});
-//    //Make CCW
-//    newPolygon1.reverse();
-//    //expected keep-out "hole" created
-//    //CW order?
-//    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(1.0, 3.0), Point(2.0, 3.0), Point(2.0, 2.0), Point(1.0, 2.0)});
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon1);
-//    expPolygonList.push_back(newPolygon2);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 2: merging two overlapping keep-in polygons that create a single keep-out 'hole'");
-//    EXPECT_TRUE(success);
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
-//
-//TEST(VisiLibityTest, Polygon_union_multiple_holes)
-//{
-//    ///Second test is merging two overlapping keep-in polygons that create a single keep-out "hole"
-//    //Basic shape: (not to scale)
-//    //          _____
-//    //         |      |
-//    //         |      |
-//    //  _______|__   _|________
-//    // |          | | |        |
-//    // |          | | |        |
-//    // |      ____| |_|_____   |
-//    // |     | |      |     |  |
-//    // |     | |      |     |  |
-//    // |     | |      |     |  |
-//    // |     |_|__   _|_____|  |
-//    // |          | | |        |
-//    // |          | | |        |
-//    // |          | | |        |
-//    // |__________| |_|________|
-//    //         |______|
-//    //
-//
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0),Point(5.0, 5.0),Point(2.0, 5.0)});
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon3(std::vector<Point>{Point(4.0, 1.0), Point(7.0, 1.0), Point(7.0, 4.0), Point(4.0, 4.0), Point(4.0, 3.0), Point(6.0, 3.0), Point(6.0, 2.0), Point(4.0, 2.0)});
-//
-//    //expected new polygon after merge - defined CW
-//    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 1.0), Point(0.0, 4.0), Point(2.0, 4.0), Point(2.0, 5.0), Point(5.0, 5.0), Point(5.0, 4.0), Point(7.0, 4.0), Point(7.0, 1.0), Point(5.0, 1.0), Point(5.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0)});
-//    //Make CCW
-//    newPolygon1.reverse();
-//    //expected keep-out "hole" created
-//    //CW order?
-//    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(5.0, 2.0), Point(5.0, 3.0), Point(6.0, 3.0), Point(6.0, 2.0)});
-//
-//    VisiLibity::Polygon newPolygon3(std::vector<Point>{Point(1.0, 3.0), Point(2.0, 3.0), Point(2.0, 2.0), Point(1.0, 2.0)});
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon1);
-//    expPolygonList.push_back(newPolygon2);
-//    expPolygonList.push_back(newPolygon3);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//    originalPolygonList.push_back(polygon3);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 2: merging three overlapping keep-in polygons that create multiple keep-out 'holes'");
-//    EXPECT_TRUE(success);
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
-//
-//TEST(VisiLibityTest, Polygon_union_invalid_orientation)
-//{
-////
-////Attempt to merge two polygons with invalid (CW) orientations
-//    //          _____
-//    //         |     |
-//    //         |     |
-//    //  _______|__   |
-//    // |          |  |
-//    // |          |  |
-//    // |      ____|  |
-//    // |     | |     |
-//    // |     | |     |
-//    // |     | |     |
-//    // |     |_|__   |
-//    // |          |  |
-//    // |          |  |
-//    // |          |  |
-//    // |__________|  |
-//    //         |_____|
-//
-//    //first polygon to merge - defined CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
-//    //Make CW
-//    polygon1.reverse();
-//    //second polygon to merge - defined CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(4.0, 0.0),Point(4.0, 5.0),Point(2.0, 5.0)});
-//    //Make CW
-//    polygon2.reverse();
-//
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output empty polygon list
-//    std::vector<Polygon> expPolygonList;
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 3: Merging two polygons that are invalid due to orientation");
-//    //should return false because wrong orientation
-//    EXPECT_FALSE(success);
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
-//
-//TEST(VisiLibityTest, Polygon_union_nonadjacent)
-//{
-//
-//    ///Third test is merging polygons that are not adjacent and do not overlap. Distance is greater than epsilon
-//    // basic shape (not to scale):
-//    //              _______
-//    //             |       |
-//    //             |       |  _________
-//    //             |       | |         |
-//    //              -------  |         |
-//    //                       |         |
-//    //                       |_________|
-//
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(4, 0.0), Point(7, 0.0), Point(7, 3.0), Point(4, 3.0) });
-//
-//    //expected new polygons after merge - both unchanged from original
-//    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-//    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(4, 0.0), Point(7, 0.0), Point(7, 3.0), Point(4, 3.0) });
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon1);
-//    expPolygonList.push_back(newPolygon2);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 4: Attempt to merge two non-adjacent polygons");
-//    EXPECT_TRUE(success);
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
+TEST(VisiLibityTest, Polygon_union_keepout_hole)
+{
+    ///Second test is merging two overlapping keep-in polygons that create a single keep-out "hole"
+    //Basic shape: (not to scale)
+    //          _____
+    //         |     |
+    //         |     |
+    //  _______|__   |
+    // |          |  |
+    // |          |  |
+    // |      ____|  |
+    // |     | |     |
+    // |     | |     |
+    // |     | |     |
+    // |     |_|__   |
+    // |          |  |
+    // |          |  |
+    // |          |  |
+    // |__________|  |
+    //         |_____|
+    //
 
-//TEST(VisiLibityTest, Polygon_union_near)
-//{
-//    ///Fourth test is merging polygons that are not adjacent and do not overlap, however the distance is less than epsilon. The result is a merged polygon.s
-//    // basic shape (not to scale):
-//    //              _______
-//    //             |       |
-//    //             |       | _________
-//    //             |       ||         |
-//    //              ------- |         |
-//    //                      |         |
-//    //                      |_________|
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(4.0, 0.0),Point(4.0, 5.0),Point(2.0, 5.0)});
+
+    //expected new polygon after merge - defined CW
+    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 1.0), Point(0.0, 4.0), Point(2.0, 4.0), Point(2.0, 5.0), Point(4.0, 5.0), Point(4.0, 00), Point(2.0, 0.0), Point(2.0, 1.0)});
+    //Make CCW
+    newPolygon1.reverse();
+    //expected keep-out "hole" created
+    //CW order?
+    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(1.0, 3.0), Point(2.0, 3.0), Point(2.0, 2.0), Point(1.0, 2.0)});
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon1);
+    expPolygonList.push_back(newPolygon2);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging two overlapping keep-in polygons that create a single keep-out 'hole'");
+    EXPECT_TRUE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_multiple_holes)
+{
+    ///Second test is merging two overlapping keep-in polygons that create a single keep-out "hole"
+    //Basic shape: (not to scale)
+    //          _____
+    //         |      |
+    //         |      |
+    //  _______|__   _|________
+    // |          | | |        |
+    // |          | | |        |
+    // |      ____| |_|_____   |
+    // |     | |      |     |  |
+    // |     | |      |     |  |
+    // |     | |      |     |  |
+    // |     |_|__   _|_____|  |
+    // |          | | |        |
+    // |          | | |        |
+    // |          | | |        |
+    // |__________| |_|________|
+    //         |______|
+    //
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0),Point(5.0, 5.0),Point(2.0, 5.0)});
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon3(std::vector<Point>{Point(4.0, 1.0), Point(7.0, 1.0), Point(7.0, 4.0), Point(4.0, 4.0), Point(4.0, 3.0), Point(6.0, 3.0), Point(6.0, 2.0), Point(4.0, 2.0)});
+
+    //expected new polygon after merge - defined CW
+    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 1.0), Point(0.0, 4.0), Point(2.0, 4.0), Point(2.0, 5.0), Point(5.0, 5.0), Point(5.0, 4.0), Point(7.0, 4.0), Point(7.0, 1.0), Point(5.0, 1.0), Point(5.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0)});
+    //Make CCW
+    newPolygon1.reverse();
+    //expected keep-out "hole" created
+    //CW order?
+    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(5.0, 2.0), Point(5.0, 3.0), Point(6.0, 3.0), Point(6.0, 2.0)});
+
+    VisiLibity::Polygon newPolygon3(std::vector<Point>{Point(1.0, 3.0), Point(2.0, 3.0), Point(2.0, 2.0), Point(1.0, 2.0)});
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon1);
+    expPolygonList.push_back(newPolygon2);
+    expPolygonList.push_back(newPolygon3);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+    originalPolygonList.push_back(polygon3);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging three overlapping keep-in polygons that create multiple keep-out 'holes'");
+    EXPECT_TRUE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_invalid_polygon)
+{
 //
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.04, 0.0), Point(6.0, 0.0), Point(6.0, 3.0), Point(3.04, 3.0) });
-//
-//    //expected new polygon after merge - CCW
-//    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(3.0, 3.0), Point(3.0, 5.0), Point(0.0, 5.0), Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 0.0), Point(6.0, 0.0), Point(6.0, 3.0)});
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon1);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    ts.runTest("Test 5: Merging two non-adjacent polygons that are within epsilon distance");
-//    TestShape::m_report_static.addLine("Polygon distance is " + std::to_string(boundary_distance( polygon1,polygon2 )));
-//    TestShape::m_report_static.addLine("Epsilon is " + std::to_string(ts.m_epsilon));
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
-//
-//TEST(VisiLibityTest, Polygon_union_three_overlapping)
-//{
-//    ///Fifth test is merging 3 overlapping polygons
-//    // basic shape (not to scale):
-//    //                  ______
-//    //              ___|___   |
-//    //             |   |   |  |
-//    //             |   |  _|__|____
-//    //             |   | | |  |    |
-//    //              -------   |    |
-//    //                 |_|____|    |
-//    //                   |_________|
-//
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
-//    //third polygon to merge - CCW
-//    VisiLibity::Polygon polygon3(std::vector<Point>{Point(1.0, 1.0), Point(4.0, 1.0), Point(4.0, 6.0), Point(1.0, 6.0)});
-//
-//
-//    //expected new polygon after merge - CCW
-//    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(0.0, 5.0), Point(1.0, 5.0), Point(1.0, 6.0), Point(4.0, 6.0), Point(4.0, 3.0), Point(5.0, 3.0), Point(5.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0), Point(1.0, 1.0), Point(1.0, 2.0)});
-//    //CCW
-//    newPolygon1.reverse();
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon1);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//    originalPolygonList.push_back(polygon3);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 6: Merging three overlapping polygons");
-//    EXPECT_TRUE(success);
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
-//
-//TEST(VisiLibityTest, Polygon_union_three_nonoverlapping)
-//{
-//    ///Fifth test is merging 3 polygons, where two do not overlap each other
-//    // basic shape (not to scale):
-//    //                  ______
-//    //              ___|___   |
-//    //             |   |   |  |
-//    //             |   |   | _|____
-//    //             |   |   || |    |
-//    //              ------- | |    |
-//    //                 |____|_|    |
-//    //                      |______|
-//
-//    //first polygon to merge - CCW
-//    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-//    //second polygon to merge - CCW
-//    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.5, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(3.5, 3.0) });
-//    //third polygon to merge - CCW
-//    VisiLibity::Polygon polygon3(std::vector<Point>{Point(1.0, 1.0), Point(4.0, 1.0), Point(4.0, 6.0), Point(1.0, 6.0)});
-//
-//
-//    //expected new polygon after merge - CCW
-//    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(0.0, 5.0), Point(1.0, 5.0), Point(1.0, 6.0), Point(4.0, 6.0), Point(4.0, 3.0), Point(5.0, 3.0), Point(5.0, 0.0), Point(3.5, 0.0), Point(3.5, 1.0), Point(1.0, 1.0), Point(1.0, 2.0)});
-//    //CCW
-//    newPolygon1.reverse();
-//
-//    //merge function arguments are vectors of polygons
-//    //expected function output polygon list
-//    std::vector<Polygon> expPolygonList;
-//    expPolygonList.push_back(newPolygon1);
-//
-//    //function input polygon list
-//    std::vector<VisiLibity::Polygon> originalPolygonList;
-//    originalPolygonList.push_back(polygon1);
-//    originalPolygonList.push_back(polygon2);
-//    originalPolygonList.push_back(polygon3);
-//
-//    TestShape ts(originalPolygonList, expPolygonList);
-//    auto success = ts.runTest("Test 6: Merging three overlapping polygons");
-//    EXPECT_TRUE(success);
-//    if(Test::HasNonfatalFailure())
-//    {
-//        TestShape::m_report_static.addLine("Test Fails", "red");
-//    }
-//    else
-//    {
-//        TestShape::m_report_static.addLine("Test Passes", "green");
-//    }
-//};
+   // basic shape (not to scale):
+    //                     |
+    //                     |
+    //                    _|_______
+    //                   | |       |
+    //                   |         |
+    //                   |         |
+    //                   |_________|
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 2.0), Point(3.0, 5.0) });
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+
+    VisiLibity::Polygon newPolygon(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+  
+    //merge function arguments are vectors of polygons
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon);
+
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging valid polygon with invalid polygon that has less than 3 vertices");
+    //should return false because wrong orientation
+    EXPECT_FALSE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_invalid_orientation)
+{
+//Attempt to merge invalid polygon with less than three vertices 
+    //          _____
+    //         |     |
+    //         |     |
+    //  _______|__   |
+    // |          |  |
+    // |          |  |
+    // |      ____|  |
+    // |     | |     |
+    // |     | |     |
+    // |     | |     |
+    // |     |_|__   |
+    // |          |  |
+    // |          |  |
+    // |          |  |
+    // |__________|  |
+    //         |_____|
+
+    //first polygon to merge - defined CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
+    //Make CW
+    polygon1.reverse();
+    //second polygon to merge - defined CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(4.0, 0.0),Point(4.0, 5.0),Point(2.0, 5.0)});
+    //Make CW
+    polygon2.reverse();
+
+
+    //merge function arguments are vectors of polygons
+    //expected function output empty polygon list
+    std::vector<Polygon> expPolygonList;
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging two polygons that are invalid due to orientation");
+    //should return false because wrong orientation
+    EXPECT_FALSE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_nonadjacent)
+{
+
+    ///Third test is merging polygons that are not adjacent and do not overlap. Distance is greater than epsilon
+    // basic shape (not to scale):
+    //              _______
+    //             |       |
+    //             |       |  _________
+    //             |       | |         |
+    //              -------  |         |
+    //                       |         |
+    //                       |_________|
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(4, 0.0), Point(7, 0.0), Point(7, 3.0), Point(4, 3.0) });
+
+    //expected new polygons after merge - both unchanged from original
+    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(4, 0.0), Point(7, 0.0), Point(7, 3.0), Point(4, 3.0) });
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon1);
+    expPolygonList.push_back(newPolygon2);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Attempt to merge two non-adjacent polygons");
+    EXPECT_TRUE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_near)
+{
+    ///Fourth test is merging polygons that are not adjacent and do not overlap, however the distance is less than epsilon. The result is a merged polygon.s
+    // basic shape (not to scale):
+    //              _______
+    //             |       |
+    //             |       | _________
+    //             |       ||         |
+    //              ------- |         |
+    //                      |         |
+    //                      |_________|
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.04, 0.0), Point(6.0, 0.0), Point(6.0, 3.0), Point(3.04, 3.0) });
+
+    //expected new polygon after merge - CCW
+    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(3.0, 3.0), Point(3.0, 5.0), Point(0.0, 5.0), Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 0.0), Point(6.0, 0.0), Point(6.0, 3.0)});
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon1);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    ts.runTest("Merging two non-adjacent polygons that are within epsilon distance");
+    TestShape::m_report_static.addLine("Polygon distance is " + std::to_string(boundary_distance( polygon1,polygon2 )));
+    TestShape::m_report_static.addLine("Epsilon is " + std::to_string(ts.m_epsilon));
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_three_overlapping)
+{
+    ///Fifth test is merging 3 overlapping polygons
+    // basic shape (not to scale):
+    //                  ______
+    //              ___|___   |
+    //             |   |   |  |
+    //             |   |  _|__|____
+    //             |   | | |  |    |
+    //              -------   |    |
+    //                 |_|____|    |
+    //                   |_________|
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+    //third polygon to merge - CCW
+    VisiLibity::Polygon polygon3(std::vector<Point>{Point(1.0, 1.0), Point(4.0, 1.0), Point(4.0, 6.0), Point(1.0, 6.0)});
+
+
+    //expected new polygon after merge - CCW
+    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(0.0, 5.0), Point(1.0, 5.0), Point(1.0, 6.0), Point(4.0, 6.0), Point(4.0, 3.0), Point(5.0, 3.0), Point(5.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0), Point(1.0, 1.0), Point(1.0, 2.0)});
+    //CCW
+    newPolygon1.reverse();
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon1);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+    originalPolygonList.push_back(polygon3);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging three mutually overlapping polygons");
+    EXPECT_TRUE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
+
+TEST(VisiLibityTest, Polygon_union_three_nonoverlapping)
+{
+    ///Fifth test is merging 3 polygons, where two do not overlap each other
+    // basic shape (not to scale):
+    //                  ______
+    //              ___|___   |
+    //             |   |   |  |
+    //             |   |   | _|____
+    //             |   |   || |    |
+    //              ------- | |    |
+    //                 |____|_|    |
+    //                      |______|
+
+    //first polygon to merge - CCW
+    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    //second polygon to merge - CCW
+    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.5, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(3.5, 3.0) });
+    //third polygon to merge - CCW
+    VisiLibity::Polygon polygon3(std::vector<Point>{Point(1.0, 1.0), Point(4.0, 1.0), Point(4.0, 6.0), Point(1.0, 6.0)});
+
+
+    //expected new polygon after merge - CCW
+    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(0.0, 5.0), Point(1.0, 5.0), Point(1.0, 6.0), Point(4.0, 6.0), Point(4.0, 3.0), Point(5.0, 3.0), Point(5.0, 0.0), Point(3.5, 0.0), Point(3.5, 1.0), Point(1.0, 1.0), Point(1.0, 2.0)});
+    //CCW
+    newPolygon1.reverse();
+
+    //merge function arguments are vectors of polygons
+    //expected function output polygon list
+    std::vector<Polygon> expPolygonList;
+    expPolygonList.push_back(newPolygon1);
+
+    //function input polygon list
+    std::vector<VisiLibity::Polygon> originalPolygonList;
+    originalPolygonList.push_back(polygon1);
+    originalPolygonList.push_back(polygon2);
+    originalPolygonList.push_back(polygon3);
+
+    TestShape ts(originalPolygonList, expPolygonList);
+    auto success = ts.runTest("Merging three non-mutually overlapping polygons");
+    EXPECT_TRUE(success);
+    if(Test::HasNonfatalFailure())
+    {
+        TestShape::m_report_static.addLine("Test Fails", "red");
+    }
+    else
+    {
+        TestShape::m_report_static.addLine("Test Passes", "green");
+    }
+};
 
 
 TEST(VisiLibityTest, Point_conversion)
@@ -612,7 +677,6 @@ TEST(VisiLibityTest, Polygon_conversion)
     EXPECT_TRUE(boost::geometry::equals(convertedBoostPoly, boostPoly));
 };
 
-//TODO: test for bad polygons - only one point, wrong orientation, etc
 TEST(VisiLibityTest, Polygon_conversion_with_holes)
 {
 
@@ -687,52 +751,57 @@ TEST(VisiLibityTest, OffsetPolygon)
     }
     
     //Create CCW list of VisiLibity Points
-    //This output is from original union_ function that used OpenGL
     std::vector<Point> outer_points(
         {
-            Point(6.09971, 0.479145),
-            Point(6.5534, 0.630374),
-            Point(7, 0.779241),
-            Point(7, 2.22076),
-            Point(6.5534, 2.36963),
-            Point(6.5534, 2.36963),
-            Point(6.31329, 2.44966),
-            Point(6.29746, 2.67125),
-            Point(6.27585, 2.97373),
-            Point(5.90391, 3.45279),
-            Point(5.72153, 3.51358),
-            Point(4.96557, 3.76557),
-            Point(4.86963, 4.0534),
-            Point(4.72076, 4.5),
-            Point(3.27924, 4.5),
-            Point(3.13037, 4.0534),
-            Point(3.13037, 4.0534),
-            Point(2.71582, 2.80973),
-            Point(2.55746, 2.77014),
-            Point(1.91493, 2.60951),
-            Point(1.93172, 2.54233),
-            Point(1.91863, 2.53492),
-            Point(1.86967, 2.58388),
-            Point(1.75982, 2.47403),
-            Point(1.4466, 2.36963),
-            Point(1, 2.22076),
-            Point(1, 1.71421),
-            Point(1, 0.779241),
-            Point(1.04982, 0.762634),
-            Point(1.0515, 0.730481),
-            Point(1.4453, 0.46795),
-            Point(2.37699, -0.153174),
-            Point(2.62009, -0.315245),
-            Point(2.70025, -0.311237),
-            Point(2.87999, -0.30225),
-            Point(3.13037, -1.0534),
-            Point(3.27924, -1.5),
-            Point(4.72076, -1.5),
-            Point(4.86963, -1.0534),
-            Point(5.15798, -0.18835),
-            Point(5.19963, -0.186268),
-            Point(5.2725, -0.182624),
-            Point(5.5247, 0.0191312)
+           Point(4.72076, 4.5),
+           Point(3.27924, 4.5),
+           Point(3.13037, 4.0534),
+           Point(2.84413, 3.21719),
+           Point(2.3788, 2.76711),
+           Point(2.1766, 2.68088),
+           Point(1.91493, 2.60951),
+           Point(1.92993, 2.5757),
+           Point(1.90556, 2.56531),
+           Point(1.86967, 2.58388),
+           Point(1.81062, 2.52483),
+           Point(1.4466, 2.36963),
+           Point(1.4988, 2.21302),
+           Point(1.37686, 2.09107),
+           Point(1, 2.22076),
+           Point(1, 1.71421),
+           Point(0.95823, 1.67244),
+           Point(1, 1.25061),
+           Point(1, 0.779241),
+           Point(1.04827, 0.763151),
+           Point(1.0515, 0.730481),
+           Point(1.23729, 0.606625),
+           Point(2.3453, -0.132052),
+           Point(3.05592, -0.660412),
+           Point(3.13037, -1.0534),
+           Point(3.30244, -0.996042),
+           Point(3.27924, -1.5),
+           Point(4.72076, -1.5),
+           Point(4.94868, -0.816228),
+           Point(5.15798, -0.188351),
+           Point(5.2725, -0.182624),
+           Point(5.32949, -0.137036),
+           Point(6.16847, 0.502063),
+           Point(6.5534, 0.630374),
+           Point(6.54377, 0.659248),
+           Point(7, 0.779241),
+           Point(7, 2.22076),
+           Point(6.5534, 2.36963),
+           Point(6.55339, 2.36963),
+           Point(6.31623, 2.44868),
+           Point(6.27585, 2.97373),
+           Point(5.90391, 3.45279),
+           Point(5.61623, 3.54868),
+           Point(5.61623, 3.54868),
+           Point(4.89503, 3.78908),
+           Point(4.89445, 3.79502),
+           Point(4.94868, 3.81623),
+           Point(4.86963, 4.0534),
+           Point(4.86963, 4.0534),
         });
     //Create a polygon with visilibity points
     Polygon visPoly(outer_points);
@@ -744,8 +813,6 @@ TEST(VisiLibityTest, OffsetPolygon)
     EXPECT_EQ(1, resultSize);
     if(resultSize == 1)
     {
-        std::cout << "actual: "<< resultingPolygons[0] << std::endl;
-        std::cout << "expected: "<< expectedVisPolyList[0] << std::endl;
         EXPECT_TRUE(VisiLibity::equivalent(resultingPolygons[0], expectedVisPolyList[0], epsilon));
     }
     
@@ -753,33 +820,33 @@ TEST(VisiLibityTest, OffsetPolygon)
     TestShape::m_report_static.addLine(std::string("Test of offset polygon function"));
     
     //Expected Results
-    std::vector<report::Plot_Polygon> expectedPolyList;
+    std::vector<report::PlotPolygon> expectedPolyList;
     for (auto &poly : polygonList)
     {
         // old polygons are red
-        expectedPolyList.push_back(report::Plot_Polygon(poly, 1, "red", "solid", "thick"));
+        expectedPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
     }
     
     for (auto &poly : expectedVisPolyList)
     {
         //new polygons are blue
-        expectedPolyList.push_back(report::Plot_Polygon(poly, 1, "blue", "dashed", "ultra thick"));
+        expectedPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
     }
     report::Plot expectedPlot(expectedPolyList, "Expected Result");
     TestShape::m_report_static.addPlot(expectedPlot);
     
     //Actual Results
-    std::vector<report::Plot_Polygon> actualPolyList;
+    std::vector<report::PlotPolygon> actualPolyList;
     for (auto &poly : polygonList)
     {
         // old polygons are red
-        actualPolyList.push_back(report::Plot_Polygon(poly, 1, "red", "solid", "thick"));
+        actualPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
     }
     
     for (auto &poly : resultingPolygons)
     {
         //new polygons are blue
-        actualPolyList.push_back(report::Plot_Polygon(poly, 1, "blue", "dashed", "ultra thick"));
+        actualPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
     }
     report::Plot actualPlot(actualPolyList, "Actual Result");
     TestShape::m_report_static.addPlot(actualPlot);
