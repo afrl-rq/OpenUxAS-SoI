@@ -1081,6 +1081,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             
             missionCommands[vehicleID - 1]->getWaypointList().clear();
             
+            
+            missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
+            
             for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++){
                 fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
                 missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
