@@ -150,36 +150,54 @@ private:
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-private:    
+private:
+    // Saved threadIDs of ICAROUS listeners
     std::vector<std::thread> icarousID;
     
+    // Saved mission commands
     std::vector<std::shared_ptr<afrl::cmasi::MissionCommand>> missionCommands;
+    
+    // Saved waypoint lists for each instance
+    // These are updated as the UAV progresses
     std::vector<std::vector<afrl::cmasi::Waypoint*>> newWaypointLists;
     
+    // A boolean to determine when to do waypoint truncation
     std::vector<bool> truncateWaypoint;
     
     // This is to keep an array of translated waypoint indexes to an ordered list
     std::vector<std::vector<int64_t>> icarousClientWaypointLists;
+    
+    // The current waypoint index a UAV is on
     std::vector<int64_t> currentWaypointIndex;
+    
+    // The last completed waypoint a UAV has done
     std::vector<int64_t> lastWaypoint;
+    
+    // A boolean to determine if the first waypoint was initialized
     std::vector<bool> isLastWaypointInitialized;
     
+    // A boolean to determine if a mission command was already created and whether or not it should be replaced
     std::vector<bool> resumePointSet;
 
+    // A list of tasks the UAV was doing before being taken over by ICAROUS
     std::vector<std::vector<int64_t>> entityTasks;
 
+    // A boolean to determine when ICAROUS has taken over
     std::vector<bool> icarousTakeoverActive;
 
+    // A boolean to determine when to soft reset ICAROUS
     std::vector<bool> softResetFlag;
+    
+    // A array of semaphores to control program flow
     sem_t *softResetSemaphores;
 
     // Dimention 1: ICAROUS instance
     // Dimention 2: Heading | Lat | Long | Alt
     std::vector<std::vector<float>> currentInformation;
     std::vector<std::vector<float>> positionBeforeTakeover;
+    
     // One mutex for each ICAROUS instance
     std::mutex *currentInformationMutexes;
-
 
     //Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};
