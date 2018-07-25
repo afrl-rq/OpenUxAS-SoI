@@ -945,38 +945,21 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // TODO - May need to fiddle with this to be correct (Not sure if implemented positive up or down in ICAROUS)
         double wDown = ptr_AirVehicleState->getW();
         
+        uNorth = ptr_AirVehicleState->getU() * cos(uHeading*M_PI/180);
+        uEast = ptr_AirVehicleState->getU() * sin(uHeading*M_PI/180);
         
-        uNorth = (1 - ((fmod(uHeading, 90.0)) / 90)) * ptr_AirVehicleState->getU();
-        uEast = ((fmod(uHeading, 90)) / 90.0) * ptr_AirVehicleState->getU();
+        vNorth = ptr_AirVehicleState->getV() * cos(vHeading*M_PI/180);
+        vEast = ptr_AirVehicleState->getV() * sin(vHeading*M_PI/180);
         
-        vNorth = (1 - ((fmod(vHeading, 90.0)) / 90)) * ptr_AirVehicleState->getV();
-        vEast = ((fmod(vHeading, 90.0)) / 90) * ptr_AirVehicleState->getV();
-        
-        if(uHeading < 90){
-            uNorth = fabs(uNorth);
-            uEast = fabs(uEast);
-            vNorth = fabs(vNorth) * -1;
-            vEast = fabs(vEast);
-        }else if(uHeading >= 90 && uHeading < 180){
-            uNorth = fabs(uNorth) * -1;
-            uEast = fabs(uEast);
-            vNorth = fabs(vNorth) * -1;
-            vEast = fabs(vEast) * -1;
-        }else if(uHeading >= 180 && uHeading < 270){
-            uNorth = fabs(uNorth) * -1;
-            uEast = fabs(uEast) * -1;
-            vNorth = fabs(vNorth);
-            vEast = fabs(vEast) * -1;
-        }else{
-            uNorth = fabs(uNorth);
-            uEast = fabs(uEast) * -1;
-            vNorth = fabs(vNorth);
-            vEast = fabs(vEast);
-        }
         
         double northTotal = uNorth + vNorth;
         double eastTotal = uEast + vEast;
         double downTotal = wDown;
+
+        fprintf(stderr, "UAV %i | northTotal  %f | eastTotal %f\n",
+            vehicleID, 
+            northTotal, 
+            eastTotal);
         
         /*
         fprintf(stdout, "UAV: %i\n", vehicleID);
