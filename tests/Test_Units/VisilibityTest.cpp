@@ -622,7 +622,7 @@ TEST(VisiLibityTest, Point_conversion)
 
     //Visilibity Point to Boost point
     auto convertedBoostPoint = VisiLibity::to_boost(visPoint);
-    EXPECT_TRUE(bg::equals(convertedBoostPoint, b_point));
+    EXPECT_TRUE(boost::geometry::equals(convertedBoostPoint, b_point));
 
     //Boost point to VisiLibity Point
     auto convertedVisPoint = VisiLibity::to_visiLibity(b_point);
@@ -649,7 +649,7 @@ TEST(VisiLibityTest, Polygon_conversion)
         //convert visiLibity point to boost point
         auto b_point = VisiLibity::to_boost(point);
         //append to boost Polygon
-        bg::append(boostPoly.outer(), b_point);
+        boost::geometry::append(boostPoly.outer(), b_point);
     }
 
     //convert boost polygon to visiLibity polygon list
@@ -735,7 +735,7 @@ TEST(VisiLibityTest, OffsetPolygon)
     
     boost::geometry::read_wkt("POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 3,5.3 2.6,5.4 1.2,4.9 0.8,2.9 0.7,2 1.3))", green);
     //make this polygon CCW
-    bg::correct(green);
+    boost::geometry::correct(green);
     auto visPolyList = to_visiLibity(green);
     if(visPolyList.size() == 1)
     {
@@ -743,7 +743,7 @@ TEST(VisiLibityTest, OffsetPolygon)
     }
     boost::geometry::read_wkt("POLYGON((4.0 -0.5 , 3.5 1.0 , 2.0 1.5 , 3.5 2.0 , 4.0 3.5 , 4.5 2.0 , 6.0 1.5 , 4.5 1.0 , 4.0 -0.5))", blue);
     //make this polygon CCW
-    bg::correct(blue);
+    boost::geometry::correct(blue);
     visPolyList = to_visiLibity(blue);
     if(visPolyList.size() == 1)
     {

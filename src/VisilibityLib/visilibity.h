@@ -114,12 +114,11 @@ namespace VisiLibity
   class Guards;
   class Visibility_Polygon;
   class Visibility_Graph;
-    
-  namespace bg = boost::geometry;
+
   // 2-dimensional boost point
-  typedef bg::model::d2::point_xy<double> boost_point;
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
   //boost polygon based on points, with counterclockwise orientation and not closed (ie last point != first point
-  typedef bg::model::polygon<boost_point, false, false> boost_polygon;
+  typedef boost::geometry::model::polygon<boost_point, false, false> boost_polygon;
 
 
   /** \brief  floating-point display precision.

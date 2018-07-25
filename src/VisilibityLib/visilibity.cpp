@@ -3943,14 +3943,14 @@ namespace VisiLibity
 
   boost_point to_boost(Point vis_point)
   {
-  bg::model::d2::point_xy<double> b_point(vis_point.x(), vis_point.y());
+  boost::geometry::model::d2::point_xy<double> b_point(vis_point.x(), vis_point.y());
   return b_point;
   }
 
   Point to_visiLibity(boost_point b_point)
   {
-    double x = bg::get<0>(b_point);
-    double y = bg::get<1>(b_point);
+    double x = boost::geometry::get<0>(b_point);
+    double y = boost::geometry::get<1>(b_point);
     Point visPoint(x,y);
     return (visPoint);
   }
@@ -3966,7 +3966,7 @@ namespace VisiLibity
         for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
         {
           auto b_point = to_boost(visPoly[pointIdx]);
-          bg::append(b_poly.outer(), b_point);
+          boost::geometry::append(b_poly.outer(), b_point);
         }
       }
 
@@ -3984,13 +3984,13 @@ namespace VisiLibity
           {
             auto b_point = to_boost(visPoly[pointIdx]);
             //subtract 1 because index is for VisiLibity polygon list, where the first element is the outer ring
-            bg::append(b_poly.inners()[polyIdx - 1], b_point);
+            boost::geometry::append(b_poly.inners()[polyIdx - 1], b_point);
           }
         }
       }
 
-      bg::validity_failure_type failure;
-      if(!bg::is_valid(b_poly, failure))
+      boost::geometry::validity_failure_type failure;
+      if(!boost::geometry::is_valid(b_poly, failure))
       {
         //invalid boost polygon created - return empty boost polygon
         b_poly.clear();
@@ -4005,8 +4005,8 @@ namespace VisiLibity
       std::vector<Polygon> visPolyList;
       Polygon visPoly;
       //check boost polygon validity
-      bg::validity_failure_type failure;
-      if(bg::is_valid(b_poly, failure))
+      boost::geometry::validity_failure_type failure;
+      if(boost::geometry::is_valid(b_poly, failure))
       {
         //for each point in outer ring
         std::vector<boost_point> const& points = b_poly.outer();
@@ -4052,11 +4052,12 @@ namespace VisiLibity
         for (int idx2 = idx1+1; idx2 < polygonList.size(); idx2++)
         {
           //make sure both polygons are valid
-          bg::validity_failure_type failure;
-          if(bg::is_valid(polygonList[idx1], failure) && bg::is_valid(polygonList[idx2], failure))
+          boost::geometry::validity_failure_type failure;
+          if(boost::geometry::is_valid(polygonList[idx1], failure) && boost::geometry::is_valid(polygonList[idx2], failure))
           {
             //if these polygons overlap
-            if( bg::distance(polygonList[idx1], polygonList[idx2]) > 0 && bg::distance(polygonList[idx1], polygonList[idx2]) < epsilon)
+            if( boost::geometry::distance(polygonList[idx1], polygonList[idx2]) > 0 &&
+                boost::geometry::distance(polygonList[idx1], polygonList[idx2]) < epsilon)
             {
               auto poly1 = to_visiLibity(polygonList[idx1]);
               auto poly2 = to_visiLibity(polygonList[idx2]);
@@ -4097,17 +4098,17 @@ namespace VisiLibity
       //outer loop is first polygon for distance calculation
       for (int idx1 = 0; idx1 < polygonList.size(); idx1++)
       {
-        bg::validity_failure_type failure;
+        boost::geometry::validity_failure_type failure;
 
         //start with polygon after outer loop so we don't compare a polygon to itself
         for (int idx2 = idx1+1; idx2 < polygonList.size(); idx2++)
         {
           //make sure both polygons are valid
-          if(bg::is_valid(polygonList[idx1], failure) && bg::is_valid(polygonList[idx2], failure))
+          if(boost::geometry::is_valid(polygonList[idx1], failure) && boost::geometry::is_valid(polygonList[idx2], failure))
           {
 
             //if these polygons overlap
-            if( bg::distance(polygonList[idx1], polygonList[idx2]) > 0 == false)
+            if( boost::geometry::distance(polygonList[idx1], polygonList[idx2]) > 0 == false)
             {
               result.push_back(std::pair<int, int>(idx1, idx2));
             }
@@ -4123,12 +4124,12 @@ namespace VisiLibity
     {
       bool success = true;
       std::vector<boost_polygon> bPolyList;
-      bg::validity_failure_type failure;
+      boost::geometry::validity_failure_type failure;
       //convert polygon list from visiLibity to boost
       for (auto &visPoly : polygonList)
       {
         auto b_poly = to_boost(std::vector<Polygon>(1,visPoly));
-        if(bg::is_valid(b_poly, failure))
+        if(boost::geometry::is_valid(b_poly, failure))
         {
           bPolyList.push_back(b_poly);
         }
@@ -4156,7 +4157,7 @@ namespace VisiLibity
           std::vector<boost_polygon> output;
 
           std::pair<int, int> indices = *revIt;
-          bg::union_(bPolyList[indices.first], bPolyList[indices.second], output);
+          boost::geometry::union_(bPolyList[indices.first], bPolyList[indices.second], output);
     //        //if we were able to merge these two
           if(output.size() == 1)
           {
@@ -4208,8 +4209,8 @@ namespace VisiLibity
       outs << "Outer:\n";
       for (auto &b_point : points)
       {
-        double x = bg::get<0>(b_point);
-        double y = bg::get<1>(b_point);
+        double x = boost::geometry::get<0>(b_point);
+        double y = boost::geometry::get<1>(b_point);
         outs << x << " " << y << std::endl;
       }
 
@@ -4222,8 +4223,8 @@ namespace VisiLibity
         for (auto &b_point : hole)
         {
 
-          double x = bg::get<0>(b_point);
-          double y = bg::get<1>(b_point);
+          double x = boost::geometry::get<0>(b_point);
+          double y = boost::geometry::get<1>(b_point);
           outs << x << " " << y << std::endl;
         }
 
