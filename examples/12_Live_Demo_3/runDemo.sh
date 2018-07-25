@@ -14,7 +14,7 @@ cd /home/nia-visi8/UxAS_pulls/OpenUxAS/examples/12_Live_Demo_3/
 
 sleep 3
 
-gnome-terminal --geometry=74x19+-10+14 --command "sh -c 'echo; cd /home/nia-visi8/UxAS_pulls/OpenUxAS/examples/12_Live_Demo_3/; ./runUxAS_Live_Demo_1.sh; exec bash'"
+gnome-terminal --geometry=74x19+-10+14 --command "sh -c 'echo; cd /home/nia-visi8/UxAS_pulls/OpenUxAS/examples/12_Live_Demo_3/; ./runUxAS_Live_Demo_3.sh; exec bash'"
 
 sleep 2
 

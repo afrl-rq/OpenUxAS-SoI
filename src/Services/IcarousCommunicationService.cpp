@@ -356,7 +356,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
         
         messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
         
-        //fprintf(stdout, "Full message from child socket #%lli:\n%s\n", icarousClientFd, messageBuffer);
+        //fprintf(stdout, "UAV %i | Full message from child socket #%lli:\n%s\n", instanceIndex + 1, icarousClientFd, messageBuffer);
         
         char *tempMessageBuffer = messageBuffer;
         
@@ -412,11 +412,18 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 {
                     //fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
+                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                    // TODO The issue is currently with a double-takeover event. When ICAROUS takes over a second     TODO
+                    // TODO time, the set passive code bellow fails to work. Check into this using example 12-3.      TODO
+                    // TODO A possible way to find this is to add print statements everywhere. Check the flag values! TODO
+                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
                     // SOFT RESET ICAROUS (RESET_SFT)
                     // Send a message to ICAROUS to ensure that it soft-resets
                     // Possibly set a variable here to true to do that
                     softResetFlag[instanceIndex] = true;
                     sem_wait(&softResetSemaphores[instanceIndex]);
+                    
+                    fprintf(stderr, "UAV %i | after semaphore\n", instanceIndex + 1);
                     
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
@@ -427,14 +434,14 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     }
                     icarousTakeoverActive[instanceIndex] = false;
                     
-                    if(resumePointSet[instanceIndex] == false){
-                        //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, missionCommands->getFirstWaypoint());
-                        //std::cout << missionCommands[instanceIndex]->toString() << std::endl;
-                        //fprintf(stderr, "SENDING NEW MISSION COMMAND TO UAV %i!!!\n", instanceIndex + 1);
-                        sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
-                        resumePointSet[instanceIndex] = true;
-                    }
+                    fprintf(stderr, "UAV %i | takeover is set to off\n", instanceIndex + 1);
                     
+                    //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, missionCommands->getFirstWaypoint());
+                    fprintf(stderr, "SENDING NEW MISSION COMMAND TO UAV %i!!!\n", instanceIndex + 1);
+                    std::cout << missionCommands[instanceIndex]->toString() << std::endl;
+                    sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
+                    resumePointSet[instanceIndex] = true;
+                
                     // ARTIFACT -- Keeping just in case we need to revert
                     // Construct the new mission command here
                     // Create a waypoint list fromt the waypoints
@@ -685,7 +692,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         {
             // Set the variable to ensure we only send one vehicle one MissionCommand
             has_gotten_waypoints[vehicleID - 1] = true;
-            fprintf(stdout, "Sending waypoints to ICAROUS instance %lld\n", vehicleID);
+            //fprintf(stdout, "Sending waypoints to ICAROUS instance %lld\n", vehicleID);
             
             // Set up variable to be used
             int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
@@ -869,7 +876,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     }
                     
                     if(lastWaypoint[vehicleID - 1] == ptr_AirVehicleState->getCurrentWaypoint()){
-                        fprintf(stdout, "UAV %i | lastwaypoint indicates task is finished\n", vehicleID);
+                        //fprintf(stdout, "UAV %i | lastwaypoint indicates task is finished\n", vehicleID);
                     }else{
                         //fprintf(stdout, "UAV %i | lastwaypoint is moving up one\n", vehicleID);
                         lastWaypoint[vehicleID - 1]++;
@@ -1093,6 +1100,10 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             //fprintf(stderr, "UAV %i | current %lli | last %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], lastWaypoint[vehicleID - 1]);
             
             //isLastWaypointInitialized[vehicleID - 1] = false;
+            softResetFlag[vehicleID - 1] = false;
+            sem_post(&softResetSemaphores[vehicleID - 1]);
+        }else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true)){
+            // Otherwise if we already have a waypoint set, continue the mission
             softResetFlag[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
