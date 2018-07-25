@@ -171,36 +171,10 @@ endif
 # creates src/Includes/config.h
 subdir('src/Includes')
 
-glu_deps = []
-# OpenGL, specifically the GLU library
-if os == 'darwin'
-  # newer MacOS splits out GLU into a separate framework, but we can't
-  # ask Meson for the version in order to handle things differently
-  glu_deps += [dependency('gl')]
-  glu_deps += [dependency('glu', required: false)]
-elif os.startswith('linux')
-  if not (target_machine.cpu_family() == 'arm')
-    glu_deps += [dependency('glu')]
-  endif
-elif os == 'windows'
-  glu_deps += [cpp.find_library('glu32')]
-endif
-
-# ensure that required glu functions are available
-# note: 'has_function' check cannot reach into windows c libraries
-glu_functions = ['gluNewTess', 'gluDeleteTess', 'gluErrorString']
-foreach fn : glu_functions
-  if os != 'windows' and not cpp.has_function(fn, dependencies: glu_deps)
-    error('GLU library functions not found')
-  endif
-endforeach
-deps += glu_deps
-
 if get_option('afrl_internal')
   deps += deps_internal
   link_args += link_args_internal
 endif
-
 
 executable(
   'uxas',
