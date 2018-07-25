@@ -22,23 +22,18 @@
  * 
  *
  *  Things still to do:
- *   TODO - translate messages from ICAROUS into LMCP (publish recieved messages)
  *   TODO - Use UxAS logging function and UxAS print statements
- *   
- *   TODO configure - Use options given from the XML
- *   TODO configure - Add error checking to the XML options and subscriptions?
  *
- *   TODO processReceivedLmcpMessage - Condense messages being sent for zones with the newest ICAROUS refactor
  *   TODO processReceivedLmcpMessage - fix hardcoding the number of sats (is there a way to get this???)
  *   TODO processReceivedLmcpMessage - Find if there is a place to get relative altitude from AMASE for the UAVs position
  *   TODO processReceivedLmcpMessage - Locate a place where horizonal accuracy is defined (hdop)
  *   TODO processReceivedLmcpMessage - Locate a place where vertical accuracy is defined (vdop)
  *   TODO processReceivedLmcpMessage - Find a way to get the yaw from AMASE for a given UAV (not default included in the message)
  *   
- *   TODO scan for waypoint reached from AirVehicleState
  *
  *  Notes:
- *   This code ONLY works on Linux, since it uses Linux function calls  
+ *   This code ONLY works on Linux, since it uses Linux function calls
+ *   Built and tested on Ubuntu 16.04 32-bit with ICAROUS 2.1
  *   
  *   *************************************************************************************************
  *   * IMPORTANT: There are several known security vulnerabilities in this file. The fixes for these *
@@ -123,13 +118,7 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
     }
 
 
-    // Subscribe to messages::
     // MissionCommand messages are used to determine where a singular UAV is going to go during a mission
-    // TODO - semaphores are system-wide, since they're implemented as files. Lock a semaphore in this thread when
-    // we don't want to re-run UxAS, and unlock it when we do. Additionally, in the terminate function for this service,
-    // delete the semaphore file.
-    // TODO TODO - Instead of going through all that, try setting the troublesome service to only send its troublesome
-    // message once, ever
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     
     // KeepInZone messages are used to define all zones to stay within
@@ -141,23 +130,23 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
     // AirVehicleStates are returned from OpenAMASE to know where a UAV is and what it is doing
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
 
-    // Other message subscriptions should go here
-
-
-    // Alway true, configuration should not fail (TODO - do not assume success, check for failure with XML options?)
+    
     return (isSuccess);
 }
 
 
 
-// Start up the module and connect to ICAROUS instance(s)
+// Start up the module, initialize variables, and connect to ICAROUS instance(s)
 bool IcarousCommunicationService::initialize()
 {
     // Perform any required initialization before the service is started
-    std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
+    //std::cout << "*** INITIALIZING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
 
 
-    // Set both vectors to the Number of UAVs specified in the XML
+    // -- Variable set-up --
+
+    // Set vectors to the Number of UAVs specified in the XML
+    // Variable uses are defined in the header file
     client_sockfd.resize(ICAROUS_CONNECTIONS);
     has_gotten_waypoints.resize(ICAROUS_CONNECTIONS);
     icarousClientWaypointLists.resize(ICAROUS_CONNECTIONS);
@@ -175,21 +164,27 @@ bool IcarousCommunicationService::initialize()
     resumePointSet.resize(ICAROUS_CONNECTIONS);
     truncateWaypoint.resize(ICAROUS_CONNECTIONS);
     
-    // Mutexes must be set like this and not in a vector
-    // This is because a vector of mutexes is non-resizable
+    // Mutexes & Semaphores must be set like this and not in a vector
+    // This is because a vector of these objects is non-resizable
+    // These objects cannot be deleted without causing an issue, 
+    // thus resizing like the above is impossible
     currentInformationMutexes = new std::mutex[ICAROUS_CONNECTIONS];
-    
     softResetSemaphores = new sem_t[ICAROUS_CONNECTIONS];
     
+    // Some vectors are subvectors and need additional initialization of size
     for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
     {
-        currentInformation[i].resize(4); // This is to set the size of heading, lat, long, and alt for each instance
+        // This is to set the size of heading, lat, long, and alt for each instance
+        currentInformation[i].resize(4);
         positionBeforeTakeover[i].resize(4);
+        
+        // Also need to initialize all the semaphores to 0
         sem_init(&softResetSemaphores[i], 0, 0);
     }
 
-    // Initialize has_gotten_waypoints[] to the number of UAVs that is planned on being used
-    has_gotten_waypoints.assign(ICAROUS_CONNECTIONS,false);    
+    // Need to initialize all variables that can be initialized at this point
+    // Some of the other vectors values are initialized later in the program at the earliest convienience
+    has_gotten_waypoints.assign(ICAROUS_CONNECTIONS,false);
     icarousTakeoverActive.assign(ICAROUS_CONNECTIONS, false);
     currentWaypointIndex.assign(ICAROUS_CONNECTIONS, 0);
     lastWaypoint.assign(ICAROUS_CONNECTIONS, -1);
@@ -198,14 +193,13 @@ bool IcarousCommunicationService::initialize()
     resumePointSet.assign(ICAROUS_CONNECTIONS, false);
     truncateWaypoint.assign(ICAROUS_CONNECTIONS, false);
     
-    // Variable set-up
     // Protocol constants for 3-way ICAROUS authentication handshake    
     const char *protocol1 = "ICAROUS-UxAS_LMCP";
     const char *protocol2 = "ok ";
     const char *sharedSecret = "28a4b77b86aa32715e4c271415b28447b8c08d704fd9ffb1258bced7b7167fe0";
     const char *err = "error";
     
-    // Other variables
+    // Other variables needed for socket setup
     int server_sockfd = -2;
     int i = 1;
     int nread;
@@ -217,7 +211,7 @@ bool IcarousCommunicationService::initialize()
     struct sockaddr_in server_address;
     server_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
     
-    // Check to make sure that the socket was created
+    // Check to make sure that the socket was created successfully
     if(server_sockfd <= 0)
     {
         fprintf(stderr, "Fatal error, socket could not be made!\n");
@@ -250,10 +244,10 @@ bool IcarousCommunicationService::initialize()
 
     // Once the first has initiated the first step of connecting, accept the number of ICAROUS' defined by the mission
     for(int connectionNum = 0; connectionNum < ICAROUS_CONNECTIONS; connectionNum++)
-    {    
+    {
         // Accept another new ICAROUS connection
         client_sockfd[connectionNum] = accept(server_sockfd, NULL, NULL);
-        
+
         // Perform 3-way handshake with ICAROUS
         // Start with the protocol that is expected
         if((write(client_sockfd[connectionNum], protocol1, strlen(protocol1))) <= 0)
@@ -270,8 +264,7 @@ bool IcarousCommunicationService::initialize()
         // Read for the password from ICAROUS
         if((nread = read(client_sockfd[connectionNum], buffer, strlen(sharedSecret))) <= 0)
         {
-            // Password reading was interupted
-            
+            // Password reading was interupted in some way
             fprintf(stderr, "Fatal error, could not read ICAROUS password!\n");
             close(client_sockfd[connectionNum]);
             return false;
@@ -279,12 +272,12 @@ bool IcarousCommunicationService::initialize()
         else if(!strcmp(sharedSecret, buffer)) // !compare==true indicates the strings are the same
         {
             // Password was acepted and recognized
-            
             // Respond back to ICAROUS instance to inform it of the connection status
             if((write(client_sockfd[connectionNum], protocol2, strlen(protocol2))) <= 0){
-              fprintf(stderr, "Fatal error, write confirmation to ICAROUS failed!\n");
-              close(client_sockfd[connectionNum]);
-              return false;
+                // If there was an error with informming ICAROUS, error out
+                fprintf(stderr, "Fatal error, write confirmation to ICAROUS failed!\n");
+                close(client_sockfd[connectionNum]);
+                return false;
             }
             
             // ICAROUS has been accepted, begin communication
@@ -292,8 +285,7 @@ bool IcarousCommunicationService::initialize()
         }
         else
         {
-            // Password was incorrect or another error was encountered
-            
+            // Password was rejected or another error was encountered
             nwrite = write(client_sockfd[connectionNum], err, strlen(err));
             fprintf(stderr, "Able to write %i bytes to ICAROUS reporting an error.\n", nwrite);
             close(client_sockfd[connectionNum]);
@@ -307,14 +299,14 @@ bool IcarousCommunicationService::initialize()
 
 
 
-// This function is used to start the service
+// This function is used to start the service and the ICAROUS listening side of the program
 bool IcarousCommunicationService::start()
 {
     // perform any actions required at the time the service starts
-    std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
+    //std::cout << "*** STARTING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
 
 
-    // Start children here to begin reading from ICAROUS instances
+    // Start threads here to begin reading from ICAROUS instances
     for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
     {
         fprintf(stdout, "Creating a thread to read from ICAROUS #%i\n", (i+1));
@@ -324,45 +316,57 @@ bool IcarousCommunicationService::start()
     return (true);
 };
 
+
+
 // Listener for ICAROUS command messages
 void IcarousCommunicationService::ICAROUS_listener(int id)
 {
+    // grab the ID from the handler (TODO - Verify if the variable 'id' is changed after other threads are started)
     int instanceIndex = id;
     fprintf(stdout, "This is icarous instance #%i\n", (instanceIndex + 1));
+    
+    // grad the ICAROUS instances' socket for reading
     int64_t icarousClientFd = client_sockfd[instanceIndex];
     fprintf(stdout, "instance #%i | icarousClientFd: %lli\n", (instanceIndex + 1), icarousClientFd);
     
-    
+    // Set the max message length and create a buffer to store messages of this size (actual max is 65535)
     const int max_message_length = 87040;
     char messageBuffer[max_message_length + 1];
     
-    // Listen to ICAROUS forever
+    // Listen to ICAROUS instance forever
     while(true){
-        //fprintf(stdout, "Child listening to icarousClientFd: %lli\n", icarousClientFd);        
+        // DEBUG STATEMENT - Prints that we have started a new itteration
+        //fprintf(stdout, "UAV &i | Child listening to icarousClientFd: %lli\n", instanceIndex + 1, icarousClientFd);        
         
+        // Variables reset upon each read
         messageBuffer[0] = '\0';
         int nread = max_message_length;
         int bytesReceived = 0;
         errno = 0;
         
-        //listen to each client socket
-        //Read any messages ICAROUS has posted
-        
+        // Listen to each client socket
+        // Read any messages ICAROUS has posted
         while(nread == max_message_length && !errno){
-            //fprintf(stdout, "Read call made in icarousClientFd %lli\n", icarousClientFd);
+            // DEBUG STATEMENT - Prints that a read call was made
+            //                   Used to determine how many times an instance reads from the socket
+            //fprintf(stdout, "UAV %i | Read call made in icarousClientFd %lli\n", instanceIndex + 1, icarousClientFd);
             nread = read(icarousClientFd, messageBuffer, max_message_length);
             bytesReceived += nread;
         }
         
-        messageBuffer[bytesReceived] = '\0'; //makes sure we never segfault
+        // Makes sure we never segfault
+        messageBuffer[bytesReceived] = '\0';
         
+        // DEBUG STATEMENT - Used for checking what the current message that was sent was
         //fprintf(stdout, "UAV %i | Full message from child socket #%lli:\n%s\n", instanceIndex + 1, icarousClientFd, messageBuffer);
         
+        // Get a pointer to the message so as to not edit the original directly
         char *tempMessageBuffer = messageBuffer;
         
+        // Process as many messages as where recieved
         while(strlen(tempMessageBuffer)){
         
-            // Necessary variables
+            // Necessary variables for parsing the message
             char *fieldEnd;
             char throwaway[400]; // Used simply to fill necessary (but useless) arguments in function calls
             int fieldLength;
@@ -370,8 +374,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
 
             if(!strncmp(tempMessageBuffer, "SETMOD", 6)) // Set Mode (has ICAROUS taken over?)
             {
-                // SETMOD,type~,\n
-
+                // MESSAGE STRUCTURE - SETMOD,type~,\n
+                
                 // The following section of code finds several fields by their tags.
                 // It's fairly difficult to follow, so here's a comment section explaining each line.            
                 /* 1. strstr returns a pointer to the first occurence of our tag in the message
@@ -382,7 +386,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                  */
                 // Note: We tried to functionize this code. We spent 4 hours and had the strangest
                 // issue we've ever seen, with a passed-in pointer being invalid memory to access.
-                // Possible it was a unique issue.
+                // Possible it was a unique issue. (TODO - Possibly try this again?)
 
                 // Mode type
                 trackingHelper            = strstr(tempMessageBuffer, "type");
@@ -391,71 +395,66 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 fieldLength               = fieldEnd - trackingHelper;
                 char *modeType            = strncpy(throwaway, trackingHelper, fieldLength);
 
-
+                // DEBUG STATEMENT - Print the contents of the message
                 //fprintf(stdout, "%lli|SETMOD|modeType|%s\n", icarousClientFd, modeType);
 
 
                 if(!strncmp(modeType, "_ACTIVE_", strlen("_ACTIVE_"))) // ICAROUS has taken over, pause all tasks
                 {
+                    // DEBUG STATEMENT - Print what the last waypoint was saved as index wise
                     //fprintf(stderr, "UAV %i's last waypoint saved currentWaypointIndex[instanceIndex] = %lli as: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
+                    
+                    // Inform other parts of the code that a take-over has started
                     icarousTakeoverActive[instanceIndex] = true;
+                    
+                    // If a takeover has started, waypoints should not be truncated
                     truncateWaypoint[instanceIndex] = false;
+                    
+                    // Pause all current tasks the UAV is doing
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
+                        // DEBUG STATEMENT - Print what tasks were paused
                         //fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
+                        // Pause the task by sending a message to AMASE
                         auto pauseTask = std::make_shared<uxas::messages::task::TaskPause>();
                         pauseTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
                         sendSharedLmcpObjectBroadcastMessage(pauseTask);
                     }
                 }
-                else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks
+                else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks and Mission
                 {
+                    // DEBUG STATEMENT - Print what waypoint was last set before handing AMASE back control
                     //fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
-                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-                    // TODO The issue is currently with a double-takeover event. When ICAROUS takes over a second     TODO
-                    // TODO time, the set passive code bellow fails to work. Check into this using example 12-3.      TODO
-                    // TODO A possible way to find this is to add print statements everywhere. Check the flag values! TODO
-                    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
                     // SOFT RESET ICAROUS (RESET_SFT)
-                    // Send a message to ICAROUS to ensure that it soft-resets
-                    // Possibly set a variable here to true to do that
                     softResetFlag[instanceIndex] = true;
+                    
+                    // Hold the UAV until the new MissionCOmmand is constructed
                     sem_wait(&softResetSemaphores[instanceIndex]);
                     
-                    fprintf(stderr, "UAV %i | after semaphore\n", instanceIndex + 1);
-                    
+                    // Resume tasks after the message is ready
                     for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
                     {
+                        // DEBUG STATEMENT - Used to tell what tasks are being resumed
                         //fprintf(stderr, "UAV %i resuming task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
+                        
+                        // Send a message for each task to resume
                         auto resumeTask = std::make_shared<uxas::messages::task::TaskResume>();
                         resumeTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
                         sendSharedLmcpObjectBroadcastMessage(resumeTask);
                     }
+                    
+                    // Let other code know that icarous should no long be in control
                     icarousTakeoverActive[instanceIndex] = false;
                     
-                    fprintf(stderr, "UAV %i | takeover is set to off\n", instanceIndex + 1);
-                    
+                    // DEBUG STATEMENT - Used to see what the new mission command is composed of
                     //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, missionCommands->getFirstWaypoint());
-                    fprintf(stderr, "SENDING NEW MISSION COMMAND TO UAV %i!!!\n", instanceIndex + 1);
-                    std::cout << missionCommands[instanceIndex]->toString() << std::endl;
+                    //fprintf(stderr, "SENDING NEW MISSION COMMAND TO UAV %i!!!\n", instanceIndex + 1);
+                    //std::cout << missionCommands[instanceIndex]->toString() << std::endl;
+                    
+                    // Send the new Mission Command to AMASE
                     sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
                     resumePointSet[instanceIndex] = true;
-                
-                    // ARTIFACT -- Keeping just in case we need to revert
-                    // Construct the new mission command here
-                    // Create a waypoint list fromt the waypoints
-                    // The current waypoint list will need to be changed back to icarous order to work better.
-                    /*
-                    auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
-                    vehicleActionCommand->setVehicleID(instanceIndex + 1);
-                    
-                    auto goToWaypointAction = new afrl::cmasi::GoToWaypointAction;
-                    goToWaypointAction->setWaypointNumber(icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
-                    
-                    vehicleActionCommand->getVehicleActionList().push_back(goToWaypointAction);
-                    sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
-                    */
                 }
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
@@ -465,7 +464,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             }
             else if(!strncmp(tempMessageBuffer, "SETPOS", 6))
             {
-                // SETPOS,lat~,long~,alt~,\n
+                // MESSAGE STRUCTURE - SETPOS,lat~,long~,alt~,\n
+                // DEBUG STATEMENT - Tell what type of message is being processed
                 //fprintf(stdout, "SETPOS message received in icarousClientFd %lli!\n", icarousClientFd);
                 
                 // Get latitude
@@ -490,14 +490,16 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 float altitude     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
 
+                // DEBUG STATEMENT - Print the contents of the message
                 //fprintf(stdout, "%lli|SETPOS|latitude|%f\n", icarousClientFd, latitude);
                 //fprintf(stdout, "%lli|SETPOS|longitude|%f\n", icarousClientFd, longitude);
                 //fprintf(stdout, "%lli|SETPOS|altitude|%f\n", icarousClientFd, altitude);
 
-
+                // Create a new vehicle action command and send the UAV to the given position
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
 
+                // Loiter at the given position until another command is recieved
                 auto loiterAction = new afrl::cmasi::LoiterAction;
                 auto location3d = new afrl::cmasi::Location3D;
                 location3d->setLatitude(latitude);
@@ -516,24 +518,25 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             }
             else if(!strncmp(tempMessageBuffer, "SETVEL", 6))
             {
-                // SETVEL,u~,v~,w~,\n
+                // MESSAGE STRUCTURE - SETVEL,north~,east~,down~,\n
+                // DEBUG STATEMENT - Tell what type of message is being processed
                 //fprintf(stdout, "SETVEL message received in icarousClientFd %lli!\n", icarousClientFd);
                 
-                // Get u
+                // Get north
                 trackingHelper            = strstr(tempMessageBuffer, "north");
                 trackingHelper           += 5; //skip past "north"
                 fieldEnd                  = strchr(trackingHelper, ',');
                 fieldLength               = fieldEnd - trackingHelper;
                 float north     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
-                // Get v
+                // Get east
                 trackingHelper            = strstr(tempMessageBuffer, "east");
                 trackingHelper           += 4; //skip past "east"
                 fieldEnd                  = strchr(trackingHelper, ',');
                 fieldLength               = fieldEnd - trackingHelper;
                 float east     = atof(strncpy(throwaway, trackingHelper, fieldLength));
 
-                // Get w
+                // Get down
                 trackingHelper            = strstr(tempMessageBuffer, "down");
                 trackingHelper           += 4; //skip past "down"
                 fieldEnd                  = strchr(trackingHelper, ',');
@@ -541,6 +544,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 float down     = atof(strncpy(throwaway, trackingHelper, fieldLength));
                 
                 
+                // DEBUG STATEMENT - Print the contents of the message
                 //fprintf(stdout, "%lli|SETVEL|north|%f\n", icarousClientFd, north);
                 //fprintf(stdout, "%lli|SETVEL|east|%f\n", icarousClientFd, east);
                 //fprintf(stdout, "%lli|SETVEL|down|%f\n", icarousClientFd, down);
@@ -552,7 +556,6 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 
                 if((north == 0) && (east == 0)) // loiter at this location
                 {
-                    //fprintf(stdout, "Start of LoiterAction construction\n");
                     auto loiterAction =  new afrl::cmasi::LoiterAction;
                     auto location3d = new afrl::cmasi::Location3D;
                     currentInformationMutexes[instanceIndex].lock();
@@ -563,16 +566,18 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     loiterAction->setLocation(location3d);
                     
                     vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
-                    //fprintf(stdout, "End of LoiterAction setup\n");
                 }
                 else // otherwise set a FlightDirectorAction to move in a certain direction
                 {
-                    //fprintf(stdout, "Start of FlightDirectorAction construction");
                     auto flightDirectorAction = new afrl::cmasi::FlightDirectorAction;
+                    
+                    // Calculate the actual speed and heading of where the UAV should be going
                     double actualSpeed = sqrt(pow(north,2)+pow(east,2));
                     flightDirectorAction->setSpeed(actualSpeed);
                     double heading = acos(north / sqrt(pow(north, 2) + pow(east, 2)));
 
+
+                    // Adjust the heading to be within -180 to 180
                     if((north > 0) && (east > 0)){
                         heading = 90 - heading;
                     }
@@ -588,20 +593,17 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     {
                         heading = 180 - heading;
                     }
-
-                    //fprintf(stdout, "Heading Set | Current Altitude: %f | Setting Altitude\n", currentInformation[instanceIndex][3]);
+                    
+                    // Add the information to the message
                     flightDirectorAction->setHeading(heading);
                     flightDirectorAction->setClimbRate(-down);
-                    //fprintf(stdout, "Altitude Set | Adding to VehicleActionCommand\n");
-                    
                     vehicleActionCommand->getVehicleActionList().push_back(flightDirectorAction);
-                    //fprintf(stdout, "End of FlightDirectorAction setup\n");
                 }
                 
+                // DEBUG STATEMENT - Print the newly constructed message before sending it
                 //std::cout << vehicleActionCommand->getVehicleActionList().front()->toString() << std::endl;;
                 
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
-                //fprintf(stdout, "VehicleActionCommand sent\n");
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
@@ -611,6 +613,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             else if(!strncmp(tempMessageBuffer, "GOTOWP", 6))
             {
                 // GOTOWP,id~,\n
+                // DEBUG STATEMENT - Tell what type of message is being processed
                 //fprintf(stdout, "GOTOWP message received in icarousClientFd %lli!\n", icarousClientFd);
                 
                 // Get id
@@ -622,10 +625,10 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 // Add one to make the index correct
                 id++;
                 
-                
+                // DEBUG STATEMENT - Print the contents of the message
                 //fprintf(stdout, "%lli|GOTOWP|id|%i\n", icarousClientFd, id);
 
-                
+                // Send the UAV to the waypoint index given by ICAROUS
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
                 
@@ -643,17 +646,16 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             }            
             else
             {
-                //fprintf(stderr,"Error, unknown message type!\n");
+                fprintf(stderr,"Error, unknown message type! Skipping to next message!\n");
                 fieldEnd = strchr(tempMessageBuffer, '\n');
                 tempMessageBuffer = fieldEnd;
                 tempMessageBuffer++;
                 //exit(EXIT_FAILURE);
             }
         }
-        
-        //fprintf(stderr, "About to read again\n");
     }
 }
+
 
 
 // This function is performed to cleanly terminate the service
@@ -662,7 +664,7 @@ bool IcarousCommunicationService::terminate()
     // perform any action required during service termination, before destructor is called.
     std::cout << "*** TERMINATING:: Service[" << s_typeName() << "] Service Id[" << m_serviceId << "] with working directory [" << m_workDirectoryName << "] *** " << std::endl;
     
-    // rejoin all threads on the programs end
+    // rejoin all threads on a termination
     for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
     {
         icarousID[i].join();
@@ -692,15 +694,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         {
             // Set the variable to ensure we only send one vehicle one MissionCommand
             has_gotten_waypoints[vehicleID - 1] = true;
-            //fprintf(stdout, "Sending waypoints to ICAROUS instance %lld\n", vehicleID);
             
             // Set up variable to be used
             int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
             int totalNumberOfWaypoints = 0;
             int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
-
             icarousClientWaypointLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
             
+            // Save the mission command to be used to send new ones later
             missionCommands[vehicleID - 1] = ptr_MissionCommand;
 
             // For each waypoint in the mission command, send each as its own message to ICAROUS
@@ -709,6 +710,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             {
                 totalNumberOfWaypoints++;
                 
+                // DEBUG STATEMENT - Print what waypoint index indicates is the next waypoint and what waypoint is being sent
                 //fprintf(stdout, "WaypointIndex: %i | nextWaypoint: %i\n", waypointIndex, nextWaypoint);
                 //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
 
@@ -723,11 +725,13 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 
                 // Need to convert numbers to the indexes
                 // Then store the lat long and alt of each waypoint
-                // This is to put them all into an ordered list
+                // This is to put them all into an ordered list for easy access when getting a GOTOWAYPOINT command
                 icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
+                // Also save this list into a vector
                 newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
+                
+                // DEBUG STATEMENT - Print how the waypoints were saved
                 //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
-                //fprintf(stdout, "WP|%lli\n", icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1].getNumber());
                 
                 // Set the index of the next waypoint
                 waypointIndex = (nextWaypoint - 1);
@@ -747,6 +751,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
             
             icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
+            newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
             //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
             
             //Send a message to ICAROUS telling it to start the mission
@@ -771,7 +776,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
             // Send each zone's vertices one at a time
-            // TODO - Condense this with the newest ICAROUS refactor
             for(int j = 0; j < lengthOfZone; j++)
             {
                 dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i.0,vertIndex%i,lat%f,long%f,floor%f,ceil%f,index%lli.0,\n",
@@ -807,7 +811,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
             // Send each zone's vertices one at a time
-            // TODO - Condense this with the newest ICAROUS refactor
             for(int j = 0; j < lengthOfZone; j++)
             {
                 dprintf(client_sockfd[i], "GEOFN,type%s,totalvert%i.0,vertIndex%i.0,lat%f,long%f,floor%f,ceil%f,index%lld.0,\n",
@@ -834,13 +837,15 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState *)receivedLmcpMessage->m_object->clone());
         int vehicleID = ptr_AirVehicleState->getID();
 
-        // Send the position of the UAV to ICAROUS every time it updates from AMASE
+
         // TODO - un-hardcode the number of sats
         
         // Get the current tasks and update the list (Only when ICAROUS does not have control)
         if(icarousTakeoverActive[vehicleID - 1] == false){
+            // Save the current tasks the UAV was doing before a takeover
             entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
             
+            // Send the position of the UAV to ICAROUS every time it updates from AMASE
             //positionBeforeTakeover[vehicleID - 1][0] = ptr_AirVehicleState->getHeading(); // First value is not needed
             positionBeforeTakeover[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
             positionBeforeTakeover[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
@@ -848,56 +853,48 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             
             // Updates the current waypoint to the waypoint the UAV is currently doing
             // Also saves this waypoint to be compared to the next to ensure that a change of waypoints is seen
-            if(isLastWaypointInitialized[vehicleID - 1]) // && (lastWaypoint[vehicleID - 1] != ptr_AirVehicleState->getCurrentWaypoint()))
+            if(isLastWaypointInitialized[vehicleID - 1])
             {
-                //        So the currentWaypoint that shows up from an AirVehicleState may skip passed some waypoints
-                //        provided that they are close enough together. This causes an issue with the bellow code because
-                //        it needs to:
-                //        1.) Send all reached waypoints to ICAROUS so that ICAROUS does not route back to an old waypoint
-                //        2.) Keep track of the index ICAROUS is at when looking at waypoints
-                
+                // For each waypoint that it is past, send a waypoint reached message
                 while(currentWaypointIndex[vehicleID - 1] < (ptr_AirVehicleState->getCurrentWaypoint() - missionCommands[vehicleID - 1]->getFirstWaypoint())){
-                  resumePointSet[vehicleID - 1] = false;
+                    // If a waypoint was reached, a new resume point can be set
+                    resumePointSet[vehicleID - 1] = false;
                     dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
                        currentWaypointIndex[vehicleID - 1]);
                     
+                    // DEBUG STATEMENT - Print the above message to see what was reached
                     //dprintf(1, "UAV %i | WPRCH,id%lli.0,\n",
                     //    vehicleID,
                     //    currentWaypointIndex[vehicleID - 1]);
                     
                     currentWaypointIndex[vehicleID - 1]++;
                     
+                    // Remove a waypoint unless it is the first or we have yet to reach it due to a takeover
                     if(truncateWaypoint[vehicleID - 1] == true){
-                        //fprintf(stderr, "UAV %i | Truncating waypoint index [%lli]\n", vehicleID, currentWaypointIndex[vehicleID - 1]);
                         newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
                     }else{
-                        //fprintf(stderr, "UAV %i | Skipping truncation\n", vehicleID);
                         truncateWaypoint[vehicleID - 1] = true;
                     }
                     
-                    if(lastWaypoint[vehicleID - 1] == ptr_AirVehicleState->getCurrentWaypoint()){
-                        //fprintf(stdout, "UAV %i | lastwaypoint indicates task is finished\n", vehicleID);
-                    }else{
-                        //fprintf(stdout, "UAV %i | lastwaypoint is moving up one\n", vehicleID);
+                    // As long as the waypoint is not the last waypoint, increase it
+                    if(lastWaypoint[vehicleID - 1] != ptr_AirVehicleState->getCurrentWaypoint()){
                         lastWaypoint[vehicleID - 1]++;
                     }
+                    
+                    // Wait 100 milliseconds to allow ICAROUS to process a waypoint recieved message
                     sleep(0.1);
                 }
-                //fprintf(stdout, "UAV %i | currentWaypointIndex %lli | getCurrentWaypoint() %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint()));
-                //currentWaypointIndex[vehicleID - 1] = (ptr_AirVehicleState->getCurrentWaypoint() - missionCommands[vehicleID - 1]->getFirstWaypoint());
             }
             else
             {
-                //fprintf(stdout, "Reseting lastWaypoint and currentWaypointIndex\n");
+                // On the first waypoint, initialize all values
                 isLastWaypointInitialized[vehicleID - 1] = true;
-                lastWaypoint[vehicleID - 1] = 0;//ptr_AirVehicleState->getCurrentWaypoint();
+                lastWaypoint[vehicleID - 1] = 0;
                 currentWaypointIndex[vehicleID - 1] = 0;
             }
-            
-            //fprintf(stderr, "UAV %i | lastWaypoint: %lli | currentWaypointIndex: %lli\n", vehicleID, lastWaypoint[vehicleID - 1], currentWaypointIndex[vehicleID - 1]);
         }
 
-
+        // Save the current information of the UAV
         currentInformationMutexes[vehicleID - 1].lock();
         /*
         fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
@@ -989,7 +986,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         fprintf(stderr, "\n");
         */
 
-
+        
+        // Inform ICAROUS of its position information using North-East-Down format
         dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,north%f,east%f,down%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
             ((double)ptr_AirVehicleState->getTime()/1000),
             ptr_AirVehicleState->getLocation()->getLatitude(),
@@ -1030,6 +1028,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // For all other ICAROUS connections, send the UAV as a traffic obsticle to avoid
         for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
         {
+            // Do not send this information to itself
             if(i != (vehicleID - 1))
             {
                 // Send the UAV obsticle along the socket as other air traffic
@@ -1045,10 +1044,10 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             }
         }
 
+        // If a soft reset was requested, initiate it only if it was not already done
+        // It will allow a new one to be created if the UAV goes further then before the takeover
         if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == false))
         {
-            // TODO - Make it so it was the last place the UAV was before ICAROUS took over
-            
             // Tell ICAROUS to initiate a soft-reset
             dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
                 "RESET_SFT",
@@ -1056,23 +1055,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 ptr_AirVehicleState->getLocation()->getLongitude(),
                 ptr_AirVehicleState->getLocation()->getAltitude());
             
-            // Set new waypoint information
-            
-            // At this point, the last waypoint is actually the current waypoint.
-            // Thus, we need to subtract one to make it the last waypoint.
-            
-            //std::cout << missionCommands[vehicleID - 1]->toString() << std::endl;
-            //missionCommands[vehicleID - 1]->setFirstWaypoint(icarousClientWaypointLists[vehicleID - 1][lastWaypoint[vehicleID - 1]]);
-            //std::cout << missionCommands[vehicleID - 1]->toString() << std::endl;
-            /*
-            for(unsigned int i = 0; i < icarousClientWaypointLists[vehicleID - 1].size(); i++){
-                fprintf(stderr, "UAV %i | icarousClientWaypointLists %lli\n", vehicleID, icarousClientWaypointLists[vehicleID - 1][i]);
-            }
-            */
             //int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
             
             //fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, currentWaypointIndex[vehicleID - 1] - 1);
             
+            // Save the new point AMASE should start at
             newWaypointLists[vehicleID - 1][0]->setLatitude(
                 positionBeforeTakeover[vehicleID - 1][1]);
             
@@ -1082,33 +1069,35 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             newWaypointLists[vehicleID - 1][0]->setAltitude(
                 positionBeforeTakeover[vehicleID - 1][3]);
             
+            // Set this new point as the first point
             missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][0]->getNumber());
             
+            // Reset the commandID to have the UAV replace the old mission command
             missionCommands[vehicleID - 1]->setCommandID(0);
             
+            // Remove all old waypoints
             missionCommands[vehicleID - 1]->getWaypointList().clear();
             
+            // Add all new waypoints plus a copy of the first because the first one is always ignored
             missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
-            
             for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++){
+                // DEBUG STATEMENT - Print what waypoints are being set
                 //fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
                 missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
             }
             
-            std::cout << missionCommands[vehicleID - 1]->toString() << std::endl;
-            
-            //fprintf(stderr, "UAV %i | current %lli | last %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], lastWaypoint[vehicleID - 1]);
-            
-            //isLastWaypointInitialized[vehicleID - 1] = false;
+            // The mission command was created, now send it along
             softResetFlag[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
-        }else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true)){
-            // Otherwise if we already have a waypoint set, continue the mission
+        }
+        // If it was already set, just resend the mission command
+        else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true))
+        {
+            // Otherwise if we already have a waypoint set, continue the original mission
             softResetFlag[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
     }// End of AirVehicleState
-
 
     // False indicates that we are ready to process more messages
     return false;
