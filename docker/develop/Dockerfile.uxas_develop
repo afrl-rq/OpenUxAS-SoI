@@ -36,7 +36,7 @@ RUN sh /opt/rustup.sh -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup target install armv7-unknown-linux-gnueabihf
 
-RUN pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.44.0/meson-0.44.0.tar.gz
+RUN pip3 install -Iv https://github.com/GaloisInc/meson/archive/0.47-rust-depfile.zip
 
 WORKDIR /UxAS/Installation/InstallLibraries/
 COPY InstallLibraries/* ./

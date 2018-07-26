@@ -40,7 +40,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup target install armv7-unknown-linux-gnueabihf
 
 WORKDIR /src
-RUN git clone -b 0.45.0 https://github.com/mesonbuild/meson.git
+RUN git clone -b 0.47-rust-depfile https://github.com/GaloisInc/meson.git
 RUN mkdir -p /usr/local/lib/python3.6/site-packages && cd meson && pip3 install -e .
 
 WORKDIR /src/OpenUxAS

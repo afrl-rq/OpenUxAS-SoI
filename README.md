@@ -238,7 +238,7 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
 1. Install ninja build system: in terminal
    * `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   * `sudo -H pip3 install meson==0.42.1`
+   * `sudo -H pip3 install https://github.com/GaloisInc/meson/archive/0.47-rust-depfile.zip`
 1. Install python plotting capabilities (**optional**): in terminal
    * `sudo apt install python3-tk`
    * `sudo -H pip3 install matplotlib`
@@ -287,7 +287,7 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
    * `sudo -H pip3 install scikit-build`
    * `sudo -H pip3 install ninja`
 1. Install meson build configuration: in terminal
-   * `sudo -H pip3 install meson==0.42.1`
+   * `sudo -H pip3 install https://github.com/GaloisInc/meson/archive/0.47-rust-depfile.zip`
 1. Install python plotting capabilities (**optional**): in terminal
    * `sudo -H pip3 install matplotlib`
    * `sudo -H pip3 install pandas`

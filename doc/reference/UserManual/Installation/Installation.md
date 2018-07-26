@@ -123,7 +123,7 @@ Installing Prerequisite Tools on Ubuntu Linux
 
 8.  Install meson build configuration: in terminal
 
-    -   sudo -H pip3 install meson
+    -   sudo -H pip3 install https://github.com/GaloisInc/meson/archive/0.47-rust-depfile.zip
 
 9.  Ensure dependency search for meson is supported: in terminal
 
@@ -215,7 +215,7 @@ Installing Prerequisites on Mac OS X
 
 11. Install meson build configuration. In terminal:
 
-    -   sudo -H pip3 install meson
+    -   sudo -H pip3 install https://github.com/GaloisInc/meson/archive/0.47-rust-depfile.zip
 
 12. Install python plotting capabilities (**optional**). In terminal:
 
