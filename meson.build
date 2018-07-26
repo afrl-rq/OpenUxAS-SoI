@@ -101,6 +101,12 @@ dep_boost = dependency(
   modules: ['date_time', 'filesystem', 'regex', 'system'],
   fallback: ['boost', 'dep'],
 )
+if not cpp.has_header('boost/geometry/algorithms/is_valid.hpp')
+  dep_boost = subproject('boost').get_variable('dep')
+endif
+if not cpp.has_header('boost/geometry/algorithms/validity_failure_type.hpp')
+  dep_boost = subproject('boost').get_variable('dep')
+endif
 
 # https://github.com/mikalhart/TinyGPS
 # The TinyGPS repo captured by UxAS does not seem to be available.
