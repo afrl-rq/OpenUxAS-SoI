@@ -95,17 +95,15 @@ else
   )
 endif
 
-# handle boost carefully
-dep_boost = dependency(
-  'boost',
-  modules: ['date_time', 'filesystem', 'regex', 'system'],
-  fallback: ['boost', 'dep'],
-)
+# handle boost carefully, require version > 1.55
 if not cpp.has_header('boost/geometry/algorithms/is_valid.hpp')
   dep_boost = subproject('boost').get_variable('dep')
-endif
-if not cpp.has_header('boost/geometry/algorithms/validity_failure_type.hpp')
-  dep_boost = subproject('boost').get_variable('dep')
+else
+  dep_boost = dependency(
+    'boost',
+    modules: ['date_time', 'filesystem', 'regex', 'system'],
+    fallback: ['boost', 'dep'],
+  )
 endif
 
 # https://github.com/mikalhart/TinyGPS

@@ -30,7 +30,7 @@
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
 #include <fstream>
-#include <boost/filesystem.hpp>
+#include "boost/filesystem.hpp"
 
 namespace uxas
 {
