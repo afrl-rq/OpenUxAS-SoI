@@ -453,7 +453,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     //std::cout << missionCommands[instanceIndex]->toString() << std::endl;
                     
                     // Send the new Mission Command to AMASE
-                    sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
+                    // TODO - rework to allow for speed resolutions
+                    //sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
                     resumePointSet[instanceIndex] = true;
                 }
                 
@@ -573,11 +574,15 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     
                     // Calculate the actual speed and heading of where the UAV should be going
                     double actualSpeed = sqrt(pow(north,2)+pow(east,2));
-                    flightDirectorAction->setSpeed(actualSpeed);
-                    double heading = acos(north / sqrt(pow(north, 2) + pow(east, 2)));
-
-
-                    // Adjust the heading to be within -180 to 180
+                    double heading = acos(north / sqrt(pow(north, 2) + pow(east, 2))) * 180 / M_PI;
+                    
+                    
+                    if(east < 0)
+                    {
+                        heading = 360 - heading;
+                    }
+                    
+                    /*
                     if((north > 0) && (east > 0)){
                         heading = 90 - heading;
                     }
@@ -593,8 +598,17 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     {
                         heading = 180 - heading;
                     }
+                    */
+                    
+                    currentInformationMutexes[instanceIndex].lock();
+                    
+                    
+                    fprintf(stderr, "UAV %i | currentHeading: %f | commandedHeading %f\n", instanceIndex + 1, currentInformation[instanceIndex][0], heading);
+                    
+                    currentInformationMutexes[instanceIndex].unlock();
                     
                     // Add the information to the message
+                    flightDirectorAction->setSpeed(actualSpeed);
                     flightDirectorAction->setHeading(heading);
                     flightDirectorAction->setClimbRate(-down);
                     vehicleActionCommand->getVehicleActionList().push_back(flightDirectorAction);
@@ -955,12 +969,12 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         double northTotal = uNorth + vNorth;
         double eastTotal = uEast + vEast;
         double downTotal = wDown;
-
+        /*
         fprintf(stderr, "UAV %i | northTotal  %f | eastTotal %f\n",
             vehicleID, 
             northTotal, 
             eastTotal);
-        
+        */
         /*
         fprintf(stdout, "UAV: %i\n", vehicleID);
         fprintf(stdout, "North is: %f\n", northTotal);
