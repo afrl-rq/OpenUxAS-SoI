@@ -163,6 +163,7 @@ bool IcarousCommunicationService::initialize()
     softResetFlag.resize(ICAROUS_CONNECTIONS);
     resumePointSet.resize(ICAROUS_CONNECTIONS);
     truncateWaypoint.resize(ICAROUS_CONNECTIONS);
+    originalStartingWaypoint.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes & Semaphores must be set like this and not in a vector
     // This is because a vector of these objects is non-resizable
@@ -454,7 +455,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     
                     // Send the new Mission Command to AMASE
                     // TODO - rework to allow for speed resolutions
-                    //sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
+                    sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
                     resumePointSet[instanceIndex] = true;
                 }
                 
@@ -600,12 +601,11 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     }
                     */
                     
+                    /*
                     currentInformationMutexes[instanceIndex].lock();
-                    
-                    
                     fprintf(stderr, "UAV %i | currentHeading: %f | commandedHeading %f\n", instanceIndex + 1, currentInformation[instanceIndex][0], heading);
-                    
                     currentInformationMutexes[instanceIndex].unlock();
+                    */
                     
                     // Add the information to the message
                     flightDirectorAction->setSpeed(actualSpeed);
@@ -717,6 +717,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             
             // Save the mission command to be used to send new ones later
             missionCommands[vehicleID - 1] = ptr_MissionCommand;
+            
+            originalStartingWaypoint[vehicleID - 1] = ptr_MissionCommand->getFirstWaypoint();
 
             // For each waypoint in the mission command, send each as its own message to ICAROUS
             // The last waypoint's next value will be equal to itself (This indicates the end)
@@ -870,7 +872,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             if(isLastWaypointInitialized[vehicleID - 1])
             {
                 // For each waypoint that it is past, send a waypoint reached message
-                while(currentWaypointIndex[vehicleID - 1] < (ptr_AirVehicleState->getCurrentWaypoint() - missionCommands[vehicleID - 1]->getFirstWaypoint())){
+                fprintf(stderr, "UAV %i | currentWP = %lli | otherWP = %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]));
+                while(currentWaypointIndex[vehicleID - 1] < (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1])){
                     // If a waypoint was reached, a new resume point can be set
                     resumePointSet[vehicleID - 1] = false;
                     dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
@@ -1084,6 +1087,15 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             }
             
             // The mission command was created, now send it along
+            
+            if(lastWaypoint[vehicleID - 1] > 0){
+                lastWaypoint[vehicleID - 1]--;
+            }
+            
+            if(currentWaypointIndex[vehicleID - 1] > 0){
+                currentWaypointIndex[vehicleID - 1]--;
+            }
+            
             softResetFlag[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
