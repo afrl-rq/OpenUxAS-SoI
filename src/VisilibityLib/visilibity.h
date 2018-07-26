@@ -87,6 +87,8 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/algorithms/is_valid.hpp>
+#include <boost/geometry/algorithms/validity_failure_type.hpp> 
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
