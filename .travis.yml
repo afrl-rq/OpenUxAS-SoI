@@ -15,7 +15,6 @@ matrix:
             - deadsnakes
           packages:
             - uuid-dev
-            - libboost1.64-all-dev
             - libgtest-dev
             - ant
             - oracle-java8-set-default
