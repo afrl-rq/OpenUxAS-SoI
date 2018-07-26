@@ -1,5 +1,5 @@
         <AirVehicleConfiguration Series="CMASI">
-            <MinimumSpeed>20.0</MinimumSpeed>
+            <MinimumSpeed>10.0</MinimumSpeed>
             <MaximumSpeed>35.0</MaximumSpeed>
             <NominalFlightProfile>
                 <FlightProfile Series="CMASI">
