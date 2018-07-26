@@ -14,12 +14,8 @@ matrix:
           sources:
             - deadsnakes
           packages:
-            - libglu1-mesa-dev
             - uuid-dev
-            - libboost-date-time-dev
-            - libboost-filesystem-dev
-            - libboost-regex-dev
-            - libboost-system-dev
+            - libboost1.64-all-dev
             - libgtest-dev
             - ant
             - oracle-java8-set-default

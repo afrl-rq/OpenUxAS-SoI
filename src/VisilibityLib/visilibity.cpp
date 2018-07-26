@@ -50,7 +50,8 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>       //assertions
 #include <iso646.h>      //aliases for boolean operators
 
-#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/algorithms/is_valid.hpp>
+#include <boost/geometry/algorithms/validity_failure_type.hpp>
 
 ///Hide helping functions in unnamed namespace (local to .C file).
 namespace
