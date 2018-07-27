@@ -68,18 +68,22 @@ namespace service
  *  
  * </ul> @n
  * 
- * Configuration String: <Service Type="IcarousCommunicationService" OptionString="Option_01" OptionInt="36" />
+ * Configuration String: <Service Type="IcarousCommunicationService" NumberOfUAVs="n" />
  * 
  * Options:
- *  - OptionString - sample string option
- *  - OptionInt - sample integer option
+ *  - NumberOfUAVs - Used to specify the number of UAVs in a scenario
  * 
  * Subscribed Messages:
- *  - afrl::cmasi::KeyValuePair
+ *  - afrl::cmasi::MissionCommand
+ *  - afrl::cmasi::KeepInZone
+ *  - afrl::cmasi::KeepOutZone
+ *  - afrl::cmasi::AirVehicleState
  * 
  * Sent Messages:
- *  - afrl::cmasi::KeyValuePair
- * 
+ *  - uxas::messages::task::TaskResume
+ *  - afrl::cmasi::MissionCommand
+ *  - afrl::cmasi::VehicleActionCommand
+ *  - afrl::cmasi::LoiterAction
  * 
  */
 

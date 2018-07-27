@@ -14,7 +14,7 @@
  *
  * Created on June 14, 2018, 3:55 PM
  *
- * <Service Type="IcarousCommunicationService" OptionString="Option_01" OptionInt="36" />
+ * <Service Type="IcarousCommunicationService" NumberOfUAVs="n" />
  * 
  * This file allows connectivity with the ICAROUS system
  * (CRoss Application Translator of Operational Unmanned Systems) 
