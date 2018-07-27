@@ -25,6 +25,7 @@
 #include "afrl/cmasi/MissionCommand.h"
 #include "afrl/cmasi/AltitudeType.h"
 #include "afrl/cmasi/SpeedType.h"
+#include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
 
 #include <memory>
 #include <vector>
@@ -125,18 +126,27 @@ public:
 
 private:
     bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
+    bool m_isOnMission {true};  //boolean stating whether or not UAV is executing waypoints on Mission or not (diverting)
     bool m_isReadyToAct {false};    //boolean stating whether or not service has all necessary prerequisites in order to react to an imminent collision.
     bool m_isTakenAction {false};   //boolean stating whether or not the service has issued a vehicle action command to the ownship.
     bool m_isReadyToActWaypoint {false};    //boolean stating whether or not the service has received a waypoint designating the goal location
     bool m_isReadyToActMissionCommand {false};  //boolean stating whether or not the service has received a mission command that lists all waypoints.
     bool m_isReadyToActConfiguration {false};  //boolean stating whether or not service has received configuration parameters in order to process violation messages
     bool m_isActionCompleted {false}; //boolean stating whether or not service has completed taking action for the violation under consideration.
+    bool m_isCloseToDesired {false};
+    double m_heading_tolerance_deg{0.5};
+    double m_tolerance_clock_s;
+    double m_tolerance_threshold_time_s{5};  //time needed to stay within desired state to be considered attained--seconds
     double m_action_time_threshold_s;   // time threshold to hold when taking action
     double m_action_hold_release_time_s;  //time at which an action hold must be released
     double m_vertical_rate_mps; //DAIDALUS configuration vertical rate used for estimation of time to perform altitude maneuver
     double m_turn_rate_degps;   //DAIDALUS configuration turn rate used for estimation of time to perform heading/track maneuver
     double m_horizontal_accel_mpsps;    //DAIDALUS configuration horizontal acceleration used for estimation of time to perform a horizontal speed maneuver
     double m_vertical_accel_mpsps;  //DAIDALUS configuration vertical 
+    double m_heading_interval_buffer_deg{5.0};  //degrees to buffer the heading bands interval by for avoidance maneuver
+    double m_groundspeed_interval_buffer_mps{10.0};   //speed to buffer the ground speed interval by for avoidance maneuver.
+    double m_verticalspeed_interval_buffer_mps{5.0};  //speed to buffer the vertical speed interval by for avoidance maneuver.
+    double m_altitude_interval_buffer_m{20.0};    //distance in meters to buffer the altitude interval by for avoidance maneuver.
     int64_t  m_NextWaypoint;// {nullptr};
     int64_t m_RoW;
     std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand;// {nullptr};
@@ -155,7 +165,8 @@ private:
         afrl::cmasi::SpeedType::SpeedType speed_type;
     }m_CurrentState, m_DivertState, m_ReturnState;
     void ResetResponse();
-
+    bool isWithinTolerance();
+    bool isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_band);
     
     
    };
