@@ -164,6 +164,10 @@ bool IcarousCommunicationService::initialize()
     resumePointSet.resize(ICAROUS_CONNECTIONS);
     truncateWaypoint.resize(ICAROUS_CONNECTIONS);
     originalStartingWaypoint.resize(ICAROUS_CONNECTIONS);
+    headingLists.resize(ICAROUS_CONNECTIONS);
+    deviationFlags.resize(ICAROUS_CONNECTIONS);
+    noDeviationReset.resize(ICAROUS_CONNECTIONS);
+    icarousCommandedSpeed.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes & Semaphores must be set like this and not in a vector
     // This is because a vector of these objects is non-resizable
@@ -193,6 +197,8 @@ bool IcarousCommunicationService::initialize()
     softResetFlag.assign(ICAROUS_CONNECTIONS, false);
     resumePointSet.assign(ICAROUS_CONNECTIONS, false);
     truncateWaypoint.assign(ICAROUS_CONNECTIONS, false);
+    deviationFlags.assign(ICAROUS_CONNECTIONS, false);
+    noDeviationReset.assign(ICAROUS_CONNECTIONS, false);
     
     // Protocol constants for 3-way ICAROUS authentication handshake    
     const char *protocol1 = "ICAROUS-UxAS_LMCP";
@@ -408,41 +414,38 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     // Inform other parts of the code that a take-over has started
                     icarousTakeoverActive[instanceIndex] = true;
                     
-                    // If a takeover has started, waypoints should not be truncated
-                    truncateWaypoint[instanceIndex] = false;
-                    
-                    // Pause all current tasks the UAV is doing
-                    for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
-                    {
-                        // DEBUG STATEMENT - Print what tasks were paused
-                        //fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
-                        // Pause the task by sending a message to AMASE
-                        auto pauseTask = std::make_shared<uxas::messages::task::TaskPause>();
-                        pauseTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
-                        sendSharedLmcpObjectBroadcastMessage(pauseTask);
-                    }
+                    // Old takeover code was moved to account for all possible takeover types
                 }
                 else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks and Mission
                 {
                     // DEBUG STATEMENT - Print what waypoint was last set before handing AMASE back control
                     //fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
-                    // SOFT RESET ICAROUS (RESET_SFT)
-                    softResetFlag[instanceIndex] = true;
-                    
-                    // Hold the UAV until the new MissionCOmmand is constructed
-                    sem_wait(&softResetSemaphores[instanceIndex]);
-                    
-                    // Resume tasks after the message is ready
-                    for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
-                    {
-                        // DEBUG STATEMENT - Used to tell what tasks are being resumed
-                        //fprintf(stderr, "UAV %i resuming task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
+                    if(deviationFlags[instanceIndex] == true){
+                        // SOFT RESET ICAROUS (RESET_SFT)
+                        softResetFlag[instanceIndex] = true;
                         
-                        // Send a message for each task to resume
-                        auto resumeTask = std::make_shared<uxas::messages::task::TaskResume>();
-                        resumeTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
-                        sendSharedLmcpObjectBroadcastMessage(resumeTask);
+                        // Hold the UAV until the new MissionCOmmand is constructed
+                        sem_wait(&softResetSemaphores[instanceIndex]);
+                        
+                        // Resume tasks after the message is ready
+                        for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
+                        {
+                            // DEBUG STATEMENT - Used to tell what tasks are being resumed
+                            //fprintf(stderr, "UAV %i resuming task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
+                            
+                            // Send a message for each task to resume
+                            auto resumeTask = std::make_shared<uxas::messages::task::TaskResume>();
+                            resumeTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
+                            sendSharedLmcpObjectBroadcastMessage(resumeTask);
+                        }
+                    }else{
+                        // If the UAV was able to make the maneuver successfully continue the mission command
+                        // heading to the next wp in the list (set it the the first wp and drop the last one at
+                        // the last place the UAV was)
+                        noDeviationReset[instanceIndex] = true;
+                        
+                        sem_wait(&softResetSemaphores[instanceIndex]);
                     }
                     
                     // Let other code know that icarous should no long be in control
@@ -601,11 +604,32 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     }
                     */
                     
-                    /*
-                    currentInformationMutexes[instanceIndex].lock();
-                    fprintf(stderr, "UAV %i | currentHeading: %f | commandedHeading %f\n", instanceIndex + 1, currentInformation[instanceIndex][0], heading);
-                    currentInformationMutexes[instanceIndex].unlock();
-                    */
+                    //fprintf(stderr, "UAV %i\n\twhat heading should be: %f\n\twhat heading is: %f\n", instanceIndex + 1, headingLists[instanceIndex][currentWaypointIndex[instanceIndex] - 1], heading);
+                    float headingDiff = fabs(heading - headingLists[instanceIndex][currentWaypointIndex[instanceIndex] - 1]);
+                    
+                    
+                    // Check for deviations from the mission that are greater then 5 degrees
+                    if((headingDiff > 5) && (deviationFlags[instanceIndex] == false)){
+                        // Set this flag to true when a deviation of more then 5 degrees occurs
+                        deviationFlags[instanceIndex] = true;
+                        
+                        // If a takeover that deviates from the path has started, waypoints should stop being truncated
+                        truncateWaypoint[instanceIndex] = false;
+                        
+                        // Pause all current tasks the UAV is doing
+                        for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
+                        {
+                            // DEBUG STATEMENT - Print what tasks were paused
+                            //fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
+                            // Pause the task by sending a message to AMASE
+                            auto pauseTask = std::make_shared<uxas::messages::task::TaskPause>();
+                            pauseTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
+                            sendSharedLmcpObjectBroadcastMessage(pauseTask);
+                        }
+                    }else{
+                        icarousCommandedSpeed[instanceIndex] = actualSpeed;
+                    }
+                    
                     
                     // Add the information to the message
                     flightDirectorAction->setSpeed(actualSpeed);
@@ -713,11 +737,16 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
             int totalNumberOfWaypoints = 0;
             int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
+            int priorWPIndex = -1;
+            
+            //Resize the vectors to the size of the waypoint lists
             icarousClientWaypointLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
+            headingLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
             
             // Save the mission command to be used to send new ones later
             missionCommands[vehicleID - 1] = ptr_MissionCommand;
             
+            // Save the original starting waypoint
             originalStartingWaypoint[vehicleID - 1] = ptr_MissionCommand->getFirstWaypoint();
 
             // For each waypoint in the mission command, send each as its own message to ICAROUS
@@ -738,7 +767,30 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
                     (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
-                
+
+                if(totalNumberOfWaypoints > 1){
+                    // Prior waypoint
+                    float lat1  = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLatitude();
+                    float long1 = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLongitude();
+
+                    // Current Waypoint
+                    float lat2  = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude();
+                    float long2 = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude();
+
+                    // Calculate the bearing for the segment
+                    headingLists[vehicleID - 1][totalNumberOfWaypoints - 2] = fmod(360 + (atan2(
+                        cos(lat2)*sin(long2-long1),
+                        cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(long2-long1)) * 180/M_PI), 360);
+                    /*
+                    // DEBUG STATEMENT - Print the headings for each segment that a UAV must follow to stay on the path
+                    fprintf(stdout, "UAV %lli | Path %i | Heading %f\n",
+                        vehicleID,
+                        totalNumberOfWaypoints - 1,
+                        headingLists[vehicleID - 1][totalNumberOfWaypoints - 2]);
+                    printf("\tLat1 %f | Long1 %f\n\tLat2 %f | Long2 %f\n", lat1, long1, lat2, long2);
+                    */
+                }
+
                 // Need to convert numbers to the indexes
                 // Then store the lat long and alt of each waypoint
                 // This is to put them all into an ordered list for easy access when getting a GOTOWAYPOINT command
@@ -750,6 +802,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
                 
                 // Set the index of the next waypoint
+                priorWPIndex = waypointIndex;
                 waypointIndex = (nextWaypoint - 1);
 
                 // Grab the next waypoint's next waypoint to check if it is the end
@@ -765,6 +818,30 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
                 ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
                 (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
+            
+            if(totalNumberOfWaypoints > 1){
+                // Prior waypoint
+                float lat1  = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLatitude();
+                float long1 = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLongitude();
+
+                // Current Waypoint
+                float lat2  = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude();
+                float long2 = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude();
+
+                // Calculate the bearing for the segment
+                headingLists[vehicleID - 1][totalNumberOfWaypoints - 2] = fmod(360 + (atan2(
+                    cos(lat2)*sin(long2-long1),
+                    cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(long2-long1)) * 180/M_PI), 360);
+                
+                // DEBUG STATEMENT - Print the headings for each segment that a UAV must follow to stay on the path
+                /*
+                fprintf(stdout, "UAV %lli | Path %i | Heading %f\n",
+                    vehicleID,
+                    totalNumberOfWaypoints - 1,
+                    headingLists[vehicleID - 1][totalNumberOfWaypoints - 2]);
+                printf("\tLat1 %f | Long1 %f\n\tLat2 %f | Long2 %f\n", lat1, long1, lat2, long2);
+                */
+            }
             
             icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
             newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
@@ -862,17 +939,16 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
             
             // Send the position of the UAV to ICAROUS every time it updates from AMASE
-            //positionBeforeTakeover[vehicleID - 1][0] = ptr_AirVehicleState->getHeading(); // First value is not needed
+            positionBeforeTakeover[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
             positionBeforeTakeover[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
             positionBeforeTakeover[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
             positionBeforeTakeover[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
-            
             // Updates the current waypoint to the waypoint the UAV is currently doing
             // Also saves this waypoint to be compared to the next to ensure that a change of waypoints is seen
             if(isLastWaypointInitialized[vehicleID - 1])
             {
                 // For each waypoint that it is past, send a waypoint reached message
-                fprintf(stderr, "UAV %i | currentWP = %lli | otherWP = %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]));
+                //fprintf(stderr, "UAV %i | currentWP = %lli | otherWP = %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]));
                 while(currentWaypointIndex[vehicleID - 1] < (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1])){
                     // If a waypoint was reached, a new resume point can be set
                     resumePointSet[vehicleID - 1] = false;
@@ -1051,9 +1127,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // Tell ICAROUS to initiate a soft-reset
             dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
                 "RESET_SFT",
-                ptr_AirVehicleState->getLocation()->getLatitude(),
-                ptr_AirVehicleState->getLocation()->getLongitude(),
-                ptr_AirVehicleState->getLocation()->getAltitude());
+                positionBeforeTakeover[vehicleID - 1][1],
+                positionBeforeTakeover[vehicleID - 1][2],
+                positionBeforeTakeover[vehicleID - 1][3]);
             
             //int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
             
@@ -1096,14 +1172,52 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 currentWaypointIndex[vehicleID - 1]--;
             }
             
+            deviationFlags[vehicleID - 1] = false;
+            
             softResetFlag[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
         // If it was already set, just resend the mission command
         else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true))
         {
+            deviationFlags[vehicleID - 1] = false;
+            
             // Otherwise if we already have a waypoint set, continue the original mission
             softResetFlag[vehicleID - 1] = false;
+            sem_post(&softResetSemaphores[vehicleID - 1]);
+        }
+        else if(noDeviationReset[vehicleID - 1] == true)
+        {
+            newWaypointLists[vehicleID - 1][0]->setLatitude(
+                currentInformation[vehicleID - 1][1]);
+            
+            newWaypointLists[vehicleID - 1][0]->setLongitude(
+                currentInformation[vehicleID - 1][2]);
+            
+            newWaypointLists[vehicleID - 1][0]->setAltitude(
+                currentInformation[vehicleID - 1][3]);
+            
+            newWaypointLists[vehicleID - 1][0]->setSpeed(
+                icarousCommandedSpeed[vehicleID - 1]);
+            
+            // Set this new point as the first point
+            missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][1]->getNumber());
+            
+            // Reset the commandID to have the UAV replace the old mission command
+            missionCommands[vehicleID - 1]->setCommandID(0);
+            
+            // Remove all old waypoints
+            missionCommands[vehicleID - 1]->getWaypointList().clear();
+            
+            // Add all new waypoints plus a copy of the first because the first one is always ignored
+            missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
+            for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++){
+                // DEBUG STATEMENT - Print what waypoints are being set
+                //fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
+                missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
+            }
+            
+            noDeviationReset[vehicleID - 1] = false;
             sem_post(&softResetSemaphores[vehicleID - 1]);
         }
     }// End of AirVehicleState

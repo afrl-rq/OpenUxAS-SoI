@@ -154,8 +154,17 @@ private:
     // Saved threadIDs of ICAROUS listeners
     std::vector<std::thread> icarousID;
     
+    std::vector<bool> deviationFlags;
+    
+    std::vector<bool> noDeviationReset;
+    
+    std::vector<float> icarousCommandedSpeed;
+    
     // Save the original starting waypoint for each UAV
     std::vector<int64_t> originalStartingWaypoint;
+    
+    // Create a list of correct headings for the UAV to follow from the MissionCommands
+    std::vector<std::vector<float>> headingLists;
     
     // Saved mission commands
     std::vector<std::shared_ptr<afrl::cmasi::MissionCommand>> missionCommands;
