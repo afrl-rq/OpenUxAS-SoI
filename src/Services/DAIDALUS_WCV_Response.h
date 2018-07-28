@@ -126,7 +126,7 @@ public:
 
 private:
     bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
-    bool m_isOnMission {true};  //boolean stating whether or not UAV is executing waypoints on Mission or not (diverting)
+    bool m_isOnMission {false};  //boolean stating whether or not UAV is executing waypoints on Mission or not (diverting)
     bool m_isReadyToAct {false};    //boolean stating whether or not service has all necessary prerequisites in order to react to an imminent collision.
     bool m_isTakenAction {false};   //boolean stating whether or not the service has issued a vehicle action command to the ownship.
     bool m_isReadyToActWaypoint {false};    //boolean stating whether or not the service has received a waypoint designating the goal location
@@ -147,9 +147,9 @@ private:
     double m_groundspeed_interval_buffer_mps{10.0};   //speed to buffer the ground speed interval by for avoidance maneuver.
     double m_verticalspeed_interval_buffer_mps{5.0};  //speed to buffer the vertical speed interval by for avoidance maneuver.
     double m_altitude_interval_buffer_m{20.0};    //distance in meters to buffer the altitude interval by for avoidance maneuver.
-    int64_t  m_NextWaypoint;// {nullptr};
+    int64_t  m_NextWaypoint{-1};// {nullptr};
     int64_t m_RoW;
-    std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand;// {nullptr};
+    std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand{nullptr};// {nullptr};
     std::vector<int64_t> m_ConflictResolutionList;
 
     struct State

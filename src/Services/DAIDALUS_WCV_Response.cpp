@@ -100,7 +100,7 @@ void DAIDALUS_WCV_Response::ResetResponse()
 }
 bool DAIDALUS_WCV_Response::isWithinTolerance()
 {
-    if ((m_DivertState.heading_deg - m_CurrentState.heading_deg) <= m_heading_tolerance_deg)
+    if (std::abs((m_DivertState.heading_deg - m_CurrentState.heading_deg)) <= m_heading_tolerance_deg)
     {
         if (!m_isCloseToDesired)
         {
@@ -112,77 +112,92 @@ bool DAIDALUS_WCV_Response::isWithinTolerance()
     {
         m_isCloseToDesired = false;
     }
-    if (m_CurrentState.time_s - m_tolerance_clock_s >= m_tolerance_threshold_time_s)
+    if ((m_CurrentState.time_s - m_tolerance_clock_s) >= m_tolerance_threshold_time_s)
     {
+        std::cout << "Within Tolerance" << std::endl;
         return true;
     }
     else
     {
+        std::cout << "Not within tolerance" << std::endl;
         return false;
     }
 }
 
 bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands)
 {
+    //std::cout << "Inside isSafe" << std::endl;
     uxas::common::utilities::FlatEarth flatEarth;
+    //std::cout << "after flat" << std::endl;
     double CS_North_m, CS_East_m, WP_North_m, WP_East_m;
     double WP_latitude_deg, WP_longitude_deg ;
     //for (uint i = 0; i < m_MissionCommand->getWaypointList().size(); i++)
-    for (auto i : m_MissionCommand->getWaypointList())
+    if (m_MissionCommand == nullptr)
     {
-        if (i->getNumber() == m_NextWaypoint)
-        {
-            WP_latitude_deg = i->getLatitude();
-            WP_longitude_deg = i->getLongitude();
-            m_ReturnState.altitude_m = i->getAltitude();
-            m_ReturnState.horizontal_speed_mps = i->getSpeed();
-            m_ReturnState.vertical_speed_mps = i->getClimbRate();
-            break;
-        }
+        return true;
     }
-    flatEarth.ConvertLatLong_degToNorthEast_m(m_CurrentState.latitude_deg, m_CurrentState.longitude_deg, CS_North_m, CS_East_m);
-    flatEarth.ConvertLatLong_degToNorthEast_m(WP_latitude_deg, WP_longitude_deg, WP_North_m, WP_East_m);
-    m_ReturnState.heading_deg = std::fmod((n_Const::c_Convert::dRadiansToDegrees()*std::atan2((WP_East_m - CS_East_m), (WP_North_m - CS_North_m))) + 360.0, 360.0);
-    std::cout << "The computed heading necessary to return to mission is " << m_ReturnState.heading_deg << " degrees." << std::endl;
-    struct intervals
+    else 
     {
-        double upper;
-        double lower;
-    };
-    std::vector<intervals> bands;
-    intervals temp;
-    for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
+        for (auto i : m_MissionCommand->getWaypointList())
         {
-            temp.lower = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
-            temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
-            bands.push_back(temp);
-        }
-        uint initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
-        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-        for (uint i = 0; i < bands.size(); i++)
-        {
-            if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.heading_deg))
+            //std::cout << "Inside loop" << std::endl;
+            if (i->getNumber() == m_NextWaypoint)
             {
-                initial_band = i;
-                isFound = true;
+                //std::cout << "I found a waypoint in order to return to mission" << std::endl;
+                WP_latitude_deg = i->getLatitude();
+                WP_longitude_deg = i->getLongitude();
+                m_ReturnState.altitude_m = i->getAltitude();
+                m_ReturnState.horizontal_speed_mps = i->getSpeed();
+                m_ReturnState.vertical_speed_mps = i->getClimbRate();
                 break;
             }
         }
-        if (initial_band == UINT32_MAX)
+        //std::cout << "After the fall" << std::endl;
+        flatEarth.ConvertLatLong_degToNorthEast_m(m_CurrentState.latitude_deg, m_CurrentState.longitude_deg, CS_North_m, CS_East_m);
+        //std::cout << "First flat earth worked." << std::endl;
+        flatEarth.ConvertLatLong_degToNorthEast_m(WP_latitude_deg, WP_longitude_deg, WP_North_m, WP_East_m);
+        m_ReturnState.heading_deg = std::fmod((n_Const::c_Convert::dRadiansToDegrees()*std::atan2((WP_East_m - CS_East_m), (WP_North_m - CS_North_m))) + 360.0, 360.0);
+        std::cout << "The computed heading necessary to return to mission is " << m_ReturnState.heading_deg << " degrees." << std::endl;
+        struct intervals
         {
-            return true;
-        }
-        else if (isFound && DAIDALUS_bands->getWCVGroundHeadingRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
-        {
-            std::cout << "NOT SAFE TO RETURN TO MISSION" << std::endl;
-            std::cout << std::endl;
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+            double upper;
 
+            double lower;
+        };
+        std::vector<intervals> bands;
+        intervals temp;
+        for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
+            {
+                temp.lower = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
+                temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
+                bands.push_back(temp);
+            }
+            uint initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
+            bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.heading_deg))
+                {
+                    initial_band = i;
+                    isFound = true;
+                    break;
+                }
+            }
+            if (initial_band == UINT32_MAX)
+            {
+                return true;
+            }
+            else if (isFound && DAIDALUS_bands->getWCVGroundHeadingRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+            {
+                std::cout << "NOT SAFE TO RETURN TO MISSION" << std::endl;
+                std::cout << std::endl;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+    }
     //TODO: form return state heading ..--done
     //TODO: check if return state is in a near band... if so not safe to return--done
     //TODO: check if return state must pass through a near band to get there from current state and determine appropriate action
@@ -222,7 +237,13 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             if (pAutoResponse->getMissionCommandList()[i]->getVehicleID() == m_entityId)
             {
                 m_MissionCommand = std::make_shared<afrl::cmasi::MissionCommand>(*(pAutoResponse->getMissionCommandList()[i]->clone()));    //why doesn't this cause memory leaks from not getting cleaned up?
+                m_isOnMission = true;
                 break;
+            }
+            else 
+            {
+                m_MissionCommand = nullptr;
+                m_isOnMission = false;
             }
         }
         //m_MissionCommand = pAutoResponse->getMissionCommandList()[it_MyMissionCommand];
@@ -239,6 +260,12 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         if (pMissionCommand->getVehicleID() == m_entityId)
         {
             m_MissionCommand = std::make_shared<afrl::cmasi::MissionCommand>(*(pMissionCommand->clone()));  //why doesn't this cause memory leaks from not getting cleaned up?
+            m_isOnMission = true;
+        }
+        else 
+        {
+            m_MissionCommand = nullptr;
+            m_isOnMission = false;
         }
         m_isReadyToActMissionCommand = true;
     }
@@ -280,7 +307,8 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
     {
         //std::cout << "DAIDALUS Response has received a violation message." << std::endl;
-        if (m_isReadyToActWaypoint && m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
+        //if (m_isReadyToActWaypoint && m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
+        if (m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
         {
             m_isReadyToAct = true;  //boolean to determine when ready to act; by having a threshold time set, a desired waypoint, and a missioncommand waypoint list
         }
@@ -342,19 +370,26 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 }
                 else
                 {
-                    //m_ConflictResolutionList = std::remove_if(m_ConflictResolutionList.begin(), m_ConflictResolutionList.end(), [&](int64_t ID) { return ID == m_RoW; });
-                    std::vector<int64_t>::iterator expunge;
-                    for (auto ii = m_ConflictResolutionList.begin(); ii != m_ConflictResolutionList.end(); ii++)
+                    //std::remove_if(m_ConflictResolutionList.begin(), m_ConflictResolutionList.end(), [&](int64_t ID) { return ID == m_RoW; });
+                    std::vector<int64_t>::iterator expunge = std::find(m_ConflictResolutionList.begin(), m_ConflictResolutionList.end(), m_RoW);
+                    
+                    if (expunge != m_ConflictResolutionList.end())
+                    {
+                        std::cout << "Removing " << *expunge << " from Conflict Resolution List" << std::endl;
+                        m_ConflictResolutionList.erase(expunge);
+                    }
+                    
+                    /* for (auto ii = m_ConflictResolutionList.begin(); ii != m_ConflictResolutionList.end(); ii++)
                     //for (auto ii : m_ConflictResolutionList)
                     {                         
                         if (*ii == m_RoW)
                         {
-                            expunge = ii;
+                            //expunge = ii;
                             std::cout << "Removing " << *ii << " from Conflict Resolution List" << std::endl;
-                            m_ConflictResolutionList.erase(ii);
+                            //m_ConflictResolutionList.erase(ii);
                             break;
                         }                        
-                    }
+                    } //*/
                     // m_ConflictResolutionList.erase(expunge);
                     if (!m_isTakenAction)
                     {
@@ -423,6 +458,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         pDivertThisWay->setAltitudeType(m_DivertState.altitude_type);
                         pDivertThisWay->setClimbRate(m_DivertState.vertical_speed_mps);
                         double m_action_time_threshold_s = std::abs(m_DivertState.heading_deg - m_CurrentState.heading_deg)/m_turn_rate_degps; 
+                        std::cout << "Maneuver should be held for " << m_action_time_threshold_s << " seconds or until divert heading obtained" << std::endl;
                         m_action_hold_release_time_s = m_CurrentState.time_s + m_action_time_threshold_s;
                         
                         std::shared_ptr<afrl::cmasi::VehicleActionCommand> pAvoidViolation = std::make_shared<afrl::cmasi::VehicleActionCommand>();
@@ -431,7 +467,8 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         pAvoidViolation->setStatus(afrl::cmasi::CommandStatusType::Approved);
                         pAvoidViolation->getVehicleActionList().push_back(pDivertThisWay.release());
                         
-                        m_isTakenAction = true;                        
+                        m_isTakenAction = true;         
+                        m_isOnMission = false;
                         //sendLmcpObjectBroadcastMessage(static_cast<avtas::lmcp::Object*>(pAvoidViolation));                
                         sendSharedLmcpObjectBroadcastMessage(pAvoidViolation);
                         std::cout << "ENTITY " << m_entityId << " is conducting a divert maneuver." << std::endl;
@@ -450,20 +487,45 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
 
                         //TODO: Evaluate the size of the ConflictResolutionList: if empty do nothing else, if empty and maneuver obtained, flag m_isTakenAction to false
                         //TODO: remove RoW vehicle from the ConflictResolutionList-- done?
-                        if (m_isActionCompleted && (m_ConflictResolutionList.size() == 0))
+                        if (m_isActionCompleted && m_ConflictResolutionList.empty())
                         {
-                            //ResetResponse();
+                            //m_isTakenAction = false;
+                            //m_isConflict = false;
+                            ResetResponse();
                             std::cout << "COMPLETED CURRENT AVOIDANCE MANEUVER." << std::endl;
                             if (isSafeToReturnToMission(pWCVIntervals))
                             {
-                                ResetResponse();
-                                m_isOnMission = true;
-                                std::cout << "Returning to Mission" << std::endl;
-                                m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
-                                sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
+                                //ResetResponse();
+                                if (m_NextWaypoint != -1)
+                                {
+                                    ResetResponse();
+                                    m_isOnMission = true;
+                                    std::cout << "Returning to Mission" << std::endl;
+                                    m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
+                                    sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
+                                }
                             }
                         }
                     }
+                }
+            }
+            else
+            {
+                if (!m_isOnMission)
+                {
+                    if (isSafeToReturnToMission(pWCVIntervals))
+                    {
+                        //ResetResponse();
+                        if (m_NextWaypoint != -1)
+                        {
+                            ResetResponse();
+                            m_isOnMission = true;
+                            std::cout << "Returning to Mission" << std::endl;
+                            m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
+                            sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
+                        }
+                    }
+                    
                 }
             }
         }

@@ -51,8 +51,6 @@
       <Label>Point A</Label>
       <EligibleEntities>
         <int64>1000</int64>
-        <int64>2000</int64>
-        <int64>4208</int64>
       </EligibleEntities>
       <RevisitRate>0.0</RevisitRate>
       <Parameters/>
@@ -76,9 +74,7 @@
       <TaskID>1</TaskID>
       <Label>Point B</Label>
       <EligibleEntities>
-        <int64>1000</int64>
         <int64>2000</int64>
-        <int64>4208</int64>
       </EligibleEntities>
       <RevisitRate>0.0</RevisitRate>
       <Parameters/>
@@ -102,8 +98,6 @@
       <TaskID>2</TaskID>
       <Label>Point C</Label>
       <EligibleEntities>
-        <int64>1000</int64>
-        <int64>2000</int64>
         <int64>4208</int64>
       </EligibleEntities>
       <RevisitRate>0.0</RevisitRate>
