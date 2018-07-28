@@ -50,6 +50,8 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>       //assertions
 #include <iso646.h>      //aliases for boolean operators
 
+#include "boost/geometry/algorithms/is_valid.hpp"
+#include "boost/geometry/algorithms/validity_failure_type.hpp"
 
 ///Hide helping functions in unnamed namespace (local to .C file).
 namespace
@@ -135,7 +137,7 @@ namespace VisiLibity
   }
 
 
- Point Point::projection_onto(const Polyline& polyline_temp) const
+  Point Point::projection_onto(const Polyline& polyline_temp) const
   {
     assert( *this == *this
         and polyline_temp.size() > 0 );
@@ -1831,7 +1833,7 @@ namespace VisiLibity
         if(deltaValue == 0)
         {
             std::vector< VisiLibity::Polygon > simpleMerge;
-            if(!Polygon::union_(polygonList, simpleMerge, epsilon))
+            if(!Polygon::boost_union(polygonList, simpleMerge, epsilon))
                 return false;
             for(n=0; n<simpleMerge.size(); n++)
                 if(simpleMerge[n].area() > fabs(epsilon))
@@ -1953,7 +1955,7 @@ namespace VisiLibity
 
         // perform a giant merge of all the expansion pieces
         std::vector<Polygon> newPolygons;
-        if( !Polygon::union_(toMerge,newPolygons,epsilon) )
+        if( !Polygon::boost_union(toMerge,newPolygons,epsilon) )
             return false;
 
         // if expansion, only return outside edges,
@@ -1983,7 +1985,7 @@ namespace VisiLibity
                         finalMerge.push_back(newPolygons[n]);
                     }
                 newPolygons.clear();
-                if( !Polygon::union_(finalMerge,newPolygons,epsilon) )
+                if( !Polygon::boost_union(finalMerge,newPolygons,epsilon) )
                     return false;
 
                 for(n=0; n<newPolygons.size(); n++)
@@ -2002,82 +2004,7 @@ namespace VisiLibity
         }
         return true;
     }
-
-  // note: static function
-  bool Polygon::union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon)
-    {
-        unsigned int n,k;
-
-        // OpenGL is used to transform a set of overlapping ccw simple
-        // polygons into a list of outside polygons oriented ccw and
-        // holes oriented cw. See OpenGL Programming Guide,
-        // OpenGL Architecture Review Board, Feb 2000, page 479.
-
-        // allocate a tessellator so as not to interfere with other programs tessellations
-        GLUtesselator* tessellator = gluNewTess();
-
-        // let opengl know that all vertices are in the xy-plane
-        gluTessNormal(tessellator,0,0,1);
-
-        // register local callback to track data as opengl computes it
-        gluTessCallback(tessellator, GLU_TESS_BEGIN, (void (CALLBACK *) ()) tessellationBegin);
-        gluTessCallback(tessellator, GLU_TESS_END, (void (CALLBACK *) ()) tessellationEnd);
-        gluTessCallback(tessellator, GLU_TESS_ERROR, (void (CALLBACK *) ()) tessellationError);
-        gluTessCallback(tessellator, GLU_TESS_VERTEX, (void (CALLBACK *) ()) tessellationVertex);
-        gluTessCallback(tessellator, GLU_TESS_COMBINE, (void (CALLBACK *) ()) tessellationCombine);
-
-        // turn off true tessellation - compute only outer boundaries of simple polygons
-        gluTessProperty(tessellator,GLU_TESS_BOUNDARY_ONLY,GL_TRUE);
-
-        // assuming that all polygons are ccw, then using this winding number rule
-        // will ensure that all returned polygons oriented ccw are outide boundaries
-        // and all cw oriented polygons are holes
-        gluTessProperty(tessellator,GLU_TESS_WINDING_RULE,GLU_TESS_WINDING_NONZERO);
-
-        // remove any vertices within epsilon
-        if(epsilon > 0.0)
-            gluTessProperty(tessellator,GLU_TESS_TOLERANCE,epsilon);
-
-        // set up memory structures for use during callbacks
-        openGlVertices_.clear();
-        openGlPolygons_.clear();
-        openGlScratchMemory_.clear();
-        openGlError_ = false;
-
-        // input current polygons to opengl (note opengl polygons have multiple contours
-        // corresponding to holes; simply add one contour per polygon)
-        gluTessBeginPolygon(tessellator, NULL);
-        for(k=0; k<polygonList.size(); k++)
-        {
-            gluTessBeginContour(tessellator);
-            for(n=0; n<polygonList[k].n(); n++)
-            {
-                double coords[3];
-                coords[0] = polygonList[k][n].x();
-                coords[1] = polygonList[k][n].y();
-                coords[2] = 0.0;
-                // note that we are passing a pointer to this specific
-                // vertex - this is returned to us during callbacks
-                gluTessVertex(tessellator,coords,&(polygonList[k][n]));
-            }
-            gluTessEndContour(tessellator);
-        }
-        gluTessEndPolygon(tessellator); // here is where openGL does it's work
-        gluDeleteTess(tessellator);
-
-        // clean up callback-used memory
-        for(n=0; n<openGlScratchMemory_.size(); n++)
-            delete openGlScratchMemory_[n];
-        openGlScratchMemory_.clear();
-
-        // return error if OpenGL errored out
-        if(openGlError_)
-            return false;
-        resultingPolygons.assign(openGlPolygons_.begin(), openGlPolygons_.end());
-        return true;
-    }
-
-
+    
   void Polygon::enforce_standard_form()
   {
     int point_count=vertices_.size();
@@ -2161,55 +2088,6 @@ namespace VisiLibity
     if( n() > 2 )
       std::reverse( ++vertices_.begin() , vertices_.end() );
   }
-
-    // note: this is a static function
-    void CALLBACK Polygon::tessellationBegin(GLenum which)
-    {
-        openGlVertices_.clear();
-        //std::cout << "Tessellation Begin: " << which << std::endl;
-    }
-
-    // note: this is a static function
-    void CALLBACK Polygon::tessellationVertex(GLvoid *vertex)
-    {
-        // opengl simply passes back the pointer to the data we passed in
-        // or that was created during combine callback
-        Point* p = (Point*) vertex;
-        openGlVertices_.push_back(Point(p->x(), p->y()));
-        //std::cout << "Tessellation Vertex: " << p->x() << ", " << p->y() << std::endl;
-    }
-
-    // note: this is a static function
-    void CALLBACK Polygon::tessellationCombine(GLdouble coords[3], GLdouble *vertex_data[4],
-                                                GLfloat weight[4], GLdouble **dataOut )
-    {
-        Point* p = new Point(coords[0], coords[1]);
-        openGlScratchMemory_.push_back(p);
-        *dataOut = (GLdouble*) p;
-        //std::cout << "Tessellation Combine: " << p->x() << ", " << p->y() << std::endl;
-    }
-
-    // note: this is a static function
-    void CALLBACK Polygon::tessellationError(GLenum errorCode)
-    {
-        std::cerr << "Tessellation Error: " << gluErrorString(errorCode) << std::endl;
-        openGlError_ = true;
-    }
-
-    // note: this is a static function
-    void CALLBACK Polygon::tessellationEnd()
-    {
-        if(openGlVertices_.size() > 2)
-            openGlPolygons_.push_back( Polygon(openGlVertices_) );
-        //std::cout << "Tessellation End" << std::endl;
-    }
-
-    // declaration of static variables to allocate space
-    std::vector<Point> Polygon::openGlVertices_;
-    std::vector<Polygon> Polygon::openGlPolygons_;
-    std::vector< Point* > Polygon::openGlScratchMemory_;
-    bool Polygon::openGlError_;
-
 
   bool operator == (Polygon polygon1, Polygon polygon2)
   {
@@ -4064,4 +3942,294 @@ namespace VisiLibity
     return outs;
   }
 
+  boost_point to_boost(Point vis_point)
+  {
+  boost::geometry::model::d2::point_xy<double> b_point(vis_point.x(), vis_point.y());
+  return b_point;
+  }
+
+  Point to_visiLibity(boost_point b_point)
+  {
+    double x = boost::geometry::get<0>(b_point);
+    double y = boost::geometry::get<1>(b_point);
+    Point visPoint(x,y);
+    return (visPoint);
+  }
+
+    boost_polygon to_boost(std::vector<Polygon> visPolyList)
+    {
+      boost_polygon b_poly;
+      ///first polygon should be CCW and is outer ring
+      if(visPolyList.size() > 0)
+      {
+        auto visPoly  = visPolyList[0];
+        //for each point in VisiLibity polygon
+        for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
+        {
+          auto b_point = to_boost(visPoly[pointIdx]);
+          boost::geometry::append(b_poly.outer(), b_point);
+        }
+      }
+
+      ///any additional rings should be CW and are used as inner rings/ holes
+      if(visPolyList.size() > 1)
+      {
+        //resize list of inner rings from 0 to size of remaining rings in list
+        b_poly.inners().resize(visPolyList.size() - 1);
+        //for each inner (CW) ring
+        for(int polyIdx = 1; polyIdx < visPolyList.size(); polyIdx++)
+        {
+          auto visPoly = visPolyList[polyIdx];
+          //for each point in VisiLibity polygon
+          for (int pointIdx = 0; pointIdx < visPoly.n(); pointIdx++)
+          {
+            auto b_point = to_boost(visPoly[pointIdx]);
+            //subtract 1 because index is for VisiLibity polygon list, where the first element is the outer ring
+            boost::geometry::append(b_poly.inners()[polyIdx - 1], b_point);
+          }
+        }
+      }
+
+      boost::geometry::validity_failure_type failure;
+      if(!boost::geometry::is_valid(b_poly, failure))
+      {
+        //invalid boost polygon created - return empty boost polygon
+        b_poly.clear();
+        std::cerr << "Attempted to merge invalid polygon" << std::endl;
+      }
+
+      return b_poly;
+    }
+
+    std::vector<Polygon> to_visiLibity(boost_polygon b_poly)
+    {
+      std::vector<Polygon> visPolyList;
+      Polygon visPoly;
+      //check boost polygon validity
+      boost::geometry::validity_failure_type failure;
+      if(boost::geometry::is_valid(b_poly, failure))
+      {
+        //for each point in outer ring
+        std::vector<boost_point> const& points = b_poly.outer();
+        for (auto &b_point : points)
+        {
+          ///convert boost point to VisiLibity point
+          auto visPoint = to_visiLibity(b_point);
+          ///Add to visiLibity polygon
+          visPoly.push_back(visPoint);
+        }
+        ///Add new VisiLibity polygon to list
+        visPolyList.push_back(visPoly);
+
+        //get boost polygon inner rings/ holes
+        auto holes = b_poly.inners();
+        ///for each hole in boost polygon
+        for(auto &hole : holes)
+        {
+          visPoly.clear();
+          ///for each point in ring/hole
+          for (auto &b_point : hole)
+          {
+            ///convert boost point to VisiLibity point
+            auto visPoint = to_visiLibity(b_point);
+            ///Add to visiLibity polygon
+            visPoly.push_back(visPoint);
+          }
+
+          //add hole to VisiLibity polygon list
+          visPolyList.push_back(visPoly);
+        }
+      }
+      return visPolyList;
+    }
+
+    void snap_near(std::vector<boost_polygon> &polygonList, double epsilon)
+    {   
+      //for each polygon, calculate distance to each other polygon, snap closest points to second polygon if distance is greater than 0 and less than epsilon
+      //outer loop is first polygon for distance calculation
+      for (int idx1 = 0; idx1 < polygonList.size(); idx1++)
+      {
+        //start with polygon after outer loop so we don't compare a polygon to itself
+        for (int idx2 = idx1+1; idx2 < polygonList.size(); idx2++)
+        {
+          //make sure both polygons are valid
+          boost::geometry::validity_failure_type failure;
+          if(boost::geometry::is_valid(polygonList[idx1], failure) && boost::geometry::is_valid(polygonList[idx2], failure))
+          {
+            //if these polygons overlap
+            if( boost::geometry::distance(polygonList[idx1], polygonList[idx2]) > 0 &&
+                boost::geometry::distance(polygonList[idx1], polygonList[idx2]) < epsilon)
+            {
+              auto poly1 = to_visiLibity(polygonList[idx1]);
+              auto poly2 = to_visiLibity(polygonList[idx2]);
+
+              //for each point in outer ring of poly1 (ignore inner rings)
+              for (int pointIdx = 0; pointIdx < poly1[0].n(); pointIdx++)
+              {
+                if(boundary_distance(poly1[0][pointIdx], poly2) < epsilon)
+                {
+                //attempt to snap point to boundary of poly2
+                //only moves point if distance to boundary is less than epsilon               
+                  poly1[0][pointIdx].snap_to_boundary_of(poly2, epsilon);
+                }
+              }
+
+              for (int pointIdx = 0; pointIdx < poly2[0].n(); pointIdx++)
+              {
+                if(boundary_distance(poly2[0][pointIdx], poly1) < epsilon)
+                {              
+                   //attempt to snap point to boundary of poly2
+                   //only moves point if distance to boundary is less than epsilon
+                  poly2[0][pointIdx].snap_to_boundary_of(poly1, epsilon);
+                }
+              }
+              polygonList[idx1] = to_boost(poly1);
+              polygonList[idx2] = to_boost(poly2);
+            }
+          }
+        }
+      }
+      //no overlapping found    
+    }
+
+    std::vector<std::pair<int, int> > find_overlap(std::vector<boost_polygon> polygonList)
+    {
+      std::vector<std::pair<int, int> > result;
+      //for each polygon, calculate distance to each other polygon, return true if any are overlapping
+      //outer loop is first polygon for distance calculation
+      for (int idx1 = 0; idx1 < polygonList.size(); idx1++)
+      {
+        boost::geometry::validity_failure_type failure;
+
+        //start with polygon after outer loop so we don't compare a polygon to itself
+        for (int idx2 = idx1+1; idx2 < polygonList.size(); idx2++)
+        {
+          //make sure both polygons are valid
+          if(boost::geometry::is_valid(polygonList[idx1], failure) && boost::geometry::is_valid(polygonList[idx2], failure))
+          {
+
+            //if these polygons overlap
+            if( boost::geometry::distance(polygonList[idx1], polygonList[idx2]) > 0 == false)
+            {
+              result.push_back(std::pair<int, int>(idx1, idx2));
+            }
+          }
+        }
+      }
+      //no overlapping found
+      return result;
+
+    }
+
+    bool Polygon::boost_union(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon)
+    {
+      bool success = true;
+      std::vector<boost_polygon> bPolyList;
+      boost::geometry::validity_failure_type failure;
+      //convert polygon list from visiLibity to boost
+      for (auto &visPoly : polygonList)
+      {
+        auto b_poly = to_boost(std::vector<Polygon>(1,visPoly));
+        if(boost::geometry::is_valid(b_poly, failure))
+        {
+          bPolyList.push_back(b_poly);
+        }
+        else
+        {
+          success = false;
+        }
+      }
+
+      //if any points are near, but not adjacent, snap them together
+      snap_near(bPolyList, epsilon);
+      auto overlapping = find_overlap(bPolyList);
+      std::vector<std::pair<int, int> > tangent;
+      // iterate as long as any 2 polygons overlap
+      while(!overlapping.empty() && overlapping != tangent)
+      {
+        tangent.clear();
+        //keep a list of polygons to remove
+        std::vector<int> toRemove;
+        //iterate backwards over list of overlapping polygon pairs so that we don't have to worry about invalidating iterators as we go
+        for (auto revIt = overlapping.rbegin(); revIt != overlapping.rend(); revIt++)
+        {
+
+          //vector to store results in boost format
+          std::vector<boost_polygon> output;
+
+          std::pair<int, int> indices = *revIt;
+          boost::geometry::union_(bPolyList[indices.first], bPolyList[indices.second], output);
+    //        //if we were able to merge these two
+          if(output.size() == 1)
+          {
+    //          //use the new merged polygon as the comparison
+            bPolyList[indices.first]= output[0];
+            //check to see if we are already planning to remove the second polygon
+            if(std::find(std::begin(toRemove), std::end(toRemove), indices.second) == std::end(toRemove))
+            {
+              //keep a list, but don't remove anything yet, because it might be needed for later merges this pass
+              toRemove.push_back(indices.second);
+            }
+          }
+          else
+          {
+            //unable to merge polygons, most likely because they share a vertex are not overlapping or adjacent
+            //keep track of which combination of polygons meets this condition
+            tangent.push_back(std::pair<int, int>(indices.first, indices.second));
+          }
+
+        }
+        //remove all merged polygons at end of this pass
+        for (auto idx : toRemove)
+        {
+          bPolyList.erase(bPolyList.begin() + idx);
+        }
+        //check to see if there are still merges possible
+        overlapping = find_overlap(bPolyList);
+      }
+      //convert merged boost polygons to VisiLibity polygons
+      for (auto &bPoly : bPolyList)
+      {
+        auto visPoly = to_visiLibity(bPoly);
+        //visPoly may include inner rings
+        for ( auto vPoly : visPoly)
+        {
+          resultingPolygons.push_back(vPoly);
+        }
+      }
+      if(resultingPolygons.empty())
+      {
+        success = false;
+      }
+      return success;
+    }
+
+    std::ostream& operator << (std::ostream& outs, boost_polygon b_poly)
+    {
+      std::vector<boost_point> const& points = b_poly.outer();
+      outs << "Outer:\n";
+      for (auto &b_point : points)
+      {
+        double x = boost::geometry::get<0>(b_point);
+        double y = boost::geometry::get<1>(b_point);
+        outs << x << " " << y << std::endl;
+      }
+
+      //get boost polygon inner rings/ holes
+      auto holes = b_poly.inners();
+      outs << "Inner:\n";
+      ///for each hole in boost polygon
+      for(auto &hole : holes)
+      {
+        for (auto &b_point : hole)
+        {
+
+          double x = boost::geometry::get<0>(b_point);
+          double y = boost::geometry::get<1>(b_point);
+          outs << x << " " << y << std::endl;
+        }
+
+      }
+      return outs;
+    }
 }
