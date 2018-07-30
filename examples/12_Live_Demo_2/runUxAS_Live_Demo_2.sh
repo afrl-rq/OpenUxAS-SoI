@@ -11,4 +11,4 @@ mkdir -p RUNDIR_AssignTasks
 cd RUNDIR_AssignTasks
 $RM_DATAWORK
 $RM_LOG
-$BIN -cfgPath ../Scenario_ICAROUS_Test_1_cfg.xml
+$BIN -cfgPath ../Scenario_Live_Demo_2_cfg.xml
