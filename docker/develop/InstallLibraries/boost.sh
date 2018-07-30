@@ -65,9 +65,9 @@ elif [ $BUILD_TYPE == BOOST ]
 then
 	#./bootstrap.sh --prefix=/usr/local --with-libraries=all
 	#./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=all
-	./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=filesystem,regex,system
+	./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=date_time,filesystem,regex,system
  
-	$_SUDO ./b2 install
+	$_SUDO ./b2 install -d0 threading=multi link=static
 	$_SUDO ldconfig
 
 elif [ $BUILD_TYPE == CMAKE ]
