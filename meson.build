@@ -95,8 +95,8 @@ else
     fallback: ['minizip', 'dep'],
   )
 
-  # handle boost carefully, require version > 1.55
-  if not cpp.has_header('boost/geometry/algorithms/is_valid.hpp')
+  # handle boost carefully, require version >= 1.67
+  if not cpp.has_header('boost/contract.hpp')
     dep_boost = subproject('boost').get_variable('dep')
   else
     dep_boost = dependency(
