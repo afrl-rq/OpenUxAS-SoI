@@ -422,6 +422,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     //fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
                     if(deviationFlags[instanceIndex] == true){
+                        fprintf(stdout, "UAV %i | Deviation flag true, passive recieved!\n", instanceIndex + 1);
                         // SOFT RESET ICAROUS (RESET_SFT)
                         softResetFlag[instanceIndex] = true;
                         
@@ -440,6 +441,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                             sendSharedLmcpObjectBroadcastMessage(resumeTask);
                         }
                     }else{
+                        fprintf(stdout, "UAV %i | Deviation flag false, passive recieved!\n", instanceIndex + 1);
                         // If the UAV was able to make the maneuver successfully continue the mission command
                         // heading to the next wp in the list (set it the the first wp and drop the last one at
                         // the last place the UAV was)
@@ -1136,11 +1138,32 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             //fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, currentWaypointIndex[vehicleID - 1] - 1);
             
             // Save the new point AMASE should start at
+            
+            // Calculate the point projected onto the line made by the last waypoint done and the current waypoint
+            // (Calculate the ortogonal projection of the UAV onto the line it should be following)
+            // This is expanded out in such a way that it would be easier to read
+            double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
+            double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
+            double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
+            double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
+            
+            double positionLat = positionBeforeTakeover[vehicleID - 1][1];
+            double positionLong = positionBeforeTakeover[vehicleID - 1][2];
+            
+            double e1x = lat2 - lat1;
+            double e1y = long2 - long1;
+            double e2x = positionLat - lat1;
+            double e2y = positionLong - long1;
+            double eDotProduct = e1x * e2x + e1y * e2y;
+            double len2 = pow(e1x, 2) + pow(e1y, 2);
+            double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
+            double newPointLong = (long1 + (eDotProduct * e1y) / len2);
+            
             newWaypointLists[vehicleID - 1][0]->setLatitude(
-                positionBeforeTakeover[vehicleID - 1][1]);
+                newPointLat);
             
             newWaypointLists[vehicleID - 1][0]->setLongitude(
-                positionBeforeTakeover[vehicleID - 1][2]);
+                newPointLong);
             
             newWaypointLists[vehicleID - 1][0]->setAltitude(
                 positionBeforeTakeover[vehicleID - 1][3]);
@@ -1188,11 +1211,31 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         }
         else if(noDeviationReset[vehicleID - 1] == true)
         {
+            // Calculate the point projected onto the line made by the last waypoint done and the current waypoint
+            // (Calculate the ortogonal projection of the UAV onto the line it should be following)
+            // This is expanded out in such a way that it would be easier to read
+            double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
+            double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
+            double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
+            double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
+            
+            double positionLat = currentInformation[vehicleID - 1][1];
+            double positionLong = currentInformation[vehicleID - 1][2];
+            
+            double e1x = lat2 - lat1;
+            double e1y = long2 - long1;
+            double e2x = positionLat - lat1;
+            double e2y = positionLong - long1;
+            double eDotProduct = e1x * e2x + e1y * e2y;
+            double len2 = pow(e1x, 2) + pow(e1y, 2);
+            double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
+            double newPointLong = (long1 + (eDotProduct * e1y) / len2);
+            
             newWaypointLists[vehicleID - 1][0]->setLatitude(
-                currentInformation[vehicleID - 1][1]);
+                newPointLat);
             
             newWaypointLists[vehicleID - 1][0]->setLongitude(
-                currentInformation[vehicleID - 1][2]);
+                newPointLong);
             
             newWaypointLists[vehicleID - 1][0]->setAltitude(
                 currentInformation[vehicleID - 1][3]);
