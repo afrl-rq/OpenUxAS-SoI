@@ -7,10 +7,10 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     cmake \
     curl \
     git \
-    libboost-date-time1.67-dev \
-    libboost-filesystem1.67-dev \
-    libboost-regex1.67-dev \
-    libboost-system1.67-dev \
+    libboost-date-time1.67.0 \
+    libboost-filesystem1.67.0 \
+    libboost-regex1.67.0 \
+    libboost-system1.67.0 \
     libczmq-dev \
     libgtest-dev \
     libminizip-dev \
