@@ -42,8 +42,8 @@ system top_level
 	annex agree {** 
 		guarantee "System output is sum of component outputs" : Output = B_out + C_out;
 		guarantee "System output is 5" : Output = 5;
-		eq B_out : Base_Types::Integer;
-		eq C_out : Base_Types::Integer;
+		eq B_out : int;
+		eq C_out : int;
 	**};	
 end top_level;
 

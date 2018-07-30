@@ -1,0 +1,23 @@
+package Simple
+public 
+	with Base_Types;
+    
+system top_level
+	features
+		Enabled: in data port Base_Types::Boolean;
+		Input_Val: in data port Base_Types::Integer;
+		Output_Val: out data port Base_Types::Integer;
+	annex agree {** 
+		assume "Input_Val is nonnegative" : Input_Val >= 0;
+		guarantee "Output_Val is nonnegative" : Output_Val >= 0;
+	**};	
+end top_level;
+
+system implementation top_level.Impl
+	annex agree {**
+		assign Output_Val = if Enabled then 2*Input_Val else 0;
+	**};
+	 
+end top_level.Impl;	
+
+end Simple;
