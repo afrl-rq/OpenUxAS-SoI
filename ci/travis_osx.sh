@@ -21,7 +21,7 @@ sh RunLmcpGen.sh
 ./prepare
 
 # build with -j2; Travis has 2 "cores"
-meson build
+meson build --Dforce_dep_download=true
 ninja -C build -j2
 # run test suite with *2 timeout multiplier, because Travis can be slow
 meson test --print-errorlogs -C build -t 2

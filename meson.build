@@ -36,6 +36,7 @@ if get_option('force_dep_download')
   dep_sqlitecpp = subproject('sqlitecpp').get_variable('dep')
   dep_zlib      = subproject('zlib').get_variable('dep')
   dep_minizip   = subproject('minizip').get_variable('dep')
+  dep_boost     = subproject('boost').get_variable('dep')
 else
   # https://github.com/zeromq/{zeromq, czmq, cppzmq, zyre}
   dep_zeromq = dependency(
@@ -93,17 +94,17 @@ else
     'minizip',
     fallback: ['minizip', 'dep'],
   )
-endif
 
-# handle boost carefully, require version > 1.55
-if not cpp.has_header('boost/geometry/algorithms/is_valid.hpp')
-  dep_boost = subproject('boost').get_variable('dep')
-else
-  dep_boost = dependency(
-    'boost',
-    modules: ['date_time', 'filesystem', 'regex', 'system'],
-    fallback: ['boost', 'dep'],
-  )
+  # handle boost carefully, require version > 1.55
+  if not cpp.has_header('boost/geometry/algorithms/is_valid.hpp')
+    dep_boost = subproject('boost').get_variable('dep')
+  else
+    dep_boost = dependency(
+      'boost',
+      modules: ['date_time', 'filesystem', 'regex', 'system'],
+      fallback: ['boost', 'dep'],
+    )
+  endif
 endif
 
 # https://github.com/mikalhart/TinyGPS
