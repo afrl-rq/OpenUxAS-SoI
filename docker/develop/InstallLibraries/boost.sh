@@ -15,9 +15,9 @@ BUILD_TYPE="BOOST"
 
 LIBRARY_NAME="boost"
 LIBRARY_FOLDER_NAME="boost"
-SOURCE_ARCHIVE_FILE="boost_1_64_0.tar.bz2"
-SOURCE_ARCHIVE_ADDRESS="https://sourceforge.net/projects/boost/files/boost/1.64.0/"
-SOURCE_FOLDER_NAME="boost_1_64_0"
+SOURCE_ARCHIVE_FILE="boost_1_67_0.tar.bz2"
+SOURCE_ARCHIVE_ADDRESS="https://dl.bintray.com/boostorg/release/1.67.0/source/"
+SOURCE_FOLDER_NAME="boost_1_67_0"
 
 ARCHIVE_COMMAND="tar xjvf "
 

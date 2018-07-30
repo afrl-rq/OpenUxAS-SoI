@@ -15,7 +15,7 @@ INSTALL_CWD=$(pwd)
 mkdir -p ./temp
 cd ./temp
 
- # bash ../boost.sh $_SUDO
+ bash ../boost.sh $_SUDO
  # bash ../zeromq.sh $_SUDO
  # bash ../czmq.sh $_SUDO
  bash ../zyre.sh $_SUDO
