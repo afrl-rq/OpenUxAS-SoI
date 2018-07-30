@@ -19,7 +19,7 @@ SOURCE_ARCHIVE_FILE="boost_1_67_0.tar.bz2"
 SOURCE_ARCHIVE_ADDRESS="https://dl.bintray.com/boostorg/release/1.67.0/source/"
 SOURCE_FOLDER_NAME="boost_1_67_0"
 
-ARCHIVE_COMMAND="tar xjvf "
+ARCHIVE_COMMAND="tar xjf "
 
 echo "Making Dirs"
 CWD=$(pwd)
