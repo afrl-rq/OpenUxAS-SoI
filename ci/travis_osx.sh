@@ -24,4 +24,4 @@ sh RunLmcpGen.sh
 meson build
 ninja -C build -j2
 # run test suite with *2 timeout multiplier, because Travis can be slow
-meson test -C build -t 2
+meson test --print-errorlogs -C build -t 2
