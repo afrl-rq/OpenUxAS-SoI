@@ -1,0 +1,20 @@
+package DPSS_Constants
+public
+	
+--	with DPSS_Data_Types;
+	
+	annex agree {**
+			
+		const P_GLOBAL : real = 10.0;	
+		const V : real = 1.0; --velocity
+		const T : real = P_GLOBAL/V;		
+		const N_real : real = 3.0; --Number of vehicles
+
+		const LEFT : int = -1;
+		const RIGHT : int = 1;
+		const N_int : int = 3; --Number of vehicles
+
+		
+	**};
+	
+end DPSS_Constants;
