@@ -31,7 +31,9 @@
 #include "TypeDefs/UxAS_TypeDefs_String.h"
 #include "CallbackTimer.h"
 
+#include "uxas/messages/route/RoutePlan.h"
 #include "uxas/messages/route/RoutePlanRequest.h"
+#include "uxas/messages/route/RoutePlanResponse.h"
 
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/TurnType.h"
@@ -164,6 +166,11 @@ private:
     std::vector<float> nominalUAVVerticleSpeed;
     
     std::vector<std::shared_ptr<uxas::messages::route::RoutePlanRequest>> routePlanRequests;
+    std::vector<std::shared_ptr<uxas::messages::route::RoutePlanResponse>> routePlanResponses;
+    std::vector<uxas::messages::route::RoutePlan*> routePlans;
+    std::vector<unsigned int> routePlanCounter;
+    std::vector<int> routePlanWaypointCounter;
+    std::vector<bool> isRoutePlanResponseInit;
     
     std::vector<bool> deviationFlags;
     

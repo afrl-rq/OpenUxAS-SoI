@@ -67,7 +67,7 @@
 // Unsure if needed
 //#include "uxas/messages/route/RoutePlan.h"
 
-#include "uxas/messages/route/RoutePlanResponse.h"
+
 #include "uxas/messages/task/TaskPause.h"
 #include "uxas/messages/task/TaskResume.h"
 #include "uxas/messages/uxnative/IncrementWaypoint.h"
@@ -198,6 +198,11 @@ bool IcarousCommunicationService::initialize()
     nominalUAVHorizontalSpeed.resize(ICAROUS_CONNECTIONS);
     nominalUAVVerticleSpeed.resize(ICAROUS_CONNECTIONS);
     routePlanRequests.resize(ICAROUS_CONNECTIONS);
+    routePlanResponses.resize(ICAROUS_CONNECTIONS);
+    routePlans.resize(ICAROUS_CONNECTIONS);
+    isRoutePlanResponseInit.resize(ICAROUS_CONNECTIONS);
+    routePlanCounter.resize(ICAROUS_CONNECTIONS);
+    routePlanWaypointCounter.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes & Semaphores must be set like this and not in a vector
     // This is because a vector of these objects is non-resizable
@@ -229,6 +234,9 @@ bool IcarousCommunicationService::initialize()
     truncateWaypoint.assign(ICAROUS_CONNECTIONS, false);
     deviationFlags.assign(ICAROUS_CONNECTIONS, false);
     noDeviationReset.assign(ICAROUS_CONNECTIONS, false);
+    isRoutePlanResponseInit.assign(ICAROUS_CONNECTIONS, false);
+    routePlanCounter.assign(ICAROUS_CONNECTIONS, 0);
+    routePlanWaypointCounter.assign(ICAROUS_CONNECTIONS, 1);
     
     // Protocol constants for 3-way ICAROUS authentication handshake    
     const char *protocol1 = "ICAROUS-UxAS_LMCP";
@@ -507,7 +515,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 
                 
                 
-                // Get latitude
+                // Get type
                 trackingHelper            = strstr(tempMessageBuffer, "type");
                 trackingHelper           += 4; //skip past "type"
                 fieldEnd                  = strchr(trackingHelper, ',');
@@ -516,7 +524,92 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
 
                 // DEBUG STATEMENT - Print the contents of the message
                 fprintf(stdout, "%lli|RPRSP|type|%s\n", icarousClientFd, type);
-
+                
+                if(!strncmp(type, "ST", 2))
+                {
+                    // Get the cost of the route from the initial message
+                    trackingHelper            = strstr(tempMessageBuffer, "cost");
+                    trackingHelper           += 4; //skip past "cost"
+                    fieldEnd                  = strchr(trackingHelper, ',');
+                    fieldLength               = fieldEnd - trackingHelper;
+                    float cost                = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                    
+                    if(!isRoutePlanResponseInit[instanceIndex]){
+                        auto instanceRoutePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
+                        instanceRoutePlanResponse->setResponseID(routePlanRequests[instanceIndex]->getRequestID());
+                        instanceRoutePlanResponse->setAssociatedTaskID(routePlanRequests[instanceIndex]->getAssociatedTaskID());
+                        instanceRoutePlanResponse->setVehicleID(routePlanRequests[instanceIndex]->getVehicleID());
+                        instanceRoutePlanResponse->setOperatingRegion(routePlanRequests[instanceIndex]->getOperatingRegion());
+                        routePlanResponses[instanceIndex] = instanceRoutePlanResponse;
+                        isRoutePlanResponseInit[instanceIndex] = true;
+                    }
+                    
+                    auto instanceRoutePlan = new uxas::messages::route::RoutePlan();
+                    // Each route plan needs the same id as its respecitve constraints
+                    instanceRoutePlan->setRouteID(routePlanRequests[instanceIndex]->getRouteRequests()[routePlanCounter[instanceIndex]]->getRouteID());
+                    instanceRoutePlan->setRouteCost(cost * 1000); // Convert the cost from seconds to milliseconds
+                    routePlanCounter[instanceIndex]++;
+                    routePlans[instanceIndex] = instanceRoutePlan;
+                    
+                    // Reset the waypoint id number
+                    routePlanWaypointCounter[instanceIndex] = 1;
+                }
+                else if(!strncmp(type, "WP", 2))
+                {
+                    // Get waypoint information
+                    trackingHelper                = strstr(tempMessageBuffer, "lat");
+                    trackingHelper               += 3; //skip past "lat"
+                    fieldEnd                      = strchr(trackingHelper, ',');
+                    fieldLength                   = fieldEnd - trackingHelper;
+                    float latitude                = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                    
+                    trackingHelper                = strstr(tempMessageBuffer, "long");
+                    trackingHelper               += 4; //skip past "long"
+                    fieldEnd                      = strchr(trackingHelper, ',');
+                    fieldLength                   = fieldEnd - trackingHelper;
+                    float longitude               = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                    
+                    trackingHelper                = strstr(tempMessageBuffer, "alt");
+                    trackingHelper               += 3; //skip past "alt"
+                    fieldEnd                      = strchr(trackingHelper, ',');
+                    fieldLength                   = fieldEnd - trackingHelper;
+                    float altitude                = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                    
+                    trackingHelper                = strstr(tempMessageBuffer, "spd");
+                    trackingHelper               += 3; //skip past "spd"
+                    fieldEnd                      = strchr(trackingHelper, ',');
+                    fieldLength                   = fieldEnd - trackingHelper;
+                    float speed                   = atof(strncpy(throwaway, trackingHelper, fieldLength));
+                    
+                    
+                    auto waypointToAdd = new afrl::cmasi::Waypoint();
+                    waypointToAdd->setNumber(routePlanWaypointCounter[instanceIndex]);
+                    waypointToAdd->setNextWaypoint((routePlanWaypointCounter[instanceIndex] + 1));
+                    routePlanWaypointCounter[instanceIndex]++;
+                    waypointToAdd->setSpeed(speed);
+                    waypointToAdd->setLatitude(latitude);
+                    waypointToAdd->setLongitude(longitude);
+                    waypointToAdd->setAltitude(altitude);
+                    routePlans[instanceIndex]->getWaypoints().push_back(waypointToAdd);
+                }
+                else if(!strncmp(type, "ED", 2))
+                {
+                    // This should add the route response to the flightplan
+                    // It should also send out the route plan response once all route plans are recieved
+                    // (This needs to check the original array of route plans size)
+                    //routePlans[instanceIndex]->getWaypoints().___()->setNextWaypoint();
+                    routePlans[instanceIndex]->getWaypoints().back()->setNextWaypoint(routePlanWaypointCounter[instanceIndex] - 1);
+                    routePlanResponses[instanceIndex]->getRouteResponses().push_back(routePlans[instanceIndex]);
+                    
+                    if(routePlanCounter[instanceIndex] == routePlanResponses[instanceIndex]->getRouteResponses().size()){
+                        sendSharedLmcpObjectBroadcastMessage(routePlanResponses[instanceIndex]);
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "UAV %i | Unknown RPRSP message type!\n", instanceIndex + 1);
+                }
+                
                 /*
                 // Create a new vehicle action command and send the UAV to the given position
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
@@ -863,6 +956,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 nominalUAVHorizontalSpeed[vehicleID - 1],
                 nominalUAVVerticleSpeed[vehicleID - 1]);
         }
+        
+        
+        
         dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,val%s,\n",
             "SEND_FP_RES",
             "STOP");
@@ -1080,7 +1176,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // Copy the message pointer to shorten access length
         auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState *)receivedLmcpMessage->m_object->clone());
         int vehicleID = ptr_AirVehicleState->getID();
-        fprintf(stdout, "UAV %i | recieved usable AirVehicleState\n", vehicleID);
+        //fprintf(stdout, "UAV %i | recieved usable AirVehicleState\n", vehicleID);
 
         // TODO - un-hardcode the number of sats
         
