@@ -22,9 +22,6 @@
 #include "visilibity.h"
 #include "TestReport.h"
 
-using namespace VisiLibity;
-using namespace test;
-
 /** \class TestShape
  * 
  * \par Description:
@@ -48,21 +45,21 @@ public:
     };
     std::vector<VisiLibity::Polygon> m_originalPolygonList;
     std::vector<VisiLibity::Polygon> m_expectedPolygonList;
-    static report::Report m_report_static;
+    static test::report::Report m_report_static;
 
     //define threshold - polygons within this distance of each other will be considered to be adjacent
     double m_epsilon = 0.05;
     bool runTest(std::string description)
     {
         std::vector<VisiLibity::Polygon> actualPolygonList;
-//        Polygon::union_(m_originalPolygonList,actualPolygonList,m_epsilon);
-        auto success = Polygon::boost_union(m_originalPolygonList,actualPolygonList,m_epsilon);
+        // VisiLibity::Polygon::union_(m_originalPolygonList,actualPolygonList,m_epsilon);
+        auto success = VisiLibity::Polygon::boost_union(m_originalPolygonList,actualPolygonList,m_epsilon);
 
         //make sure there are no extraneous polygons in the list
         EXPECT_EQ(m_expectedPolygonList.size(), actualPolygonList.size());
 
         //get length of shorter of two polygon lists, in case above check fails
-        int n_toCompare = std::min(m_expectedPolygonList.size(), actualPolygonList.size());
+        int n_toCompare = (std::min)(m_expectedPolygonList.size(), actualPolygonList.size());
         //compare actual to expected results for each polygon
         for (int polyIdx = 0; polyIdx < n_toCompare; polyIdx++)
         {
@@ -73,36 +70,36 @@ public:
         m_report_static.addLine(description);
 
         //Expected Results
-        std::vector<report::PlotPolygon> expectedPolyList;
+        std::vector<test::report::PlotPolygon> expectedPolyList;
         for (auto &poly : m_originalPolygonList)
         {
             // old polygons are red
-            expectedPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
+            expectedPolyList.push_back(test::report::PlotPolygon(poly, 1, "red", "solid", "thick"));
         }
 
         for (auto &poly : m_expectedPolygonList)
         {
             //new polygons are blue
-            expectedPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
+            expectedPolyList.push_back(test::report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
         }
 
-        report::Plot expectedPlot(expectedPolyList, "Expected Result");
+        test::report::Plot expectedPlot(expectedPolyList, "Expected Result");
         m_report_static.addPlot(expectedPlot);
 
         //Actual Results
-        std::vector<report::PlotPolygon> actualPolyList;
+        std::vector<test::report::PlotPolygon> actualPolyList;
         for (auto &poly : m_originalPolygonList)
         {
             // old polygons are red
-            actualPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
+            actualPolyList.push_back(test::report::PlotPolygon(poly, 1, "red", "solid", "thick"));
         }
 
         for (auto &poly : actualPolygonList)
         {
             //new polygons are blue
-            actualPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
+            actualPolyList.push_back(test::report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
         }
-        report::Plot actualPlot(actualPolyList, "Actual Result");
+        test::report::Plot actualPlot(actualPolyList, "Actual Result");
         m_report_static.addPlot(actualPlot);
         return success;
     }
@@ -127,16 +124,16 @@ TEST(VisiLibityTest, Polygon_union_overlapping)
     //                   |_________|
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(2.0, 3.0) });
 
     //expected new polygon after merge - CCW
-    VisiLibity::Polygon newPolygon(std::vector<Point>{Point(3.0, 3.0), Point(3.0, 5.0), Point(0.0, 5.0), Point(0.0, 2.0), Point(2.0, 2.0), Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0)});
+    VisiLibity::Polygon newPolygon(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 3.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0), VisiLibity::Point(0.0, 2.0), VisiLibity::Point(2.0, 2.0), VisiLibity::Point(2.0, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 3.0)});
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon);
 
     //function input polygon list
@@ -170,18 +167,18 @@ TEST(VisiLibityTest, Polygon_union_tangent)
     //                     |_________|
     
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.0, 0.0), Point(6.0, 0.0), Point(6.0, 2.0), Point(3.0, 2.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 0.0), VisiLibity::Point(6.0, 0.0), VisiLibity::Point(6.0, 2.0), VisiLibity::Point(3.0, 2.0) });
     
     //expected new polygon after merge - CCW
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(3.0, 0.0), Point(6.0, 0.0), Point(6.0, 2.0), Point(3.0, 2.0) });
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
+    VisiLibity::Polygon newPolygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 0.0), VisiLibity::Point(6.0, 0.0), VisiLibity::Point(6.0, 2.0), VisiLibity::Point(3.0, 2.0) });
 
     
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
     expPolygonList.push_back(newPolygon2);
     
@@ -227,21 +224,21 @@ TEST(VisiLibityTest, Polygon_union_keepout_hole)
     //
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 1.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(1.0, 2.0), VisiLibity::Point(1.0, 3.0), VisiLibity::Point(3.0, 3.0), VisiLibity::Point(3.0, 4.0), VisiLibity::Point(0.0, 4.0), VisiLibity::Point(0.0, 1.0)});
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(4.0, 0.0),Point(4.0, 5.0),Point(2.0, 5.0)});
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(4.0, 0.0), VisiLibity::Point(4.0, 5.0), VisiLibity::Point(2.0, 5.0)});
 
     //expected new polygon after merge - defined CW
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 1.0), Point(0.0, 4.0), Point(2.0, 4.0), Point(2.0, 5.0), Point(4.0, 5.0), Point(4.0, 00), Point(2.0, 0.0), Point(2.0, 1.0)});
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 1.0), VisiLibity::Point(0.0, 4.0), VisiLibity::Point(2.0, 4.0), VisiLibity::Point(2.0, 5.0), VisiLibity::Point(4.0, 5.0), VisiLibity::Point(4.0, 00), VisiLibity::Point(2.0, 0.0), VisiLibity::Point(2.0, 1.0)});
     //Make CCW
     newPolygon1.reverse();
     //expected keep-out "hole" created
     //CW order?
-    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(1.0, 3.0), Point(2.0, 3.0), Point(2.0, 2.0), Point(1.0, 2.0)});
+    VisiLibity::Polygon newPolygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(1.0, 3.0), VisiLibity::Point(2.0, 3.0), VisiLibity::Point(2.0, 2.0), VisiLibity::Point(1.0, 2.0)});
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
     expPolygonList.push_back(newPolygon2);
 
@@ -286,25 +283,25 @@ TEST(VisiLibityTest, Polygon_union_multiple_holes)
     //
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 1.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(1.0, 2.0), VisiLibity::Point(1.0, 3.0), VisiLibity::Point(3.0, 3.0), VisiLibity::Point(3.0, 4.0), VisiLibity::Point(0.0, 4.0), VisiLibity::Point(0.0, 1.0)});
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0),Point(5.0, 5.0),Point(2.0, 5.0)});
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 5.0), VisiLibity::Point(2.0, 5.0)});
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon3(std::vector<Point>{Point(4.0, 1.0), Point(7.0, 1.0), Point(7.0, 4.0), Point(4.0, 4.0), Point(4.0, 3.0), Point(6.0, 3.0), Point(6.0, 2.0), Point(4.0, 2.0)});
+    VisiLibity::Polygon polygon3(std::vector<VisiLibity::Point>{VisiLibity::Point(4.0, 1.0), VisiLibity::Point(7.0, 1.0), VisiLibity::Point(7.0, 4.0), VisiLibity::Point(4.0, 4.0), VisiLibity::Point(4.0, 3.0), VisiLibity::Point(6.0, 3.0), VisiLibity::Point(6.0, 2.0), VisiLibity::Point(4.0, 2.0)});
 
     //expected new polygon after merge - defined CW
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 1.0), Point(0.0, 4.0), Point(2.0, 4.0), Point(2.0, 5.0), Point(5.0, 5.0), Point(5.0, 4.0), Point(7.0, 4.0), Point(7.0, 1.0), Point(5.0, 1.0), Point(5.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0)});
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 1.0), VisiLibity::Point(0.0, 4.0), VisiLibity::Point(2.0, 4.0), VisiLibity::Point(2.0, 5.0), VisiLibity::Point(5.0, 5.0), VisiLibity::Point(5.0, 4.0), VisiLibity::Point(7.0, 4.0), VisiLibity::Point(7.0, 1.0), VisiLibity::Point(5.0, 1.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(2.0, 0.0), VisiLibity::Point(2.0, 1.0)});
     //Make CCW
     newPolygon1.reverse();
     //expected keep-out "hole" created
     //CW order?
-    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(5.0, 2.0), Point(5.0, 3.0), Point(6.0, 3.0), Point(6.0, 2.0)});
+    VisiLibity::Polygon newPolygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(5.0, 2.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(6.0, 3.0), VisiLibity::Point(6.0, 2.0)});
 
-    VisiLibity::Polygon newPolygon3(std::vector<Point>{Point(1.0, 3.0), Point(2.0, 3.0), Point(2.0, 2.0), Point(1.0, 2.0)});
+    VisiLibity::Polygon newPolygon3(std::vector<VisiLibity::Point>{VisiLibity::Point(1.0, 3.0), VisiLibity::Point(2.0, 3.0), VisiLibity::Point(2.0, 2.0), VisiLibity::Point(1.0, 2.0)});
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
     expPolygonList.push_back(newPolygon2);
     expPolygonList.push_back(newPolygon3);
@@ -341,14 +338,14 @@ TEST(VisiLibityTest, Polygon_union_invalid_polygon)
     //                   |_________|
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 2.0), Point(3.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(2.0, 3.0) });
 
-    VisiLibity::Polygon newPolygon(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+    VisiLibity::Polygon newPolygon(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(2.0, 3.0) });
   
     //merge function arguments are vectors of polygons
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon);
 
 
@@ -392,18 +389,18 @@ TEST(VisiLibityTest, Polygon_union_invalid_orientation)
     //         |_____|
 
     //first polygon to merge - defined CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(3.0, 1.0), Point(3.0, 2.0), Point(1.0, 2.0), Point(1.0, 3.0), Point(3.0, 3.0), Point(3.0, 4.0), Point(0.0, 4.0), Point(0.0, 1.0)});
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 1.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(1.0, 2.0), VisiLibity::Point(1.0, 3.0), VisiLibity::Point(3.0, 3.0), VisiLibity::Point(3.0, 4.0), VisiLibity::Point(0.0, 4.0), VisiLibity::Point(0.0, 1.0)});
     //Make CW
     polygon1.reverse();
     //second polygon to merge - defined CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(4.0, 0.0),Point(4.0, 5.0),Point(2.0, 5.0)});
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(4.0, 0.0), VisiLibity::Point(4.0, 5.0), VisiLibity::Point(2.0, 5.0)});
     //Make CW
     polygon2.reverse();
 
 
     //merge function arguments are vectors of polygons
     //expected function output empty polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
 
     //function input polygon list
     std::vector<VisiLibity::Polygon> originalPolygonList;
@@ -438,17 +435,17 @@ TEST(VisiLibityTest, Polygon_union_nonadjacent)
     //                       |_________|
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(4, 0.0), Point(7, 0.0), Point(7, 3.0), Point(4, 3.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(4, 0.0), VisiLibity::Point(7, 0.0), VisiLibity::Point(7, 3.0), VisiLibity::Point(4, 3.0) });
 
     //expected new polygons after merge - both unchanged from original
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
-    VisiLibity::Polygon newPolygon2(std::vector<Point>{Point(4, 0.0), Point(7, 0.0), Point(7, 3.0), Point(4, 3.0) });
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
+    VisiLibity::Polygon newPolygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(4, 0.0), VisiLibity::Point(7, 0.0), VisiLibity::Point(7, 3.0), VisiLibity::Point(4, 3.0) });
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
     expPolygonList.push_back(newPolygon2);
 
@@ -483,16 +480,16 @@ TEST(VisiLibityTest, Polygon_union_near)
     //                      |_________|
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.04, 0.0), Point(6.0, 0.0), Point(6.0, 3.0), Point(3.04, 3.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(3.04, 0.0), VisiLibity::Point(6.0, 0.0), VisiLibity::Point(6.0, 3.0), VisiLibity::Point(3.04, 3.0) });
 
     //expected new polygon after merge - CCW
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(3.0, 3.0), Point(3.0, 5.0), Point(0.0, 5.0), Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 0.0), Point(6.0, 0.0), Point(6.0, 3.0)});
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(3.0, 3.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0), VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 0.0), VisiLibity::Point(6.0, 0.0), VisiLibity::Point(6.0, 3.0)});
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
 
     //function input polygon list
@@ -528,21 +525,21 @@ TEST(VisiLibityTest, Polygon_union_three_overlapping)
     //                   |_________|
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(2.0, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(2.0, 3.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(2.0, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(2.0, 3.0) });
     //third polygon to merge - CCW
-    VisiLibity::Polygon polygon3(std::vector<Point>{Point(1.0, 1.0), Point(4.0, 1.0), Point(4.0, 6.0), Point(1.0, 6.0)});
+    VisiLibity::Polygon polygon3(std::vector<VisiLibity::Point>{VisiLibity::Point(1.0, 1.0), VisiLibity::Point(4.0, 1.0), VisiLibity::Point(4.0, 6.0), VisiLibity::Point(1.0, 6.0)});
 
 
     //expected new polygon after merge - CCW
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(0.0, 5.0), Point(1.0, 5.0), Point(1.0, 6.0), Point(4.0, 6.0), Point(4.0, 3.0), Point(5.0, 3.0), Point(5.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0), Point(1.0, 1.0), Point(1.0, 2.0)});
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(0.0, 5.0), VisiLibity::Point(1.0, 5.0), VisiLibity::Point(1.0, 6.0), VisiLibity::Point(4.0, 6.0), VisiLibity::Point(4.0, 3.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(2.0, 0.0), VisiLibity::Point(2.0, 1.0), VisiLibity::Point(1.0, 1.0), VisiLibity::Point(1.0, 2.0)});
     //CCW
     newPolygon1.reverse();
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
 
     //function input polygon list
@@ -578,21 +575,21 @@ TEST(VisiLibityTest, Polygon_union_three_nonoverlapping)
     //                      |______|
 
     //first polygon to merge - CCW
-    VisiLibity::Polygon polygon1(std::vector<Point>{Point(0.0, 2.0), Point(3.0, 2.0), Point(3.0, 5.0), Point(0.0, 5.0) });
+    VisiLibity::Polygon polygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(3.0, 2.0), VisiLibity::Point(3.0, 5.0), VisiLibity::Point(0.0, 5.0) });
     //second polygon to merge - CCW
-    VisiLibity::Polygon polygon2(std::vector<Point>{Point(3.5, 0.0), Point(5.0, 0.0), Point(5.0, 3.0), Point(3.5, 3.0) });
+    VisiLibity::Polygon polygon2(std::vector<VisiLibity::Point>{VisiLibity::Point(3.5, 0.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(3.5, 3.0) });
     //third polygon to merge - CCW
-    VisiLibity::Polygon polygon3(std::vector<Point>{Point(1.0, 1.0), Point(4.0, 1.0), Point(4.0, 6.0), Point(1.0, 6.0)});
+    VisiLibity::Polygon polygon3(std::vector<VisiLibity::Point>{VisiLibity::Point(1.0, 1.0), VisiLibity::Point(4.0, 1.0), VisiLibity::Point(4.0, 6.0), VisiLibity::Point(1.0, 6.0)});
 
 
     //expected new polygon after merge - CCW
-    VisiLibity::Polygon newPolygon1(std::vector<Point>{Point(0.0, 2.0), Point(0.0, 5.0), Point(1.0, 5.0), Point(1.0, 6.0), Point(4.0, 6.0), Point(4.0, 3.0), Point(5.0, 3.0), Point(5.0, 0.0), Point(3.5, 0.0), Point(3.5, 1.0), Point(1.0, 1.0), Point(1.0, 2.0)});
+    VisiLibity::Polygon newPolygon1(std::vector<VisiLibity::Point>{VisiLibity::Point(0.0, 2.0), VisiLibity::Point(0.0, 5.0), VisiLibity::Point(1.0, 5.0), VisiLibity::Point(1.0, 6.0), VisiLibity::Point(4.0, 6.0), VisiLibity::Point(4.0, 3.0), VisiLibity::Point(5.0, 3.0), VisiLibity::Point(5.0, 0.0), VisiLibity::Point(3.5, 0.0), VisiLibity::Point(3.5, 1.0), VisiLibity::Point(1.0, 1.0), VisiLibity::Point(1.0, 2.0)});
     //CCW
     newPolygon1.reverse();
 
     //merge function arguments are vectors of polygons
     //expected function output polygon list
-    std::vector<Polygon> expPolygonList;
+    std::vector<VisiLibity::Polygon> expPolygonList;
     expPolygonList.push_back(newPolygon1);
 
     //function input polygon list
@@ -633,15 +630,15 @@ TEST(VisiLibityTest, Polygon_conversion)
 {
 
     //Create CCW list of VisiLibity Points
-    std::vector<Point> points({Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0),
-        Point(0.0, 1.0)});
+    std::vector<VisiLibity::Point> points({ VisiLibity::Point(0.0, 0.0), VisiLibity::Point(1.0, 0.0), VisiLibity::Point(1.0, 1.0),
+		VisiLibity::Point(0.0, 1.0)});
     //Create a polygon with visilibity points
-    Polygon visPoly(points);
+	VisiLibity::Polygon visPoly(points);
     //put that polygon into a vector of length 1
-    std::vector<Polygon> visPolyList(1,visPoly);
+    std::vector<VisiLibity::Polygon> visPolyList(1,visPoly);
 
     //Create boost polygon
-    boost_polygon boostPoly;
+	VisiLibity::boost_polygon boostPoly;
 
     //Append each point
     for (auto &point: points)
@@ -672,7 +669,7 @@ TEST(VisiLibityTest, Polygon_conversion)
     EXPECT_EQ(convertedVisPolyList.size(), visPolyList.size());
 
     //convert visiLibity polygon to boost polygon
-    auto convertedBoostPoly = VisiLibity::to_boost(std::vector<Polygon>(1,visPoly));
+    auto convertedBoostPoly = VisiLibity::to_boost(std::vector<VisiLibity::Polygon>(1,visPoly));
 
     EXPECT_TRUE(boost::geometry::equals(convertedBoostPoly, boostPoly));
 };
@@ -681,23 +678,23 @@ TEST(VisiLibityTest, Polygon_conversion_with_holes)
 {
 
     //Create CCW list of VisiLibity Points
-    std::vector<Point> outer_points({Point(0.0, 0.0), Point(4.0, 0.0), Point(4.0, 4.0),
-        Point(0.0, 4.0)});
+    std::vector<VisiLibity::Point> outer_points({ VisiLibity::Point(0.0, 0.0), VisiLibity::Point(4.0, 0.0), VisiLibity::Point(4.0, 4.0),
+		VisiLibity::Point(0.0, 4.0)});
     //Create a polygon with visilibity points
-    Polygon visPoly(outer_points);
+	VisiLibity::Polygon visPoly(outer_points);
     //put that polygon into a vector of length 1
-    std::vector<Polygon> visPolyList(1,visPoly);
+    std::vector<VisiLibity::Polygon> visPolyList(1,visPoly);
 
     //Create CW list of VisiLibity Points for hole
-    std::vector<Point> inner_points({Point(2.0, 2.0), Point(2.0, 3.0), Point(3.0, 3.0),
-        Point(3.0, 2.0)});
+    std::vector<VisiLibity::Point> inner_points({ VisiLibity::Point(2.0, 2.0), VisiLibity::Point(2.0, 3.0), VisiLibity::Point(3.0, 3.0),
+		VisiLibity::Point(3.0, 2.0)});
     //Create polygon to represent hole
-    Polygon hole(inner_points);
+	VisiLibity::Polygon hole(inner_points);
     //add hole to list
     visPolyList.push_back(hole);
 
     //Create boost polygon
-    boost_polygon boostPoly{{{0.0, 0.0}, {4.0, 0.0}, {4.0, 4.0}, {0.0, 4.0}},
+	VisiLibity::boost_polygon boostPoly{{{0.0, 0.0}, {4.0, 0.0}, {4.0, 4.0}, {0.0, 4.0}},
         {{2.0, 2.0}, {2.0, 3.0}, {3.0, 3.0}, {3.0, 2.0}}};
 
     //convert boost polygon to visiLibity polygon list
@@ -720,23 +717,23 @@ TEST(VisiLibityTest, Polygon_conversion_with_holes)
 
     //convert visiLibity polygon to boost polygon
     auto convertedBoostPoly = VisiLibity::to_boost(visPolyList);
-    auto actual = to_visiLibity(convertedBoostPoly);
-    auto expected = to_visiLibity(boostPoly);
+    auto actual = VisiLibity::to_visiLibity(convertedBoostPoly);
+    auto expected = VisiLibity::to_visiLibity(boostPoly);
     EXPECT_TRUE(boost::geometry::equals(convertedBoostPoly, boostPoly));
 };
 
 TEST(VisiLibityTest, OffsetPolygon)
 {
     //geometries from boost documentation at https://www.boost.org/doc/libs/1_58_0/libs/geometry/doc/html/geometry/reference/algorithms/union_.html
-    std::vector<Polygon> polygonList, resultingPolygons;
+    std::vector<VisiLibity::Polygon> polygonList, resultingPolygons;
     double epsilon = 0.5;
     double delta = 1.0;
-    boost_polygon green, blue;
+	VisiLibity::boost_polygon green, blue;
     
     boost::geometry::read_wkt("POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 3,5.3 2.6,5.4 1.2,4.9 0.8,2.9 0.7,2 1.3))", green);
     //make this polygon CCW
     boost::geometry::correct(green);
-    auto visPolyList = to_visiLibity(green);
+    auto visPolyList = VisiLibity::to_visiLibity(green);
     if(visPolyList.size() == 1)
     {
         polygonList.push_back(visPolyList[0]);
@@ -744,71 +741,71 @@ TEST(VisiLibityTest, OffsetPolygon)
     boost::geometry::read_wkt("POLYGON((4.0 -0.5 , 3.5 1.0 , 2.0 1.5 , 3.5 2.0 , 4.0 3.5 , 4.5 2.0 , 6.0 1.5 , 4.5 1.0 , 4.0 -0.5))", blue);
     //make this polygon CCW
     boost::geometry::correct(blue);
-    visPolyList = to_visiLibity(blue);
+    visPolyList = VisiLibity::to_visiLibity(blue);
     if(visPolyList.size() == 1)
     {
         polygonList.push_back(visPolyList[0]);
     }
     
     //Create CCW list of VisiLibity Points
-    std::vector<Point> outer_points(
+    std::vector<VisiLibity::Point> outer_points(
         {
-           Point(4.72076, 4.5),
-           Point(3.27924, 4.5),
-           Point(3.13037, 4.0534),
-           Point(2.84413, 3.21719),
-           Point(2.3788, 2.76711),
-           Point(2.1766, 2.68088),
-           Point(1.91493, 2.60951),
-           Point(1.92993, 2.5757),
-           Point(1.90556, 2.56531),
-           Point(1.86967, 2.58388),
-           Point(1.81062, 2.52483),
-           Point(1.4466, 2.36963),
-           Point(1.4988, 2.21302),
-           Point(1.37686, 2.09107),
-           Point(1, 2.22076),
-           Point(1, 1.71421),
-           Point(0.95823, 1.67244),
-           Point(1, 1.25061),
-           Point(1, 0.779241),
-           Point(1.04827, 0.763151),
-           Point(1.0515, 0.730481),
-           Point(1.23729, 0.606625),
-           Point(2.3453, -0.132052),
-           Point(3.05592, -0.660412),
-           Point(3.13037, -1.0534),
-           Point(3.30244, -0.996042),
-           Point(3.27924, -1.5),
-           Point(4.72076, -1.5),
-           Point(4.94868, -0.816228),
-           Point(5.15798, -0.188351),
-           Point(5.2725, -0.182624),
-           Point(5.32949, -0.137036),
-           Point(6.16847, 0.502063),
-           Point(6.5534, 0.630374),
-           Point(6.54377, 0.659248),
-           Point(7, 0.779241),
-           Point(7, 2.22076),
-           Point(6.5534, 2.36963),
-           Point(6.55339, 2.36963),
-           Point(6.31623, 2.44868),
-           Point(6.27585, 2.97373),
-           Point(5.90391, 3.45279),
-           Point(5.61623, 3.54868),
-           Point(5.61623, 3.54868),
-           Point(4.89503, 3.78908),
-           Point(4.89445, 3.79502),
-           Point(4.94868, 3.81623),
-           Point(4.86963, 4.0534),
-           Point(4.86963, 4.0534),
+		   VisiLibity::Point(4.72076, 4.5),
+		   VisiLibity::Point(3.27924, 4.5),
+		   VisiLibity::Point(3.13037, 4.0534),
+		   VisiLibity::Point(2.84413, 3.21719),
+		   VisiLibity::Point(2.3788, 2.76711),
+		   VisiLibity::Point(2.1766, 2.68088),
+		   VisiLibity::Point(1.91493, 2.60951),
+		   VisiLibity::Point(1.92993, 2.5757),
+		   VisiLibity::Point(1.90556, 2.56531),
+		   VisiLibity::Point(1.86967, 2.58388),
+		   VisiLibity::Point(1.81062, 2.52483),
+		   VisiLibity::Point(1.4466, 2.36963),
+		   VisiLibity::Point(1.4988, 2.21302),
+		   VisiLibity::Point(1.37686, 2.09107),
+		   VisiLibity::Point(1, 2.22076),
+		   VisiLibity::Point(1, 1.71421),
+           VisiLibity::Point(0.95823, 1.67244),
+           VisiLibity::Point(1, 1.25061),
+           VisiLibity::Point(1, 0.779241),
+           VisiLibity::Point(1.04827, 0.763151),
+           VisiLibity::Point(1.0515, 0.730481),
+           VisiLibity::Point(1.23729, 0.606625),
+           VisiLibity::Point(2.3453, -0.132052),
+           VisiLibity::Point(3.05592, -0.660412),
+           VisiLibity::Point(3.13037, -1.0534),
+           VisiLibity::Point(3.30244, -0.996042),
+           VisiLibity::Point(3.27924, -1.5),
+           VisiLibity::Point(4.72076, -1.5),
+           VisiLibity::Point(4.94868, -0.816228),
+           VisiLibity::Point(5.15798, -0.188351),
+           VisiLibity::Point(5.2725, -0.182624),
+           VisiLibity::Point(5.32949, -0.137036),
+           VisiLibity::Point(6.16847, 0.502063),
+           VisiLibity::Point(6.5534, 0.630374),
+           VisiLibity::Point(6.54377, 0.659248),
+           VisiLibity::Point(7, 0.779241),
+           VisiLibity::Point(7, 2.22076),
+           VisiLibity::Point(6.5534, 2.36963),
+           VisiLibity::Point(6.55339, 2.36963),
+           VisiLibity::Point(6.31623, 2.44868),
+           VisiLibity::Point(6.27585, 2.97373),
+           VisiLibity::Point(5.90391, 3.45279),
+           VisiLibity::Point(5.61623, 3.54868),
+           VisiLibity::Point(5.61623, 3.54868),
+           VisiLibity::Point(4.89503, 3.78908),
+           VisiLibity::Point(4.89445, 3.79502),
+           VisiLibity::Point(4.94868, 3.81623),
+           VisiLibity::Point(4.86963, 4.0534),
+           VisiLibity::Point(4.86963, 4.0534),
         });
     //Create a polygon with visilibity points
-    Polygon visPoly(outer_points);
+	VisiLibity::Polygon visPoly(outer_points);
     //put that polygon into a vector of length 1
-    std::vector<Polygon> expectedVisPolyList(1,visPoly);
+    std::vector<VisiLibity::Polygon> expectedVisPolyList(1,visPoly);
     
-    EXPECT_TRUE(Polygon::offset_polygons(polygonList, resultingPolygons, delta, epsilon));
+    EXPECT_TRUE(VisiLibity::Polygon::offset_polygons(polygonList, resultingPolygons, delta, epsilon));
     auto resultSize = resultingPolygons.size();
     EXPECT_EQ(1, resultSize);
     if(resultSize == 1)
@@ -820,40 +817,40 @@ TEST(VisiLibityTest, OffsetPolygon)
     TestShape::m_report_static.addLine(std::string("Test of offset polygon function"));
     
     //Expected Results
-    std::vector<report::PlotPolygon> expectedPolyList;
+    std::vector<test::report::PlotPolygon> expectedPolyList;
     for (auto &poly : polygonList)
     {
         // old polygons are red
-        expectedPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
+        expectedPolyList.push_back(test::report::PlotPolygon(poly, 1, "red", "solid", "thick"));
     }
     
     for (auto &poly : expectedVisPolyList)
     {
         //new polygons are blue
-        expectedPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
+        expectedPolyList.push_back(test::report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
     }
-    report::Plot expectedPlot(expectedPolyList, "Expected Result");
+    test::report::Plot expectedPlot(expectedPolyList, "Expected Result");
     TestShape::m_report_static.addPlot(expectedPlot);
     
     //Actual Results
-    std::vector<report::PlotPolygon> actualPolyList;
+    std::vector<test::report::PlotPolygon> actualPolyList;
     for (auto &poly : polygonList)
     {
         // old polygons are red
-        actualPolyList.push_back(report::PlotPolygon(poly, 1, "red", "solid", "thick"));
+        actualPolyList.push_back(test::report::PlotPolygon(poly, 1, "red", "solid", "thick"));
     }
     
     for (auto &poly : resultingPolygons)
     {
         //new polygons are blue
-        actualPolyList.push_back(report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
+        actualPolyList.push_back(test::report::PlotPolygon(poly, 1, "blue", "dashed", "ultra thick"));
     }
-    report::Plot actualPlot(actualPolyList, "Actual Result");
+    test::report::Plot actualPlot(actualPolyList, "Actual Result");
     TestShape::m_report_static.addPlot(actualPlot);
 }
 
 //Initialize static report
-report::Report TestShape::m_report_static("VisiLibity");
+test::report::Report TestShape::m_report_static("VisiLibity");
 
 int main(int argc, char **argv)
 {
