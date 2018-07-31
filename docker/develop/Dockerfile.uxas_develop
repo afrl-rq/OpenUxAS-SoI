@@ -7,12 +7,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     cmake \
     curl \
     git \
-    libboost-date-time-dev \
-    libboost-filesystem-dev \
-    libboost-regex-dev \
-    libboost-system-dev \
     libczmq-dev \
-    libglu1-mesa-dev \
     libgtest-dev \
     libminizip-dev \
     libsqlite3-dev \

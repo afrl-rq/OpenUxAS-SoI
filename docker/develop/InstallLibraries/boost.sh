@@ -15,11 +15,11 @@ BUILD_TYPE="BOOST"
 
 LIBRARY_NAME="boost"
 LIBRARY_FOLDER_NAME="boost"
-SOURCE_ARCHIVE_FILE="boost_1_64_0.tar.bz2"
-SOURCE_ARCHIVE_ADDRESS="https://sourceforge.net/projects/boost/files/boost/1.64.0/"
-SOURCE_FOLDER_NAME="boost_1_64_0"
+SOURCE_ARCHIVE_FILE="boost_1_67_0.tar.bz2"
+SOURCE_ARCHIVE_ADDRESS="https://dl.bintray.com/boostorg/release/1.67.0/source/"
+SOURCE_FOLDER_NAME="boost_1_67_0"
 
-ARCHIVE_COMMAND="tar xjvf "
+ARCHIVE_COMMAND="tar xjf "
 
 echo "Making Dirs"
 CWD=$(pwd)
@@ -65,9 +65,9 @@ elif [ $BUILD_TYPE == BOOST ]
 then
 	#./bootstrap.sh --prefix=/usr/local --with-libraries=all
 	#./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=all
-	./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=filesystem,regex,system
+	./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=date_time,filesystem,regex,system
  
-	$_SUDO ./b2 install
+	$_SUDO ./b2 install -d0 threading=multi
 	$_SUDO ldconfig
 
 elif [ $BUILD_TYPE == CMAKE ]

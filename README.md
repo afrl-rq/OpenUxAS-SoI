@@ -311,21 +311,22 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
    * Ensure C++ selected in `Workloads` tab
    * Ensure `Git for Windows` is selected in `Individual components` tab
 1. Install [Git](https://git-scm.com/download/win) with Bash shell
-1. Install [Python 3](https://www.python.org/ftp/python/3.6.1/python-3.6.1.exe)
-   * Make sure to check `Add Python 3.6 to PATH`
+1. Install [Python 3](https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe)
+   * Make sure to check `Add Python 3.7 to PATH`
    * Choose standard install (`Install Now`, requires admin)
    * Verify installation by: `python --version` in `cmd` prompt
    * Verify *pip* is also installed: `pip --version` in `cmd` prompt
-   * If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python36-32\`
-1. Install *meson* (only version 0.41.0 is compatible with Windows build)
-   * In `cmd` prompt **with admin priviledges**: `pip install meson==0.41.0`
-1. Install [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.1-32.exe/download)
-   * Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_64_0`
+   * If unable to get python on path, follow [this answer](https://stackoverflow.com/questions/23400030/windows-7-add-path) using location `C:\Users\[user]\AppData\Local\Programs\Python\Python37-32\`
+1. Install *meson* (due to Boost linking difficulty, a patched version of meson is required)
+   * In Git Bash shell: `git -c http.sslVerify=false clone https://github.com/derekkingston/meson.git`
+   * Install *meson* in Git Bash shell: `cd meson; python setup.py install`
+1. Install [Boost 1.67](https://dl.bintray.com/boostorg/release/1.67.0/binaries/boost_1_67_0-msvc-14.1-32.exe)
+   * Note: the above link is for VS2017 pre-compiled libraries. To compile from source, you must install at the location: `C:\local\boost_1_67_0`
 1. Pull UxAS repositories (from Git Bash shell)
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/OpenUxAS.git`
    * `git -c http.sslVerify=false clone https://github.com/afrl-rq/LmcpGen.git`
    * `git -c https://github.com/afrl-rq/OpenAMASE.git`
-1. (**optional**) Build OpenAMASE
+1. (**optional**) Build OpenAMASE or [download](https://github.com/afrl-rq/OpenAMASE/releases/download/v1.3.1/OpenAMASE.jar) and place in the `OpenAMASE\OpenAMASE\dist` directory
    * Load the OpenAMASE project in NetBeans and click `Build`
 1. Auto-create the UxAS messaging library
    * Download released executable from [GitHub](https://github.com/afrl-rq/LmcpGen/releases/download/v1.7.1/LmcpGen.jar)
@@ -336,17 +337,11 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
    * Open VS command prompt (Tools -> Visual Studio Command Prompt)
    * Note: If the Visual Studio Command Prompt is absent from Visual Studio, it is also possible to perform the following actions by searching for the `Developer Command Prompt for VS 2017` application and switching the working directory to the root OpenUxAS directory
    * `python prepare`
-   * `meson.py build --backend=vs` This should create a Visual Studio solution in the build folder.
-   * Note: If the meson.py fails to build the misc.py file may need to be modified. This file is located in the AppData\\Local\\Programs\\Python\\Python36\\Lib\\site-packages\\mesonbuild\\dependencies\\ folder. Line 232 should be changed to `if self.libdir and self.boost\_root`
-1. Set UxAS as the Startup Project
-   * Open the OpenUxAS.sln with Visual Studio, right-click the UxAS project found in the Solution Explorer
-   * Select Set as StartUp Project
-1. Add the boost library to the Library Directories for the dependent projects
-   * With the OpenUxAS solution open in Visaul Studio, right-click the uxas project from the Solution Explorer and select `Properties` from the context menu.
-   * Select `VC++ Directories` located within the `Configuration Properties` node in the `uxas Properties Pages` Pop Up
-   * In under the general tab, there will be a `Library Directories` option. Add the absolute path of the boost libraries here. Given boost was setup with the instruction above, this path should be `C:\local\boost_1_64_0\lib32-msvc-14.1`
+   * `meson.py build --backend=vs`
+   * A Visual Studio solution named `UxAS.sln` will be in the `build` folder
 1. Build project with Visual Studio
-   * Open project file `OpenUxAS.sln` in the `OpenUxAS/build` directory
+   * Open project file `UxAS.sln` in the `OpenUxAS/build` directory
+   * (**optional**) Remove `REGEN`, `RUN_INSTALL`, and `RUN_TESTS` projects from the solution
    * In the `Solution Explorer`, right-click the `uxas` project, and select `Build` from the context menu
 
 ### Caveats

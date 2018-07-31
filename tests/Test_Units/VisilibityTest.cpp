@@ -17,7 +17,7 @@
  */
 #include "gtest/gtest.h"
 
-#include <boost/foreach.hpp>
+#include "boost/foreach.hpp"
 
 #include "visilibity.h"
 #include "TestReport.h"
