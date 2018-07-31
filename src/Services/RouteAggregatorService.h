@@ -70,10 +70,12 @@ public:
 
  * 
  * Configuration String: 
- *  <Service Type="RouteAggregatorService" FastPlan="FALSE" />
+ *  <Service Type="RouteAggregatorService" FastPlan="FALSE" RoutePlannerUsed="-1"/>
  * 
  * Options:
  *  - FastPlan
+ *  - UseICAROUSRoutePlanner - This specifies which route planner to use 
+ *                             "true" indicates that an ICAROUS route planner will be used
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::AirVehicleState
@@ -225,7 +227,8 @@ private:
     //                route id,      task+option pair
     std::unordered_map<int64_t, std::shared_ptr<AggregatorTaskOptionPair> > m_routeTaskPairing;
 
-
+    int32_t USE_ICAROUS_ROUTEPLANNER{false};
+    
     // Track full route plan responses for directly reconstructing 'RouteResponse'
     int64_t m_routeRequestId{1};
     std::unordered_map<int64_t, std::shared_ptr<uxas::messages::route::RoutePlanResponse> > m_routePlanResponses;

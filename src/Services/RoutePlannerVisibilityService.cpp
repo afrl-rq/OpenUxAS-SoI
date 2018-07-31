@@ -147,9 +147,15 @@ RoutePlannerVisibilityService::configure(const pugi::xml_node& ndComponent)
     for(auto child : childconfigs)
         addSubscriptionAddress(child);
     
+
+    if (!ndComponent.attribute(STRING_XML_ICAROUS_USE_THIS_PLANNER).empty())
+    {
+        usePlanner = ndComponent.attribute(STRING_XML_ICAROUS_USE_THIS_PLANNER).as_bool();
+    }
+
     // service 'global' path planning requests (system assumes aircraft)
     addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
-    
+        
     // requests directed to an aircraft planner should also be handled
     addSubscriptionAddress(uxas::common::MessageGroup::AircraftPathPlanner());
 
@@ -226,14 +232,27 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             if (bProcessRoutePlanRequest(request, routePlanResponse))
             {
-                auto message = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
-                // always limited-cast route plan responses
-                sendSharedLmcpObjectLimitedCastMessage(
-                        getNetworkClientUnicastAddress(
-                            receivedLmcpMessage->m_attributes->getSourceEntityId(),
-                            receivedLmcpMessage->m_attributes->getSourceServiceId()
-                        ),
-                        message);
+                if(costMatrixSent < routePlanResponse->getVehicleID()){
+                    //fprintf(stdout, "UAV %lli | 2 | This is a test\n", routePlanResponse->getVehicleID());
+                    costMatrixSent += 1; // TODO - need to account for all UAVs cost matrix being set, then move on to getting the actual planners working
+                    auto message = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
+                    // always limited-cast route plan responses
+                    sendSharedLmcpObjectLimitedCastMessage(
+                            getNetworkClientUnicastAddress(
+                                receivedLmcpMessage->m_attributes->getSourceEntityId(),
+                                receivedLmcpMessage->m_attributes->getSourceServiceId()
+                            ),
+                            message);
+                }else if(usePlanner){
+                    auto message = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
+                    // always limited-cast route plan responses
+                    sendSharedLmcpObjectLimitedCastMessage(
+                            getNetworkClientUnicastAddress(
+                                receivedLmcpMessage->m_attributes->getSourceEntityId(),
+                                receivedLmcpMessage->m_attributes->getSourceServiceId()
+                            ),
+                            message);
+                }
             }
             else
             {
@@ -444,7 +463,7 @@ bool RoutePlannerVisibilityService::bProcessRoutePlanRequest(const std::shared_p
                 double routeCost_ms = static_cast<int64_t> (((itPlannerParameters->second->nominalSpeed_mps > 0.0) ?
                         (pathInformation->iGetLength() / itPlannerParameters->second->nominalSpeed_mps) : (0.0))*1000.0);
                 routePlan->setRouteCost(routeCost_ms);
-                if (!routePlanRequest->getIsCostOnlyRequest())
+                if (usePlanner && !routePlanRequest->getIsCostOnlyRequest())
                 {
                     n_FrameworkLib::CTrajectoryParameters::enPathType_t enpathType = n_FrameworkLib::CTrajectoryParameters::pathTurnStraightTurn;
                     if((!(*itRequest)->getUseEndHeading()) && (!(*itRequest)->getUseStartHeading()))

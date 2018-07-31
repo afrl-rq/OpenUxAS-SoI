@@ -49,11 +49,10 @@
 #include <iostream>
 
 #include "afrl/cmasi/AirVehicleState.h"
+#include "afrl/cmasi/AirVehicleConfiguration.h"
 #include "afrl/cmasi/AirVehicleStateDescendants.h"
 #include "afrl/cmasi/Polygon.h"
 #include "afrl/cmasi/AbstractGeometry.h"
-
-
 #include "afrl/cmasi/AutomationResponse.h"
 #include "afrl/cmasi/CommandStatusType.h"
 #include "afrl/cmasi/FlightDirectorAction.h"
@@ -65,10 +64,15 @@
 #include "afrl/cmasi/NavigationMode.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
 
-#include "uxas/messages/uxnative/IncrementWaypoint.h"
+// Unsure if needed
+//#include "uxas/messages/route/RoutePlan.h"
+
+#include "uxas/messages/route/RoutePlanResponse.h"
 #include "uxas/messages/task/TaskPause.h"
 #include "uxas/messages/task/TaskResume.h"
+#include "uxas/messages/uxnative/IncrementWaypoint.h"
 
+#include "Constants/UxAS_String.h"
 
 // Convenience definitions for the option strings
 #define STRING_XML_OPTION_STRING "OptionString"
@@ -117,7 +121,28 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
         isSuccess = false;
     }
 
+    if (!ndComponent.attribute(STRING_XML_ICAROUS_ROUTEPLANNER).empty())
+    {
+        ICAROUS_ROUTEPLANNER = ndComponent.attribute(STRING_XML_ICAROUS_ROUTEPLANNER).as_int();
+    }// If not specified, do not use
 
+
+
+    // DEBUGGING
+    //addSubscriptionAddress(uxas::common::MessageGroup::AircraftPathPlanner());
+
+    // DEBUGGING
+    //addSubscriptionAddress(uxas::messages::route::RoutePlanResponse::Subscription);
+    
+
+
+
+    // Used to notify ICAROUS of path plans
+    addSubscriptionAddress(uxas::common::MessageGroup::IcarousPathPlanner());
+
+    // RoutePlanRequest messages are used for if a route plan is given and we want to use ICAROUS route planners
+    addSubscriptionAddress(uxas::messages::route::RoutePlanRequest::Subscription);
+    
     // MissionCommand messages are used to determine where a singular UAV is going to go during a mission
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
     
@@ -129,7 +154,9 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
     
     // AirVehicleStates are returned from OpenAMASE to know where a UAV is and what it is doing
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
-
+    
+    // Need the aircraft's nominal speed from this
+    addSubscriptionAddress(afrl::cmasi::AirVehicleConfiguration::Subscription);
     
     return (isSuccess);
 }
@@ -168,6 +195,9 @@ bool IcarousCommunicationService::initialize()
     deviationFlags.resize(ICAROUS_CONNECTIONS);
     noDeviationReset.resize(ICAROUS_CONNECTIONS);
     icarousCommandedSpeed.resize(ICAROUS_CONNECTIONS);
+    nominalUAVHorizontalSpeed.resize(ICAROUS_CONNECTIONS);
+    nominalUAVVerticleSpeed.resize(ICAROUS_CONNECTIONS);
+    routePlanRequests.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes & Semaphores must be set like this and not in a vector
     // This is because a vector of these objects is non-resizable
@@ -379,6 +409,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             int fieldLength;
             char *trackingHelper;
 
+            // START OF MESSAGE PROCESSING FROM ICAROUS
+
             if(!strncmp(tempMessageBuffer, "SETMOD", 6)) // Set Mode (has ICAROUS taken over?)
             {
                 // MESSAGE STRUCTURE - SETMOD,type~,\n
@@ -463,6 +495,45 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     sendSharedLmcpObjectBroadcastMessage(missionCommands[instanceIndex]);
                     resumePointSet[instanceIndex] = true;
                 }
+                
+                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
+            }
+            else if(!strncmp(tempMessageBuffer, "RPRSP", 5))
+            {
+                //fprintf(stdout, "RPRSP message received in icarousClientFd %lli!\n", icarousClientFd);
+                
+                
+                
+                // Get latitude
+                trackingHelper            = strstr(tempMessageBuffer, "type");
+                trackingHelper           += 4; //skip past "type"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                char* type                = strncpy(throwaway, trackingHelper, fieldLength);
+
+                // DEBUG STATEMENT - Print the contents of the message
+                fprintf(stdout, "%lli|RPRSP|type|%s\n", icarousClientFd, type);
+
+                /*
+                // Create a new vehicle action command and send the UAV to the given position
+                auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
+                vehicleActionCommand->setVehicleID(instanceIndex + 1);
+
+                // Loiter at the given position until another command is recieved
+                auto loiterAction = new afrl::cmasi::LoiterAction;
+                auto location3d = new afrl::cmasi::Location3D;
+                location3d->setLatitude(latitude);
+                location3d->setLongitude(longitude);
+                location3d->setAltitude(altitude);
+                loiterAction->setLocation(location3d);
+
+                vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
+                sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
+                */
+                
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
@@ -692,6 +763,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 tempMessageBuffer++;
                 //exit(EXIT_FAILURE);
             }
+            
+            //END OF MESSAGE PROCESSING FROM ICAROUS
         }
     }
 }
@@ -718,8 +791,84 @@ bool IcarousCommunicationService::terminate()
 // Listen for defined messages and relay them to the needed ICAROUS instance they belong to
 bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
+    if(afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object))
+    {
+        auto ptr_AirVehicleConfiguration = std::shared_ptr<afrl::cmasi::AirVehicleConfiguration>((afrl::cmasi::AirVehicleConfiguration*)receivedLmcpMessage->m_object->clone());
+        auto ptr_NominalFlightProfile = ptr_AirVehicleConfiguration->getNominalFlightProfile();
+        auto vehicleID = ptr_AirVehicleConfiguration->getID();
+        nominalUAVHorizontalSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getAirspeed();
+        nominalUAVVerticleSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getVerticalSpeed();
+    }
+    /*
+    // Listen for RoutePlanResponses (For debugging)
+    else if(uxas::messages::route::isRoutePlanResponse(receivedLmcpMessage->m_object))
+    {
+        auto ptr_RoutePlanResponse = std::shared_ptr<uxas::messages::route::RoutePlanResponse>((uxas::messages::route::RoutePlanResponse*)receivedLmcpMessage->m_object->clone());
+        auto vehicleID = ptr_RoutePlanResponse->getVehicleID();
+        fprintf(stdout, "Recieved RoutePlanResponse for UAV %lli\n", vehicleID);
+        //std::cout << ptr_RoutePlanResponse->toString() << std::endl;
+    }// End of RoutePlanResponse
+    */
+    // Process a RoutePlanRequest
+    // If -1 do not use ICAROUS route planners
+    else if(uxas::messages::route::isRoutePlanRequest(receivedLmcpMessage->m_object) && (ICAROUS_ROUTEPLANNER > -1))
+    {
+        auto ptr_RoutePlanRequest = std::shared_ptr<uxas::messages::route::RoutePlanRequest>((uxas::messages::route::RoutePlanRequest*)receivedLmcpMessage->m_object->clone());
+        
+        auto ptr_VectorRouteConstraints = ptr_RoutePlanRequest->getRouteRequests();
+        auto vehicleID = ptr_RoutePlanRequest->getVehicleID();
+        routePlanRequests[vehicleID - 1] = ptr_RoutePlanRequest;
+        fprintf(stdout, "Recieved RoutePlanRequest for UAV %lli\n", vehicleID);
+        std::string wpreqType = "";
+        switch(ICAROUS_ROUTEPLANNER){
+            case 0: // GRID planner
+                wpreqType = "GRID";
+                break;
+            case 1: // ASTAR planner
+                wpreqType = "ASTAR";
+                break;
+            case 2: // RRT planner
+                wpreqType = "RRT";
+                break;
+            case 3: // SPLINE
+                wpreqType = "SPLINE";
+                break;
+        }
+
+        fprintf(stdout, "UAV %lli | Using planner: %s\n", vehicleID, wpreqType.c_str());
+        std::cout << ptr_RoutePlanRequest->toString() << std::endl;
+        std::cout << ptr_VectorRouteConstraints[0]->toString() << std::endl;
+
+        dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,val%s,\n",
+            "SEND_FP_RES",
+            "START");
+
+        for(unsigned int i = 0; i < ptr_VectorRouteConstraints.size(); i++)
+        {
+            auto startLocation = ptr_VectorRouteConstraints[i]->getStartLocation();
+            auto endLocation = ptr_VectorRouteConstraints[i]->getEndLocation();
+            if(endLocation->getAltitude() == 0){
+                endLocation->setAltitude(startLocation->getAltitude());
+            }
+            // TODO - End heading needs to be accounted for (currently ICAROUS cannot do that)
+            dprintf(client_sockfd[vehicleID - 1], "WPREQ,type%s,slat%f,slong%f,salt%f,elat%f,elong%f,ealt%f,track%f,vh%f,vv%f,\n",
+                wpreqType.c_str(),
+                startLocation->getLatitude(),
+                startLocation->getLongitude(),
+                startLocation->getAltitude(),
+                endLocation->getLatitude(),
+                endLocation->getLongitude(),
+                endLocation->getAltitude(),
+                ptr_VectorRouteConstraints[i]->getStartHeading(),
+                nominalUAVHorizontalSpeed[vehicleID - 1],
+                nominalUAVVerticleSpeed[vehicleID - 1]);
+        }
+        dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,val%s,\n",
+            "SEND_FP_RES",
+            "STOP");
+    }// End of RoutePlanRequest
     // Process a MissionCommand message
-    if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
+    else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
     {
         // Copy the message pointer to shorten access length
         auto ptr_MissionCommand = std::shared_ptr<afrl::cmasi::MissionCommand>((afrl::cmasi::MissionCommand*)receivedLmcpMessage->m_object->clone());
@@ -931,7 +1080,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // Copy the message pointer to shorten access length
         auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState *)receivedLmcpMessage->m_object->clone());
         int vehicleID = ptr_AirVehicleState->getID();
-
+        fprintf(stdout, "UAV %i | recieved usable AirVehicleState\n", vehicleID);
 
         // TODO - un-hardcode the number of sats
         

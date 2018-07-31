@@ -8,13 +8,13 @@
     <Service Type="TaskManagerService"/>
     <Service Type="AutomationRequestValidatorService"/>
     <Service Type="SensorManagerService"/>
-    <Service Type="RouteAggregatorService"/>
-    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0"/>
-    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="RouteAggregatorService" UseICAROUSRoutePlanner="true"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0" UseThisPlanner="false"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
 
-    <Service Type="IcarousCommunicationService" NumberOfUAVs="3" />
+    <Service Type="IcarousCommunicationService" NumberOfUAVs="3" RoutePlannerUsed="1"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="1024" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="101"/>
     <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="1024" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="102"/>

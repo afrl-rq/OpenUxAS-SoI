@@ -82,6 +82,7 @@ public:
     static const std::string& RadarFilter() { static std::string s_string("RadarFilter"); return(s_string); };
     static const std::string& VicsLogger() { static std::string s_string("VicsLogger"); return(s_string); };
     static const std::string& AircraftPathPlanner() { static std::string s_string("AircraftPathPlanner"); return(s_string); };
+    static const std::string& IcarousPathPlanner() { static std::string s_string("IcarousPathPlanner"); return(s_string); };
     static const std::string& GroundPathPlanner() { static std::string s_string("GroundPathPlanner"); return(s_string); };
 };
 

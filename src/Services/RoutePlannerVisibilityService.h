@@ -32,6 +32,7 @@
 
 #include "ServiceBase.h"
 
+#define STRING_XML_ICAROUS_USE_THIS_PLANNER "UseThisPlanner"
 
 namespace uxas
 {
@@ -50,13 +51,14 @@ namespace service
  * 
  * Configuration String: 
  *  <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" 
-  *                OsmFileName="" MinimumWaypointSeparation_m="50.0"/> 
+  *                OsmFileName="" MinimumWaypointSeparation_m="50.0"
+  *                UseThisPlanner="true" /> 
  * 
  * Options:
  *  - TurnRadiusOffset_m
  *  - OsmFileName
  *  - MinimumWaypointSeparation_m
- *  - 
+ *  - UseThisPlanner - Inform UxAS to use this planner (This is needed so that it knows ICAROUS is not using its route planners)
  *  - 
  * 
  * Subscribed Messages:
@@ -203,10 +205,10 @@ protected:
     double m_minimumWaypointSeparation_m = 50; //TODO:: this need to be configurable
 
 private:
-
-
-
-
+    bool usePlanner{true};
+    int64_t costMatrixSent{0};
+    
+    
 };
 
 }; //namespace service

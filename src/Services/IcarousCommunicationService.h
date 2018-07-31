@@ -31,6 +31,8 @@
 #include "TypeDefs/UxAS_TypeDefs_String.h"
 #include "CallbackTimer.h"
 
+#include "uxas/messages/route/RoutePlanRequest.h"
+
 #include "afrl/cmasi/Waypoint.h"
 #include "afrl/cmasi/TurnType.h"
 #include "afrl/cmasi/MissionCommand.h"
@@ -53,9 +55,8 @@
 #include <semaphore.h>
 
 #define PORT 5557
-
 #define STRING_XML_ICAROUS_CONNECTIONS "NumberOfUAVs"
-
+#define STRING_XML_ICAROUS_ROUTEPLANNER "RoutePlannerUsed"
 #define M_PI 3.14159265358979323846
 
 namespace uxas
@@ -158,6 +159,12 @@ private:
     // Saved threadIDs of ICAROUS listeners
     std::vector<std::thread> icarousID;
     
+    std::vector<float> nominalUAVHorizontalSpeed;
+    
+    std::vector<float> nominalUAVVerticleSpeed;
+    
+    std::vector<std::shared_ptr<uxas::messages::route::RoutePlanRequest>> routePlanRequests;
+    
     std::vector<bool> deviationFlags;
     
     std::vector<bool> noDeviationReset;
@@ -217,6 +224,13 @@ private:
 
     //Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};
+    
+    // Route planners are defined as:
+    // 0 = GRID
+    // 1 = ASTAR
+    // 2 = RRT
+    // 3 = SPLINE
+    int32_t ICAROUS_ROUTEPLANNER{-1};
 
     //This is the number of ICAROUS clients that are permitted
     std::vector<int> client_sockfd;

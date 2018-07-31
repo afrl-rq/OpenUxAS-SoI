@@ -26,6 +26,7 @@
 
 #define STRING_COMPONENT_NAME "RouteAggregator"
 #define STRING_XML_COMPONENT_TYPE STRING_COMPONENT_NAME
+#define STRING_XML_USE_ICAROUS_ROUTEPLANNER "UseICAROUSRoutePlanner"
 #define STRING_XML_COMPONENT "Component"
 #define STRING_XML_TYPE "Type"
 #define STRING_XML_FAST_PLAN "FastPlan"
@@ -65,6 +66,11 @@ RouteAggregatorService::configure(const pugi::xml_node& ndComponent)
         // computationally expensive ground route calculations
         m_fastPlan = ndComponent.attribute(STRING_XML_FAST_PLAN).as_bool();
     }
+    
+    if (!ndComponent.attribute(STRING_XML_USE_ICAROUS_ROUTEPLANNER).empty())
+    {
+        USE_ICAROUS_ROUTEPLANNER = ndComponent.attribute(STRING_XML_USE_ICAROUS_ROUTEPLANNER).as_bool();
+    }// If not specified, do not use
 
     // track states and configurations for assignment cost matrix calculation
     // [EntityStates] are used to calculate costs from current position to first task
@@ -434,6 +440,10 @@ void RouteAggregatorService::HandleRouteRequest(std::shared_ptr<uxas::messages::
                 // send externally
                 sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::GroundPathPlanner(), pRequest);
             }
+        }
+        else if(USE_ICAROUS_ROUTEPLANNER == true)
+        {
+            sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::IcarousPathPlanner(), pRequest);
         }
         else
         {
