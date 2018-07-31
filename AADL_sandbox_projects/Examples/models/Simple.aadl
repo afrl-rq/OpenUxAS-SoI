@@ -15,7 +15,7 @@ end top_level;
 
 system implementation top_level.Impl
 	annex agree {**
-		assign Output_Val = if Enabled then 2*Input_Val else 0;
+		assign Output_Val = if Enabled then 2*Input_Val + prev(Output_Val,0) else 0;
 	**};
 	 
 end top_level.Impl;	

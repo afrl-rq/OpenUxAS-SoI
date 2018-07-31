@@ -10,11 +10,11 @@ public
 	annex agree {**
 
 		-- This is a simple integer constant whose value is 81.
-		const EXAMPLE_INT: Base_Types::Integer = 81;
+		const EXAMPLE_INT: int = 81;
 		
 		--Note that the backend analysis tools use rationals (BigFraction),
 		-- so EXAMPLE_REAL defined below is a real for the purpose of analysis.
-		const EXAMPLE_REAL: Base_Types::Float = 3.2;	
+		const EXAMPLE_REAL: real = 3.2;	
 	
 		-- Below is an example of how to define a constant record.
 		-- The type of Example_Record_Type is defined in Data_Types.aadl.
