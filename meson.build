@@ -27,6 +27,25 @@ elif os == 'windows'
   link_args += []
 endif
 
+# handle boost carefully, require version >= 1.67
+if os == 'windows'
+  # require windows install of boost, no fallback
+  dep_boost = dependency(
+    'boost',
+    modules: ['date_time', 'filesystem', 'regex', 'system'],
+  )
+elif get_option('force_dep_download')
+  dep_boost = subproject('boost').get_variable('dep')
+elif not cpp.has_header('boost/contract.hpp')
+  dep_boost = subproject('boost').get_variable('dep')
+else
+  dep_boost = dependency(
+    'boost',
+    modules: ['date_time', 'filesystem', 'regex', 'system'],
+    fallback: ['boost', 'dep'],
+  )
+endif
+
 if get_option('force_dep_download')
   dep_zeromq    = subproject('zeromq').get_variable('dep')
   dep_czmq      = subproject('czmq').get_variable('dep')
@@ -96,17 +115,6 @@ else
   )
 
   dep_wellclear = subproject('wellclear').get_variable('dep')
-endif
-
-# handle boost carefully, require version > 1.55
-if not cpp.has_header('boost/geometry/algorithms/is_valid.hpp')
-  dep_boost = subproject('boost').get_variable('dep')
-else
-  dep_boost = dependency(
-    'boost',
-    modules: ['date_time', 'filesystem', 'regex', 'system'],
-    fallback: ['boost', 'dep'],
-  )
 endif
 
 # https://github.com/mikalhart/TinyGPS
