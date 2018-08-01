@@ -34,7 +34,8 @@
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
-    <Service Type="DAIDALUS_WCV_Detection" RTCAAlertLevels="3"/>
+    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" LookAheadTime="180" RTCAAlertLevels="3" HorizontalAcceleration="2.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinHorizontalRecovery="200"/>
+    <Service Type="DAIDALUS_WCV_Response" />
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
              DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"

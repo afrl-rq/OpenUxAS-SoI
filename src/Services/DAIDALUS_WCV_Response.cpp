@@ -75,7 +75,8 @@ bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
 
- 
+    //TODO: Allow class member variables to be set via xml-- Maneuver type, time thresholds, maneuver offsets from NEAR interval, etc... 
+    //TODO: Allow for multiple Response services to be active by using vehicleID passed in via xml in place of m_entityId.
     // subscribe to messages::
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
@@ -100,6 +101,7 @@ void DAIDALUS_WCV_Response::ResetResponse()
 }
 bool DAIDALUS_WCV_Response::isWithinTolerance()
 {
+    //TODO: extend function to be passed the type of divert maneuver and consider altitude, ground speed, and vertical speed.
     if (std::abs((m_DivertState.heading_deg - m_CurrentState.heading_deg)) <= m_heading_tolerance_deg)
     {
         if (!m_isCloseToDesired)
@@ -126,6 +128,7 @@ bool DAIDALUS_WCV_Response::isWithinTolerance()
 
 bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands)
 {
+    //TODO:  accept maneuver type as a parameter and consider safe to return for altitude, ground speed, and vertical speed maneuvers.
     //std::cout << "Inside isSafe" << std::endl;
     uxas::common::utilities::FlatEarth flatEarth;
     //std::cout << "after flat" << std::endl;
@@ -172,31 +175,31 @@ bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm
                 temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
                 bands.push_back(temp);
             }
-            uint initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
-            bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-            for (uint i = 0; i < bands.size(); i++)
+        uint initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
+        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.heading_deg))
             {
-                if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.heading_deg))
-                {
-                    initial_band = i;
-                    isFound = true;
-                    break;
-                }
+                initial_band = i;
+                isFound = true;
+                break;
             }
-            if (initial_band == UINT32_MAX)
-            {
-                return true;
-            }
-            else if (isFound && DAIDALUS_bands->getWCVGroundHeadingRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
-            {
-                std::cout << "NOT SAFE TO RETURN TO MISSION" << std::endl;
-                std::cout << std::endl;
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+        }
+        if (initial_band == UINT32_MAX)
+        {
+            return true;
+        }
+        else if (isFound && DAIDALUS_bands->getWCVGroundHeadingRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+        {
+            std::cout << "NOT SAFE TO RETURN TO MISSION" << std::endl;
+            std::cout << std::endl;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     //TODO: form return state heading ..--done
     //TODO: check if return state is in a near band... if so not safe to return--done
@@ -228,6 +231,8 @@ bool DAIDALUS_WCV_Response::terminate()
 
 bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
+    //Process automation responses to retain a copy of the mission command--Mission commands for non-ownship vehicles are ignored
+    //Assumption that only one automation response expected...subsequent automation responses will lead to unintended behavior.
     if (afrl::cmasi::isAutomationResponse(receivedLmcpMessage->m_object))
     {
         std::shared_ptr<afrl::cmasi::AutomationResponse> pAutoResponse = 
@@ -255,6 +260,8 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     }
     else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))
     {
+        //Process mission commands to retain a copy of the mission command--Mission commands for non-ownship vehicles are ignored
+        //Assumption that only one mission command message expected...subsequent mission commands will lead to unintended behavior.
         std::shared_ptr<afrl::cmasi::MissionCommand> pMissionCommand = 
                 std::static_pointer_cast<afrl::cmasi::MissionCommand>(receivedLmcpMessage->m_object);
         if (pMissionCommand->getVehicleID() == m_entityId)
