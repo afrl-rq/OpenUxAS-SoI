@@ -373,7 +373,17 @@ void RouteAggregatorService::BuildMatrixRequests(int64_t reqId, const std::share
         std::shared_ptr<avtas::lmcp::Object> pRequest = std::static_pointer_cast<avtas::lmcp::Object>(sendAirPlanRequest.at(k));
         sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::AircraftPathPlanner(), pRequest);
     }
-
+    
+    if(USE_ICAROUS_ROUTEPLANNER == true)
+        {
+        // send all requests for aircraft plans
+        for (size_t k = 0; k < sendAirPlanRequest.size(); k++)
+        {
+            std::shared_ptr<avtas::lmcp::Object> pRequest = std::static_pointer_cast<avtas::lmcp::Object>(sendAirPlanRequest.at(k));
+            sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::IcarousPathPlanner(), pRequest);
+        }
+    }
+    
     // send all requests for ground plans
     for (size_t k = 0; k < sendGroundPlanRequest.size(); k++)
     {

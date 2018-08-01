@@ -6,15 +6,15 @@
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
     </Bridge>
     <Service Type="TaskManagerService"/>
-    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="AutomationRequestValidatorService" MaxResponseTime_ms="180000"/>
     <Service Type="SensorManagerService"/>
-    <Service Type="RouteAggregatorService"/>
-    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0"/>
-    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />   
+    <Service Type="RouteAggregatorService" UseICAROUSRoutePlanner="true"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0" UseThisPlanner="false"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
-    
-    <Service Type="IcarousCommunicationService" NumberOfUAVs="2" />
+
+    <Service Type="IcarousCommunicationService" NumberOfUAVs="2" RoutePlannerUsed="2"/>
     
     <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="101"/>
     <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="102"/>

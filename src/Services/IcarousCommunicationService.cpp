@@ -523,7 +523,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 char* type                = strncpy(throwaway, trackingHelper, fieldLength);
 
                 // DEBUG STATEMENT - Print the contents of the message
-                fprintf(stdout, "%lli|RPRSP|type|%s\n", icarousClientFd, type);
+                //fprintf(stdout, "%lli|RPRSP|type|%s\n", icarousClientFd, type);
                 
                 if(!strncmp(type, "ST", 2))
                 {
@@ -536,17 +536,18 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     
                     if(!isRoutePlanResponseInit[instanceIndex]){
                         auto instanceRoutePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
-                        instanceRoutePlanResponse->setResponseID(routePlanRequests[instanceIndex]->getRequestID());
-                        instanceRoutePlanResponse->setAssociatedTaskID(routePlanRequests[instanceIndex]->getAssociatedTaskID());
-                        instanceRoutePlanResponse->setVehicleID(routePlanRequests[instanceIndex]->getVehicleID());
-                        instanceRoutePlanResponse->setOperatingRegion(routePlanRequests[instanceIndex]->getOperatingRegion());
+                        instanceRoutePlanResponse->setResponseID(routePlanRequests[instanceIndex][0]->getRequestID());
+                        printf("UAV %i | RoutePlanResponse: RequestID = %lli\n", instanceIndex + 1, routePlanRequests[instanceIndex][0]->getRequestID());
+                        instanceRoutePlanResponse->setAssociatedTaskID(routePlanRequests[instanceIndex][0]->getAssociatedTaskID());
+                        instanceRoutePlanResponse->setVehicleID(routePlanRequests[instanceIndex][0]->getVehicleID());
+                        instanceRoutePlanResponse->setOperatingRegion(routePlanRequests[instanceIndex][0]->getOperatingRegion());
                         routePlanResponses[instanceIndex] = instanceRoutePlanResponse;
                         isRoutePlanResponseInit[instanceIndex] = true;
                     }
                     
                     auto instanceRoutePlan = new uxas::messages::route::RoutePlan();
                     // Each route plan needs the same id as its respecitve constraints
-                    instanceRoutePlan->setRouteID(routePlanRequests[instanceIndex]->getRouteRequests()[routePlanCounter[instanceIndex]]->getRouteID());
+                    instanceRoutePlan->setRouteID(routePlanRequests[instanceIndex][0]->getRouteRequests()[routePlanCounter[instanceIndex]]->getRouteID());
                     instanceRoutePlan->setRouteCost(cost * 1000); // Convert the cost from seconds to milliseconds
                     routePlanCounter[instanceIndex]++;
                     routePlans[instanceIndex] = instanceRoutePlan;
@@ -581,6 +582,9 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     fieldLength                   = fieldEnd - trackingHelper;
                     float speed                   = atof(strncpy(throwaway, trackingHelper, fieldLength));
                     
+                    if(speed == 0){
+                        speed = nominalUAVHorizontalSpeed[instanceIndex];
+                    }
                     
                     auto waypointToAdd = new afrl::cmasi::Waypoint();
                     waypointToAdd->setNumber(routePlanWaypointCounter[instanceIndex]);
@@ -597,12 +601,28 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     // This should add the route response to the flightplan
                     // It should also send out the route plan response once all route plans are recieved
                     // (This needs to check the original array of route plans size)
-                    //routePlans[instanceIndex]->getWaypoints().___()->setNextWaypoint();
-                    routePlans[instanceIndex]->getWaypoints().back()->setNextWaypoint(routePlanWaypointCounter[instanceIndex] - 1);
+                    printf("UAV %i | routePlanWaypointCounter = %i\n", instanceIndex + 1, routePlanWaypointCounter[instanceIndex]);
+
+                    if(routePlanWaypointCounter[instanceIndex] == 0){
+                        // clear waypoints for invalid routes
+                        routePlans[instanceIndex]->getWaypoints().clear();
+                        routePlans[instanceIndex]->setRouteCost(-1.0);
+                    }else{
+                        printf("UAV %i | lastWP in routePlan = %lli\n", instanceIndex + 1, routePlans[instanceIndex]->getWaypoints().back()->getNextWaypoint());
+                        routePlans[instanceIndex]->getWaypoints().back()->setNextWaypoint(routePlanWaypointCounter[instanceIndex] - 1);
+                    }
+                    
                     routePlanResponses[instanceIndex]->getRouteResponses().push_back(routePlans[instanceIndex]);
                     
-                    if(routePlanCounter[instanceIndex] == routePlanResponses[instanceIndex]->getRouteResponses().size()){
+                    if(routePlanCounter[instanceIndex] == routePlanRequests[instanceIndex][0]->getRouteRequests().size()){
+                        //std::cout << routePlanResponses[instanceIndex]->toString() << std::endl;
+                        printf("UAV %i | Sending ResponseID [%lli]\n", instanceIndex + 1, routePlanResponses[instanceIndex]->getResponseID());
                         sendSharedLmcpObjectBroadcastMessage(routePlanResponses[instanceIndex]);
+                        routePlanRequests[instanceIndex].erase(routePlanRequests[instanceIndex].begin());
+                        routePlanCounter[instanceIndex] = 0;
+                        isRoutePlanResponseInit[instanceIndex] = false;
+                    }else{
+                        printf("UAV %i | counter=%i | neededPlans=%i\n", instanceIndex + 1, routePlanCounter[instanceIndex], routePlanRequests[instanceIndex][0]->getRouteRequests().size());
                     }
                 }
                 else
@@ -907,61 +927,56 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
     else if(uxas::messages::route::isRoutePlanRequest(receivedLmcpMessage->m_object) && (ICAROUS_ROUTEPLANNER > -1))
     {
         auto ptr_RoutePlanRequest = std::shared_ptr<uxas::messages::route::RoutePlanRequest>((uxas::messages::route::RoutePlanRequest*)receivedLmcpMessage->m_object->clone());
-        
-        auto ptr_VectorRouteConstraints = ptr_RoutePlanRequest->getRouteRequests();
-        auto vehicleID = ptr_RoutePlanRequest->getVehicleID();
-        routePlanRequests[vehicleID - 1] = ptr_RoutePlanRequest;
-        fprintf(stdout, "Recieved RoutePlanRequest for UAV %lli\n", vehicleID);
-        std::string wpreqType = "";
-        switch(ICAROUS_ROUTEPLANNER){
-            case 0: // GRID planner
-                wpreqType = "GRID";
-                break;
-            case 1: // ASTAR planner
-                wpreqType = "ASTAR";
-                break;
-            case 2: // RRT planner
-                wpreqType = "RRT";
-                break;
-            case 3: // SPLINE
-                wpreqType = "SPLINE";
-                break;
-        }
-
-        fprintf(stdout, "UAV %lli | Using planner: %s\n", vehicleID, wpreqType.c_str());
-        std::cout << ptr_RoutePlanRequest->toString() << std::endl;
-        std::cout << ptr_VectorRouteConstraints[0]->toString() << std::endl;
-
-        dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,val%s,\n",
-            "SEND_FP_RES",
-            "START");
-
-        for(unsigned int i = 0; i < ptr_VectorRouteConstraints.size(); i++)
-        {
-            auto startLocation = ptr_VectorRouteConstraints[i]->getStartLocation();
-            auto endLocation = ptr_VectorRouteConstraints[i]->getEndLocation();
-            if(endLocation->getAltitude() == 0){
-                endLocation->setAltitude(startLocation->getAltitude());
+        if(!ptr_RoutePlanRequest->getIsCostOnlyRequest()){
+            auto ptr_VectorRouteConstraints = ptr_RoutePlanRequest->getRouteRequests();
+            auto vehicleID = ptr_RoutePlanRequest->getVehicleID();
+            routePlanRequests[vehicleID - 1].push_back(ptr_RoutePlanRequest);
+            fprintf(stdout, "Recieved RoutePlanRequest for UAV %lli\n", vehicleID);
+            std::string wpreqType = "";
+            switch(ICAROUS_ROUTEPLANNER){
+                case 0: // GRID planner
+                    wpreqType = "GRID";
+                    break;
+                case 1: // ASTAR planner
+                    wpreqType = "ASTAR";
+                    break;
+                case 2: // RRT planner
+                    wpreqType = "RRT";
+                    break;
+                case 3: // SPLINE
+                    wpreqType = "SPLINE";
+                    break;
             }
-            // TODO - End heading needs to be accounted for (currently ICAROUS cannot do that)
-            dprintf(client_sockfd[vehicleID - 1], "WPREQ,type%s,slat%f,slong%f,salt%f,elat%f,elong%f,ealt%f,track%f,vh%f,vv%f,\n",
-                wpreqType.c_str(),
-                startLocation->getLatitude(),
-                startLocation->getLongitude(),
-                startLocation->getAltitude(),
-                endLocation->getLatitude(),
-                endLocation->getLongitude(),
-                endLocation->getAltitude(),
-                ptr_VectorRouteConstraints[i]->getStartHeading(),
-                nominalUAVHorizontalSpeed[vehicleID - 1],
-                nominalUAVVerticleSpeed[vehicleID - 1]);
+
+            fprintf(stdout, "UAV %lli | Using planner: %s\n", vehicleID, wpreqType.c_str());
+            //std::cout << ptr_RoutePlanRequest->toString() << std::endl;
+            //std::cout << ptr_VectorRouteConstraints[0]->toString() << std::endl;
+            
+            for(unsigned int i = 0; i < ptr_VectorRouteConstraints.size(); i++)
+            {
+                auto startLocation = ptr_VectorRouteConstraints[i]->getStartLocation();
+                auto endLocation = ptr_VectorRouteConstraints[i]->getEndLocation();
+                // TODO - altitudes of some route plans are being given at 0, this is an issue with the route requests being incorrect (Unsure how to fix). For now, if they are 0, they are hard-codded
+                if(endLocation->getAltitude() == 0){
+                    endLocation->setAltitude(400);
+                    startLocation->setAltitude(400);
+                    //startLocation->getAltitude());
+                }
+                // TODO - End heading needs to be accounted for (currently ICAROUS cannot do that)
+                dprintf(client_sockfd[vehicleID - 1], "WPREQ,type%s,slat%f,slong%f,salt%f,elat%f,elong%f,ealt%f,track%f,vh%f,vv%f,\n",
+                    wpreqType.c_str(),
+                    startLocation->getLatitude(),
+                    startLocation->getLongitude(),
+                    startLocation->getAltitude(),
+                    endLocation->getLatitude(),
+                    endLocation->getLongitude(),
+                    endLocation->getAltitude(),
+                    ptr_VectorRouteConstraints[i]->getStartHeading(),
+                    nominalUAVHorizontalSpeed[vehicleID - 1],
+                    nominalUAVVerticleSpeed[vehicleID - 1]);
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            }
         }
-        
-        
-        
-        dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,val%s,\n",
-            "SEND_FP_RES",
-            "STOP");
     }// End of RoutePlanRequest
     // Process a MissionCommand message
     else if (afrl::cmasi::isMissionCommand(receivedLmcpMessage->m_object))

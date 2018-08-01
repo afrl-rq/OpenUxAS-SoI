@@ -6,7 +6,7 @@
         <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
     </Bridge>
     <Service Type="TaskManagerService"/>
-    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="AutomationRequestValidatorService" MaxResponseTime_ms="300000"/>
     <Service Type="SensorManagerService"/>
     <Service Type="RouteAggregatorService" UseICAROUSRoutePlanner="true"/>
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0" UseThisPlanner="false"/>

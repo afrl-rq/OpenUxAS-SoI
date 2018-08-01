@@ -232,9 +232,11 @@ RoutePlannerVisibilityService::processReceivedLmcpMessage(std::unique_ptr<uxas::
             auto routePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
             if (bProcessRoutePlanRequest(request, routePlanResponse))
             {
-                if(costMatrixSent < routePlanResponse->getVehicleID()){
+                fprintf(stderr, "isCostMatrixRequest = %i\n", request->getIsCostOnlyRequest());
+                
+                if(request->getIsCostOnlyRequest()){
                     //fprintf(stdout, "UAV %lli | 2 | This is a test\n", routePlanResponse->getVehicleID());
-                    costMatrixSent += 1; // TODO - need to account for all UAVs cost matrix being set, then move on to getting the actual planners working
+                    //printf("Sending a cost matrix for UAV %lli\n", routePlanResponse->getVehicleID());
                     auto message = std::static_pointer_cast<avtas::lmcp::Object>(routePlanResponse);
                     // always limited-cast route plan responses
                     sendSharedLmcpObjectLimitedCastMessage(

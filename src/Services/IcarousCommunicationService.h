@@ -54,6 +54,7 @@
 #include <math.h>
 #include <thread>
 #include <mutex>
+#include <chrono>
 #include <semaphore.h>
 
 #define PORT 5557
@@ -165,7 +166,7 @@ private:
     
     std::vector<float> nominalUAVVerticleSpeed;
     
-    std::vector<std::shared_ptr<uxas::messages::route::RoutePlanRequest>> routePlanRequests;
+    std::vector<std::vector<std::shared_ptr<uxas::messages::route::RoutePlanRequest>>> routePlanRequests;
     std::vector<std::shared_ptr<uxas::messages::route::RoutePlanResponse>> routePlanResponses;
     std::vector<uxas::messages::route::RoutePlan*> routePlans;
     std::vector<unsigned int> routePlanCounter;
