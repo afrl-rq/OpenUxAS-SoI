@@ -603,7 +603,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     // (This needs to check the original array of route plans size)
                     printf("UAV %i | routePlanWaypointCounter = %i\n", instanceIndex + 1, routePlanWaypointCounter[instanceIndex]);
 
-                    if(routePlanWaypointCounter[instanceIndex] == 0){
+                    if(routePlanWaypointCounter[instanceIndex] == 1){
                         // clear waypoints for invalid routes
                         routePlans[instanceIndex]->getWaypoints().clear();
                         routePlans[instanceIndex]->setRouteCost(-1.0);
@@ -629,24 +629,6 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 {
                     fprintf(stderr, "UAV %i | Unknown RPRSP message type!\n", instanceIndex + 1);
                 }
-                
-                /*
-                // Create a new vehicle action command and send the UAV to the given position
-                auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
-                vehicleActionCommand->setVehicleID(instanceIndex + 1);
-
-                // Loiter at the given position until another command is recieved
-                auto loiterAction = new afrl::cmasi::LoiterAction;
-                auto location3d = new afrl::cmasi::Location3D;
-                location3d->setLatitude(latitude);
-                location3d->setLongitude(longitude);
-                location3d->setAltitude(altitude);
-                loiterAction->setLocation(location3d);
-
-                vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
-                sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
-                */
-                
                 
                 // Cut off the processed part of tempMessageBuffer using pointer arithmetic
                 fieldEnd = strchr(tempMessageBuffer, '\n');
