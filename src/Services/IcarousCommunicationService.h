@@ -169,9 +169,15 @@ private:
     std::vector<std::vector<std::shared_ptr<uxas::messages::route::RoutePlanRequest>>> routePlanRequests;
     std::vector<std::shared_ptr<uxas::messages::route::RoutePlanResponse>> routePlanResponses;
     std::vector<uxas::messages::route::RoutePlan*> routePlans;
+    
+    std::vector<std::vector<std::string>> messageQueue;
+    
     std::vector<unsigned int> routePlanCounter;
     std::vector<int> routePlanWaypointCounter;
     std::vector<bool> isRoutePlanResponseInit;
+    
+    std::vector<bool> waitingForResponse;
+    std::mutex *messageQueueMutex;
     
     std::vector<bool> deviationFlags;
     

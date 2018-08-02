@@ -203,6 +203,8 @@ bool IcarousCommunicationService::initialize()
     isRoutePlanResponseInit.resize(ICAROUS_CONNECTIONS);
     routePlanCounter.resize(ICAROUS_CONNECTIONS);
     routePlanWaypointCounter.resize(ICAROUS_CONNECTIONS);
+    messageQueue.resize(ICAROUS_CONNECTIONS);
+    waitingForResponse.resize(ICAROUS_CONNECTIONS);
     
     // Mutexes & Semaphores must be set like this and not in a vector
     // This is because a vector of these objects is non-resizable
@@ -210,6 +212,7 @@ bool IcarousCommunicationService::initialize()
     // thus resizing like the above is impossible
     currentInformationMutexes = new std::mutex[ICAROUS_CONNECTIONS];
     softResetSemaphores = new sem_t[ICAROUS_CONNECTIONS];
+    messageQueueMutex = new std::mutex[ICAROUS_CONNECTIONS];
     
     // Some vectors are subvectors and need additional initialization of size
     for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
@@ -237,6 +240,7 @@ bool IcarousCommunicationService::initialize()
     isRoutePlanResponseInit.assign(ICAROUS_CONNECTIONS, false);
     routePlanCounter.assign(ICAROUS_CONNECTIONS, 0);
     routePlanWaypointCounter.assign(ICAROUS_CONNECTIONS, 1);
+    waitingForResponse.assign(ICAROUS_CONNECTIONS, false);
     
     // Protocol constants for 3-way ICAROUS authentication handshake    
     const char *protocol1 = "ICAROUS-UxAS_LMCP";
@@ -527,13 +531,6 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 
                 if(!strncmp(type, "ST", 2))
                 {
-                    // Get the cost of the route from the initial message
-                    trackingHelper            = strstr(tempMessageBuffer, "cost");
-                    trackingHelper           += 4; //skip past "cost"
-                    fieldEnd                  = strchr(trackingHelper, ',');
-                    fieldLength               = fieldEnd - trackingHelper;
-                    float cost                = atof(strncpy(throwaway, trackingHelper, fieldLength));
-                    
                     if(!isRoutePlanResponseInit[instanceIndex]){
                         auto instanceRoutePlanResponse = std::make_shared<uxas::messages::route::RoutePlanResponse>();
                         instanceRoutePlanResponse->setResponseID(routePlanRequests[instanceIndex][0]->getRequestID());
@@ -548,7 +545,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     auto instanceRoutePlan = new uxas::messages::route::RoutePlan();
                     // Each route plan needs the same id as its respecitve constraints
                     instanceRoutePlan->setRouteID(routePlanRequests[instanceIndex][0]->getRouteRequests()[routePlanCounter[instanceIndex]]->getRouteID());
-                    instanceRoutePlan->setRouteCost(cost * 1000); // Convert the cost from seconds to milliseconds
+                    // Route cost will be calculated based on the lines that are returned
+                    instanceRoutePlan->setRouteCost(0);
                     routePlanCounter[instanceIndex]++;
                     routePlans[instanceIndex] = instanceRoutePlan;
                     
@@ -589,6 +587,28 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     auto waypointToAdd = new afrl::cmasi::Waypoint();
                     waypointToAdd->setNumber(routePlanWaypointCounter[instanceIndex]);
                     waypointToAdd->setNextWaypoint((routePlanWaypointCounter[instanceIndex] + 1));
+                    
+                    if(routePlanWaypointCounter[instanceIndex] > 1){
+                        // Add cost of the last line segment
+                        
+                        // Using Haversine formula to calculate distance between two lat/long points
+                        int meanRadiusOfEarth = 6371000;
+                        float priorLatitude = routePlans[instanceIndex]->getWaypoints()[routePlanWaypointCounter[instanceIndex] - 2]->getLongitude();
+                        float priorLongitude = routePlans[instanceIndex]->getWaypoints()[routePlanWaypointCounter[instanceIndex] - 2]->getLongitude();
+                        float lat1Rad = priorLatitude * M_PI / 180;
+                        float lat2Rad = latitude * M_PI / 180;
+                        float diffLatRad = (latitude - priorLatitude) * M_PI / 180;
+                        float diffLongRad = (longitude - priorLongitude) * M_PI / 180;
+
+                        float neededCalculation = sin(diffLatRad / 2) * sin(diffLatRad / 2) + cos(lat1Rad) * cos(lat2Rad) * sin(diffLongRad / 2) * sin(diffLongRad / 2);
+
+                        float distance = meanRadiusOfEarth * (2 * atan2(sqrt(neededCalculation), sqrt(1 - neededCalculation)));
+                        
+                        int64_t costOfRoute_ms = (distance / speed) * 1000;
+                        printf("UAV %i | Adding Route cost: %lli\n", instanceIndex + 1, costOfRoute_ms);
+                        routePlans[instanceIndex]->setRouteCost(routePlans[instanceIndex]->getRouteCost() + costOfRoute_ms);
+                    }
+                    
                     routePlanWaypointCounter[instanceIndex]++;
                     waypointToAdd->setSpeed(speed);
                     waypointToAdd->setLatitude(latitude);
@@ -602,7 +622,22 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     // It should also send out the route plan response once all route plans are recieved
                     // (This needs to check the original array of route plans size)
                     printf("UAV %i | routePlanWaypointCounter = %i\n", instanceIndex + 1, routePlanWaypointCounter[instanceIndex]);
-
+                    messageQueueMutex[instanceIndex].lock();
+                    if(messageQueue[instanceIndex].size() > 0){
+                        dprintf(client_sockfd[instanceIndex], "%s\n", messageQueue[instanceIndex][0].c_str());
+                        messageQueue[instanceIndex].erase(messageQueue[instanceIndex].begin());
+                    }else{
+                        printf("Finished Queue for UAV %i\n", instanceIndex + 1);
+                    }
+                    
+                    
+                    if(messageQueue[instanceIndex].size() != 0){
+                        waitingForResponse[instanceIndex] = true;
+                    }else{
+                        waitingForResponse[instanceIndex] = false;
+                    }
+                    messageQueueMutex[instanceIndex].unlock();
+                    
                     if(routePlanWaypointCounter[instanceIndex] == 1){
                         // clear waypoints for invalid routes
                         routePlans[instanceIndex]->getWaypoints().clear();
@@ -611,7 +646,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                         printf("UAV %i | lastWP in routePlan = %lli\n", instanceIndex + 1, routePlans[instanceIndex]->getWaypoints().back()->getNextWaypoint());
                         routePlans[instanceIndex]->getWaypoints().back()->setNextWaypoint(routePlanWaypointCounter[instanceIndex] - 1);
                     }
-                    
+                    printf("Cost for RoutePlan = %lli\n", routePlans[instanceIndex]->getRouteCost());
                     routePlanResponses[instanceIndex]->getRouteResponses().push_back(routePlans[instanceIndex]);
                     
                     if(routePlanCounter[instanceIndex] == routePlanRequests[instanceIndex][0]->getRouteRequests().size()){
@@ -945,6 +980,41 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     //startLocation->getAltitude());
                 }
                 // TODO - End heading needs to be accounted for (currently ICAROUS cannot do that)
+                // Save into request vector
+                // (This is the EXACT request message that needs to be sent without the newline)
+                // (need to add \n at the end when sending)
+                std::string messageToAdd = "WPREQ,type"
+                                           + wpreqType
+                                           + ",slat"
+                                           + std::to_string(startLocation->getLatitude())
+                                           + ",slong"
+                                           + std::to_string(startLocation->getLongitude())
+                                           + ",salt"
+                                           + std::to_string(startLocation->getAltitude())
+                                           + ",elat"
+                                           + std::to_string(endLocation->getLatitude())
+                                           + ",elong"
+                                           + std::to_string(endLocation->getLongitude())
+                                           + ",ealt"
+                                           + std::to_string(endLocation->getAltitude())
+                                           + ",track"
+                                           + std::to_string(ptr_VectorRouteConstraints[i]->getStartHeading())
+                                           + ",vh"
+                                           + std::to_string(nominalUAVHorizontalSpeed[vehicleID - 1])
+                                           + ",vv"
+                                           + std::to_string(nominalUAVVerticleSpeed[vehicleID - 1])
+                                           + ",";
+                
+                messageQueueMutex[vehicleID - 1].lock();
+                messageQueue[vehicleID - 1].push_back(messageToAdd);
+                if(!waitingForResponse[vehicleID - 1]){
+                    dprintf(client_sockfd[vehicleID - 1], "%s\n", messageQueue[vehicleID - 1][0].c_str());
+                    messageQueue[vehicleID - 1].erase(messageQueue[vehicleID - 1].begin());
+                    waitingForResponse[vehicleID - 1] = true;
+                }
+                messageQueueMutex[vehicleID - 1].unlock();
+                
+                /*
                 dprintf(client_sockfd[vehicleID - 1], "WPREQ,type%s,slat%f,slong%f,salt%f,elat%f,elong%f,ealt%f,track%f,vh%f,vv%f,\n",
                     wpreqType.c_str(),
                     startLocation->getLatitude(),
@@ -956,7 +1026,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_VectorRouteConstraints[i]->getStartHeading(),
                     nominalUAVHorizontalSpeed[vehicleID - 1],
                     nominalUAVVerticleSpeed[vehicleID - 1]);
-                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                */
+                //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             }
         }
     }// End of RoutePlanRequest
