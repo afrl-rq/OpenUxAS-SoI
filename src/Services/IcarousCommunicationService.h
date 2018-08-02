@@ -15,6 +15,7 @@
  * This file allows connectivity with the CRATOUS system
  * (CRoss Application Translator of Operational Unmanned Systems) 
  * CRATOUS allows cooperative mission planning between UxAS and ICAROUS
+ * It also allows for UxAS to use ICAROUS route planning algorithms
  *
  */
 
@@ -76,19 +77,28 @@ namespace service
  * 
  * Options:
  *  - NumberOfUAVs - Used to specify the number of UAVs in a scenario
+ *  - RoutePlannerUsed="n" - Inform this service what planner to use
+ *                      -1 - UxAS Visibility planner
+ *                      0 - GRID
+ *                      1 - ASTAR
+ *                      2 - RRT
+ *                      3 - SPLINE
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::MissionCommand
  *  - afrl::cmasi::KeepInZone
  *  - afrl::cmasi::KeepOutZone
  *  - afrl::cmasi::AirVehicleState
+ *  - afrl::cmasi::AirVehicleConfiguration
+ *  - uxas::common::MessageGroup::IcarousPathPlanner
+ *  - uxas::messages::route::RoutePlanRequest
  * 
  * Sent Messages:
- *  - uxas::messages::task::TaskResume
  *  - afrl::cmasi::MissionCommand
  *  - afrl::cmasi::VehicleActionCommand
- *  - afrl::cmasi::LoiterAction
- * 
+ *  - uxas::messages::route::RoutePlanResponse
+ *  - uxas::messages::task::TaskResume
+ *
  */
 
 class IcarousCommunicationService : public ServiceBase
@@ -124,7 +134,6 @@ public:
     };
 
     IcarousCommunicationService();
-    bool isInitializePlan(std::shared_ptr<afrl::cmasi::MissionCommand> & ptr_MissionCommand);
 
     /** brief Listen to ICAROUS clients for commands*/
     void ICAROUS_listener(int id);
@@ -162,28 +171,41 @@ private:
     // Saved threadIDs of ICAROUS listeners
     std::vector<std::thread> icarousID;
     
+    // Save the nominal speeds of a UAV to send to ICAROUS
     std::vector<float> nominalUAVHorizontalSpeed;
-    
     std::vector<float> nominalUAVVerticleSpeed;
     
+    // Save the routePlanRequests for a UAV
     std::vector<std::vector<std::shared_ptr<uxas::messages::route::RoutePlanRequest>>> routePlanRequests;
+    
+    // Save all routePlanResponses while they are being constructed
     std::vector<std::shared_ptr<uxas::messages::route::RoutePlanResponse>> routePlanResponses;
+    
+    // Save all routePlans ICAROUS returns
     std::vector<uxas::messages::route::RoutePlan*> routePlans;
     
+    // Save all waypoint requests that need to be sent to ICAROUS
     std::vector<std::vector<std::string>> messageQueue;
     
+    // Keep count of how many routePlans that have been created for a response
     std::vector<unsigned int> routePlanCounter;
+    
+    // Keep track of the waypoint ID for each routePlan
     std::vector<int> routePlanWaypointCounter;
+    
+    // Check if a RoutePlanResponse has been created for new requests
     std::vector<bool> isRoutePlanResponseInit;
     
+    // Used to ensure the message queue is safely accessed
     std::vector<bool> waitingForResponse;
     std::mutex *messageQueueMutex;
     
+    // A flag that denotes when a deviation from the mission has occured
+    // If a deviation is small enough, the UAV can safely continue its mission
     std::vector<bool> deviationFlags;
     
+    // For if many deviations occur and require a redirect to the original path
     std::vector<bool> noDeviationReset;
-    
-    std::vector<float> icarousCommandedSpeed;
     
     // Save the original starting waypoint for each UAV
     std::vector<int64_t> originalStartingWaypoint;
@@ -230,7 +252,12 @@ private:
 
     // Dimention 1: ICAROUS instance
     // Dimention 2: Heading | Lat | Long | Alt
+    // Used for updating the current place the UAV is regardless of if ICAROUS is in control or not
     std::vector<std::vector<float>> currentInformation;
+    
+    // Dimention 1: ICAROUS instance
+    // Dimention 2: Heading | Lat | Long | Alt
+    // Used for updating the last place a UAV was before ICAROUS took over
     std::vector<std::vector<float>> positionBeforeTakeover;
     
     // One mutex for each ICAROUS instance
