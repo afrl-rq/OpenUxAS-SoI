@@ -942,90 +942,95 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
     if(afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object))
     {
         auto ptr_AirVehicleConfiguration = std::shared_ptr<afrl::cmasi::AirVehicleConfiguration>((afrl::cmasi::AirVehicleConfiguration*)receivedLmcpMessage->m_object->clone());
-        auto ptr_NominalFlightProfile = ptr_AirVehicleConfiguration->getNominalFlightProfile();
         auto vehicleID = ptr_AirVehicleConfiguration->getID();
-        nominalUAVHorizontalSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getAirspeed();
-        nominalUAVVerticleSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getVerticalSpeed();
+        if(vehicleID <= ICAROUS_CONNECTIONS)
+        {
+            auto ptr_NominalFlightProfile = ptr_AirVehicleConfiguration->getNominalFlightProfile();
+            nominalUAVHorizontalSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getAirspeed();
+            nominalUAVVerticleSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getVerticalSpeed();
+        }
     }
     // Process a RoutePlanRequest
     // If -1 do not use ICAROUS route planners
     else if(uxas::messages::route::isRoutePlanRequest(receivedLmcpMessage->m_object) && (ICAROUS_ROUTEPLANNER > -1))
     {
         auto ptr_RoutePlanRequest = std::shared_ptr<uxas::messages::route::RoutePlanRequest>((uxas::messages::route::RoutePlanRequest*)receivedLmcpMessage->m_object->clone());
-        
-        // Let UxAS Visibility planner handle the costs of each request
-        if(!ptr_RoutePlanRequest->getIsCostOnlyRequest())
+        auto vehicleID = ptr_RoutePlanRequest->getVehicleID();
+        if(vehicleID <= ICAROUS_CONNECTIONS)
         {
-            auto ptr_VectorRouteConstraints = ptr_RoutePlanRequest->getRouteRequests();
-            auto vehicleID = ptr_RoutePlanRequest->getVehicleID();
-            routePlanRequests[vehicleID - 1].push_back(ptr_RoutePlanRequest);
-            std::string wpreqType = "";
-            
-            // Determine the planner to use
-            switch(ICAROUS_ROUTEPLANNER)
+            // Let UxAS Visibility planner handle the costs of each request
+            if(!ptr_RoutePlanRequest->getIsCostOnlyRequest())
             {
-                case 0: // GRID planner
-                    wpreqType = "GRID";
-                    break;
-                case 1: // ASTAR planner
-                    wpreqType = "ASTAR";
-                    break;
-                case 2: // RRT planner
-                    wpreqType = "RRT";
-                    break;
-                case 3: // SPLINE
-                    wpreqType = "SPLINE";
-                    break;
-            }
-            
-            // For each routePlanConstraint, construct a request to ICAROUS
-            for(unsigned int i = 0; i < ptr_VectorRouteConstraints.size(); i++)
-            {
-                auto startLocation = ptr_VectorRouteConstraints[i]->getStartLocation();
-                auto endLocation = ptr_VectorRouteConstraints[i]->getEndLocation();
-                // TODO - altitudes of some route plans are being given at 0, this is an issue with the route requests being incorrect (Unsure how to fix). For now, if they are 0, they are hard-codded
-                if(endLocation->getAltitude() == 0)
+                auto ptr_VectorRouteConstraints = ptr_RoutePlanRequest->getRouteRequests();
+                routePlanRequests[vehicleID - 1].push_back(ptr_RoutePlanRequest);
+                std::string wpreqType = "";
+                
+                // Determine the planner to use
+                switch(ICAROUS_ROUTEPLANNER)
                 {
-                    endLocation->setAltitude(400);
-                    startLocation->setAltitude(400);
-                    //startLocation->getAltitude());
+                    case 0: // GRID planner
+                        wpreqType = "GRID";
+                        break;
+                    case 1: // ASTAR planner
+                        wpreqType = "ASTAR";
+                        break;
+                    case 2: // RRT planner
+                        wpreqType = "RRT";
+                        break;
+                    case 3: // SPLINE
+                        wpreqType = "SPLINE";
+                        break;
                 }
-                // TODO - End heading needs to be accounted for (currently ICAROUS cannot do that)
-                // Save into request vector
-                // (This is the EXACT request message that needs to be sent without the newline)
-                // (need to add \n at the end when sending)
-                std::string messageToAdd = "WPREQ,type"
-                                           + wpreqType
-                                           + ",slat"
-                                           + std::to_string(startLocation->getLatitude())
-                                           + ",slong"
-                                           + std::to_string(startLocation->getLongitude())
-                                           + ",salt"
-                                           + std::to_string(startLocation->getAltitude())
-                                           + ",elat"
-                                           + std::to_string(endLocation->getLatitude())
-                                           + ",elong"
-                                           + std::to_string(endLocation->getLongitude())
-                                           + ",ealt"
-                                           + std::to_string(endLocation->getAltitude())
-                                           + ",track"
-                                           + std::to_string(ptr_VectorRouteConstraints[i]->getStartHeading())
-                                           + ",vh"
-                                           + std::to_string(nominalUAVHorizontalSpeed[vehicleID - 1])
-                                           + ",vv"
-                                           + std::to_string(nominalUAVVerticleSpeed[vehicleID - 1])
-                                           + ",";
+                
+                // For each routePlanConstraint, construct a request to ICAROUS
+                for(unsigned int i = 0; i < ptr_VectorRouteConstraints.size(); i++)
+                {
+                    auto startLocation = ptr_VectorRouteConstraints[i]->getStartLocation();
+                    auto endLocation = ptr_VectorRouteConstraints[i]->getEndLocation();
+                    // TODO - altitudes of some route plans are being given at 0, this is an issue with the route requests being incorrect (Unsure how to fix). For now, if they are 0, they are hard-codded
+                    if(endLocation->getAltitude() == 0)
+                    {
+                        endLocation->setAltitude(400);
+                        startLocation->setAltitude(400);
+                        //startLocation->getAltitude());
+                    }
+                    // TODO - End heading needs to be accounted for (currently ICAROUS cannot do that)
+                    // Save into request vector
+                    // (This is the EXACT request message that needs to be sent without the newline)
+                    // (need to add \n at the end when sending)
+                    std::string messageToAdd = "WPREQ,type"
+                                               + wpreqType
+                                               + ",slat"
+                                               + std::to_string(startLocation->getLatitude())
+                                               + ",slong"
+                                               + std::to_string(startLocation->getLongitude())
+                                               + ",salt"
+                                               + std::to_string(startLocation->getAltitude())
+                                               + ",elat"
+                                               + std::to_string(endLocation->getLatitude())
+                                               + ",elong"
+                                               + std::to_string(endLocation->getLongitude())
+                                               + ",ealt"
+                                               + std::to_string(endLocation->getAltitude())
+                                               + ",track"
+                                               + std::to_string(ptr_VectorRouteConstraints[i]->getStartHeading())
+                                               + ",vh"
+                                               + std::to_string(nominalUAVHorizontalSpeed[vehicleID - 1])
+                                               + ",vv"
+                                               + std::to_string(nominalUAVVerticleSpeed[vehicleID - 1])
+                                               + ",";
 
-                // If this is the first request, send it; otherwise, add it to the request queue
-                messageQueueMutex[vehicleID - 1].lock();
-                messageQueue[vehicleID - 1].push_back(messageToAdd);
-                if(!waitingForResponse[vehicleID - 1])
-                {
-                    dprintf(client_sockfd[vehicleID - 1], "%s\n", messageQueue[vehicleID - 1][0].c_str());
-                    messageQueue[vehicleID - 1].erase(messageQueue[vehicleID - 1].begin());
-                    waitingForResponse[vehicleID - 1] = true;
+                    // If this is the first request, send it; otherwise, add it to the request queue
+                    messageQueueMutex[vehicleID - 1].lock();
+                    messageQueue[vehicleID - 1].push_back(messageToAdd);
+                    if(!waitingForResponse[vehicleID - 1])
+                    {
+                        dprintf(client_sockfd[vehicleID - 1], "%s\n", messageQueue[vehicleID - 1][0].c_str());
+                        messageQueue[vehicleID - 1].erase(messageQueue[vehicleID - 1].begin());
+                        waitingForResponse[vehicleID - 1] = true;
+                    }
+                    messageQueueMutex[vehicleID - 1].unlock();
                 }
-                messageQueueMutex[vehicleID - 1].unlock();
             }
         }
     }// End of RoutePlanRequest
@@ -1038,41 +1043,95 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // Grab the vehicles's ID to use as an index + 1
         // (so when using it as an index, it should be [vehicleID - 1])
         auto vehicleID = ptr_MissionCommand->getVehicleID();
-        std::cout << "Vehicle ID is " << vehicleID << "\n";
-        
-        // Check that the vehicle has not already recieved its waypoints
-        if (!has_gotten_waypoints[vehicleID - 1])
+        if(vehicleID <= ICAROUS_CONNECTIONS)
         {
-            // Set the variable to ensure we only send one vehicle one MissionCommand
-            has_gotten_waypoints[vehicleID - 1] = true;
+            std::cout << "Vehicle ID is " << vehicleID << "\n";
             
-            // Set up variable to be used
-            int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
-            int totalNumberOfWaypoints = 0;
-            int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
-            int priorWPIndex = -1;
-            
-            //Resize the vectors to the size of the waypoint lists
-            icarousClientWaypointLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
-            headingLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
-            
-            // Save the mission command to be used to send new ones later
-            missionCommands[vehicleID - 1] = ptr_MissionCommand;
-            
-            // Save the original starting waypoint
-            originalStartingWaypoint[vehicleID - 1] = ptr_MissionCommand->getFirstWaypoint();
-
-            // For each waypoint in the mission command, send each as its own message to ICAROUS
-            // The last waypoint's next value will be equal to itself (This indicates the end)
-            while(nextWaypoint != (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber()))
+            // Check that the vehicle has not already recieved its waypoints
+            if (!has_gotten_waypoints[vehicleID - 1])
             {
-                totalNumberOfWaypoints++;
+                // Set the variable to ensure we only send one vehicle one MissionCommand
+                has_gotten_waypoints[vehicleID - 1] = true;
                 
-                // DEBUG STATEMENT - Print what waypoint index indicates is the next waypoint and what waypoint is being sent
-                //fprintf(stdout, "WaypointIndex: %i | nextWaypoint: %i\n", waypointIndex, nextWaypoint);
-                //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
+                // Set up variable to be used
+                int waypointIndex = (ptr_MissionCommand->getFirstWaypoint() - 1);
+                int totalNumberOfWaypoints = 0;
+                int nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
+                int priorWPIndex = -1;
+                
+                //Resize the vectors to the size of the waypoint lists
+                icarousClientWaypointLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
+                headingLists[vehicleID - 1].resize(ptr_MissionCommand->getWaypointList().size());
+                
+                // Save the mission command to be used to send new ones later
+                missionCommands[vehicleID - 1] = ptr_MissionCommand;
+                
+                // Save the original starting waypoint
+                originalStartingWaypoint[vehicleID - 1] = ptr_MissionCommand->getFirstWaypoint();
 
-                // Actually set up the message to send using dprintf and send along the socket
+                // For each waypoint in the mission command, send each as its own message to ICAROUS
+                // The last waypoint's next value will be equal to itself (This indicates the end)
+                while(nextWaypoint != (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber()))
+                {
+                    totalNumberOfWaypoints++;
+                    
+                    // DEBUG STATEMENT - Print what waypoint index indicates is the next waypoint and what waypoint is being sent
+                    //fprintf(stdout, "WaypointIndex: %i | nextWaypoint: %i\n", waypointIndex, nextWaypoint);
+                    //fprintf(stdout, "Sending a waypoint to ICAROUS[%i]\n", client_sockfd[vehicleID-1]);
+
+                    // Actually set up the message to send using dprintf and send along the socket
+                    dprintf(client_sockfd[vehicleID - 1], "WAYPT,total%i.0,speed%f,lat%f,long%f,alt%f,index%lld.0,\n",
+                        totalNumberOfWaypoints,
+                        ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(),
+                        ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(),
+                        ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
+                        ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
+                        (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
+
+                    if(totalNumberOfWaypoints > 1)
+                    {
+                        // Prior waypoint
+                        float lat1  = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLatitude();
+                        float long1 = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLongitude();
+
+                        // Current Waypoint
+                        float lat2  = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude();
+                        float long2 = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude();
+
+                        // Calculate the bearing for the segment
+                        headingLists[vehicleID - 1][totalNumberOfWaypoints - 2] = fmod(360 + (atan2(
+                            cos(lat2)*sin(long2-long1),
+                            cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(long2-long1)) * 180/M_PI), 360);
+                        /*
+                        // DEBUG STATEMENT - Print the headings for each segment that a UAV must follow to stay on the path
+                        fprintf(stdout, "UAV %lli | Path %i | Heading %f\n",
+                            vehicleID,
+                            totalNumberOfWaypoints - 1,
+                            headingLists[vehicleID - 1][totalNumberOfWaypoints - 2]);
+                        printf("\tLat1 %f | Long1 %f\n\tLat2 %f | Long2 %f\n", lat1, long1, lat2, long2);
+                        */
+                    }
+
+                    // Need to convert numbers to the indexes
+                    // Then store the lat long and alt of each waypoint
+                    // This is to put them all into an ordered list for easy access when getting a GOTOWAYPOINT command
+                    icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
+                    // Also save this list into a vector
+                    newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
+                    
+                    // DEBUG STATEMENT - Print how the waypoints were saved
+                    //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
+                    
+                    // Set the index of the next waypoint
+                    priorWPIndex = waypointIndex;
+                    waypointIndex = (nextWaypoint - 1);
+
+                    // Grab the next waypoint's next waypoint to check if it is the end
+                    nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
+                }
+                
+                // Need to ensure the last waypoint is also sent
+                totalNumberOfWaypoints++;
                 dprintf(client_sockfd[vehicleID - 1], "WAYPT,total%i.0,speed%f,lat%f,long%f,alt%f,index%lld.0,\n",
                     totalNumberOfWaypoints,
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(),
@@ -1080,7 +1139,8 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
                     ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
                     (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
-
+                
+                // Create a list of headings the UAV must follow to not deviate from the path
                 if(totalNumberOfWaypoints > 1)
                 {
                     // Prior waypoint
@@ -1095,68 +1155,16 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     headingLists[vehicleID - 1][totalNumberOfWaypoints - 2] = fmod(360 + (atan2(
                         cos(lat2)*sin(long2-long1),
                         cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(long2-long1)) * 180/M_PI), 360);
-                    /*
-                    // DEBUG STATEMENT - Print the headings for each segment that a UAV must follow to stay on the path
-                    fprintf(stdout, "UAV %lli | Path %i | Heading %f\n",
-                        vehicleID,
-                        totalNumberOfWaypoints - 1,
-                        headingLists[vehicleID - 1][totalNumberOfWaypoints - 2]);
-                    printf("\tLat1 %f | Long1 %f\n\tLat2 %f | Long2 %f\n", lat1, long1, lat2, long2);
-                    */
                 }
-
-                // Need to convert numbers to the indexes
-                // Then store the lat long and alt of each waypoint
-                // This is to put them all into an ordered list for easy access when getting a GOTOWAYPOINT command
-                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
-                // Also save this list into a vector
-                newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
                 
-                // DEBUG STATEMENT - Print how the waypoints were saved
+                icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
+                newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
                 //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
                 
-                // Set the index of the next waypoint
-                priorWPIndex = waypointIndex;
-                waypointIndex = (nextWaypoint - 1);
-
-                // Grab the next waypoint's next waypoint to check if it is the end
-                nextWaypoint = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNextWaypoint();
+                //Send a message to ICAROUS telling it to start the mission
+                dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,\n",
+                "START_MISSION");
             }
-            
-            // Need to ensure the last waypoint is also sent
-            totalNumberOfWaypoints++;
-            dprintf(client_sockfd[vehicleID - 1], "WAYPT,total%i.0,speed%f,lat%f,long%f,alt%f,index%lld.0,\n",
-                totalNumberOfWaypoints,
-                ptr_MissionCommand->getWaypointList()[waypointIndex]->getSpeed(),
-                ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude(),
-                ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude(), 
-                ptr_MissionCommand->getWaypointList()[waypointIndex]->getAltitude(),
-                (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber() - ptr_MissionCommand->getFirstWaypoint()));
-            
-            // Create a list of headings the UAV must follow to not deviate from the path
-            if(totalNumberOfWaypoints > 1)
-            {
-                // Prior waypoint
-                float lat1  = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLatitude();
-                float long1 = ptr_MissionCommand->getWaypointList()[priorWPIndex]->getLongitude();
-
-                // Current Waypoint
-                float lat2  = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLatitude();
-                float long2 = ptr_MissionCommand->getWaypointList()[waypointIndex]->getLongitude();
-
-                // Calculate the bearing for the segment
-                headingLists[vehicleID - 1][totalNumberOfWaypoints - 2] = fmod(360 + (atan2(
-                    cos(lat2)*sin(long2-long1),
-                    cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(long2-long1)) * 180/M_PI), 360);
-            }
-            
-            icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
-            newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
-            //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
-            
-            //Send a message to ICAROUS telling it to start the mission
-            dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,\n",
-            "START_MISSION");
         }
     }// End of MissionCommand
     // Process a KeepInZone
@@ -1236,132 +1244,324 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // Copy the message pointer to shorten access length
         auto ptr_AirVehicleState = std::shared_ptr<afrl::cmasi::AirVehicleState>((afrl::cmasi::AirVehicleState *)receivedLmcpMessage->m_object->clone());
         int vehicleID = ptr_AirVehicleState->getID();
-        //fprintf(stdout, "UAV %i | recieved usable AirVehicleState\n", vehicleID);
-
-        // TODO - un-hardcode the number of sats
-        // Get the current tasks and update the list (Only when ICAROUS does not have control)
-        if(icarousTakeoverActive[vehicleID - 1] == false)
+        if(vehicleID <= ICAROUS_CONNECTIONS)
         {
-            // Save the current tasks the UAV was doing before a takeover
-            entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
-            
-            // Send the position of the UAV to ICAROUS every time it updates from AMASE
-            positionBeforeTakeover[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
-            positionBeforeTakeover[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
-            positionBeforeTakeover[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
-            positionBeforeTakeover[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
-            // Updates the current waypoint to the waypoint the UAV is currently doing
-            // Also saves this waypoint to be compared to the next to ensure that a change of waypoints is seen
-            if(isLastWaypointInitialized[vehicleID - 1])
-            {
-                // For each waypoint that it is past, send a waypoint reached message
-                //fprintf(stderr, "UAV %i | currentWP = %lli | otherWP = %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]));
-                while(currentWaypointIndex[vehicleID - 1] < (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]))
-                {
-                    // If a waypoint was reached, a new resume point can be set
-                    resumePointSet[vehicleID - 1] = false;
-                    dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
-                       currentWaypointIndex[vehicleID - 1]);
+            //fprintf(stdout, "UAV %i | recieved usable AirVehicleState\n", vehicleID);
 
-                    currentWaypointIndex[vehicleID - 1]++;
-                    
-                    // Remove a waypoint unless it is the first or we have yet to reach it due to a takeover
-                    if(truncateWaypoint[vehicleID - 1] == true)
+            // TODO - un-hardcode the number of sats
+            // Get the current tasks and update the list (Only when ICAROUS does not have control)
+            if(icarousTakeoverActive[vehicleID - 1] == false)
+            {
+                // Save the current tasks the UAV was doing before a takeover
+                entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
+                
+                // Send the position of the UAV to ICAROUS every time it updates from AMASE
+                positionBeforeTakeover[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
+                positionBeforeTakeover[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
+                positionBeforeTakeover[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
+                positionBeforeTakeover[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
+                // Updates the current waypoint to the waypoint the UAV is currently doing
+                // Also saves this waypoint to be compared to the next to ensure that a change of waypoints is seen
+                if(isLastWaypointInitialized[vehicleID - 1])
+                {
+                    // For each waypoint that it is past, send a waypoint reached message
+                    //fprintf(stderr, "UAV %i | currentWP = %lli | otherWP = %lli\n", vehicleID, currentWaypointIndex[vehicleID - 1], (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]));
+                    while(currentWaypointIndex[vehicleID - 1] < (ptr_AirVehicleState->getCurrentWaypoint() - originalStartingWaypoint[vehicleID - 1]))
                     {
-                        newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
-                    }else{
-                        truncateWaypoint[vehicleID - 1] = true;
+                        // If a waypoint was reached, a new resume point can be set
+                        resumePointSet[vehicleID - 1] = false;
+                        dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
+                           currentWaypointIndex[vehicleID - 1]);
+
+                        currentWaypointIndex[vehicleID - 1]++;
+                        
+                        // Remove a waypoint unless it is the first or we have yet to reach it due to a takeover
+                        if(truncateWaypoint[vehicleID - 1] == true)
+                        {
+                            newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
+                        }else{
+                            truncateWaypoint[vehicleID - 1] = true;
+                        }
+                        
+                        // As long as the waypoint is not the last waypoint, increase it
+                        if(lastWaypoint[vehicleID - 1] != ptr_AirVehicleState->getCurrentWaypoint())
+                        {
+                            lastWaypoint[vehicleID - 1]++;
+                        }
+                        
+                        // Wait 100 milliseconds to allow ICAROUS to process a waypoint recieved message
+                        sleep(0.1);
                     }
-                    
-                    // As long as the waypoint is not the last waypoint, increase it
-                    if(lastWaypoint[vehicleID - 1] != ptr_AirVehicleState->getCurrentWaypoint())
-                    {
-                        lastWaypoint[vehicleID - 1]++;
-                    }
-                    
-                    // Wait 100 milliseconds to allow ICAROUS to process a waypoint recieved message
-                    sleep(0.1);
+                }
+                else
+                {
+                    // On the first waypoint, initialize all values
+                    isLastWaypointInitialized[vehicleID - 1] = true;
+                    lastWaypoint[vehicleID - 1] = 0;
+                    currentWaypointIndex[vehicleID - 1] = 0;
                 }
             }
-            else
+
+            // Save the current information of the UAV
+            currentInformationMutexes[vehicleID - 1].lock();
+            /*
+            fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
+                vehicleID,
+                ptr_AirVehicleState->getHeading(),
+                ptr_AirVehicleState->getLocation()->getLatitude(),
+                ptr_AirVehicleState->getLocation()->getLongitude(),
+                ptr_AirVehicleState->getLocation()->getAltitude(),
+                currentInformation[vehicleID - 1][0],
+                currentInformation[vehicleID - 1][1],
+                currentInformation[vehicleID - 1][2],
+                currentInformation[vehicleID - 1][3]);
+            */
+            currentInformation[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
+            currentInformation[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
+            currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
+            currentInformation[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
+            currentInformationMutexes[vehicleID - 1].unlock();
+
+            
+            // TODO - This needs re-worked to account for pitch angle
+            //        (For now, this works when planning is only done in 2D space)
+            
+            double uHeading = fmod((ptr_AirVehicleState->getHeading() + 360), 360.0);
+            double vHeading = fmod((uHeading + 90), 360.0);
+            double uNorth;
+            double vNorth;
+            double uEast;
+            double vEast;
+            double wDown = ptr_AirVehicleState->getW();
+            
+            uNorth = ptr_AirVehicleState->getU() * cos(uHeading*M_PI/180);
+            uEast = ptr_AirVehicleState->getU() * sin(uHeading*M_PI/180);
+            
+            vNorth = ptr_AirVehicleState->getV() * cos(vHeading*M_PI/180);
+            vEast = ptr_AirVehicleState->getV() * sin(vHeading*M_PI/180);
+            
+            
+            double northTotal = uNorth + vNorth;
+            double eastTotal = uEast + vEast;
+            double downTotal = wDown;
+            
+            // Inform ICAROUS of its position information using North-East-Down format
+            dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,north%f,east%f,down%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
+                ((double)ptr_AirVehicleState->getTime()/1000),
+                ptr_AirVehicleState->getLocation()->getLatitude(),
+                ptr_AirVehicleState->getLocation()->getLongitude(),
+                ptr_AirVehicleState->getLocation()->getAltitude(),
+                ptr_AirVehicleState->getLocation()->getAltitude(),// TODO - come back to this, rel altitude != abs altitude
+                northTotal,
+                eastTotal,
+                downTotal,
+                0.1,// TODO - actual horizontal accuracy
+                0.1,// TODO - actual vertical accuracy
+                25,
+                vehicleID);
+
+            // Send the attitude of the UAV (roll,pitch,yaw) every time it updates from AMASE
+            dprintf(client_sockfd[vehicleID - 1], "ATTUD,roll%f,pitch%f,yaw%f,\n",
+                ptr_AirVehicleState->getRoll(),
+                ptr_AirVehicleState->getPitch(),
+                0.0);// TODO - find a way to actually get Yaw (no way currently from AirVehicleState)
+
+
+            // For all other ICAROUS connections, send the UAV as a traffic obsticle to avoid
+            for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
             {
-                // On the first waypoint, initialize all values
-                isLastWaypointInitialized[vehicleID - 1] = true;
-                lastWaypoint[vehicleID - 1] = 0;
-                currentWaypointIndex[vehicleID - 1] = 0;
+                // Do not send this information to itself
+                if(i != (vehicleID - 1))
+                {
+                    // Send the UAV obsticle along the socket as other air traffic
+                    dprintf(client_sockfd[i], "OBJCT,type%s,lat%f,long%f,alt%f,north%f,east%f,down%f,index%i.0,\n",
+                        "_TRAFFIC_",//either _TRAFFIC_ or _OBSTACLE_
+                        ptr_AirVehicleState->getLocation()->getLatitude(),
+                        ptr_AirVehicleState->getLocation()->getLongitude(),
+                        ptr_AirVehicleState->getLocation()->getAltitude(),
+                        northTotal,
+                        eastTotal,
+                        downTotal,
+                        vehicleID); // ICAROUS indexes start at 1 normally
+                }
+            }
+
+            // If a soft reset was requested, initiate it only if it was not already done
+            // It will allow a new one to be created if the UAV goes further then before the takeover
+            if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == false))
+            {
+                // Tell ICAROUS to initiate a soft-reset
+                dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                    "RESET_SFT",
+                    positionBeforeTakeover[vehicleID - 1][1],
+                    positionBeforeTakeover[vehicleID - 1][2],
+                    positionBeforeTakeover[vehicleID - 1][3]);
+                
+                //int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
+                
+                //fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, currentWaypointIndex[vehicleID - 1] - 1);
+                
+                // Save the new point AMASE should start at
+                
+                // Calculate the point projected onto the line made by the last waypoint done and the current waypoint
+                // (Calculate the ortogonal projection of the UAV onto the line it should be following)
+                // This is expanded out in such a way that it would be easier to read
+                double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
+                double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
+                double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
+                double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
+                
+                double positionLat = positionBeforeTakeover[vehicleID - 1][1];
+                double positionLong = positionBeforeTakeover[vehicleID - 1][2];
+                
+                double e1x = lat2 - lat1;
+                double e1y = long2 - long1;
+                double e2x = positionLat - lat1;
+                double e2y = positionLong - long1;
+                double eDotProduct = e1x * e2x + e1y * e2y;
+                double len2 = pow(e1x, 2) + pow(e1y, 2);
+                double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
+                double newPointLong = (long1 + (eDotProduct * e1y) / len2);
+                
+                
+                // Adjust the first points to be these new points
+                newWaypointLists[vehicleID - 1][0]->setLatitude(
+                    newPointLat);
+                
+                newWaypointLists[vehicleID - 1][0]->setLongitude(
+                    newPointLong);
+                
+                newWaypointLists[vehicleID - 1][0]->setAltitude(
+                    positionBeforeTakeover[vehicleID - 1][3]);
+                
+                // Set this new point as the first point
+                missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][0]->getNumber());
+                
+                // Reset the commandID to have the UAV replace the old mission command
+                missionCommands[vehicleID - 1]->setCommandID(0);
+                
+                // Remove all old waypoints
+                missionCommands[vehicleID - 1]->getWaypointList().clear();
+                
+                // Add all new waypoints plus a copy of the first because the first one is always ignored
+                missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
+                for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++)
+                {
+                    // DEBUG STATEMENT - Print what waypoints are being set
+                    //fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
+                    missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
+                }
+                
+                // The mission command was created, now send it along
+                
+                // Re-send the last waypoint done due to moving back one waypoint
+                if(lastWaypoint[vehicleID - 1] > 0)
+                {
+                    lastWaypoint[vehicleID - 1]--;
+                }
+                
+                if(currentWaypointIndex[vehicleID - 1] > 0)
+                {
+                    currentWaypointIndex[vehicleID - 1]--;
+                }
+                
+                deviationFlags[vehicleID - 1] = false;
+                
+                softResetFlag[vehicleID - 1] = false;
+                sem_post(&softResetSemaphores[vehicleID - 1]);
+            }
+            // If it was already set, just resend the old mission command
+            else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true))
+            {
+                deviationFlags[vehicleID - 1] = false;
+                
+                // Otherwise if we already have a waypoint set, continue the original mission
+                softResetFlag[vehicleID - 1] = false;
+                sem_post(&softResetSemaphores[vehicleID - 1]);
+            }
+            // If no deviation occured, update the last point that ICAROUS handed back control
+            else if(noDeviationReset[vehicleID - 1] == true)
+            {
+                // Calculate the point projected onto the line made by the last waypoint done and the current waypoint
+                // (Calculate the ortogonal projection of the UAV onto the line it should be following)
+                // This is expanded out in such a way that it would be easier to read
+                double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
+                double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
+                double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
+                double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
+                
+                double positionLat = currentInformation[vehicleID - 1][1];
+                double positionLong = currentInformation[vehicleID - 1][2];
+                
+                double e1x = lat2 - lat1;
+                double e1y = long2 - long1;
+                double e2x = positionLat - lat1;
+                double e2y = positionLong - long1;
+                double eDotProduct = e1x * e2x + e1y * e2y;
+                double len2 = pow(e1x, 2) + pow(e1y, 2);
+                double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
+                double newPointLong = (long1 + (eDotProduct * e1y) / len2);
+                
+                
+                // Adjust the first points to be these new points
+                newWaypointLists[vehicleID - 1][0]->setLatitude(
+                    newPointLat);
+                
+                newWaypointLists[vehicleID - 1][0]->setLongitude(
+                    newPointLong);
+                
+                newWaypointLists[vehicleID - 1][0]->setAltitude(
+                    currentInformation[vehicleID - 1][3]);
+                
+                // Set this new point as the first point
+                missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][1]->getNumber());
+                
+                // Reset the commandID to have the UAV replace the old mission command
+                missionCommands[vehicleID - 1]->setCommandID(0);
+                
+                // Remove all old waypoints
+                missionCommands[vehicleID - 1]->getWaypointList().clear();
+                
+                // Add all new waypoints plus a copy of the first because the first one is always ignored
+                missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
+                for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++)
+                {
+                    // DEBUG STATEMENT - Print what waypoints are being set
+                    //fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
+                    missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
+                }
+                
+                noDeviationReset[vehicleID - 1] = false;
+                sem_post(&softResetSemaphores[vehicleID - 1]);
             }
         }
-
-        // Save the current information of the UAV
-        currentInformationMutexes[vehicleID - 1].lock();
-        /*
-        fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
-            vehicleID,
-            ptr_AirVehicleState->getHeading(),
-            ptr_AirVehicleState->getLocation()->getLatitude(),
-            ptr_AirVehicleState->getLocation()->getLongitude(),
-            ptr_AirVehicleState->getLocation()->getAltitude(),
-            currentInformation[vehicleID - 1][0],
-            currentInformation[vehicleID - 1][1],
-            currentInformation[vehicleID - 1][2],
-            currentInformation[vehicleID - 1][3]);
-        */
-        currentInformation[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
-        currentInformation[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
-        currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
-        currentInformation[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
-        currentInformationMutexes[vehicleID - 1].unlock();
-
-        
-        // TODO - This needs re-worked to account for pitch angle
-        //        (For now, this works when planning is only done in 2D space)
-        
-        double uHeading = fmod((ptr_AirVehicleState->getHeading() + 360), 360.0);
-        double vHeading = fmod((uHeading + 90), 360.0);
-        double uNorth;
-        double vNorth;
-        double uEast;
-        double vEast;
-        double wDown = ptr_AirVehicleState->getW();
-        
-        uNorth = ptr_AirVehicleState->getU() * cos(uHeading*M_PI/180);
-        uEast = ptr_AirVehicleState->getU() * sin(uHeading*M_PI/180);
-        
-        vNorth = ptr_AirVehicleState->getV() * cos(vHeading*M_PI/180);
-        vEast = ptr_AirVehicleState->getV() * sin(vHeading*M_PI/180);
-        
-        
-        double northTotal = uNorth + vNorth;
-        double eastTotal = uEast + vEast;
-        double downTotal = wDown;
-        
-        // Inform ICAROUS of its position information using North-East-Down format
-        dprintf(client_sockfd[vehicleID - 1], "POSTN,timegps%f,lat%f,long%f,altabs%f,altrel%f,north%f,east%f,down%f,hdop%f,vdop%f,numsats%i.0,id%i.0,\n",
-            ((double)ptr_AirVehicleState->getTime()/1000),
-            ptr_AirVehicleState->getLocation()->getLatitude(),
-            ptr_AirVehicleState->getLocation()->getLongitude(),
-            ptr_AirVehicleState->getLocation()->getAltitude(),
-            ptr_AirVehicleState->getLocation()->getAltitude(),// TODO - come back to this, rel altitude != abs altitude
-            northTotal,
-            eastTotal,
-            downTotal,
-            0.1,// TODO - actual horizontal accuracy
-            0.1,// TODO - actual vertical accuracy
-            25,
-            vehicleID);
-
-        // Send the attitude of the UAV (roll,pitch,yaw) every time it updates from AMASE
-        dprintf(client_sockfd[vehicleID - 1], "ATTUD,roll%f,pitch%f,yaw%f,\n",
-            ptr_AirVehicleState->getRoll(),
-            ptr_AirVehicleState->getPitch(),
-            0.0);// TODO - find a way to actually get Yaw (no way currently from AirVehicleState)
-
-
-        // For all other ICAROUS connections, send the UAV as a traffic obsticle to avoid
-        for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
+        // Intruder vehicles still need to report their location to ICAROUS instances
+        else
         {
-            // Do not send this information to itself
-            if(i != (vehicleID - 1))
+            // TODO - This needs re-worked to account for pitch angle
+            //        (For now, this works when planning is only done in 2D space)
+            
+            double uHeading = fmod((ptr_AirVehicleState->getHeading() + 360), 360.0);
+            double vHeading = fmod((uHeading + 90), 360.0);
+            double uNorth;
+            double vNorth;
+            double uEast;
+            double vEast;
+            double wDown = ptr_AirVehicleState->getW();
+            
+            uNorth = ptr_AirVehicleState->getU() * cos(uHeading*M_PI/180);
+            uEast = ptr_AirVehicleState->getU() * sin(uHeading*M_PI/180);
+            
+            vNorth = ptr_AirVehicleState->getV() * cos(vHeading*M_PI/180);
+            vEast = ptr_AirVehicleState->getV() * sin(vHeading*M_PI/180);
+            
+            
+            double northTotal = uNorth + vNorth;
+            double eastTotal = uEast + vEast;
+            double downTotal = wDown;
+            
+            // For all other ICAROUS connections, send the UAV as a traffic obsticle to avoid
+            for(int i = 0; i < ICAROUS_CONNECTIONS; i++)
             {
                 // Send the UAV obsticle along the socket as other air traffic
                 dprintf(client_sockfd[i], "OBJCT,type%s,lat%f,long%f,alt%f,north%f,east%f,down%f,index%i.0,\n",
@@ -1374,155 +1574,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     downTotal,
                     vehicleID); // ICAROUS indexes start at 1 normally
             }
-        }
-
-        // If a soft reset was requested, initiate it only if it was not already done
-        // It will allow a new one to be created if the UAV goes further then before the takeover
-        if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == false))
-        {
-            // Tell ICAROUS to initiate a soft-reset
-            dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
-                "RESET_SFT",
-                positionBeforeTakeover[vehicleID - 1][1],
-                positionBeforeTakeover[vehicleID - 1][2],
-                positionBeforeTakeover[vehicleID - 1][3]);
-            
-            //int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
-            
-            //fprintf(stdout, "UAV %i | Replacing waypoint %i at index %lli\n", vehicleID, indexOfWaypointToReplace, currentWaypointIndex[vehicleID - 1] - 1);
-            
-            // Save the new point AMASE should start at
-            
-            // Calculate the point projected onto the line made by the last waypoint done and the current waypoint
-            // (Calculate the ortogonal projection of the UAV onto the line it should be following)
-            // This is expanded out in such a way that it would be easier to read
-            double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
-            double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
-            double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
-            double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
-            
-            double positionLat = positionBeforeTakeover[vehicleID - 1][1];
-            double positionLong = positionBeforeTakeover[vehicleID - 1][2];
-            
-            double e1x = lat2 - lat1;
-            double e1y = long2 - long1;
-            double e2x = positionLat - lat1;
-            double e2y = positionLong - long1;
-            double eDotProduct = e1x * e2x + e1y * e2y;
-            double len2 = pow(e1x, 2) + pow(e1y, 2);
-            double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
-            double newPointLong = (long1 + (eDotProduct * e1y) / len2);
-            
-            
-            // Adjust the first points to be these new points
-            newWaypointLists[vehicleID - 1][0]->setLatitude(
-                newPointLat);
-            
-            newWaypointLists[vehicleID - 1][0]->setLongitude(
-                newPointLong);
-            
-            newWaypointLists[vehicleID - 1][0]->setAltitude(
-                positionBeforeTakeover[vehicleID - 1][3]);
-            
-            // Set this new point as the first point
-            missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][0]->getNumber());
-            
-            // Reset the commandID to have the UAV replace the old mission command
-            missionCommands[vehicleID - 1]->setCommandID(0);
-            
-            // Remove all old waypoints
-            missionCommands[vehicleID - 1]->getWaypointList().clear();
-            
-            // Add all new waypoints plus a copy of the first because the first one is always ignored
-            missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
-            for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++)
-            {
-                // DEBUG STATEMENT - Print what waypoints are being set
-                //fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
-                missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
-            }
-            
-            // The mission command was created, now send it along
-            
-            // Re-send the last waypoint done due to moving back one waypoint
-            if(lastWaypoint[vehicleID - 1] > 0)
-            {
-                lastWaypoint[vehicleID - 1]--;
-            }
-            
-            if(currentWaypointIndex[vehicleID - 1] > 0)
-            {
-                currentWaypointIndex[vehicleID - 1]--;
-            }
-            
-            deviationFlags[vehicleID - 1] = false;
-            
-            softResetFlag[vehicleID - 1] = false;
-            sem_post(&softResetSemaphores[vehicleID - 1]);
-        }
-        // If it was already set, just resend the old mission command
-        else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true))
-        {
-            deviationFlags[vehicleID - 1] = false;
-            
-            // Otherwise if we already have a waypoint set, continue the original mission
-            softResetFlag[vehicleID - 1] = false;
-            sem_post(&softResetSemaphores[vehicleID - 1]);
-        }
-        // If no deviation occured, update the last point that ICAROUS handed back control
-        else if(noDeviationReset[vehicleID - 1] == true)
-        {
-            // Calculate the point projected onto the line made by the last waypoint done and the current waypoint
-            // (Calculate the ortogonal projection of the UAV onto the line it should be following)
-            // This is expanded out in such a way that it would be easier to read
-            double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
-            double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
-            double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
-            double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
-            
-            double positionLat = currentInformation[vehicleID - 1][1];
-            double positionLong = currentInformation[vehicleID - 1][2];
-            
-            double e1x = lat2 - lat1;
-            double e1y = long2 - long1;
-            double e2x = positionLat - lat1;
-            double e2y = positionLong - long1;
-            double eDotProduct = e1x * e2x + e1y * e2y;
-            double len2 = pow(e1x, 2) + pow(e1y, 2);
-            double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
-            double newPointLong = (long1 + (eDotProduct * e1y) / len2);
-            
-            
-            // Adjust the first points to be these new points
-            newWaypointLists[vehicleID - 1][0]->setLatitude(
-                newPointLat);
-            
-            newWaypointLists[vehicleID - 1][0]->setLongitude(
-                newPointLong);
-            
-            newWaypointLists[vehicleID - 1][0]->setAltitude(
-                currentInformation[vehicleID - 1][3]);
-            
-            // Set this new point as the first point
-            missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][1]->getNumber());
-            
-            // Reset the commandID to have the UAV replace the old mission command
-            missionCommands[vehicleID - 1]->setCommandID(0);
-            
-            // Remove all old waypoints
-            missionCommands[vehicleID - 1]->getWaypointList().clear();
-            
-            // Add all new waypoints plus a copy of the first because the first one is always ignored
-            missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][0]);
-            for(unsigned int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++)
-            {
-                // DEBUG STATEMENT - Print what waypoints are being set
-                //fprintf(stderr, "UAV %i | Setting waypointList at %i to %lli\n", vehicleID, i, newWaypointLists[vehicleID - 1][i]->getNumber());
-                missionCommands[vehicleID - 1]->getWaypointList().push_back(newWaypointLists[vehicleID - 1][i]);
-            }
-            
-            noDeviationReset[vehicleID - 1] = false;
-            sem_post(&softResetSemaphores[vehicleID - 1]);
         }
     }// End of AirVehicleState
 
