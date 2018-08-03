@@ -886,6 +886,12 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 // DEBUG STATEMENT - Print the contents of the message
                 //fprintf(stdout, "%lli|GOTOWP|id|%i\n", icarousClientFd, id);
 
+                // TODO - This currently will not work due to soft resets
+                //        A soft reset causes ICAROUS to "forget" all waypoints it has reached and reset its index
+                //        to 0 at the last waypoint that was done. This causes issues with icarousClientWaypointLists.
+                //        icarousClientWaypointLists does not update its indexes on what it is points at. This was
+                //        attempted before and was unable to be resolved in a clean way.
+
                 // Send the UAV to the waypoint index given by ICAROUS
                 auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                 vehicleActionCommand->setVehicleID(instanceIndex + 1);
