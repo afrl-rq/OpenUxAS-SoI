@@ -1075,6 +1075,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // Save the original starting waypoint
                 originalStartingWaypoint[vehicleID - 1] = ptr_MissionCommand->getFirstWaypoint();
 
+                // Soft Reset ICAROUS to reset the waypoints it was using if a path planner was specified
+                // Values are ignored due to not reaching a waypoint
+                dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                    "RESET_SFT",
+                    0.0,
+                    0.0,
+                    0.0);
+
                 // For each waypoint in the mission command, send each as its own message to ICAROUS
                 // The last waypoint's next value will be equal to itself (This indicates the end)
                 while(nextWaypoint != (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber()))
@@ -1429,16 +1437,19 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
                 double newPointLong = (long1 + (eDotProduct * e1y) / len2);
                 
-                
-                // Adjust the first points to be these new points
-                newWaypointLists[vehicleID - 1][0]->setLatitude(
-                    newPointLat);
-                
-                newWaypointLists[vehicleID - 1][0]->setLongitude(
-                    newPointLong);
-                
-                newWaypointLists[vehicleID - 1][0]->setAltitude(
-                    positionBeforeTakeover[vehicleID - 1][3]);
+                // If both the UAVs current position and the waypoint being checked are the exact same, don't change the waypoint
+                if((lat1 != lat2) && (long1 != long2))
+                {
+                    // Adjust the first points to be these new points
+                    newWaypointLists[vehicleID - 1][0]->setLatitude(
+                        newPointLat);
+                    
+                    newWaypointLists[vehicleID - 1][0]->setLongitude(
+                        newPointLong);
+                    
+                    newWaypointLists[vehicleID - 1][0]->setAltitude(
+                        positionBeforeTakeover[vehicleID - 1][3]);
+                }
                 
                 // Set this new point as the first point
                 missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][0]->getNumber());
@@ -1498,7 +1509,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 
                 double positionLat = currentInformation[vehicleID - 1][1];
                 double positionLong = currentInformation[vehicleID - 1][2];
-                
+
                 double e1x = lat2 - lat1;
                 double e1y = long2 - long1;
                 double e2x = positionLat - lat1;
@@ -1507,18 +1518,20 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double len2 = pow(e1x, 2) + pow(e1y, 2);
                 double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
                 double newPointLong = (long1 + (eDotProduct * e1y) / len2);
-                
-                
-                // Adjust the first points to be these new points
-                newWaypointLists[vehicleID - 1][0]->setLatitude(
-                    newPointLat);
-                
-                newWaypointLists[vehicleID - 1][0]->setLongitude(
-                    newPointLong);
-                
-                newWaypointLists[vehicleID - 1][0]->setAltitude(
-                    currentInformation[vehicleID - 1][3]);
-                
+
+                // If both the UAVs current position and the waypoint being checked are the exact same, don't change the waypoint
+                if((lat1 != lat2) && (long1 != long2))
+                {
+                    // Adjust the first points to be these new points
+                    newWaypointLists[vehicleID - 1][0]->setLatitude(
+                        newPointLat);
+                    
+                    newWaypointLists[vehicleID - 1][0]->setLongitude(
+                        newPointLong);
+                    
+                    newWaypointLists[vehicleID - 1][0]->setAltitude(
+                        currentInformation[vehicleID - 1][3]);
+                }
                 // Set this new point as the first point
                 missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][1]->getNumber());
                 
