@@ -36,12 +36,17 @@
 #include <cmath>
 #include <memory>
 #include <cstdint>
+#include <string>
 #include <vector>
 #include <iostream>     // std::cout, cerr, etc
 
 // convenience definitions for the option strings
-#define STRING_XML_OPTION_STRING "OptionString"
+#define STRING_XML_MANEUVERTYPE "ManeuverType"
 #define STRING_XML_OPTION_INT "OptionInt"
+#define HEADING "Heading"
+#define GROUNDSPEED "GroundSpeed"
+#define VERTICALSPEED "VerticalSpeed"
+#define ALTITUDE "Altitude"
 
 #define MILLISECONDSTOSECONDS  1.0/1000.0;
 namespace
@@ -75,6 +80,27 @@ bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
 
+    if (!ndComponent.attribute(STRING_XML_MANEUVERTYPE).empty())
+    {
+        std::string local_avoidance_maneuver_type = ndComponent.attribute(STRING_XML_MANEUVERTYPE).as_string();
+        if (local_avoidance_maneuver_type == HEADING)
+        {
+            m_AvoidanceManeuverType = local_avoidance_maneuver_type;
+        }
+        else if (local_avoidance_maneuver_type == GROUNDSPEED)
+        {
+            m_AvoidanceManeuverType = GROUNDSPEED;
+        }
+        else if (local_avoidance_maneuver_type == VERTICALSPEED)
+        {
+            m_AvoidanceManeuverType = VERTICALSPEED;
+        }
+        else
+        {
+            m_AvoidanceManeuverType = ALTITUDE;
+        }
+        
+    }
     //TODO: Allow class member variables to be set via xml-- Maneuver type, time thresholds, maneuver offsets from NEAR interval, etc... 
     //TODO: Allow for multiple Response services to be active by using vehicleID passed in via xml in place of m_entityId.
     // subscribe to messages::
@@ -98,25 +124,80 @@ void DAIDALUS_WCV_Response::ResetResponse()
     m_isActionCompleted = false;
     m_isConflict = false;
     m_ConflictResolutionList.clear();
+    m_isCloseToDesired = false;
 }
 bool DAIDALUS_WCV_Response::isWithinTolerance()
 {
     //TODO: extend function to be passed the type of divert maneuver and consider altitude, ground speed, and vertical speed.
-    if (std::abs((m_DivertState.heading_deg - m_CurrentState.heading_deg)) <= m_heading_tolerance_deg)
+    if (m_AvoidanceManeuverType == HEADING)
     {
-        if (!m_isCloseToDesired)
+        if (std::abs((m_DivertState.heading_deg - m_CurrentState.heading_deg)) <= m_heading_tolerance_deg)
         {
-            m_tolerance_clock_s = m_CurrentState.time_s;
+            if (!m_isCloseToDesired)
+            {
+                m_tolerance_clock_s = m_CurrentState.time_s;
+            }
+            m_isCloseToDesired = true;
         }
-        m_isCloseToDesired = true;
+        else
+        {
+            m_isCloseToDesired = false;
+        }
+    }
+    else if (m_AvoidanceManeuverType == GROUNDSPEED)
+    {
+        if (std::abs((m_DivertState.horizontal_speed_mps - m_CurrentState.horizontal_speed_mps)) <= m_groundspeed_tolerance_mps)
+        {
+            if (!m_isCloseToDesired)
+            {
+                m_tolerance_clock_s = m_CurrentState.time_s;
+            }
+            m_isCloseToDesired = true;
+        }
+        else
+        {
+            m_isCloseToDesired = false;
+        }
+        
+    }
+    else if (m_AvoidanceManeuverType == VERTICALSPEED)
+    {
+        if (std::abs((m_DivertState.vertical_speed_mps - m_CurrentState.vertical_speed_mps)) <= m_verticalspeed_tolerance_mps)
+        {
+            if (!m_isCloseToDesired)
+            {
+                m_tolerance_clock_s = m_CurrentState.time_s;
+            }
+            m_isCloseToDesired = true;
+        }
+        else
+        {
+            m_isCloseToDesired = false;
+        }
+        
     }
     else
     {
-        m_isCloseToDesired = false;
+        if (std::abs((m_DivertState.altitude_m - m_CurrentState.altitude_m)) <= m_altitude_tolerance_m)
+        {
+            if (!m_isCloseToDesired)
+            {
+                m_tolerance_clock_s = m_CurrentState.time_s;
+            }
+            m_isCloseToDesired = true;
+        }
+        else
+        {
+            m_isCloseToDesired = false;
+        }
+        
     }
-    if ((m_CurrentState.time_s - m_tolerance_clock_s) >= m_tolerance_threshold_time_s)
+    
+    if (m_isCloseToDesired && ((m_CurrentState.time_s - m_tolerance_clock_s) >= m_tolerance_threshold_time_s))
     {
         std::cout << "Within Tolerance" << std::endl;
+        //std::cout << "DivertState.altitude = " << m_DivertState.altitude_m << " CurrentState.altitude = " << m_CurrentState.altitude_m << std::endl;
+        //std::cout << "Current time = " << m_CurrentState.time_s << " Tolerance clock = " << m_tolerance_clock_s << " Tolerance threshold time = " << m_tolerance_threshold_time_s << std::endl;
         return true;
     }
     else
@@ -126,9 +207,233 @@ bool DAIDALUS_WCV_Response::isWithinTolerance()
     }
 }
 
+void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands)
+{
+    if (m_AvoidanceManeuverType == HEADING)
+    {
+        m_DivertState.heading_deg = m_CurrentState.heading_deg;
+        std::cout << "Current heading = " << m_CurrentState.heading_deg << std::endl;
+        struct intervals
+        {
+            double lower;
+            double upper;
+        };
+        std::vector<intervals> bands;
+        intervals temp;
+        for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
+        {
+            temp.lower = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
+            temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
+            bands.push_back(temp);
+            std::cout << "Lower = " << temp.lower << std::endl;
+            std::cout << "Upper = " << temp.upper << std::endl;
+        }
+        std::cout << std::endl;
+        uint initial_band = 0;  //band that the initial heading was in.
+        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
+            {
+                m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
+                if (!isFound)
+                {
+                    initial_band = i;
+                    isFound = true;
+                }
+            }
+        }
+        if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, a left turn is preferred.
+        {
+            for (uint i = initial_band; i > 0; i--)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.heading_deg))
+                {
+                    m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
+                }
+            }
+        }
+        if (m_DivertState.heading_deg < m_heading_min_deg) //If after checking right turns and left turns no better heading found, keep current heading
+        {
+            m_DivertState.heading_deg = m_CurrentState.heading_deg;
+            std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
+            std::cout << std::endl;
+        }
+        //TODO: Determine recommended action from DAIDALUS--done
+        //TODO: set action response to aforementioned recommended action--done
+        //TODO: ensure divert action does not violate keep out zones
+        //TODO: send vehicle action command--done
+        //TODO: remove RoW vehicle from the ConflictResolutionList--done by nature of the loop
+        //m_DivertState.heading_deg = m_CurrentState.heading_deg + 90.0;  //make sure heading is from 0 to 360
+        std::cout << "Divert to heading " << m_DivertState.heading_deg << std::endl;
+        m_DivertState.altitude_m = m_CurrentState.altitude_m;
+        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;       
+    }
+    else if (m_AvoidanceManeuverType == GROUNDSPEED)
+    {
+        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+        struct intervals
+        {
+            double lower;
+            double upper;
+        };
+        std::vector<intervals> bands;
+        intervals temp;
+        for (uint i = 0; i < DAIDALUS_bands->getWCVGroundSpeedIntervals().size(); i++)
+        {
+            temp.lower = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[0];
+            temp.upper = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[1];
+            bands.push_back(temp);
+        }
+        
+        uint initial_band = 0;  //band that the initial heading was in.
+        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
+            {
+                m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps;
+                if (!isFound)
+                {
+                    initial_band = i;
+                    isFound = true;
+                }
+            }
+        }
+        
+        if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
+        {
+            for (uint i = initial_band; i > 0; i--)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.horizontal_speed_mps))
+                {
+                    m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps;
+                }
+            }
+        }
+        
+        if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps) //If after checking right turns and left turns no better heading found, keep current heading
+        {
+            m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+        }
+        
+        m_DivertState.altitude_m = m_CurrentState.altitude_m;
+        m_DivertState.heading_deg = m_CurrentState.heading_deg;
+        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;        
+    }
+    else if (m_AvoidanceManeuverType == VERTICALSPEED)
+    {
+        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+        struct intervals
+        {
+            double lower;
+            double upper;
+        };
+        std::vector<intervals> bands;
+        intervals temp;
+        for (uint i = 0; i < DAIDALUS_bands->getWCVVerticalSpeedIntervals().size(); i++)
+        {
+            temp.lower = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[0];
+            temp.upper = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[1];
+            bands.push_back(temp);
+        }
+        
+        uint initial_band = 0;  //band that the initial heading was in.
+        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.vertical_speed_mps))
+            {
+                m_DivertState.vertical_speed_mps = bands[i].upper + m_verticalspeed_interval_buffer_mps;
+                if (!isFound)
+                {
+                    initial_band = i;
+                    isFound = true;
+                }
+            }
+        }
+        
+        if (m_DivertState.vertical_speed_mps > m_vertical_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
+        {
+            for (uint i = initial_band; i > 0; i--)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.vertical_speed_mps))
+                {
+                    m_DivertState.vertical_speed_mps = bands[i].lower - m_verticalspeed_interval_buffer_mps;
+                }
+            }
+        }
+        
+        if (m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps) //If after checking right turns and left turns no better heading found, keep current heading
+        {
+            m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+        }
+        
+        m_DivertState.altitude_m = m_CurrentState.altitude_m;
+        m_DivertState.heading_deg = m_CurrentState.heading_deg;
+        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;        
+    }
+    else
+    {
+        m_DivertState.altitude_m = m_CurrentState.altitude_m;
+        struct intervals
+        {
+            double lower;
+            double upper;
+        };
+        std::vector<intervals> bands;
+        intervals temp;
+        for (uint i = 0; i < DAIDALUS_bands->getWCVAlitudeIntervals().size(); i++)
+        {
+            temp.lower = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[0];
+            temp.upper = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[1];
+            bands.push_back(temp);
+        }
+        
+        uint initial_band = 0;  //band that the initial heading was in.
+        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.altitude_m))
+            {
+                m_DivertState.altitude_m = bands[i].upper + m_altitude_interval_buffer_m;
+                if (!isFound)
+                {
+                    initial_band = i;
+                    isFound = true;
+                }
+            }
+        }
+        
+        if (m_DivertState.altitude_m > m_altitude_max_m)  //If divert heading is greater than 360, a left turn is preferred.
+        {
+            for (uint i = initial_band; i > 0; i--)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.altitude_m))
+                {
+                    m_DivertState.altitude_m = bands[i].lower - m_altitude_interval_buffer_m;
+                }
+            }
+        }
+        
+        if (m_DivertState.altitude_m < m_altitude_min_m) //If after checking right turns and left turns no better heading found, keep current heading
+        {
+            m_DivertState.altitude_m = m_CurrentState.altitude_m;
+            std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
+            std::cout << std::endl;
+        }
+        //m_DivertState.altitude_m = m_CurrentState.altitude_m + 450; //testing change altitude
+        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+        m_DivertState.heading_deg = m_CurrentState.heading_deg;
+        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;        
+    }
+}
+
 bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands)
 {
     //TODO:  accept maneuver type as a parameter and consider safe to return for altitude, ground speed, and vertical speed maneuvers.
+    //TODO:  maybe add distance to intruders > DMD as a condition on safe to return.
     //std::cout << "Inside isSafe" << std::endl;
     uxas::common::utilities::FlatEarth flatEarth;
     //std::cout << "after flat" << std::endl;
@@ -141,6 +446,10 @@ bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm
     }
     else 
     {
+        bool isReturnHeadingSafe = true;
+        bool isReturnAltitudeSafe = true;
+        bool isReturnHorizontalSpeedSafe = true;
+        bool isReturnVerticalSpeedSafe = true;
         for (auto i : m_MissionCommand->getWaypointList())
         {
             //std::cout << "Inside loop" << std::endl;
@@ -161,20 +470,24 @@ bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm
         flatEarth.ConvertLatLong_degToNorthEast_m(WP_latitude_deg, WP_longitude_deg, WP_North_m, WP_East_m);
         m_ReturnState.heading_deg = std::fmod((n_Const::c_Convert::dRadiansToDegrees()*std::atan2((WP_East_m - CS_East_m), (WP_North_m - CS_North_m))) + 360.0, 360.0);
         std::cout << "The computed heading necessary to return to mission is " << m_ReturnState.heading_deg << " degrees." << std::endl;
+        std::cout << "The return to mission horizontal speed is " << m_ReturnState.horizontal_speed_mps << " m/s." << std::endl;
+        std::cout << "The return to mission vertical speed is " << m_ReturnState.vertical_speed_mps << " m/s." << std::endl;
+        std::cout << "The return to mission altitude is " << m_ReturnState.altitude_m << " m." << std::endl;
         struct intervals
         {
             double upper;
-
             double lower;
         };
+        
         std::vector<intervals> bands;
         intervals temp;
         for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
-            {
-                temp.lower = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
-                temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
-                bands.push_back(temp);
-            }
+        {
+            temp.lower = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
+            temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
+            bands.push_back(temp);
+        }
+        
         uint initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
         bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
         for (uint i = 0; i < bands.size(); i++)
@@ -186,19 +499,97 @@ bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm
                 break;
             }
         }
-        if (initial_band == UINT32_MAX)
+        
+        if (isFound && DAIDALUS_bands->getWCVGroundHeadingRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+        {
+            isReturnHeadingSafe = false;
+        }
+//        
+        bands.clear();
+        for (uint i = 0; i < DAIDALUS_bands->getWCVGroundSpeedIntervals().size(); i++)
+        {
+            temp.lower = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[0];
+            temp.upper = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[1];
+            bands.push_back(temp);
+        }
+        
+        initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
+        isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.horizontal_speed_mps))
+            {
+                initial_band = i;
+                isFound = true;
+                break;
+            }
+        }
+        
+        if (isFound && DAIDALUS_bands->getWCVGroundSpeedRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+        {
+            isReturnHorizontalSpeedSafe = false;
+        }
+ //
+        bands.clear();
+        for (uint i = 0; i < DAIDALUS_bands->getWCVVerticalSpeedIntervals().size(); i++)
+        {
+            temp.lower = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[0];
+            temp.upper = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[1];
+            bands.push_back(temp);
+        }
+        
+        initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
+        isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.vertical_speed_mps))
+            {
+                initial_band = i;
+                isFound = true;
+                break;
+            }
+        }
+        
+        if (isFound && DAIDALUS_bands->getWCVVerticalSpeedRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+        {
+            isReturnVerticalSpeedSafe = false;
+        }
+        
+//        
+        bands.clear();
+        for (uint i = 0; i < DAIDALUS_bands->getWCVAlitudeIntervals().size(); i++)
+        {
+            temp.lower = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[0];
+            temp.upper = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[1];
+            bands.push_back(temp);
+        }
+        
+        initial_band = UINT32_MAX;  //band that the Return to Mission heading was in.
+        isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_ReturnState.altitude_m))
+            {
+                initial_band = i;
+                isFound = true;
+                break;
+            }
+        }
+        
+        if (isFound && DAIDALUS_bands->getWCVAltitudeRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+        {
+            isReturnAltitudeSafe = false;
+        }
+
+        if (isReturnHeadingSafe && isReturnHorizontalSpeedSafe && isReturnVerticalSpeedSafe && isReturnAltitudeSafe)
         {
             return true;
         }
-        else if (isFound && DAIDALUS_bands->getWCVGroundHeadingRegions()[initial_band] == larcfm::DAIDALUS::BandsRegion::NEAR)
+        else
         {
             std::cout << "NOT SAFE TO RETURN TO MISSION" << std::endl;
             std::cout << std::endl;
             return false;
-        }
-        else
-        {
-            return true;
         }
     }
     //TODO: form return state heading ..--done
@@ -276,7 +667,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         }
         m_isReadyToActMissionCommand = true;
     }
-    if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
+    else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
         std::shared_ptr<afrl::cmasi::AirVehicleState> pAirVehicleState = 
                 std::static_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
@@ -290,6 +681,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             m_CurrentState.longitude_deg = pAirVehicleState->getLocation()->getLongitude();
             m_CurrentState.altitude_type = pAirVehicleState->getLocation()->getAltitudeType();
             m_CurrentState.speed_type = afrl::cmasi::SpeedType::Groundspeed;
+            m_CurrentState.total_velocity_mps = pAirVehicleState->getAirspeed();
             m_CurrentState.time_s = pAirVehicleState->getTime()*MILLISECONDSTOSECONDS;
             if (m_isOnMission)
             {
@@ -299,29 +691,31 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             }
         }
     }
-    if (larcfm::DAIDALUS::isDAIDALUSConfiguration(receivedLmcpMessage->m_object))
+    else if (larcfm::DAIDALUS::isDAIDALUSConfiguration(receivedLmcpMessage->m_object))
     {
         std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> configuration = 
                 std::static_pointer_cast<larcfm::DAIDALUS::DAIDALUSConfiguration>(receivedLmcpMessage->m_object);
         m_action_time_threshold_s = configuration->getAlertTime3();
         m_vertical_rate_mps = configuration->getVerticalRate();
         m_horizontal_accel_mpsps = configuration->getHorizontalAcceleration();
-        m_vertical_accel_mpsps = configuration->getVerticalAcceleration();
+        m_vertical_accel_G = configuration->getVerticalAcceleration();
         m_turn_rate_degps = configuration->getTurnRate();
+        m_ground_speed_max_mps = configuration->getMaxGroundSpeed();
+        m_ground_speed_min_mps = configuration->getMinGroundSpeed();
+        m_vertical_speed_max_mps = configuration->getMaxVerticalSpeed();
+        m_vertical_speed_min_mps = configuration->getMinVerticalSpeed();
+        m_altitude_max_m = configuration->getMaxAltitude();
+        m_altitude_min_m = configuration->getMinAltitude();
         m_isReadyToActConfiguration = true;  //boolean indicating if a threshold time is set from reading a DAIDALUS configuration parameter.
         //std::cout << "DAIDALUS Response has received the DAIDALUS configuration used for detection." << std::endl;
     }
-    if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
+    else if (larcfm::DAIDALUS::isWellClearViolationIntervals(receivedLmcpMessage->m_object))
     {
         //std::cout << "DAIDALUS Response has received a violation message." << std::endl;
         //if (m_isReadyToActWaypoint && m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
-        if (m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
-        {
-            m_isReadyToAct = true;  //boolean to determine when ready to act; by having a threshold time set, a desired waypoint, and a missioncommand waypoint list
-        }
         std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> pWCVIntervals = 
                 std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
-        if (m_isReadyToAct)
+        if (m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
         {
             /*
             m_CurrentState.altitude_m = pWCVIntervals->getCurrentAltitude();
@@ -343,13 +737,14 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     }
                 }
             }    
-            if (!m_isConflict && m_ConflictResolutionList.size() > 0) //TODO: add check for current heading in NEAR to conditional for action.
+            
+            if (!m_isConflict && m_ConflictResolutionList.size() > 0) //TODO: add check for current heading in NEAR to conditional for action.--done via m_ConflictResolutionList size
             {
                 m_isConflict = true;//bool t = SetisConflict(true);
             }
+            
             if (m_isConflict)
             {
-                //TODO: Get conflict bands and store
                 std::cout << "I HAVE DETERMINED THAT A CONFLICT MUST BE RESOLVED" << std::endl;
                 if (m_ConflictResolutionList.size() > 0)
                 {
@@ -359,6 +754,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 {
                     m_RoW = INT64_MIN;
                 }
+                
                 // determine the vehicle that has the Right of Way
                 for (int64_t i : m_ConflictResolutionList)
                 //for (size_t i = m_ConflictResolutionList.cbegin();  i < m_ConflictResolutionList.size(); i++)
@@ -369,6 +765,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     }                 
                     std::cout << "A Candidate for the Right of Way vehicle is Entity " << m_RoW << std::endl;
                 }
+                
                 if (m_entityId < m_RoW)
                 {
                     //Ownship has Right of Way and therefore should take no action 
@@ -401,70 +798,50 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     if (!m_isTakenAction)
                     {
                         //Current logic assumes DAIDALUS returns bands intervals ordered and grouped from 0(True North) to 360
-                        m_DivertState.heading_deg = m_CurrentState.heading_deg;
-                        std::cout << "Current heading = " << m_CurrentState.heading_deg << std::endl;
-                        struct intervals
-                        {
-                            double lower;
-                            double upper;
-                        };
-                        std::vector<intervals> bands;
-                        intervals temp;
-                        for (uint i = 0; i < pWCVIntervals->getWCVGroundHeadingIntervals().size(); i++)
-                        {
-                            temp.lower = std::fmod(pWCVIntervals->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
-                            temp.upper = std::fmod(pWCVIntervals->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
-                            bands.push_back(temp);
-                            std::cout << "Lower = " << temp.lower << std::endl;
-                            std::cout << "Upper = " << temp.upper << std::endl;
-                        }
-                        std::cout << std::endl;
-                        uint initial_band = 0;  //band that the initial heading was in.
-                        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-                        for (uint i = 0; i < bands.size(); i++)
-                        {
-                            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
-                            {
-                                m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
-                                if (!isFound)
-                                {
-                                    initial_band = i;
-                                    isFound = true;
-                                }
-                            }
-                        }
-                        if (m_DivertState.heading_deg > 360.0)  //If divert heading is greater than 360, a left turn is preferred.
-                        {
-                            for (uint i = initial_band; i > 0; i--)
-                            {
-                                if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
-                                {
-                                    m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
-                                }
-                            }
-                        }
-                        if (m_DivertState.heading_deg < 0.0) //If after checking right turns and left turns no better heading found, keep current heading
-                        {
-                            m_DivertState.heading_deg = m_CurrentState.heading_deg;
-                        }
-                        //TODO: Determine recommended action from DAIDALUS
-                        //TODO: set action response to aforementioned recommended action
-                        //TODO: ensure divert action does not violate keep out zones
-                        //TODO: send vehicle action command--done
-                        //TODO: remove RoW vehicle from the ConflictResolutionList--done by nature of the loop
-                        //m_DivertState.heading_deg = m_CurrentState.heading_deg + 90.0;  //make sure heading is from 0 to 360
-                        std::cout << "Divert to heading " << m_DivertState.heading_deg << std::endl;
-                        m_DivertState.altitude_m = m_CurrentState.altitude_m;
-                        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
-                        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;                        
-                        
+                        SetDivertState(pWCVIntervals);
                         std::unique_ptr<afrl::cmasi::FlightDirectorAction> pDivertThisWay = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
                         pDivertThisWay->setHeading(static_cast<float>(m_DivertState.heading_deg)); 
                         pDivertThisWay->setAltitude(m_DivertState.altitude_m);
                         pDivertThisWay->setSpeed(m_DivertState.horizontal_speed_mps);
                         pDivertThisWay->setAltitudeType(m_DivertState.altitude_type);
                         pDivertThisWay->setClimbRate(m_DivertState.vertical_speed_mps);
-                        double m_action_time_threshold_s = std::abs(m_DivertState.heading_deg - m_CurrentState.heading_deg)/m_turn_rate_degps; 
+                        double m_action_time_threshold_s = 0;
+                        if (((m_turn_rate_degps == 0) && (m_bank_angle_deg == 0)) || (m_horizontal_accel_mpsps == 0) || (m_vertical_accel_G == 0) ||
+                                (m_vertical_rate_mps == 0))
+                        {
+                            m_action_time_threshold_s = 68;
+                        }
+                        else if (m_AvoidanceManeuverType == HEADING)
+                        {
+                            if (m_turn_rate_degps != 0)
+                            {
+                                m_action_time_threshold_s = std::abs(m_DivertState.heading_deg - m_CurrentState.heading_deg) / m_turn_rate_degps; //TODO: handle DAIDALUS configuration using instantaneous bands
+                            }
+                            else
+                            {
+                                double estimate_turn_rate_degps = (9.81*std::tan(m_bank_angle_deg * n_Const::c_Convert::dDegreesToRadians())) / 
+                                m_CurrentState.total_velocity_mps;
+                                m_action_time_threshold_s = std::abs(m_DivertState.heading_deg - m_CurrentState.heading_deg) / estimate_turn_rate_degps;
+                            }
+                            
+                        }
+                        else if (m_AvoidanceManeuverType == GROUNDSPEED)
+                        {
+                            m_action_time_threshold_s = std::abs(m_DivertState.horizontal_speed_mps - m_CurrentState.horizontal_speed_mps) / 
+                                    m_horizontal_accel_mpsps;
+                        }
+                        else if (m_AvoidanceManeuverType == VERTICALSPEED)
+                        {
+                            m_action_time_threshold_s = std::abs(m_DivertState.vertical_speed_mps - m_CurrentState.vertical_speed_mps) / 
+                                    (m_vertical_accel_G * 9.81);
+                        }
+                        else
+                        {
+                            m_action_time_threshold_s = std::abs(m_DivertState.altitude_m - m_CurrentState.altitude_m) / 
+                                    (m_vertical_speed_max_mps) + std::abs(m_vertical_speed_max_mps - m_CurrentState.vertical_speed_mps) / 
+                                    (m_vertical_accel_G * 9.81);
+                        }
+                        
                         std::cout << "Maneuver should be held for " << m_action_time_threshold_s << " seconds or until divert heading obtained" << std::endl;
                         m_action_hold_release_time_s = m_CurrentState.time_s + m_action_time_threshold_s;
                         
@@ -478,17 +855,18 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         m_isOnMission = false;
                         //sendLmcpObjectBroadcastMessage(static_cast<avtas::lmcp::Object*>(pAvoidViolation));                
                         sendSharedLmcpObjectBroadcastMessage(pAvoidViolation);
-                        std::cout << "ENTITY " << m_entityId << " is conducting a divert maneuver." << std::endl;
-                        
+                        std::cout << "ENTITY " << m_entityId << " is conducting a divert maneuver." << std::endl;                        
                     }
                     else
                     {
-                        //TODO: hold conflict until elapsed time for maneuver has passed or until desired state attained--time hold in place
-                        //TODO: Compare desired "mode value" to current nogo band and if outside mode value send action command to desired and set isConflict to false
-                        if ((m_CurrentState.time_s >= m_action_hold_release_time_s) || isWithinTolerance())  //TODO: add a comparison between current state and desired state to this conditional
+                        //TODO: hold conflict until elapsed time for maneuver has passed or until desired state attained--time hold in place--done
+                        //TODO: Compare desired "mode value" to current nogo band and if outside mode value send action command to desired and set isConflict to false--done
+                        //if ((m_CurrentState.time_s >= m_action_hold_release_time_s) || isWithinTolerance())  //TODO: add a comparison between current state and desired state to this conditional--done
+                        if (isWithinTolerance())
                         {
                             m_isTakenAction = false;
                             m_isActionCompleted = true;
+                            m_isCloseToDesired = false;
                         }
                         std::cout << "Still performing collision avoidance maneuver." << std::endl;
 
@@ -505,7 +883,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                                 //ResetResponse();
                                 if (m_NextWaypoint != -1)
                                 {
-                                    ResetResponse();
+                                    //ResetResponse();
                                     m_isOnMission = true;
                                     std::cout << "Returning to Mission" << std::endl;
                                     m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
@@ -525,14 +903,13 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         //ResetResponse();
                         if (m_NextWaypoint != -1)
                         {
-                            ResetResponse();
+                            //ResetResponse();
                             m_isOnMission = true;
                             std::cout << "Returning to Mission" << std::endl;
                             m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
                             sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
                         }
                     }
-                    
                 }
             }
         }

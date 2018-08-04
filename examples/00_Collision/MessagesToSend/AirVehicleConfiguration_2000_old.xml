@@ -11,50 +11,17 @@
       <EnergyRate>3.0E-4</EnergyRate>
     </FlightProfile>
   </NominalFlightProfile>
-  <AlternateFlightProfiles>
-    <FlightProfile Series="CMASI">
-      <Name/>
-      <Airspeed>5.1444</Airspeed>
-      <PitchAngle>0.0</PitchAngle>
-      <VerticalSpeed>0.0</VerticalSpeed>
-      <MaxBankAngle>20.0</MaxBankAngle>
-      <EnergyRate>3.0E-4</EnergyRate>
-  </FlightProfile>
-  <FlightProfile Series="CMASI">
-      <Name/>
-      <Airspeed>360.11</Airspeed>
-      <PitchAngle>0.0</PitchAngle>
-      <VerticalSpeed>0.0</VerticalSpeed>
-      <MaxBankAngle>20.0</MaxBankAngle>
-      <EnergyRate>3.0E-4</EnergyRate>
-  </FlightProfile>
-  <FlightProfile Series="CMASI">
-      <Name/>
-      <Airspeed>20.0</Airspeed>
-      <PitchAngle>0.0</PitchAngle>
-      <VerticalSpeed>-30.48</VerticalSpeed>
-      <MaxBankAngle>20.0</MaxBankAngle>
-      <EnergyRate>3.0E-4</EnergyRate>
-  </FlightProfile>
-  <FlightProfile Series="CMASI">
-      <Name/>
-      <Airspeed>20.0</Airspeed>
-      <PitchAngle>0.0</PitchAngle>
-      <VerticalSpeed>30.48</VerticalSpeed>
-      <MaxBankAngle>20.0</MaxBankAngle>
-      <EnergyRate>3.0E-4</EnergyRate>
-  </FlightProfile>
-  </AlternateFlightProfiles>
+  <AlternateFlightProfiles/>
   <AvailableLoiterTypes/>
   <AvailableTurnTypes/>
   <MinimumAltitude>0.0</MinimumAltitude>
   <MinAltitudeType>AGL</MinAltitudeType>
   <MaximumAltitude>1000000.0</MaximumAltitude>
   <MaxAltitudeType>MSL</MaxAltitudeType>
-  <ID>4208</ID>
+  <ID>2000</ID>
   <Affiliation>Unknown</Affiliation>
   <EntityType/>
-  <Label>UAV_3</Label>
+  <Label>UAV_2</Label>
   <NominalSpeed>20.0</NominalSpeed>
   <NominalAltitude>500.0</NominalAltitude>
   <NominalAltitudeType>AGL</NominalAltitudeType>
@@ -74,7 +41,7 @@
       </DiscreteHorizontalFieldOfViewList>
       <VideoStreamHorizontalResolution>1024</VideoStreamHorizontalResolution>
       <VideoStreamVerticalResolution>768</VideoStreamVerticalResolution>
-      <PayloadID>4001</PayloadID>
+      <PayloadID>2001</PayloadID>
       <PayloadKind/>
       <Parameters/>
     </CameraConfiguration>
@@ -93,9 +60,9 @@
       <MaxElevationSlewRate>115.0</MaxElevationSlewRate>
       <MaxRotationRate>0.0</MaxRotationRate>
       <ContainedPayloadList>
-        <int64>4001</int64>
+        <int64>2001</int64>
       </ContainedPayloadList>
-      <PayloadID>401</PayloadID>
+      <PayloadID>201</PayloadID>
       <PayloadKind/>
       <Parameters/>
     </GimbalConfiguration>

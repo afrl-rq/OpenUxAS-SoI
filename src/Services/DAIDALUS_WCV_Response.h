@@ -28,6 +28,7 @@
 #include "larcfm/DAIDALUS/WellClearViolationIntervals.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 namespace uxas
 {
@@ -135,14 +136,26 @@ private:
     bool m_isActionCompleted {false}; //boolean stating whether or not service has completed taking action for the violation under consideration.
     bool m_isCloseToDesired {false};
     double m_heading_tolerance_deg{0.5};
+    double m_groundspeed_tolerance_mps{5};
+    double m_verticalspeed_tolerance_mps{5};
+    double m_altitude_tolerance_m{10};
     double m_tolerance_clock_s;
     double m_tolerance_threshold_time_s{5};  //time needed to stay within desired state to be considered attained--seconds
     double m_action_time_threshold_s;   // time threshold to hold when taking action
     double m_action_hold_release_time_s;  //time at which an action hold must be released
     double m_vertical_rate_mps; //DAIDALUS configuration vertical rate used for estimation of time to perform altitude maneuver
     double m_turn_rate_degps;   //DAIDALUS configuration turn rate used for estimation of time to perform heading/track maneuver
+    double m_bank_angle_deg;    //DAIDALUS configuration bank angle used for estimation to time to perform heading/track maneuver
     double m_horizontal_accel_mpsps;    //DAIDALUS configuration horizontal acceleration used for estimation of time to perform a horizontal speed maneuver
-    double m_vertical_accel_mpsps;  //DAIDALUS configuration vertical 
+    double m_vertical_accel_G;  //DAIDALUS configuration vertical 
+    double m_ground_speed_max_mps;  //DAIDALUS configuration maximum horizontal speed
+    double m_ground_speed_min_mps; //DAIDALUS configuration minimum horizontal speed
+    double m_heading_max_deg{360.0};  //DAIDALUS maximum heading 
+    double m_heading_min_deg{0.0};   //DAIDALUS minimum heading 
+    double m_vertical_speed_max_mps;    //DAIDALUS configuration maximum vertical speed
+    double m_vertical_speed_min_mps;    //DAIDALUS configuration minimum vertical speed
+    double m_altitude_max_m;    //DAIDALUS configuration maximum altitude
+    double m_altitude_min_m;    //DAIDALS configuration minimum altitude
     double m_heading_interval_buffer_deg{5.0};  //degrees to buffer the heading bands interval by for avoidance maneuver
     double m_groundspeed_interval_buffer_mps{10.0};   //speed to buffer the ground speed interval by for avoidance maneuver.
     double m_verticalspeed_interval_buffer_mps{5.0};  //speed to buffer the vertical speed interval by for avoidance maneuver.
@@ -150,6 +163,7 @@ private:
     int64_t  m_NextWaypoint{-1};// {nullptr};
     int64_t m_RoW;
     std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand{nullptr};// {nullptr};
+    std::string m_AvoidanceManeuverType = "Altitude";
     std::vector<int64_t> m_ConflictResolutionList;
 
     struct State
@@ -161,10 +175,12 @@ private:
         double latitude_deg;
         double longitude_deg;
         double time_s;
+        double total_velocity_mps;
         afrl::cmasi::AltitudeType::AltitudeType altitude_type;
         afrl::cmasi::SpeedType::SpeedType speed_type;
     }m_CurrentState, m_DivertState, m_ReturnState;
     void ResetResponse();
+    void SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands);
     bool isWithinTolerance();
     bool isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_band);
     
