@@ -1,0 +1,35 @@
+<AirVehicleState Time="0.0" Series="CMASI">
+    <ID>1</ID>
+    <u>0.0</u>
+    <v>0.0</v>
+    <w>0.0</w>
+    <udot>0.0</udot>
+    <vdot>0.0</vdot>
+    <wdot>0.0</wdot>
+    <Heading>0.0</Heading>
+    <Pitch>0.0</Pitch>
+    <Roll>0.0</Roll>
+    <p>0.0</p>
+    <q>0.0</q>
+    <r>0.0</r>
+    <Airspeed>30.0</Airspeed>
+    <VerticalSpeed>0.0</VerticalSpeed>
+    <ActualEnergyRate>0.0</ActualEnergyRate>
+    <EnergyAvailable>100.0</EnergyAvailable>
+    <WindSpeed>0.0</WindSpeed>
+    <WindDirection>0.0</WindDirection>
+    <GroundSpeed>0.0</GroundSpeed>
+    <Location>
+        <Location3D Series="CMASI">
+            <Altitude>500.0</Altitude>
+            <Latitude>1.515222469185929</Latitude>
+            <Longitude>-132.5299158713604</Longitude>
+        </Location3D>
+    </Location>
+    <GroundTrack>0.0</GroundTrack>
+    <CurrentWaypoint>0</CurrentWaypoint>
+    <CurrentCommand>0</CurrentCommand>
+    <Mode>Waypoint</Mode>
+    <AssociatedTasks/>
+    <Time>0</Time>
+</AirVehicleState>

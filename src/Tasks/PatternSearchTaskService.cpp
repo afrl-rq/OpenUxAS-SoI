@@ -20,13 +20,17 @@
 #include "Position.h"
 #include "FileSystemUtilities.h"
 #include "Polygon.h"
+#include "Constants/Convert.h"
 
 #include "afrl/cmasi/Circle.h"
 #include "afrl/cmasi/Polygon.h"
 #include "afrl/cmasi/Rectangle.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
+#include "afrl/cmasi/VideoStreamAction.h"
 #include "afrl/cmasi/GimbalStareAction.h"
+#include "afrl/cmasi/GimbalAngleAction.h"
 #include "afrl/cmasi/GimbalConfiguration.h"
+#include "afrl/cmasi/CameraConfiguration.h"
 #include "uxas/messages/task/SensorFootprintResponse.h"
 #include "uxas/messages/task/FootprintRequest.h"
 #include "uxas/messages/task/SensorFootprintRequests.h"
@@ -37,14 +41,15 @@
 #include "uxas/messages/uxnative/VideoRecord.h"
 
 #include "pugixml.hpp"
-#include "Constants/Convert.h"
 
 #include <sstream>      //std::stringstream
 #include <iostream>     // std::cout, cerr, etc
 #include <iomanip>  //setfill
 
-#define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "PTNST-PTNST-PTNST-PTNST:: PatternSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
-#define CERR_FILE_LINE_MSG(MESSAGE) std::cerr << "PTNST-PTNST-PTNST-PTNST:: PatternSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cerr.flush();
+#define STRING_SPIRAL_CENTER_RADIUS_M "SpiralCenterRadius_m"
+
+#define COUT_FILE_LINE_MSG(MESSAGE) std::cout << "<OO>PatternSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cout.flush();
+#define CERR_FILE_LINE_MSG(MESSAGE) std::cerr << "<OO>PatternSearch:" << __FILE__ << ":" << __LINE__ << ":" << MESSAGE << std::endl;std::cerr.flush();
 
 
 namespace uxas
@@ -57,9 +62,13 @@ PatternSearchTaskService::ServiceBase::CreationRegistrar<PatternSearchTaskServic
 PatternSearchTaskService::s_registrar(PatternSearchTaskService::s_registryServiceTypeNames());
 
 PatternSearchTaskService::PatternSearchTaskService()
-: TaskServiceBase(PatternSearchTaskService::s_typeName(), PatternSearchTaskService::s_directoryName()) { };
+: TaskServiceBase(PatternSearchTaskService::s_typeName(), PatternSearchTaskService::s_directoryName())
+{
+};
 
-PatternSearchTaskService::~PatternSearchTaskService() { };
+PatternSearchTaskService::~PatternSearchTaskService()
+{
+};
 
 bool
 PatternSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
@@ -97,6 +106,40 @@ PatternSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
                     isSuccessful = false;
                 }
             }
+            if(isSuccessful)
+            {
+                //////////////////////////////////////////////
+                //////////// PROCESS OPTIONS /////////////////
+                pugi::xml_node ndTaskOptions = ndComponent.child(m_taskOptions_XmlTag.c_str());
+                if (ndTaskOptions)
+                {
+                    for (pugi::xml_node ndTaskOption = ndTaskOptions.first_child(); ndTaskOption; ndTaskOption = ndTaskOption.next_sibling())
+                    {
+                        if (std::string(STRING_SPIRAL_CENTER_RADIUS_M) == ndTaskOption.name())
+                        {
+                            pugi::xml_node ndOptionValue = ndTaskOption.first_child();
+                            if (ndOptionValue)
+                            {
+                                double spiralCenterRadius_m = -1.0;
+                                try
+                                {
+                                    spiralCenterRadius_m = std::stod(ndOptionValue.value());
+                                }
+                                catch (std::exception& ex)
+                                {
+                                    UXAS_LOG_ERROR(s_typeName(), " failed to find m_dIntruderSpeedLowerBoundFraction in [", ndOptionValue.value(), "]; EXCEPTION: ", ex.what());
+                                }
+                                if (spiralCenterRadius_m > 0.0)
+                                {
+                                    m_spiralCenterRadius_m = spiralCenterRadius_m;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
         }
         else
         {
@@ -328,7 +371,7 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute(std::shared_ptr<TaskO
 
     if (m_patternSearchTask->getPattern() == afrl::impact::AreaSearchPattern::Spiral)
     {
-        m_isUseDpss = false;
+        m_isUseDpss = true;
         isSuccess = isCalculatePatternScanRoute_Spiral(pTaskOptionClass, sensorFootprint);
     }
     else if (m_patternSearchTask->getPattern() == afrl::impact::AreaSearchPattern::Sector)
@@ -350,100 +393,29 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute(std::shared_ptr<TaskO
     return (isSuccess);
 }
 
-bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_ptr<TaskOptionClass>& pTaskOptionClass,
-                                                                  const std::unique_ptr<uxas::messages::task::SensorFootprint>& sensorFootprint)
+bool PatternSearchTaskService::isAddDpssSteering(std::shared_ptr<TaskOptionClass>& pTaskOptionClass, std::vector<Dpss_Data_n::xyPoint>& vxyTrueRoadPoints, std::vector<Dpss_Data_n::xyPoint>& vxyWaypoints)
 {
     bool isSuccess(true);
 
-    uxas::common::utilities::CUnitConversions unitConversions;
-    double northStart_m = 0.0;
-    double eastStart_m = 0.0;
-    unitConversions.ConvertLatLong_degToNorthEast_m(m_patternSearchTask->getSearchLocation()->getLatitude(),
-                                                    m_patternSearchTask->getSearchLocation()->getLongitude(), northStart_m, eastStart_m);
-
-    if (m_isUseDpss)
-    {
-        std::vector<Dpss_Data_n::xyPoint> vxyTrueRoad;
-        std::vector<Dpss_Data_n::xyPoint> vxyTrueWaypoints;
-
-        bool firstPass = true;
-        uint32_t pointId(1); // road point Id's for DPSS
-        double startHeading_rad = 1.5 * n_Const::c_Convert::dPi();
-        double theta_rad = 0.0; //could be used to set a different starting heading
-        double radius_m = 0.0;
-        while (radius_m <= m_patternSearchTask->getExtent())
+    if ((vxyTrueRoadPoints.size() > 1) && (vxyWaypoints.size() > 1))
         {
-            radius_m = 0.5 * pTaskOptionClass->m_laneSpacing_m * (1.0 + theta_rad / n_Const::c_Convert::dPi());
-            double north_m = (radius_m * sin(theta_rad - startHeading_rad)) + northStart_m;
-            double east_m = (radius_m * cos(theta_rad - startHeading_rad)) + eastStart_m;
-            if (firstPass)
-            {
-                // add a starting point that puts the leading edge of the sensor on the start of the spiral
-                north_m -= sensorFootprint->getHorizontalToLeadingEdge() * cos(startHeading_rad);
-                east_m -= sensorFootprint->getHorizontalToLeadingEdge() * sin(startHeading_rad);
-                Dpss_Data_n::xyPoint xyTemp(north_m, east_m, pTaskOptionClass->m_altitude_m);
-                xyTemp.id = pointId;
-                vxyTrueRoad.push_back(xyTemp);
-                pointId++;
-            }
-            Dpss_Data_n::xyPoint xyTemp(north_m, east_m, pTaskOptionClass->m_altitude_m);
-            xyTemp.id = pointId;
-            vxyTrueRoad.push_back(xyTemp);
-            pointId++;
-
-            if (radius_m > 0.0) // divide by zero check
-            {
-                assert(m_waypointSpacing_m > 0.0);
-                theta_rad += m_waypointSpacing_m / radius_m; // set the next theta based on the desired waypoint separation
-            }
-            firstPass = false;
-        }
-
-        vxyTrueWaypoints = vxyTrueRoad;
-
-        int32_t maxNumberWaypointsPoints = static_cast<int32_t> (vxyTrueRoad.size());
-
-        // first reset the Dpss
         auto dpss = std::make_shared<Dpss>();
         std::string dpssPath = m_strSavePath + "DPSS_Output/OptionId_" + std::to_string(pTaskOptionClass->m_taskOption->getOptionID()) + "/";
         dpss->SetOutputPath(dpssPath.c_str());
-        dpss->SetSingleDirectionPlanning(false);
+        dpss->SetSingleDirectionPlanning(true);
 
-        //1.1) Call DPSS Plan the path (quickly)
-        dpss->PreProcessPath(vxyTrueWaypoints);
+        double azimuth{0.0};
+        double elevation{n_Const::c_Convert::toRadians(-80.0)};
+        double altitude{pTaskOptionClass->m_altitude_m};
 
-        // need non-const versions of these 
-        auto localAzimuthLookAngle_rad = 0.0;
-        auto localElevationLookAngle_rad = -60.0 * n_Const::c_Convert::dDegreesToRadians();
-        auto localNominalAltitude_m = pTaskOptionClass->m_altitude_m;
-
-        dpss->SetNominalAzimuth_rad(localAzimuthLookAngle_rad);
-        dpss->SetNominalElevation_rad(localElevationLookAngle_rad);
-        dpss->SetNominalAltitude_m(localNominalAltitude_m);
-
-        dpss->PlanQuickly(vxyTrueWaypoints, maxNumberWaypointsPoints);
-
-        //1.2) Offset the Path in Forward and reverse directions
-
-        //1.2.1) Call DPSS Offset Path Forward
-        std::vector<Dpss_Data_n::xyPoint> vxyPlanForward;
-        dpss->OffsetPlanForward(vxyTrueWaypoints, vxyPlanForward);
-
-        //1.2.2) Call DPSS Offset Path Reverse
-        std::vector<Dpss_Data_n::xyPoint> vxyPlanReverse;
-        dpss->OffsetPlanReverse(vxyTrueWaypoints, vxyPlanReverse);
-
-        if ((vxyPlanForward.size() > 1) && (vxyPlanReverse.size() > 1))
-        {
-            std::vector<Dpss_Data_n::xyPoint> vxyPlanComplete;
-            vxyPlanComplete = vxyPlanForward;
-            vxyPlanComplete.insert(vxyPlanComplete.end(), vxyPlanReverse.begin(), vxyPlanReverse.end());
-
+        dpss->SetNominalAzimuth_rad(azimuth);
+        dpss->SetNominalElevation_rad(elevation);
+        dpss->SetNominalAltitude_m(altitude);
 
             ObjectiveParameters op; //TODO:: do I need to do anything with this?
             op.sameSide = 0;
-            op.nominalAzimuthInRadians = localAzimuthLookAngle_rad;
-            op.nominalElevationInRadians = localElevationLookAngle_rad;
+        op.nominalAzimuthInRadians = 0.0;
+        op.nominalElevationInRadians = n_Const::c_Convert::toRadians(-80.0);
             op.lreLatitudeInRadians = 0.0;
             op.lreLongitudeInRadians = 0.0;
             op.nearWaypointThresholdDistanceInMeters = 0.0;
@@ -451,79 +423,27 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_pt
             op.rendezvousDistanceInMeters = 0.0;
 
             //1.3) Call DPSS Update Plan and Sensor Path
-            dpss->SetObjective(vxyTrueRoad, vxyPlanComplete, &op);
+        dpss->SetObjective(vxyTrueRoadPoints, vxyWaypoints, &op);
 
-
-            // build the forward waypoints && calculate cost
-            auto routePlan = std::make_shared<uxas::messages::route::RoutePlan>();
-            int64_t waypointNumber = 1;
-            auto itWaypoint = vxyPlanForward.begin();
-            auto itWaypointlast = vxyPlanForward.begin();
-            double distance_m = 0.0;
-            double startHeading_deg = 0.0;
-            double endHeading_deg = 0.0;
-            for (; itWaypoint != vxyPlanForward.end(); itWaypoint++, waypointNumber++)
-            {
-                double latitude_deg(0.0);
-                double longitude_deg(0.0);
-                unitConversions.ConvertNorthEast_mToLatLong_deg(itWaypoint->x, itWaypoint->y, latitude_deg, longitude_deg);
-
-                auto waypoint = new afrl::cmasi::Waypoint();
-                waypoint->setNumber(waypointNumber);
-                waypoint->setLatitude(latitude_deg);
-                waypoint->setLongitude(longitude_deg);
-                waypoint->setAltitude(itWaypoint->z);
-                routePlan->getWaypoints().push_back(waypoint);
-                waypoint = nullptr; // gave up ownership
-
-                if (itWaypoint != vxyPlanForward.begin())
-                {
-                    // add to the length of the path
-                    distance_m += itWaypoint->dist(*itWaypointlast);
-
-                    if (itWaypointlast == vxyPlanForward.begin())
-                    {
-                        startHeading_deg = itWaypointlast->heading2d(*itWaypoint);
-                        startHeading_deg = startHeading_deg * n_Const::c_Convert::dRadiansToDegrees();
+        m_optionIdVsDpss.insert(std::make_pair(pTaskOptionClass->m_taskOption->getOptionID(), dpss));
                     }
-                    else if ((itWaypoint + 1) == vxyPlanForward.end())
+    else
                     {
-                        endHeading_deg = (itWaypointlast->heading2d(*itWaypoint) + n_Const::c_Convert::dPi()) * n_Const::c_Convert::dRadiansToDegrees();
+        // ERROR:: not enough waypoints for DPSS
+        isSuccess = false;
                     }
-                }
-                itWaypointlast = itWaypoint;
+
+    return (isSuccess);
             }
 
-            m_optionIdVsDpss.insert(std::make_pair(pTaskOptionClass->m_taskOption->getOptionID(), dpss));
+bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_ptr<TaskOptionClass>& pTaskOptionClass,
+        const std::unique_ptr<uxas::messages::task::SensorFootprint>& sensorFootprint)
+{
+    bool isSuccess(true);
 
-            int64_t routeId = TaskOptionClass::m_firstImplementationRouteId;
-            routePlan->setRouteID(routeId);
-
-            double cost_ms = static_cast<int64_t> (((pTaskOptionClass->m_speed_mps > 0.0) ? (distance_m / pTaskOptionClass->m_speed_mps) : (0.0))*1000.0);
-            routePlan->setRouteCost(cost_ms);
-
-            pTaskOptionClass->m_orderedRouteIdVsPlan[routePlan->getRouteID()] = routePlan;
-
-            pTaskOptionClass->m_taskOption->setStartLocation(new afrl::cmasi::Location3D(*(routePlan->getWaypoints().front())));
-            pTaskOptionClass->m_taskOption->setStartHeading(startHeading_deg);
-            pTaskOptionClass->m_taskOption->setEndLocation(new afrl::cmasi::Location3D(*(routePlan->getWaypoints().back())));
-            pTaskOptionClass->m_taskOption->setEndHeading(endHeading_deg);
-
-            pTaskOptionClass->m_taskOption->setCost(cost_ms);
-
-            m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
-        } //if((vxyPlanForward.size() > 1) && (vxyPlanReverse.size() > 1))
-    }
-    else //if(m_isUseDpss)
+    if (pTaskOptionClass->m_laneSpacing_m > 0.0)
     {
-        auto routePlan = std::make_shared<uxas::messages::route::RoutePlan>();
-        int64_t waypointNumber = 1;
-        double distance_m = 0.0;
-        double northLast_m = 0.0;
-        double eastLast_m = 0.0;
-        double startHeading_deg = 0;
-        double endHeading_deg = 0;
-
+        auto sensorSteeringSegments = std::make_shared<uxas::common::utilities::SensorSteeringSegments>();
         // SPIRAL:: r = a + b*Theta
         //psi_rad = 0*np.pi
         //laneWidth = 100
@@ -539,38 +459,64 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_pt
         //    thetas.append((theta_rad - psi_rad))
         //    print 'theta_rad[{0}], radius[{1}]'.format(theta_rad,radius_m)
         //    theta_rad = theta_rad + (m_waypointSpacing_m/radius_m)
-        double theta_rad = 0.0; //could be used to set a different starting heading
-        double radius_m = 0.0;
-        bool firstPass = true;
-        while (radius_m <= m_patternSearchTask->getExtent())
+
+
+        double northStart_m = 0.0;
+        double eastStart_m = 0.0;
+        m_flatEarth.ConvertLatLong_degToNorthEast_m(m_patternSearchTask->getSearchLocation()->getLatitude(),
+                m_patternSearchTask->getSearchLocation()->getLongitude(), northStart_m, eastStart_m);
+
+        auto routePlan = std::make_shared<uxas::messages::route::RoutePlan>();
+        int64_t waypointNumber = 1;
+        double distance_m = 0.0;
+        double northLast_m = 0.0;
+        double eastLast_m = 0.0;
+        double theta_rad{0.0}; //could be used to set a different starting heading
+        double startHeading_rad{0.0};
+        double radius_m{0.0};
+        bool firstPass{true};
+        bool firstWaypoint{true};
+        double deltaNorth_m{0.0};
+        double deltaEast_m{0.0};
+
+        int64_t roadPointIndex{0};
+        std::vector<std::shared_ptr<uxas::common::utilities::SensorSteering::PointData> > waypoints;
+        std::vector<std::shared_ptr<uxas::common::utilities::SensorSteering::PointData> > roadpoints;
+
+
+        bool isInitialSegment{true};
+        bool isSegmentEnd{false};
+
+        double spiralBoundary_m = m_patternSearchTask->getExtent() + (0.55 * pTaskOptionClass->m_laneSpacing_m);
+        while (radius_m <= spiralBoundary_m)
         {
-            radius_m = 0.5 * pTaskOptionClass->m_laneSpacing_m * (1.0 + theta_rad / n_Const::c_Convert::dPi());
-            double north_m = (radius_m * sin(theta_rad - startHeading_deg)) + northStart_m;
-            double east_m = (radius_m * cos(theta_rad - startHeading_deg)) + eastStart_m;
-            double latitude_deg(0.0);
-            double longitude_deg(0.0);
+            radius_m = 0.45 * pTaskOptionClass->m_laneSpacing_m * (1.0 + theta_rad / n_Const::c_Convert::dPi());
             if (firstPass)
             {
-                // add a starting point that puts the leading edge of the sensor on the start of the spiral
-                northLast_m = north_m - sensorFootprint->getHorizontalToLeadingEdge() * cos(startHeading_deg);
-                eastLast_m = east_m - sensorFootprint->getHorizontalToLeadingEdge() * sin(startHeading_deg);
-                unitConversions.ConvertNorthEast_mToLatLong_deg(northLast_m, eastLast_m,
-                                                                latitude_deg, longitude_deg);
-                auto waypoint = new afrl::cmasi::Waypoint();
-                waypoint->setNumber(waypointNumber);
-                waypoint->setLatitude(latitude_deg);
-                waypoint->setLongitude(longitude_deg);
-                waypoint->setAltitude(pTaskOptionClass->m_altitude_m);
-                waypoint->setSpeed(pTaskOptionClass->m_speed_mps);
-                routePlan->getWaypoints().push_back(waypoint);
-
-                pTaskOptionClass->m_taskOption->setStartLocation(new afrl::cmasi::Location3D(*(waypoint)));
-                pTaskOptionClass->m_taskOption->setStartHeading(startHeading_deg);
-
-                waypoint = nullptr; // gave up ownership
-                waypointNumber++; // next waypoint
+                radius_m = 50.0;
             }
-            unitConversions.ConvertNorthEast_mToLatLong_deg(north_m, east_m,
+            double north_m = (radius_m * sin(theta_rad - startHeading_rad)) + northStart_m;
+            double east_m = (radius_m * cos(theta_rad - startHeading_rad)) + eastStart_m;
+
+            roadpoints.push_back(std::make_shared<uxas::common::utilities::SensorSteering::PointData>(roadPointIndex, north_m, east_m));
+
+            double vehicleRadius_m = radius_m;
+            if (vehicleRadius_m < m_spiralCenterRadius_m)
+            {
+                vehicleRadius_m = m_spiralCenterRadius_m;
+            }
+            else if (isInitialSegment)
+            {
+                isInitialSegment = false;
+                isSegmentEnd = true;
+            }
+            double vehicleNorth_m = (vehicleRadius_m * sin(theta_rad - startHeading_rad)) + northStart_m;
+            double vehicleEast_m = (vehicleRadius_m * cos(theta_rad - startHeading_rad)) + eastStart_m;
+            deltaNorth_m = vehicleNorth_m - northLast_m;
+            deltaEast_m = vehicleEast_m - eastLast_m;
+            double latitude_deg(0.0);
+            double longitude_deg(0.0);
+            m_flatEarth.ConvertNorthEast_mToLatLong_deg(vehicleNorth_m, vehicleEast_m,
                                                             latitude_deg, longitude_deg);
             auto waypoint = new afrl::cmasi::Waypoint();
             waypoint->setNumber(waypointNumber);
@@ -578,11 +524,30 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_pt
             waypoint->setLongitude(longitude_deg);
             waypoint->setAltitude(pTaskOptionClass->m_altitude_m);
             waypoint->setSpeed(pTaskOptionClass->m_speed_mps);
+            waypoints.push_back(std::make_shared<uxas::common::utilities::SensorSteering::PointData>(waypoint->getNumber(), waypoint, m_flatEarth));
             routePlan->getWaypoints().push_back(waypoint);
+            if (firstWaypoint)
+            {
+                pTaskOptionClass->m_taskOption->setStartLocation(new afrl::cmasi::Location3D(*(waypoint)));
+                pTaskOptionClass->m_taskOption->setStartHeading(n_Const::c_Convert::toDegrees(startHeading_rad));
+                firstWaypoint = false;
+            }
             waypoint = nullptr; // gave up ownership
+
+            if (isSegmentEnd)
+            {
+                sensorSteeringSegments->AddSegment(waypoints, roadpoints);
+                auto lastWaypoint = std::make_shared<uxas::common::utilities::SensorSteering::PointData>(*(waypoints.back()));;
+                auto lastRoadpoint = std::make_shared<uxas::common::utilities::SensorSteering::PointData>(*(roadpoints.back()));
+                waypoints.clear();
+                roadpoints.clear();
+                waypoints.push_back(lastWaypoint);
+                roadpoints.push_back(lastRoadpoint);
+                isSegmentEnd = false;;
+            }
+
+            roadPointIndex++;
             waypointNumber++; // next waypoint
-            double deltaNorth_m = north_m - northLast_m;
-            double deltaEast_m = east_m - eastLast_m;
             distance_m += pow((pow(deltaNorth_m, 2.0) + pow(deltaEast_m, 2.0)), 0.5);
 
             if (radius_m > 0.0) // divide by zero check
@@ -590,15 +555,18 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_pt
                 assert(m_waypointSpacing_m > 0.0);
                 theta_rad += m_waypointSpacing_m / radius_m; // set the next theta based on the desired waypoint separation
             }
-            if (radius_m > m_patternSearchTask->getExtent())
-            {
-                endHeading_deg = atan2(deltaEast_m, deltaNorth_m) * n_Const::c_Convert::dRadiansToDegrees();
-            }
-            northLast_m = north_m;
-            eastLast_m = east_m;
+            northLast_m = vehicleNorth_m;
+            eastLast_m = vehicleEast_m;
             firstPass = false;
         }
+        if (!waypoints.empty() && !roadpoints.empty())
+            {
+            sensorSteeringSegments->AddSegment(waypoints, roadpoints);
+            waypoints.clear();
+            roadpoints.clear();
+        }
 
+        double endHeading_deg = n_Const::c_Convert::toDegrees(atan2(deltaEast_m, deltaNorth_m));
         pTaskOptionClass->m_taskOption->setEndLocation(new afrl::cmasi::Location3D(*(routePlan->getWaypoints().back())));
         pTaskOptionClass->m_taskOption->setEndHeading(endHeading_deg);
 
@@ -610,16 +578,16 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Spiral(std::shared_pt
 
         pTaskOptionClass->m_orderedRouteIdVsPlan[routePlan->getRouteID()] = routePlan;
 
-        pTaskOptionClass->m_taskOption->setStartLocation(new afrl::cmasi::Location3D(*(routePlan->getWaypoints().front())));
-        pTaskOptionClass->m_taskOption->setStartHeading(startHeading_deg);
-        pTaskOptionClass->m_taskOption->setEndLocation(new afrl::cmasi::Location3D(*(routePlan->getWaypoints().back())));
-        pTaskOptionClass->m_taskOption->setEndHeading(endHeading_deg);
-
         pTaskOptionClass->m_taskOption->setCost(cost_ms);
 
         m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
-    } //if(m_isUseDpss)            
-
+        m_optionIdVsSensorSteeringSegments.insert(std::make_pair(pTaskOptionClass->m_taskOption->getOptionID(), sensorSteeringSegments));
+    }
+    else //if(pTaskOptionClass->m_laneSpacing_m > 0.0)
+    {
+        //ERROR:: m_laneSpacing_m must be > 0.0
+        isSuccess = false;
+    }
     return (isSuccess);
 }
 
@@ -629,10 +597,9 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Sector(std::shared_pt
 {
     bool isSuccess(true);
 
-    uxas::common::utilities::CUnitConversions unitConversions;
     double northStart_m = 0.0;
     double eastStart_m = 0.0;
-    unitConversions.ConvertLatLong_degToNorthEast_m(m_patternSearchTask->getSearchLocation()->getLatitude(),
+    m_flatEarth.ConvertLatLong_degToNorthEast_m(m_patternSearchTask->getSearchLocation()->getLatitude(),
                                                     m_patternSearchTask->getSearchLocation()->getLongitude(), northStart_m, eastStart_m);
 
     std::vector<std::shared_ptr < s_SearchLeg>> searchSegments;
@@ -687,7 +654,7 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Sector(std::shared_pt
         auto startLocation = new afrl::cmasi::Location3D();
         double startLatitude_deg(0.0);
         double startLongitude_deg(0.0);
-        unitConversions.ConvertNorthEast_mToLatLong_deg(searchSegment->m_startPosition.m_north_m,
+        m_flatEarth.ConvertNorthEast_mToLatLong_deg(searchSegment->m_startPosition.m_north_m,
                                                         searchSegment->m_startPosition.m_east_m, startLatitude_deg, startLongitude_deg);
         startLocation->setLatitude(startLatitude_deg);
         startLocation->setLongitude(startLongitude_deg);
@@ -696,7 +663,7 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Sector(std::shared_pt
         auto endLocation = new afrl::cmasi::Location3D();
         double endLatitude_deg(0.0);
         double endLongitude_deg(0.0);
-        unitConversions.ConvertNorthEast_mToLatLong_deg(searchSegment->m_endPosition.m_north_m,
+        m_flatEarth.ConvertNorthEast_mToLatLong_deg(searchSegment->m_endPosition.m_north_m,
                                                         searchSegment->m_endPosition.m_east_m, endLatitude_deg, endLongitude_deg);
         endLocation->setLatitude(endLatitude_deg);
         endLocation->setLongitude(endLongitude_deg);
@@ -746,31 +713,79 @@ bool PatternSearchTaskService::isCalculatePatternScanRoute_Sweep(std::shared_ptr
 {
     bool isSuccess(true);
 
-    uxas::common::utilities::CUnitConversions unitConversions;
     double northStart_m = 0.0;
     double eastStart_m = 0.0;
-    unitConversions.ConvertLatLong_degToNorthEast_m(m_patternSearchTask->getSearchLocation()->getLatitude(),
+    m_flatEarth.ConvertLatLong_degToNorthEast_m(m_patternSearchTask->getSearchLocation()->getLatitude(),
                                                     m_patternSearchTask->getSearchLocation()->getLongitude(), northStart_m, eastStart_m);
 
     return (isSuccess);
 }
 
+bool PatternSearchTaskService::isProcessTaskImplementationRouteResponse(std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse, std::shared_ptr<TaskOptionClass>& taskOptionClass,
+        int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route)
+{
+
+    auto sensorSteeringSegments = m_optionIdVsSensorSteeringSegments.find(taskOptionClass->m_taskOption->getOptionID());
+    if (sensorSteeringSegments != m_optionIdVsSensorSteeringSegments.end())
+    {
+        m_activeSensorSteeringSegments = sensorSteeringSegments->second;
+    }
+    return (false); // want the base class to build the response
+}
+
 void PatternSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)
 {
-    uxas::common::utilities::CUnitConversions unitConversions;
-    if (m_isUseDpss)
+    if (m_activeSensorSteeringSegments)
     {
-        if (m_activeDpss)
+        auto itOptionWaypointId = m_optionWaypointIdVsFinalWaypointId.find(entityState->getCurrentWaypoint());
+        if (itOptionWaypointId != m_optionWaypointIdVsFinalWaypointId.end())
         {
-            double north_m(0.0);
-            double east_m(0.0);
-            unitConversions.ConvertLatLong_degToNorthEast_m(entityState->getLocation()->getLatitude(),
-                                                            entityState->getLocation()->getLongitude(), north_m, east_m);
-            xyPoint xyVehiclePosition(north_m, east_m, entityState->getLocation()->getAltitude());
+            auto optionWaypointId = itOptionWaypointId->second;
+            afrl::cmasi::Location3D sensorStarePoint;
+            m_activeSensorSteeringSegments->FindSensorStarePoint(optionWaypointId, entityState->getLocation(), sensorStarePoint, m_flatEarth);
 
-            xyPoint xyStarePoint;
-            m_activeDpss->CalculateStarePoint(xyStarePoint, xyVehiclePosition);
+            /////////////////////////////////////////////////////////////////////////
+            // Send VideoStreamAction if specified in this RoadSearchTask
+            /////////////////////////////////////////////////////////////////////////
+            if (!m_isVideoStreamActionSent)
+            {
+                //COUT_MSG("Test if the message has been sent" << m_roadSearchTask->getTaskID()) // DWCTest
+                m_isVideoStreamActionSent = true;
+                if (!m_patternSearchTask->getDesiredWavelengthBands().empty()) // If task has a specified desired wavelength
+                {
+                    //COUT_MSG("DesiredWavelength is not empty") // DWCTest
+                    // Assume if desiredWavelengthBands is not empty, then there is only 1 specified wavelength
+                    auto itEntityConfiguration = m_entityConfigurations.find(entityState->getID());
+                    if (itEntityConfiguration != m_entityConfigurations.end())
+                    {
+                        //COUT_MSG("itEntityConfiguration if statement") // DWCTest
+                        // Search through this RoadSearchTask's active entity's payloads
+                        for (auto& payload : itEntityConfiguration->second->getPayloadConfigurationList())
+                        {
+                            // check if this payload is a camera
+                            //COUT_FILE_LINE_MSG("Loop through payloads") // DWCTest
+                            if (afrl::cmasi::isCameraConfiguration(payload))
+                            {
+                                //COUT_FILE_LINE_MSG("CameraConfiguration") // DWCTest
+                                // is this camera the desired type (wavelength)
+                                auto cameraConfiguration = static_cast<afrl::cmasi::CameraConfiguration*> (payload);
+                                if (cameraConfiguration->getSupportedWavelengthBand() == m_patternSearchTask->getDesiredWavelengthBands().front())
+                                {
+                                    auto videoStreamAction = std::make_shared<afrl::cmasi::VideoStreamAction>();
+                                    videoStreamAction->setVideoStreamID(0); // 0 is default value
+                                    videoStreamAction->setActiveSensor(cameraConfiguration->getPayloadID()); // find the camera id
+                                    // TODO - store current cameraid ...
+                                    sendSharedLmcpObjectBroadcastMessage(videoStreamAction);
+                                    //COUT_FILE_LINE_MSG("POINT:: Latitude[" << avstate->getLocation()->getLatitude() << "] Longitude[" << avstate->getLocation()->getLongitude() << "]")
+                                    //COUT_FILE_LINE_MSG("Sending VehicleStreamAction") // DWCTest
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
+                }
+            }
             /////////////////////////////////////////////////////////////////////////
             // send out new sensor steering commands for the current vehicle
             /////////////////////////////////////////////////////////////////////////
@@ -791,10 +806,6 @@ void PatternSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cma
                 }
             }
 
-            double dLatitude_deg(0.0);
-            double dLongitude_deg(0.0);
-            unitConversions.ConvertNorthEast_mToLatLong_deg(xyStarePoint.x, xyStarePoint.y, dLatitude_deg, dLongitude_deg);
-
             //point the gimbal
             auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
             vehicleActionCommand->setVehicleID(entityState->getID());
@@ -802,13 +813,7 @@ void PatternSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cma
             afrl::cmasi::GimbalStareAction* pGimbalStareAction = new afrl::cmasi::GimbalStareAction();
             pGimbalStareAction->setPayloadID(gimbalPayloadId);
             pGimbalStareAction->getAssociatedTaskList().push_back(m_patternSearchTask->getTaskID());
-            afrl::cmasi::Location3D* stareLocation = new afrl::cmasi::Location3D;
-            stareLocation->setLatitude(dLatitude_deg);
-            stareLocation->setLongitude(dLongitude_deg);
-            stareLocation->setAltitude(static_cast<float> (xyStarePoint.z));
-            pGimbalStareAction->setStarepoint(stareLocation);
-            stareLocation = nullptr;
-
+            pGimbalStareAction->setStarepoint(sensorStarePoint.clone());
             vehicleActionCommand->getVehicleActionList().push_back(pGimbalStareAction);
             pGimbalStareAction = nullptr;
 
@@ -830,13 +835,68 @@ void PatternSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cma
             auto VideoRecord = std::make_shared<uxas::messages::uxnative::VideoRecord>();
             VideoRecord->setRecord(true);
             auto newMessage_Record = std::static_pointer_cast<avtas::lmcp::Object>(VideoRecord);
-            sendSharedLmcpObjectBroadcastMessage(newMessage_Record);
+            sendSharedLmcpObjectBroadcastMessage(VideoRecord);
         }
-        else //if (m_isUseDpss && m_activeDpss)
+        else    //if(itOptionWaypointId != m_optionWaypointIdVsFinalWaypointId.end())
         {
-            //ERROR:: no DPSS
-        } //if (m_isUseDpss && m_activeDpss)
-    } //if(m_isUseDpss)
+            UXAS_LOG_ERROR("PatternSearchTaskService::activeEntityState::", " Can not point sensor. Option waypoint ID for waypoint number [" , entityState->getCurrentWaypoint() , "] not found.");
+        }
+        }
+    else //if(m_isUseDpss)
+        {
+        /////////////////////////////////////////////////////////////////////////
+        // send out new sensor steering commands for the current vehicle
+        /////////////////////////////////////////////////////////////////////////
+
+        // find the gimbal payload id to use to point the camera 
+        //ASSUME: use first gimbal
+        int64_t gimbalPayloadId = 0;
+        auto itEntityConfiguration = m_entityConfigurations.find(entityState->getID());
+        if (itEntityConfiguration != m_entityConfigurations.end())
+        {
+            for (auto& payload : itEntityConfiguration->second->getPayloadConfigurationList())
+            {
+                if (afrl::cmasi::isGimbalConfiguration(payload))
+                {
+                    gimbalPayloadId = payload->getPayloadID();
+                    break;
+                }
+            }
+        }
+
+        //point the gimbal
+        auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
+        vehicleActionCommand->setVehicleID(entityState->getID());
+
+        auto gimbalAngleAction = new afrl::cmasi::GimbalAngleAction();
+        gimbalAngleAction->setPayloadID(gimbalPayloadId);
+        gimbalAngleAction->getAssociatedTaskList().push_back(m_patternSearchTask->getTaskID());
+        gimbalAngleAction->setAzimuth(0.0);
+        gimbalAngleAction->setElevation(-80.0);
+
+        vehicleActionCommand->getVehicleActionList().push_back(gimbalAngleAction);
+        gimbalAngleAction = nullptr;
+
+#ifdef CONFIGURE_THE_SENSOR
+        //configure the sensor
+        afrl::cmasi::CameraAction* pCameraAction = new afrl::cmasi::CameraAction();
+        pCameraAction->setPayloadID(pVehicle->gsdGetSettings().iGetPayloadID_Sensor());
+        pCameraAction->setHorizontalFieldOfView(static_cast<float> (pVehicle->gsdGetSettings().dGetHorizantalFOV_rad() * _RAD_TO_DEG));
+        pCameraAction->getAssociatedTaskList().push_back(iGetID());
+        vehicleActionCommand->getVehicleActionList().push_back(pCameraAction);
+        pCameraAction = 0; //don't own it
+#endif  //CONFIGURE_THE_SENSOR
+
+        // send out the response
+        auto newMessage_Action = std::static_pointer_cast<avtas::lmcp::Object>(vehicleActionCommand);
+        sendSharedLmcpObjectBroadcastMessage(newMessage_Action);
+
+        //send the record video command to the axis box
+        auto VideoRecord = std::make_shared<uxas::messages::uxnative::VideoRecord>();
+        VideoRecord->setRecord(true);
+        auto newMessage_Record = std::static_pointer_cast<avtas::lmcp::Object>(VideoRecord);
+        sendSharedLmcpObjectBroadcastMessage(newMessage_Record);
+    } ////if(m_isUseDpss)
 }
 }; //namespace task
 }; //namespace service

@@ -109,6 +109,7 @@ private:
     // key: unique automation request ID, value: map
     //                     key: vehicle ID, value: absolute time at task start in ms
     std::unordered_map<int64_t, std::unordered_map<int64_t, int64_t> > m_taskStartTime;
+    std::unordered_map<int64_t, std::unordered_map<int64_t, bool> > m_taskEncountered;
     
     // key: vehicle ID, value: pair (time of valuation, remaining distance)
     std::unordered_map<int64_t, std::pair<int64_t, double> > m_distanceRemaining;

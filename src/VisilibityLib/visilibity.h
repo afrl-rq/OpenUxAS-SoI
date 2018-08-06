@@ -84,6 +84,10 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>     //string class
 #include <cassert>    //assertions
 
+#include "boost/geometry.hpp"
+#include "boost/geometry/geometries/point_xy.hpp"
+#include "boost/geometry/geometries/polygon.hpp"
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -92,19 +96,6 @@ License along with VisiLibity.  If not, see <http://www.gnu.org/licenses/>.
 #if (defined(__APPLE__) && defined(__MACH__))
 #define OSX
 #endif
-
-#ifdef OSX
-#include <OpenGL/gl.h>    //basic open gl library
-#include <OpenGL/glu.h> 
-#else
-#include <GL/gl.h>    //basic open gl library
-#include <GL/glu.h>   //gl tools including tessellation for polygon merge/expand
-#endif
-
-#ifndef CALLBACK      //windows requires a specific CALLBACK type, leave blank for others
-#define CALLBACK
-#endif
-
 
 /// VisiLibity's sole namespace
 namespace VisiLibity
@@ -123,6 +114,11 @@ namespace VisiLibity
   class Guards;
   class Visibility_Polygon;
   class Visibility_Graph;
+
+  // 2-dimensional boost point
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
+  //boost polygon based on points, with counterclockwise orientation and not closed (ie last point != first point
+  typedef boost::geometry::model::polygon<boost_point, false, false> boost_polygon;
 
 
   /** \brief  floating-point display precision.
@@ -152,7 +148,6 @@ namespace VisiLibity
    */  
   double uniform_random_sample(double lower_bound, double upper_bound);
 
-
   /** \brief  rectangle with sides parallel to the x- and y-axes
    *
    * \author  Karl J. Obermeyer
@@ -160,6 +155,47 @@ namespace VisiLibity
    */
   struct Bounding_Box { double x_min, x_max, y_min, y_max; };
 
+/** \brief  convert VisiLibity polygon to Boost polygon
+ *
+ * \author  Amanda Cinnamon
+ * Written for use within Polygon union_ method
+ */
+  boost_polygon to_boost(std::vector<Polygon> x);
+
+  /** \brief  convert VisilLibity polygon to Boost polygon
+   *
+   * \author  Amanda Cinnamon
+   * Written for use within Polygon union_ method
+   */
+  std::vector<Polygon> to_visiLibity(boost_polygon x);
+
+  /** \brief  convert VisiLibity polygon to Boost polygon
+   *
+   * \author  Amanda Cinnamon
+   * Written for use within Polygon union_ method
+   */
+  boost_point to_boost(Point visPoint);
+
+  /** \brief  convert VisilLibity polygon to Boost polygon
+   *
+   * \author  Amanda Cinnamon
+   * Written for use within Polygon union_ method
+   */
+  Point to_visiLibity(boost_point x);
+
+   /** \brief  search for polygons that are near (within epsilon) but not adjacent and force them to adjacent
+   *
+   * \author  Amanda Cinnamon
+   * Written for use within Polygon union_ method
+   */  
+  void snap_near(std::vector<boost_polygon> &polygonList, double epsilon=0.0);
+
+  /** \brief  identify pairs of boost polygons that overlap
+   *
+   * \author  Amanda Cinnamon
+   * Written for use within Polygon union_ method
+   */  
+  std::vector<std::pair<int, int> > find_overlap(std::vector<boost_polygon> polygonList);
 
   /// Point in the plane represented by Cartesian coordinates
   class Point
@@ -172,7 +208,7 @@ namespace VisiLibity
      * data are numbers can be used as a precondition in functions.
      */
     Point() : x_(NAN) , y_(NAN) { }
-    /// costruct from raw coordinates
+    /// construct from raw coordinates
     Point(double x_temp, double y_temp)
     { x_=x_temp; y_=y_temp; }
     //Accessors
@@ -1319,14 +1355,13 @@ namespace VisiLibity
      */
     static bool offset_polygons(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double delta, double epsilon=0.0);
     static bool offset_polygons(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, std::vector<double>& delta, double epsilon=0.0);
-    /** \brief  merges a list of simple polygons oriented ccw using OpenGL
+    /** \brief  merges a list of simple polygons oriented ccw using boost union
      *
-     * \pre polygonList contains only simple ccw oriented polygons, but for
-     *      efficiency, simplicity and orientation are not asserted
-     * \author  Derek Kingston
-     * \remarks Will return false if an error occurs (e.g. OpenGL tessellation errors).
+     * \pre polygonList contains only simple ccw oriented polygons
+     * \author  Amanda Cinnamon
+     * \remarks Will return false if an error occurs (e.g. XXX).
      */
-    static bool union_(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
+    static bool boost_union(std::vector<Polygon>& polygonList, std::vector<Polygon>& resultingPolygons, double epsilon=0.0);
     //Mutators
     /** \brief  access with automatic wrap-around in forward direction
      *
@@ -1369,41 +1404,13 @@ namespace VisiLibity
      * \remarks  vertex first in list is held first
      */
     void reverse();
-    /** \brief  opengl callback at the begining of a new contour
-     *
-     * \remarks  updates data structures tracking calculated polygons
-     */
-    static void CALLBACK tessellationBegin(GLenum type);
-    /** \brief  opengl callback when a vertex is added during tessallation
-     *
-     * \author Derek Kingston
-     * \remarks  keeps track of vertices in the polygon
-     */
-    static void CALLBACK tessellationVertex(GLvoid *vertex);
-    /** \brief  opengl callback for registering new vertices
-     *
-     * \author Derek Kingston
-     * \remarks  opengl requires that the memory be handled user-side
-     * which this function tracks and updates
-     */
-    static void CALLBACK tessellationCombine(GLdouble coords[3], GLdouble *vertex_data[4], GLfloat weight[4], GLdouble **dataOut );
-    /** \brief  opengl callback for error tracking
-     *
-     * \author Derek Kingston
-     * \remarks logs error during tessallation
-     */
-    static void CALLBACK tessellationError(GLenum errorCode);
-    /** \brief  opengl callback at the completion of a calculated contour
-     *
-     * \author Derek Kingston
-     */
-    static void CALLBACK tessellationEnd();
+
   protected:
     std::vector<Point> vertices_;
-    static std::vector<Point> openGlVertices_;
-    static std::vector<Polygon> openGlPolygons_;
-    static std::vector< Point* > openGlScratchMemory_;
-    static bool openGlError_;
+//    static std::vector<Point> openGlVertices_;
+//    static std::vector<Polygon> openGlPolygons_;
+//    static std::vector< Point* > openGlScratchMemory_;
+//    static bool openGlError_;
   };
 
 
@@ -2286,6 +2293,7 @@ namespace VisiLibity
   std::ostream& operator << (std::ostream& outs,
                  const Visibility_Graph& visibility_graph);
 
+    std::ostream& operator << (std::ostream& outs, const boost_polygon b_poly);
 }
   
 #endif //VISILIBITY_H

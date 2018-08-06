@@ -76,6 +76,19 @@ LmcpObjectNetworkZeroMqZyreBridge::configure(const pugi::xml_node& bridgeXmlNode
     {
         UXAS_LOG_INFORM(s_typeName(), "::configure setting Zyre network device value to ", m_zyreNetworkDevice, " default value");
     }
+    
+    if (isSuccess)
+    {
+        if (!bridgeXmlNode.attribute("ConsiderSelfGenerated").empty())
+        {
+            m_isConsideredSelfGenerated = bridgeXmlNode.attribute("ConsiderSelfGenerated").as_bool();
+            UXAS_LOG_INFORM(s_typeName(), "::configure setting 'ConsiderSelfGenerated' boolean to ", m_isConsideredSelfGenerated, " from XML configuration");
+        }
+        else
+        {
+            UXAS_LOG_INFORM(s_typeName(), "::configure did not find 'ConsiderSelfGenerated' boolean in XML configuration; 'ConsiderSelfGenerated' boolean is ", m_isConsideredSelfGenerated);
+        }
+    }
 
     std::set<std::string> extSubAddDupChk; // prevent dup external address subscription
     std::string delimitedExtSubAddresses{""};
@@ -240,6 +253,11 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
         isSuccess = false;
         UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler failed to find the ", uxas::common::StringConstant::EntityID(), " key/value pair in the Zyre header map");
     }
+    else if(std::stoull(entityIdKvPairIt->second) == m_entityId)
+    {
+        isSuccess = false;
+        UXAS_LOG_ERROR(s_typeName(), "::zyreEnterMessageHandler self entity ID tried to join [", m_entityId, "]");
+    }
     
     auto entityTypeKvPairIt = headerKeyValuePairs.find(uxas::common::StringConstant::EntityType());
     if (entityTypeKvPairIt == headerKeyValuePairs.end())
@@ -307,7 +325,7 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreEnterMessageHandler(const std::string& zy
     // broadcast entity join message
     UXAS_LOG_INFORM(s_typeName(), "::zyreEnterMessageHandler broadcasting EntityJoin for type [", entityTypeKvPairIt->second, "] ID [", entityIdKvPairIt->second, "]");
     std::unique_ptr<uxas::messages::uxnative::EntityJoin> entityJoin = uxas::stduxas::make_unique<uxas::messages::uxnative::EntityJoin>();
-    entityJoin->setEntityID(std::stoi(entityIdKvPairIt->second));
+    entityJoin->setEntityID(std::stoull(entityIdKvPairIt->second));
     entityJoin->setLabel(entityTypeKvPairIt->second);
     sendLmcpObjectBroadcastMessage(std::move(entityJoin));
 
@@ -393,6 +411,10 @@ LmcpObjectNetworkZeroMqZyreBridge::zyreWhisperMessageHandler(const std::string& 
                 {
                     if (m_nonImportForwardAddresses.find(recvdAddAttMsg->getAddress()) == m_nonImportForwardAddresses.end())
                     {
+                        if(m_isConsideredSelfGenerated)
+                        {
+                            recvdAddAttMsg->updateSourceAttributes("ZyreBridge", std::to_string(m_entityId), std::to_string(m_networkId));
+                        }
                         sendSerializedLmcpObjectMessage(std::move(recvdAddAttMsg));
                     }
                     else
