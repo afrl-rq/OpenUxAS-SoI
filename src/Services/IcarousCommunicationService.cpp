@@ -1550,13 +1550,13 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                         "RESET_SFT",
                         newPointLat,
                         newPointLong,
-                        positionBeforeTakeover[vehicleID - 1][3]);
+                        currentInformation[vehicleID - 1][3]);
 
                     dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
                         "RESET_SFT",
                         newPointLat,
                         newPointLong,
-                        positionBeforeTakeover[vehicleID - 1][3]);
+                        currentInformation[vehicleID - 1][3]);
                 
                     // Adjust the first points to be these new points
                     newWaypointLists[vehicleID - 1][0]->setLatitude(
