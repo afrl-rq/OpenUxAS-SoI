@@ -1404,12 +1404,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             // It will allow a new one to be created if the UAV goes further then before the takeover
             if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == false))
             {
-                // Tell ICAROUS to initiate a soft-reset
-                dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
-                    "RESET_SFT",
-                    positionBeforeTakeover[vehicleID - 1][1],
-                    positionBeforeTakeover[vehicleID - 1][2],
-                    positionBeforeTakeover[vehicleID - 1][3]);
+
                 
                 //int indexOfWaypointToReplace = icarousClientWaypointLists[vehicleID - 1][currentWaypointIndex[vehicleID - 1] - 1] - 1;
                 
@@ -1440,6 +1435,19 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // If both the UAVs current position and the waypoint being checked are the exact same, don't change the waypoint
                 if((lat1 != lat2) && (long1 != long2))
                 {
+                    // Tell ICAROUS to initiate a soft-reset
+                    dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newPointLat,
+                        newPointLong,
+                        positionBeforeTakeover[vehicleID - 1][3]);
+
+                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newPointLat,
+                        newPointLong,
+                        positionBeforeTakeover[vehicleID - 1][3]);
+                    
                     // Adjust the first points to be these new points
                     newWaypointLists[vehicleID - 1][0]->setLatitude(
                         newPointLat);
@@ -1449,6 +1457,21 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     
                     newWaypointLists[vehicleID - 1][0]->setAltitude(
                         positionBeforeTakeover[vehicleID - 1][3]);
+                }
+                else
+                {
+                    // Tell ICAROUS to initiate a soft-reset
+                    dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
+                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
+                        newWaypointLists[vehicleID - 1][0]->getAltitude());
+
+                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
+                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
+                        newWaypointLists[vehicleID - 1][0]->getAltitude());
                 }
                 
                 // Set this new point as the first point
@@ -1522,6 +1545,19 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 // If both the UAVs current position and the waypoint being checked are the exact same, don't change the waypoint
                 if((lat1 != lat2) && (long1 != long2))
                 {
+                    // Tell ICAROUS to initiate a soft-reset
+                    dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newPointLat,
+                        newPointLong,
+                        positionBeforeTakeover[vehicleID - 1][3]);
+
+                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newPointLat,
+                        newPointLong,
+                        positionBeforeTakeover[vehicleID - 1][3]);
+                
                     // Adjust the first points to be these new points
                     newWaypointLists[vehicleID - 1][0]->setLatitude(
                         newPointLat);
@@ -1532,6 +1568,22 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     newWaypointLists[vehicleID - 1][0]->setAltitude(
                         currentInformation[vehicleID - 1][3]);
                 }
+                else
+                {
+                    // Tell ICAROUS to initiate a soft-reset
+                    dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
+                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
+                        newWaypointLists[vehicleID - 1][0]->getAltitude());
+
+                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
+                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
+                        newWaypointLists[vehicleID - 1][0]->getAltitude());
+                }
+                
                 // Set this new point as the first point
                 missionCommands[vehicleID - 1]->setFirstWaypoint(newWaypointLists[vehicleID - 1][1]->getNumber());
                 
