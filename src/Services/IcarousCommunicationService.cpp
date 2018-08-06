@@ -1486,12 +1486,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double e2x = positionLat - lat1;
                 double e2y = positionLong - long1;
                 double eDotProduct = e1x * e2x + e1y * e2y;
+                double e1DotProduct = e1x * e1x + e1y * e1y;
                 double len2 = pow(e1x, 2) + pow(e1y, 2);
                 double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
                 double newPointLong = (long1 + (eDotProduct * e1y) / len2);
                 
                 // If both the UAVs current position and the waypoint being checked are the exact same, don't change the waypoint
-                if((lat1 != lat2) && (long1 != long2))
+                // Also check if the new point falls within the two points
+                if((lat1 != lat2) && (long1 != long2) && ((eDotProduct > 0) && (eDotProduct < e1DotProduct)))
                 {
                     // Tell ICAROUS to initiate a soft-reset
                     dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
@@ -1584,12 +1586,14 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double e2x = positionLat - lat1;
                 double e2y = positionLong - long1;
                 double eDotProduct = e1x * e2x + e1y * e2y;
+                double e1DotProduct = e1x * e1x + e1y * e1y;
                 double len2 = pow(e1x, 2) + pow(e1y, 2);
                 double newPointLat = (lat1 + (eDotProduct * e1x) / len2);
                 double newPointLong = (long1 + (eDotProduct * e1y) / len2);
 
                 // If both the UAVs current position and the waypoint being checked are the exact same, don't change the waypoint
-                if((lat1 != lat2) && (long1 != long2))
+                // Also check if the new point falls within the two points
+                if((lat1 != lat2) && (long1 != long2) && ((eDotProduct > 0) && (eDotProduct < e1DotProduct)))
                 {
                     // Tell ICAROUS to initiate a soft-reset
                     dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
