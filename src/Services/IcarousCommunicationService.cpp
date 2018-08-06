@@ -414,7 +414,48 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
             char *trackingHelper;
 
             // START OF MESSAGE PROCESSING FROM ICAROUS
+            
+            /*
+            // Sending to ICAROUS template
+            if(!strncmp(tempMessageBuffer, "<type>", <type length>)) // <type description>
+            {
+                // MESSAGE STRUCTURE - <type structure>
+                
+                // The following section of code finds several fields by their tags.
+                // It's fairly difficult to follow, so here's a comment section explaining each line.            
+                 1. strstr returns a pointer to the first occurence of our tag in the message
+                 * 2. Use pointer arithmetic to skip past the tag
+                 * 3. Find the end of the field (they're variable length) using the ',' delimiter
+                 * 4. Get the length of the field via pointer arithmetic (end - beginning)
+                 * 5. Convert the field to a usable number and store it into the message to be published to cFS
+                 
+                // Note: We tried to functionize this code. We spent 4 hours and had the strangest
+                // issue we've ever seen, with a passed-in pointer being invalid memory to access.
+                // Possible it was a unique issue. (TODO - Possibly try this again?)
 
+                // Mode type
+                trackingHelper            = strstr(tempMessageBuffer, "<information header>");
+                trackingHelper           += <length of <information header>>; // skip past "<information header>"
+                fieldEnd                  = strchr(trackingHelper, ',');
+                fieldLength               = fieldEnd - trackingHelper;
+                char *<information>       = strncpy(throwaway, trackingHelper, fieldLength);
+
+                // Other information parsing can go here
+                
+                // Processing code goes here
+                
+                // Generally these also send:
+                sendSharedLmcpObjectBroadcastMessage(<message variable here>);
+                // This should check is it is a valid message type
+                
+                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
+                fieldEnd = strchr(tempMessageBuffer, '\n');
+                tempMessageBuffer = fieldEnd;
+                tempMessageBuffer++;
+            }
+            else
+            */
+            
             if(!strncmp(tempMessageBuffer, "SETMOD", 6)) // Set Mode (has ICAROUS taken over?)
             {
                 // MESSAGE STRUCTURE - SETMOD,type~,\n
@@ -955,7 +996,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         // Sending ICAROUS a Dummy Command message
         dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,\n",
             "Dummy Command");
-    }
+    }// End of Template
     else
     */
     
@@ -970,7 +1011,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             nominalUAVHorizontalSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getAirspeed();
             nominalUAVVerticleSpeed[vehicleID - 1] = ptr_NominalFlightProfile->getVerticalSpeed();
         }
-    }
+    }// End of AirVehicleConfiguration
     // Process a RoutePlanRequest
     // If -1 do not use ICAROUS route planners
     else if(uxas::messages::route::isRoutePlanRequest(receivedLmcpMessage->m_object) && (ICAROUS_ROUTEPLANNER > -1))
