@@ -264,7 +264,7 @@ private:
     // One mutex for each ICAROUS instance
     std::mutex *currentInformationMutexes;
 
-    //Number of unique UAVs in the scenario
+    // Number of unique UAVs in the scenario
     int32_t ICAROUS_CONNECTIONS{-1};
     
     // Route planners are defined as:
@@ -274,10 +274,10 @@ private:
     // 3 = SPLINE
     int32_t ICAROUS_ROUTEPLANNER{-1};
 
-    //This is the number of ICAROUS clients that are permitted
+    // This is the number of ICAROUS clients that are permitted
     std::vector<int> client_sockfd;
 
-    //This is an array keeping track of which ICAROUS instances have gotten vehicle waypoint information
+    // This is an array keeping track of which ICAROUS instances have gotten vehicle waypoint information
     std::vector<bool> has_gotten_waypoints;
 };
 

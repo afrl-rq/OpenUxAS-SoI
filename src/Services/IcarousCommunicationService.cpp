@@ -362,11 +362,11 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
 {
     // grab the ID from the handler (TODO - Verify if the variable 'id' is changed after other threads are started)
     int instanceIndex = id;
-    fprintf(stdout, "This is icarous instance #%i\n", (instanceIndex + 1));
+    //fprintf(stdout, "This is icarous instance #%i\n", (instanceIndex + 1));
     
     // grad the ICAROUS instances' socket for reading
     int64_t icarousClientFd = client_sockfd[instanceIndex];
-    fprintf(stdout, "instance #%i | icarousClientFd: %lli\n", (instanceIndex + 1), icarousClientFd);
+    //fprintf(stdout, "instance #%i | icarousClientFd: %lli\n", (instanceIndex + 1), icarousClientFd);
     
     // Set the max message length and create a buffer to store messages of this size (TCP socket buffer maximum)
     const int max_message_length = 65535;
@@ -1107,7 +1107,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         auto vehicleID = ptr_MissionCommand->getVehicleID();
         if(vehicleID <= ICAROUS_CONNECTIONS)
         {
-            std::cout << "Vehicle ID is " << vehicleID << "\n";
+            //std::cout << "Vehicle ID is " << vehicleID << "\n";
             
             // Check that the vehicle has not already recieved its waypoints
             if (!has_gotten_waypoints[vehicleID - 1])
@@ -1240,7 +1240,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
     // Process a KeepInZone
     else if(afrl::cmasi::isKeepInZone(receivedLmcpMessage->m_object.get()))
     {
-        fprintf(stdout, "Keep In Geofence\n");
+        //fprintf(stdout, "Keep In Geofence\n");
         
         // Copy the message pointer to shorten access length
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepInZone>((afrl::cmasi::KeepInZone*)receivedLmcpMessage->m_object->clone());
@@ -1276,7 +1276,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
     // Process a KeepOutZone
     else if(afrl::cmasi::isKeepOutZone(receivedLmcpMessage->m_object.get()))
     {
-        fprintf(stdout, "Keep Out Geofence\n");
+        //fprintf(stdout, "Keep Out Geofence\n");
         
         // Copy the message pointer to shorten access length
         auto ptr_Zone = std::shared_ptr<afrl::cmasi::KeepOutZone>((afrl::cmasi::KeepOutZone*)receivedLmcpMessage->m_object->clone());
@@ -1499,12 +1499,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                         newPointLat,
                         newPointLong,
                         positionBeforeTakeover[vehicleID - 1][3]);
-
-                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
-                        "RESET_SFT",
-                        newPointLat,
-                        newPointLong,
-                        positionBeforeTakeover[vehicleID - 1][3]);
                     
                     // Adjust the first points to be these new points
                     newWaypointLists[vehicleID - 1][0]->setLatitude(
@@ -1520,12 +1514,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 {
                     // Tell ICAROUS to initiate a soft-reset
                     dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
-                        "RESET_SFT",
-                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
-                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
-                        newWaypointLists[vehicleID - 1][0]->getAltitude());
-
-                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
                         "RESET_SFT",
                         newWaypointLists[vehicleID - 1][0]->getLatitude(),
                         newWaypointLists[vehicleID - 1][0]->getLongitude(),
@@ -1610,12 +1598,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                         newPointLong,
                         currentInformation[vehicleID - 1][3]);
 
-                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
-                        "RESET_SFT",
-                        newPointLat,
-                        newPointLong,
-                        currentInformation[vehicleID - 1][3]);
-                
                     // Adjust the first points to be these new points
                     newWaypointLists[vehicleID - 1][0]->setLatitude(
                         newPointLat);
@@ -1630,12 +1612,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 {
                     // Tell ICAROUS to initiate a soft-reset
                     dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
-                        "RESET_SFT",
-                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
-                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
-                        newWaypointLists[vehicleID - 1][0]->getAltitude());
-
-                    dprintf(2, "COMND,type%s,lat%f,long%f,alt%f,\n",
                         "RESET_SFT",
                         newWaypointLists[vehicleID - 1][0]->getLatitude(),
                         newWaypointLists[vehicleID - 1][0]->getLongitude(),
