@@ -944,6 +944,21 @@ bool IcarousCommunicationService::terminate()
 // Listen for defined messages and relay them to the needed ICAROUS instance they belong to
 bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage)
 {
+    /*
+    // Template for added new message parsing
+    if(<namespace>::<namespace>::is<type>(receivedLmcpMessage->m_object))
+    {
+        auto ptr_<type> = std::shared_ptr<<namespace>::<namespace>::<type>((<namespace>::<namespace>::<type>*)receivedLmcpMessage->m_object->clone());
+        // Parsing code
+        ptr_<type>->getInformation();
+        
+        // Sending ICAROUS a Dummy Command message
+        dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,\n",
+            "Dummy Command");
+    }
+    else
+    */
+    
     // Parse the AirVehicleConfiguration for the UAVs nominal speeds
     if(afrl::cmasi::isAirVehicleConfiguration(receivedLmcpMessage->m_object))
     {
@@ -1212,8 +1227,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             }
             
             //Send a message to ICAROUS telling it to start the mission
-            dprintf(client_sockfd[i], "COMND,type%s,\n",
-            "GEOFN_SEND");
+            dprintf(client_sockfd[i], "COMND,type%s,id%lli.0,\n",
+            "GEOFN_SEND",
+            ptr_Zone->getZoneID());
         }
     }// End of KeepInZone
     // Process a KeepOutZone
@@ -1247,8 +1263,9 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             }
             
             //Send a message to ICAROUS telling it to start the mission
-            dprintf(client_sockfd[i], "COMND,type%s,\n",//,id%lld.0,\n",
-            "GEOFN_SEND");//,
+            dprintf(client_sockfd[i], "COMND,type%s,id%lli.0,\n",//,id%lld.0,\n",
+            "GEOFN_SEND",
+            ptr_Zone->getZoneID());//,
             //ptr_Zone->getZoneID());
         }
     }// End of KeepOutZone Check

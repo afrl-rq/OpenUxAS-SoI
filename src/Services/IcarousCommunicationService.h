@@ -97,6 +97,7 @@ namespace service
  *  - afrl::cmasi::MissionCommand
  *  - afrl::cmasi::VehicleActionCommand
  *  - uxas::messages::route::RoutePlanResponse
+ *  - uxas::messages::task::TaskPause
  *  - uxas::messages::task::TaskResume
  *
  */
