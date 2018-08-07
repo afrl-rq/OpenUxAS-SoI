@@ -272,9 +272,14 @@ public
 			--GUARANTEES
 			-----------------------------------------------------
 			
-			-- Main Theorem			
-			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
+			-- Main Theorem, v1			
+			guarantee "Theorem 2 for Algorithm B for 3 Vehicles (v1)":
 				(time >= ((5.0*N_TRUTH_REAL - 1.0)/N_TRUTH_REAL)*T) =>
+					(stable	and deltaT = T/N_TRUTH_REAL);
+			
+			--Main Theorem, v2
+			guarantee "Theorem 2 for Algorithm B for 3 Vehicles (v2)":
+				(time >= 5.0*T) =>
 					(stable	and deltaT = T/N_TRUTH_REAL);
 			
 			guarantee "deltaT is positive":
@@ -418,9 +423,6 @@ public
 			--Used in lemmas
 			eq steps : int = 1 -> pre(steps) + 1;
 			
-			--Expected number of steps it takes to converge to the stable configuration
-			--eq steps_to_converge : int = 20; --This is the case when the config parameters are initialized to 0
-			
 			----------------------------------------------------------------------------
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
 			----------------------------------------------------------------------------
@@ -470,6 +472,34 @@ public
 					and UAV2.numLeft = 0 and UAV2.numRight = 0
 					and UAV3.numLeft = 0 and UAV3.numRight = 0
 				));
+
+			lemma "Observer: Config params are not yet converged after 3T":
+				(steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
+					and stable_config_params 
+					and not (pre(stable_config_params))
+				) => 
+					(time <= 3.0*T);
+
+			lemma "Observer: Config params are not yet converged after 3T (with initial positions set)":
+				(--steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
+					--and 
+					stable_config_params 
+					and not pre(stable_config_params)
+					and DPSS_Node_Lib.initial_value_true(
+							direction_UAV1 = 1
+						and direction_UAV2 = -1
+						and direction_UAV3 = -1
+						and pos_UAV1 = 0.0046
+						and pos_UAV2 = 8.5283
+						and pos_UAV3 = 8.5610
+						and UAV1.perimLeft = 10.0373
+						and UAV2.perimLeft = 18.5637 and UAV2.perimRight = 1.5371
+						and UAV3.perimRight = 21.4390
+						and UAV1.numLeft = 2
+						and UAV2.numLeft = 0 and UAV2.numRight = 2
+						and UAV3.numRight = 3)
+				) => 
+					(time <= 3.0*T);
 						
 --			--Redundant with the observer below
 --			lemma "Observer: Config params are not yet converged after (3 + 1/6)T":
@@ -496,9 +526,6 @@ public
 					and UAV3.numRight = 3
 				));		
 							
---			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
---				steps = steps_to_converge - 1 => stable;
-
 			lemma "Observer: Config params not yet stable after 15 steps":
 				steps = 15 => stable_config_params;
 				
@@ -554,8 +581,13 @@ public
 				(stable_config_params and not (pre(stable_config_params))) => 
 					(time < (3.0 + 1.0/3.0)*T);
 					
---			lemma "Stable on and after steps_to_converge steps":
---				steps >= steps_to_converge => stable;	
+			lemma "(Experimental) Time for config params to converge is < (3 + 1/4)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time < (3.0 + 1.0/4.0)*T);
+					
+			lemma "(Experimental) Time for config params to converge is < (3 + 1/5)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time < (3.0 + 1.0/5.0)*T);
 			
 			lemma "Stable on and after 20 steps":
 				steps >= 20 => stable;
@@ -564,6 +596,10 @@ public
 			lemma "Time to become stable is less than 4T":
 				(stable and not (pre(stable))) => 
 					(time < 4.0*T);
+					
+			lemma "Time to become stable is less than 4T + T/N":
+				(stable and not (pre(stable))) => 
+					(time < 4.0*T + T/N_TRUTH_REAL);
 			
 		**};
 		
