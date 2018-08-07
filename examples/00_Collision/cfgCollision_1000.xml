@@ -27,7 +27,7 @@
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>
     <Service Type="PlanBuilderService"/>
-    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" LookAheadTime="180" RTCAAlertLevels="3" HorizontalAcceleration="2.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54"/>
+    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" RTCAAlertLevels="3" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="15" MaxGroundSpeed="35"/>
     <Service Type="DAIDALUS_WCV_Response" />
 
     <Service Type="WaypointPlanManagerService" VehicleID="1000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"

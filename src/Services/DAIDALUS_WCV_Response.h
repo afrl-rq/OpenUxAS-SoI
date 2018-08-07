@@ -163,7 +163,7 @@ private:
     int64_t  m_NextWaypoint{-1};// {nullptr};
     int64_t m_RoW;
     std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand{nullptr};// {nullptr};
-    std::string m_AvoidanceManeuverType = "Altitude";
+    std::string m_AvoidanceManeuverType = "Heading";
     std::vector<int64_t> m_ConflictResolutionList;
 
     struct State

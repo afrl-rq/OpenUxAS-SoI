@@ -245,7 +245,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         }
         if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, a left turn is preferred.
         {
-            for (uint i = initial_band; i > 0; i--)
+            for (int i = initial_band; i >= 0; i--)
             {
                 if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.heading_deg))
                 {
@@ -304,7 +304,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         
         if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
         {
-            for (uint i = initial_band; i > 0; i--)
+            for (int i = initial_band; i >= 0; i--)
             {
                 if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.horizontal_speed_mps))
                 {
@@ -356,7 +356,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         
         if (m_DivertState.vertical_speed_mps > m_vertical_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
         {
-            for (uint i = initial_band; i > 0; i--)
+            for (int i = initial_band; i >= 0; i--)
             {
                 if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.vertical_speed_mps))
                 {
@@ -408,7 +408,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         
         if (m_DivertState.altitude_m > m_altitude_max_m)  //If divert heading is greater than 360, a left turn is preferred.
         {
-            for (uint i = initial_band; i > 0; i--)
+            for (int i = initial_band; i >= 0; i--)
             {
                 if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.altitude_m))
                 {
@@ -424,7 +424,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             std::cout << std::endl;
         }
         //m_DivertState.altitude_m = m_CurrentState.altitude_m + 450; //testing change altitude
-        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+        m_DivertState.vertical_speed_mps = 0.0; //m_CurrentState.vertical_speed_mps;--"fix" for inconsistency in DivertState.
         m_DivertState.heading_deg = m_CurrentState.heading_deg;
         m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;        
     }
