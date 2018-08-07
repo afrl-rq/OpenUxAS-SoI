@@ -672,7 +672,16 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                             nogo_ptr->getWCVGroundHeadingIntervals().push_back(pTempPtr.release());
                             nogo_ptr->getWCVGroundHeadingRegions().push_back(temp_regionType);
                         }
+                        else if (regionType == larcfm::BandsRegion::RECOVERY)
+                        {
+                            std::unique_ptr<larcfm::DAIDALUS::GroundHeadingRecoveryInterval> pRecoveryPtr (new larcfm::DAIDALUS::GroundHeadingRecoveryInterval);
+                            pRecoveryPtr->getRecoveryGroundHeadings()[0] = lower_trk_deg;
+                            pRecoveryPtr->getRecoveryGroundHeadings()[1] = upper_trk_deg;
+                            nogo_ptr->getRecoveryGroundHeadingIntervals().push_back(pRecoveryPtr.release());
+                        }
+                        
                     }
+                    
                     for (int ii = 0; ii < m_daa_bands.groundSpeedLength();++ii) //ground speed bands
                     {
                         std::unique_ptr<larcfm::DAIDALUS::GroundSpeedInterval> pTempPtr (new larcfm::DAIDALUS::GroundSpeedInterval);
@@ -700,7 +709,16 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                             nogo_ptr->getWCVGroundSpeedIntervals().push_back(pTempPtr.release());
                             nogo_ptr->getWCVGroundSpeedRegions().push_back(temp_regionType);
                         }
+                        else if (regionType == larcfm::BandsRegion::RECOVERY)
+                        {
+                            std::unique_ptr<larcfm::DAIDALUS::GroundSpeedRecoveryInterval> pRecoveryPtr (new larcfm::DAIDALUS::GroundSpeedRecoveryInterval);
+                            pRecoveryPtr->getRecoveryGroundSpeeds()[0] = lower_gs_mps;
+                            pRecoveryPtr->getRecoveryGroundSpeeds()[1] = upper_gs_mps;
+                            nogo_ptr->getRecoveryGroundSpeedIntervals().push_back(pRecoveryPtr.release());
+                        }
+                        
                     }
+                    
                     for (int ii =0; ii < m_daa_bands.verticalSpeedLength();++ii)    //vertical speed bands
                     {
                         std::unique_ptr<larcfm::DAIDALUS::VerticalSpeedInterval> pTempPtr (new larcfm::DAIDALUS::VerticalSpeedInterval);
@@ -728,7 +746,16 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                             nogo_ptr->getWCVVerticalSpeedIntervals().push_back(pTempPtr.release());
                             nogo_ptr->getWCVVerticalSpeedRegions().push_back(temp_regionType);
                         }
+                        else if (regionType == larcfm::BandsRegion::RECOVERY)
+                        {
+                            std::unique_ptr<larcfm::DAIDALUS::VerticalSpeedRecoveryInterval> pRecoveryPtr (new larcfm::DAIDALUS::VerticalSpeedRecoveryInterval);
+                            pRecoveryPtr->getRecoveryVerticalSpeed()[0] = lower_vs_mps;
+                            pRecoveryPtr->getRecoveryVerticalSpeed()[1] = upper_vs_mps;
+                            nogo_ptr->getRecoveryVerticalSpeedIntervals().push_back(pRecoveryPtr.release());
+                        }
+                        
                     }
+                    
                     for (int ii = 0; ii < m_daa_bands.altitudeLength(); ++ii)   //altitude bands
                     {
                         std::unique_ptr<larcfm::DAIDALUS::AltitudeInterval> pTempPtr (new larcfm::DAIDALUS::AltitudeInterval);
@@ -756,7 +783,16 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                             nogo_ptr->getWCVAlitudeIntervals().push_back(pTempPtr.release());
                             nogo_ptr->getWCVAltitudeRegions().push_back(temp_regionType);
                         }
+                        else if (regionType == larcfm::BandsRegion::RECOVERY)
+                        {
+                            std::unique_ptr<larcfm::DAIDALUS::AltitudeRecoveryInterval> pRecoveryPtr (new larcfm::DAIDALUS::AltitudeRecoveryInterval);
+                            pRecoveryPtr->getRecoveryAltitude()[0] = lower_alt_m;
+                            pRecoveryPtr->getRecoveryAltitude()[1] = upper_alt_m;
+                            nogo_ptr->getRecoveryAltitudeIntervals().push_back(pRecoveryPtr.release());
+                        }
+                        
                     }
+                    
                     //Screen output for debugging --TODO: DELETE LOOP AND SCREEN OUTPUT
                     for (auto itViolations = detectedViolations.cbegin(); itViolations != detectedViolations.cend(); itViolations++)
                     {
