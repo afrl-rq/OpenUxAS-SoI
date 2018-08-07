@@ -125,6 +125,12 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
         ICAROUS_ROUTEPLANNER = ndComponent.attribute(STRING_XML_ICAROUS_ROUTEPLANNER).as_int();
     }// If not specified, do not use (-1 option is default)
 
+    // Define the distance a UAV can travel away from its path and still continue the mission
+    if (!ndComponent.attribute(STRING_XML_LINE_VOLUME).empty())
+    {
+        LINE_VOLUME = ndComponent.attribute(STRING_XML_LINE_VOLUME).as_int();
+    }// If not specified, use 500m
+
     // Used to notify ICAROUS of path plans
     addSubscriptionAddress(uxas::common::MessageGroup::IcarousPathPlanner());
 
@@ -192,12 +198,14 @@ bool IcarousCommunicationService::initialize()
     softResetFlag.resize(ICAROUS_CONNECTIONS);
     truncateWaypoint.resize(ICAROUS_CONNECTIONS);
     waitingForResponse.resize(ICAROUS_CONNECTIONS);
+
     
     // Mutexes & Semaphores must be set like this and not in a vector
     // This is because a vector of these objects is non-resizable
     // These objects cannot be deleted without causing an issue, 
     // thus resizing like the above is impossible
     currentInformationMutexes = new std::mutex[ICAROUS_CONNECTIONS];
+    deviationMutex = new std::mutex[ICAROUS_CONNECTIONS];
     messageQueueMutex = new std::mutex[ICAROUS_CONNECTIONS];
     softResetSemaphores = new sem_t[ICAROUS_CONNECTIONS];
     
@@ -485,17 +493,19 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 // ICAROUS has taken over
                 if(!strncmp(modeType, "_ACTIVE_", strlen("_ACTIVE_")))
                 {
+                    printf("UAV %i | active\n", instanceIndex + 1);
                     // Inform other parts of the code that a take-over has started
                     icarousTakeoverActive[instanceIndex] = true;
-                    
                     // Old takeover code was moved to account for all possible takeover types
                 }
                 else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks and Mission
                 {
+                    printf("UAV %i | passive\n", instanceIndex + 1);
                     // DEBUG STATEMENT - Print what waypoint was last set before handing AMASE back control
                     //fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
                     // If the UAV deviated, it will need to return to the old path before ICAROUS deviated and resume all old tasks
+                    deviationMutex[instanceIndex].lock();
                     if(deviationFlags[instanceIndex] == true)
                     {
                         // DEBUG STATEMENT - Print when the UAV has deviated and will need to be redirected to the path
@@ -504,6 +514,10 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                         
                         // This will need a soft-reset for ICAROUS to continue
                         softResetFlag[instanceIndex] = true;
+                        
+                        
+                        deviationMutex[instanceIndex].unlock();
+                        
                         
                         // Hold the UAV until the new MissionCommand is constructed
                         sem_wait(&softResetSemaphores[instanceIndex]);
@@ -532,12 +546,16 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                         // the last place the UAV was)
                         noDeviationReset[instanceIndex] = true;
                         
+                        
+                        deviationMutex[instanceIndex].unlock();
+                        
+                        
                         // Wait for the missionCommand with the updated waypoint to be sent to the UAV
                         sem_wait(&softResetSemaphores[instanceIndex]);
                     }
-                    
-                    // Let other code know that icarous should no long be in control
+                    deviationFlags[instanceIndex] = false;
                     icarousTakeoverActive[instanceIndex] = false;
+                    
                     
                     // DEBUG STATEMENT - Used to see what the new mission command is composed of
                     //fprintf(stdout, "UAV %i | FirstWaypoint before sending: %lli \n", instanceIndex + 1, missionCommands->getFirstWaypoint());
@@ -867,30 +885,6 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     {
                         heading = 360 - heading;
                     }
-                    
-                    float headingDiff = fabs(heading - headingLists[instanceIndex][currentWaypointIndex[instanceIndex] - 1]);
-                    
-                    // Check for deviations from the mission that are greater then 5 degrees
-                    if((headingDiff > 5) && (deviationFlags[instanceIndex] == false))
-                    {
-                        // Set this flag to true when a deviation of more then 5 degrees occurs
-                        deviationFlags[instanceIndex] = true;
-                        
-                        // If a takeover that deviates from the path has started, waypoints should stop being truncated
-                        truncateWaypoint[instanceIndex] = false;
-                        
-                        // Pause all current tasks the UAV is doing
-                        for(unsigned int taskIndex = 0; taskIndex < entityTasks[instanceIndex].size(); taskIndex++)
-                        {
-                            // DEBUG STATEMENT - Print what tasks were paused
-                            //fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
-                            // Pause the task by sending a message to AMASE
-                            auto pauseTask = std::make_shared<uxas::messages::task::TaskPause>();
-                            pauseTask->setTaskID(entityTasks[instanceIndex][taskIndex]);
-                            sendSharedLmcpObjectBroadcastMessage(pauseTask);
-                        }
-                    }
-                    
                     
                     // Add the information to the message
                     flightDirectorAction->setSpeed(actualSpeed);
@@ -1320,6 +1314,26 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
         {
             //fprintf(stdout, "UAV %i | recieved usable AirVehicleState\n", vehicleID);
 
+            // Save the current information of the UAV
+            currentInformationMutexes[vehicleID - 1].lock();
+            /*
+            fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
+                vehicleID,
+                ptr_AirVehicleState->getHeading(),
+                ptr_AirVehicleState->getLocation()->getLatitude(),
+                ptr_AirVehicleState->getLocation()->getLongitude(),
+                ptr_AirVehicleState->getLocation()->getAltitude(),
+                currentInformation[vehicleID - 1][0],
+                currentInformation[vehicleID - 1][1],
+                currentInformation[vehicleID - 1][2],
+                currentInformation[vehicleID - 1][3]);
+            */
+            currentInformation[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
+            currentInformation[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
+            currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
+            currentInformation[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
+            currentInformationMutexes[vehicleID - 1].unlock();
+            
             // TODO - un-hardcode the number of sats
             // Get the current tasks and update the list (Only when ICAROUS does not have control)
             if(icarousTakeoverActive[vehicleID - 1] == false)
@@ -1374,26 +1388,56 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 }
             }
 
-            // Save the current information of the UAV
-            currentInformationMutexes[vehicleID - 1].lock();
-            /*
-            fprintf(stdout, "UAV %i | Heading %f | Lat %f | Long %f | Alt %f\n      | Heading %f | Lat %f | Long %f | Alt %f",
-                vehicleID,
-                ptr_AirVehicleState->getHeading(),
-                ptr_AirVehicleState->getLocation()->getLatitude(),
-                ptr_AirVehicleState->getLocation()->getLongitude(),
-                ptr_AirVehicleState->getLocation()->getAltitude(),
-                currentInformation[vehicleID - 1][0],
-                currentInformation[vehicleID - 1][1],
-                currentInformation[vehicleID - 1][2],
-                currentInformation[vehicleID - 1][3]);
-            */
-            currentInformation[vehicleID - 1][0] = ptr_AirVehicleState->getHeading();
-            currentInformation[vehicleID - 1][1] = ptr_AirVehicleState->getLocation()->getLatitude();
-            currentInformation[vehicleID - 1][2] = ptr_AirVehicleState->getLocation()->getLongitude();
-            currentInformation[vehicleID - 1][3] = ptr_AirVehicleState->getLocation()->getAltitude();
-            currentInformationMutexes[vehicleID - 1].unlock();
+            // TODO - add XML option to make distance from a line configurable and default to 500m
+            // Check for deviations from the mission that are > 500 meters
+            if(icarousTakeoverActive[vehicleID - 1] == true){
+                //This is erroring, this means newWaypointLists isn't initialized on the first AirVehicleState, Add a check for this
+                double lat1 = newWaypointLists[vehicleID - 1][0]->getLatitude();
+                double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
+                double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
+                double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();            
+                double pointToCheckLat = currentInformation[vehicleID - 1][1];
+                double pointToCheckLong = currentInformation[vehicleID - 1][2];
+                
+                double bearing1 = atan2(sin(pointToCheckLong - long1) * cos(pointToCheckLat), 
+                                        cos(lat1) * sin(pointToCheckLat) - sin(lat1) * cos(pointToCheckLat) * cos(pointToCheckLat - lat1)) * 180 / M_PI;
+                bearing1 = 360 - (fmod((bearing1 + 360), 360));
+                
+                double bearing2 = atan2(sin(long2 - long1) * cos(lat2),
+                                        cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lat2 - lat1)) * 180 / M_PI;
+                bearing2 = 360 - (fmod((bearing2 + 360),360));
 
+                double lat1InRad = lat1 * M_PI / 180;
+                double pointToCheckLatInRad = pointToCheckLat * M_PI / 180;
+                double deltaLong = (pointToCheckLong - long1) * M_PI / 180;
+
+                double distanceAC = acos(sin(lat1InRad) * sin(pointToCheckLatInRad)+cos(lat1InRad)*cos(pointToCheckLatInRad)*cos(deltaLong)) * 6371;  
+                double min_distance = fabs(asin(sin(distanceAC/6371)*sin((bearing1 * M_PI / 180)-(bearing2 * M_PI / 180))) * 6371);
+                min_distance = min_distance * 1000; // Need to convert km to to m
+                deviationMutex[vehicleID - 1].lock();
+                fprintf(stderr, "UAV %i | LINE_VOLUME = %i | min_distance = %f\n", vehicleID, LINE_VOLUME, min_distance);
+                if((min_distance > LINE_VOLUME) && (deviationFlags[vehicleID - 1] == false))
+                {
+                    fprintf(stderr, "!!!WARNING, UAV %i has deviated from path!!!\n", vehicleID);
+                    // Set this flag to true when a deviation of more then 5 degrees occurs
+                    deviationFlags[vehicleID - 1] = true;
+                    
+                    // If a takeover that deviates from the path has started, waypoints should stop being truncated
+                    truncateWaypoint[vehicleID - 1] = false;
+                    
+                    // Pause all current tasks the UAV is doing
+                    for(unsigned int taskIndex = 0; taskIndex < entityTasks[vehicleID - 1].size(); taskIndex++)
+                    {
+                        // DEBUG STATEMENT - Print what tasks were paused
+                        //fprintf(stderr, "UAV %i pausing task #%lli\n", (instanceIndex + 1), entityTasks[instanceIndex][taskIndex]);
+                        // Pause the task by sending a message to AMASE
+                        auto pauseTask = std::make_shared<uxas::messages::task::TaskPause>();
+                        pauseTask->setTaskID(entityTasks[vehicleID - 1][taskIndex]);
+                        sendSharedLmcpObjectBroadcastMessage(pauseTask);
+                    }
+                }
+                deviationMutex[vehicleID - 1].unlock();
+            }
             
             // TODO - This needs re-worked to account for pitch angle
             //        (For now, this works when planning is only done in 2D space)
@@ -1477,7 +1521,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
                 double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
                 double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
-                
                 double positionLat = positionBeforeTakeover[vehicleID - 1][1];
                 double positionLong = positionBeforeTakeover[vehicleID - 1][2];
                 
@@ -1553,16 +1596,12 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     currentWaypointIndex[vehicleID - 1]--;
                 }
                 
-                deviationFlags[vehicleID - 1] = false;
-                
                 softResetFlag[vehicleID - 1] = false;
                 sem_post(&softResetSemaphores[vehicleID - 1]);
             }
             // If it was already set, just resend the old mission command
             else if((softResetFlag[vehicleID - 1] == true) && (resumePointSet[vehicleID - 1] == true))
-            {
-                deviationFlags[vehicleID - 1] = false;
-                
+            {   
                 // Otherwise if we already have a waypoint set, continue the original mission
                 softResetFlag[vehicleID - 1] = false;
                 sem_post(&softResetSemaphores[vehicleID - 1]);
@@ -1577,7 +1616,6 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double lat2 = newWaypointLists[vehicleID - 1][1]->getLatitude();
                 double long1 = newWaypointLists[vehicleID - 1][0]->getLongitude();
                 double long2 = newWaypointLists[vehicleID - 1][1]->getLongitude();
-                
                 double positionLat = currentInformation[vehicleID - 1][1];
                 double positionLong = currentInformation[vehicleID - 1][2];
 

@@ -61,6 +61,7 @@
 #define PORT 5557
 #define STRING_XML_ICAROUS_CONNECTIONS "NumberOfUAVs"
 #define STRING_XML_ICAROUS_ROUTEPLANNER "RoutePlannerUsed"
+#define STRING_XML_LINE_VOLUME "DeviationAllowed"
 #define M_PI 3.14159265358979323846
 
 namespace uxas
@@ -169,6 +170,10 @@ private:
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
 private:
+    std::mutex *deviationMutex;
+
+    int32_t LINE_VOLUME{500};
+
     // Saved threadIDs of ICAROUS listeners
     std::vector<std::thread> icarousID;
     
