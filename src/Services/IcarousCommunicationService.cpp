@@ -809,6 +809,8 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 location3d->setLongitude(longitude);
                 location3d->setAltitude(altitude);
                 loiterAction->setLocation(location3d);
+                loiterAction->setDuration(-1); // Loiter at this location until told otherwise
+                
 
                 vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
                 sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
@@ -868,6 +870,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     location3d->setAltitude(down + currentInformation[instanceIndex][3]);
                     currentInformationMutexes[instanceIndex].unlock();
                     loiterAction->setLocation(location3d);
+                    loiterAction->setDuration(-1); // Loiter at this location until told otherwise
                     
                     vehicleActionCommand->getVehicleActionList().push_back(loiterAction);
                 }
@@ -1415,10 +1418,10 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 double min_distance = fabs(asin(sin(distanceAC/6371)*sin((bearing1 * M_PI / 180)-(bearing2 * M_PI / 180))) * 6371);
                 min_distance = min_distance * 1000; // Need to convert km to to m
                 deviationMutex[vehicleID - 1].lock();
-                fprintf(stderr, "UAV %i | LINE_VOLUME = %i | min_distance = %f\n", vehicleID, LINE_VOLUME, min_distance);
+                //fprintf(stderr, "UAV %i | LINE_VOLUME = %i | min_distance = %f\n", vehicleID, LINE_VOLUME, min_distance);
                 if((min_distance > LINE_VOLUME) && (deviationFlags[vehicleID - 1] == false))
                 {
-                    fprintf(stderr, "!!!WARNING, UAV %i has deviated from path!!!\n", vehicleID);
+                    //fprintf(stderr, "!!!WARNING, UAV %i has deviated from path!!!\n", vehicleID);
                     // Set this flag to true when a deviation of more then 5 degrees occurs
                     deviationFlags[vehicleID - 1] = true;
                     
