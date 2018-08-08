@@ -507,9 +507,7 @@ public
 --					(time <= (3.0 + 1.0/5.0)*T);
 
 			lemma "Observer: Config params not converged after (3 + 1/5)T, but system still converges by 4T.":
-				not (--steps = 12 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
-					--and 
-					stable
+				not (stable
 					and 
 					--Initially, ...
 					DPSS_Node_Lib.initial_value_true(
