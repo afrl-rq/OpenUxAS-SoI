@@ -375,10 +375,17 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         firstWaypoint->setAltitude(state->second->getLocation()->getAltitude());
         mish->getWaypointList().push_back(firstWaypoint);
         
+        int waypointCounter = 0;
         for(auto wp : taskImplementationResponse->getTaskWaypoints()){
-            wp->setNumber(wp->getNumber() + 1);
-            wp->setNextWaypoint(wp->getNextWaypoint() + 1);
-            mish->getWaypointList().push_back(wp->clone());
+            if(waypointCounter < 1024){
+                wp->setNumber(wp->getNumber() + 1);
+                wp->setNextWaypoint(wp->getNextWaypoint() + 1);
+                mish->getWaypointList().push_back(wp->clone());
+            }else{
+                fprintf(stderr, "Error, there were too many waypoints in this Mission Command!\n");
+                exit(EXIT_FAILURE);
+            }
+            waypointCounter++;
         }
         //set default camera view
 
