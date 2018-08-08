@@ -481,8 +481,8 @@ public
 					(time <= 3.0*T);
 
 			lemma "Observer: Config params are not yet converged after 3T (with initial positions set)":
-				(--steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
-					--and 
+				(steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
+					and 
 					stable_config_params 
 					and not pre(stable_config_params)
 					and DPSS_Node_Lib.initial_value_true(
@@ -502,29 +502,30 @@ public
 					(time <= 3.0*T);
 						
 --			--Redundant with the observer below
---			lemma "Observer: Config params are not yet converged after (3 + 1/6)T":
+--			lemma "Observer: Config params are not yet converged after (3 + 1/5)T":
 --				(stable_config_params and not (pre(stable_config_params))) => 
---					(time <= (3.0 + 1.0/6.0)*T);
+--					(time <= (3.0 + 1.0/5.0)*T);
 
-			lemma "Observer: Config params not converged after (3 + 1/6)T, but system still converges by 4T.":
-				not (
+			lemma "Observer: Config params not converged after (3 + 1/5)T, but system still converges by 4T.":
+				not (--steps = 12 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
+					--and 
 					stable
 					and 
 					--Initially, ...
 					DPSS_Node_Lib.initial_value_true(
 						direction_UAV1 = 1
-					and direction_UAV2 = -1
+					and direction_UAV2 = 1
 					and direction_UAV3 = -1
-					and pos_UAV1 = 3.36
-					and pos_UAV2 = 9.75
-					and pos_UAV3 = 9.84
-					and UAV1.perimLeft = 10.69
-					and UAV2.perimLeft = 9.03 and UAV2.perimRight = 0.14
-					and UAV3.perimRight = 17.40
-					and UAV1.numLeft = 2
-					and UAV2.numLeft = 2 and UAV2.numRight = 3
-					and UAV3.numRight = 3
-				));		
+					and pos_UAV1 = 0.013
+					and pos_UAV2 = 0.028
+					and pos_UAV3 = 6.713
+					and UAV1.perimLeft = 17.465
+					and UAV2.perimLeft = 0.002 and UAV2.perimRight = 14.678
+					and UAV3.perimRight = 10.754
+					and UAV1.numLeft = 3
+					and UAV2.numLeft = 3 and UAV2.numRight = 0
+					and UAV3.numRight = 2
+				));
 							
 			lemma "Observer: Config params not yet stable after 15 steps":
 				steps = 15 => stable_config_params;
@@ -576,18 +577,10 @@ public
 
 			lemma "Config params stable on and after 16 steps":
 				steps >= 16 => stable_config_params;
-								
-			lemma "Time for config params to converge is < (3 + 1/3)T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time < (3.0 + 1.0/3.0)*T);
 					
-			lemma "(Experimental) Time for config params to converge is < (3 + 1/4)T":
+			lemma "Time for config params to converge is < (3 + 1/4)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
 					(time < (3.0 + 1.0/4.0)*T);
-					
-			lemma "(Experimental) Time for config params to converge is < (3 + 1/5)T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time < (3.0 + 1.0/5.0)*T);
 			
 			lemma "Stable on and after 20 steps":
 				steps >= 20 => stable;
