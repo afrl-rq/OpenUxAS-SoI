@@ -363,11 +363,25 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         mish->setCommandID(m_commandId++);
         mish->setVehicleID(taskImplementationResponse->getVehicleID());
         mish->setFirstWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
-        for(auto wp : taskImplementationResponse->getTaskWaypoints())
-            mish->getWaypointList().push_back(wp->clone());
 
+        auto state = m_currentEntityStates.find(taskImplementationResponse->getVehicleID());        
+        // Need to ensure that there is a first waypoint where the UAV starts
+        auto firstWaypoint = new afrl::cmasi::Waypoint();
+        firstWaypoint->setNumber(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
+        firstWaypoint->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
+        firstWaypoint->setSpeed(state->second->getU());
+        firstWaypoint->setLatitude(state->second->getLocation()->getLatitude());
+        firstWaypoint->setLongitude(state->second->getLocation()->getLongitude());
+        firstWaypoint->setAltitude(state->second->getLocation()->getAltitude());
+        mish->getWaypointList().push_back(firstWaypoint);
+        
+        for(auto wp : taskImplementationResponse->getTaskWaypoints()){
+            wp->setNumber(wp->getNumber() + 1);
+            wp->setNextWaypoint(wp->getNextWaypoint() + 1);
+            mish->getWaypointList().push_back(wp->clone());
+        }
         //set default camera view
-        auto state = m_currentEntityStates.find(taskImplementationResponse->getVehicleID());
+
         if (state != m_currentEntityStates.end())
         {
             for (auto payload : state->second->getPayloadStateList())
