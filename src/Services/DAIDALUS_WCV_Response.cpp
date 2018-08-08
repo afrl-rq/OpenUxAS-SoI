@@ -41,6 +41,7 @@
 #include <iostream>     // std::cout, cerr, etc
 
 // convenience definitions for the option strings
+#define STRING_XML_VEHICLE_ID "VehicleID"
 #define STRING_XML_MANEUVERTYPE "ManeuverType"
 #define STRING_XML_OPTION_INT "OptionInt"
 #define HEADING "Heading"
@@ -79,6 +80,13 @@ DAIDALUS_WCV_Response::~DAIDALUS_WCV_Response() { };
 bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
 {
     bool isSuccess(true);
+    m_VehicleID = m_entityId;
+
+    if (!ndComponent.attribute(STRING_XML_VEHICLE_ID).empty())
+    {
+        m_VehicleID = ndComponent.attribute(STRING_XML_VEHICLE_ID).as_int();
+    }
+    
 
     if (!ndComponent.attribute(STRING_XML_MANEUVERTYPE).empty())
     {
@@ -102,7 +110,7 @@ bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
         
     }
     //TODO: Allow class member variables to be set via xml-- Maneuver type, time thresholds, maneuver offsets from NEAR interval, etc... 
-    //TODO: Allow for multiple Response services to be active by using vehicleID passed in via xml in place of m_entityId.
+    //TODO: Allow for multiple Response services to be active by using vehicleID passed in via xml in place of m_entityId.--done
     // subscribe to messages::
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     addSubscriptionAddress(afrl::cmasi::MissionCommand::Subscription);
@@ -243,7 +251,27 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
                 }
             }
         }
-        if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, a left turn is preferred.
+        if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, check to see if a right turn is still possible if not turn left
+        {
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
+                {
+                    m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
+                }
+                else
+                {
+                    break;
+                }
+                
+            }
+        }
+        
+        if (m_DivertState.heading_deg <= (m_CurrentState.heading_deg + 180.0))
+        {
+            m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
+        }
+        else
         {
             for (int i = initial_band; i >= 0; i--)
             {
@@ -252,12 +280,61 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
                     m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
                 }
             }
-        }
-        if (m_DivertState.heading_deg < m_heading_min_deg) //If after checking right turns and left turns no better heading found, keep current heading
-        {
-            m_DivertState.heading_deg = m_CurrentState.heading_deg;
-            std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
-            std::cout << std::endl;
+            if (m_DivertState.heading_deg < m_heading_min_deg)
+            {
+                for (int i = bands.size(); i >=0; i--)
+                {
+                    if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
+                    {
+                        m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
+                }
+                
+            }
+            if (std::fmod(m_DivertState.heading_deg + 360.0, 360.0) >= std::fmod((m_CurrentState.heading_deg -180.0) + 360.0, 360.0))
+            {
+                m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
+            }
+            else
+            {
+                //m_DivertState.heading_deg = m_CurrentState.heading_deg;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[1];
+                bands.push_back(temp);
+            }
+            
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if ((bands[i].lower > m_CurrentState.heading_deg) && (bands[i].upper > m_CurrentState.heading_deg))
+                {
+                    m_DivertState.heading_deg = bands[i].lower + m_heading_interval_buffer_deg / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+            
+            if (!isRecoveryFound)
+            {
+                for (int i = bands.size(); i >= 0; i--)
+                    if ((bands[i].lower < m_CurrentState.heading_deg) && (bands[i].upper < m_CurrentState.heading_deg))
+                    {
+                        m_DivertState.heading_deg = bands[i].upper - m_heading_interval_buffer_deg / 2.0;
+                        break;
+                    }
+            }
+            
+                std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
+                std::cout << std::endl;
+               //use right turn recovery band
+            }
         }
         //TODO: Determine recommended action from DAIDALUS--done
         //TODO: set action response to aforementioned recommended action--done
@@ -316,6 +393,34 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps) //If after checking right turns and left turns no better heading found, keep current heading
         {
             m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[1];
+                bands.push_back(temp);
+            }
+            
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if ((bands[i].lower > m_CurrentState.horizontal_speed_mps) && (bands[i].upper > m_CurrentState.horizontal_speed_mps))
+                {
+                    m_DivertState.horizontal_speed_mps = bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+            
+            if (!isRecoveryFound)
+            {
+                for (int i = bands.size(); i >= 0; i--)
+                    if ((bands[i].lower < m_CurrentState.horizontal_speed_mps) && (bands[i].upper < m_CurrentState.horizontal_speed_mps))
+                    {
+                        m_DivertState.horizontal_speed_mps = bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
+                        break;
+                    }
+            }
+            
         }
         
         m_DivertState.altitude_m = m_CurrentState.altitude_m;
@@ -367,7 +472,34 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         
         if (m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps) //If after checking right turns and left turns no better heading found, keep current heading
         {
-            m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+            //m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[1];
+                bands.push_back(temp);
+            }
+            
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if ((bands[i].lower > m_CurrentState.vertical_speed_mps) && (bands[i].upper > m_CurrentState.vertical_speed_mps))
+                {
+                    m_DivertState.vertical_speed_mps = bands[i].lower + m_verticalspeed_interval_buffer_mps / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+            
+            if (!isRecoveryFound)
+            {
+                for (int i = bands.size(); i >= 0; i--)
+                    if ((bands[i].lower < m_CurrentState.vertical_speed_mps) && (bands[i].upper < m_CurrentState.vertical_speed_mps))
+                    {
+                        m_DivertState.vertical_speed_mps = bands[i].upper - m_verticalspeed_interval_buffer_mps / 2.0;
+                        break;
+                    }
+            }
         }
         
         m_DivertState.altitude_m = m_CurrentState.altitude_m;
@@ -419,7 +551,34 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         
         if (m_DivertState.altitude_m < m_altitude_min_m) //If after checking right turns and left turns no better heading found, keep current heading
         {
-            m_DivertState.altitude_m = m_CurrentState.altitude_m;
+            //m_DivertState.altitude_m = m_CurrentState.altitude_m;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryAltitudeIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[1];
+                bands.push_back(temp);
+            }
+            
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if ((bands[i].lower > m_CurrentState.altitude_m) && (bands[i].upper > m_CurrentState.altitude_m))
+                {
+                    m_DivertState.altitude_m = bands[i].lower + m_altitude_interval_buffer_m / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+            
+            if (!isRecoveryFound)
+            {
+                for (int i = bands.size(); i >= 0; i--)
+                    if ((bands[i].lower < m_CurrentState.altitude_m) && (bands[i].upper < m_CurrentState.altitude_m))
+                    {
+                        m_DivertState.altitude_m = bands[i].upper - m_altitude_interval_buffer_m / 2.0;
+                        break;
+                    }
+            }
             std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
             std::cout << std::endl;
         }
@@ -630,7 +789,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 std::static_pointer_cast<afrl::cmasi::AutomationResponse>(receivedLmcpMessage->m_object);
         for (uint32_t i = 0; i < pAutoResponse->getMissionCommandList().size(); i++)
         {
-            if (pAutoResponse->getMissionCommandList()[i]->getVehicleID() == m_entityId)
+            if (pAutoResponse->getMissionCommandList()[i]->getVehicleID() == m_VehicleID)
             {
                 m_MissionCommand = std::make_shared<afrl::cmasi::MissionCommand>(*(pAutoResponse->getMissionCommandList()[i]->clone()));    //why doesn't this cause memory leaks from not getting cleaned up?
                 m_isOnMission = true;
@@ -655,7 +814,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         //Assumption that only one mission command message expected...subsequent mission commands will lead to unintended behavior.
         std::shared_ptr<afrl::cmasi::MissionCommand> pMissionCommand = 
                 std::static_pointer_cast<afrl::cmasi::MissionCommand>(receivedLmcpMessage->m_object);
-        if (pMissionCommand->getVehicleID() == m_entityId)
+        if (pMissionCommand->getVehicleID() == m_VehicleID)
         {
             m_MissionCommand = std::make_shared<afrl::cmasi::MissionCommand>(*(pMissionCommand->clone()));  //why doesn't this cause memory leaks from not getting cleaned up?
             m_isOnMission = true;
@@ -671,7 +830,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     {
         std::shared_ptr<afrl::cmasi::AirVehicleState> pAirVehicleState = 
                 std::static_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object);
-        if (pAirVehicleState->getID() == m_entityId)
+        if (pAirVehicleState->getID() == m_VehicleID)
         {
             m_CurrentState.altitude_m = pAirVehicleState->getLocation()->getAltitude();
             m_CurrentState.heading_deg = std::fmod(pAirVehicleState->getCourse()+360.0,360.0); //Course reported between -180 and 180 deg
@@ -766,7 +925,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     std::cout << "A Candidate for the Right of Way vehicle is Entity " << m_RoW << std::endl;
                 }
                 
-                if (m_entityId < m_RoW)
+                if (m_VehicleID < m_RoW)
                 {
                     //Ownship has Right of Way and therefore should take no action 
                     ResetResponse();
@@ -847,7 +1006,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         
                         std::shared_ptr<afrl::cmasi::VehicleActionCommand> pAvoidViolation = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                         pAvoidViolation->setCommandID(getUniqueEntitySendMessageId());
-                        pAvoidViolation->setVehicleID(m_entityId);
+                        pAvoidViolation->setVehicleID(m_VehicleID);
                         pAvoidViolation->setStatus(afrl::cmasi::CommandStatusType::Approved);
                         pAvoidViolation->getVehicleActionList().push_back(pDivertThisWay.release());
                         
@@ -855,7 +1014,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         m_isOnMission = false;
                         //sendLmcpObjectBroadcastMessage(static_cast<avtas::lmcp::Object*>(pAvoidViolation));                
                         sendSharedLmcpObjectBroadcastMessage(pAvoidViolation);
-                        std::cout << "ENTITY " << m_entityId << " is conducting a divert maneuver." << std::endl;                        
+                        std::cout << "ENTITY " << m_VehicleID << " is conducting a divert maneuver." << std::endl;                        
                     }
                     else
                     {

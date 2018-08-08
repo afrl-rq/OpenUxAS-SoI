@@ -126,6 +126,7 @@ public:
     
 
 private:
+    int64_t m_VehicleID;
     bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
     bool m_isOnMission {false};  //boolean stating whether or not UAV is executing waypoints on Mission or not (diverting)
     bool m_isReadyToAct {false};    //boolean stating whether or not service has all necessary prerequisites in order to react to an imminent collision.

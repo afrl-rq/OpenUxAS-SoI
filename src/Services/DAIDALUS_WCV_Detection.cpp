@@ -40,6 +40,7 @@
 
 
 // convenience definitions for the option strings
+#define STRING_XML_VEHICLE_ID "VehicleID"
 #define STRING_XML_LOOKAHEADTIME "LookAheadTime"
 #define STRING_XML_LEFTTRACK "LeftTrack"
 #define STRING_XML_RIGHTTRACK "RightTrack"
@@ -139,6 +140,13 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     bool isSuccess(true);
     bool useBankAngle = false;
     // process options from the XML configuration node:
+    m_VehicleID = m_entityId;
+
+    if (!ndComponent.attribute(STRING_XML_VEHICLE_ID).empty())
+    {
+        m_VehicleID = ndComponent.attribute(STRING_XML_VEHICLE_ID).as_int();
+    }
+    
     if (!ndComponent.attribute(STRING_XML_LOOKAHEADTIME).empty())
     {
        double local_lookahead_time_s = ndComponent.attribute(STRING_XML_LOOKAHEADTIME).as_double();
@@ -516,7 +524,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         if (bFirst)
         {
             std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
-            DetectionConfiguration->setEntityId(m_entityId);
+            DetectionConfiguration->setEntityId(m_VehicleID);
             DetectionConfiguration->setLookAheadTime(m_daa.parameters.getLookaheadTime("s"));
             DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
             DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
@@ -591,15 +599,15 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         vehicleInfo.longitude_deg = airVehicleState->getLocation()->getLongitude();
         m_daidalusVehicleInfo[airVehicleState->getID()] = vehicleInfo;
         // Conditional check for appropriateness off a well clear violation check-- 2 known vehicle states including the ownship
-        if (m_daidalusVehicleInfo.size()>1 && m_daidalusVehicleInfo.count(m_entityId)>0)    
+        if (m_daidalusVehicleInfo.size()>1 && m_daidalusVehicleInfo.count(m_VehicleID)>0)    
         { 
-            m_daa.setOwnshipState(std::to_string(m_entityId), m_daidalusVehicleInfo[m_entityId].m_daidalusPosition, 
-                m_daidalusVehicleInfo[m_entityId].m_daidalusVelocity, m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s); //set DAIDALUS object ownship state
+            m_daa.setOwnshipState(std::to_string(m_VehicleID), m_daidalusVehicleInfo[m_VehicleID].m_daidalusPosition, 
+                m_daidalusVehicleInfo[m_VehicleID].m_daidalusVelocity, m_daidalusVehicleInfo[m_VehicleID].m_daidalusTime_s); //set DAIDALUS object ownship state
             for (const auto& vehiclePackagedInfo : m_daidalusVehicleInfo)
             {
                 //add intruder traffic state to DAIDALUS object
-                if ((vehiclePackagedInfo.first!=m_entityId) && 
-                        (std::abs(m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s - vehiclePackagedInfo.second.m_daidalusTime_s) <= m_staleness_time_s)) //--TODO add staleness check to this statement or put check on outer most if
+                if ((vehiclePackagedInfo.first!=m_VehicleID) && 
+                        (std::abs(m_daidalusVehicleInfo[m_VehicleID].m_daidalusTime_s - vehiclePackagedInfo.second.m_daidalusTime_s) <= m_staleness_time_s)) //--TODO add staleness check to this statement or put check on outer most if
                     {
                         m_daa.addTrafficState(std::to_string(vehiclePackagedInfo.first), vehiclePackagedInfo.second.m_daidalusPosition, 
                                 vehiclePackagedInfo.second.m_daidalusVelocity, vehiclePackagedInfo.second.m_daidalusTime_s);
@@ -635,14 +643,14 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                         nogo_ptr->getEntityList().push_back(itViolations->first);
                         nogo_ptr->getTimeToViolationList().push_back(itViolations->second);
                     }
-                    nogo_ptr->setEntityId(m_entityId);  //Ownship Id
+                    nogo_ptr->setEntityId(m_VehicleID);  //Ownship Id
                     nogo_ptr->setCurrentHeading(daa_own.track("deg"));  //DAIDALUS current heading--0deg = TrueNorth Currently does not account for wind
                     nogo_ptr->setCurrentGoundSpeed(daa_own.groundSpeed("m/s")); //DAIDALUS current ground speed--does not account for wind
                     nogo_ptr->setCurrentVerticalSpeed(daa_own.verticalSpeed("m/s"));    //DAIDALUS current vertical speed--does not account for wind
                     nogo_ptr->setCurrentAltitude(daa_own.altitude("m"));    //DAIDALUS current altitude
-                    nogo_ptr->setCurrentLatitude(m_daidalusVehicleInfo[m_entityId].latitude_deg);    //Current ownship latitude
-                    nogo_ptr->setCurrentLongitude(m_daidalusVehicleInfo[m_entityId].longitude_deg);  //Current ownship longitude
-                    nogo_ptr->setCurrentTime(m_daidalusVehicleInfo[m_entityId].m_daidalusTime_s);
+                    nogo_ptr->setCurrentLatitude(m_daidalusVehicleInfo[m_VehicleID].latitude_deg);    //Current ownship latitude
+                    nogo_ptr->setCurrentLongitude(m_daidalusVehicleInfo[m_VehicleID].longitude_deg);  //Current ownship longitude
+                    nogo_ptr->setCurrentTime(m_daidalusVehicleInfo[m_VehicleID].m_daidalusTime_s);
                     
                     for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)  //ground track bands
                     {
@@ -797,7 +805,7 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     for (auto itViolations = detectedViolations.cbegin(); itViolations != detectedViolations.cend(); itViolations++)
                     {
                         if (itViolations->second <= 25)
-                        std::cout << "Entity " << m_entityId << "'s well clear volume will be violated by Entity " << itViolations->first << " in " 
+                        std::cout << "Entity " << m_VehicleID << "'s well clear volume will be violated by Entity " << itViolations->first << " in " 
                                 << itViolations->second <<" seconds!!" << std::endl<<std::endl; //--TODO delete
                        // std::cout << m_nogo_trk_deg <<  std::endl;--TODO delete
                     }
