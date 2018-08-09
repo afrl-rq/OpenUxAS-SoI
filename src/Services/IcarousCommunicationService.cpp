@@ -922,47 +922,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 fieldEnd = strchr(tempMessageBuffer, '\n');
                 tempMessageBuffer = fieldEnd;
                 tempMessageBuffer++;
-            }
-            else if(!strncmp(tempMessageBuffer, "GOTOWP", 6))
-            {
-                // GOTOWP,id~,\n
-                // DEBUG STATEMENT - Tell what type of message is being processed
-                //fprintf(stdout, "GOTOWP message received in icarousClientFd %lli!\n", icarousClientFd);
-                
-                // Get id
-                trackingHelper            = strstr(tempMessageBuffer, "id");
-                trackingHelper           += 2; //skip past "id"
-                fieldEnd                  = strchr(trackingHelper, ',');
-                fieldLength               = fieldEnd - trackingHelper;
-                int id     = atof(strncpy(throwaway, trackingHelper, fieldLength));
-                // Add one to make the index correct
-                id++;
-                
-                // DEBUG STATEMENT - Print the contents of the message
-                //fprintf(stdout, "%lli|GOTOWP|id|%i\n", icarousClientFd, id);
-
-                // TODO - This currently will not work due to soft resets
-                //        A soft reset causes ICAROUS to "forget" all waypoints it has reached and reset its index
-                //        to 0 at the last waypoint that was done. This causes issues with icarousClientWaypointLists.
-                //        icarousClientWaypointLists does not update its indexes on what it is points at. This was
-                //        attempted before and was unable to be resolved in a clean way.
-
-                // Send the UAV to the waypoint index given by ICAROUS
-                auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
-                vehicleActionCommand->setVehicleID(instanceIndex + 1);
-                
-                auto goToWaypointAction = new afrl::cmasi::GoToWaypointAction;
-                goToWaypointAction->setWaypointNumber(icarousClientWaypointLists[instanceIndex][id]);
-                
-                vehicleActionCommand->getVehicleActionList().push_back(goToWaypointAction);
-                sendSharedLmcpObjectBroadcastMessage(vehicleActionCommand);
-                
-                
-                // Cut off the processed part of tempMessageBuffer using pointer arithmetic
-                fieldEnd = strchr(tempMessageBuffer, '\n');
-                tempMessageBuffer = fieldEnd;
-                tempMessageBuffer++;
-            }            
+            }           
             else
             {
                 fprintf(stderr,"Error, unknown message type! Skipping to next message!\n");
