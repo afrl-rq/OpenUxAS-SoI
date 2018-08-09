@@ -125,10 +125,25 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
         ICAROUS_ROUTEPLANNER = ndComponent.attribute(STRING_XML_ICAROUS_ROUTEPLANNER).as_int();
     }// If not specified, do not use (-1 option is default)
 
+    // Which routePlanner ICAROUS should use (if specified, otherwise use UxAS visibility planner)
+    if (!ndComponent.attribute(STRING_XML_ICAROUS_DEVIATION_ORIGIN).empty())
+    {
+        DEVIATION_ORIGIN = ndComponent.attribute(STRING_XML_ICAROUS_DEVIATION_ORIGIN).as_string();
+    }// If not specified, do not use (-1 option is default)    
+
     // Define the distance a UAV can travel away from its path and still continue the mission
     if (!ndComponent.attribute(STRING_XML_LINE_VOLUME).empty())
     {
         LINE_VOLUME = ndComponent.attribute(STRING_XML_LINE_VOLUME).as_int();
+        if(DEVIATION_ORIGIN == "line"){
+            // TODO - Need to actually take into account the distance from the line in deviation amounts.
+            //        This will require checking the search that is being done, and checking distances based on that.
+            LINE_VOLUME = LINE_VOLUME - 200;
+        }
+        else if(DEVIATION_ORIGIN == "path")
+        {
+            // LINE_VOLUME stays the same.
+        }
     }// If not specified, use 500m
 
     // Used to notify ICAROUS of path plans
@@ -1339,7 +1354,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
             
             // TODO - un-hardcode the number of sats
             // Get the current tasks and update the list (Only when ICAROUS does not have control)
-            if(icarousTakeoverActive[vehicleID - 1] == false)
+            if(deviationFlags[vehicleID - 1] == false)
             {
                 // Save the current tasks the UAV was doing before a takeover
                 entityTasks[vehicleID - 1] = ptr_AirVehicleState->getAssociatedTasks();
@@ -1360,7 +1375,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                         // If a waypoint was reached, a new resume point can be set
                         resumePointSet[vehicleID - 1] = false;
                         dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
-                           currentWaypointIndex[vehicleID - 1]);
+                            currentWaypointIndex[vehicleID - 1]);
 
                         currentWaypointIndex[vehicleID - 1]++;
                         
@@ -1558,9 +1573,22 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     newWaypointLists[vehicleID - 1][0]->setAltitude(
                         positionBeforeTakeover[vehicleID - 1][3]);
                 }
+                else if(eDotProduct < e1DotProduct)
+                {
+                    dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
+                        currentWaypointIndex[vehicleID - 1]);
+                    currentWaypointIndex[vehicleID - 1]++;
+                    newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
+                    
+                    // Tell ICAROUS to initiate a soft-reset
+                    dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
+                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
+                        newWaypointLists[vehicleID - 1][0]->getAltitude());
+                }
                 else
                 {
-                    // Tell ICAROUS to initiate a soft-reset
                     dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
                         "RESET_SFT",
                         newWaypointLists[vehicleID - 1][0]->getLatitude(),
@@ -1652,6 +1680,20 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                     
                     newWaypointLists[vehicleID - 1][0]->setAltitude(
                         currentInformation[vehicleID - 1][3]);
+                }
+                else if(eDotProduct < e1DotProduct)
+                {
+                    dprintf(client_sockfd[vehicleID - 1], "WPRCH,id%lli.0,\n",
+                        currentWaypointIndex[vehicleID - 1]);
+                    currentWaypointIndex[vehicleID - 1]++;
+                    newWaypointLists[vehicleID - 1].erase(newWaypointLists[vehicleID - 1].begin());
+                    
+                    // Tell ICAROUS to initiate a soft-reset
+                    dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,lat%f,long%f,alt%f,\n",
+                        "RESET_SFT",
+                        newWaypointLists[vehicleID - 1][0]->getLatitude(),
+                        newWaypointLists[vehicleID - 1][0]->getLongitude(),
+                        newWaypointLists[vehicleID - 1][0]->getAltitude());
                 }
                 else
                 {

@@ -62,6 +62,7 @@
 #define STRING_XML_ICAROUS_CONNECTIONS "NumberOfUAVs"
 #define STRING_XML_ICAROUS_ROUTEPLANNER "RoutePlannerUsed"
 #define STRING_XML_LINE_VOLUME "DeviationAllowed"
+#define STRING_XML_ICAROUS_DEVIATION_ORIGIN "DeviationOrigin"
 #define M_PI 3.14159265358979323846
 
 namespace uxas
@@ -84,6 +85,9 @@ namespace service
  *                      1 - ASTAR
  *                      2 - RRT
  *                      3 - SPLINE
+ *  - DeviationOrigin - origin point for deviations
+ *                      line - the line that is being searched
+ *                      path - the path the UAV is taking
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::MissionCommand
@@ -278,6 +282,8 @@ private:
     // 2 = RRT
     // 3 = SPLINE
     int32_t ICAROUS_ROUTEPLANNER{-1};
+
+    std::string DEVIATION_ORIGIN{"line"};
 
     // This is the number of ICAROUS clients that are permitted
     std::vector<int> client_sockfd;
