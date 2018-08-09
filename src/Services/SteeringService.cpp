@@ -430,11 +430,22 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                 isWithinAcceptanceDistance = withinDistance(current_m, position_m, m_acceptanceDistance);
     
             // waypoint acceptance check
+            std::unordered_set<int64_t> acceptedWaypoints;
             while (!m_isLastWaypoint &&
                    ((!isOrbitType(pCurrentWp) && (CheckLineAcceptance(position_m, previous_m, current_m) || withinDistance(current_m, previous_m, DISTANCE_TRESHOLD_M) || isWithinAcceptanceDistance)) ||
                     (isOrbitType(pCurrentWp) && CheckOrbitAcceptance(pCurrentWp, m_currentStartTimestamp_ms))))
             {
                 UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedLmcpMessage - Vehicle Id [", m_vehicleID, "] accepted Waypoint ", m_currentWpID);
+
+                // don't allow persisent cycling through loop of waypoints that are clustered together
+                // if the newly accepted waypoint has already been accepted during this check, then
+                // a cycle has been detected and there's nothing more to be accomplished
+                if (acceptedWaypoints.find(m_currentWpID) != acceptedWaypoints.end())
+                {
+                    m_isLastWaypoint = true;
+                    break;
+                }
+                acceptedWaypoints.insert(m_currentWpID);
 
                 m_previousLocation.reset(pCurrentWp->clone());
                 previous_m = current_m;
