@@ -204,7 +204,7 @@ private:
     bool m_recovery_gs_bool = {true};    // Boolean--enable computation of horizontal speed recovery maneuvers
     bool m_recovery_vs_bool = {true};    // Boolean--enable computation of vertical speed recovery maneuvers
     bool m_recovery_alt_bool = {true};   // Boolean--enable computation of altitude recovery maneuvers
-    bool m_ca_bands_bool = {false};  // Boolean--enable computation of collision avoidance maneuvers
+    bool m_ca_bands_bool = {true};  // Boolean--enable computation of collision avoidance maneuvers
     double m_ca_factor = {0.2}; //factor to reduce min horizontal/vertical recovery separation when computing collision avoidance maneuvers (scalar (0,1])
     double m_horizontal_nmac_m = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters--Horizontal Near Mid-Air Collision (distance)
     double m_vertical_nmac_m = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters--Vertical Near Mid-Air Collision (distance)
