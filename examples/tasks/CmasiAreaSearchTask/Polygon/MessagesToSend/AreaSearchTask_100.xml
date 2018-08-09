@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<AreaSearchTask Series="CMASI">
+  <SearchArea>
+    <Polygon Series="CMASI">
+      <BoundaryPoints>
+        <Location3D Series="CMASI">
+          <Latitude>30.53825372459707</Latitude>
+          <Longitude>-87.16855554072103</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.512433391643317</Latitude>
+          <Longitude>-87.1535755674233</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.511294259307125</Latitude>
+          <Longitude>-87.11304152202945</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.495726117379128</Latitude>
+          <Longitude>-87.15093204272371</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.467247808974253</Latitude>
+          <Longitude>-87.14167970627511</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.490030455698154</Latitude>
+          <Longitude>-87.1667931909213</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.465728965859327</Latitude>
+          <Longitude>-87.1852978638185</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.49230872037054</Latitude>
+          <Longitude>-87.18353551401877</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.51015512697093</Latitude>
+          <Longitude>-87.2143766355141</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+        <Location3D Series="CMASI">
+          <Latitude>30.513572523979512</Latitude>
+          <Longitude>-87.17780787716963</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </BoundaryPoints>
+    </Polygon>
+  </SearchArea>
+  <ViewAngleList/>
+  <DesiredWavelengthBands/>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0.0</GroundSampleDistance>
+  <TaskID>100</TaskID>
+  <Label/>
+  <EligibleEntities/>
+  <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</AreaSearchTask>
+
