@@ -9,27 +9,30 @@ cd /dev/mqueue
 rm -r ./*
 cd $TEMPVAR
 
+#Demo number goes here
+DEMO="3"
+
 if [ $USER = "nia" ]
 then
     #This is for Winston's directory structure
-    cd $HOME/uxas-pulls/OpenUxAS/examples/14_Waypoint_Test/
+    cd $HOME/uxas-pulls/OpenUxAS/examples/07_Live_Demo_${DEMO}/
 
-    ./runAMASE_Waypoint_Test.sh&
+    ./runAMASE_Live_Demo_${DEMO}.sh&
 
     sleep 3
-    gnome-terminal --geometry=74x19+-10+14 --command "sh -c 'echo; cd ${HOME}/uxas-pulls/OpenUxAS/examples/14_Waypoint_Test/; ./runUxAS_Waypoint_Test.sh; exec bash'"
+    gnome-terminal --geometry=74x19+-10+14 --command "sh -c 'echo; cd ${HOME}/uxas-pulls/OpenUxAS/examples/07_Live_Demo_${DEMO}/; ./runUxAS_Live_Demo_${DEMO}.sh; exec bash'"
 
     sleep 2
     gnome-terminal --geometry=74x19--5+14 --command "sh -c 'echo; cd ${HOME}/icarous-pulls/icarous/cFS/bin/cpu1/ && ./core-cpu1; exec bash'"
     #End of Winston's
 else
     #This is for Paul's directory structure
-    cd $HOME/UxAS_pulls/OpenUxAS/examples/14_Waypoint_Test/
+    cd $HOME/UxAS_pulls/OpenUxAS/examples/07_Live_Demo_${DEMO}/
 
-    ./runAMASE_Waypoint_Test.sh&
+    ./runAMASE_Live_Demo_${DEMO}.sh&
 
     sleep 3
-    gnome-terminal --geometry=74x19+-10+14 --command "sh -c 'echo; cd ${HOME}/UxAS_pulls/OpenUxAS/examples/14_Waypoint_Test/; ./runUxAS_Waypoint_Test.sh; exec bash'"
+    gnome-terminal --geometry=74x19+-10+14 --command "sh -c 'echo; cd ${HOME}/UxAS_pulls/OpenUxAS/examples/07_Live_Demo_${DEMO}/; ./runUxAS_Live_Demo_${DEMO}.sh; exec bash'"
 
     sleep 2
     gnome-terminal --geometry=74x19--5+14 --command "sh -c 'echo; cd ${HOME}/ICAROUS_pulls/icarous/cFS/bin/cpu1/ && ./core-cpu1; exec bash'"
