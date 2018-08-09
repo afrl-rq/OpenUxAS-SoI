@@ -138,6 +138,8 @@ bool IcarousCommunicationService::configure(const pugi::xml_node& ndComponent)
         if(DEVIATION_ORIGIN == "line"){
             // TODO - Need to actually take into account the distance from the line in deviation amounts.
             //        This will require checking the search that is being done, and checking distances based on that.
+            //        Something to note is that deviation will be 200 meters less then specified to keep the UAV a
+            //        safe distance from the line. Negative deviation or zero indicate no deviation is allowed.
             LINE_VOLUME = LINE_VOLUME - 200;
         }
         else if(DEVIATION_ORIGIN == "path")
