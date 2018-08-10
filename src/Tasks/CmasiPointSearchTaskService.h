@@ -168,6 +168,7 @@ private:
     bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const double& wedgeHeading_rad);
 private:
     std::shared_ptr<afrl::cmasi::PointSearchTask> m_pointSearchTask;
+    int64_t m_discretizationLevel{16};
 
 public:
 
