@@ -65,6 +65,7 @@ namespace service
  * 
  * Options:
  *  - AssignmentStartPointLead_m
+ *  - UseIcarousRoutePlannerSettings - This is used to determine if the first waypoint in a mission command needs to be set to the UAVs current position
  * 
  * Subscribed Messages:
  *  - uxas::messages::task::UniqueAutomationRequest

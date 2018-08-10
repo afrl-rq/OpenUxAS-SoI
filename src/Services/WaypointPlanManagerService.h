@@ -66,6 +66,7 @@ namespace service
  *  - SetLastWaypointSpeedTo0
  *  - TurnType
  *  - GimbalPayloadId
+ *  - enableIcarousAntiLoopback - This is used to disable loopbacks that ICAROUS plans man cause UxAS to generate
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::AutomationResponse
