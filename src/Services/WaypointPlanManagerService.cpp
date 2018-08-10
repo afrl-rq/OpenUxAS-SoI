@@ -478,7 +478,7 @@ bool WaypointPlanManagerService::isGetCurrentSegment(const int64_t& waypointIdCu
         m_idMissionSegmentCurrent = segmentTemp->getCommandID();
         afrl::cmasi::MissionCommand* segmentCurrentLocal = {segmentTemp->clone()};
         idMissionSegmentCurrent = segmentCurrentLocal->getCommandID();
-
+        
         // don't "goto" the first waypoint in the segment as the first waypoint to go to
         // this is set as the second waypoint in the segment by default
         if (waypointIdCurrent != segmentCurrentLocal->getWaypointList().front()->getNumber())

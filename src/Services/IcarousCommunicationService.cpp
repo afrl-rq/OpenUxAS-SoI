@@ -510,14 +510,14 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                 // ICAROUS has taken over
                 if(!strncmp(modeType, "_ACTIVE_", strlen("_ACTIVE_")))
                 {
-                    printf("UAV %i | active\n", instanceIndex + 1);
+                    //printf("UAV %i | active\n", instanceIndex + 1);
                     // Inform other parts of the code that a take-over has started
                     icarousTakeoverActive[instanceIndex] = true;
                     // Old takeover code was moved to account for all possible takeover types
                 }
                 else if(!strncmp(modeType, "_PASSIVE_", strlen("_PASSIVE_"))) // ICAROUS has handed back control, resume all tasks and Mission
                 {
-                    printf("UAV %i | passive\n", instanceIndex + 1);
+                    //printf("UAV %i | passive\n", instanceIndex + 1);
                     // DEBUG STATEMENT - Print what waypoint was last set before handing AMASE back control
                     //fprintf(stderr, "Sending UAV %i to its currentWaypointIndex[instanceIndex] = %lli last waypoint: %lli\n", (instanceIndex + 1), currentWaypointIndex[instanceIndex], icarousClientWaypointLists[instanceIndex][currentWaypointIndex[instanceIndex]]);
                     
@@ -749,7 +749,7 @@ void IcarousCommunicationService::ICAROUS_listener(int id)
                     {
                         // DEBUG STATEMENT - Print the last waypoint that was found in a given routePlan
                         //printf("UAV %i | lastWP in routePlan = %lli\n", instanceIndex + 1, routePlans[instanceIndex]->getWaypoints().back()->getNextWaypoint());
-                        
+
                         // Set the last waypoint to point to itself
                         routePlans[instanceIndex]->getWaypoints().back()->setNextWaypoint(routePlanWaypointCounter[instanceIndex] - 1);
                     }
@@ -1115,7 +1115,7 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
 
                 // For each waypoint in the mission command, send each as its own message to ICAROUS
                 // The last waypoint's next value will be equal to itself (This indicates the end)
-                while(nextWaypoint != (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber()))
+                while((nextWaypoint != (ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber())) && (totalNumberOfWaypoints < icarousClientWaypointLists[vehicleID - 1].size()))
                 {
                     totalNumberOfWaypoints++;
                     
@@ -1204,7 +1204,11 @@ bool IcarousCommunicationService::processReceivedLmcpMessage(std::unique_ptr<uxa
                 icarousClientWaypointLists[vehicleID - 1][totalNumberOfWaypoints - 1] = ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber();
                 newWaypointLists[vehicleID - 1].push_back(ptr_MissionCommand->getWaypointList()[waypointIndex]);
                 //fprintf(stderr, "UAV %lli | Stored index %i as %lli\n", vehicleID, (totalNumberOfWaypoints - 1), ptr_MissionCommand->getWaypointList()[waypointIndex]->getNumber());
-                
+                /*
+                for(int i = 0; i < newWaypointLists[vehicleID - 1].size(); i++){
+                    printf("Waypoint %lli\n", newWaypointLists[vehicleID - 1][i]->getNumber());
+                }
+                */
                 //Send a message to ICAROUS telling it to start the mission
                 dprintf(client_sockfd[vehicleID - 1], "COMND,type%s,\n",
                 "START_MISSION");

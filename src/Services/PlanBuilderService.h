@@ -193,6 +193,8 @@ private:
     bool m_addLoiterToEndOfMission = false;
 
     double m_deafultLoiterRadius{ 300.0 };
+    
+    bool m_icarousNoLoopback{false};
 };
 
 

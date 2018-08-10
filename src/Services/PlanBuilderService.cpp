@@ -33,6 +33,7 @@
 #define STRING_XML_ASSIGNMENT_START_POINT_LEAD_M "AssignmentStartPointLead_m"
 #define STRING_XML_ADD_LOITER_TO_END_OF_MISSION "AddLoiterToEndOfMission"
 #define STRING_XML_DEFAULT_LOITER_RADIUS_M "DefaultLoiterRadius_m"
+#define STRING_XML_ICAROUS_NO_LOOPBACK "UseIcarousRoutePlannerSettings"
 
 namespace uxas
 {
@@ -61,6 +62,10 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
     if (!ndComponent.attribute(STRING_XML_DEFAULT_LOITER_RADIUS_M).empty())
     {
         m_deafultLoiterRadius = ndComponent.attribute(STRING_XML_DEFAULT_LOITER_RADIUS_M).as_double();
+    }
+    if(!ndComponent.attribute(STRING_XML_ICAROUS_NO_LOOPBACK).empty())
+    {
+        m_icarousNoLoopback = ndComponent.attribute(STRING_XML_ICAROUS_NO_LOOPBACK).as_bool();
     }
 
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -364,29 +369,45 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         mish->setVehicleID(taskImplementationResponse->getVehicleID());
         mish->setFirstWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
 
-        auto state = m_currentEntityStates.find(taskImplementationResponse->getVehicleID());        
-        // Need to ensure that there is a first waypoint where the UAV starts
-        auto firstWaypoint = new afrl::cmasi::Waypoint();
-        firstWaypoint->setNumber(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
-        firstWaypoint->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
-        firstWaypoint->setSpeed(state->second->getU());
-        firstWaypoint->setLatitude(state->second->getLocation()->getLatitude());
-        firstWaypoint->setLongitude(state->second->getLocation()->getLongitude());
-        firstWaypoint->setAltitude(state->second->getLocation()->getAltitude());
-        mish->getWaypointList().push_back(firstWaypoint);
-        
-        int waypointCounter = 0;
-        for(auto wp : taskImplementationResponse->getTaskWaypoints()){
-            if(waypointCounter < 1024){
-                wp->setNumber(wp->getNumber() + 1);
-                wp->setNextWaypoint(wp->getNextWaypoint() + 1);
-                mish->getWaypointList().push_back(wp->clone());
-            }else{
-                fprintf(stderr, "Error, there were too many waypoints in this Mission Command!\n");
-                exit(EXIT_FAILURE);
+        auto state = m_currentEntityStates.find(taskImplementationResponse->getVehicleID());// THIS LINE IS STILL NEEDED
+
+
+        if(m_icarousNoLoopback == true)
+        {
+            // Need to ensure that there is a first waypoint where the UAV starts
+            auto firstWaypoint = new afrl::cmasi::Waypoint();
+            firstWaypoint->setNumber(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
+            firstWaypoint->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
+            firstWaypoint->setSpeed(state->second->getU());
+            firstWaypoint->setLatitude(state->second->getLocation()->getLatitude());
+            firstWaypoint->setLongitude(state->second->getLocation()->getLongitude());
+            firstWaypoint->setAltitude(state->second->getLocation()->getAltitude());
+            mish->getWaypointList().push_back(firstWaypoint);
+            
+            int waypointCounter = 0;
+            for(auto wp : taskImplementationResponse->getTaskWaypoints()){
+                if(waypointCounter < 1024){
+                    wp->setNumber(wp->getNumber() + 1);
+                    wp->setNextWaypoint(wp->getNextWaypoint() + 1);
+                    mish->getWaypointList().push_back(wp->clone());
+                }else{
+                    fprintf(stderr, "Error, there were too many waypoints in this Mission Command!\n");
+                    exit(EXIT_FAILURE);
+                }
+                waypointCounter++;
             }
-            waypointCounter++;
+            
+            // Set the last waypoint to be itself to avoid loop-back for ICAROUS planning (ASTAR caused issues without this)
+            mish->getWaypointList().back()->setNextWaypoint(mish->getWaypointList().back()->getNumber());
         }
+        else
+        {
+            // Original UxAS waypoint adding
+            for(auto wp : taskImplementationResponse->getTaskWaypoints())
+                mish->getWaypointList().push_back(wp->clone());
+        }
+        
+        
         //set default camera view
 
         if (state != m_currentEntityStates.end())
