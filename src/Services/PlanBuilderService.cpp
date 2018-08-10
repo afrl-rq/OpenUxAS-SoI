@@ -332,8 +332,23 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
         {
             (*corrMish)->getWaypointList().back()->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
         }
-        for(auto wp : taskImplementationResponse->getTaskWaypoints())
-            (*corrMish)->getWaypointList().push_back(wp->clone());
+        if(m_icarousNoLoopback == true)
+        {
+            int vehicleID = (*corrMish)->getVehicleID();
+            for(auto wp : taskImplementationResponse->getTaskWaypoints()){
+                if(waypointCounter[vehicleID - 1] < 1024){
+                    (*corrMish)->getWaypointList().push_back(wp->clone());
+                }else{
+                    fprintf(stderr, "Error, there were too many waypoints in this Mission Command!\n");
+                    exit(EXIT_FAILURE);
+                }
+                waypointCounter[vehicleID - 1]++;
+            }
+        }
+        else{
+            for(auto wp : taskImplementationResponse->getTaskWaypoints())
+                (*corrMish)->getWaypointList().push_back(wp->clone());
+        }
     }
     else
     {
@@ -371,9 +386,9 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
 
         auto state = m_currentEntityStates.find(taskImplementationResponse->getVehicleID());// THIS LINE IS STILL NEEDED
 
-
         if(m_icarousNoLoopback == true)
         {
+            int vehicleID = state->second->getID();
             // Need to ensure that there is a first waypoint where the UAV starts
             auto firstWaypoint = new afrl::cmasi::Waypoint();
             firstWaypoint->setNumber(taskImplementationResponse->getTaskWaypoints().front()->getNumber());
@@ -384,9 +399,10 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
             firstWaypoint->setAltitude(state->second->getLocation()->getAltitude());
             mish->getWaypointList().push_back(firstWaypoint);
             
-            int waypointCounter = 0;
+            waypointCounter.push_back(0);
+            
             for(auto wp : taskImplementationResponse->getTaskWaypoints()){
-                if(waypointCounter < 1024){
+                if(waypointCounter[vehicleID - 1] < 1024){
                     wp->setNumber(wp->getNumber() + 1);
                     wp->setNextWaypoint(wp->getNextWaypoint() + 1);
                     mish->getWaypointList().push_back(wp->clone());
@@ -394,11 +410,8 @@ void PlanBuilderService::processTaskImplementationResponse(const std::shared_ptr
                     fprintf(stderr, "Error, there were too many waypoints in this Mission Command!\n");
                     exit(EXIT_FAILURE);
                 }
-                waypointCounter++;
+                waypointCounter[vehicleID - 1]++;
             }
-            
-            // Set the last waypoint to be itself to avoid loop-back for ICAROUS planning (ASTAR caused issues without this)
-            mish->getWaypointList().back()->setNextWaypoint(mish->getWaypointList().back()->getNumber());
         }
         else
         {

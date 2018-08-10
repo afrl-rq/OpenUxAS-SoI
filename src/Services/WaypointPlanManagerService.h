@@ -198,7 +198,7 @@ protected:
 
 private:
 
-
+    bool enableIcarousAntiLoopback{false};
 
 
 };

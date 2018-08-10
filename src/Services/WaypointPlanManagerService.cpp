@@ -48,6 +48,7 @@
 #define STRING_XML_SET_LAST_WAYPOINT_SPEED_TO_0 "SetLastWaypointSpeedTo0"
 #define STRING_XML_TURN_TYPE "TurnType"
 #define STRING_XML_GIMBAL_PAYLOAD_ID "GimbalPayloadId"
+#define STRING_XML_ICAROUS_ANIT_LOOP "enableIcarousAntiLoopback"
 
 #define DEFAULT_SEGMENT_LENGTH_MIN_M (100000)
 #define DEFAULT_NEW_WAYPOINTS_FRACTION (1.0)
@@ -140,7 +141,11 @@ WaypointPlanManagerService::configure(const pugi::xml_node& ndComponent)
     {
         m_gimbalPayloadId = ndComponent.attribute(STRING_XML_GIMBAL_PAYLOAD_ID).as_int64();
     }
-
+    if (!ndComponent.attribute(STRING_XML_ICAROUS_ANIT_LOOP).empty())
+    {
+        enableIcarousAntiLoopback = ndComponent.attribute(STRING_XML_ICAROUS_ANIT_LOOP).as_bool();
+    }
+    
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
     // Air Vehicle States
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
@@ -479,6 +484,9 @@ bool WaypointPlanManagerService::isGetCurrentSegment(const int64_t& waypointIdCu
         afrl::cmasi::MissionCommand* segmentCurrentLocal = {segmentTemp->clone()};
         idMissionSegmentCurrent = segmentCurrentLocal->getCommandID();
         
+        if(enableIcarousAntiLoopback){
+            segmentCurrentLocal->getWaypointList().back()->setNextWaypoint(segmentCurrentLocal->getWaypointList().back()->getNumber());
+        }
         // don't "goto" the first waypoint in the segment as the first waypoint to go to
         // this is set as the second waypoint in the segment by default
         if (waypointIdCurrent != segmentCurrentLocal->getWaypointList().front()->getNumber())

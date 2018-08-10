@@ -195,6 +195,7 @@ private:
     double m_deafultLoiterRadius{ 300.0 };
     
     bool m_icarousNoLoopback{false};
+    std::vector<int> waypointCounter;
 };
 
 
