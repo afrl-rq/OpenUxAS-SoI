@@ -71,9 +71,21 @@ ZeroMqZyreBridge::setZyreWhisperMessageHandler(std::function<void(const std::str
 };
 
 bool
-ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string& zyreNodeId, const std::unique_ptr<std::unordered_map<std::string, std::string>>& headerKeyValuePairs)
+ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string& zyreEndpoint, const std::string& gossipEndpoint, const bool& isGossipBind,
+                         const std::string& zyreNodeId, const std::unique_ptr<std::unordered_map<std::string, std::string>>& headerKeyValuePairs)
 {
-    if (!zyreNetworkDevice.empty())
+    bool useGossip = false;
+    
+    if (!zyreEndpoint.empty() && !gossipEndpoint.empty())
+    {
+        useGossip = true;
+        m_zyreEndpoint = zyreEndpoint;
+        m_gossipEndpoint = gossipEndpoint;
+        m_isGossipBind = isGossipBind;
+        UXAS_LOG_INFORM(s_typeName(), "::configure reading Zyre endpoint value ", zyreEndpoint);
+        UXAS_LOG_INFORM(s_typeName(), "::configure reading Zyre gossip endpoint value ", gossipEndpoint);
+    }
+    else if (!zyreNetworkDevice.empty())
     {
         m_zyreNetworkDevice = zyreNetworkDevice;
         UXAS_LOG_INFORM(s_typeName(), "::start set Zyre network device to ", m_zyreNetworkDevice);
@@ -101,9 +113,25 @@ ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string&
     lock.lock();
     terminateZyreNodeAndThread();
 
-    UXAS_LOG_INFORM(s_typeName(), "::start creating new Zyre node with node ID ", m_zyreNodeId, " and network device ", m_zyreNetworkDevice);
     m_zyreNode = zyre_new(m_zyreNodeId.c_str());
-    zyre_set_interface(m_zyreNode, m_zyreNetworkDevice.c_str()); // associate node with network device
+    if(!useGossip)
+    {
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::start creating new Zyre node with node ID ", m_zyreNodeId, " and network device ", m_zyreNetworkDevice);
+        zyre_set_interface(m_zyreNode, m_zyreNetworkDevice.c_str()); // associate node with network device
+    }
+    else
+    {
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::start creating new Zyre node with node ID ", m_zyreNodeId, " zyre endpoint ", zyreEndpoint, " and gossip endpoint ", gossipEndpoint);
+        zyre_set_endpoint(m_zyreNode, m_zyreEndpoint.c_str());
+        if(m_isGossipBind)
+        {
+            zyre_gossip_bind(m_zyreNode, m_gossipEndpoint.c_str());
+        }
+        else
+        {
+            zyre_gossip_connect(m_zyreNode, m_gossipEndpoint.c_str());
+        }
+    }
 
     for (auto hdrKvPairsIt = headerKeyValuePairs->cbegin(), hdrKvPairsItEnd = headerKeyValuePairs->cend(); hdrKvPairsIt != hdrKvPairsItEnd; hdrKvPairsIt++)
     {
@@ -118,7 +146,7 @@ ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string&
         m_isStarted = true;
         m_isTerminate = false;
         m_zyreEventProcessingThread = uxas::stduxas::make_unique<std::thread>(&ZeroMqZyreBridge::executeZyreEventProcessing, this);
-        UXAS_LOG_INFORM(s_typeName(), "::start Zyre event processing thread [", m_zyreEventProcessingThread->get_id(), "]");
+        UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::start Zyre event processing thread [", m_zyreEventProcessingThread->get_id(), "]");
     }
     else
     {
