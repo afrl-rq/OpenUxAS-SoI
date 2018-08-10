@@ -6,7 +6,7 @@ public
 	annex agree {**
 			
 		const P_GLOBAL : real = 10.0;	
-		const V : real = 1.0; --velocity
+		const V : real = 1.0; --UAV velocity
 		const T : real = P_GLOBAL/V;		
 		const N_real : real = 3.0; --Number of vehicles
 

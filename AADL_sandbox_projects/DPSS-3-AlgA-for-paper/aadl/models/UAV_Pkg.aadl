@@ -7,11 +7,11 @@ public
 	system UAV
 		features
 			--Inputs
-			suggested_initial_direction : in data port Base_Types::Integer; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
+			initial_direction : in data port Base_Types::Integer; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
 			initial_position : in data port Base_Types::Float;
 			pos_LN : in data port Base_Types::Float; --Position of left neighbor (< 0  if there is no left neighbor)
 			pos_RN : in data port Base_Types::Float; --Position of right neighbor (> P_GLOBAL if there is no right neighbor)
-			id : in data port Base_Types::Integer; --a positive integer between 1 and N
+			n_id : in data port Base_Types::Integer; --a positive integer between 1 and N
 			
 			--Outputs
 			direction: out data port Base_Types::Integer;
@@ -25,12 +25,12 @@ public
 			-----------------------------------------------------		
 				
 			--Shared border positions
-			eq S_L : real = real(id-1)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;  
-			eq S_R : real = real(id)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;	
+			eq S_L : real = real(n_id-1)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;  
+			eq S_R : real = real(n_id)*DPSS_Constants.P_GLOBAL/DPSS_Constants.N_real;	
 				
 			--Previous direction
 			eq pre_direction : int = 
-				prev(direction, suggested_initial_direction);
+				prev(direction, initial_direction);
 				
 			--Previous position
 			eq pre_pos : real =
@@ -46,27 +46,27 @@ public
 			--ASSUMPTIONS
 			-----------------------------------------------------		
 			
-			assume "ID in range":
-				id >= 1 and id <= DPSS_Constants.N_int;
+			assume "n_id in range":
+				n_id >= 1 and n_id <= DPSS_Constants.N_int;
 						
-			assume "ID is fixed":
-				true -> (id = pre(id));
+			assume "n_id is fixed":
+				true -> (n_id = pre(n_id));
 			
 			assume "Input initial position is between 0 and P_GLOBAL":
 				(	0.0 <= initial_position
 				and initial_position <= DPSS_Constants.P_GLOBAL)
 				-> true;
 							
-			assume "Suggested initial direction is LEFT or RIGHT":
-				(		suggested_initial_direction = DPSS_Constants.LEFT
-					or 	suggested_initial_direction = DPSS_Constants.RIGHT)
+			assume "Initial direction is LEFT or RIGHT":
+				(		initial_direction = DPSS_Constants.LEFT
+					or 	initial_direction = DPSS_Constants.RIGHT)
 				-> true;
 			
-			assume "ID = 1 implies pos_LN < 0":
-				id = 1 => pos_LN < 0.0;
+			assume "n_id = 1 implies pos_LN < 0":
+				n_id = 1 => pos_LN < 0.0;
 				
-			assume "ID = N implies pos_RN > P_GLOBAL":
-				id = DPSS_Constants.N_int => pos_RN > DPSS_Constants.P_GLOBAL;
+			assume "n_id = N implies pos_RN > P_GLOBAL":
+				n_id = DPSS_Constants.N_int => pos_RN > DPSS_Constants.P_GLOBAL;
 						
 			-----------------------------------------------------
 			--GUARANTEES

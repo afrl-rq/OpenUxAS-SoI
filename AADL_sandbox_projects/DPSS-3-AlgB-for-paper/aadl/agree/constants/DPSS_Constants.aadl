@@ -3,7 +3,7 @@ public
 		
 	annex agree {**
 			
-		const V : real = 1.0; --velocity
+		const V : real = 1.0; --UAV velocity
 		const LEFT : int = -1;
 		const RIGHT : int = 1;
 
