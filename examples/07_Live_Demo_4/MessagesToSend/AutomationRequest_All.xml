@@ -1,0 +1,11 @@
+        <AutomationRequest Series="CMASI">
+            <EntityList>
+                <int64>1</int64>
+            </EntityList>
+            <TaskList>
+                <int64>1</int64>
+            </TaskList>
+            <TaskRelationships>|(p1)</TaskRelationships>
+            <OperatingRegion>10</OperatingRegion>
+            <RedoAllTasks>false</RedoAllTasks>
+        </AutomationRequest>

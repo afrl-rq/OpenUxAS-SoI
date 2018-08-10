@@ -10,34 +10,27 @@
     <Service Type="SensorManagerService"/>
     <Service Type="RouteAggregatorService" UseICAROUSRoutePlanner="true"/>
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50.0" UseThisPlanner="false"/>
-    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX" />
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>   
     <Service Type="PlanBuilderService" UseIcarousRoutePlannerSettings="true"/>
     <Service Type="AutomationDiagramDataService"/>
 
-    <Service Type="IcarousCommunicationService" NumberOfUAVs="3" RoutePlannerUsed="1" DeviationAllowed="100"/>
+    <Service Type="IcarousCommunicationService" NumberOfUAVs="1" RoutePlannerUsed="1" DeviationAllowed="200"/>
 
     <Service Type="WaypointPlanManagerService" VehicleID="1" NumberWaypointsToServe="1024" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="101" enableIcarousAntiLoopback="true"/>
-    <Service Type="WaypointPlanManagerService" VehicleID="2" NumberWaypointsToServe="1024" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="102" enableIcarousAntiLoopback="true"/>
-    <Service Type="WaypointPlanManagerService" VehicleID="3" NumberWaypointsToServe="1024" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="103" enableIcarousAntiLoopback="true"/>
     
     
     <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
-
         <Message MessageFileName="AirVehicleConfiguration_V1.xml" SendTime_ms="110"/>
-        <Message MessageFileName="AirVehicleConfiguration_V2.xml" SendTime_ms="120"/>        
-        <Message MessageFileName="AirVehicleConfiguration_V3.xml" SendTime_ms="130"/>        
 
-        <Message MessageFileName="AirVehicleState_V1.xml" SendTime_ms="140"/>
-        <Message MessageFileName="AirVehicleState_V2.xml" SendTime_ms="150"/>
-        <Message MessageFileName="AirVehicleState_V3.xml" SendTime_ms="160"/>
+        <Message MessageFileName="AirVehicleState_V1.xml" SendTime_ms="120"/>
 
-        <Message MessageFileName="KeepInZone_1.xml" SendTime_ms="170"/>
-        
-        <Message MessageFileName="OperatingRegion_10.xml" SendTime_ms="180"/>
+        <Message MessageFileName="KeepInZone_1.xml" SendTime_ms="130"/>
+        <Message MessageFileName="KeepOutZone_2.xml" SendTime_ms="140"/>
 
-        <Message MessageFileName="LineSearchTask_1.xml" SendTime_ms="190"/>
-        <Message MessageFileName="LineSearchTask_2.xml" SendTime_ms="200"/>
-        <Message MessageFileName="LineSearchTask_3.xml" SendTime_ms="210"/>
+        <Message MessageFileName="PointSearchTask_1.xml" SendTime_ms="150"/>
+        <Message MessageFileName="PointSearchTask_2.xml" SendTime_ms="160"/>
+
+        <Message MessageFileName="OperatingRegion_10.xml" SendTime_ms="170"/>
 
         <Message MessageFileName="AutomationRequest_All.xml" SendTime_ms="5000"/>
     </Service>

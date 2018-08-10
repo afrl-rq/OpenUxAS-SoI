@@ -1,0 +1,85 @@
+        <AreaSearchTask Series="CMASI">
+            <SearchArea>
+                <Polygon Series="CMASI">
+                    <BoundaryPoints>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.08576916697982</Latitude>
+                            <Longitude>-76.38179403628916</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.09151262689636</Latitude>
+                            <Longitude>-76.38729317819268</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.09345726293109</Latitude>
+                            <Longitude>-76.39256555135792</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.106096112853905</Latitude>
+                            <Longitude>-76.39408522231834</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.10843393208963</Latitude>
+                            <Longitude>-76.39358633109411</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.10639455786272</Latitude>
+                            <Longitude>-76.37699819788824</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.10206710523488</Latitude>
+                            <Longitude>-76.3682676014641</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.09838628345948</Latitude>
+                            <Longitude>-76.359661727846</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.094556239179674</Latitude>
+                            <Longitude>-76.35810269277027</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.089333451525384</Latitude>
+                            <Longitude>-76.3630292436096</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                        <Location3D Series="CMASI">
+                            <Latitude>37.08654796477643</Latitude>
+                            <Longitude>-76.37219636985496</Longitude>
+                            <Altitude>0.0</Altitude>
+                            <AltitudeType>MSL</AltitudeType>
+                        </Location3D>
+                    </BoundaryPoints>
+                </Polygon>
+            </SearchArea>
+            <ViewAngleList/>
+            <DesiredWavelengthBands/>
+            <DwellTime>0</DwellTime>
+            <GroundSampleDistance>0.0</GroundSampleDistance>
+            <TaskID>1</TaskID>
+            <Label/>
+            <EligibleEntities/>
+            <RevisitRate>0.0</RevisitRate>
+            <Parameters/>
+            <Priority>0</Priority>
+            <Required>true</Required>
+        </AreaSearchTask>
