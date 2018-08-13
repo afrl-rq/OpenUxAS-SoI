@@ -7,16 +7,20 @@ public
 	system UAV
 		features
 			--Inputs
+			--Initial direction, set by system and essentially constrained by system-level assumptions
 			initial_direction : in data port Base_Types::Integer; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
-			initial_position : in data port Base_Types::Float;
-			pos_LN : in data port Base_Types::Float; --Position of left neighbor (< 0  if there is no left neighbor)
-			pos_RN : in data port Base_Types::Float; --Position of right neighbor (> P_GLOBAL if there is no right neighbor)
+			--This UAV's position, updated by system after an event
+			pos : in data port Base_Types::Float;
+			--Set by system when right/left neighbor is co-located
+			meet_LN : in data port Base_Types::Boolean; --True iff this UAV and its left neighbor are co-located
+			meet_RN : in data port Base_Types::Boolean; --True iff this UAV and its right neighbor are co-located
+			--The index, or ID, of this UAV, set at the system level
 			n_id : in data port Base_Types::Integer; --a positive integer between 1 and N
 			
 			--Outputs
+			-- This UAV's current direction and goal
 			direction: out data port Base_Types::Integer;
 			goal : out data port Base_Types::Float;
-			pos : out data port Base_Types::Float;
 					
 		annex agree {**
 			
@@ -31,17 +35,7 @@ public
 			--Previous direction
 			eq pre_direction : int = 
 				prev(direction, initial_direction);
-				
-			--Previous position
-			eq pre_pos : real =
-				prev(pos, initial_position);
-			
-			--These Booleans are true iff the neighbors meet (i.e., are co-located) on this timestep. 
-			eq meet_LN : bool = (pos_LN = pos); --Meet left neighbor?
-			eq meet_RN : bool = (pos_RN = pos); --Meet right neighbor?
-			
-		--	eq deltaT : real = 0.0 -> time - pre(time);
-					
+									
 			-----------------------------------------------------
 			--ASSUMPTIONS
 			-----------------------------------------------------		
@@ -51,46 +45,40 @@ public
 						
 			assume "n_id is fixed":
 				true -> (n_id = pre(n_id));
-			
-			assume "Input initial position is between 0 and P_GLOBAL":
-				(	0.0 <= initial_position
-				and initial_position <= DPSS_Constants.P_GLOBAL)
-				-> true;
-							
+									
 			assume "Initial direction is LEFT or RIGHT":
 				(		initial_direction = DPSS_Constants.LEFT
 					or 	initial_direction = DPSS_Constants.RIGHT)
 				-> true;
-			
-			assume "n_id = 1 implies pos_LN < 0":
-				n_id = 1 => pos_LN < 0.0;
 				
-			assume "n_id = N implies pos_RN > P_GLOBAL":
-				n_id = DPSS_Constants.N_int => pos_RN > DPSS_Constants.P_GLOBAL;
-						
 			-----------------------------------------------------
 			--GUARANTEES
 			-----------------------------------------------------		
 
 			guarantee "Direction formula":
 				direction = (
+					-- Turn around at the left boundary.
 					if pos <= 0.0 then
-						1
+						DPSS_Constants.RIGHT
 					else 
+						-- Turn around at the right boundary.
 						if pos >= DPSS_Constants.P_GLOBAL then
-							-1
+							DPSS_Constants.LEFT
 						else 
+							-- If meeting left neighbor, travel together toward shared border.
 							if meet_LN then
 								if pos <= S_L then
-									1
+									DPSS_Constants.RIGHT
 								else --pos > S_L
-									-1
+									DPSS_Constants.LEFT
 							else
+								-- If meeting right neighbor, travel together toward shared border.
 							  	if meet_RN then
 									if pos < S_R then
-										1
+										DPSS_Constants.RIGHT
 									else --pos >= S_R
-										-1 
+										DPSS_Constants.LEFT 
+								-- In all other cases, proceed in the same direction.
 								else 
 									pre_direction
 				);  
@@ -115,18 +103,11 @@ public
 									else -- pos < S_R
 										S_R
 								else 
-									if direction = 1 then
+									if direction = DPSS_Constants.RIGHT then
 										DPSS_Constants.P_GLOBAL
-									else --direction = -1 
+									else --direction = DPSS_Constants.LEFT 
 										0.0 
 				); 
-
-			guarantee "Position formula":
-				pos = (initial_position -> 
-						(if pre_direction = 1 then
-							pre_pos + DPSS_Constants.V*(time - pre(time))
-						else --pre_direction = -1
-							pre_pos - DPSS_Constants.V*(time - pre(time))));
 			
 		**};
 		

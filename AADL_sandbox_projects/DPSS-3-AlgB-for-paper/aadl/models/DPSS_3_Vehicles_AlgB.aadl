@@ -17,7 +17,7 @@ public
 			initial_pos_UAV2 : in data port Base_Types::Float;
 			initial_pos_UAV3 : in data port Base_Types::Float;
 						
-			--Suggested initial directions
+			--Initial directions
 			initial_direction_UAV1 : in data port Base_Types::Integer;
 			initial_direction_UAV2 : in data port Base_Types::Integer;
 			initial_direction_UAV3 : in data port Base_Types::Integer;
@@ -194,32 +194,30 @@ public
 					and PR_UAV3 = RIGHT_ENDP_TRUTH - pos_UAV3; 
 
 			eq optimal : bool = 
-				--Configuration parameters have converged
 				correct_coordination_variables
-				--and
 				and (
-				--either
-				(	--the UAVs are at LEFT_ENDP_TRUTH, P_23, and P_23, respectively
+				--Either the UAVs are at LEFT_ENDP_TRUTH, P_23, and P_23
+				--and were previously at P_12, P_12, and RIGHT_ENDP_TRUTH
+				(	
 					(
 						pos_UAV1 = LEFT_ENDP_TRUTH and 
 						pos_UAV2 = P_23 and 
 						pos_UAV3 = P_23 
 					)
-					--and were previously at P_12, P_12, and RIGHT_ENDP_TRUTH, respectively
 					and (
 						pre_pos_UAV1 = P_12 and 
 						pre_pos_UAV2 = P_12 and 
 						pre_pos_UAV3 = RIGHT_ENDP_TRUTH
 					)
 				)
-				--or
-				or (--the UAVs are at P_12, P_12, and RIGHT_ENDP_TRUTH, respectively
+				--or the UAVs are at P_12, P_12, and RIGHT_ENDP_TRUTH
+				--and were previously at LEFT_ENDP_TRUTH, P_23, and P_23
+				or (
 					(
 						pos_UAV1 = P_12 and 
 						pos_UAV2 = P_12 and 
 						pos_UAV3 = RIGHT_ENDP_TRUTH
 					)
-					--and were previously at LEFT_ENDP_TRUTH, P_23, and P_23, respectively
 					and (
 						pre_pos_UAV1 = LEFT_ENDP_TRUTH and 
 						pre_pos_UAV2 = P_23 and 
@@ -265,7 +263,7 @@ public
 			--GUARANTEES
 			-----------------------------------------------------
 			
-			-- Main Theorem, v1			
+			-- Main Theorem	
 			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
 				(time >= ((5.0*N_TRUTH_REAL - 1.0)/N_TRUTH_REAL)*T) =>
 					(optimal	and deltaT = T/N_TRUTH_REAL);
@@ -390,8 +388,8 @@ public
 		
 			--Set the meet_LN variables for each UAV
 			assert UAV1.meet_LN = false; --There is no left neighbor to UAV1
-			assert UAV2.meet_LN = (pos_UAV2 = pos_UAV1);
-			assert UAV3.meet_LN = (pos_UAV3 = pos_UAV2);
+			assert UAV2.meet_LN = (pos_UAV1 = pos_UAV2);
+			assert UAV3.meet_LN = (pos_UAV2 = pos_UAV3);
 			
 			--Set the meet_RN variables for each UAV
 			assert UAV1.meet_RN = (pos_UAV1 = pos_UAV2);
@@ -466,14 +464,14 @@ public
 					and UAV3.NL = 0 and UAV3.NR = 0
 				));
 
-			lemma "Observer: Config params are not yet converged after 3T":
+			lemma "Observer: Coordination variables are not correct after 3T":
 				(steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
 					and correct_coordination_variables 
 					and not (pre(correct_coordination_variables))
 				) => 
 					(time <= 3.0*T);
 
-			lemma "Observer: Config params are not yet converged after 3T (with initial positions set)":
+			lemma "Observer: Coordination variables are not correct after 3T (with initial positions set)":
 				(steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
 					and 
 					correct_coordination_variables 
@@ -495,11 +493,11 @@ public
 					(time <= 3.0*T);
 						
 --			--Redundant with the observer below
---			lemma "Observer: Config params are not yet converged after (3 + 1/5)T":
+--			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T":
 --				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
 --					(time <= (3.0 + 1.0/5.0)*T);
 
-			lemma "Observer: Config params not converged after (3 + 1/5)T, but system still converges by 4T.":
+			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T, but system still converges by 4T.":
 				not (optimal
 					and 
 					--Initially, ...
@@ -518,7 +516,7 @@ public
 					and UAV3.NR = 2
 				));
 							
-			lemma "Observer: Config params not yet optimal after 15 steps":
+			lemma "Observer: Coordination variables are not correct after 15 steps":
 				steps = 15 => correct_coordination_variables;
 				
 			lemma "Observer: Not yet optimal after 19 steps":
@@ -551,13 +549,13 @@ public
 			lemma "UAV2's NR is between 0 and 4": UAV2.NR >= 0 and UAV2.NR <= 4;
 			lemma "UAV3's NR is between 0 and 3": UAV3.NR >= 0 and UAV3.NR <= 3;
 						
-			lemma "Once optimal, stays optimal (here 'optimal' includes correct coordination variables":
+			lemma "Once in the optimal configuration, it stays there":
 				true -> pre(optimal)	=> optimal;
 				
-			lemma "Once the configuration paramters are optimal, they stay optimal.":
+			lemma "Once the coordination variables are correct, they stay correct.":
 				true -> pre(correct_coordination_variables) => correct_coordination_variables;
 				
-			lemma "Optimal implies deltaT = T/N":
+			lemma "Optimal configuration implies deltaT = T/N":
 				optimal => deltaT = T/N_TRUTH_REAL;
 			
 			lemma "deltaT is between 0 and T":
@@ -566,10 +564,10 @@ public
 					and deltaT <= T
 					);
 
-			lemma "Config params optimal on and after 16 steps":
+			lemma "Coordination variables are correct on and after 16 steps":
 				steps >= 16 => correct_coordination_variables;
 					
-			lemma "Time for config params to converge is < (3 + 1/4)T":
+			lemma "Time for coordination variables to be correct is < (3 + 1/4)T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
 					(time < (3.0 + 1.0/4.0)*T);
 			
