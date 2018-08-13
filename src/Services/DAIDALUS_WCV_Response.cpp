@@ -230,8 +230,8 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
         intervals temp;
         for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
         {
-            temp.lower = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0]+360.0, 360.0);
-            temp.upper = std::fmod(DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1]+360.0, 360.0);
+            temp.lower = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0];
+            temp.upper = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1];
             bands.push_back(temp);
             std::cout << "Lower = " << temp.lower << std::endl;
             std::cout << "Upper = " << temp.upper << std::endl;
