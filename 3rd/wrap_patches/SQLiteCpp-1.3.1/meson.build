@@ -1,16 +1,25 @@
 project('sqlitecpp', 'cpp')
 
+cpp = meson.get_compiler('cpp')
+if cpp.get_id() == 'msvc'
+  cpp_args_sqlitecpp = [
+    '/std:c++14',
+  ]
+else
+  cpp_args_sqlitecpp = [
+    '-std=c++11',
+  ]
+endif
+
 dep_sqlite3 = dependency(
   'sqlite3',
   required: false,
 )
 
 # force native build of SQLite3 if load extension function is unavailable
-cpp = meson.get_compiler('cpp')
 if not dep_sqlite3.found() or not cpp.has_function('sqlite3_enable_load_extension', dependencies: dep_sqlite3)
   dep_sqlite3 = subproject('sqlite3').get_variable('dep')
 endif
-
 
 lib = static_library(
   'sqlitecpp',
@@ -21,9 +30,7 @@ lib = static_library(
     'src/Statement.cpp',
     'src/Transaction.cpp',
   ],
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args_sqlitecpp,
   dependencies: dep_sqlite3,
   include_directories: include_directories(
     'include',
