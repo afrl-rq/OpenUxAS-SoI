@@ -193,6 +193,10 @@ private:
     bool m_addLoiterToEndOfMission = false;
 
     double m_deafultLoiterRadius{ 300.0 };
+
+    /*! \brief  the turn type to send out in mission commands*/
+    afrl::cmasi::TurnType::TurnType m_turnType = {afrl::cmasi::TurnType::TurnShort};
+    bool m_overrideTurnType{false};
 };
 
 
