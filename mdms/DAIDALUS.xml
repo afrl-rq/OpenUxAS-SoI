@@ -63,6 +63,8 @@
             <Field Name="EntityList" Type="int64[]" Units="None" />
             <!-- List of times to violation -->
             <Field Name="TimeToViolationList" Type="real64[]" Units="seconds" />
+            <!-- List of alert levels for intruders -->
+            <Field Name="AlertLevelList" Type="real64[]" Units="None" />
             <!-- Entity Id that generated this message -->
             <Field Name="EntityId" Type="uint32" Units="None" />
             <!-- Ownship Heading -->

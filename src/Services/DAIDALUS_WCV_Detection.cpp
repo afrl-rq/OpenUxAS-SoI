@@ -575,7 +575,13 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         //std::cout << "DAIDALUS_WCV_Detection has received an AirVehicleState at " << airVehicleState->getTime() <<" ms--from Entity " << 
         //        airVehicleState->getID() << std::endl; 
         //handle message
-        std::unordered_map<int64_t, double> detectedViolations;        
+        struct violation_data
+        {
+            double TimeToViolation;
+            int IntruderAlertLevel;
+        };
+        std::unordered_map<int64_t, violation_data> detectedViolations;        
+        //std::unordered_map<int64_t, int> intruderAlertLevel;
         //add air vehicle message state to the Daidalus Object
         MydaidalusPackage vehicleInfo;  
         vehicleInfo.m_daidalusPosition = larcfm::Position::makeLatLonAlt(airVehicleState->getLocation()->getLatitude(), "deg",
@@ -622,9 +628,13 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                 for (int intruderIndex = 1; intruderIndex<=m_daa.numberOfAircraft()-1; ++intruderIndex)
                 {
                     double timeToViolation_s = m_daa.timeToViolation(intruderIndex);
+                    int alert_level = m_daa.alerting(intruderIndex);
+                    violation_data temp_data;
+                    temp_data.TimeToViolation = timeToViolation_s;
+                    temp_data.IntruderAlertLevel = alert_level;
                     if (timeToViolation_s != PINFINITY && timeToViolation_s != NaN)
                     { 
-                        detectedViolations[std::stoi(m_daa.getAircraftState(intruderIndex).getId(),nullptr,10)] = timeToViolation_s;
+                        detectedViolations[std::stoi(m_daa.getAircraftState(intruderIndex).getId(),nullptr,10)] = temp_data;
                         //std::cout << "Collision with intruder " <<m_daa.getAircraftState(intruderIndex).getId() << " in " << timeToViolation << " seconds" << std::endl;--TODO delete
                     }
                 }
@@ -641,7 +651,8 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     for (auto itViolations = detectedViolations.cbegin(); itViolations !=detectedViolations.cend(); itViolations++)
                     {
                         nogo_ptr->getEntityList().push_back(itViolations->first);
-                        nogo_ptr->getTimeToViolationList().push_back(itViolations->second);
+                        nogo_ptr->getTimeToViolationList().push_back(itViolations->second.TimeToViolation);
+                        nogo_ptr->getAlertLevelList().push_back(itViolations->second.IntruderAlertLevel);
                     }
                     nogo_ptr->setEntityId(m_VehicleID);  //Ownship Id
                     nogo_ptr->setCurrentHeading(daa_own.track("deg"));  //DAIDALUS current heading--0deg = TrueNorth Currently does not account for wind
@@ -804,9 +815,9 @@ bool DAIDALUS_WCV_Detection::processReceivedLmcpMessage(std::unique_ptr<uxas::co
                     //Screen output for debugging --TODO: DELETE LOOP AND SCREEN OUTPUT
                     for (auto itViolations = detectedViolations.cbegin(); itViolations != detectedViolations.cend(); itViolations++)
                     {
-                        if (itViolations->second <= 25)
+                        if (itViolations->second.TimeToViolation <= 25)
                         std::cout << "Entity " << m_VehicleID << "'s well clear volume will be violated by Entity " << itViolations->first << " in " 
-                                << itViolations->second <<" seconds!!" << std::endl<<std::endl; //--TODO delete
+                                << itViolations->second.TimeToViolation <<" seconds!!" << std::endl<<std::endl; //--TODO delete
                        // std::cout << m_nogo_trk_deg <<  std::endl;--TODO delete
                     }
                     sendSharedLmcpObjectBroadcastMessage(nogo_ptr);
