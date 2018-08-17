@@ -21,7 +21,6 @@
 #include "afrl/cmasi/SpeedType.h"
 #include "afrl/cmasi/VehicleAction.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
-#include "afrl/cmasi/Waypoint.h"
 #include "uxas/messages/uxnative/SafeHeadingAction.h"
 #include "uxas/messages/task/UniqueAutomationRequest.h"
 #include "uxas/messages/task/UniqueAutomationResponse.h"
@@ -32,7 +31,6 @@
 #include "FlatEarth.h"
 #include "UxAS_Log.h"
 #include "UxAS_Time.h"
-#include "visilibity.h"
 
 #include "stdUniquePtr.h"
 
@@ -112,11 +110,6 @@ afrl::cmasi::Waypoint* getWaypoint(const std::unique_ptr<afrl::cmasi::MissionCom
     }
 
     return nullptr;
-}
-
-bool withinDistance(const VisiLibity::Point& point1, const VisiLibity::Point& point2, double threshold)
-{
-    return (distance(point1, point2) <= threshold);
 }
 
 bool isOrbitType(afrl::cmasi::Waypoint* pWaypoint)
@@ -408,31 +401,22 @@ bool SteeringService::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
         if (pCurrentWp != nullptr)
         {
             const afrl::cmasi::Location3D* pLocation = pState->getLocation();
-
-            if (!m_previousLocation)
-            {
-                m_previousLocation.reset(pLocation->clone());
-            }
-
             uxas::common::utilities::FlatEarth flatEarth;
 
             // TODO: don't need to calculate at linearization point and can remove identity operations from subsequent calculations
             VisiLibity::Point position_m = convertLocation3DToNorthEast_m(pLocation, flatEarth);
-            VisiLibity::Point previous_m = convertLocation3DToNorthEast_m(m_previousLocation.get(), flatEarth);
             VisiLibity::Point current_m = getNorthEast_m(pCurrentWp, flatEarth);
+            VisiLibity::Point previous_m = position_m;
+            if (m_previousLocation)
+                previous_m = convertLocation3DToNorthEast_m(m_previousLocation.get(), flatEarth);
 
             int64_t nextWpID = pCurrentWp->getNextWaypoint();
             afrl::cmasi::Waypoint* pNextWp = getWaypoint(m_pMissionCmd, nextWpID);
-
-            // from current (target), a non-positive dot-product indicates crossing/acceptance
-            bool isWithinAcceptanceDistance = false;
-            if(m_acceptanceTimeToArrive_ms > 0 && pCurrentWp->getTurnType() == afrl::cmasi::TurnType::TurnShort)
-                isWithinAcceptanceDistance = withinDistance(current_m, position_m, m_acceptanceDistance);
     
             // waypoint acceptance check
             std::unordered_set<int64_t> acceptedWaypoints;
             while (!m_isLastWaypoint &&
-                   ((!isOrbitType(pCurrentWp) && (CheckLineAcceptance(position_m, previous_m, current_m) || withinDistance(current_m, previous_m, DISTANCE_TRESHOLD_M) || isWithinAcceptanceDistance)) ||
+                   ((!isOrbitType(pCurrentWp) && (CheckLineAcceptance(position_m, previous_m, current_m) || withinDistance(current_m, previous_m, DISTANCE_TRESHOLD_M) || CheckProximity(position_m, current_m, pCurrentWp))) ||
                     (isOrbitType(pCurrentWp) && CheckOrbitAcceptance(pCurrentWp, m_currentStartTimestamp_ms))))
             {
                 UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedLmcpMessage - Vehicle Id [", m_vehicleID, "] accepted Waypoint ", m_currentWpID);
@@ -620,6 +604,20 @@ void SteeringService::reset(const afrl::cmasi::MissionCommand* pMissionCmd)
     }
 
     UXAS_LOG_DEBUGGING(s_typeName(), "::processReceivedLmcpMessage - Vehicle Id [", m_vehicleID, "received mission command");
+}
+
+bool SteeringService::withinDistance(const VisiLibity::Point& point1, const VisiLibity::Point& point2, double threshold)
+{
+    return (VisiLibity::distance(point1, point2) <= threshold);
+}
+
+bool SteeringService::CheckProximity(VisiLibity::Point position, VisiLibity::Point current, afrl::cmasi::Waypoint* wp)
+{
+    // from current (target), a non-positive dot-product indicates crossing/acceptance
+    bool isWithinAcceptanceDistance = false;
+    if(m_acceptanceTimeToArrive_ms > 0 && wp->getTurnType() == afrl::cmasi::TurnType::TurnShort)
+        isWithinAcceptanceDistance = withinDistance(position, current, m_acceptanceDistance);
+    return isWithinAcceptanceDistance;
 }
 
 } // namespace service

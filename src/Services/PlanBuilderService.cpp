@@ -33,6 +33,7 @@
 #define STRING_XML_ASSIGNMENT_START_POINT_LEAD_M "AssignmentStartPointLead_m"
 #define STRING_XML_ADD_LOITER_TO_END_OF_MISSION "AddLoiterToEndOfMission"
 #define STRING_XML_DEFAULT_LOITER_RADIUS_M "DefaultLoiterRadius_m"
+#define STRING_XML_TURN_TYPE "TurnType"
 
 namespace uxas
 {
@@ -61,6 +62,19 @@ PlanBuilderService::configure(const pugi::xml_node& ndComponent)
     if (!ndComponent.attribute(STRING_XML_DEFAULT_LOITER_RADIUS_M).empty())
     {
         m_deafultLoiterRadius = ndComponent.attribute(STRING_XML_DEFAULT_LOITER_RADIUS_M).as_double();
+    }
+    if (!ndComponent.attribute(STRING_XML_TURN_TYPE).empty())
+    {
+        m_overrideTurnType = true;
+        std::string turnTypeString = ndComponent.attribute(STRING_XML_TURN_TYPE).value();
+        if (turnTypeString == "FlyOver")
+        {
+            m_turnType = afrl::cmasi::TurnType::FlyOver;
+        }
+        else
+        {
+            m_turnType = afrl::cmasi::TurnType::TurnShort;
+        }
     }
 
     addSubscriptionAddress(uxas::messages::task::UniqueAutomationRequest::Subscription);
@@ -426,6 +440,12 @@ void PlanBuilderService::checkNextTaskImplementationRequest(int64_t uniqueReques
             if (m_addLoiterToEndOfMission)
             {
                 AddLoitersToMissionCommands(response);
+            }
+            if(m_overrideTurnType)
+            {
+                for (auto mission : response->getOriginalResponse()->getMissionCommandList())
+                    for (auto wp : mission->getWaypointList())
+                        wp->setTurnType(m_turnType);
             }
 
             sendSharedLmcpObjectBroadcastMessage(response);
