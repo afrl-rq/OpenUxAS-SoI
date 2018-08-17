@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<AirVehicleState Series="CMASI">
+  <ID>102</ID>
+  <Location>
+    <Location3D Series="CMASI">
+      <Latitude>30.52724211201384</Latitude>
+      <Longitude>-87.255</Longitude>
+      <Altitude>700.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+  </Location>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>90</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Airspeed>22.1211109161377</Airspeed>
+  <VerticalSpeed>0</VerticalSpeed>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <EnergyAvailable>100</EnergyAvailable>
+  <WindSpeed>0</WindSpeed>
+  <WindDirection>0</WindDirection>
+  <GroundSpeed>0</GroundSpeed>
+  <GroundTrack>0</GroundTrack>
+  <PayloadStateList>
+    <GimbalState Series="CMASI">
+      <PointingMode>AirVehicleRelativeAngle</PointingMode>
+      <Azimuth>0.0</Azimuth>
+      <Elevation>-45.0</Elevation>
+      <Rotation>0.0</Rotation>
+      <PayloadID>2</PayloadID>
+    </GimbalState>
+    <CameraState Series="CMASI">
+      <HorizontalFieldOfView>45.0</HorizontalFieldOfView>
+      <Footprint/>
+      <PayloadID>10002</PayloadID>
+    </CameraState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+        </AssociatedTasks>
+  <Time>0</Time>
+</AirVehicleState>
+
