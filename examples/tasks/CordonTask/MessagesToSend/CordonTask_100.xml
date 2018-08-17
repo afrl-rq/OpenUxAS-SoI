@@ -1,0 +1,20 @@
+<CordonTask Series="IMPACT">
+  <CordonLocation>
+   <Location3D Series="CMASI">
+     <Latitude>30.4508</Latitude>
+     <Longitude>-87.1894</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </CordonLocation>
+  <StandoffDistance>100</StandoffDistance>
+  <TaskID>100</TaskID>
+  <Label></Label>
+  <EligibleEntities>
+  </EligibleEntities>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</CordonTask>

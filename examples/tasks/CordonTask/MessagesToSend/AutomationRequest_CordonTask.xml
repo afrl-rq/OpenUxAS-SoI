@@ -1,0 +1,15 @@
+<AutomationRequest Series="CMASI">
+  <EntityList>
+  <int64>13</int64>
+  <int64>14</int64>
+  <int64>15</int64>
+  <int64>16</int64>
+  </EntityList>
+  <TaskList>
+  <int64>100</int64>
+  </TaskList>
+  <TaskRelationships></TaskRelationships>
+  <OperatingRegion>0</OperatingRegion>
+  <RedoAllTasks>false</RedoAllTasks>
+</AutomationRequest>
+
