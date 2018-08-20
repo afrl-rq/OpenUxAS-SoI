@@ -24,7 +24,7 @@
         
         <Message MessageFileName="AreaOfInterest_1.xml" SendTime_ms="1000"/>
         <Message MessageFileName="AngledAreaSearchTask_100.xml" SendTime_ms="1100"/>
-        <Message MessageFileName="AutomationRequest.xml" SendTime_ms="1200"/>
+        <Message MessageFileName="AutomationRequest_AngledAreaSearchTask.xml" SendTime_ms="1200"/>
     </Service>
 
     <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
