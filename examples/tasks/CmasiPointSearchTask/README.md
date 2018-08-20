@@ -14,7 +14,7 @@ Files:
 * `MessagesToSend/AirVehicleConfiguration_V101.xml` - Details for air vehicle 101.
 * `MessagesToSend/AirVehicleState_V101.xml` - Air vehicle 101's initial state.
 * `MessagesToSend/PointSearchTask_100.xml` - The point search task that is requested.
-* `MessagesToSend/AutomationRequest_LineSearch.xml` - The automation request for the point search task.
+* `MessagesToSend/AutomationRequest_PointSearch.xml` - The automation request for the point search task.
 
 
 Running the example:
