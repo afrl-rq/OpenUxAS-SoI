@@ -24,7 +24,7 @@
     
     <Message MessageFileName="LineOfInterest_1.xml" SendTime_ms="1000"/>
     <Message MessageFileName="ImpactLineSearchTask_100.xml" SendTime_ms="2000"/>
-    <Message MessageFileName="AutomationRequest.xml" SendTime_ms="4000"/>
+    <Message MessageFileName="AutomationRequest_ImpactLineSearch.xml" SendTime_ms="4000"/>
   </Service>
 
   <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
