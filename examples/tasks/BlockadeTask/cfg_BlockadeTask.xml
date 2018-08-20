@@ -19,8 +19,8 @@
   <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
   <Service Type="WaypointPlanManagerService" VehicleID="101" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10001"/>
   <Service Type="WaypointPlanManagerService" VehicleID="102" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10002"/>
-    <Service Type="WaypointPlanManagerService" VehicleID="103" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10003"/>
-      <Service Type="WaypointPlanManagerService" VehicleID="104" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10004"/>
+  <Service Type="WaypointPlanManagerService" VehicleID="103" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10003"/>
+  <Service Type="WaypointPlanManagerService" VehicleID="104" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10004"/>
   <Service Type="SensorManagerService"/>
 
   <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
