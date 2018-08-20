@@ -161,10 +161,11 @@ private:
     double m_groundspeed_interval_buffer_mps{10.0};   //speed to buffer the ground speed interval by for avoidance maneuver.
     double m_verticalspeed_interval_buffer_mps{5.0};  //speed to buffer the vertical speed interval by for avoidance maneuver.
     double m_altitude_interval_buffer_m{20.0};    //distance in meters to buffer the altitude interval by for avoidance maneuver.
-    int64_t  m_NextWaypoint{-1};// {nullptr};
+    int64_t m_NextWaypoint{-1};// {nullptr};
     int64_t m_RoW;
+    uint16_t m_alertlevels_count;
     std::shared_ptr<afrl::cmasi::MissionCommand> m_MissionCommand{nullptr};// {nullptr};
-    std::string m_AvoidanceManeuverType = "GroundSpeed";
+    std::string m_AvoidanceManeuverType = "Heading";
     std::vector<int64_t> m_ConflictResolutionList;
 
     struct State

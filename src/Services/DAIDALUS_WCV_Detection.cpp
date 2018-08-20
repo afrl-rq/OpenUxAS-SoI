@@ -460,26 +460,26 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     larcfm::Detection3D* raw_ptr;
     raw_ptr = cd.get();
     m_daa.parameters.alertor.clear();
-    m_daa.parameters.alertor.setConflictAlertLevel(2);
-    if (m_RTCA_alert_levels == 3)
-    {
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_1_s,m_early_alert_time_1_s,larcfm::BandsRegion::FAR));
-        m_daa.parameters.alertor.setConflictAlertLevel(1);
-    }
-    else
-    {
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_1_s,m_early_alert_time_1_s,larcfm::BandsRegion::NONE));
-    }
     if (m_RTCA_alert_levels == 1)
     {
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_2_s,m_early_alert_time_2_s,larcfm::BandsRegion::NONE));
-        m_daa.parameters.alertor.setConflictAlertLevel(3);
-    }    
-    else
-    {
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_2_s,m_early_alert_time_2_s,larcfm::BandsRegion::MID));
+        m_daa.parameters.alertor.setConflictAlertLevel(1);
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::NEAR));
+        
     }
-    m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr,m_alert_time_3_s,m_early_alert_time_3_s,larcfm::BandsRegion::NEAR));
+    else if (m_RTCA_alert_levels == 2)
+    {
+        m_daa.parameters.alertor.setConflictAlertLevel(2);
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::MID));
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::NEAR));
+    }
+    else 
+    {
+        m_daa.parameters.alertor.setConflictAlertLevel(3);
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::FAR));
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::MID));
+        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_3_s, m_early_alert_time_3_s, larcfm::BandsRegion::NEAR));
+    }
+    
     raw_ptr = nullptr;
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);

@@ -226,7 +226,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             double lower;
             double upper;
         };
-        std::vector<intervals> bands;
+        std::vector<intervals> bands, r_bands;
         intervals temp;
         for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
         {
@@ -300,36 +300,36 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             {
                 m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
             }
-            else
+            else if (DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size() >0)
             {
-                //m_DivertState.heading_deg = m_CurrentState.heading_deg;
-            bool isRecoveryFound = false;
-            for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size(); i++)
-            {
-                temp.lower = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[0];
-                temp.upper = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[1];
-                bands.push_back(temp);
-            }
-            
-            for (uint i = 0; i < bands.size(); i++)
-            {
-                if ((bands[i].lower > m_CurrentState.heading_deg) && (bands[i].upper > m_CurrentState.heading_deg))
+                    //m_DivertState.heading_deg = m_CurrentState.heading_deg;
+                bool isRecoveryFound = false;
+                for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size(); i++)
                 {
-                    m_DivertState.heading_deg = bands[i].lower + m_heading_interval_buffer_deg / 2.0;
-                    isRecoveryFound = true;
-                    break;
+                    temp.lower = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[0];
+                    temp.upper = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[1];
+                    r_bands.push_back(temp);
                 }
-            }
-            
-            if (!isRecoveryFound)
-            {
-                for (int i = bands.size(); i >= 0; i--)
-                    if ((bands[i].lower < m_CurrentState.heading_deg) && (bands[i].upper < m_CurrentState.heading_deg))
+
+                for (uint i = 0; i < r_bands.size(); i++)
+                {
+                    if ((r_bands[i].lower > m_CurrentState.heading_deg) && (r_bands[i].upper > m_CurrentState.heading_deg))
                     {
-                        m_DivertState.heading_deg = bands[i].upper - m_heading_interval_buffer_deg / 2.0;
+                        m_DivertState.heading_deg = r_bands[i].lower + m_heading_interval_buffer_deg / 2.0;
+                        isRecoveryFound = true;
                         break;
                     }
-            }
+                }
+
+                if (!isRecoveryFound)
+                {
+                    for (int i = r_bands.size(); i >= 0; i--)
+                        if ((r_bands[i].lower < m_CurrentState.heading_deg) && (r_bands[i].upper < m_CurrentState.heading_deg))
+                        {
+                            m_DivertState.heading_deg = r_bands[i].upper - m_heading_interval_buffer_deg / 2.0;
+                            break;
+                        }
+                }
             
                 std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
                 std::cout << std::endl;
@@ -355,7 +355,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             double lower;
             double upper;
         };
-        std::vector<intervals> bands;
+        std::vector<intervals> bands, r_bands;
         intervals temp;
         for (uint i = 0; i < DAIDALUS_bands->getWCVGroundSpeedIntervals().size(); i++)
         {
@@ -390,7 +390,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             }
         }
         
-        if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps) //If after checking right turns and left turns no better heading found, keep current heading
+        if ((m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps) && (DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size() > 0)) //If after checking right turns and left turns no better heading found, keep current heading
         {
             m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
             bool isRecoveryFound = false;
@@ -398,14 +398,14 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             {
                 temp.lower = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[0];
                 temp.upper = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[1];
-                bands.push_back(temp);
+                r_bands.push_back(temp);
             }
             
-            for (uint i = 0; i < bands.size(); i++)
+            for (uint i = 0; i < r_bands.size(); i++)
             {
-                if ((bands[i].lower > m_CurrentState.horizontal_speed_mps) && (bands[i].upper > m_CurrentState.horizontal_speed_mps))
+                if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
                 {
-                    m_DivertState.horizontal_speed_mps = bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
+                    m_DivertState.horizontal_speed_mps = r_bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
                     isRecoveryFound = true;
                     break;
                 }
@@ -413,10 +413,10 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             
             if (!isRecoveryFound)
             {
-                for (int i = bands.size(); i >= 0; i--)
-                    if ((bands[i].lower < m_CurrentState.horizontal_speed_mps) && (bands[i].upper < m_CurrentState.horizontal_speed_mps))
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
                     {
-                        m_DivertState.horizontal_speed_mps = bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
+                        m_DivertState.horizontal_speed_mps = r_bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
                         break;
                     }
             }
@@ -435,7 +435,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             double lower;
             double upper;
         };
-        std::vector<intervals> bands;
+        std::vector<intervals> bands, r_bands;
         intervals temp;
         for (uint i = 0; i < DAIDALUS_bands->getWCVVerticalSpeedIntervals().size(); i++)
         {
@@ -470,7 +470,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             }
         }
         
-        if (m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps) //If after checking right turns and left turns no better heading found, keep current heading
+        if ((m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps) && (DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size() > 0))//If after checking right turns and left turns no better heading found, keep current heading
         {
             //m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
             bool isRecoveryFound = false;
@@ -478,14 +478,14 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             {
                 temp.lower = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[0];
                 temp.upper = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[1];
-                bands.push_back(temp);
+                r_bands.push_back(temp);
             }
             
             for (uint i = 0; i < bands.size(); i++)
             {
-                if ((bands[i].lower > m_CurrentState.vertical_speed_mps) && (bands[i].upper > m_CurrentState.vertical_speed_mps))
+                if ((r_bands[i].lower > m_CurrentState.vertical_speed_mps) && (r_bands[i].upper > m_CurrentState.vertical_speed_mps))
                 {
-                    m_DivertState.vertical_speed_mps = bands[i].lower + m_verticalspeed_interval_buffer_mps / 2.0;
+                    m_DivertState.vertical_speed_mps = r_bands[i].lower + m_verticalspeed_interval_buffer_mps / 2.0;
                     isRecoveryFound = true;
                     break;
                 }
@@ -493,10 +493,10 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             
             if (!isRecoveryFound)
             {
-                for (int i = bands.size(); i >= 0; i--)
-                    if ((bands[i].lower < m_CurrentState.vertical_speed_mps) && (bands[i].upper < m_CurrentState.vertical_speed_mps))
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.vertical_speed_mps) && (r_bands[i].upper < m_CurrentState.vertical_speed_mps))
                     {
-                        m_DivertState.vertical_speed_mps = bands[i].upper - m_verticalspeed_interval_buffer_mps / 2.0;
+                        m_DivertState.vertical_speed_mps = r_bands[i].upper - m_verticalspeed_interval_buffer_mps / 2.0;
                         break;
                     }
             }
@@ -514,7 +514,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             double lower;
             double upper;
         };
-        std::vector<intervals> bands;
+        std::vector<intervals> bands, r_bands;
         intervals temp;
         for (uint i = 0; i < DAIDALUS_bands->getWCVAlitudeIntervals().size(); i++)
         {
@@ -549,7 +549,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             }
         }
         
-        if (m_DivertState.altitude_m < m_altitude_min_m) //If after checking right turns and left turns no better heading found, keep current heading
+        if ((m_DivertState.altitude_m < m_altitude_min_m) && (DAIDALUS_bands->getRecoveryAltitudeIntervals().size() > 0))//If after checking right turns and left turns no better heading found, keep current heading
         {
             //m_DivertState.altitude_m = m_CurrentState.altitude_m;
             bool isRecoveryFound = false;
@@ -557,14 +557,14 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             {
                 temp.lower = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[0];
                 temp.upper = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[1];
-                bands.push_back(temp);
+                r_bands.push_back(temp);
             }
             
-            for (uint i = 0; i < bands.size(); i++)
+            for (uint i = 0; i < r_bands.size(); i++)
             {
-                if ((bands[i].lower > m_CurrentState.altitude_m) && (bands[i].upper > m_CurrentState.altitude_m))
+                if ((r_bands[i].lower > m_CurrentState.altitude_m) && (r_bands[i].upper > m_CurrentState.altitude_m))
                 {
-                    m_DivertState.altitude_m = bands[i].lower + m_altitude_interval_buffer_m / 2.0;
+                    m_DivertState.altitude_m = r_bands[i].lower + m_altitude_interval_buffer_m / 2.0;
                     isRecoveryFound = true;
                     break;
                 }
@@ -572,10 +572,10 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
             
             if (!isRecoveryFound)
             {
-                for (int i = bands.size(); i >= 0; i--)
-                    if ((bands[i].lower < m_CurrentState.altitude_m) && (bands[i].upper < m_CurrentState.altitude_m))
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.altitude_m) && (r_bands[i].upper < m_CurrentState.altitude_m))
                     {
-                        m_DivertState.altitude_m = bands[i].upper - m_altitude_interval_buffer_m / 2.0;
+                        m_DivertState.altitude_m = r_bands[i].upper - m_altitude_interval_buffer_m / 2.0;
                         break;
                     }
             }
@@ -854,7 +854,20 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
     {
         std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> configuration = 
                 std::static_pointer_cast<larcfm::DAIDALUS::DAIDALUSConfiguration>(receivedLmcpMessage->m_object);
-        m_action_time_threshold_s = configuration->getAlertTime3();
+        m_alertlevels_count = configuration->getRTCAAlertLevels();
+        if (m_alertlevels_count == 1)
+        {
+            m_action_time_threshold_s = configuration->getAlertTime1();
+        }
+        else if (m_alertlevels_count ==2)
+        {
+            m_action_time_threshold_s = configuration->getAlertTime2();
+        }
+        else
+        {
+            m_action_time_threshold_s = configuration->getAlertTime3();
+        }
+        
         m_vertical_rate_mps = configuration->getVerticalRate();
         m_horizontal_accel_mpsps = configuration->getHorizontalAcceleration();
         m_vertical_accel_G = configuration->getVerticalAcceleration();
