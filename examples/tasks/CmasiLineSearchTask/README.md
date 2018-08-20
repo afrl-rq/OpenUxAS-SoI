@@ -13,7 +13,7 @@ Files:
 * `MessagesToSend/` - Contains the messages send by UxAS with the send messages service.
 * `MessagesToSend/AirVehicleConfiguration_V101.xml` - Details for air vehicle 101.
 * `MessagesToSend/AirVehicleState_V101.xml` - Air vehicle 101's initial state.
-* `MessagesToSend/LineSearchTask_100.xml` - The line search task that is requiested.
+* `MessagesToSend/LineSearchTask_100.xml` - The line search task that is requested.
 * `MessagesToSend/AutomationRequest_LineSearch.xml` - The automation request for the line search task.
 
 
