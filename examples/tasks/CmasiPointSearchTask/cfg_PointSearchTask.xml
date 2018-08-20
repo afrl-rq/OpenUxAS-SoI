@@ -22,7 +22,7 @@
     <Message MessageFileName="AirVehicleConfiguration_V101.xml" SendTime_ms="100"/>
     <Message MessageFileName="AirVehicleState_V101.xml" SendTime_ms="100"/>
     <Message MessageFileName="PointSearchTask_100.xml" SendTime_ms="2000"/>
-    <Message MessageFileName="AutomationRequest.xml" SendTime_ms="4000"/>
+    <Message MessageFileName="AutomationRequest_PointSearch.xml" SendTime_ms="4000"/>
   </Service>
 
   <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
