@@ -13,16 +13,16 @@ Files:
 * `MessagesToSend/` - Contains the messages send by UxAS with the send messages service.
 * `MessagesToSend/AirVehicleConfiguration_V101.xml` - Details for air vehicle 101.
 * `MessagesToSend/AirVehicleState_V101.xml` - Air vehicle 101's initial state.
-* `MessagesToSend/MustFlyTask_100.xml` - The point search task that is requested.
-* `MessagesToSend/AutomationRequest_PointSearch.xml` - The automation request for the point search task.
+* `MessagesToSend/MustFlyTask_100.xml` - The requested must fly task.
+* `MessagesToSend/AutomationRequest_MustFly.xml` - The automation request for the must fly task.
 
 
 Running the example:
 --------------------
-1. Open a terminal window in the directory: "examples/tasks/CmasiPointSearchTask"
-2. enter the command `python3 runUxAS_PointSearchTask.py` or `./runUxAS_PointSearchTask.py`
-3. open another terminal window in the directory: "examples/tasks/CmasiPointSearchTask"
-4. enter the command `python3 runAMASE_PointSearchTask.py` or `./runAMASE_PointSearchTask.py`
+1. Open a terminal window in the directory: "examples/tasks/MustFlyTask"
+2. enter the command `python3 runUxAS_MustFlyTask.py` or `./runUxAS_MustFlyTask.py`
+3. open another terminal window in the directory: "examples/tasks/MustFlyTask"
+4. enter the command `python3 runAMASE_MustFlyTask.py` or `./runAMASE_MustFlyTask.py`
 5. start the AMASE simulation (i.e. press the play button)
 
 ### What happens?

@@ -34,6 +34,6 @@ Running the example:
 ### What happens?
 * When the AMASE simulation starts, vehicles 101, 102, and 103 will be initialized and begin flying east.
 * After 1.5 seconds, an automation request for the point search task is sent.
-* Once plan have been calculated, UAV 103 will being performing the point search task.
+* Once plans have been calculated, UAV 103 will being performing the point search task.
 * After 9 seconds, an automation request for the blockade task is sent.
 * Once plans have been calculated, vehicles 101 and 102 will begin the blockade task.

@@ -23,10 +23,10 @@ Files:
 
 Running the example:
 --------------------
-1. Open a terminal window in the directory: "examples/tasks/BlockadeTask"
-2. enter the command `python3 runUxAS_BlockadeTask.py` or `./runUxAS_BlockadeTask.py`
-3. open another terminal window in the directory: "examples/tasks/BlockadeTask"
-4. enter the command `python3 runAMASE_BlockadeTask.py` or `./runAMASE_BlockadeTask.py`
+1. Open a terminal window in the directory: "examples/tasks/MultiVehicleWatchTask"
+2. enter the command `python3 runUxAS_MultiVehicleWatchTask.py` or `./runUxAS_MultiVehicleWatchTask.py`
+3. open another terminal window in the directory: "examples/tasks/MultiVehicleWatchTask"
+4. enter the command `python3 runAMASE_MultiVehicleWatchTask.py` or `./runAMASE_MultiVehicleWatchTask.py`
 5. start the AMASE simulation (i.e. press the play button)
 
 ### What happens?

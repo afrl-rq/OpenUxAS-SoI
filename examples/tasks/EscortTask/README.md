@@ -1,7 +1,7 @@
 Escort Task
 =======================
 
-A task for tageting surveillance at an offset of a moving entity. This can be used to scout ahead or behind a convoy.
+A task for targeting surveillance at an offset of a moving entity. This can be used to scout ahead or behind a convoy.
 
 Files:
 ------

@@ -1,7 +1,7 @@
 Loiter Task
 =======================
 
-An IMPACT task where a vehicle loiters around a point.
+An task where a vehicle loiters around a point.
 
 Files:
 ------

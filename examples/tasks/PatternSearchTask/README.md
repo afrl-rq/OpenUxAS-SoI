@@ -13,7 +13,7 @@ Files:
 * `MessagesToSend/` - Contains the messages sent by UxAS with the send messages service.
 * `MessagesToSend/AirVehicleConfiguration_V101.xml` - Details for air vehicle 101.
 * `MessagesToSend/AirVehicleState_V101.xml` - Air vehicle 101's initial state.
-* `MessagesToSend/PatternSearchTask_100.xml` - The pattern search task configuration which will be performed by vehicle 101.
+* `MessagesToSend/PatternSearchTask_100.xml` - The pattern search task configuration.
 * `MessagesToSend/AutomationRequest_PatternSearch.xml` - The automation request for the pattern search task.
 
 
@@ -28,4 +28,4 @@ Running the example:
 ### What happens?
 * When the AMASE simulation starts, vehicle 101 will be initialized and begin flying east.
 * After 4 seconds, an automation request for the pattern search task is sent.
-* Once plan have been calculated, UAV 101 will being performing the pattern search task.
+* Once plans have been calculated, UAV 101 will being performing the pattern search task.

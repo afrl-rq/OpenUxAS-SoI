@@ -19,7 +19,7 @@ Files:
 * `MessagesToSend/RadioTowerState_V21.xml` - Radio tower 21's initial state.
 * `MessagesToSend/CommRelayTask_100.xml` - The comm relay task to support vehicle 101.
 * `MessagesToSend/AutomationRequest_CommRelay.xml` - The automation request for the communication relay task.
-* `MessagesToSend/PointSearchTask_200.xml` - The point search task for vehicle 101.
+* `MessagesToSend/PointSearchTask_200.xml` - The point search task.
 * `MessagesToSend/AutomationRequest_PointSearch.xml` - The automation request for the line search task.
 
 
