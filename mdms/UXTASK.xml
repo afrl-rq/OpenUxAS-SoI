@@ -9,7 +9,7 @@
 <MDM>
     <SeriesName>UXTASK</SeriesName>
     <Namespace>uxas/messages/task</Namespace>
-    <Version>7</Version>
+    <Version>8</Version>
     
     <EnumList>
     </EnumList>
@@ -39,16 +39,6 @@
                  entities, then this task will only produce a single option that ensures
                  those exact entities meet at the rendezvous location. -->
             <Field Name="NumberOfParticipants" Type="byte" />
-            <!-- If 'MultiLocationRendezvous' is false, all vehicles will meet at this location
-                 simultaneously. When 'MultiLocationRendezvous' is true, Location is allowed
-                 to be null as 'RendezvousStates' will override the single location behavior. -->
-            <Field Name="Location" Type="CMASI/Location3D" Default="null" Optional="true" />
-            <!-- Rendezvous location. All vehicles will arrive with this heading
-                 simultaneously unless 'MultiLocationRendezvous' is set to 'true'. -->
-            <Field Name="Heading" Type="real32" />
-            <!-- Flag for specifying complex rendezvous arrangements. When 'true'
-                 vehicles must arrive according to the list of specified locations. -->
-            <Field Name="MultiLocationRendezvous" Type="bool" Default="false" />
             <!-- The desired rendezvous states of the entities. If the EntityID fields
                  are set to 0, then any eligible vehicle can be used at that location. 
                  Only used when 'MultiLocationRendezvous' is set to 'true'. If the 

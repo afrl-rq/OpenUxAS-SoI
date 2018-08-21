@@ -19,6 +19,7 @@
 #include "FlatEarth.h"
 #include "RouteExtension.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
+#include "afrl/cmasi/AirVehicleState.h"
 #include "uxas/messages/task/RendezvousTask.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
 #include "uxas/messages/uxnative/SpeedOverrideAction.h"
@@ -181,48 +182,26 @@ void RendezvousTask::buildTaskPlanOptions()
     {
         for (auto v : itEligibleEntities->second)
         {
-            if(!rtask->getMultiLocationRendezvous())
+            // add an option for each distinct desired state at rendezvous
+            for(auto planstate : rtask->getRendezvousStates())
             {
-                // plan for each vehicle to meet at the same location
-                if(!rtask->getLocation()) break;
-                auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
-                auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
-                pTaskOptionClass->m_taskOption->setTaskID(taskId);
-                pTaskOptionClass->m_taskOption->setOptionID(optionId);
-                pTaskOptionClass->m_taskOption->setCost(0);
-                pTaskOptionClass->m_taskOption->setStartLocation(rtask->getLocation()->clone());
-                pTaskOptionClass->m_taskOption->setStartHeading(rtask->getHeading());
-                pTaskOptionClass->m_taskOption->setEndLocation(rtask->getLocation()->clone());
-                pTaskOptionClass->m_taskOption->setEndHeading(rtask->getHeading());
-                pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
-                m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
-                m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
-                optionMap[v].push_back(optionId);
-                optionId++;
-            }
-            else
-            {
-                // add an option for each distinct desired state at rendezvous
-                for(auto planstate : rtask->getRendezvousStates())
+                // these can be vehicle specific or for any vehicle (0 ID)
+                if(planstate->getEntityID() == 0 || planstate->getEntityID() == v)
                 {
-                    // these can be vehicle specific or for any vehicle (0 ID)
-                    if(planstate->getEntityID() == 0 || planstate->getEntityID() == v)
-                    {
-                        auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
-                        auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
-                        pTaskOptionClass->m_taskOption->setTaskID(taskId);
-                        pTaskOptionClass->m_taskOption->setOptionID(optionId);
-                        pTaskOptionClass->m_taskOption->setCost(0);
-                        pTaskOptionClass->m_taskOption->setStartLocation(planstate->getPlanningPosition()->clone());
-                        pTaskOptionClass->m_taskOption->setStartHeading(planstate->getPlanningHeading());
-                        pTaskOptionClass->m_taskOption->setEndLocation(planstate->getPlanningPosition()->clone());
-                        pTaskOptionClass->m_taskOption->setEndHeading(planstate->getPlanningHeading());
-                        pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
-                        m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
-                        m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
-                        optionMap[v].push_back(optionId);
-                        optionId++;
-                    }
+                    auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+                    auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+                    pTaskOptionClass->m_taskOption->setTaskID(taskId);
+                    pTaskOptionClass->m_taskOption->setOptionID(optionId);
+                    pTaskOptionClass->m_taskOption->setCost(0);
+                    pTaskOptionClass->m_taskOption->setStartLocation(planstate->getPlanningPosition()->clone());
+                    pTaskOptionClass->m_taskOption->setStartHeading(planstate->getPlanningHeading());
+                    pTaskOptionClass->m_taskOption->setEndLocation(planstate->getPlanningPosition()->clone());
+                    pTaskOptionClass->m_taskOption->setEndHeading(planstate->getPlanningHeading());
+                    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
+                    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+                    m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
+                    optionMap[v].push_back(optionId);
+                    optionId++;
                 }
             }
         }
@@ -472,7 +451,12 @@ void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::Entity
     if(!avconfig) return;
 
     double speedNom_mps = avconfig->getNominalSpeed();
-    if(speedNom_mps < 1e-4) speedNom_mps = entityState->getGroundspeed();
+    if(speedNom_mps < 1e-4)
+    {
+        speedNom_mps = entityState->getGroundspeed();
+        auto avstate = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(entityState);
+        if(avstate) speedNom_mps = avstate->getAirspeed();
+    }
     if(speedNom_mps < 1e-4) return;
     auto speedInterval = SpeedClip(avconfig, speedNom_mps);
 
