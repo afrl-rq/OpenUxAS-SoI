@@ -66,7 +66,7 @@ void MustFlyTaskService::buildTaskPlanOptions()
     int64_t optionId = TaskOptionClass::m_firstOptionId;
 
 #ifdef AFRL_INTERNAL_ENABLED
-    if(afrl::famus::isMustFlyTask(m_task))
+    if(afrl::famus::isMustFlyTask(m_task.get()))
     {
         auto famusTask = std::static_pointer_cast<afrl::famus::MustFlyTask>(m_task);
         if(famusTask->getEnforceHeading())
@@ -137,7 +137,7 @@ bool MustFlyTaskService::isProcessTaskImplementationRouteResponse(std::shared_pt
 {
 #ifdef AFRL_INTERNAL_ENABLED
     // override speed as necessary
-    if(afrl::famus::isMustFlyTask(m_task))
+    if(afrl::famus::isMustFlyTask(m_task.get()))
     {
         auto famusTask = std::static_pointer_cast<afrl::famus::MustFlyTask>(m_task);
         if(famusTask->getDesiredSpeed() > 1e-4)
@@ -189,12 +189,12 @@ bool MustFlyTaskService::isBuildAndSendImplementationRouteRequest(const int64_t&
 
 #ifdef AFRL_INTERNAL_ENABLED
     // override heading if required
-    if(afrl::famus::isMustFlyTask(m_task))
+    if(afrl::famus::isMustFlyTask(m_task.get()))
     {
         auto famusTask = std::static_pointer_cast<afrl::famus::MustFlyTask>(m_task);
         if(famusTask->getEnforceHeading())
         {
-            routeConstraints->setEndLocation(famusTask->getHeading());
+            routeConstraints->setEndHeading(famusTask->getHeading());
             routeConstraints->setUseEndHeading(true);
         }
     }

@@ -285,7 +285,7 @@ bool CmasiPointSearchTaskService::isProcessTaskImplementationRouteResponse(std::
 {
 #ifdef AFRL_INTERNAL_ENABLED
     // override speed as necessary
-    if(afrl::famus::isPointSearchTask(m_task))
+    if(afrl::famus::isPointSearchTask(m_task.get()))
     {
         auto famusTask = std::static_pointer_cast<afrl::famus::PointSearchTask>(m_task);
         if(famusTask->getDesiredSpeed() > 1e-4)
