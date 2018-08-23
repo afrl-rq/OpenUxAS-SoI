@@ -567,7 +567,7 @@ public
 			lemma "Coordination variables are correct on and after 16 steps":
 				steps >= 16 => correct_coordination_variables;
 					
-			lemma "Time for coordination variables to be correct is < (3 + 1/4)T":
+			lemma "Time to correct coordination variables is < (3 + 1/4)T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
 					(time < (3.0 + 1.0/4.0)*T);
 			
