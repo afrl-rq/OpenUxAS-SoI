@@ -128,6 +128,10 @@ dep_serial = subproject('serial-1.2.1').get_variable('dep')
 dep_pugixml = subproject('PugiXML').get_variable('dep')
 
 if get_option('afrl_internal')
+  add_project_arguments('-DAFRL_INTERNAL_ENABLED', language: ['c', 'cpp'])
+endif
+
+if get_option('afrl_internal')
   subdir('UxAS-afrl_internal')
 endif
 

@@ -51,8 +51,8 @@ deps_services = [
 ]
 
 if get_option('afrl_internal')
-  deps_services += [deps_services_internal]
-  incs_services += [incs_services_internal]
+  deps_services += deps_services_internal
+  incs_services += incs_services_internal
 else
   srcs_services_internal = files()
 endif
