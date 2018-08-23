@@ -481,6 +481,7 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
     }
     
     raw_ptr = nullptr;
+    m_daa.parameters.saveToFile("testConfiguraton");
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);
     std::cout << "Successfully subscribed to AirVehicleState from DAIDALUS_WCV_Detection." << std::endl;
