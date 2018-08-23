@@ -24,6 +24,9 @@
 #include "afrl/cmasi/VehicleActionCommand.h"
 #include "uxas/messages/uxnative/SpeedOverrideAction.h"
 
+#ifdef AFRL_INTERNAL_ENABLED
+#include "afrl/famus/PlanningState.h"
+#endif
 namespace uxas
 {
 namespace service
@@ -198,6 +201,29 @@ void RendezvousTask::buildTaskPlanOptions()
                     pTaskOptionClass->m_taskOption->setEndLocation(planstate->getPlanningPosition()->clone());
                     pTaskOptionClass->m_taskOption->setEndHeading(planstate->getPlanningHeading());
                     pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
+#ifdef AFRL_INTERNAL_ENABLED
+                    if(afrl::famus::isPlanningState(planstate))
+                    {
+                        auto famusPlanState = static_cast<afrl::famus::PlanningState*>(planstate);
+                        if(!famusPlanState->getEnforceHeading())
+                        {
+                            if(planstate->getEntityID() && m_entityStates.find(planstate->getEntityID()) != m_entityStates.end())
+                            {
+                                // set end heading as bearing from current position
+                                uxas::common::utilities::FlatEarth flatEarth;
+                                auto loc = m_entityStates[planstate->getEntityID()]->getLocation();
+                                flatEarth.Initialize(loc->getLatitude()*n_Const::c_Convert::dDegreesToRadians(),
+                                                     loc->getLongitude()*n_Const::c_Convert::dDegreesToRadians());
+                                double north, east;
+                                flatEarth.ConvertLatLong_degToNorthEast_m(planstate->getPlanningPosition()->getLatitude(),
+                                                            planstate->getPlanningPosition()->getLongitude(), north, east);
+                                double bearing = atan2(east,north)*n_Const::c_Convert::dRadiansToDegrees();
+                                pTaskOptionClass->m_taskOption->setStartHeading(bearing);
+                                pTaskOptionClass->m_taskOption->setEndHeading(bearing);
+                            }
+                        }
+                    }
+#endif
                     m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
                     m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
                     optionMap[v].push_back(optionId);
@@ -206,7 +232,7 @@ void RendezvousTask::buildTaskPlanOptions()
             }
         }
     }
-    
+
     // check for self-consistency:
     //   a. all vehicles have a single option -OR-
     //   b. all vehicles have the same number of options AND
