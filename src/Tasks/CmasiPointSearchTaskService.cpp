@@ -161,12 +161,28 @@ bool CmasiPointSearchTaskService::isCalculateOption(const int64_t& taskId, int64
 
     uxas::common::utilities::CUnitConversions unitConversions;
     double standoffDistance = m_pointSearchTask->getStandoffDistance();
-    if(standoffDistance < 1.0) standoffDistance = 1.0;
 
     auto taskOption = new uxas::messages::task::TaskOption;
     auto startEndHeading_deg = n_Const::c_Convert::dNormalizeAngleRad((wedgeHeading_rad + n_Const::c_Convert::dPi()), 0.0) * n_Const::c_Convert::dRadiansToDegrees(); // [0,2PI) 
     taskOption->setStartHeading(startEndHeading_deg);
     taskOption->setEndHeading(startEndHeading_deg);
+    
+    if (n_Const::c_Convert::bCompareDouble(standoffDistance, 0.0, n_Const::c_Convert::enLessEqual))
+    {
+        taskOption->setTaskID(taskId);
+        taskOption->setOptionID(optionId);
+        //taskOption->setCost();    // defaults to 0.0
+        taskOption->setStartLocation(m_pointSearchTask->getSearchLocation()->clone());
+        taskOption->setEndLocation(m_pointSearchTask->getSearchLocation()->clone());
+        for(auto itEligibleEntities : m_speedAltitudeVsEligibleEntityIdsRequested)
+            for( auto id : itEligibleEntities.second )
+                taskOption->getEligibleEntities().push_back(id);
+        taskOption->setCost(0);
+        auto pTaskOption = std::shared_ptr<uxas::messages::task::TaskOption>(taskOption->clone());
+        m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, std::make_shared<TaskOptionClass>(pTaskOption)));
+        m_taskPlanOptions->getOptions().push_back(taskOption);
+        return true;
+    }
 
     taskOption->setTaskID(taskId);
     taskOption->setOptionID(optionId);
