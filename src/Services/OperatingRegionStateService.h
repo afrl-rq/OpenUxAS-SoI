@@ -34,10 +34,10 @@ namespace service
  * \brief  
  * 
  * Configuration String: 
- *  <Service Type="OperatingRegionStateService"/>
+ *  <Service Type="OperatingRegionStateService" AdditionalPadding="0.0" />
  * 
  * Options:
- *  - NONE
+ *  - AdditionalPadding: adds this value to the normal padding of all zones
  * 
  * Subscribed Messages:
  *  - afrl::cmasi::KeepInZone
@@ -96,38 +96,13 @@ private:
     bool
     configure(const pugi::xml_node& serviceXmlNode) override;
 
-    //bool
-    //initialize() override;
-
-    //bool
-    //start() override;
-
-    //bool
-    //terminate() override;
-
     bool
     processReceivedLmcpMessage(std::unique_ptr<uxas::communications::data::LmcpMessage> receivedLmcpMessage) override;
 
-
-public:
-
-
-
-
-public: //virtual
-
-
-
-
-
-
-private:
-
-
-
-
     // storage
     std::shared_ptr<afrl::cmasi::OperatingRegion> m_region;
+    double m_additionalPadding{0.0};
+
 };
 
 }; //namespace service
