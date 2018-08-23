@@ -22,6 +22,7 @@
 
 #include "afrl/cmasi/VehicleActionCommand.h"
 #include "afrl/cmasi/GimbalStareAction.h"
+#include "afrl/cmasi/GimbalConfiguration.h"
 #include "uxas/messages/task/TaskImplementationResponse.h"
 #include "uxas/messages/task/TaskOption.h"
 #include "uxas/messages/route/RouteRequest.h"
@@ -51,6 +52,7 @@ CmasiPointSearchTaskService::s_registrar(CmasiPointSearchTaskService::s_registry
 CmasiPointSearchTaskService::CmasiPointSearchTaskService()
 : TaskServiceBase(CmasiPointSearchTaskService::s_typeName(), CmasiPointSearchTaskService::s_directoryName()) {
     //UXAS_LOG_INFORM_ASSIGNMENT("*** CONSTRUCTOR m_networkId[",m_networkId,"] ***");
+    m_isMakeTransitionWaypointsActive = true;
 };
 
 CmasiPointSearchTaskService::~CmasiPointSearchTaskService() {
@@ -290,6 +292,16 @@ bool CmasiPointSearchTaskService::isCalculateOption(const int64_t& taskId, int64
 
 void CmasiPointSearchTaskService::activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState)
 {
+    // TODO: point all gimbals, not simply the last one listed
+    int64_t gimbalId = 0;
+    if (m_entityConfigurations.find(entityState->getID()) != m_entityConfigurations.end())
+    {
+        auto cfg = m_entityConfigurations[entityState->getID()];
+        for (auto payload : cfg->getPayloadConfigurationList())
+            if (afrl::cmasi::isGimbalConfiguration(payload))
+                gimbalId = payload->getPayloadID();
+    }
+
     // we are at an active waypoint
     // point the camera at the search point
     auto vehicleActionCommand = std::make_shared<afrl::cmasi::VehicleActionCommand>();
@@ -297,6 +309,7 @@ void CmasiPointSearchTaskService::activeEntityState(const std::shared_ptr<afrl::
     vehicleActionCommand->setVehicleID(entityState->getID());
     //vehicleActionCommand->setStatus();
     auto gimbalStareAction = new afrl::cmasi::GimbalStareAction;
+    gimbalStareAction->setPayloadID(gimbalId);
     gimbalStareAction->setStarepoint(m_pointSearchTask->getSearchLocation()->clone());
     vehicleActionCommand->getVehicleActionList().push_back(gimbalStareAction);
     gimbalStareAction = nullptr; //gave up ownership
