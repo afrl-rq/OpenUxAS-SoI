@@ -110,9 +110,15 @@ private:
     //                     key: vehicle ID, value: absolute time at task start in ms
     std::unordered_map<int64_t, std::unordered_map<int64_t, int64_t> > m_taskStartTime;
     std::unordered_map<int64_t, std::unordered_map<int64_t, bool> > m_taskEncountered;
+
+    // key: option ID, value: speed for option
+    std::unordered_map<int64_t, double> m_optionSpeed;
     
     // key: vehicle ID, value: pair (time of valuation, remaining distance)
     std::unordered_map<int64_t, std::pair<int64_t, double> > m_distanceRemaining;
+
+    // task parameter to attempt speed only changes to reach formation
+    bool m_preferSpeedOnly{false};
 };
 
 
