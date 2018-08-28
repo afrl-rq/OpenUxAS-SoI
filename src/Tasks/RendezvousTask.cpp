@@ -334,6 +334,13 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
     if(!wp) return false;
     if(wp->getSpeed() < 1e-4) return false;
     double V = wp->getSpeed();
+
+    // ensure altitudes match request
+    for(auto wp : taskImplementationResponse->getTaskWaypoints())
+    {
+        wp->setAltitude(taskOptionClass->m_taskOption->getEndLocation()->getAltitude());
+        wp->setAltitudeType(taskOptionClass->m_taskOption->getEndLocation()->getAltitudeType());
+    }
     
     // look up timing for each vehicle involved in the task
     auto assignsummary = m_assignmentSummary.find(taskImplementationResponse->getCorrespondingAutomationRequestID());
