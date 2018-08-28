@@ -135,6 +135,14 @@ bool MustFlyTaskService::isProcessTaskImplementationRouteResponse(std::shared_pt
     std::shared_ptr<TaskOptionClass>& taskOptionClass,
     int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route)
 {
+    // make sure altitude matches must fly altitude
+    auto mustfly = std::dynamic_pointer_cast<afrl::cmasi::MustFlyTask>(m_task);
+    for(auto wp : taskImplementationResponse->getTaskWaypoints())
+    {
+        wp->setAltitude(mustfly->getPosition()->getAltitude());
+        wp->setAltitudeType(mustfly->getPosition()->getAltitudeType());
+    }
+
 #ifdef AFRL_INTERNAL_ENABLED
     // override speed as necessary
     if(afrl::famus::isMustFlyTask(m_task.get()))
