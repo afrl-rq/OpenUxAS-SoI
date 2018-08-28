@@ -55,6 +55,16 @@ const int64_t TaskOptionClass::m_firstImplementationRouteId{2}; // first id to u
 //XML STRINGS    
 const std::string TaskServiceBase::m_taskOptions_XmlTag{"TaskOptions"};
 
+bool isCollocated(afrl::cmasi::Location3D* a, afrl::cmasi::Location3D* b)
+{
+    if(!a || !b) return false;
+
+    if( fabs(a->getLatitude() - b->getLatitude()) < 1e-6 &&
+        fabs(a->getLongitude() - b->getLongitude()) < 1e-6 )
+        return true;
+    return false;
+}
+
 TaskOptionClass::TaskOptionClass(std::shared_ptr<uxas::messages::task::TaskOption>& taskOption)
 : m_taskOption(taskOption)
 {
@@ -933,9 +943,17 @@ void TaskServiceBase::processImplementationRoutePlanResponseBase(const std::shar
                                                 itTaskOptionClass->second->m_firstTaskActiveWaypointID = waypointId;
                                             }
                                         }
+                                        if(!taskImplementationResponse->getTaskWaypoints().empty() &&
+                                            isCollocated(taskImplementationResponse->getTaskWaypoints().back(), waypoint))
+                                        {
+                                            waypointId = taskImplementationResponse->getTaskWaypoints().back()->getNumber();
+                                            waypoint->setNumber(waypointId);
+                                            delete taskImplementationResponse->getTaskWaypoints().back();
+                                            taskImplementationResponse->getTaskWaypoints().pop_back();;
+                                        }
                                         taskImplementationResponse->getTaskWaypoints().push_back(waypoint);
-                                        waypoint = nullptr; // gave up ownership
                                         waypointId++;
+                                        waypoint = nullptr; // gave up ownership
                                     }
                                 }
                                 // got a new plan so remove old restart plan, if any
