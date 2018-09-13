@@ -551,9 +551,13 @@ public
 					and UAV4.numLeft = 0 and UAV4.numRight = 0
 				));
 
-			lemma "Experimental Observer: Config params are not yet converged after (3 + 1/8)T":
+			lemma "Experimental Observer: Config params are not yet converged after (3 + 1/5)T":
 				(stable_config_params and not (pre(stable_config_params))) => 
-					(time <= (3.0 + 1.0/8.0)*T);
+					(time <= (3.0 + 1.0/5.0)*T);
+					
+			lemma "Experimental Observer: Config params are not yet converged after (3 + 1/6)T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time <= (3.0 + 1.0/6.0)*T);
 			
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
