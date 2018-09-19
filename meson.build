@@ -83,6 +83,7 @@ else
   # https://www.sqlite.org/src
   dep_sqlite3 = dependency(
     'sqlite3',
+    static: true,
     required: false,
   )
 
