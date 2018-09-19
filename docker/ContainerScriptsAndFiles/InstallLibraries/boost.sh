@@ -63,9 +63,12 @@ then
 
 elif [ $BUILD_TYPE == BOOST ]
 then
+	export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/include/python2.7/"
+	
 	#./bootstrap.sh --prefix=/usr/local --with-libraries=all
-	#./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=all
-	./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=date_time,filesystem,regex,system
+	# ./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=all
+	./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"
+	#./bootstrap.sh --prefix=/usr/local cxxflags="-stdlib=libc++ -std=c++11 -DLINUX" linkflags="-stdlib=libc++ -std=c++11 -DLINUX"  --with-libraries=date_time,filesystem,regex,system,contract
  
 	$_SUDO ./b2 install -d0 threading=multi
 	$_SUDO ldconfig

@@ -14,9 +14,12 @@ BUILD_TYPE="AUTOCONFIG"
 
 LIBRARY_NAME="sqlite"
 LIBRARY_FOLDER_NAME="sqlite"
-SOURCE_ARCHIVE_FILE="sqlite-autoconf-3210000.tar.gz"
-SOURCE_ARCHIVE_ADDRESS="https://sqlite.org/2017/"
-SOURCE_FOLDER_NAME="sqlite-autoconf-3210000"
+SOURCE_ARCHIVE_FILE="sqlite-autoconf-3120200.tar.gz"
+SOURCE_ARCHIVE_ADDRESS="https://sqlite.org/2016/"
+SOURCE_FOLDER_NAME="sqlite-autoconf-3120200"
+# SOURCE_ARCHIVE_FILE="sqlite-autoconf-3210000.tar.gz"
+# SOURCE_ARCHIVE_ADDRESS="https://sqlite.org/2017/"
+# SOURCE_FOLDER_NAME="sqlite-autoconf-3210000"
 
 ARCHIVE_COMMAND="tar xzvf"
 

@@ -1,0 +1,55 @@
+{
+    {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "C++ Launch in already running uxas_debug container",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "/tmp_build/build_debug/uxas",
+        "args": ["-cfgPath", "cfg_TestUxAS.xml"],
+        "stopAtEntry": false,
+        "cwd": "/working",
+        "environment": [],
+        "externalConsole": false,
+        "pipeTransport": {
+            "pipeCwd": "${workspaceRoot}",
+            "pipeProgram": "docker",
+            "pipeArgs": [
+                "exec", 
+                "-i", 
+                "uxas_debug", 
+                "sh",
+                "-c"
+            ],
+            "debuggerPath": "/usr/bin/gdb"
+        },
+        "sourceFileMap": {
+                "/tmp_build":"${workspaceRoot}"
+        },
+        "linux": {
+          "MIMode": "gdb",
+          "setupCommands": [
+            {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+            }
+          ]
+        },
+        "osx": {
+          "MIMode": "gdb"
+        },
+        "windows": {
+          "MIMode": "gdb",
+          "setupCommands": [
+            {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+            }
+          ]
+        }
+      },
+    ]
+  }

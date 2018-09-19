@@ -6,18 +6,23 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     curl \
+    gdb \ 
+    gdbserver \ 
     git \
     libczmq-dev \
     libgtest-dev \
     libminizip-dev \
-    libsqlite3-dev \
     libtool-bin \
     libzmq3-dev \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
+    python-dev \
+    python2.7 \
+    python-pip \
     python3-pip \
     python3-setuptools \
+    rsync \
     unzip \
     uuid-dev \
     wget \
@@ -26,10 +31,11 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 RUN apt-get install -y --no-install-recommends \
     automake
 
-RUN pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.44.0/meson-0.44.0.tar.gz
+RUN pip3 install wheel
+RUN pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.47.0/meson-0.47.0.tar.gz
 
 WORKDIR /UxAS/Installation/InstallLibraries/
-COPY InstallLibraries/* ./
+COPY ContainerScriptsAndFiles/InstallLibraries/* ./
 RUN chmod -R +x . \
     && ./00_InstallDependencies.sh NO_SUDO
 

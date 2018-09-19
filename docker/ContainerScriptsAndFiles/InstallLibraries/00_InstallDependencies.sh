@@ -20,7 +20,7 @@ cd ./temp
  # bash ../czmq.sh $_SUDO
  bash ../zyre.sh $_SUDO
  bash ../cppzmq.sh $_SUDO
- # bash ../sqlite3.sh $_SUDO
+ bash ../sqlite3.sh $_SUDO
  bash ../sqlitecpp.sh $_SUDO
  # bash ../zlib.sh $_SUDO
  # bash ../minizip.sh $_SUDO
