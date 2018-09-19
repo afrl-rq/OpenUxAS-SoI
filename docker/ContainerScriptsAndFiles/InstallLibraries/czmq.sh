@@ -7,9 +7,6 @@ _SUDO=$1
 set -e
 
 
-BUILD_TYPE="AUTOTOOLS"
-#BUILD_TYPE="CMAKE"
-
 LIBRARY_NAME="czmq"
 LIBRARY_FOLDER_NAME="czmq"
 SOURCE_ARCHIVE_FILE="v4.0.2.zip"
@@ -36,28 +33,12 @@ unzip -o ${SOURCE_ARCHIVE_FILE}
 cd ${SOURCE_FOLDER_NAME}
 
 echo "Building..."
+./autogen.sh
+./configure && make check
 
-
-if [ $BUILD_TYPE == CMAKE ]
-then
-	mkdir -p ./build
-	cd ./build
-	cmake ..
-	make -j8; make
-	echo "Installing..."
-	$_SUDO make install
-
-elif [ $BUILD_TYPE == AUTOTOOLS ]
-then
-	./autogen.sh
-	./configure && make check
-	echo "Installing..."
-	$_SUDO make install
-	$_SUDO ldconfig
-
-else
-	echo "!!! UNKNOWN BUILD TYPE ["${BUILD_TYPE}"]"
-fi
+echo "Installing..."
+$_SUDO make install
+$_SUDO ldconfig
 
 echo "Cleaning up..."
 cd ${CWD}
