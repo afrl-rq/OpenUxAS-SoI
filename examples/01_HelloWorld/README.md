@@ -4,7 +4,11 @@ This is a basic example of a UxAS service that sends/receives KeyValuePair messa
 
 ## Files:
 
-    *runUxAS_HelloWorld.sh* - This is a bash shell script used to execute the example
+    *runUxAS_HelloWorld.py* - This is a python script used to execute the example
+
+    *runUxAS_HelloWorld_Docker.py* - This is a python script used to execute the example using Docker
+
+    *runUxAS_HelloWorld.sh* - This is a bash shell script used to execute the example (deprecated)
 
     *cfg_HelloWorld.xml* - This is the file used to configure the example for UxAS
 
