@@ -5,6 +5,16 @@ if os.startswith('linux')
   add_project_arguments('-DLINUX', language: ['c', 'cpp'])
 endif
 
+if meson.get_compiler('cpp').get_id() == 'msvc'
+  cpp_args_tinygps = [
+    '/std:c++14',
+  ]
+else
+  cpp_args_tinygps = [
+    '-std=c++11',
+  ]
+endif
+
 dep_boost = dependency(
   'boost',
   modules: ['date_time'],
@@ -14,9 +24,7 @@ dep_boost = dependency(
 lib = static_library(
   'tinygps',
   'TinyGPS.cpp',
-  cpp_args: [
-    '-std=c++11',
-  ],
+  cpp_args: cpp_args_tinygps,
   dependencies: dep_boost,
   include_directories: include_directories(
     '../../src/Includes',

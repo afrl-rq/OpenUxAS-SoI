@@ -1,0 +1,71 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "01_buildRelease (Docker)",
+            "type": "shell",
+            "command": "python 03_BuildDeploy_UxAS.py",
+            "options": {
+                "cwd": "${workspaceRoot}/docker"
+            }
+        },
+        {
+            "label": "02_CleanReleaseBuild",
+            "type": "shell",
+            "command": "python 06_RemoveBuildFiles.py",
+            "options": {
+                "cwd": "${workspaceRoot}/docker"
+            }
+        },
+        {
+            "label": "03_buildDebug (Docker)",
+            "type": "shell",
+            "command": "python 08_Build_UxAS_Debug.py",
+            "options": {
+                "cwd": "${workspaceRoot}/docker"
+            }
+        },
+        {
+            "label": "04_CleanDebugBuild",
+            "type": "shell",
+            "command": "python 09_RemoveDebugBuildFiles.py",
+            "options": {
+                "cwd": "${workspaceRoot}/docker"
+            }
+        },
+        {
+            "label": "05_StartDockerDebugContainer",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "-d",
+                "--privileged",
+                "--rm",
+                "--name",
+                "uxas_debug",
+                "-w=\"/working\"",
+                "--mount",
+                "type=bind,source=\"${cwd}/docker/10_test_debug\",target=\"/working\"",
+                "--mount",
+                "source=UxAS_Build_Vol,target=\"/tmp_build\"",
+                "uxas/uxas-build:x86_64"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/docker/10_test_debug"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "06_RemoveDockerSource",
+            "type": "shell",
+            "command": "python 07_RemoveSourceFilesInVolume.py",
+            "options": {
+                "cwd": "${workspaceRoot}/docker"
+            }
+        }
+    ]
+}

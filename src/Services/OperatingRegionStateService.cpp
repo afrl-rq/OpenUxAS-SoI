@@ -22,10 +22,7 @@
 #include <map>
 #include <algorithm>
 
-#define STRING_COMPONENT_NAME "OpRegionState"
-#define STRING_XML_COMPONENT_TYPE STRING_COMPONENT_NAME
-#define STRING_XML_COMPONENT "Component"
-#define STRING_XML_TYPE "Type"
+#define STRING_XML_ADDITIONAL_PADDING "AdditionalPadding"
 
 namespace uxas
 {
@@ -46,6 +43,8 @@ OperatingRegionStateService::~OperatingRegionStateService()
 bool
 OperatingRegionStateService::configure(const pugi::xml_node& serviceXmlNode)
 {
+    m_additionalPadding = serviceXmlNode.attribute(STRING_XML_ADDITIONAL_PADDING).as_double(0.0);
+
     addSubscriptionAddress(afrl::cmasi::KeepInZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::KeepOutZone::Subscription);
     addSubscriptionAddress(afrl::cmasi::RemoveZones::Subscription);
@@ -79,9 +78,13 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
         removeZone = kzone->getStartTime() == -1 && kzone->getEndTime() == -1;
         if (addZone && !removeZone)
         {
+            if(m_additionalPadding > 1e-4)
+            {
+                kzone->setPadding( kzone->getPadding() + m_additionalPadding );
+                sendSharedLmcpObjectBroadcastMessage(kzone);
+            }
             m_region->getKeepInAreas().push_back(kzone->getZoneID());
             IMPACT_INFORM("Added Keep In Zone ", kzone->getZoneID(), " ", kzone->getLabel());
-
         }
         if (removeZone)
         {
@@ -111,6 +114,11 @@ OperatingRegionStateService::processReceivedLmcpMessage(std::unique_ptr<uxas::co
 
         if (addZone && !removeZone)
         {
+            if(m_additionalPadding > 1e-4)
+            {
+                kzone->setPadding( kzone->getPadding() + m_additionalPadding );
+                sendSharedLmcpObjectBroadcastMessage(kzone);
+            }
             m_region->getKeepOutAreas().push_back(kzone->getZoneID());
             IMPACT_INFORM("Added Keep Out Zone ", kzone->getZoneID(), " ", kzone->getLabel());
         }

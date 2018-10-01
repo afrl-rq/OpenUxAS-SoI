@@ -40,42 +40,37 @@ class MustFlyTaskService : public TaskServiceBase
 {
 public:
 
-	static const std::string&
-		s_typeName()
+	static const std::string& s_typeName()
 	{
 		static std::string s_string("MustFlyTaskService");
 		return (s_string);
 	};
 
-	static const std::vector<std::string>
-		s_registryServiceTypeNames()
+	static const std::vector<std::string> s_registryServiceTypeNames()
 	{
-		std::vector<std::string> registryServiceTypeNames = { s_typeName(), "afrl.cmasi.MustFlyTask" };
+		std::vector<std::string> registryServiceTypeNames = { s_typeName(), "afrl.cmasi.MustFlyTask", "afrl.famus.MustFlyTask" };
 		return (registryServiceTypeNames);
 	};
 
-	static const std::string&
-		s_directoryName()
+	static const std::string& s_directoryName()
 	{
 		static std::string s_string("");
 		return (s_string);
 	};
 
-	static ServiceBase*
-		create()
+	static ServiceBase* create()
 	{
 		return new MustFlyTaskService;
 	};
 
 	MustFlyTaskService();
+	virtual ~MustFlyTaskService();
 
-	virtual
-		~MustFlyTaskService();
+	virtual void buildTaskPlanOptions() override;
 
 private:
 
-	static
-		ServiceBase::CreationRegistrar<MustFlyTaskService> s_registrar;
+	static ServiceBase::CreationRegistrar<MustFlyTaskService> s_registrar;
 
 	/** brief Copy construction not permitted */
 	MustFlyTaskService(MustFlyTaskService const&) = delete;
@@ -83,29 +78,17 @@ private:
 	/** brief Copy assignment operation not permitted */
 	void operator=(MustFlyTaskService const&) = delete;
 
-private:
-
 	bool configureTask(const pugi::xml_node& serviceXmlNode) override;
+	
+	bool isProcessTaskImplementationRouteResponse(std::shared_ptr<uxas::messages::task::TaskImplementationResponse>& taskImplementationResponse,
+                std::shared_ptr<TaskOptionClass>& taskOptionClass,
+                int64_t& waypointId, std::shared_ptr<uxas::messages::route::RoutePlan>& route) override;
 
-	bool processReceivedLmcpMessageTask(std::shared_ptr<avtas::lmcp::Object>& receivedLmcpObject) override;
-
-
-public:
-	const double m_defaultElevationLookAngle_rad = 60.0 * n_Const::c_Convert::dDegreesToRadians(); //60 deg down
-
-public: //virtual
-
-	virtual void activeEntityState(const std::shared_ptr<afrl::cmasi::EntityState>& entityState) override;
-	virtual void buildTaskPlanOptions() override;
-
-private:
-
+	bool isBuildAndSendImplementationRouteRequest(const int64_t& optionId,
+        const std::shared_ptr<uxas::messages::task::TaskImplementationRequest>& taskImplementationRequest,
+        const std::shared_ptr<uxas::messages::task::TaskOption>& taskOption) override;
 
 	std::shared_ptr<afrl::cmasi::MustFlyTask> m_mustFlyTask;
-
-
-
-
 
 };
 

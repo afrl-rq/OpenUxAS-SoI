@@ -23,10 +23,6 @@
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
-#define noexcept
-#endif
-
 namespace uxas
 {
 namespace common

@@ -41,6 +41,9 @@ public:
     static const std::string& MessageGroup() { static std::string s_string("MessageGroup"); return(s_string); };
     static const std::string& MessageType() { static std::string s_string("MessageType"); return(s_string); };
     static const std::string& NetworkDevice() { static std::string s_string("NetworkDevice"); return(s_string); };
+    static const std::string& ZyreEndpoint() { static std::string s_string("ZyreEndpoint"); return(s_string); };
+    static const std::string& GossipEndpoint() { static std::string s_string("GossipEndpoint"); return(s_string); };
+    static const std::string& GossipBind() { static std::string s_string("GossipBind"); return(s_string); };
     static const std::string& ReceiveEntityId() { static std::string s_string("ReceiveEntityId"); return(s_string); };
     static const std::string& RunDuration_s() { static std::string s_string("RunDuration_s"); return(s_string); };
     static const std::string& SendAddress() { static std::string s_string("SendAddress"); return(s_string); };
