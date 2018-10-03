@@ -22,7 +22,7 @@ START_ALL=$(timer)
 
 
 printf "\n*** Sync Files ### \n"
-bash /UxASDev/OpenUxAS/docker/ContainerScriptsAndFiles/syncUxasFiles.sh
+python /UxASDev/OpenUxAS/docker/ContainerScriptsAndFiles/syncUxasFiles.py
 
 printf "\n#### RUNNING MESON ####\n"
 START=$(timer)
