@@ -11,5 +11,5 @@ cmd = ('docker run -i --rm ' +
       '--mount type=bind,source={0}/..,target="/UxASDev" '.format(hostOpenUxAS_Dir) +
       '--mount source=UxAS_Build_Vol,target="/tmp_build" ' + 
       'uxas/uxas-build:x86_64 ' +
-      '/UxASDev/OpenUxAS/docker/ContainerScriptsAndFiles/runUxAS_tests.sh')
+      'python /UxASDev/OpenUxAS/docker/ContainerScriptsAndFiles/runUxAS_tests.py')
 call(cmd,shell=True)
