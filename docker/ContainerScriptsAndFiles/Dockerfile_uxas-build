@@ -37,6 +37,6 @@ RUN pip3 install -Iv https://github.com/mesonbuild/meson/releases/download/0.47.
 WORKDIR /UxAS/Installation/InstallLibraries/
 COPY ContainerScriptsAndFiles/InstallLibraries/* ./
 RUN chmod -R +x . \
-    && ./00_InstallDependencies.sh NO_SUDO
+    && python3 ./00_InstallDependencies.py NO_SUDO
 
 WORKDIR /UxAS
