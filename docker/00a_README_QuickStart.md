@@ -25,7 +25,7 @@ LmcpGen, but is optional. The directory structure should look like this:
 ## Build and Run UxAS
 
 1) `prepare` the `3rd` libraries, build and run LMCPGen:
-   `python 02_PrepareAndBuildLmcp.py`
+   `python 01_PrepareAndBuildLmcp.py`
 2) build UxAS and construct the `uxas-deploy` image:
-   `python 03_BuildDeploy_UxAS.py`
-3) the directory `04_test` contains a script and configuration file to test run the containerized UxAS
+   `python 02_BuildDeploy_UxAS.py`
+3) the directory `03_test` contains a script and configuration file to test run the containerized UxAS
