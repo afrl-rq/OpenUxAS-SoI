@@ -26,7 +26,7 @@ os.chdir("/tmp_build")
 
 # 2
 # if "build" exists the just run Ninja
-if(os.path.isdir("build_debug")):
+if(not os.path.isdir("build_debug")):
     callWithShell("meson build_debug --buildtype=debug")
 
 print( "\n#### FINISHED RUNNING MESON [{}] ####\n.".format(time.time() - startMeson))
