@@ -2,10 +2,12 @@
 import time
 import sys
 import os
+import subprocess
 from subprocess import call 
 
 def callWithShell(cmd):
-    call(cmd,shell=True)
+    process = subprocess.Popen(cmd,shell=True)
+    process.wait()
 
 startAllTime = time.time()
 
@@ -20,7 +22,7 @@ sys.stdout.flush()
 mesonStartTime = time.time()
 
 # 1 - change to the directory: OpenUxAS
-callWithShell("cd /tmp_build")
+os.chdir("/tmp_build")
 
 # 2
 # if "build" exists the just run Ninja
