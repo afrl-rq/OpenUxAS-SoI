@@ -35,7 +35,7 @@ executable running in the container.
 
 ### DEBUGGING
 1) Build a debug version of UxAS :
-   `python 08_Build_UxAS_Debug.py`
+   `python 07_Build_UxAS_Debug.py`
 2) Start `gdbserver` in a `uxas-build` container, adding UxAS arguments:
    There is an example of starting the gdbserver, in a `uxas-build` container, in the directory `09_test_debug`
 3) Start `gdb`, point at the `host` copy of the UxAS executable compile for the

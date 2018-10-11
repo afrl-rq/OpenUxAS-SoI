@@ -25,7 +25,7 @@ call(cmd,shell=True)
 
 timeStartBuild = time.time()
 print("\n##### START BuildUxAS #####\n")
-cmd = 'docker exec -i uxas_build_debug  bash /UxASDev/OpenUxAS/docker/ContainerScriptsAndFiles/buildUxAS_Debug.sh'
+cmd = 'docker exec -i uxas_build_debug  /usr/bin/python3 /UxASDev/OpenUxAS/docker/ContainerScriptsAndFiles/buildUxAS_Debug.py'
 call(cmd,shell=True)
 print('\n##### FINISHED-BuildUxAS  Build Time [{0}] #####\n\n\n'.format(time.time() - timeStartBuild))
 
