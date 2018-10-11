@@ -6,7 +6,7 @@ def callWithShell(cmd):
     call(cmd, shell=True)
 
 # 1 - change to the volume with OpenUxAS code :
-callWithShell("cd /tmp_build")
+os.chdir("/tmp_build")
 
 # if `build` exists, then just run Ninja
 if(os.path.isdir("build")):
