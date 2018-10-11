@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<RadioTowerState Series="IMPACT">
+  <!--Radio Tower State fields-->
+  <Enabled>true</Enabled>
+  <!--Entity State fields-->
+  <ID>21</ID>
+  <Location>
+    <Location3D Series="CMASI">
+      <Latitude>30.529723268898915</Latitude>
+      <Longitude>-87.20788664886517</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+  </Location>
+</RadioTowerState>
+
