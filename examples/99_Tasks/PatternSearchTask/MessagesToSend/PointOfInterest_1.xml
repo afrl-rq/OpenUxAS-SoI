@@ -1,0 +1,16 @@
+<PointOfInterest Series="IMPACT">
+	<PointID>1</PointID>
+	<Location>
+    <Location3D Series="CMASI">
+      <Latitude>30.525723268898915</Latitude>
+      <Longitude>-87.20688664886517</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+	</Location>
+	
+	<PointAction></PointAction>
+	<PointLabel>Pattern Search Point</PointLabel>
+	<BackgroundBehaviorPoint>false</BackgroundBehaviorPoint>
+	
+</PointOfInterest>

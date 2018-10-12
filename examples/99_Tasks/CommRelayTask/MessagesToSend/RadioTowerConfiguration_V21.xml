@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<RadioTowerConfiguration Series="IMPACT">
+  <!--Radio Tower configuration specific fields-->
+  <Position>
+    <Location3D Series="CMASI">
+      <Latitude>30.529723268898915</Latitude>
+      <Longitude>-87.20788664886517</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>AGL</AltitudeType>
+    </Location3D>
+  </Position>
+  <Range>3000</Range>
+  <Enabled>true</Enabled>
+  <!--Entity Configuration Fields-->
+  <ID>21</ID>
+  <Label>Tower21</Label>
+</RadioTowerConfiguration>
+

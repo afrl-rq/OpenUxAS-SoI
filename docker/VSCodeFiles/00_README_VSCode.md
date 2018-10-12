@@ -7,7 +7,7 @@ containers.
 
 ## VS Code
 * VS Code website: [https://code.visualstudio.com]
-* To use the `.json` configuration files, copy then to the directory:
+* To use the `.json` configuration files, copy them to the directory:
 `OpenUxAS/.vscode` and then open VS Code.
 * After installing VS Code install the `C/C++` VS Code extension 
 * There are also very good VS Code extensions such as those for Docker, git, markdown, python, and many others.

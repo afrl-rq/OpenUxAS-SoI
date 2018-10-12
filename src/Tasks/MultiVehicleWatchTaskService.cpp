@@ -227,7 +227,7 @@ void MultiVehicleWatchTaskService::activeEntityState(const std::shared_ptr<afrl:
 std::shared_ptr<afrl::cmasi::VehicleActionCommand> MultiVehicleWatchTaskService::CalculateGimbalActions(const std::shared_ptr<afrl::cmasi::EntityState>& entityState, double lat, double lon)
 {
     std::shared_ptr<afrl::cmasi::VehicleActionCommand> caction(new afrl::cmasi::VehicleActionCommand);
-
+    caction->setVehicleID(entityState->getID());
     double surveyRadius = 300.0; // default 300 meters, circular
     double surveySpeed = entityState->getGroundspeed();
     auto surveyType = afrl::cmasi::LoiterType::Circular;
