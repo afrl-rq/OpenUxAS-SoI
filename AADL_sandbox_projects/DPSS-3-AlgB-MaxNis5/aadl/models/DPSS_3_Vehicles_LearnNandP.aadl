@@ -272,9 +272,9 @@ public
 			-----------------------------------------------------
 			
 			-- Main Theorem			
-			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
-				(time >= ((5.0*N_TRUTH_REAL - 1.0)/N_TRUTH_REAL)*T) =>
-					(stable	and deltaT = T/N_TRUTH_REAL);
+--			guarantee "Theorem 2 for Algorithm B for 3 Vehicles":
+--				(time >= ((5.0*N_TRUTH_REAL - 1.0)/N_TRUTH_REAL)*T) =>
+--					(stable	and deltaT = T/N_TRUTH_REAL);
 			
 			guarantee "deltaT is positive":
 				true -> deltaT > 0.0;
@@ -424,85 +424,89 @@ public
 			--OBSERVERS (Invalid lemmas that produce examples of behavior of interest)
 			----------------------------------------------------------------------------
 						
-			lemma "Observer: Nearly 3T convergence":
-				not (
-					stable
-					and
-					--Initially, ...
-					DPSS_Node_Lib.initial_value_true(
-					--all UAVs are heading to the left
-						direction_UAV1 = -1
-					and direction_UAV2 = -1
-					and direction_UAV3 = -1
-					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
-					and pos_UAV1 = RIGHT_ENDP_TRUTH - 0.03
-					and pos_UAV2 = RIGHT_ENDP_TRUTH - 0.02
-					and pos_UAV3 = RIGHT_ENDP_TRUTH - 0.01
-					--and UAVN starts out thinking there is no perimeter to its right
-					and UAV3.perimRight = 0.0
-					--and each UAV starts out thinking it is the only one
-					and UAV1.numLeft = 0 and UAV1.numRight = 0
-					and UAV2.numLeft = 0 and UAV2.numRight = 0
-					and UAV3.numLeft = 0 and UAV3.numRight = 0
-				));
-
-			lemma "Observer: Worst time (nearly 4T) convergence":
-				not (
-					stable
-					and
-					steps = 14 --I know through experimentation how many steps it takes. Adding this constraint reduces the time it takes the model checker to find the CE.
-					and 
-					--Initially, ...
-					DPSS_Node_Lib.initial_value_true(
-					--all UAVs are heading to the right
-						direction_UAV1 = 1
-					and direction_UAV2 = 1
-					and direction_UAV3 = 1
-					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
-					and pos_UAV1 = LEFT_ENDP_TRUTH + 0.01
-					and pos_UAV2 = LEFT_ENDP_TRUTH + 0.02
-					and pos_UAV3 = LEFT_ENDP_TRUTH + 0.03
-					--and UAV1 starts out thinking there is a segment of length (N-1)*RIGHT_ENDP_TRUTH to its left
-					and UAV1.perimLeft = (N_TRUTH_REAL - 1.0) * RIGHT_ENDP_TRUTH
-					--and each UAV starts out thinking it is the only one
-					and UAV1.numLeft = 0 and UAV1.numRight = 0
-					and UAV2.numLeft = 0 and UAV2.numRight = 0
-					and UAV3.numLeft = 0 and UAV3.numRight = 0
-				));
+--			lemma "Observer: Nearly 3T convergence":
+--				not (
+--					stable
+--					and
+--					--Initially, ...
+--					DPSS_Node_Lib.initial_value_true(
+--					--all UAVs are heading to the left
+--						direction_UAV1 = -1
+--					and direction_UAV2 = -1
+--					and direction_UAV3 = -1
+--					--and the UAVs are located close together on the right end of the perimeter (but just shy of the right boundary)
+--					and pos_UAV1 = RIGHT_ENDP_TRUTH - 0.03
+--					and pos_UAV2 = RIGHT_ENDP_TRUTH - 0.02
+--					and pos_UAV3 = RIGHT_ENDP_TRUTH - 0.01
+--					--and UAVN starts out thinking there is no perimeter to its right
+--					and UAV3.perimRight = 0.0
+--					--and each UAV starts out thinking it is the only one
+--					and UAV1.numLeft = 0 and UAV1.numRight = 0
+--					and UAV2.numLeft = 0 and UAV2.numRight = 0
+--					and UAV3.numLeft = 0 and UAV3.numRight = 0
+--				));
+--
+--			lemma "Observer: Worst time (nearly 4T) convergence":
+--				not (
+--					stable
+--					and
+--					steps = 14 --I know through experimentation how many steps it takes. Adding this constraint reduces the time it takes the model checker to find the CE.
+--					and 
+--					--Initially, ...
+--					DPSS_Node_Lib.initial_value_true(
+--					--all UAVs are heading to the right
+--						direction_UAV1 = 1
+--					and direction_UAV2 = 1
+--					and direction_UAV3 = 1
+--					--and the UAVs are located close together on the left end of the perimeter (but just shy of the left boundary)
+--					and pos_UAV1 = LEFT_ENDP_TRUTH + 0.01
+--					and pos_UAV2 = LEFT_ENDP_TRUTH + 0.02
+--					and pos_UAV3 = LEFT_ENDP_TRUTH + 0.03
+--					--and UAV1 starts out thinking there is a segment of length (N-1)*RIGHT_ENDP_TRUTH to its left
+--					and UAV1.perimLeft = (N_TRUTH_REAL - 1.0) * RIGHT_ENDP_TRUTH
+--					--and each UAV starts out thinking it is the only one
+--					and UAV1.numLeft = 0 and UAV1.numRight = 0
+--					and UAV2.numLeft = 0 and UAV2.numRight = 0
+--					and UAV3.numLeft = 0 and UAV3.numRight = 0
+--				));
 						
 --			--Redundant with the observer below
 --			lemma "Observer: Config params are not yet converged after (3 + 1/6)T":
 --				(stable_config_params and not (pre(stable_config_params))) => 
 --					(time <= (3.0 + 1.0/6.0)*T);
 
-			lemma "Observer: Config params not converged after (3 + 1/6)T, but system still converges by 4T.":
-				not (
-					stable
-					and 
-					--Initially, ...
-					DPSS_Node_Lib.initial_value_true(
-						direction_UAV1 = 1
-					and direction_UAV2 = -1
-					and direction_UAV3 = -1
-					and pos_UAV1 = 3.36
-					and pos_UAV2 = 9.75
-					and pos_UAV3 = 9.84
-					and UAV1.perimLeft = 10.69
-					and UAV2.perimLeft = 9.03 and UAV2.perimRight = 0.14
-					and UAV3.perimRight = 17.40
-					and UAV1.numLeft = 2
-					and UAV2.numLeft = 2 and UAV2.numRight = 3
-					and UAV3.numRight = 3
-				));		
+			lemma "Experimental Observer: Coordination variables are not correct after 2.235T":
+				(stable_config_params and not (pre(stable_config_params))) => 
+					(time <= 3.235*T);
+
+--			lemma "Observer: Config params not converged after (3 + 1/6)T, but system still converges by 4T.":
+--				not (
+--					stable
+--					and 
+--					--Initially, ...
+--					DPSS_Node_Lib.initial_value_true(
+--						direction_UAV1 = 1
+--					and direction_UAV2 = -1
+--					and direction_UAV3 = -1
+--					and pos_UAV1 = 3.36
+--					and pos_UAV2 = 9.75
+--					and pos_UAV3 = 9.84
+--					and UAV1.perimLeft = 10.69
+--					and UAV2.perimLeft = 9.03 and UAV2.perimRight = 0.14
+--					and UAV3.perimRight = 17.40
+--					and UAV1.numLeft = 2
+--					and UAV2.numLeft = 2 and UAV2.numRight = 3
+--					and UAV3.numRight = 3
+--				));		
 							
 --			lemma "Observer: Worst steps convergence (not yet stable after steps_to_converge - 1 steps)":
 --				steps = steps_to_converge - 1 => stable;
 
-			lemma "Observer: Config params not yet stable after 15 steps":
-				steps = 15 => stable_config_params;
-				
-			lemma "Observer: Not yet stable after 19 steps":
-				steps >= 19 => stable;
+--			lemma "Observer: Config params not yet stable after 15 steps":
+--				steps = 15 => stable_config_params;
+--				
+--			lemma "Observer: Not yet stable after 19 steps":
+--				steps >= 19 => stable;
 			
 				
 			----------------------------------------------------------------------------
@@ -546,23 +550,23 @@ public
 					and deltaT <= T
 					);
 
-			lemma "Config params stable on and after 16 steps":
-				steps >= 16 => stable_config_params;
-								
-			lemma "Time for config params to converge is < (3 + 1/3)T":
-				(stable_config_params and not (pre(stable_config_params))) => 
-					(time < (3.0 + 1.0/3.0)*T);
+--			lemma "Config params stable on and after 16 steps":
+--				steps >= 16 => stable_config_params;
+--								
+--			lemma "Time for config params to converge is < (3 + 1/3)T":
+--				(stable_config_params and not (pre(stable_config_params))) => 
+--					(time < (3.0 + 1.0/3.0)*T);
 					
 --			lemma "Stable on and after steps_to_converge steps":
 --				steps >= steps_to_converge => stable;	
 			
-			lemma "Stable on and after 20 steps":
-				steps >= 20 => stable;
-				
-			-- This is a good way to find the real time bound, by experimenting with lower bounds!	
-			lemma "Time to become stable is less than 4T":
-				(stable and not (pre(stable))) => 
-					(time < 4.0*T);
+--			lemma "Stable on and after 20 steps":
+--				steps >= 20 => stable;
+--				
+--			-- This is a good way to find the real time bound, by experimenting with lower bounds!	
+--			lemma "Time to become stable is less than 4T":
+--				(stable and not (pre(stable))) => 
+--					(time < 4.0*T);
 			
 		**};
 		

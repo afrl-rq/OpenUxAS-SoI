@@ -95,20 +95,8 @@ public
 											if id = 8 then
 												8.0
 											else
-												if id = 9 then
-													9.0
-												else 
-													if id = 10 then
-														10.0
-													else
-														if id = 11 then
-															11.0
-														else 
-															if id = 12 then
-																12.0
-															else
-																13.0; 
-			
+												9.0; 
+					
 			--Make N a piecewise-constant real-valued variable. This, combined with id_lin, makes the shared border formulas piecewise linear and allows 
 			--     analysis to be successful at the top level.
 			--Assumes 1 <= N <= 13		
