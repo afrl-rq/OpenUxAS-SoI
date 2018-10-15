@@ -4,7 +4,7 @@ import shutil
 import subprocess
 
 app = "java"
-scenarioPath = "../../OpenUxAS/examples/tasks/CmasiLineSearchTask/Scenario_LineSearchTask.xml"
+scenarioPath = "../../OpenUxAS/examples/99_Tasks/CmasiLineSearchTask/Scenario_LineSearchTask.xml"
 runAmaseArgs = ["java", "-Xmx2048m", "-splash:./data/amase_splash.png", "-classpath", "./dist/*:./lib/*",  "avtas.app.Application", "--config", "config/amase", "--scenario", scenarioPath]
 
 currentDir = os.path.dirname(os.path.realpath(__file__))
