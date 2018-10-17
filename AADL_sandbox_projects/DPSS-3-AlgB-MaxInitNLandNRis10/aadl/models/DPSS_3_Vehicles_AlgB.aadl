@@ -498,12 +498,16 @@ public
 
 			lemma "Experimental Observer: Coordination variables are not correct after 3.4T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
-					(time <= 3.4*T);
-					
---			lemma "Experimental Observer: Coordination variables are not correct after 3.5T":
---				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
---					(time <= 3.5*T);
-						
+					(time < 3.4*T);
+
+			lemma "Experimental Observer: Coordination variables are not correct after 3.5T":
+				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
+					(time < 3.5*T);
+
+			lemma "Experimental Observer: Time to optimal configuration is more than 4T":
+				(optimal and not (pre(optimal))) => 
+					(time < 4.0*T);
+																
 --			--Redundant with the observer below
 --			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T":
 --				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
@@ -589,12 +593,7 @@ public
 			
 			lemma "Optimal on and after 20 steps":
 				steps >= 20 => optimal;
-				
-			-- This is a good way to find the real time bound, by experimenting with lower bounds!	
-			lemma "Experimental Observer: Time to optimal configuration is less than 4T":
-				(optimal and not (pre(optimal))) => 
-					(time < 4.0*T);
-				
+							
 			-- This is a good way to find the real time bound, by experimenting with lower bounds!
 			lemma "Time to optimal configuration is less than (4 + 2/3)T":
 				(optimal and not (pre(optimal))) => 
