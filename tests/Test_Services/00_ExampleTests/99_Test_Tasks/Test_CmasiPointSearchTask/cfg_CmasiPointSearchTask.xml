@@ -18,8 +18,8 @@
   <Service Type="SensorManagerService"/>
 
   <Service Type="SendMessagesService" PathToMessageFiles="../tests/Test_Services/00_ExampleTests/99_Test_Tasks/Test_CmasiPointSearchTask/MessagesToSend/">
-    <Message MessageFileName="AirVehicleConfiguration_V101.xml" SendTime_ms="100"/>
-    <Message MessageFileName="AirVehicleState_V101.xml" SendTime_ms="100"/>
+    <Message MessageFileName="../../CommonMessages/AirVehicleConfiguration_V101.xml" SendTime_ms="100"/>
+    <Message MessageFileName="../../CommonMessages/AirVehicleState_V101.xml" SendTime_ms="100"/>
     <Message MessageFileName="PointSearchTask_100.xml" SendTime_ms="2000"/>
     <Message MessageFileName="AutomationRequest_PointSearch.xml" SendTime_ms="4000"/>
   </Service>
