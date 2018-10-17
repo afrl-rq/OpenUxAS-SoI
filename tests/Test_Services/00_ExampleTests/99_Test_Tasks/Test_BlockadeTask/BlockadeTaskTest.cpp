@@ -59,11 +59,12 @@ TEST(BlockadeTask_Test01, CorrectNumberMessages)
 	*	EXPECT_EQ - Google Test Macro
     */
     EXPECT_EQ( 3, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AirVehicleConfiguration")));
-    EXPECT_EQ( 4, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AirVehicleState")));
+    EXPECT_EQ( 3, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AirVehicleState")));
     EXPECT_EQ( 2, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationRequest")));
     EXPECT_EQ( 2, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.AutomationResponse")));
     EXPECT_EQ( 3, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.MissionCommand")));
     EXPECT_EQ( 1, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.PointSearchTask")));
+    EXPECT_EQ( 8, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.cmasi.ServiceStatus")));
     EXPECT_EQ( 1, CountMessagesInLogDb(savedMessagesPath, std::string("afrl.impact.BlockadeTask")));
     EXPECT_EQ( 3, CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.route.RoutePlanRequest")));
     EXPECT_EQ( 2, CountMessagesInLogDb(savedMessagesPath, std::string("uxas.messages.task.AssignmentCostMatrix")));

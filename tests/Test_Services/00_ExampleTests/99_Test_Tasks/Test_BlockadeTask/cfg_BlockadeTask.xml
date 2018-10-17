@@ -34,7 +34,6 @@
     <Message MessageFileName="AutomationRequest_PointSearch.xml" SendTime_ms="1500"/>
     
     <Message MessageFileName="BlockadeTask_100.xml" SendTime_ms="2000"/>
-    <Message MessageFileName="../../CommonMessages/AirVehicleState_V103.xml" SendTime_ms="2200"/>    
     <Message MessageFileName="AutomationRequest_Blockade.xml" SendTime_ms="3000"/>
   </Service>
 
