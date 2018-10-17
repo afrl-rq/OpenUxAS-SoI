@@ -496,9 +496,13 @@ public
 --				) => 
 --					(time <= 3.0*T);
 
-			lemma "Experimental Observer: Coordination variables are not correct after 3.3T":
+			lemma "Experimental Observer: Coordination variables are not correct after 3.4T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
-					(time <= 3.3*T);
+					(time <= 3.4*T);
+					
+--			lemma "Experimental Observer: Coordination variables are not correct after 3.5T":
+--				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
+--					(time <= 3.5*T);
 						
 --			--Redundant with the observer below
 --			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T":
@@ -579,30 +583,26 @@ public
 			lemma "Coordination variables are correct on and after 16 steps":
 				steps >= 16 => correct_coordination_variables;
 					
-			lemma "Time to correct coordination variables is < (3 + 1/3)T":
+			lemma "Time to correct coordination variables is < (3 + 2/3)T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
-					(time < (3.0 + 1.0/3.0)*T);
+					(time < (3.0 + 2.0/3.0)*T);
 			
 			lemma "Optimal on and after 20 steps":
 				steps >= 20 => optimal;
 				
 			-- This is a good way to find the real time bound, by experimenting with lower bounds!	
-			lemma "Time to optimal configuration is less than 4T":
+			lemma "Experimental Observer: Time to optimal configuration is less than 4T":
 				(optimal and not (pre(optimal))) => 
 					(time < 4.0*T);
+				
+			-- This is a good way to find the real time bound, by experimenting with lower bounds!
+			lemma "Time to optimal configuration is less than (4 + 2/3)T":
+				(optimal and not (pre(optimal))) => 
+					(time < (4.0 + 2.0/3.0)*T);
 --					
 --			lemma "Time to optimal configuration is less than 4T + T/N":
 --				(optimal and not (pre(optimal))) => 
 --					(time < 4.0*T + T/N_TRUTH_REAL);
-			
-			lemma "pre(optimal) is false on the initial step":
-				not pre_optimal -> true;
-				
-			lemma "pre(correct_coordination_variables) is false on the initial step":
-				not pre_correct_coordination_variables -> true;
-				
-			lemma "correct_coordination_variables is false on the initial step":
-				not correct_coordination_variables -> true;
 				
 			lemma "optimal is false on the initial step":
 				not optimal -> true;
