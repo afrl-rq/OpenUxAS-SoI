@@ -1,0 +1,460 @@
+package UAV_Pkg
+public
+	--with DPSS_Data_Types;
+	with Base_Types;
+	with DPSS_Constants;
+	 
+	system UAV
+		features
+			--Inputs
+			--Initial direction and position, set by system and essentially constrained by system-level assumptions
+			initial_direction : in data port Base_Types::Integer; --The UAV may choose a different direction for the initial timestep, depending on the circumstances.
+			initial_position : in data port Base_Types::Float;
+			--This UAV's position, updated by system after an event
+			pos : in data port Base_Types::Float;
+			--Set by system when right/left neighbor is co-located
+			meet_LN : in data port Base_Types::Boolean; --True iff this UAV and its left neighbor are co-located
+			meet_RN : in data port Base_Types::Boolean; --True iff this UAV and its right neighbor are co-located
+			--PR and NR of right neighbor, PL and NL of left neighbor, passed in by system		
+			PR_RN : in data port Base_Types::Float; --Perimeter to the right of the right neighbor (as best as the right neighbor knows it) 
+			PL_LN : in data port Base_Types::Float; --Perimeter to the left of the left neighbor (not necessary because this is equal to pos_LN)
+			NR_RN : in data port Base_Types::Integer;
+			NL_LN : in data port Base_Types::Integer;
+			--Actual right and left perimeter endpoints
+			right_endp_truth : in data port Base_Types::Float; --only used to detect when the UAV reaches the true right endpoint
+			left_endp_truth : in data port Base_Types::Float; --only used to detect when the UAV reaches the true left endpoint			
+			
+			--Outputs
+			-- This UAV's current direction and goal
+			direction: out data port Base_Types::Integer;
+			goal : out data port Base_Types::Float;
+			-- This UAV's coordination variables
+			PR : out data port Base_Types::Float; --perimeter to the right of this UAV (as best as it knows)
+			PL : out data port Base_Types::Float; --perimeter to the left of this UAV (as best as it knows)
+			NR : out data port Base_Types::Integer; --number of UAVs to the right of this UAV (as best as this UAV knows)
+			NL : out data port Base_Types::Integer; --number of UAVs to the left of this UAV (as best as this UAV knows)		
+					
+		annex agree {**
+			
+			-----------------------------------------------------
+			--STATE VARIABLES
+			-----------------------------------------------------
+			
+			--The true left and right endpoints are only used to determine whether the vehicle has reached them.
+			eq reach_right_endp_truth : bool = (pos >= right_endp_truth); 
+			eq reach_left_endp_truth : 	bool = (pos <= left_endp_truth); 
+
+			--Previous NL
+			eq pre_NL : int; --See guarantees for restrictions on pre_NL
+			
+			--Previous NR
+			eq pre_NR : int; --See guarantees for restrictions on pre_NR
+			
+			--Previous PR; initially can be any real value
+			eq pre_PR : real = pre(PR);
+			
+			--Previous PL; initially can be any real value
+			eq pre_PL : real = pre(PL);
+			
+			--UAV's estimate of its ID n_id (will change during execution as this UAV meets its neighbors)
+			eq n_id : int = NL + 1;
+			
+			--UAV's estimate of N, the total number of UAVs 
+			eq N : int = NL + NR + 1;
+			
+			--UAV's estimate of the total perimeter P
+			eq P : real = PR + PL;
+			
+			--UAV's estimate of the left perimeter endpoint	
+			eq left_endp_est : real = pos - PL;
+			
+			--UAV's estimate of the right perimeter endpoint	
+			eq right_endp_est : real = pos + PR;
+
+			--Make n_id a piecewise-constant real-valued variable. This, combined with N_real, makes the shared border formulas piecewise linear and allows 
+			--     analysis to be successful at the top level.
+			--Assumes 1 <= n_id <= 23
+			--Notes: (1) NL will be in the range 0, 1, ..., N_TRUTH - 1 + max(initial NL))
+			-- 				In this case, that upper bound is 3 - 1 + 20 = 22
+			--       (2) n_id = NL + 1	
+			eq n_id_real : real = 
+				if n_id = 1 then
+					1.0
+				else
+					if n_id = 2 then
+						2.0
+					else 
+						if n_id = 3 then
+							3.0
+						else
+							if n_id = 4 then
+								4.0
+							else 
+								if n_id = 5 then
+									5.0
+								else
+									if n_id = 6 then
+										6.0
+									else
+										if n_id = 7 then
+											7.0
+										else
+											if n_id = 8 then
+												8.0
+											else
+												if n_id = 9 then
+													9.0
+												else
+													if n_id = 10 then
+														10.0
+													else
+														if n_id = 11 then
+															11.0
+														else
+															if n_id = 12 then
+																12.0
+															else
+																if n_id = 13 then
+																	13.0
+																else
+																	if n_id = 14 then
+																		14.0
+																	else
+																		if n_id = 15 then
+																			15.0
+																		else
+																			if n_id = 16 then
+																				16.0
+																			else 
+																				if n_id = 17 then
+																					17.0
+																				else 
+																					if n_id = 18 then
+																						18.0
+																					else 
+																						if n_id = 19 then
+																							19.0
+																						else
+																							if n_id = 20 then
+																								20.0
+																							else
+																								if n_id = 21 then
+																									21.0
+																								else
+																									if n_id = 22 then
+																										22.0
+																									else
+																										23.0; 
+			
+			--Make N a piecewise-constant real-valued variable. This, combined with n_id_real, makes the shared border formulas piecewise linear and allows 
+			--     analysis to be successful at the top level.
+			--Assumes 1 <= N <= 13		
+			--Notes: (1) NR will be in the range 0, 1, ..., N_TRUTH - 1 + max(initial NR))
+			--       (2) NL  will be in the range 0, 1, ..., N_TRUTH - 1 + max(initial NL ))
+			--       (3) N = NR + NL + 1
+			--       (4) Therefore, 1 <= N <= 2*N_TRUTH + max(initial NR) + max(initial NL) - 1
+			--				In this case, that upper bound is 2*3 + 20 + 20 - 1 = 45
+			--       (5) We could improve this bound since NR and NL will not be maximized at the same time, but we'll keep the generous bound for now.			
+			eq N_real : real = 
+				if N = 1 then
+					1.0
+				else 
+					if N = 2 then
+						2.0
+					else 
+						if N = 3 then
+							3.0
+						else
+							if N = 4 then
+								4.0
+							else 
+								if N = 5 then
+									5.0
+								else
+									if N = 6 then
+										6.0
+									else
+										if N = 7 then
+											7.0
+										else
+											if N = 8 then
+												8.0
+											else
+												if N = 9 then
+													9.0
+												else 
+													if N = 10 then
+														10.0
+													else
+														if N = 11 then
+															11.0
+														else 
+															if N = 12 then
+																12.0
+															else
+																if N = 13 then
+																	13.0
+																else
+																	if N = 14 then
+																		14.0
+																	else
+																		if N = 15 then
+																			15.0
+																		else
+																			if N = 16 then
+																				16.0
+																			else
+																				if N = 17 then
+																					17.0
+																				else
+																					if N = 18 then
+																						18.0
+																					else
+																						if N = 19 then
+																							19.0
+																						else
+																							if N = 20 then
+																								20.0
+																							else
+																								if N = 21 then
+																									21.0
+																								else
+																									if N = 22 then
+																										22.0
+																									else
+																										if N = 23 then
+																											23.0
+																										else
+																											if N = 24 then
+																												24.0
+																											else
+																												if N = 25 then
+																													25.0
+																												else
+																													if N = 26 then
+																														26.0
+																													else 
+																														if N = 27 then
+																															27.0
+																														else
+																															if N = 28 then
+																																28.0
+																															else
+																																if N = 29 then
+																																	29.9
+																																else
+																																	if N = 30 then
+																																		30.0
+																																	else
+																																		if N = 31 then
+																																			31.0
+																																		else
+																																			if N = 32 then
+																																				32.0
+																																			else
+																																				if N = 33 then
+																																					33.0
+																																				else
+																																					if N = 34 then
+																																						34.0
+																																					else
+																																						if N = 35 then
+																																							35.0
+																																						else
+																																							if N = 36 then
+																																								36.0
+																																							else
+																																								if N = 37 then
+																																									37.0
+																																								else
+																																									if N = 38 then
+																																										38.0
+																																									else
+																																										if N = 39 then
+																																											39.0
+																																										else
+																																											if N = 40 then
+																																												40.0
+																																											else
+																																												if N = 41 then
+																																													41.0
+																																												else
+																																													if N = 42 then
+																																														42.0
+																																													else
+																																														if N = 43 then
+																																															43.0
+																																														else
+																																															if N = 44 then
+																																																44.0
+																																															else
+																																																45.0; 
+				
+			--Shared border positions where n_id_real and N_real are N and n_id as real types returned by a lookup table
+			eq S_L : real = 
+				(n_id_real - 1.0)*P/N_real + left_endp_est;  
+			eq S_R : real = 
+				n_id_real*P/N_real + left_endp_est;	
+					
+			--Previous direction
+			eq pre_direction : int = 
+				prev(direction, initial_direction);
+				
+			--Previous position
+			eq pre_pos : real =
+				prev(pos, initial_position);
+						
+			-----------------------------------------------------
+			--ASSUMPTIONS
+			-----------------------------------------------------		
+			
+			assume "right_endp_truth is greater than left_endp_truth":
+				right_endp_truth > left_endp_truth;
+				
+			assume "right_endp_truth is fixed":
+				true -> (right_endp_truth = pre(right_endp_truth));
+
+			assume "left_endp_truth is fixed":
+				true -> (left_endp_truth = pre(left_endp_truth));			
+						
+			assume "Initial direction is LEFT or RIGHT":
+				(	   initial_direction = DPSS_Constants.LEFT
+					or initial_direction = DPSS_Constants.RIGHT)
+				-> true;
+			
+			-----------------------------------------------------
+			--GUARANTEES
+			-----------------------------------------------------
+	
+			guarantee "Direction formula":
+				direction = (
+					-- Turn around at the left boundary.
+					if reach_left_endp_truth then
+						DPSS_Constants.RIGHT
+					else 
+						-- Turn around at the right boundary.
+						if reach_right_endp_truth then
+							DPSS_Constants.LEFT
+						else 
+							-- If meeting left neighbor, travel together toward shared border.
+							if meet_LN then
+								if pos <= S_L then
+									DPSS_Constants.RIGHT
+								else --pos > S_L
+									DPSS_Constants.LEFT
+							else
+								-- If meeting right neighbor, travel together toward shared border. 
+							  	if meet_RN then
+									if pos < S_R then
+										DPSS_Constants.RIGHT
+									else --pos >= S_R
+										DPSS_Constants.LEFT 
+								-- In all other cases, proceed in the same direction.
+								else 
+									pre_direction
+				);  
+
+			guarantee "Goal formula":
+				goal = (
+						-- If co-located with left and right neighbors,...
+						if meet_LN and meet_RN then
+							--...and at or to the left of the shared border with the left neighbor, make goal the shared border with the right neighbor.
+							if pos <= S_L then
+								S_R
+							--...and to the right of the shared border with the left neighbor, make goal the shared border with the left neighbor.
+							else -- pos > S_L
+								S_L 
+						else		
+							-- If co-located with left neighbor only,...
+							if meet_LN then
+								--...and at or to the left of the shared border with the left neighbor, make goal the right endpoint.
+								if pos <= S_L then
+									right_endp_est
+								--...and to the right of the shared border with the left neighbor, make goal the shared border with the left neighbor.
+								else -- pos > S_L
+									S_L
+							else 
+								-- If co-located with right neighbor only,...
+								if meet_RN then
+									--...and at or to the right of the shared border with the right neighbor, make goal the left endpoint.
+									if pos >= S_R then
+										left_endp_est
+									--...and to the left of the shared border with the right neighbor, make goal the shared border with the right neighbor.
+									else -- pos < S_R
+										S_R
+								else -- If not co-located with either neighbor,...
+									-- ...and heading right, set goal to the right endpoint. 
+									if direction = DPSS_Constants.RIGHT then
+										right_endp_est
+									  -- ...and heading left, set goal to the left endpoint.
+									else --direction = DPSS_Constants.LEFT 
+										left_endp_est 
+				); 
+						
+			guarantee "pre_NL is pre(NL) after the initial timestep":
+				true -> pre_NL = pre(NL);
+			
+			guarantee "pre_NR is pre(NR) after the initial timestep":
+				true -> pre_NR = pre(NR);
+
+			--We allow the initial value of pre_NL to range from 0 to 3 (We're assuming no more than 4 vehicles since our linearized formulas only support up to 4 vehicles)	
+			guarantee "pre_NL initial value restrictions":
+				DPSS_Node_Lib.initial_value_true(
+								pre_NL >= 0 
+							and	pre_NL <= 20
+				);
+			
+			--We allow the initial value of pre_NR to range from 0 to 3 (We're assuming no more than 4 vehicles since our linearized formulas only support up to 4 vehicles)	
+			guarantee "pre_NR initial value restrictions":
+				DPSS_Node_Lib.initial_value_true(
+								pre_NR >= 0 
+							and pre_NR <= 20
+				);
+		
+			guarantee "NL formula":
+				NL = 	if meet_LN then 
+								NL_LN + 1 
+						 	else 
+						 		if reach_left_endp_truth then
+						 			0
+						 		else 
+						  			pre_NL;
+				
+			guarantee "NR formula":
+				NR = 	if meet_RN then 
+								NR_RN + 1 
+							else 
+								if reach_right_endp_truth then
+									0
+								else
+									pre_NR;				
+			
+			--max_real is an auxiliary 'node' defined in library DPSS_Node_Lib that returns the max of its arguments       
+			guarantee "PR formula":
+				PR = if meet_RN then 
+								PR_RN 
+							 else 
+							 	if reach_right_endp_truth then
+							 		0.0
+							 	else  
+								 	if pre_direction = DPSS_Constants.RIGHT then
+								 		DPSS_Node_Lib.max_real(0.0, pre_PR - (pos - pre_pos))
+								 	else --pre_direction = DPSS_Constants.LEFT
+								 		DPSS_Node_Lib.max_real(0.0, pre_PR + (pre_pos - pos));
+								 		
+			guarantee "PL formula":
+				PL = if meet_LN then
+								PL_LN
+							else 
+								if reach_left_endp_truth then
+									0.0
+								else
+									if pre_direction = DPSS_Constants.RIGHT then
+										DPSS_Node_Lib.max_real(0.0, pre_PL + (pos - pre_pos))
+									else --pre_direction = DPSS_Constants.LEFT
+										DPSS_Node_Lib.max_real(0.0, pre_PL - (pre_pos - pos));
+			
+		**};
+		
+	end UAV;
+end UAV_Pkg;
