@@ -496,17 +496,9 @@ public
 --				) => 
 --					(time <= 3.0*T);
 
-			lemma "Experimental Observer: Coordination variables are not correct after 3.4T":
+			lemma "Observer: Coordination variables are not correct after 3.4T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
 					(time < 3.4*T);
-
-			lemma "Experimental Observer: Coordination variables are not correct after 3.5T":
-				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
-					(time < 3.5*T);
-
-			lemma "Experimental Observer: Time to optimal configuration is more than 4T":
-				(optimal and not (pre(optimal))) => 
-					(time < 4.0*T);
 																
 --			--Redundant with the observer below
 --			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T":
@@ -586,22 +578,26 @@ public
 
 			lemma "Coordination variables are correct on and after 16 steps":
 				steps >= 16 => correct_coordination_variables;
-					
-			lemma "Time to correct coordination variables is < (3 + 2/3)T":
+
+			lemma "(Dependent on bound on initial NR and NL) Time to correct coordination variables is < 3.5T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
-					(time < (3.0 + 2.0/3.0)*T);
+					(time < 3.5*T);
+					
+			lemma "Time to correct coordination variables is < (3 + (N-1)/N)T":
+				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
+					(time < (3.0 + (N_TRUTH_REAL - 1.0)/N_TRUTH_REAL)*T);
 			
 			lemma "Optimal on and after 20 steps":
 				steps >= 20 => optimal;
+
+			lemma "(Dependent on bound on initial NR and NL) Time to optimal configuration is less than 4T":
+				(optimal and not (pre(optimal))) => 
+					(time < 4.0*T);
 							
 			-- This is a good way to find the real time bound, by experimenting with lower bounds!
-			lemma "Time to optimal configuration is less than (4 + 2/3)T":
+			lemma "Time to optimal configuration is less than (4 + 1/N)T":
 				(optimal and not (pre(optimal))) => 
-					(time < (4.0 + 2.0/3.0)*T);
---					
---			lemma "Time to optimal configuration is less than 4T + T/N":
---				(optimal and not (pre(optimal))) => 
---					(time < 4.0*T + T/N_TRUTH_REAL);
+					(time < (4.0 + 1.0/N_TRUTH_REAL)*T);
 				
 			lemma "optimal is false on the initial step":
 				not optimal -> true;
