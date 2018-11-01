@@ -468,80 +468,20 @@ public
 --					and UAV3.NL = 0 and UAV3.NR = 0
 --				));
 --
---			lemma "Observer: Coordination variables are not correct after 3T":
---				(steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
---					and correct_coordination_variables 
---					and not (pre(correct_coordination_variables))
---				) => 
---					(time <= 3.0*T);
---
---			lemma "Observer: Coordination variables are not correct after 3T (with initial positions set)":
---				(steps = 11 --Through experimentation, we learned how many steps it takes to get such an observer. Adding this clause helps JKind find the observer faster. 
---					and 
---					correct_coordination_variables 
---					and not pre(correct_coordination_variables)
---					and DPSS_Node_Lib.initial_value_true(
---							direction_UAV1 = DPSS_Constants.RIGHT
---						and direction_UAV2 = DPSS_Constants.LEFT
---						and direction_UAV3 = DPSS_Constants.LEFT
---						and pos_UAV1 = 0.0046
---						and pos_UAV2 = 8.5283
---						and pos_UAV3 = 8.5610
---						and UAV1.PL = 10.0373
---						and UAV2.PL = 18.5637 and UAV2.PR = 1.5371
---						and UAV3.PR = 21.4390
---						and UAV1.NL = 2
---						and UAV2.NL = 0 and UAV2.NR = 2
---						and UAV3.NR = 3)
---				) => 
---					(time <= 3.0*T);
 
---			lemma "Experimental Observer: Coordination variables are not correct after 3.4T":
---				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
---					(time < 3.4*T);
-
-			lemma "Experimental Observer: Coordination variables are not correct after 3.5T":
+			lemma "Observer: Coordination variables are not correct after 3.5T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
 					(time < 3.5*T);
 
-			lemma "Experimental Observer: Time to optimal configuration is more than 4T":
+			lemma "Observer: Time to optimal configuration is more than 4T":
 				(optimal and not (pre(optimal))) => 
 					(time < 4.0*T);
-																
---			--Redundant with the observer below
---			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T":
---				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
---					(time <= (3.0 + 1.0/5.0)*T);
-
---			lemma "Experimental Observer: Coordination variables are not correct after (3 + 1/(4 + epsilon))T":
---				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
---					(time <= (3.0 + 1.0/(4.0 + 0.001))*T);
-
---			lemma "Observer: Coordination variables are not correct after (3 + 1/5)T, but system still converges by 4T.":
---				not (optimal
---					and 
---					--Initially, ...
---					DPSS_Node_Lib.initial_value_true(
---						direction_UAV1 = DPSS_Constants.RIGHT
---					and direction_UAV2 = DPSS_Constants.RIGHT
---					and direction_UAV3 = DPSS_Constants.LEFT
---					and pos_UAV1 = 0.013
---					and pos_UAV2 = 0.028
---					and pos_UAV3 = 6.713
---					and UAV1.PL = 17.465
---					and UAV2.PL = 0.002 and UAV2.PR = 14.678
---					and UAV3.PR = 10.754
---					and UAV1.NL = 3
---					and UAV2.NL = 3 and UAV2.NR = 0
---					and UAV3.NR = 2
---				));
---							
+							
 --			lemma "Observer: Coordination variables are not correct after 15 steps":
 --				steps = 15 => correct_coordination_variables;
 --				
 --			lemma "Observer: Not yet optimal after 19 steps":
 --				steps >= 19 => optimal;
-			
 				
 			----------------------------------------------------------------------------
 			--LEMMAS (We expect these to be true and to potentially help the model checker prove the guarantees)
@@ -595,13 +535,9 @@ public
 				steps >= 20 => optimal;
 							
 			-- This is a good way to find the real time bound, by experimenting with lower bounds!
-			lemma "Time to optimal configuration is less than (4 + 2/3)T":
+			lemma "Time to optimal configuration is less than (4 + 1/N)T":
 				(optimal and not (pre(optimal))) => 
-					(time < (4.0 + 2.0/3.0)*T);
---					
---			lemma "Time to optimal configuration is less than 4T + T/N":
---				(optimal and not (pre(optimal))) => 
---					(time < 4.0*T + T/N_TRUTH_REAL);
+					(time < (4.0 + 1.0/N_TRUTH_REAL)*T);
 				
 			lemma "optimal is false on the initial step":
 				not optimal -> true;
