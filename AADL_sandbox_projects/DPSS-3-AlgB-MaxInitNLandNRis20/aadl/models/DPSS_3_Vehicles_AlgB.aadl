@@ -444,7 +444,7 @@ public
 --					and UAV3.NL = 0 and UAV3.NR = 0
 --				));
 --
---			lemma "Observer: Worst time (nearly 4T) convergence":
+--			lemma "Observer: Nearly 4T convergence":
 --				not (
 --					optimal
 --					and
