@@ -878,6 +878,14 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         m_vertical_speed_min_mps = configuration->getMinVerticalSpeed();
         m_altitude_max_m = configuration->getMaxAltitude();
         m_altitude_min_m = configuration->getMinAltitude();
+        m_heading_delta_deg = configuration->getTrackStep();
+        m_ground_speed_delta_mps = configuration->getGroundSpeedStep();
+        m_vertical_speed_delta_mps = configuration->getVerticalSpeedStep();
+        m_altitude_delta_m = configuration->getAltitudeStep();
+        m_heading_interval_buffer_deg = m_heading_delta_deg / 2.0;
+        m_groundspeed_interval_buffer_mps = m_ground_speed_delta_mps / 2.0;
+        m_verticalspeed_interval_buffer_mps = m_vertical_speed_delta_mps / 2.0;
+        m_altitude_interval_buffer_m = m_altitude_delta_m / 2.0;
         m_isReadyToActConfiguration = true;  //boolean indicating if a threshold time is set from reading a DAIDALUS configuration parameter.
         //std::cout << "DAIDALUS Response has received the DAIDALUS configuration used for detection." << std::endl;
     }
@@ -889,87 +897,53 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                 std::static_pointer_cast<larcfm::DAIDALUS::WellClearViolationIntervals> (receivedLmcpMessage->m_object);
         if (m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
         {
-            /*
-            m_CurrentState.altitude_m = pWCVIntervals->getCurrentAltitude();
-            m_CurrentState.heading_deg = pWCVIntervals->getCurrentHeading();
-            m_CurrentState.horizontal_speed_mps = pWCVIntervals->getCurrentGoundSpeed();
-            m_CurrentState.vertical_speed_mps = pWCVIntervals->getCurrentVerticalSpeed();
-            m_CurrentState.latitude_deg = pWCVIntervals->getCurrentLatitude();
-            m_CurrentState.longitude_deg = pWCVIntervals->getCurrentLongitude();
-             * */
-            //std::cout << "DAIDALUS Response has received a violation message and is ready to act on it" << std::endl;
-            if (!m_isConflict)
+            std::vector<int64_t> ConflictResolutionList;
+            for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
             {
-                for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
+                if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
                 {
-                    if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
-                    {
-                        std::cout << "Adding " << pWCVIntervals->getEntityList()[i] << " to the Conflict Resolution List" << std::endl;
-                        m_ConflictResolutionList.push_back(pWCVIntervals->getEntityList()[i]);
-                    }
+                    std::cout << "Adding " << pWCVIntervals->getEntityList()[i] << " to the Conflict Resolution List" << std::endl;
+                    ConflictResolutionList.push_back(pWCVIntervals->getEntityList()[i]);
                 }
-            }    
-            
-            if (!m_isConflict && m_ConflictResolutionList.size() > 0) //TODO: add check for current heading in NEAR to conditional for action.--done via m_ConflictResolutionList size
-            {
-                m_isConflict = true;//bool t = SetisConflict(true);
             }
-            
-            if (m_isConflict)
+            int64_t RoW;
+            if (ConflictResolutionList.size() > 0)
             {
-                std::cout << "I HAVE DETERMINED THAT A CONFLICT MUST BE RESOLVED" << std::endl;
-                if (m_ConflictResolutionList.size() > 0)
+                std:: cout << "I HAVE DETERMINED THAT A CONFLICT MUST BE RESOLVED" << std::endl;
+                RoW = INT64_MAX;
+            }
+            else
+            {
+                RoW = INT64_MIN;
+            }
+            for (auto i : ConflictResolutionList)
+            {
+                if (i < RoW)
                 {
-                    m_RoW = INT64_MAX;
+                    RoW = i;
                 }
-                else
-                {
-                    m_RoW = INT64_MIN;
-                }
-                
-                // determine the vehicle that has the Right of Way
-                for (int64_t i : m_ConflictResolutionList)
-                //for (size_t i = m_ConflictResolutionList.cbegin();  i < m_ConflictResolutionList.size(); i++)
-                {
-                    if (i < m_RoW)
+                std::cout << "A Candidate for the Right of Way vehicle is Entity" << RoW << std::endl;
+            }
+            if (ConflictResolutionList.size() > 0)
+            {
+                m_state = InConflict;
+            }
+            switch (m_state)
+            {
+                case 1:
+//                    if (ConflictResolutionList.size() > 0)
+//                    {
+//                        m_state = InConflict;
+//                    }
+                    break;
+                case 2:
+                    if (m_VehicleID < RoW)
                     {
-                        m_RoW = i;
-                    }                 
-                    std::cout << "A Candidate for the Right of Way vehicle is Entity " << m_RoW << std::endl;
-                }
-                
-                if (m_VehicleID < m_RoW)
-                {
-                    //Ownship has Right of Way and therefore should take no action 
-                    ResetResponse();
-                    std::cout << "I HAVE THE RIGHT OF WAY--NOT DOING ANYTHING TO AVOID COLLISION" << std::endl;
-                }
-                else
-                {
-                    //std::remove_if(m_ConflictResolutionList.begin(), m_ConflictResolutionList.end(), [&](int64_t ID) { return ID == m_RoW; });
-                    std::vector<int64_t>::iterator expunge = std::find(m_ConflictResolutionList.begin(), m_ConflictResolutionList.end(), m_RoW);
-                    
-                    if (expunge != m_ConflictResolutionList.end())
-                    {
-                        std::cout << "Removing " << *expunge << " from Conflict Resolution List" << std::endl;
-                        m_ConflictResolutionList.erase(expunge);
+                        //Ownship has the Right of Way and therefore should take no action
+                        m_state = OnHold;
                     }
-                    
-                    /* for (auto ii = m_ConflictResolutionList.begin(); ii != m_ConflictResolutionList.end(); ii++)
-                    //for (auto ii : m_ConflictResolutionList)
-                    {                         
-                        if (*ii == m_RoW)
-                        {
-                            //expunge = ii;
-                            std::cout << "Removing " << *ii << " from Conflict Resolution List" << std::endl;
-                            //m_ConflictResolutionList.erase(ii);
-                            break;
-                        }                        
-                    } //*/
-                    // m_ConflictResolutionList.erase(expunge);
-                    if (!m_isTakenAction)
+                    else
                     {
-                        //Current logic assumes DAIDALUS returns bands intervals ordered and grouped from 0(True North) to 360
                         SetDivertState(pWCVIntervals);
                         std::unique_ptr<afrl::cmasi::FlightDirectorAction> pDivertThisWay = uxas::stduxas::make_unique<afrl::cmasi::FlightDirectorAction>();
                         pDivertThisWay->setHeading(static_cast<float>(m_DivertState.heading_deg)); 
@@ -977,112 +951,41 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                         pDivertThisWay->setSpeed(m_DivertState.horizontal_speed_mps);
                         pDivertThisWay->setAltitudeType(m_DivertState.altitude_type);
                         pDivertThisWay->setClimbRate(m_DivertState.vertical_speed_mps);
-                        double m_action_time_threshold_s = 0;
-                        if (((m_turn_rate_degps == 0) && (m_bank_angle_deg == 0)) || (m_horizontal_accel_mpsps == 0) || (m_vertical_accel_G == 0) ||
-                                (m_vertical_rate_mps == 0))
-                        {
-                            m_action_time_threshold_s = 68;
-                        }
-                        else if (m_AvoidanceManeuverType == HEADING)
-                        {
-                            if (m_turn_rate_degps != 0)
-                            {
-                                m_action_time_threshold_s = std::abs(m_DivertState.heading_deg - m_CurrentState.heading_deg) / m_turn_rate_degps; //TODO: handle DAIDALUS configuration using instantaneous bands
-                            }
-                            else
-                            {
-                                double estimate_turn_rate_degps = (9.81*std::tan(m_bank_angle_deg * n_Const::c_Convert::dDegreesToRadians())) / 
-                                m_CurrentState.total_velocity_mps;
-                                m_action_time_threshold_s = std::abs(m_DivertState.heading_deg - m_CurrentState.heading_deg) / estimate_turn_rate_degps;
-                            }
-                            
-                        }
-                        else if (m_AvoidanceManeuverType == GROUNDSPEED)
-                        {
-                            m_action_time_threshold_s = std::abs(m_DivertState.horizontal_speed_mps - m_CurrentState.horizontal_speed_mps) / 
-                                    m_horizontal_accel_mpsps;
-                        }
-                        else if (m_AvoidanceManeuverType == VERTICALSPEED)
-                        {
-                            m_action_time_threshold_s = std::abs(m_DivertState.vertical_speed_mps - m_CurrentState.vertical_speed_mps) / 
-                                    (m_vertical_accel_G * 9.81);
-                        }
-                        else
-                        {
-                            m_action_time_threshold_s = std::abs(m_DivertState.altitude_m - m_CurrentState.altitude_m) / 
-                                    (m_vertical_speed_max_mps) + std::abs(m_vertical_speed_max_mps - m_CurrentState.vertical_speed_mps) / 
-                                    (m_vertical_accel_G * 9.81);
-                        }
-                        
-                        std::cout << "Maneuver should be held for " << m_action_time_threshold_s << " seconds or until divert heading obtained" << std::endl;
-                        m_action_hold_release_time_s = m_CurrentState.time_s + m_action_time_threshold_s;
-                        
                         std::shared_ptr<afrl::cmasi::VehicleActionCommand> pAvoidViolation = std::make_shared<afrl::cmasi::VehicleActionCommand>();
                         pAvoidViolation->setCommandID(getUniqueEntitySendMessageId());
                         pAvoidViolation->setVehicleID(m_VehicleID);
                         pAvoidViolation->setStatus(afrl::cmasi::CommandStatusType::Approved);
                         pAvoidViolation->getVehicleActionList().push_back(pDivertThisWay.release());
-                        
-                        m_isTakenAction = true;         
+//                        m_isTakenAction = true;         
                         m_isOnMission = false;
                         //sendLmcpObjectBroadcastMessage(static_cast<avtas::lmcp::Object*>(pAvoidViolation));                
                         sendSharedLmcpObjectBroadcastMessage(pAvoidViolation);
-                        std::cout << "ENTITY " << m_VehicleID << " is conducting a divert maneuver." << std::endl;                        
+                        std::cout << "ENTITY " << m_VehicleID << " is conducting a divert maneuver." << std::endl;  
+                        m_state = OnHold;
+                        
+                    }
+                    
+                    break;
+                case 3:
+//                    std::cout << "In Hold last command and there are no conflicts detected." << std::endl;
+                    if (m_isOnMission)
+                    {
+                        m_state = OnMission;
                     }
                     else
                     {
-                        //TODO: hold conflict until elapsed time for maneuver has passed or until desired state attained--time hold in place--done
-                        //TODO: Compare desired "mode value" to current nogo band and if outside mode value send action command to desired and set isConflict to false--done
-                        //if ((m_CurrentState.time_s >= m_action_hold_release_time_s) || isWithinTolerance())  //TODO: add a comparison between current state and desired state to this conditional--done
-                        if (isWithinTolerance())
+                        if (isSafeToReturnToMission(pWCVIntervals))
                         {
-                            m_isTakenAction = false;
-                            m_isActionCompleted = true;
-                            m_isCloseToDesired = false;
-                        }
-                        std::cout << "Still performing collision avoidance maneuver." << std::endl;
-
-                        //TODO: Evaluate the size of the ConflictResolutionList: if empty do nothing else, if empty and maneuver obtained, flag m_isTakenAction to false
-                        //TODO: remove RoW vehicle from the ConflictResolutionList-- done?
-                        if (m_isActionCompleted && m_ConflictResolutionList.empty())
-                        {
-                            //m_isTakenAction = false;
-                            //m_isConflict = false;
-                            ResetResponse();
-                            std::cout << "COMPLETED CURRENT AVOIDANCE MANEUVER." << std::endl;
-                            if (isSafeToReturnToMission(pWCVIntervals))
+                            //send safe to return to mission command
+                            if (m_NextWaypoint != -1)
                             {
-                                //ResetResponse();
-                                if (m_NextWaypoint != -1)
-                                {
-                                    //ResetResponse();
-                                    m_isOnMission = true;
-                                    std::cout << "Returning to Mission" << std::endl;
-                                    m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
-                                    sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
-                                }
+                                m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
+                                sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
+                                m_state = OnMission;
                             }
                         }
                     }
-                }
-            }
-            else
-            {
-                if (!m_isOnMission)
-                {
-                    if (isSafeToReturnToMission(pWCVIntervals))
-                    {
-                        //ResetResponse();
-                        if (m_NextWaypoint != -1)
-                        {
-                            //ResetResponse();
-                            m_isOnMission = true;
-                            std::cout << "Returning to Mission" << std::endl;
-                            m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
-                            sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
-                        }
-                    }
-                }
+                    break;
             }
         }
     }

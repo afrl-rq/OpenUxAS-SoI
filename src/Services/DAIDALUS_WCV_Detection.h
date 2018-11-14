@@ -198,8 +198,6 @@ private:
     double m_bank_angle_deg = {0.0};    // degrees--bank angle used in the computation of horizontal direction maneuvers (angle)
     double m_vertical_rate_mps = {0.0}; //meters per second--vertical rate used in the computation of altitude maneuvers (speed)
     double m_recovery_stability_time_s = {0};  // seconds--time delay to stabilize recovery maneuvers 
-    double m_min_horizontal_recovery_m = {1222.32};   // meters--minimum horizontal separation used in the computation of recovery maneuvers (distance)
-    double m_min_vertical_recovery_m = {450.0*n_Const::c_Convert::dFeetToMeters()}; // meters--minimum vertical separation used in the computation of recovery maneuvers (distance)
     bool m_recovery_trk_bool = {true};   // Boolean--enable computation of horizontal direction recovery maneuvers (boolean)
     bool m_recovery_gs_bool = {true};    // Boolean--enable computation of horizontal speed recovery maneuvers
     bool m_recovery_vs_bool = {true};    // Boolean--enable computation of vertical speed recovery maneuvers
@@ -208,9 +206,11 @@ private:
     double m_ca_factor = {0.2}; //factor to reduce min horizontal/vertical recovery separation when computing collision avoidance maneuvers (scalar (0,1])
     double m_horizontal_nmac_m = {500.0*n_Const::c_Convert::dFeetToMeters()};    // meters--Horizontal Near Mid-Air Collision (distance)
     double m_vertical_nmac_m = {100.0*n_Const::c_Convert::dFeetToMeters()};   // meters--Vertical Near Mid-Air Collision (distance)
+    double m_min_horizontal_recovery_m = {1222.32};   // meters--minimum horizontal separation used in the computation of recovery maneuvers (distance)
+    double m_min_vertical_recovery_m = {450.0*n_Const::c_Convert::dFeetToMeters()}; // meters--minimum vertical separation used in the computation of recovery maneuvers (distance)
     double m_contour_thr_deg = {180.0}; // degrees--threshold relative to ownship horizontal direction for the computation of horizontal contours aka. blobs (angle)
-    double m_DTHR_m = {m_min_horizontal_recovery_m};    //meters--horizontal distance threshold for WCV volume definition
-    double m_ZTHR_m = {m_min_vertical_recovery_m};  //meters--vertical distance threshold for WCV volume definition
+    double m_DTHR_m = 1222.32; //{m_min_horizontal_recovery_m};    //meters--horizontal distance threshold for WCV volume definition
+    double m_ZTHR_m = 450.0*n_Const::c_Convert::dFeetToMeters(); //{m_min_vertical_recovery_m};  //meters--vertical distance threshold for WCV volume definition
     double m_TTHR_s = {35}; //seconds--time threshold for WCV voulume definition
     double m_alert_time_1_s = {m_lookahead_time_s};  //seconds--alerting time for alert level 1
     double m_early_alert_time_1_s = {m_lookahead_time_s+20};    //seconds--early alerting time for alert level 1

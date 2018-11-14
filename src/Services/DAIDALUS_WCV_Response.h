@@ -126,6 +126,7 @@ public:
     
 
 private:
+    enum states {OnMission=1, InConflict, OnHold} m_state{OnMission};
     int64_t m_VehicleID;
     bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
     bool m_isOnMission {false};  //boolean stating whether or not UAV is executing waypoints on Mission or not (diverting)
@@ -157,6 +158,10 @@ private:
     double m_vertical_speed_min_mps;    //DAIDALUS configuration minimum vertical speed
     double m_altitude_max_m;    //DAIDALUS configuration maximum altitude
     double m_altitude_min_m;    //DAIDALS configuration minimum altitude
+    double m_heading_delta_deg; //DAIDALUS configuration heading discretization 
+    double m_ground_speed_delta_mps;    //DAIDALUS configuration ground speed discretization
+    double m_vertical_speed_delta_mps;  //DAIDALUS configuration vertical speed discretization
+    double m_altitude_delta_m;  //DAIDALUS configuration altitude discretization
     double m_heading_interval_buffer_deg{5.0};  //degrees to buffer the heading bands interval by for avoidance maneuver
     double m_groundspeed_interval_buffer_mps{10.0};   //speed to buffer the ground speed interval by for avoidance maneuver.
     double m_verticalspeed_interval_buffer_mps{5.0};  //speed to buffer the vertical speed interval by for avoidance maneuver.

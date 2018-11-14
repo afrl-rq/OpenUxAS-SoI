@@ -29,7 +29,7 @@ recovery_vs = true
 recovery_alt = true
 # Collision Avoidance Bands Parameters
 ca_bands = true
-ca_factor = 0.200000
+ca_factor = 0.100000
 horizontal_nmac = 152.400000 [m]
 vertical_nmac = 30.480000 [m]
 # Implicit Coordination Parameters
@@ -62,7 +62,7 @@ alert_3_spread_alt = 0.000000 [ft]
 alert_3_spread_gs = 0.000000 [knot]
 alert_3_spread_trk = 0.000000 [deg]
 alert_3_spread_vs = 0.000000 [fpm]
-conflict_level = 2
+conflict_level = 3
 det_1_WCV_DTHR = 1222.320000 [m]
 det_1_WCV_TCOA = 0.000000 [s]
 det_1_WCV_TTHR = 35.000000 [s]

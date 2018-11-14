@@ -80,6 +80,8 @@
 #define STRING_XML_ALERTTIME3 "AlertTime3"
 #define STRING_XML_EARLYALERTTIME3 "EarlyAlertTime3"
 #define STRING_XML_HORIZONTALDETECTIONTYPE "HorizontalDetectionType"
+#define STRING_XML_DTHR "DTHR"
+#define STRING_XML_ZTHR "ZTHR"
 
 
 
@@ -417,6 +419,18 @@ bool DAIDALUS_WCV_Detection::configure(const pugi::xml_node& ndComponent)
         {
             m_horizontal_detection_type == local_horizontal_detection_type;
         }
+    }
+    if (!ndComponent.attribute(STRING_XML_DTHR).empty())
+    {
+        double local_DTHR_m = ndComponent.attribute(STRING_XML_DTHR).as_double();
+        m_DTHR_m = local_DTHR_m;
+        m_min_horizontal_recovery_m = m_DTHR_m;
+    }
+    if (!ndComponent.attribute(STRING_XML_ZTHR).empty())
+    {
+        double local_ZTHR_m = ndComponent.attribute(STRING_XML_ZTHR).as_double();
+        m_ZTHR_m = local_ZTHR_m;
+        m_min_vertical_recovery_m = m_ZTHR_m;
     }
     m_daa.parameters.setLookaheadTime(m_lookahead_time_s, "s");
     m_daa.parameters.setLeftTrack(m_left_trk_deg, "deg");
