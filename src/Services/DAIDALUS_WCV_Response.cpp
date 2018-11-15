@@ -125,6 +125,398 @@ bool DAIDALUS_WCV_Response::configure(const pugi::xml_node& ndComponent)
 {
     return (ID == m_RoW);
 }*/
+bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
+{
+    bool guaranteed_flag = true;
+    m_DivertState.heading_deg = m_CurrentState.heading_deg;
+    m_DivertState.altitude_m = m_CurrentState.altitude_m;
+    m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+    m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;       
+
+    std::cout << "Current heading = " << m_CurrentState.heading_deg << std::endl;
+    struct intervals
+    {
+        double lower;
+        double upper;
+    };
+    std::vector<intervals> bands, r_bands;
+    intervals temp;
+    for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
+    {
+        temp.lower = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0];
+        temp.upper = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1];
+        bands.push_back(temp);
+        std::cout << "Lower = " << temp.lower << std::endl;
+        std::cout << "Upper = " << temp.upper << std::endl;
+    }
+    std::cout << std::endl;
+    uint initial_band = 0;  //band that the initial heading was in.
+    bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    for (uint i = 0; i < bands.size(); i++)
+    {
+        if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
+        {
+            m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
+            if (!isFound)
+            {
+                initial_band = i;
+                isFound = true;
+            }
+        }
+    }
+    if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, check to see if a right turn is still possible if not turn left
+    {
+        for (uint i = 0; i < bands.size(); i++)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
+            {
+                m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
+            }
+            else
+            {
+                break;
+            }
+
+        }
+    }
+
+    if (m_DivertState.heading_deg <= (m_CurrentState.heading_deg + 180.0))
+    {
+        m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
+    }
+    else
+    {
+        for (int i = initial_band; i >= 0; i--)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.heading_deg))
+            {
+                m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
+            }
+        }
+        if (m_DivertState.heading_deg < m_heading_min_deg)
+        {
+            for (int i = bands.size(); i >=0; i--)
+            {
+                if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
+                {
+                    m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+        }
+        if (std::fmod(m_DivertState.heading_deg + 360.0, 360.0) >= std::fmod((m_CurrentState.heading_deg -180.0) + 360.0, 360.0))
+        {
+            m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
+        }
+        else if (DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size() >0)
+        {
+            guaranteed_flag = false;
+                //m_DivertState.heading_deg = m_CurrentState.heading_deg;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[1];
+                r_bands.push_back(temp);
+            }
+
+            for (uint i = 0; i < r_bands.size(); i++)
+            {
+                if ((r_bands[i].lower > m_CurrentState.heading_deg) && (r_bands[i].upper > m_CurrentState.heading_deg))
+                {
+                    m_DivertState.heading_deg = r_bands[i].lower + m_heading_interval_buffer_deg / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+
+            if (!isRecoveryFound)
+            {
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.heading_deg) && (r_bands[i].upper < m_CurrentState.heading_deg))
+                    {
+                        m_DivertState.heading_deg = r_bands[i].upper - m_heading_interval_buffer_deg / 2.0;
+                        break;
+                    }
+            }
+
+            std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
+            std::cout << std::endl;
+           //use right turn recovery band
+        }
+    }
+    //TODO: Determine recommended action from DAIDALUS--done
+    //TODO: set action response to aforementioned recommended action--done
+    //TODO: ensure divert action does not violate keep out zones
+    //TODO: send vehicle action command--done
+    //TODO: remove RoW vehicle from the ConflictResolutionList--done by nature of the loop
+    //m_DivertState.heading_deg = m_CurrentState.heading_deg + 90.0;  //make sure heading is from 0 to 360
+    std::cout << "Divert to heading " << m_DivertState.heading_deg << std::endl;
+    return guaranteed_flag;
+
+}
+bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
+{
+    bool guaranteed_flag = true;
+    m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+    m_DivertState.altitude_m = m_CurrentState.altitude_m;
+    m_DivertState.heading_deg = m_CurrentState.heading_deg;
+    m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+    struct intervals
+    {
+        double lower;
+        double upper;
+    };
+    std::vector<intervals> bands, r_bands;
+    intervals temp;
+    for (uint i = 0; i < DAIDALUS_bands->getWCVGroundSpeedIntervals().size(); i++)
+    {
+        temp.lower = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[0];
+        temp.upper = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[1];
+        bands.push_back(temp);
+    }
+
+    uint initial_band = 0;  //band that the initial heading was in.
+    bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    for (uint i = 0; i < bands.size(); i++)
+    {
+        if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
+        {
+            m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps;
+            if (!isFound)
+            {
+                initial_band = i;
+                isFound = true;
+            }
+        }
+    }
+
+    if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
+    {
+        for (int i = initial_band; i >= 0; i--)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.horizontal_speed_mps))
+            {
+                m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps;
+            }
+        }
+    }
+
+    if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps)  //If after checking right turns and left turns no better heading found, keep current heading
+    {
+        guaranteed_flag = false;
+        if (DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size() > 0)
+        {
+            bool isRecoveryFound = false;
+            //m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[1];
+                r_bands.push_back(temp);
+            }
+
+            for (uint i = 0; i < r_bands.size(); i++)
+            {
+                if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
+                {
+                    m_DivertState.horizontal_speed_mps = r_bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+
+            if (!isRecoveryFound)
+            {
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
+                    {
+                        m_DivertState.horizontal_speed_mps = r_bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
+                        break;
+                    }
+            }
+
+        }
+    }
+    return guaranteed_flag;    
+}
+bool DAIDALUS_WCV_Response::foundWCVVerticalSpeedResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
+{
+    bool guaranteed_flag = true;
+    m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+    m_DivertState.altitude_m = m_CurrentState.altitude_m;
+    m_DivertState.heading_deg = m_CurrentState.heading_deg;
+    m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+    struct intervals
+    {
+        double lower;
+        double upper;
+    };
+    std::vector<intervals> bands, r_bands;
+    intervals temp;
+    for (uint i = 0; i < DAIDALUS_bands->getWCVVerticalSpeedIntervals().size(); i++)
+    {
+        temp.lower = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[0];
+        temp.upper = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[1];
+        bands.push_back(temp);
+    }
+
+    uint initial_band = 0;  //band that the initial heading was in.
+    bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    for (uint i = 0; i < bands.size(); i++)
+    {
+        if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.vertical_speed_mps))
+        {
+            m_DivertState.vertical_speed_mps = bands[i].upper + m_verticalspeed_interval_buffer_mps;
+            if (!isFound)
+            {
+                initial_band = i;
+                isFound = true;
+            }
+        }
+    }
+
+    if (m_DivertState.vertical_speed_mps > m_vertical_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
+    {
+        for (int i = initial_band; i >= 0; i--)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.vertical_speed_mps))
+            {
+                m_DivertState.vertical_speed_mps = bands[i].lower - m_verticalspeed_interval_buffer_mps;
+            }
+        }
+    }
+
+    if (m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps)//If after checking right turns and left turns no better heading found, keep current heading
+    {
+        guaranteed_flag = false;
+        if (DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size() > 0)
+        {
+            //m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[1];
+                r_bands.push_back(temp);
+            }
+
+            for (uint i = 0; i < bands.size(); i++)
+            {
+                if ((r_bands[i].lower > m_CurrentState.vertical_speed_mps) && (r_bands[i].upper > m_CurrentState.vertical_speed_mps))
+                {
+                    m_DivertState.vertical_speed_mps = r_bands[i].lower + m_verticalspeed_interval_buffer_mps / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+
+            if (!isRecoveryFound)
+            {
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.vertical_speed_mps) && (r_bands[i].upper < m_CurrentState.vertical_speed_mps))
+                    {
+                        m_DivertState.vertical_speed_mps = r_bands[i].upper - m_verticalspeed_interval_buffer_mps / 2.0;
+                        break;
+                    }
+            }
+        }
+
+    }
+    return guaranteed_flag;
+}
+bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
+{
+    bool guaranteed_flag = true;
+    m_DivertState.altitude_m = m_CurrentState.altitude_m;
+    m_DivertState.vertical_speed_mps = 0.0; //m_CurrentState.vertical_speed_mps;--"fix" for inconsistency in DivertState.
+    m_DivertState.heading_deg = m_CurrentState.heading_deg;
+    m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;    
+    struct intervals
+    {
+        double lower;
+        double upper;
+    };
+    std::vector<intervals> bands, r_bands;
+    intervals temp;
+    for (uint i = 0; i < DAIDALUS_bands->getWCVAlitudeIntervals().size(); i++)
+    {
+        temp.lower = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[0];
+        temp.upper = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[1];
+        bands.push_back(temp);
+    }
+
+    uint initial_band = 0;  //band that the initial heading was in.
+    bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    for (uint i = 0; i < bands.size(); i++)
+    {
+        if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.altitude_m))
+        {
+            m_DivertState.altitude_m = bands[i].upper + m_altitude_interval_buffer_m;
+            if (!isFound)
+            {
+                initial_band = i;
+                isFound = true;
+            }
+        }
+    }
+
+    if (m_DivertState.altitude_m > m_altitude_max_m)  //If divert altitude is greater than altitude max, a descent is preferred.
+    {
+        for (int i = initial_band; i >= 0; i--)
+        {
+            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.altitude_m))
+            {
+                m_DivertState.altitude_m = bands[i].lower - m_altitude_interval_buffer_m;
+            }
+        }
+    }
+
+    if (m_DivertState.altitude_m < m_altitude_min_m)//If after checking right turns and left turns no better heading found, keep current heading
+    {
+        guaranteed_flag = false;
+        if (DAIDALUS_bands->getRecoveryAltitudeIntervals().size() > 0)
+        {
+            //m_DivertState.altitude_m = m_CurrentState.altitude_m;
+            bool isRecoveryFound = false;
+            for (uint i = 0; i < DAIDALUS_bands->getRecoveryAltitudeIntervals().size(); i++)
+            {
+                temp.lower = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[0];
+                temp.upper = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[1];
+                r_bands.push_back(temp);
+            }
+
+            for (uint i = 0; i < r_bands.size(); i++)
+            {
+                if ((r_bands[i].lower > m_CurrentState.altitude_m) && (r_bands[i].upper > m_CurrentState.altitude_m))
+                {
+                    m_DivertState.altitude_m = r_bands[i].lower + m_altitude_interval_buffer_m / 2.0;
+                    isRecoveryFound = true;
+                    break;
+                }
+            }
+
+            if (!isRecoveryFound)
+            {
+                for (int i = r_bands.size(); i >= 0; i--)
+                    if ((r_bands[i].lower < m_CurrentState.altitude_m) && (r_bands[i].upper < m_CurrentState.altitude_m))
+                    {
+                        m_DivertState.altitude_m = r_bands[i].upper - m_altitude_interval_buffer_m / 2.0;
+                        break;
+                    }
+            }
+            std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
+            std::cout << std::endl;
+        }
+        //m_DivertState.altitude_m = m_CurrentState.altitude_m + 450; //testing change altitude
+    }
+    return guaranteed_flag;
+}
 
 void DAIDALUS_WCV_Response::ResetResponse()
 {
@@ -215,381 +607,27 @@ bool DAIDALUS_WCV_Response::isWithinTolerance()
     }
 }
 
-void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands)
+void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
 {
     if (m_AvoidanceManeuverType == HEADING)
     {
-        m_DivertState.heading_deg = m_CurrentState.heading_deg;
-        std::cout << "Current heading = " << m_CurrentState.heading_deg << std::endl;
-        struct intervals
-        {
-            double lower;
-            double upper;
-        };
-        std::vector<intervals> bands, r_bands;
-        intervals temp;
-        for (uint i = 0; i < DAIDALUS_bands->getWCVGroundHeadingIntervals().size(); i++)
-        {
-            temp.lower = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0];
-            temp.upper = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1];
-            bands.push_back(temp);
-            std::cout << "Lower = " << temp.lower << std::endl;
-            std::cout << "Upper = " << temp.upper << std::endl;
-        }
-        std::cout << std::endl;
-        uint initial_band = 0;  //band that the initial heading was in.
-        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-        for (uint i = 0; i < bands.size(); i++)
-        {
-            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
-            {
-                m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
-                if (!isFound)
-                {
-                    initial_band = i;
-                    isFound = true;
-                }
-            }
-        }
-        if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, check to see if a right turn is still possible if not turn left
-        {
-            for (uint i = 0; i < bands.size(); i++)
-            {
-                if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
-                {
-                    m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
-                }
-                else
-                {
-                    break;
-                }
-                
-            }
-        }
-        
-        if (m_DivertState.heading_deg <= (m_CurrentState.heading_deg + 180.0))
-        {
-            m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
-        }
-        else
-        {
-            for (int i = initial_band; i >= 0; i--)
-            {
-                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.heading_deg))
-                {
-                    m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
-                }
-            }
-            if (m_DivertState.heading_deg < m_heading_min_deg)
-            {
-                for (int i = bands.size(); i >=0; i--)
-                {
-                    if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
-                    {
-                        m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                    
-                }
-                
-            }
-            if (std::fmod(m_DivertState.heading_deg + 360.0, 360.0) >= std::fmod((m_CurrentState.heading_deg -180.0) + 360.0, 360.0))
-            {
-                m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
-            }
-            else if (DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size() >0)
-            {
-                    //m_DivertState.heading_deg = m_CurrentState.heading_deg;
-                bool isRecoveryFound = false;
-                for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundHeadingIntervals().size(); i++)
-                {
-                    temp.lower = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[0];
-                    temp.upper = DAIDALUS_bands->getRecoveryGroundHeadingIntervals()[i]->getRecoveryGroundHeadings()[1];
-                    r_bands.push_back(temp);
-                }
-
-                for (uint i = 0; i < r_bands.size(); i++)
-                {
-                    if ((r_bands[i].lower > m_CurrentState.heading_deg) && (r_bands[i].upper > m_CurrentState.heading_deg))
-                    {
-                        m_DivertState.heading_deg = r_bands[i].lower + m_heading_interval_buffer_deg / 2.0;
-                        isRecoveryFound = true;
-                        break;
-                    }
-                }
-
-                if (!isRecoveryFound)
-                {
-                    for (int i = r_bands.size(); i >= 0; i--)
-                        if ((r_bands[i].lower < m_CurrentState.heading_deg) && (r_bands[i].upper < m_CurrentState.heading_deg))
-                        {
-                            m_DivertState.heading_deg = r_bands[i].upper - m_heading_interval_buffer_deg / 2.0;
-                            break;
-                        }
-                }
-            
-                std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
-                std::cout << std::endl;
-               //use right turn recovery band
-            }
-        }
-        //TODO: Determine recommended action from DAIDALUS--done
-        //TODO: set action response to aforementioned recommended action--done
-        //TODO: ensure divert action does not violate keep out zones
-        //TODO: send vehicle action command--done
-        //TODO: remove RoW vehicle from the ConflictResolutionList--done by nature of the loop
-        //m_DivertState.heading_deg = m_CurrentState.heading_deg + 90.0;  //make sure heading is from 0 to 360
-        std::cout << "Divert to heading " << m_DivertState.heading_deg << std::endl;
-        m_DivertState.altitude_m = m_CurrentState.altitude_m;
-        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
-        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;       
+        foundWCVHeadingResolution(DAIDALUS_bands);
     }
     else if (m_AvoidanceManeuverType == GROUNDSPEED)
     {
-        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
-        struct intervals
-        {
-            double lower;
-            double upper;
-        };
-        std::vector<intervals> bands, r_bands;
-        intervals temp;
-        for (uint i = 0; i < DAIDALUS_bands->getWCVGroundSpeedIntervals().size(); i++)
-        {
-            temp.lower = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[0];
-            temp.upper = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[1];
-            bands.push_back(temp);
-        }
-        
-        uint initial_band = 0;  //band that the initial heading was in.
-        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-        for (uint i = 0; i < bands.size(); i++)
-        {
-            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
-            {
-                m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps;
-                if (!isFound)
-                {
-                    initial_band = i;
-                    isFound = true;
-                }
-            }
-        }
-        
-        if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
-        {
-            for (int i = initial_band; i >= 0; i--)
-            {
-                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.horizontal_speed_mps))
-                {
-                    m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps;
-                }
-            }
-        }
-        
-        if ((m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps) && (DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size() > 0)) //If after checking right turns and left turns no better heading found, keep current heading
-        {
-            m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
-            bool isRecoveryFound = false;
-            for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size(); i++)
-            {
-                temp.lower = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[0];
-                temp.upper = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[1];
-                r_bands.push_back(temp);
-            }
-            
-            for (uint i = 0; i < r_bands.size(); i++)
-            {
-                if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
-                {
-                    m_DivertState.horizontal_speed_mps = r_bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
-                    isRecoveryFound = true;
-                    break;
-                }
-            }
-            
-            if (!isRecoveryFound)
-            {
-                for (int i = r_bands.size(); i >= 0; i--)
-                    if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
-                    {
-                        m_DivertState.horizontal_speed_mps = r_bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
-                        break;
-                    }
-            }
-            
-        }
-        
-        m_DivertState.altitude_m = m_CurrentState.altitude_m;
-        m_DivertState.heading_deg = m_CurrentState.heading_deg;
-        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;        
+        foundWCVGroundSpeedResolution(DAIDALUS_bands);
     }
     else if (m_AvoidanceManeuverType == VERTICALSPEED)
     {
-        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
-        struct intervals
-        {
-            double lower;
-            double upper;
-        };
-        std::vector<intervals> bands, r_bands;
-        intervals temp;
-        for (uint i = 0; i < DAIDALUS_bands->getWCVVerticalSpeedIntervals().size(); i++)
-        {
-            temp.lower = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[0];
-            temp.upper = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[1];
-            bands.push_back(temp);
-        }
-        
-        uint initial_band = 0;  //band that the initial heading was in.
-        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-        for (uint i = 0; i < bands.size(); i++)
-        {
-            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.vertical_speed_mps))
-            {
-                m_DivertState.vertical_speed_mps = bands[i].upper + m_verticalspeed_interval_buffer_mps;
-                if (!isFound)
-                {
-                    initial_band = i;
-                    isFound = true;
-                }
-            }
-        }
-        
-        if (m_DivertState.vertical_speed_mps > m_vertical_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
-        {
-            for (int i = initial_band; i >= 0; i--)
-            {
-                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.vertical_speed_mps))
-                {
-                    m_DivertState.vertical_speed_mps = bands[i].lower - m_verticalspeed_interval_buffer_mps;
-                }
-            }
-        }
-        
-        if ((m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps) && (DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size() > 0))//If after checking right turns and left turns no better heading found, keep current heading
-        {
-            //m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
-            bool isRecoveryFound = false;
-            for (uint i = 0; i < DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size(); i++)
-            {
-                temp.lower = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[0];
-                temp.upper = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[1];
-                r_bands.push_back(temp);
-            }
-            
-            for (uint i = 0; i < bands.size(); i++)
-            {
-                if ((r_bands[i].lower > m_CurrentState.vertical_speed_mps) && (r_bands[i].upper > m_CurrentState.vertical_speed_mps))
-                {
-                    m_DivertState.vertical_speed_mps = r_bands[i].lower + m_verticalspeed_interval_buffer_mps / 2.0;
-                    isRecoveryFound = true;
-                    break;
-                }
-            }
-            
-            if (!isRecoveryFound)
-            {
-                for (int i = r_bands.size(); i >= 0; i--)
-                    if ((r_bands[i].lower < m_CurrentState.vertical_speed_mps) && (r_bands[i].upper < m_CurrentState.vertical_speed_mps))
-                    {
-                        m_DivertState.vertical_speed_mps = r_bands[i].upper - m_verticalspeed_interval_buffer_mps / 2.0;
-                        break;
-                    }
-            }
-        }
-        
-        m_DivertState.altitude_m = m_CurrentState.altitude_m;
-        m_DivertState.heading_deg = m_CurrentState.heading_deg;
-        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;        
+        foundWCVVerticalSpeedResolution(DAIDALUS_bands);
     }
     else
     {
-        m_DivertState.altitude_m = m_CurrentState.altitude_m;
-        struct intervals
-        {
-            double lower;
-            double upper;
-        };
-        std::vector<intervals> bands, r_bands;
-        intervals temp;
-        for (uint i = 0; i < DAIDALUS_bands->getWCVAlitudeIntervals().size(); i++)
-        {
-            temp.lower = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[0];
-            temp.upper = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[1];
-            bands.push_back(temp);
-        }
-        
-        uint initial_band = 0;  //band that the initial heading was in.
-        bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-        for (uint i = 0; i < bands.size(); i++)
-        {
-            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.altitude_m))
-            {
-                m_DivertState.altitude_m = bands[i].upper + m_altitude_interval_buffer_m;
-                if (!isFound)
-                {
-                    initial_band = i;
-                    isFound = true;
-                }
-            }
-        }
-        
-        if (m_DivertState.altitude_m > m_altitude_max_m)  //If divert heading is greater than 360, a left turn is preferred.
-        {
-            for (int i = initial_band; i >= 0; i--)
-            {
-                if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.altitude_m))
-                {
-                    m_DivertState.altitude_m = bands[i].lower - m_altitude_interval_buffer_m;
-                }
-            }
-        }
-        
-        if ((m_DivertState.altitude_m < m_altitude_min_m) && (DAIDALUS_bands->getRecoveryAltitudeIntervals().size() > 0))//If after checking right turns and left turns no better heading found, keep current heading
-        {
-            //m_DivertState.altitude_m = m_CurrentState.altitude_m;
-            bool isRecoveryFound = false;
-            for (uint i = 0; i < DAIDALUS_bands->getRecoveryAltitudeIntervals().size(); i++)
-            {
-                temp.lower = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[0];
-                temp.upper = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[1];
-                r_bands.push_back(temp);
-            }
-            
-            for (uint i = 0; i < r_bands.size(); i++)
-            {
-                if ((r_bands[i].lower > m_CurrentState.altitude_m) && (r_bands[i].upper > m_CurrentState.altitude_m))
-                {
-                    m_DivertState.altitude_m = r_bands[i].lower + m_altitude_interval_buffer_m / 2.0;
-                    isRecoveryFound = true;
-                    break;
-                }
-            }
-            
-            if (!isRecoveryFound)
-            {
-                for (int i = r_bands.size(); i >= 0; i--)
-                    if ((r_bands[i].lower < m_CurrentState.altitude_m) && (r_bands[i].upper < m_CurrentState.altitude_m))
-                    {
-                        m_DivertState.altitude_m = r_bands[i].upper - m_altitude_interval_buffer_m / 2.0;
-                        break;
-                    }
-            }
-            std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
-            std::cout << std::endl;
-        }
-        //m_DivertState.altitude_m = m_CurrentState.altitude_m + 450; //testing change altitude
-        m_DivertState.vertical_speed_mps = 0.0; //m_CurrentState.vertical_speed_mps;--"fix" for inconsistency in DivertState.
-        m_DivertState.heading_deg = m_CurrentState.heading_deg;
-        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;        
+        foundWCVAltitudeResolution(DAIDALUS_bands);//do stuff
     }
 }
 
-bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands)
+bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
 {
     //TODO:  accept maneuver type as a parameter and consider safe to return for altitude, ground speed, and vertical speed maneuvers.
     //TODO:  maybe add distance to intruders > DMD as a condition on safe to return.
@@ -867,7 +905,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         {
             m_action_time_threshold_s = configuration->getAlertTime3();
         }
-        
+        m_priority_time_threshold_s = m_action_time_threshold_s / 2.0;
         m_vertical_rate_mps = configuration->getVerticalRate();
         m_horizontal_accel_mpsps = configuration->getHorizontalAcceleration();
         m_vertical_accel_G = configuration->getVerticalAcceleration();
@@ -898,6 +936,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
         if (m_isReadyToActMissionCommand && m_isReadyToActConfiguration)
         {
             std::vector<int64_t> ConflictResolutionList;
+            int local_priority = 0;
             for (size_t i = 0; i < pWCVIntervals->getEntityList().size(); i++)
             {
                 if (pWCVIntervals->getTimeToViolationList()[i] <= m_action_time_threshold_s)
@@ -905,6 +944,18 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     std::cout << "Adding " << pWCVIntervals->getEntityList()[i] << " to the Conflict Resolution List" << std::endl;
                     ConflictResolutionList.push_back(pWCVIntervals->getEntityList()[i]);
                 }
+                if (pWCVIntervals->getTimeToViolationList()[i] <= m_priority_time_threshold_s)
+                {
+                    local_priority = local_priority + 1;
+                }
+            }
+            if (local_priority > 0) 
+            {
+                m_priority = High;
+            }
+            else
+            {
+                m_priority = Standard;
             }
             int64_t RoW;
             if (ConflictResolutionList.size() > 0)

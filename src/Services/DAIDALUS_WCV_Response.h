@@ -127,6 +127,7 @@ public:
 
 private:
     enum states {OnMission=1, InConflict, OnHold} m_state{OnMission};
+    enum priority {Standard = 1, High = 2} m_priority{Standard};
     int64_t m_VehicleID;
     bool m_isConflict {false};  //boolean stating whether or not a potential WCV has been detected that requires action
     bool m_isOnMission {false};  //boolean stating whether or not UAV is executing waypoints on Mission or not (diverting)
@@ -144,6 +145,7 @@ private:
     double m_tolerance_clock_s;
     double m_tolerance_threshold_time_s{5};  //time needed to stay within desired state to be considered attained--seconds
     double m_action_time_threshold_s;   // time threshold to hold when taking action
+    double m_priority_time_threshold_s; //time threshold to raise priority level when taking action
     double m_action_hold_release_time_s;  //time at which an action hold must be released
     double m_vertical_rate_mps; //DAIDALUS configuration vertical rate used for estimation of time to perform altitude maneuver
     double m_turn_rate_degps;   //DAIDALUS configuration turn rate used for estimation of time to perform heading/track maneuver
@@ -187,10 +189,13 @@ private:
         afrl::cmasi::SpeedType::SpeedType speed_type;
     }m_CurrentState, m_DivertState, m_ReturnState;
     void ResetResponse();
-    void SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_bands);
+    void SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands);
     bool isWithinTolerance();
-    bool isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals> DAIDALUS_band);
-    
+    bool isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_band);
+    bool foundWCVAltitudeResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands);
+    bool foundWCVVerticalSpeedResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands);
+    bool foundWCVGroundSpeedResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands);
+    bool foundWCVHeadingResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands);
     
    };
 
