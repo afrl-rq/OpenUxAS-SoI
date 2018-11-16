@@ -146,10 +146,10 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
         temp.lower = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[0];
         temp.upper = DAIDALUS_bands->getWCVGroundHeadingIntervals()[i]->getGroundHeadings()[1];
         bands.push_back(temp);
-        std::cout << "Lower = " << temp.lower << std::endl;
-        std::cout << "Upper = " << temp.upper << std::endl;
+//        std::cout << "Lower = " << temp.lower << std::endl;
+//        std::cout << "Upper = " << temp.upper << std::endl;
     }
-    std::cout << std::endl;
+//    std::cout << std::endl;
     if (bands.size() == 0)
     {
         //Expected conflict bands but found none--set divert state to current state
@@ -675,8 +675,14 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
     bool altitude_resolution_good, heading_resolution_good, groundspeed_resolution_good;
     switch (m_priority)
     {
+//        std::cout << std::endl;
+//        std::cout << "PRIORITY = " << m_priority << std::endl;
+//        std::cout << std::endl;
         case 1:
             altitude_resolution_good = foundWCVAltitudeResolution(DAIDALUS_bands);
+//            std::cout << std::endl;
+//            std::cout << "Altitude resolution is good as a " << altitude_resolution_good << " statement." << std::endl;
+//            std::cout << std::endl;
             if (!altitude_resolution_good)
             {
                 heading_resolution_good = foundWCVHeadingResolution(DAIDALUS_bands);
@@ -686,6 +692,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
                 }
                 
             }
+            break;
         case 2:
             groundspeed_resolution_good = foundWCVGroundSpeedResolution(DAIDALUS_bands);
             if (!groundspeed_resolution_good)
@@ -697,6 +704,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
                 }
                 
             }
+            break;
             
     }
     
