@@ -150,13 +150,19 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
         std::cout << "Upper = " << temp.upper << std::endl;
     }
     std::cout << std::endl;
+    if (bands.size() == 0)
+    {
+        //Expected conflict bands but found none--set divert state to current state
+        return false;
+    }
     uint initial_band = 0;  //band that the initial heading was in.
     bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
-    for (uint i = 0; i < bands.size(); i++)
+    for (uint i = 0; i < bands.size(); i++) //loop over the bands trying to set divert action to the maximum (right hand turn) of an interval until no 
+        //more consecutive intervals are found
     {
         if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
         {
-            m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
+            m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg; //set divert heading to just over the maximum of the interval that current heading was found in
             if (!isFound)
             {
                 initial_band = i;
@@ -166,11 +172,14 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
     }
     if (m_DivertState.heading_deg > m_heading_max_deg)  //If divert heading is greater than 360, check to see if a right turn is still possible if not turn left
     {
+        // this loop checks the angle wrapped form of the divert action to see if increased turn to the right can find a heading that is not in conflict
+        // process terminates immediately when a conflict interval does not contain the candidate divert heading
         for (uint i = 0; i < bands.size(); i++)
         {
             if (isInRange(bands[i].lower, bands[i].upper, std::fmod(m_DivertState.heading_deg + 360.0, 360.0)))
             {
-                m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg;
+                m_DivertState.heading_deg = bands[i].upper + m_heading_interval_buffer_deg; // if angle wrapped divert heading is found in an interval,
+                //set divert heading to just over the maximum of the interval
             }
             else
             {
@@ -184,16 +193,18 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
     {
         m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
     }
-    else
+    else 
     {
+        //this branch attempts to find a left turn for divert heading by looping over the intervals from last to first--already know some bands exist
         for (int i = initial_band; i >= 0; i--)
         {
             if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.heading_deg))
             {
-                m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg;
+                m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg; // set divert heading to just under the interval minimum 
+                // that contains the current heading--loop over the bands from the current band to the initial band
             }
         }
-        if (m_DivertState.heading_deg < m_heading_min_deg)
+        if (m_DivertState.heading_deg < m_heading_min_deg)  //check for angle wrap if candidate divert heading is less than the minimum
         {
             for (int i = bands.size(); i >=0; i--)
             {
@@ -249,6 +260,12 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
             std::cout << std::endl;
            //use right turn recovery band
         }
+        else
+        {
+            guaranteed_flag = false;
+            std::cout << "No resolution found. Divert heading is " << m_DivertState.heading_deg << std::endl;
+            std::cout << std::endl;
+        }
     }
     //TODO: Determine recommended action from DAIDALUS--done
     //TODO: set action response to aforementioned recommended action--done
@@ -262,6 +279,7 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
 }
 bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
 {
+    //slower speeds preferred
     bool guaranteed_flag = true;
     m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
     m_DivertState.altitude_m = m_CurrentState.altitude_m;
@@ -280,39 +298,48 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
         temp.upper = DAIDALUS_bands->getWCVGroundSpeedIntervals()[i]->getGroundSpeeds()[1];
         bands.push_back(temp);
     }
-
+    if (bands.size()== 0)
+    {
+        //unexpected result
+        std::cout << "Expected conflict bands but found none." << std::endl;
+        return false;
+    }
     uint initial_band = 0;  //band that the initial heading was in.
-    bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
     for (uint i = 0; i < bands.size(); i++)
     {
         if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
         {
-            m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps;
-            if (!isFound)
-            {
-                initial_band = i;
-                isFound = true;
-            }
+            initial_band = i;
+            break;
+        }
+    }
+    
+    for (int i = initial_band; i >= 0; i--)
+    {
+        if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
+        {
+            m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps;
         }
     }
 
-    if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
+    if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps)  //If divert speed is less than min, a speed up is preferred.
     {
-        for (int i = initial_band; i >= 0; i--)
+        for (uint i = initial_band; i < bands.size(); i++)
         {
             if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.horizontal_speed_mps))
             {
-                m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps;
+                m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps;
             }
         }
     }
 
-    if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps)  //If after checking right turns and left turns no better heading found, keep current heading
+    if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If after checking right turns and left turns no better heading found, keep current heading
     {
         guaranteed_flag = false;
         if (DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size() > 0)
         {
             bool isRecoveryFound = false;
+            //ASSERT(Recovery bands will never span the entire range)--Need to set recovery volume to start at well clear volume
             //m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
             for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size(); i++)
             {
@@ -321,11 +348,12 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
                 r_bands.push_back(temp);
             }
 
-            for (uint i = 0; i < r_bands.size(); i++)
+            for (int i = r_bands.size(); i >= 0; i--)
             {
-                if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
+//                if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
+                if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
                 {
-                    m_DivertState.horizontal_speed_mps = r_bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
+                    m_DivertState.horizontal_speed_mps = r_bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
                     isRecoveryFound = true;
                     break;
                 }
@@ -333,14 +361,19 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
 
             if (!isRecoveryFound)
             {
-                for (int i = r_bands.size(); i >= 0; i--)
-                    if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
+                for (uint i = 0; i < r_bands.size(); i++)
+//                    if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
+                    if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
                     {
-                        m_DivertState.horizontal_speed_mps = r_bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
+                        m_DivertState.horizontal_speed_mps = r_bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
                         break;
                     }
             }
 
+        }
+        else 
+        {
+            m_DivertState.horizontal_speed_mps = m_ground_speed_min_mps;
         }
     }
     return guaranteed_flag;    
@@ -365,7 +398,11 @@ bool DAIDALUS_WCV_Response::foundWCVVerticalSpeedResolution(const std::shared_pt
         temp.upper = DAIDALUS_bands->getWCVVerticalSpeedIntervals()[i]->getVerticalSpeeds()[1];
         bands.push_back(temp);
     }
-
+    if (bands.size() == 0)
+    {
+        //Expected conflict bands but found none--set divert state to current state
+        return false;
+    }
     uint initial_band = 0;  //band that the initial heading was in.
     bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
     for (uint i = 0; i < bands.size(); i++)
@@ -450,7 +487,11 @@ bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<lar
         temp.upper = DAIDALUS_bands->getWCVAlitudeIntervals()[i]->getAltitude()[1];
         bands.push_back(temp);
     }
-
+    if (bands.size() == 0)
+    {
+        //Expected conflict bands but found none--set divert state to current state (minus vertical speed)
+        return false;
+    }
     uint initial_band = 0;  //band that the initial heading was in.
     bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
     for (uint i = 0; i < bands.size(); i++)
@@ -510,8 +551,14 @@ bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<lar
                         break;
                     }
             }
+        }
+        else
+        {
+            guaranteed_flag = false;
+            m_DivertState.altitude_m = m_altitude_max_m;
             std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
             std::cout << std::endl;
+
         }
         //m_DivertState.altitude_m = m_CurrentState.altitude_m + 450; //testing change altitude
     }
@@ -609,22 +656,50 @@ bool DAIDALUS_WCV_Response::isWithinTolerance()
 
 void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
 {
-    if (m_AvoidanceManeuverType == HEADING)
+//    if (m_AvoidanceManeuverType == HEADING)
+//    {
+//        foundWCVHeadingResolution(DAIDALUS_bands);
+//    }
+//    else if (m_AvoidanceManeuverType == GROUNDSPEED)
+//    {
+//        foundWCVGroundSpeedResolution(DAIDALUS_bands);
+//    }
+//    else if (m_AvoidanceManeuverType == VERTICALSPEED)
+//    {
+//        foundWCVVerticalSpeedResolution(DAIDALUS_bands);
+//    }
+//    else
+//    {
+//        foundWCVAltitudeResolution(DAIDALUS_bands);//do stuff
+//    }
+    bool altitude_resolution_good, heading_resolution_good, groundspeed_resolution_good;
+    switch (m_priority)
     {
-        foundWCVHeadingResolution(DAIDALUS_bands);
+        case 1:
+            altitude_resolution_good = foundWCVAltitudeResolution(DAIDALUS_bands);
+            if (!altitude_resolution_good)
+            {
+                heading_resolution_good = foundWCVHeadingResolution(DAIDALUS_bands);
+                if (!heading_resolution_good)
+                {
+                    groundspeed_resolution_good = foundWCVGroundSpeedResolution(DAIDALUS_bands);
+                }
+                
+            }
+        case 2:
+            groundspeed_resolution_good = foundWCVGroundSpeedResolution(DAIDALUS_bands);
+            if (!groundspeed_resolution_good)
+            {
+                heading_resolution_good = foundWCVHeadingResolution(DAIDALUS_bands);
+                if (!heading_resolution_good)
+                {
+                    altitude_resolution_good = foundWCVAltitudeResolution(DAIDALUS_bands);
+                }
+                
+            }
+            
     }
-    else if (m_AvoidanceManeuverType == GROUNDSPEED)
-    {
-        foundWCVGroundSpeedResolution(DAIDALUS_bands);
-    }
-    else if (m_AvoidanceManeuverType == VERTICALSPEED)
-    {
-        foundWCVVerticalSpeedResolution(DAIDALUS_bands);
-    }
-    else
-    {
-        foundWCVAltitudeResolution(DAIDALUS_bands);//do stuff
-    }
+    
 }
 
 bool DAIDALUS_WCV_Response::isSafeToReturnToMission(const std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>& DAIDALUS_bands)
