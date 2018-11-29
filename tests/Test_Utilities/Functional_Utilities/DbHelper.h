@@ -28,10 +28,6 @@
 
 class DbHelper{
 public:
-//    DbHelper(std::string dbLogPath);
-//    DbHelper(const DbHelper& orig);
-//    virtual ~DbHelper();
-    
     DbHelper(const std::string& dbLogPath) : dbLogPath(dbLogPath)
     {
     }
@@ -49,14 +45,14 @@ public:
 private:
     std::string dbLogPath;
 private:
-//    std::vector<LoggedMessage> getMessagesWithDescriptor(std::string descriptor);
-//    std::vector<LoggedMessage> getMessagesWithSqlString(std::string sqlString);
+    //queries the Db with the message's descriptor and returns LoggedMessages
     std::vector<std::shared_ptr<LoggedMessage>> getMessagesWithDescriptor(std::string descriptor)
     {
         std::string queryString = "SELECT * FROM msg WHERE descriptor = \"" + descriptor +"\"";
         return getMessagesWithSqlString(queryString);
     }
 
+    //queries the db with the sql string and returns LoggedMessages
     std::vector<std::shared_ptr<LoggedMessage>> getMessagesWithSqlString(std::string queryString)
     {
         std::vector<std::shared_ptr<LoggedMessage>> loggedMessages;

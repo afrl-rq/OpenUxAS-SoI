@@ -22,32 +22,7 @@
 
 class XmlHelper {
 public:
-//    //assigns root node based on xmlStringRepresentation
-//    XmlHelper(std::string xmlStringRepresentation);
-//    XmlHelper(pugi::xml_document xmlDocument);
-//    XmlHelper(const XmlHelper& orig);
-//    virtual ~XmlHelper();
-//    
-//    //Setter for the root node based on a string representation of the xml
-//    void SetRootNode(std::string xmlStringRepresentation);
-//    
-//    //Setter for the xml helpers root node through a document. Allows a single XmlHelper service to be used for tests
-//    void SetRootNode(pugi::xml_document* doc);
-//    
-//    //Getter for the root node.
-//    pugi::xml_node GetRootNode();
-//
-//    //looks for a particular node by the tag string then returns the text (returns the text of the first node found in GetDescendentsByName)
-//    std::string GetFirstTagText(std::string childTagName);
-//    
-//    //looks for a particular node by the tag string, then returns the text (returns all)
-//    std::vector<std::string> GetAllMatchingTagsText(std::string childTagName);
-//    
-//    //get the descendents of the current XmlHelper's root node by name
-//    std::vector<pugi::xml_node> GetDescendentsByName(std::string name);
-//    
-//    //performs a one way check for matching content in the second node from the first node
-//    static bool DoNodesMatch(pugi::xml_node firstNode, pugi::xml_node secondNode);
+
 XmlHelper(std::string xmlStringRepresentation){
     rootNode = stringToXmlNode(xmlStringRepresentation);
 }
@@ -124,19 +99,23 @@ static bool DoNodesMatch(pugi::xml_node firstNode, pugi::xml_node secondNode)
     return true;
 }
 
+//get the descendents of the current XmlHelper's tree by name
 std::vector<pugi::xml_node> GetDescendentsByName(std::string name) {
 	return getDescendentsOfNodeByName(rootNode, name);
 }
 
+// Setter for the root node based on a string representation of the xml
 void SetRootNode(std::string xmlStringRepresentation) {
 	this->rootNode = stringToXmlNode(xmlStringRepresentation);
 }
 
+// Setter for the xml helpers root node through a document. Allows a single XmlHelper service to be used for tests
 void SetRootNode(pugi::xml_document* doc) {
 	this->document = doc;
 	this->rootNode = this->document->document_element();
 }
 
+// Returns the root node of the xml tree
 pugi::xml_node GetRootNode() {
 	return rootNode;
 }
@@ -147,13 +126,8 @@ private:
 
     //the document containing the root node. Note: the document must be stored, otherwise the xml_nodes will not exist
     pugi::xml_document* document = new pugi::xml_document();
-
-//    //converts a string and allows reading as long as XmlHelper is in scope by converting string to XmlHelper's xml_document
-//    pugi::xml_node stringToXmlNode(std::string xmlStringRepresentation);
-//
-//    //return a vector of xml_node with the matching name. Note: Returns all matching children regardless of depth in tree
-//    std::vector<pugi::xml_node> getDescendentsOfNodeByName(pugi::xml_node node, std::string name);
     
+    // converts a string to an xml node
     pugi::xml_node stringToXmlNode(std::string xmlStringRepresentation){
 	document->load(xmlStringRepresentation.c_str());
 	if (document->empty())
@@ -161,13 +135,11 @@ private:
 	return document->document_element();
     }
     
+    // gets the descendents of a node by the descendents name
     std::vector<pugi::xml_node> getDescendentsOfNodeByName(pugi::xml_node node, std::string name)
     {
         const auto children = node.children();
         std::vector<pugi::xml_node> matchedNodes;
-        //if ((children.begin()) == children.end()){
-        //        return matchedNodes;}
-        //for(auto child : children){
         for(auto child = children.begin(); child != children.end(); ++child){
             std::cout << child->name() << std::endl;
             auto childMatchedNodes = getDescendentsOfNodeByName(*child, name);

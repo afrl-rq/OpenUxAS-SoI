@@ -20,16 +20,7 @@
 #include <iostream>
 class LoggedMessage {
 public:
-//    LoggedMessage(int id, int time_ms, std::string descriptor, std::string groupID, int entityID, int serviceID, std::string xml);
-//    LoggedMessage(const LoggedMessage& orig);
-//    int GetId();
-//    int GetTime();
-//    std::string GetDescriptor();
-//    std::string GetGroupId();
-//    int GetEntityId();
-//    int GetServiceId();
-//    std::string GetXml();
-//    virtual ~LoggedMessage();
+    
     LoggedMessage(int id, int64_t time_ms, std::string descriptor, std::string groupID, int entityID, int serviceID, std::string xml) :
     id(id), time_ms(time_ms), descriptor(descriptor), groupID(groupID), entityID(entityID), serviceID(serviceID), xml(xml){
     }
@@ -40,30 +31,37 @@ public:
     ~LoggedMessage() {
     }
 
+    // returns the id of the logged message
     int GetId(){
         return id;
     }
 
+    // returns the time the logged message was sent
     int64_t GetTime(){
         return time_ms;
     }
 
+    // returns the descriptor of the logged message
     std::string GetDescriptor(){
         return descriptor;
     }
 
+    // returns the group id of the logged message
     std::string GetGroupId(){
         return groupID;
     }
 
+    //returns the entity id of the logged message
     int GetEntityId(){
         return entityID;
     }
 
+    //returns the service id of the logged message
     int GetServiceId(){
         return serviceID;
     }
 
+    //returns the raw xml of the logged message
     std::string GetXml(){
         return xml;
     }

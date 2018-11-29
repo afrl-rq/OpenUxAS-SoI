@@ -66,10 +66,6 @@ public:
     
     //checks for each footprint's VehicleID must be represented as the EntityID of an EntityConfiguration
     bool DoFootprintVehiclesExist(){
-        //first get the logged entity configurations and make new map with time
-        // entity configurations are afrl.cmasi.EntityConfiguration, afrl.cmasi.AirVehicleConfiguration, afrl.impact.RadioTowerConfiguration, afrl.vehicles.GroundVehicleConfiguration, afrl.vehicles.SurfaceVehicleConfiguration, and afrl.vehicles.StationarySensorConfiguration, 
-        //NOTE: This is a brittle approach. Is it possible to get the subscription string for each of these messages with just the entity configuration?
-        
         //make vector of all entity configuration subscription addresses (descriptors) to query db with
         std::vector<std::string> descriptors = afrl::cmasi::EntityConfigurationDescendants();
         descriptors.push_back(afrl::cmasi::EntityConfiguration::Subscription);
