@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<AreaSearchTask Series="CMASI">
+  <SearchArea>
+    <Rectangle Series="CMASI">
+      <CenterPoint>
+        <Location3D Series="CMASI">
+          <Latitude>30.515660933262527</Latitude>
+          <Longitude>-87.16525113484647</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </CenterPoint>
+      <Width>7654.3354</Width>
+      <Height>2064.247</Height>
+      <Rotation>0.0</Rotation>
+    </Rectangle>
+  </SearchArea>
+  <ViewAngleList/>
+  <DesiredWavelengthBands/>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0.0</GroundSampleDistance>
+  <TaskID>100</TaskID>
+  <Label/>
+  <EligibleEntities/>
+  <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</AreaSearchTask>
+

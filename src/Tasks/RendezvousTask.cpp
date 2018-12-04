@@ -19,10 +19,14 @@
 #include "FlatEarth.h"
 #include "RouteExtension.h"
 #include "afrl/cmasi/AirVehicleConfiguration.h"
+#include "afrl/cmasi/AirVehicleState.h"
 #include "uxas/messages/task/RendezvousTask.h"
 #include "afrl/cmasi/VehicleActionCommand.h"
 #include "uxas/messages/uxnative/SpeedOverrideAction.h"
 
+#ifdef AFRL_INTERNAL_ENABLED
+#include "afrl/famus/PlanningState.h"
+#endif
 namespace uxas
 {
 namespace service
@@ -47,13 +51,32 @@ bool
 RendezvousTask::configureTask(const pugi::xml_node& ndComponent)
 {
     UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Configuring Rendezvous Task!" );
-    
+
     // add subscription to TaskAssignmentSummary to determine the complete
     // set of vehicles assigned to this task
     addSubscriptionAddress(uxas::messages::task::TaskAssignmentSummary::Subscription);
     
     // add subscription to AssignmentCostMatrix to determine timing between options
     addSubscriptionAddress(uxas::messages::task::AssignmentCostMatrix::Subscription);
+
+    // Process task options
+    pugi::xml_node ndTaskOptions = ndComponent.child(m_taskOptions_XmlTag.c_str());
+    if (!ndTaskOptions)
+        return true;  // no options to process
+    for (pugi::xml_node ndTaskOption = ndTaskOptions.first_child();
+            ndTaskOption; ndTaskOption = ndTaskOption.next_sibling())
+    {
+        if (std::string("PreferSpeedOnly") == ndTaskOption.name())
+        {
+            pugi::xml_node ndOptionValue = ndTaskOption.first_child();
+            if(ndOptionValue)
+            {
+                std::string val = ndOptionValue.value();
+                std::transform(val.begin(), val.end(), val.begin(), ::tolower);
+                m_preferSpeedOnly = (val == "true");
+            }
+        }
+    }
     
     return true;
 }
@@ -181,53 +204,56 @@ void RendezvousTask::buildTaskPlanOptions()
     {
         for (auto v : itEligibleEntities->second)
         {
-            if(!rtask->getMultiLocationRendezvous())
+            // add an option for each distinct desired state at rendezvous
+            for(auto planstate : rtask->getRendezvousStates())
             {
-                // plan for each vehicle to meet at the same location
-                if(!rtask->getLocation()) break;
-                auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
-                auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
-                pTaskOptionClass->m_taskOption->setTaskID(taskId);
-                pTaskOptionClass->m_taskOption->setOptionID(optionId);
-                pTaskOptionClass->m_taskOption->setCost(0);
-                pTaskOptionClass->m_taskOption->setStartLocation(rtask->getLocation()->clone());
-                pTaskOptionClass->m_taskOption->setStartHeading(rtask->getHeading());
-                pTaskOptionClass->m_taskOption->setEndLocation(rtask->getLocation()->clone());
-                pTaskOptionClass->m_taskOption->setEndHeading(rtask->getHeading());
-                pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
-                m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
-                m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
-                optionMap[v].push_back(optionId);
-                optionId++;
-            }
-            else
-            {
-                // add an option for each distinct desired state at rendezvous
-                for(auto planstate : rtask->getRendezvousStates())
+                // these can be vehicle specific or for any vehicle (0 ID)
+                if(planstate->getEntityID() == 0 || planstate->getEntityID() == v)
                 {
-                    // these can be vehicle specific or for any vehicle (0 ID)
-                    if(planstate->getEntityID() == 0 || planstate->getEntityID() == v)
+                    auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
+                    auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
+                    pTaskOptionClass->m_taskOption->setTaskID(taskId);
+                    pTaskOptionClass->m_taskOption->setOptionID(optionId);
+                    pTaskOptionClass->m_taskOption->setCost(0);
+                    pTaskOptionClass->m_taskOption->setStartLocation(planstate->getPlanningPosition()->clone());
+                    pTaskOptionClass->m_taskOption->setStartHeading(planstate->getPlanningHeading());
+                    pTaskOptionClass->m_taskOption->setEndLocation(planstate->getPlanningPosition()->clone());
+                    pTaskOptionClass->m_taskOption->setEndHeading(planstate->getPlanningHeading());
+                    pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
+#ifdef AFRL_INTERNAL_ENABLED
+                    if(afrl::famus::isPlanningState(planstate))
                     {
-                        auto pTaskOption = std::make_shared<uxas::messages::task::TaskOption>();
-                        auto pTaskOptionClass = std::make_shared<TaskOptionClass>(pTaskOption);
-                        pTaskOptionClass->m_taskOption->setTaskID(taskId);
-                        pTaskOptionClass->m_taskOption->setOptionID(optionId);
-                        pTaskOptionClass->m_taskOption->setCost(0);
-                        pTaskOptionClass->m_taskOption->setStartLocation(planstate->getPlanningPosition()->clone());
-                        pTaskOptionClass->m_taskOption->setStartHeading(planstate->getPlanningHeading());
-                        pTaskOptionClass->m_taskOption->setEndLocation(planstate->getPlanningPosition()->clone());
-                        pTaskOptionClass->m_taskOption->setEndHeading(planstate->getPlanningHeading());
-                        pTaskOptionClass->m_taskOption->getEligibleEntities().push_back(v);
-                        m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
-                        m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
-                        optionMap[v].push_back(optionId);
-                        optionId++;
+                        auto famusPlanState = static_cast<afrl::famus::PlanningState*>(planstate);
+                        if(famusPlanState->getDesiredSpeed() > 1e-4)
+                            m_optionSpeed[optionId] = famusPlanState->getDesiredSpeed();
+                        if(!famusPlanState->getEnforceHeading())
+                        {
+                            if(planstate->getEntityID() && m_entityStates.find(planstate->getEntityID()) != m_entityStates.end())
+                            {
+                                // set end heading as bearing from current position
+                                uxas::common::utilities::FlatEarth flatEarth;
+                                auto loc = m_entityStates[planstate->getEntityID()]->getLocation();
+                                flatEarth.Initialize(loc->getLatitude()*n_Const::c_Convert::dDegreesToRadians(),
+                                                     loc->getLongitude()*n_Const::c_Convert::dDegreesToRadians());
+                                double north, east;
+                                flatEarth.ConvertLatLong_degToNorthEast_m(planstate->getPlanningPosition()->getLatitude(),
+                                                            planstate->getPlanningPosition()->getLongitude(), north, east);
+                                double bearing = atan2(east,north)*n_Const::c_Convert::dRadiansToDegrees();
+                                pTaskOptionClass->m_taskOption->setStartHeading(bearing);
+                                pTaskOptionClass->m_taskOption->setEndHeading(bearing);
+                            }
+                        }
                     }
+#endif
+                    m_optionIdVsTaskOptionClass.insert(std::make_pair(optionId, pTaskOptionClass));
+                    m_taskPlanOptions->getOptions().push_back(pTaskOptionClass->m_taskOption->clone());
+                    optionMap[v].push_back(optionId);
+                    optionId++;
                 }
             }
         }
     }
-    
+
     // check for self-consistency:
     //   a. all vehicles have a single option -OR-
     //   b. all vehicles have the same number of options AND
@@ -324,11 +350,48 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
 {
     UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), " Rendezvous Task processing route response!");
     
-    if(taskImplementationResponse->getTaskWaypoints().empty()) return false; 
-    auto wp = taskImplementationResponse->getTaskWaypoints().at(0);
-    if(!wp) return false;
-    if(wp->getSpeed() < 1e-4) return false;
-    double V = wp->getSpeed();
+    auto avstate = m_entityStates.find(taskImplementationResponse->getVehicleID());
+    if(avstate == m_entityStates.end()) return false;
+    auto entconfig = m_entityConfigurations.find(taskImplementationResponse->getVehicleID());
+    std::shared_ptr<afrl::cmasi::AirVehicleConfiguration> avconfig;
+    if(entconfig != m_entityConfigurations.end())
+        avconfig = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(entconfig->second);
+
+    // speed at which the maneuver should be planned
+    double V = avstate->second->getGroundspeed();
+    if(avconfig) V = avconfig->getNominalSpeed();
+    if(m_optionSpeed.find(taskOptionClass->m_taskOption->getOptionID()) != m_optionSpeed.end())
+        V = m_optionSpeed[taskOptionClass->m_taskOption->getOptionID()];
+
+    if(taskImplementationResponse->getTaskWaypoints().empty())
+    {
+        auto endwp = new afrl::cmasi::Waypoint;
+        endwp->setLatitude(taskOptionClass->m_taskOption->getEndLocation()->getLatitude());
+        endwp->setLongitude(taskOptionClass->m_taskOption->getEndLocation()->getLongitude());
+        endwp->setNumber(waypointId);
+        endwp->setNextWaypoint(waypointId);
+        endwp->getAssociatedTasks().push_back(m_task->getTaskID());
+        taskImplementationResponse->getTaskWaypoints().push_back(endwp);
+    }
+
+    // ensure speed and altitudes match request
+    for(auto twp : taskImplementationResponse->getTaskWaypoints())
+    {
+        twp->setSpeed(V);
+        twp->setSpeedType(afrl::cmasi::SpeedType::Airspeed);
+        twp->setAltitude(taskOptionClass->m_taskOption->getEndLocation()->getAltitude());
+        twp->setAltitudeType(taskOptionClass->m_taskOption->getEndLocation()->getAltitudeType());
+    }
+
+    if(taskImplementationResponse->getTaskWaypoints().size() == 1)
+    {
+        taskImplementationResponse->getTaskWaypoints().push_back(taskImplementationResponse->getTaskWaypoints().front()->clone());
+        taskImplementationResponse->getTaskWaypoints().at(0)->setLatitude(avstate->second->getLocation()->getLatitude());
+        taskImplementationResponse->getTaskWaypoints().at(0)->setLongitude(avstate->second->getLocation()->getLongitude());
+        taskImplementationResponse->getTaskWaypoints().at(0)->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().at(0)->getNumber()+1);
+        taskImplementationResponse->getTaskWaypoints().at(1)->setNumber(taskImplementationResponse->getTaskWaypoints().at(0)->getNumber()+1);
+        taskImplementationResponse->getTaskWaypoints().at(1)->setNextWaypoint(taskImplementationResponse->getTaskWaypoints().at(0)->getNumber()+1);
+    }
     
     // look up timing for each vehicle involved in the task
     auto assignsummary = m_assignmentSummary.find(taskImplementationResponse->getCorrespondingAutomationRequestID());
@@ -379,8 +442,6 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
                 if(vehicleStartTime == startTimes->second.end())
                 {
                     // look up from state message
-                    auto avstate = m_entityStates.find(taskImplementationResponse->getVehicleID());
-                    if(avstate == m_entityStates.end()) continue;
                     arrivalTime = optioncost->getTimeToGo() + avstate->second->getTime();
                 }
                 else
@@ -396,6 +457,7 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
     }
 
     // need to extend path, calculate actual path length
+    auto wp = taskImplementationResponse->getTaskWaypoints().at(0);
     uxas::common::utilities::FlatEarth flatEarth;
     flatEarth.Initialize(wp->getLatitude()*n_Const::c_Convert::dDegreesToRadians(),
                          wp->getLongitude()*n_Const::c_Convert::dDegreesToRadians());
@@ -418,23 +480,28 @@ bool RendezvousTask::isProcessTaskImplementationRouteResponse(std::shared_ptr<ux
 
     std::cout << "Extending route for " << taskImplementationResponse->getVehicleID() << " by amount (ms) " << extendTime_ms << std::endl;
     
-    // determine turn radius of extension maneuver
-    double R = 300.0; // default for SUAS
-    auto entconfig = m_entityConfigurations.find(taskImplementationResponse->getVehicleID());
-    if(entconfig != m_entityConfigurations.end())
+    // determine turn radius of extension maneuver and ability to match using speed only
+    double g = n_Const::c_Convert::dGravity_mps2();
+    double R = 1.2*V*V/g/tan(20.0*n_Const::c_Convert::dDegreesToRadians()); // assume 20 bank
+    double minV = V; // assume no ability to change speed;
+    if(avconfig)
     {
-        auto avconfig = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(entconfig->second);
-        if(avconfig)
-        {
-            // update loiter radius and lead-ahead distance based on configuration
-            double g = n_Const::c_Convert::dGravity_mps2();
-            // speed from waypoint
-            //double V = avconfig->getNominalSpeed();
-            double phi = fabs(avconfig->getNominalFlightProfile()->getMaxBankAngle());
-            if(phi < 1.0) phi = 1.0; // bounded away from 0
-            R = V*V/g/tan(phi*n_Const::c_Convert::dDegreesToRadians());
-            R = 1.2*R; // 20% buffer
-        }
+        minV = avconfig->getMinimumSpeed();
+        double maxV = avconfig->getMaximumSpeed();
+        double dmax = (std::max)(maxV - V, 0.0);
+        double dmin = (std::max)(V - minV, 0.0);
+        if(dmax < dmin) minV = V - dmax;
+        double phi = fabs(avconfig->getNominalFlightProfile()->getMaxBankAngle());
+        if(phi < 1.0) phi = 1.0; // bounded away from 0
+        R = V*V/g/tan(phi*n_Const::c_Convert::dDegreesToRadians());
+        R = 1.2*R; // 20% buffer
+    }
+
+    if (m_preferSpeedOnly)
+    {
+        double deltaV = V - minV;
+        if(deltaV > 1e-4 && extendTime_ms*deltaV < travelDist*1000)
+            return true; // assume we can meet with speed only
     }
     
     // extend waypoints
@@ -472,7 +539,12 @@ void RendezvousTask::activeEntityState(const std::shared_ptr<afrl::cmasi::Entity
     if(!avconfig) return;
 
     double speedNom_mps = avconfig->getNominalSpeed();
-    if(speedNom_mps < 1e-4) speedNom_mps = entityState->getGroundspeed();
+    if(speedNom_mps < 1e-4)
+    {
+        speedNom_mps = entityState->getGroundspeed();
+        auto avstate = std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(entityState);
+        if(avstate) speedNom_mps = avstate->getAirspeed();
+    }
     if(speedNom_mps < 1e-4) return;
     auto speedInterval = SpeedClip(avconfig, speedNom_mps);
 

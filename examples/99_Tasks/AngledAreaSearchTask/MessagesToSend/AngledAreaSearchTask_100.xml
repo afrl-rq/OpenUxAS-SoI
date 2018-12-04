@@ -1,0 +1,26 @@
+<AngledAreaSearchTask Series="IMPACT">
+  <SearchAreaID>1</SearchAreaID>
+  <SweepAngle>0</SweepAngle>
+  <StartPoint>
+    <Location3D Series="CMASI">
+      <Latitude>30.3575</Latitude>
+      <Longitude>-87.1466</Longitude>
+      <Altitude>0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+  </StartPoint>
+  <DesiredWavelengthBands>
+  </DesiredWavelengthBands>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0.5</GroundSampleDistance>
+  <TaskID>100</TaskID>
+  <Label/>
+  <EligibleEntities>
+  </EligibleEntities>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</AngledAreaSearchTask>
+

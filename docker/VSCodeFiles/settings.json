@@ -1,0 +1,25 @@
+{
+    "files.exclude": {
+        "**/.git*": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/examples": false,
+        "**/mdms": true,
+        "**/build*": true,
+        "**/doc*": true,
+        "**/ci*": true,
+        "**/3rd*": false,
+        "**/tests*": false,
+        "**/resources*": false,
+        "**/meson*": false,
+        "**/*.md": true,
+        "**/.*": true,
+        "**/*.txt": true,
+        "**/*.py": true,
+        "**/*.sh": true,
+        "**/prepare": true,
+        "**/rm-external": true,
+    }
+}

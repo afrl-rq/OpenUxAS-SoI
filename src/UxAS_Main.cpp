@@ -23,6 +23,7 @@
 #include "UxAS_StringUtil.h"
 
 #ifdef AFRL_INTERNAL_ENABLED
+#include "afrl/famus/PointSearchTask.h"
 //#include "UxAS_SerialPortEmulator.h"
 #endif
 
@@ -89,6 +90,11 @@ main(int argc, char** argv)
             std::cout << "   VERSION: " << MAJOR_VERSION << "." << MINOR_VERSION << "." << PATCH_VERSION << std::endl;
             std::cout << "     CMASI:  " << o->getSeriesVersion() << std::endl;
             std::cout << "     IMPACT: " << p->getSeriesVersion() << std::endl;
+#ifdef AFRL_INTERNAL_ENABLED
+            auto q = new afrl::famus::PointSearchTask;
+            std::cout << "      FAMUS: " << q->getSeriesVersion() << std::endl;
+            delete q;
+#endif
             std::cout << "#######################" << std::endl << std::endl;
             delete o;
             delete p;

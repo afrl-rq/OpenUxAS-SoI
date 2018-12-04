@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS FormatVersion="1.0" EntityID="100" EntityType="Aircraft">
+
+    <Service Type="OsmPlannerService" OsmFile="../MessagesToSend/Pensacola_Map.xml"/>
+
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>   
+    <Service Type="AutomationDiagramDataService"/>
+
+    <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
+  <Service Type="WaypointPlanManagerService" VehicleID="13" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="130"/>
+    <Service Type="WaypointPlanManagerService" VehicleID="14" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="140"/>
+      <Service Type="WaypointPlanManagerService" VehicleID="15" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="150"/>
+        <Service Type="WaypointPlanManagerService" VehicleID="16" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="160"/>
+
+
+    <Service Type="BatchSummaryService"/>
+
+    <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+        <Message MessageFileName="GroundVehicleConfiguration_13.xml" SendTime_ms="100"/>
+        <Message MessageFileName="GroundVehicleState_13.xml" SendTime_ms="100"/>
+        <Message MessageFileName="GroundVehicleConfiguration_14.xml" SendTime_ms="200"/>
+        <Message MessageFileName="GroundVehicleState_14.xml" SendTime_ms="200"/>
+        <Message MessageFileName="GroundVehicleConfiguration_15.xml" SendTime_ms="300"/>
+        <Message MessageFileName="GroundVehicleState_15.xml" SendTime_ms="300"/>
+        <Message MessageFileName="GroundVehicleConfiguration_16.xml" SendTime_ms="400"/>
+        <Message MessageFileName="GroundVehicleState_16.xml" SendTime_ms="400"/>
+
+        <Message MessageFileName="CordonTask_100.xml" SendTime_ms="3400"/>
+        <Message MessageFileName="AutomationRequest_CordonTask.xml" SendTime_ms="4500"/>
+    </Service>
+
+    <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>

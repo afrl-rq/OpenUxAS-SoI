@@ -26,6 +26,11 @@ bool RouteExtension::ExtendPath(std::vector<afrl::cmasi::Waypoint*>& wplist, int
     DubinsWaypoint startwp(east, north, 0.0, 0.0, 0.0, 0);
     index++;
 
+    size_t maxLengthClearSegment{0};
+    double clearedLength{0.0};
+    double extendlen_max{0.0};
+    double minNeeded_max{0.0};
+
     // assume *ordered* waypoint list
     while(index < wplist.size())
     {
@@ -43,31 +48,57 @@ bool RouteExtension::ExtendPath(std::vector<afrl::cmasi::Waypoint*>& wplist, int
 
         // TODO: check segment for clearance of 2*R
 
-        // check segment length for possible extension
+        // find longest segment that allows extension
         double seglen = sqrt( (endwp.x-startwp.x)*(endwp.x-startwp.x) + (endwp.y-startwp.y)*(endwp.y-startwp.y) );
-        if(seglen >= minlen)
+        if(seglen >= minlen && seglen > clearedLength)
         {
-            // build extension waypoints
-            std::vector<DubinsWaypoint> dubins_extension = ExtendSegment(startwp, endwp, extendlen, R);
-            std::vector<afrl::cmasi::Waypoint*> extension = DiscretizeExtension(dubins_extension, d, flatEarth, wplist[index]);
-
-            // insert extension, saving ID of next original point after extension
-            int64_t wp_id = wplist[index]->getNumber();
-            wplist.insert(wplist.begin()+index, extension.begin(), extension.end());
-
-            // re-number and re-build 'next' fields (linked list)
-            while(index < wplist.size())
-            {
-                wplist[index]->setNumber(wp_id);
-                wplist[index++]->setNextWaypoint(++wp_id);
-            }
-            wplist.back()->setNextWaypoint(wplist.back()->getNumber());
-
-            return true;
+            clearedLength = seglen;
+            maxLengthClearSegment = index-1;
+            extendlen_max = extendlen;
+            minNeeded_max = minlen;
         }
 
         startwp = endwp;
         index++;
+    }
+
+    if(clearedLength > 1e-4)
+    {
+        flatEarth.ConvertLatLong_degToNorthEast_m(wplist[maxLengthClearSegment]->getLatitude(),
+                                    wplist[maxLengthClearSegment]->getLongitude(), north, east);
+        DubinsWaypoint start_wp(east, north, 0.0, 0.0, 0.0, 0);
+        flatEarth.ConvertLatLong_degToNorthEast_m(wplist[maxLengthClearSegment+1]->getLatitude(),
+                                    wplist[maxLengthClearSegment+1]->getLongitude(), north, east);
+        DubinsWaypoint end_wp(east, north, 0.0, 0.0, 0.0, 0);
+        index = maxLengthClearSegment+1;
+
+        // move start up to center the extension
+        double forwardPercent = ( (clearedLength - minNeeded_max)/2.0 )/clearedLength;
+        start_wp.x += (end_wp.x - start_wp.x)*forwardPercent;
+        start_wp.y += (end_wp.y - start_wp.y)*forwardPercent;
+        afrl::cmasi::Waypoint* startManeuver = wplist[index]->clone();
+        double lat, lon;
+        flatEarth.ConvertNorthEast_mToLatLong_deg(start_wp.y, start_wp.x, lat, lon);
+        startManeuver->setLatitude(lat);
+        startManeuver->setLongitude(lon);
+
+        // saving ID of next original point after extension
+        int64_t wp_id = wplist[index]->getNumber();
+        wplist.insert(wplist.begin()+index, startManeuver);
+
+        // build extension waypoints
+        std::vector<DubinsWaypoint> dubins_extension = ExtendSegment(start_wp, end_wp, extendlen_max, R);
+        std::vector<afrl::cmasi::Waypoint*> extension = DiscretizeExtension(dubins_extension, d, flatEarth, wplist[index]);
+        wplist.insert(wplist.begin()+index+1, extension.begin(), extension.end());
+
+        // re-number and re-build 'next' fields (linked list)
+        while(index < wplist.size())
+        {
+            wplist[index]->setNumber(wp_id);
+            wplist[index++]->setNextWaypoint(++wp_id);
+        }
+        wplist.back()->setNextWaypoint(wplist.back()->getNumber());
+        return true;
     }
 
     return false;

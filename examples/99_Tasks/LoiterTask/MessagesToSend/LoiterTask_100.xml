@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<LoiterTask Series="CMASI">
+  <TaskID>100</TaskID>
+  <Label/>
+  <EligibleEntities><int64>101</int64></EligibleEntities>
+    <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+  <DesiredAction>
+    <LoiterAction Series="CMASI">
+      <LoiterType>Circular</LoiterType>
+      <Radius>300</Radius>
+      <Axis>0</Axis>
+      <Length>0</Length>
+      <Direction>
+        <LoiterDirection>Clockwise</LoiterDirection>
+      </Direction>
+      <Duration>5000</Duration>
+      <Airspeed/>
+      <Location>
+      <Location3D Series="CMASI">
+        <Latitude>30.525723268898915</Latitude>
+        <Longitude>-87.20688664886517</Longitude>
+        <Altitude>0.0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+    </Location>
+    </LoiterAction>
+    
+  </DesiredAction>
+</LoiterTask>
+

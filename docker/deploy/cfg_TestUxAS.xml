@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<UxAS EntityID="100" FormatVersion="1.0" EntityType="None">
-
-    <Service Type="HelloWorld" StringToSend="Hello from #1" SendPeriod_ms="1000"/>
-    <Service Type="HelloWorld" StringToSend="Hello from #2" SendPeriod_ms="5001"/>
-
-</UxAS>
-
-

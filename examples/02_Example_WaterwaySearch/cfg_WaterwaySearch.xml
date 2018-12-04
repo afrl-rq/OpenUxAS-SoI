@@ -37,7 +37,7 @@
     </Service>
     
     <!-- Send every message from zeromq bus to an external program using TCP -->
-    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9999" Server="TRUE">
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://*:9999" Server="TRUE">
         <SubscribeToMessage MessageType="a" />
         <SubscribeToMessage MessageType="b" />
         <SubscribeToMessage MessageType="c" />
@@ -95,7 +95,7 @@
     <!-- Send every message from zeromq bus to an external program using ZeroMQ
          Note: the external program must 'connect' using a SUB socket (for receive)
          and 'connect' with a separate PUSH socket (for send).  -->
-    <Bridge Type="LmcpObjectNetworkPublishPullBridge" AddressPUB="tcp://127.0.0.1:5560" AddressPULL="tcp://127.0.0.1:5561">
+    <Bridge Type="LmcpObjectNetworkPublishPullBridge" AddressPUB="tcp://*:5560" AddressPULL="tcp://*:5561">
         <SubscribeToMessage MessageType="a" />
         <SubscribeToMessage MessageType="b" />
         <SubscribeToMessage MessageType="c" />

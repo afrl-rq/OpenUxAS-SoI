@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<ImpactPointSearchTask Series="IMPACT">
+  <!--Point Search Task Fields-->
+  <SearchLocationID>0</SearchLocationID>
+  <SearchLocation>
+  	<Location3D Series="CMASI">
+      <Latitude>30.525723268898915</Latitude>
+      <Longitude>-87.20688664886517</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+  </SearchLocation>
+  <StandoffDistance>0</StandoffDistance>
+  <ViewAngleList>
+  <Wedge Series="CMASI">
+     <AzimuthCenterline>0</AzimuthCenterline>
+     <VerticalCenterline>0</VerticalCenterline>
+     <AzimuthExtent>0</AzimuthExtent>
+     <VerticalExtent>0</VerticalExtent>
+   </Wedge>
+  </ViewAngleList>
+  <DesiredAction>
+   <LoiterAction Series="CMASI">
+     <LoiterType>Circular</LoiterType>
+     <Radius>60</Radius>
+     <Axis>0</Axis>
+     <Length>200</Length>
+     <Direction>Clockwise</Direction>
+     <Duration>30000</Duration>
+     <Airspeed>0</Airspeed>
+     <Location>
+    <Location3D Series="CMASI">
+      <Latitude>30.525723268898915</Latitude>
+      <Longitude>-87.20688664886517</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+     </Location>
+     <AssociatedTaskList>
+     </AssociatedTaskList>
+   </LoiterAction>
+  </DesiredAction>
+ 
+  <!--Search Task Fields-->
+  <DesiredWavelengthBands>
+    <WavelengthBand>AllAny</WavelengthBand>
+  </DesiredWavelengthBands>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0</GroundSampleDistance>
+  <!--Task Fields-->
+  <TaskID>100</TaskID>
+  <EligibleEntities/>
+  <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</ImpactPointSearchTask>
+
+
+<ImpactPointSearchTask Series="IMPACT">
+  <SearchLocationID>0</SearchLocationID>
+  <SearchLocation>
+   <Location3D Series="CMASI">
+     <Latitude>30.4806527777778</Latitude>
+     <Longitude>-87.2192722222222</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>MSL</AltitudeType>
+   </Location3D>
+  </SearchLocation>
+  <StandoffDistance>0</StandoffDistance>
+  <ViewAngleList>
+   <Wedge Series="CMASI">
+     <AzimuthCenterline>0</AzimuthCenterline>
+     <VerticalCenterline>0</VerticalCenterline>
+     <AzimuthExtent>0</AzimuthExtent>
+     <VerticalExtent>0</VerticalExtent>
+   </Wedge>
+  </ViewAngleList>
+  <DesiredAction>
+   <LoiterAction Series="CMASI">
+     <LoiterType>Hover</LoiterType>
+     <Radius>60</Radius>
+     <Axis>0</Axis>
+     <Length>200</Length>
+     <Direction>Clockwise</Direction>
+     <Duration>30000</Duration>
+     <Airspeed>0</Airspeed>
+     <Location>
+      <Location3D Series="CMASI">
+        <Latitude>30.4806527777778</Latitude>
+        <Longitude>-87.2192722222222</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </Location>
+     <AssociatedTaskList>
+     </AssociatedTaskList>
+   </LoiterAction>
+  </DesiredAction>
+  <DesiredWavelengthBands>
+  </DesiredWavelengthBands>
+  <DwellTime>1</DwellTime>
+  <GroundSampleDistance>0.5</GroundSampleDistance>
+  <TaskID>1113</TaskID>
+  <Label></Label>
+  <EligibleEntities>
+  </EligibleEntities>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</ImpactPointSearchTask>
+

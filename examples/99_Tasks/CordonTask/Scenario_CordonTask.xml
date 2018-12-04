@@ -1,0 +1,739 @@
+<?xml version="1.0" ?>
+
+<AMASE>
+  <ScenarioData>
+    <SimulationView LongExtent=".33" Latitude="30.4508" Longitude="-87.1894"/>
+    <ScenarioName>Cordon Example</ScenarioName>
+    <Date>1/1/2020:12:00:00</Date>
+    <ScenarioDuration>3600.0</ScenarioDuration>
+    <TrackAgeOut/>
+  </ScenarioData>
+  <ScenarioEventList>
+<GroundVehicleConfiguration Series="VEHICLES" Time=".4">
+  <RoadGraphID>31991985</RoadGraphID>
+  <MinimumSpeed>0</MinimumSpeed>
+  <MaximumSpeed>6.69999980926514</MaximumSpeed>
+  <EnergyRate>0.00115999998524785</EnergyRate>
+  <ID>13</ID>
+  <Affiliation>Friendly</Affiliation>
+  <EntityType>Gladiator</EntityType>
+  <Label>Tiger-20</Label>
+  <NominalSpeed>4.46000003814697</NominalSpeed>
+  <NominalAltitude>0</NominalAltitude>
+  <NominalAltitudeType>AGL</NominalAltitudeType>
+  <PayloadConfigurationList>
+   <GimbalConfiguration Series="CMASI">
+     <SupportedPointingModes>
+     <GimbalPointingMode>LatLonSlaved</GimbalPointingMode>
+     <GimbalPointingMode>AirVehicleRelativeAngle</GimbalPointingMode>
+     </SupportedPointingModes>
+     <MinAzimuth>-180</MinAzimuth>
+     <MaxAzimuth>180</MaxAzimuth>
+     <IsAzimuthClamped>true</IsAzimuthClamped>
+     <MinElevation>0</MinElevation>
+     <MaxElevation>40</MaxElevation>
+     <IsElevationClamped>true</IsElevationClamped>
+     <MinRotation>0</MinRotation>
+     <MaxRotation>360</MaxRotation>
+     <IsRotationClamped>false</IsRotationClamped>
+     <MaxAzimuthSlewRate>114.589996337891</MaxAzimuthSlewRate>
+     <MaxElevationSlewRate>114.589996337891</MaxElevationSlewRate>
+     <MaxRotationRate>114.589996337891</MaxRotationRate>
+     <ContainedPayloadList>
+     <int64>131</int64>
+     <int64>132</int64>
+     </ContainedPayloadList>
+     <PayloadID>130</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </GimbalConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>90</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>320</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>240</VideoStreamVerticalResolution>
+     <PayloadID>131</PayloadID>
+     <PayloadKind>eo-imager</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>MWIR</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>50</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>320</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>240</VideoStreamVerticalResolution>
+     <PayloadID>132</PayloadID>
+     <PayloadKind>FLIR</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <ImpactPayloadConfiguration Series="IMPACT">
+     <AvailablePayloads>
+     <ImpactPayloadType>M240B</ImpactPayloadType>
+     <ImpactPayloadType>Flashbang</ImpactPayloadType>
+     <ImpactPayloadType>TearGas</ImpactPayloadType>
+     <ImpactPayloadType>HeatBeam</ImpactPayloadType>
+     <ImpactPayloadType>Track</ImpactPayloadType>
+     <ImpactPayloadType>Megaphone</ImpactPayloadType>
+     <ImpactPayloadType>Siren</ImpactPayloadType>
+     </AvailablePayloads>
+     <PayloadID>133</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </ImpactPayloadConfiguration>
+   <RadioConfiguration Series="IMPACT">
+     <Range>2500</Range>
+     <RallyPoint>
+      <Location3D Series="CMASI">
+        <Latitude>30.471585</Latitude>
+        <Longitude>-87.181458</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </RallyPoint>
+     <Timeout>600</Timeout>
+     <PayloadID>135</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </RadioConfiguration>
+  </PayloadConfigurationList>
+  <Info>
+  </Info>
+</GroundVehicleConfiguration>
+
+<GroundVehicleConfiguration Series="VEHICLES" Time="0.5">
+  <RoadGraphID>31991985</RoadGraphID>
+  <MinimumSpeed>0</MinimumSpeed>
+  <MaximumSpeed>6.69999980926514</MaximumSpeed>
+  <EnergyRate>0.00115999998524785</EnergyRate>
+  <ID>14</ID>
+  <Affiliation>Friendly</Affiliation>
+  <EntityType>Gladiator</EntityType>
+  <Label>Tiger-21</Label>
+  <NominalSpeed>4.46000003814697</NominalSpeed>
+  <NominalAltitude>0</NominalAltitude>
+  <NominalAltitudeType>AGL</NominalAltitudeType>
+  <PayloadConfigurationList>
+   <GimbalConfiguration Series="CMASI">
+     <SupportedPointingModes>
+     <GimbalPointingMode>LatLonSlaved</GimbalPointingMode>
+     <GimbalPointingMode>AirVehicleRelativeAngle</GimbalPointingMode>
+     </SupportedPointingModes>
+     <MinAzimuth>-180</MinAzimuth>
+     <MaxAzimuth>180</MaxAzimuth>
+     <IsAzimuthClamped>true</IsAzimuthClamped>
+     <MinElevation>0</MinElevation>
+     <MaxElevation>40</MaxElevation>
+     <IsElevationClamped>true</IsElevationClamped>
+     <MinRotation>0</MinRotation>
+     <MaxRotation>360</MaxRotation>
+     <IsRotationClamped>false</IsRotationClamped>
+     <MaxAzimuthSlewRate>114.589996337891</MaxAzimuthSlewRate>
+     <MaxElevationSlewRate>114.589996337891</MaxElevationSlewRate>
+     <MaxRotationRate>114.589996337891</MaxRotationRate>
+     <ContainedPayloadList>
+     <int64>141</int64>
+     <int64>142</int64>
+     </ContainedPayloadList>
+     <PayloadID>140</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </GimbalConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>90</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>320</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>240</VideoStreamVerticalResolution>
+     <PayloadID>141</PayloadID>
+     <PayloadKind>eo-imager</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>MWIR</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>50</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>320</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>240</VideoStreamVerticalResolution>
+     <PayloadID>142</PayloadID>
+     <PayloadKind>FLIR</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <ImpactPayloadConfiguration Series="IMPACT">
+     <AvailablePayloads>
+     <ImpactPayloadType>M240B</ImpactPayloadType>
+     <ImpactPayloadType>Flashbang</ImpactPayloadType>
+     <ImpactPayloadType>TearGas</ImpactPayloadType>
+     <ImpactPayloadType>HeatBeam</ImpactPayloadType>
+     <ImpactPayloadType>Track</ImpactPayloadType>
+     <ImpactPayloadType>Megaphone</ImpactPayloadType>
+     <ImpactPayloadType>Siren</ImpactPayloadType>
+     </AvailablePayloads>
+     <PayloadID>143</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </ImpactPayloadConfiguration>
+   <RadioConfiguration Series="IMPACT">
+     <Range>2500</Range>
+     <RallyPoint>
+      <Location3D Series="CMASI">
+        <Latitude>30.471585</Latitude>
+        <Longitude>-87.181458</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </RallyPoint>
+     <Timeout>600</Timeout>
+     <PayloadID>145</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </RadioConfiguration>
+  </PayloadConfigurationList>
+  <Info>
+  </Info>
+</GroundVehicleConfiguration>
+
+<GroundVehicleConfiguration Series="VEHICLES" Time="0.6">
+  <RoadGraphID>31991985</RoadGraphID>
+  <MinimumSpeed>0</MinimumSpeed>
+  <MaximumSpeed>13.4099998474121</MaximumSpeed>
+  <EnergyRate>0.0017359999474138</EnergyRate>
+  <ID>15</ID>
+  <Affiliation>Friendly</Affiliation>
+  <EntityType>MDARS</EntityType>
+  <Label>Tiger-22</Label>
+  <NominalSpeed>8.89999961853027</NominalSpeed>
+  <NominalAltitude>0</NominalAltitude>
+  <NominalAltitudeType>AGL</NominalAltitudeType>
+  <PayloadConfigurationList>
+   <GimbalConfiguration Series="CMASI">
+     <SupportedPointingModes>
+     <GimbalPointingMode>LatLonSlaved</GimbalPointingMode>
+     <GimbalPointingMode>AirVehicleRelativeAngle</GimbalPointingMode>
+     </SupportedPointingModes>
+     <MinAzimuth>-180</MinAzimuth>
+     <MaxAzimuth>180</MaxAzimuth>
+     <IsAzimuthClamped>true</IsAzimuthClamped>
+     <MinElevation>0</MinElevation>
+     <MaxElevation>40</MaxElevation>
+     <IsElevationClamped>true</IsElevationClamped>
+     <MinRotation>0</MinRotation>
+     <MaxRotation>360</MaxRotation>
+     <IsRotationClamped>false</IsRotationClamped>
+     <MaxAzimuthSlewRate>114.589996337891</MaxAzimuthSlewRate>
+     <MaxElevationSlewRate>114.589996337891</MaxElevationSlewRate>
+     <MaxRotationRate>114.589996337891</MaxRotationRate>
+     <ContainedPayloadList>
+     <int64>151</int64>
+     <int64>152</int64>
+     </ContainedPayloadList>
+     <PayloadID>150</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </GimbalConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>107</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>640</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
+     <PayloadID>151</PayloadID>
+     <PayloadKind>eo900-turret</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>MWIR</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>50</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>640</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
+     <PayloadID>152</PayloadID>
+     <PayloadKind>FLIR</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <ImpactPayloadConfiguration Series="IMPACT">
+     <AvailablePayloads>
+     <ImpactPayloadType>Taser</ImpactPayloadType>
+     <ImpactPayloadType>Track</ImpactPayloadType>
+     <ImpactPayloadType>Tag</ImpactPayloadType>
+     <ImpactPayloadType>SearchLight</ImpactPayloadType>
+     </AvailablePayloads>
+     <PayloadID>153</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </ImpactPayloadConfiguration>
+   <RadioConfiguration Series="IMPACT">
+     <Range>2500</Range>
+     <RallyPoint>
+      <Location3D Series="CMASI">
+        <Latitude>30.471585</Latitude>
+        <Longitude>-87.181458</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </RallyPoint>
+     <Timeout>600</Timeout>
+     <PayloadID>155</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </RadioConfiguration>
+  </PayloadConfigurationList>
+  <Info>
+  </Info>
+</GroundVehicleConfiguration>
+
+<GroundVehicleConfiguration Series="VEHICLES" Time="0.7">
+  <RoadGraphID>31991985</RoadGraphID>
+  <MinimumSpeed>0</MinimumSpeed>
+  <MaximumSpeed>13.4099998474121</MaximumSpeed>
+  <EnergyRate>0.0017359999474138</EnergyRate>
+  <ID>16</ID>
+  <Affiliation>Friendly</Affiliation>
+  <EntityType>MDARS</EntityType>
+  <Label>Tiger-23</Label>
+  <NominalSpeed>8.89999961853027</NominalSpeed>
+  <NominalAltitude>0</NominalAltitude>
+  <NominalAltitudeType>AGL</NominalAltitudeType>
+  <PayloadConfigurationList>
+   <GimbalConfiguration Series="CMASI">
+     <SupportedPointingModes>
+     <GimbalPointingMode>LatLonSlaved</GimbalPointingMode>
+     <GimbalPointingMode>AirVehicleRelativeAngle</GimbalPointingMode>
+     </SupportedPointingModes>
+     <MinAzimuth>-180</MinAzimuth>
+     <MaxAzimuth>180</MaxAzimuth>
+     <IsAzimuthClamped>true</IsAzimuthClamped>
+     <MinElevation>0</MinElevation>
+     <MaxElevation>40</MaxElevation>
+     <IsElevationClamped>true</IsElevationClamped>
+     <MinRotation>0</MinRotation>
+     <MaxRotation>360</MaxRotation>
+     <IsRotationClamped>false</IsRotationClamped>
+     <MaxAzimuthSlewRate>114.589996337891</MaxAzimuthSlewRate>
+     <MaxElevationSlewRate>114.589996337891</MaxElevationSlewRate>
+     <MaxRotationRate>114.589996337891</MaxRotationRate>
+     <ContainedPayloadList>
+     <int64>161</int64>
+     <int64>162</int64>
+     </ContainedPayloadList>
+     <PayloadID>160</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </GimbalConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>EO</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>107</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>640</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
+     <PayloadID>161</PayloadID>
+     <PayloadKind>eo900-turret</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <CameraConfiguration Series="CMASI">
+     <SupportedWavelengthBand>MWIR</SupportedWavelengthBand>
+     <FieldOfViewMode>Continuous</FieldOfViewMode>
+     <MinHorizontalFieldOfView>0</MinHorizontalFieldOfView>
+     <MaxHorizontalFieldOfView>50</MaxHorizontalFieldOfView>
+     <DiscreteHorizontalFieldOfViewList>
+     </DiscreteHorizontalFieldOfViewList>
+     <VideoStreamHorizontalResolution>640</VideoStreamHorizontalResolution>
+     <VideoStreamVerticalResolution>480</VideoStreamVerticalResolution>
+     <PayloadID>162</PayloadID>
+     <PayloadKind>FLIR</PayloadKind>
+     <Parameters>
+     </Parameters>
+   </CameraConfiguration>
+   <ImpactPayloadConfiguration Series="IMPACT">
+     <AvailablePayloads>
+     <ImpactPayloadType>Taser</ImpactPayloadType>
+     <ImpactPayloadType>Track</ImpactPayloadType>
+     <ImpactPayloadType>Tag</ImpactPayloadType>
+     <ImpactPayloadType>SearchLight</ImpactPayloadType>
+     </AvailablePayloads>
+     <PayloadID>163</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </ImpactPayloadConfiguration>
+   <RadioConfiguration Series="IMPACT">
+     <Range>2500</Range>
+     <RallyPoint>
+      <Location3D Series="CMASI">
+        <Latitude>30.471585</Latitude>
+        <Longitude>-87.181458</Longitude>
+        <Altitude>0</Altitude>
+        <AltitudeType>MSL</AltitudeType>
+      </Location3D>
+     </RallyPoint>
+     <Timeout>600</Timeout>
+     <PayloadID>165</PayloadID>
+     <PayloadKind></PayloadKind>
+     <Parameters>
+     </Parameters>
+   </RadioConfiguration>
+  </PayloadConfigurationList>
+  <Info>
+  </Info>
+</GroundVehicleConfiguration>
+
+<GroundVehicleState Series="VEHICLES" Time="0.9">
+  <ID>13</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>160</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.480275</Latitude>
+     <Longitude>-87.16315833</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>AGL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>100</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>130</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>90</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>131</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>50</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>132</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <RadioState Series="IMPACT">
+     <Enabled>true</Enabled>
+     <InRange>true</InRange>
+     <PayloadID>135</PayloadID>
+     <Parameters>
+     </Parameters>
+   </RadioState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</GroundVehicleState>
+
+<GroundVehicleState Series="VEHICLES" Time="1.0">
+  <ID>14</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>160</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.47951944</Latitude>
+     <Longitude>-87.17023333</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>AGL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>100</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>140</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>90</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>141</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>50</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>142</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <RadioState Series="IMPACT">
+     <Enabled>true</Enabled>
+     <InRange>true</InRange>
+     <PayloadID>145</PayloadID>
+     <Parameters>
+     </Parameters>
+   </RadioState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</GroundVehicleState>
+
+<GroundVehicleState Series="VEHICLES" Time="1.1">
+  <ID>15</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>160</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.465</Latitude>
+     <Longitude>-87.18</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>AGL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>100</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>150</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>90</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>151</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>50</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>152</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <RadioState Series="IMPACT">
+     <Enabled>true</Enabled>
+     <InRange>true</InRange>
+     <PayloadID>155</PayloadID>
+     <Parameters>
+     </Parameters>
+   </RadioState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</GroundVehicleState>
+
+<GroundVehicleState Series="VEHICLES" Time="1.2">
+  <ID>16</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>160</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.45</Latitude>
+     <Longitude>-87.19</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>AGL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>100</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>160</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>90</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>161</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>50</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>162</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <RadioState Series="IMPACT">
+     <Enabled>true</Enabled>
+     <InRange>true</InRange>
+     <PayloadID>165</PayloadID>
+     <Parameters>
+     </Parameters>
+   </RadioState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</GroundVehicleState>
+
+  </ScenarioEventList>
+</AMASE>

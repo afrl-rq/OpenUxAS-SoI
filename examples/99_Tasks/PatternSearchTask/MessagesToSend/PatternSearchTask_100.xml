@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<PatternSearchTask Series="IMPACT">
+  <!--Pattern Search Task Fields-->
+  <SearchLocationID>1</SearchLocationID>
+  <Pattern>Spiral</Pattern>
+  <Extent>0</Extent>
+  
+  <!--Search Task Fields-->
+  <DesiredWavelengthBands>
+  	<WavelengthBand>AllAny</WavelengthBand>
+  </DesiredWavelengthBands>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0</GroundSampleDistance>
+  
+  <!--Task Fields-->
+  <TaskID>100</TaskID>
+  <EligibleEntities/>
+  <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+
+</PatternSearchTask>
+

@@ -1,0 +1,80 @@
+<GroundVehicleState Series="VEHICLES">
+  <ID>16</ID>
+  <u>0</u>
+  <v>0</v>
+  <w>0</w>
+  <udot>0</udot>
+  <vdot>0</vdot>
+  <wdot>0</wdot>
+  <Heading>160</Heading>
+  <Pitch>0</Pitch>
+  <Roll>0</Roll>
+  <p>0</p>
+  <q>0</q>
+  <r>0</r>
+  <Course>0</Course>
+  <Groundspeed>0</Groundspeed>
+  <Location>
+   <Location3D Series="CMASI">
+     <Latitude>30.45</Latitude>
+     <Longitude>-87.19</Longitude>
+     <Altitude>0</Altitude>
+     <AltitudeType>AGL</AltitudeType>
+   </Location3D>
+  </Location>
+  <EnergyAvailable>100</EnergyAvailable>
+  <ActualEnergyRate>0</ActualEnergyRate>
+  <PayloadStateList>
+   <GimbalState Series="CMASI">
+     <PointingMode>AirVehicleRelativeAngle</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>160</PayloadID>
+     <Parameters>
+     </Parameters>
+   </GimbalState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>90</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>161</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <CameraState Series="CMASI">
+     <HorizontalFieldOfView>50</HorizontalFieldOfView>
+     <VerticalFieldOfView>0</VerticalFieldOfView>
+     <Footprint>
+     </Footprint>
+     <PointingMode>Unknown</PointingMode>
+     <Azimuth>0</Azimuth>
+     <Elevation>0</Elevation>
+     <Rotation>0</Rotation>
+     <PayloadID>162</PayloadID>
+     <Parameters>
+     </Parameters>
+   </CameraState>
+   <RadioState Series="IMPACT">
+     <Enabled>true</Enabled>
+     <InRange>true</InRange>
+     <PayloadID>165</PayloadID>
+     <Parameters>
+     </Parameters>
+   </RadioState>
+  </PayloadStateList>
+  <CurrentWaypoint>0</CurrentWaypoint>
+  <CurrentCommand>0</CurrentCommand>
+  <Mode>Waypoint</Mode>
+  <AssociatedTasks>
+  </AssociatedTasks>
+  <Time>0</Time>
+  <Info>
+  </Info>
+</GroundVehicleState>
+
