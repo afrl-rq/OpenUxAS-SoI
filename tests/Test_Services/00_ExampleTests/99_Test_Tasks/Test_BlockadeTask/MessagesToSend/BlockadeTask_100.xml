@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<BlockadeTask Series="IMPACT">
+	<!--Blockade Task Specific Fields-->
+	<BlockedEntityID>103</BlockedEntityID>
+	<StandoffDistance/>
+	<NumberVehicles>2</NumberVehicles>
+	<ProtectedLocation/>
+	
+	<!--Task Specific Fields-->
+	<TaskID>100</TaskID>
+	<Label/>
+	<EligibleEntities>
+	<int64>101</int64>
+	<int64>102</int64>
+	</EligibleEntities>
+	<RevisitRate>0.0</RevisitRate>
+	<Parameters/>
+	<Priority>0</Priority>
+	<Required>true</Required>
+	
+</BlockadeTask>
+
