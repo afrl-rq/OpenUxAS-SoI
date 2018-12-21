@@ -4,45 +4,44 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "01_buildRelease (Docker)",
+            "label": "02_BuildDeploy_UxAS (Docker)",
             "type": "shell",
-            "command": "python 02_BuildDeploy_UxAS.py",
+            "command": "python3 02_BuildDeploy_UxAS.py",
             "options": {
                 "cwd": "${workspaceRoot}/docker"
             }
         },
         {
-            "label": "02_CleanReleaseBuild",
+            "label": "05_RemoveBuildFiles",
             "type": "shell",
-            "command": "python 05_RemoveBuildFiles.py",
+            "command": "python3 05_RemoveBuildFiles.py",
             "options": {
                 "cwd": "${workspaceRoot}/docker"
             }
         },
         {
-            "label": "03_buildDebug (Docker)",
+            "label": "07_Build_UxAS_Debug (Docker)",
             "type": "shell",
-            "command": "python 07_Build_UxAS_Debug.py",
+            "command": "python3 07_Build_UxAS_Debug.py",
             "options": {
                 "cwd": "${workspaceRoot}/docker"
             }
         },
         {
-            "label": "04_CleanDebugBuild",
+            "label": "08_RemoveDebugBuildFiles",
             "type": "shell",
-            "command": "python 08_RemoveDebugBuildFiles.py",
+            "command": "python3 08_RemoveDebugBuildFiles.py",
             "options": {
                 "cwd": "${workspaceRoot}/docker"
             }
         },
         {
-            "label": "05_StartDockerDebugContainer",
+            "label": "StartDockerDebugContainer",
             "type": "shell",
             "command": "docker",
             "args": [
                 "run",
-                "-i",
-                "-d",
+                "-it",
                 "--privileged",
                 "--rm",
                 "--name",
@@ -60,9 +59,9 @@
             "problemMatcher": []
         },
         {
-            "label": "06_RemoveDockerSource",
+            "label": "06_RemoveSourceFilesInVolume",
             "type": "shell",
-            "command": "python 06_RemoveSourceFilesInVolume.py",
+            "command": "python3 06_RemoveSourceFilesInVolume.py",
             "options": {
                 "cwd": "${workspaceRoot}/docker"
             }

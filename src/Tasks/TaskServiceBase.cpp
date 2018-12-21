@@ -413,7 +413,7 @@ bool TaskServiceBase::processReceivedLmcpMessage(std::unique_ptr<uxas::communica
                         for (auto& planWaypoint : itRoute->second->getWaypoints())
                         {
                             //COUT_INFO_MSG("waypointIdRestart[" << waypointIdRestart << "], planWaypoint->getNumber()[" << planWaypoint->getNumber() << "]")
-                            if (waypointIdRestart == planWaypoint->getNumber()) // found one waypoint past start of the restart plan
+                            if ((waypointIdRestart == planWaypoint->getNumber()) && lastWaypoint) // found one waypoint past start of the restart plan
                             {
                                 //COUT_INFO_MSG("waypointIdRestart[" << waypointIdRestart << "], planWaypoint->getNumber()[" << planWaypoint->getNumber() << "]")
                                 itOption->second->m_restartRoutePlan->getWaypoints().push_back(lastWaypoint->clone());
