@@ -25,14 +25,14 @@ LmcpGen, but is optional. The directory structure should look like this:
   * `OpenAMASE/` (optional)
   * `OpenUxAS/`
 
-(optional) construct the `uxas-build` Docker image:
-	`python 01_construct_uxas-build.py`
+(optional, not recommended) construct the `uxas-build` Docker image:
+	`python 99_construct_uxas-build.py`
 
 1) `prepare` the `3rd` libraries, build and run LMCPGen:
-	`python 02_PrepareAndBuildLmcp.py`
+	`python 01_PrepareAndBuildLmcp.py`
 2) build UxAS and construct the `uxas-deploy` image:
-	`python 03_BuildDeploy_UxAS.py`
-3) the directory `04_test` contains a script and configuration file to test run the containerized UxAS
+	`python 02_BuildDeploy_UxAS.py`
+3) the directory `03_test` contains a script and configuration file to test run the containerized UxAS
 
 ## Running UxAS in a Docker container can be accompilshed with the following command:
 >docker run \
@@ -65,32 +65,32 @@ for specifics on these details.
 ### Directory contents
   -- NOTE: .py are python scripts
 
-- `01_construct_uxas-build.py` uses Docker commands to construct the
+- `99_construct_uxas-build.py` uses Docker commands to construct the
   `uxas-build` Docker image.
 
-- `02_PrepareAndBuildLmcp.py` uses the `uxas-build` Docker image
+- `01_PrepareAndBuildLmcp.py` uses the `uxas-build` Docker image
   to run `prepare` and `RunLmcpGen.sh` commands.
 
-- `03_BuildDeploy_UxAS.py` uses the `uxas-build` Docker image
+- `02_BuildDeploy_UxAS.py` uses the `uxas-build` Docker image
   to build UxAS and construct a `uxas-deploy` Docker image.
 
-- `04_test` folder containg scripts to demonstrate how to run UxAS in
+- `03_test` folder containg scripts to demonstrate how to run UxAS in
   the files in the directory are:
   	-- `01_Run_UxAS.py` starts UxAS in a `uxas-deploy` container 
    	-- `cfg_TestUxAS.xml` the configuration file used by UxAS.
 
-- `05_runUxAS_Tests.py` runs the UxAS test suite within a `uxas-build`
+- `04_runUxAS_Tests.py` runs the UxAS test suite within a `uxas-build`
   container.
 
-- `06_RemoveBuildFiles.py` uses the `uxas-build` Docker image
+- `05_RemoveBuildFiles.py` uses the `uxas-build` Docker image
   to remove the 'build' directory from the 'internal' Docker Volume.
   This will force `meson` to create a new build directory
 
-- `07_RemoveSourceFilesInVolume.py`  uses the `uxas-build` Docker image
+- `06_RemoveSourceFilesInVolume.py`  uses the `uxas-build` Docker image
   to remove the 'source' directories from the 'internal' Docker Volume.
   This will force `rsync` to re-upload the source files.
 
-- `08_Build_UxAS_Debug.py`  uses the `uxas-build` Docker image
+- `07_Build_UxAS_Debug.py`  uses the `uxas-build` Docker image
   to build a `debug` version of UxAS which is stored in the Docker volume
   and copied into the directory, `OpenUxAS/tmp/debug/`.
 
@@ -109,10 +109,10 @@ for specifics on these details.
 files in the directory `OpenUxAS/docker/ContainerScriptsAndFiles` are scripts
 that are designed to be executed inside the Docker containers.
 
-- `buildUxAS_Debug.sh` calls the appropriate Meson and Ninja from inside the
+- `buildUxAS_Debug.py` calls the appropriate Meson and Ninja from inside the
   `uxas-build` Docker image to build a debug version of UxAS.
 
-- `buildUxAS.sh` calls the appropriate Meson and Ninja from inside the
+- `buildUxAS.py` calls the appropriate Meson and Ninja from inside the
   `uxas-build` Docker image to build a release version of UxAS
 
 - `Dockerfile_uxas-build` is the DockerFile that defines the
@@ -129,11 +129,11 @@ that are designed to be executed inside the Docker containers.
 - `InstallLibraries` contains scripts for installing UxAS prequisites
   from source. Not meant to be used manually.
 
-- `runUxAS_tests.sh` calls the appropriate Meson and Ninja from inside the
+- `runUxAS_tests.py` calls the appropriate Meson and Ninja from inside the
   `uxas-build` Docker image to run the UxAS test suite . Not meant to be 
   used manually.
 
-- `syncUxasFiles.sh` is used to synchronize the UxAS source files, that is,
+- `syncUxasFiles.py` is used to synchronize the UxAS source files, that is,
   if any files are different in the source directories than in the Docker 
   volume, rsync copies the souce file to the volume.    
 
