@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<UxAS FormatVersion="1.0" EntityID="100" EntityType="Aircraft">
+  
+  <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:5555" Server="FALSE">
+    <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand"/>
+    <SubscribeToMessage MessageType="afrl.cmasi.LoiterTask"/>
+    <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand"/>
+  </Bridge>
+  
+<!---  <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="enx281878b8fee2">
+    <!-- <SubscribeToExternalMessage MessageType="uxas.messages.task.TaskActive"/> -->
+    <!-- <SubscribeToExternalMessage MessageType="uxas.project.pisr.ProjectedTaskActive"/> 
+    <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
+  </Bridge>-->
+  
+  <Service Type="TaskManagerService"/>
+  <Service Type="AutomationRequestValidatorService"/>
+  <Service Type="RoutePlannerVisibilityService" TurnRadiusOffset_m="0.0" MinimumWaypointSeparation_m="50.0"/>
+  <Service Type="RouteAggregatorService"/>
+  <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>
+  <Service Type="AutomationDiagramDataService"/>
+  <Service Type="Test_SimulationTime"/>
+  <Service Type="PlanBuilderService" AssignmentStartPointLead_m="0.0"/>
+  <Service Type="WaypointPlanManagerService" VehicleID="101" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10001"/>
+  <Service Type="WaypointPlanManagerService" VehicleID="102" NumberWaypointsToServe="512" NumberWaypointsOverlap="5" param.turnType="FlyOver" GimbalPayloadId="10002"/>
+  <Service Type="SensorManagerService"/>
+  <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+    <Message MessageFileName="AirVehicleConfiguration_V101.xml" SendTime_ms="100"/>
+    <Message MessageFileName="AirVehicleState_V101.xml" SendTime_ms="100"/>
+    <Message MessageFileName="AirVehicleConfiguration_V102.xml" SendTime_ms="200"/>
+    <Message MessageFileName="AirVehicleState_V102.xml" SendTime_ms="200"/>
+    <Message MessageFileName="AirVehicleConfiguration_V103.xml" SendTime_ms="300"/>
+    <Message MessageFileName="AirVehicleState_V103.xml" SendTime_ms="300"/>
+    <Message MessageFileName="MultiVehicleWatchTask_100.xml" SendTime_ms="2000"/>
+    <Message MessageFileName="AutomationRequest_MultiVehicleWatch.xml" SendTime_ms="4000"/>
+  </Service>
+  <Service Type="MessageLoggerDataService" LogFileMessageCountLimit="1000" FilesPerSubDirectory="1000">
+    <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+    <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+  </Service>
+</UxAS>
+

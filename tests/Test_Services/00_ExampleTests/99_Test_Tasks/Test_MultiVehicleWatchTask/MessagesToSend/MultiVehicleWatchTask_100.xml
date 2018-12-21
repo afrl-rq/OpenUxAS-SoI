@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<MultiVehicleWatchTask Series="IMPACT">
+	<!--Multi-Vehicle Watch Task Specific Fields-->
+	<WatchedEntityID>103</WatchedEntityID>
+	<NumberVehicles>2</NumberVehicles>
+	
+	<!--Search Task Specific Fields-->
+	<DesiredWavelengthBands/>
+	<DwellTime/>
+	<GroundSampleDistance/>
+	
+	<!--Task Specific Fields-->
+	<TaskID>100</TaskID>
+	<Label/>
+	<EligibleEntities>
+	<int64>101</int64>
+	<int64>102</int64>
+	</EligibleEntities>
+	<RevisitRate>0.0</RevisitRate>
+	<Parameters/>
+	<Priority>0</Priority>
+	<Required>true</Required>
+	
+</MultiVehicleWatchTask>
+

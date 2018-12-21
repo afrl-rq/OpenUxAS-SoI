@@ -22,6 +22,7 @@
 
 
 #include "VisibilityGraph.h"
+#include "FlatEarth.h"
 
 #include "ServiceBase.h"
 #include "Constants/Constants_Control.h"
@@ -219,6 +220,7 @@ public:
     {
         std::deque<int64_t> m_nodeIds;
         int64_t m_highwayId = -1;
+        double m_distance_m = 0;
     };
 
 
@@ -276,7 +278,7 @@ protected:
 
 private:
     bool isBuildFullPlot(const std::vector<int64_t>& highWayIds);
-
+    uxas::common::utilities::FlatEarth m_flatEarth;
 
 
 };

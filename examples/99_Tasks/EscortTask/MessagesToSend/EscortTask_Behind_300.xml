@@ -1,0 +1,20 @@
+<EscortTask Series="IMPACT">
+	<!--Escort Task Specific Fields-->
+	<SupportedEntityID>101</SupportedEntityID>
+	<RouteID>1</RouteID>
+	<StandoffDistance>100</StandoffDistance>
+	
+	<!--Search Task Specific Fields-->
+	<DesiredWavelengthBands>
+		<WavelengthBand>AllAny</WavelengthBand>
+	</DesiredWavelengthBands>
+	
+	<!--Task Specific Fields-->
+	<TaskID>300</TaskID>
+	<EligibleEntities>
+	</EligibleEntities>
+	<RevisitRate>0</RevisitRate>
+	<Priority>99</Priority>
+	<Required>true</Required>
+	
+</EscortTask>

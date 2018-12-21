@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<MustFlyTask Series="CMASI">
+  <!--Must fly task specific fields -->
+  <Position>
+    <Location3D Series="CMASI">
+      <Latitude>30.525723268898915</Latitude>
+      <Longitude>-87.20688664886517</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+  </Position>
+  <UseAltitude>false</UseAltitude>
+  <!--Task specific fields-->
+  <TaskID>100</TaskID>
+  <Label/>
+  <EligibleEntities>
+    <int64>101</int64>
+  </EligibleEntities>
+  <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</MustFlyTask>
+

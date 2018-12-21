@@ -1,0 +1,20 @@
+<ImpactLineSearchTask Series="IMPACT">
+  <LineID>1</LineID>
+  <ViewAngleList>
+  </ViewAngleList>
+  <UseInertialViewAngles>false</UseInertialViewAngles>
+  <DesiredWavelengthBands>
+  </DesiredWavelengthBands>
+  <DwellTime>1</DwellTime>
+  <GroundSampleDistance>0.5</GroundSampleDistance>
+  <TaskID>100</TaskID>
+  <Label></Label>
+  <EligibleEntities>
+  </EligibleEntities>
+  <RevisitRate>0</RevisitRate>
+  <Parameters>
+  </Parameters>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</ImpactLineSearchTask>
+
