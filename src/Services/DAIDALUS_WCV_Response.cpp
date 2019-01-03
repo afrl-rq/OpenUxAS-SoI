@@ -678,7 +678,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
 //        std::cout << std::endl;
 //        std::cout << "PRIORITY = " << m_priority << std::endl;
 //        std::cout << std::endl;
-        case 1:
+        case Standard:
             altitude_resolution_good = foundWCVAltitudeResolution(DAIDALUS_bands);
 //            std::cout << std::endl;
 //            std::cout << "Altitude resolution is good as a " << altitude_resolution_good << " statement." << std::endl;
@@ -693,7 +693,7 @@ void DAIDALUS_WCV_Response::SetDivertState(const std::shared_ptr<larcfm::DAIDALU
                 
             }
             break;
-        case 2:
+        case High:
             groundspeed_resolution_good = foundWCVGroundSpeedResolution(DAIDALUS_bands);
             if (!groundspeed_resolution_good)
             {
@@ -1064,13 +1064,13 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
             }
             switch (m_state)
             {
-                case 1:
+                case OnMission:
 //                    if (ConflictResolutionList.size() > 0)
 //                    {
 //                        m_state = InConflict;
 //                    }
                     break;
-                case 2:
+                case InConflict:
                     if (m_VehicleID < RoW)
                     {
                         //Ownship has the Right of Way and therefore should take no action
@@ -1100,7 +1100,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                     }
                     
                     break;
-                case 3:
+                case OnHold:
 //                    std::cout << "In Hold last command and there are no conflicts detected." << std::endl;
                     if (m_isOnMission)
                     {
@@ -1116,6 +1116,7 @@ bool DAIDALUS_WCV_Response::processReceivedLmcpMessage(std::unique_ptr<uxas::com
                                 m_MissionCommand->setFirstWaypoint(m_NextWaypoint);
                                 sendSharedLmcpObjectBroadcastMessage(m_MissionCommand);
                                 m_state = OnMission;
+                                m_isOnMission = true;
                             }
                         }
                     }
