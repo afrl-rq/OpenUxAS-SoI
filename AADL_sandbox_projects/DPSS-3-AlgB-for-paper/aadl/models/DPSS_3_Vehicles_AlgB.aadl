@@ -567,32 +567,35 @@ public
 			lemma "Coordination variables are correct on and after 16 steps":
 				steps >= 16 => correct_coordination_variables;
 
+			--This is conjenctured to be the true bound for the time to reach correct coordination variables for 3 vehicles.
+			-- However, we cannot prove it for all possible initial values of NR and NL. We must bound them to avoid 
+			-- too much nonlinearity for the downstream solvers.
 			lemma "Time to correct coordination variables is < (3 + 2/3)T":
 				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
 					(time < (3.0 + 2.0/3.0)*T);
 			
 			--This lemma is correct, but it depends on the bound on the initial values of NR and NL (<= 3 for this project)
 			--If the bound on the initial values of NR and NL is relaxed, it can take longer to achieve correct coordination variables.
-			lemma "Time to correct coordination variables is < (3 + 1/4)T":
-				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
-					(time < (3.0 + 1.0/4.0)*T);
+--			lemma "Time to correct coordination variables is < (3 + 1/4)T":
+--				(correct_coordination_variables and not (pre(correct_coordination_variables))) => 
+--					(time < (3.0 + 1.0/4.0)*T);
 			
 			lemma "Optimal on and after 20 steps":
 				steps >= 20 => optimal;
 				
-			--This lemma is correct, but it depends on the bound on the initial values of NR and NL (<= 3 for this project)
-			--If the bound on the initial values of NR and NL is relaxed, it can take longer to achieve the optimal configuration.
-			lemma "Time to optimal configuration is less than 4T":
-				(optimal and not (pre(optimal))) => 
-					(time < 4.0*T);
-					
 			--This is conjenctured to be the true bound for the time to reach the optimal configuration for 3 vehicles.
 			-- However, we cannot prove it for all possible initial values of NR and NL. We must bound them to avoid 
 			-- too much nonlinearity for the downstream solvers. 		
 			lemma "Time to optimal configuration is less than (4 + 1/3)T":
 				(optimal and not (pre(optimal))) => 
 					(time < (4.0 + 1.0/3.0)*T);
-			
+				
+			--This lemma is correct, but it depends on the bound on the initial values of NR and NL (<= 3 for this project)
+			--If the bound on the initial values of NR and NL is relaxed, it can take longer to achieve the optimal configuration.
+--			lemma "Time to optimal configuration is less than 4T":
+--				(optimal and not (pre(optimal))) => 
+--					(time < 4.0*T);
+								
 		**};
 		
 	end DPSS_3_Vehicles_AlgB.Impl;
