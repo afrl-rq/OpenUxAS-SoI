@@ -1,0 +1,63 @@
+--Copyright 2016-2017 Rockwell Collins, Inc. All rights reserved.
+-------------------------------------
+-- This multiplier implements the following system.
+--
+--    B_____
+--          |
+--          * ------> Output 
+--    C_____|      
+-------------------------------------
+
+
+package MultWithConversion
+public 
+   with Base_Types;
+   
+   
+system B
+	features
+		--Output: out data port Base_Types::Float;
+		Output: out data port Base_Types::Integer;
+			
+	annex agree {** 
+		--guarantee "B output range" : Output > 1.0;
+		guarantee "B output range" : Output > 1;
+	**};	
+end B ; 
+
+system C
+	features
+		Output: out data port Base_Types::Float;
+			
+	annex agree {** 
+		guarantee "C output range" : Output > 4.0;
+	**};	
+end C ; 
+   
+system top_level
+	features
+		Output: out data port Base_Types::Float;
+	annex agree {** 	
+		--guarantee "System output is sum of component outputs" : Output = B_out*C_out;
+		guarantee "System output is sum of component outputs" : Output = real(B_out)*C_out;
+		guarantee "System output is greater than 0" : Output > 0.0;
+		--eq B_out : real;
+		eq B_out : int;
+		eq C_out : real;
+	**};	
+end top_level;
+
+system implementation top_level.Impl
+	subcomponents
+		B_sub : system B ; 
+		C_sub : system C ; 
+	annex agree {**
+		assign B_out = B_sub.Output;
+		assign C_out = C_sub.Output;
+		--assign Output = B_out*C_out;
+		assign Output = real(B_out)*C_out;
+	**};
+	 
+end top_level.Impl;	
+
+end MultWithConversion;
