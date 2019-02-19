@@ -261,7 +261,7 @@
        (set_loc uas3 dt)
        
        ;Print out the updated state information
-       (cw "stepping")
+       (cw "t:= ~p0\n UAS1: ~p1\n\t\tUAS2: ~p2\n\t\tUAS3: ~p3\n\t\t" (uas-loc uas1) (uas-loc uas2) (uas-loc uas3))
        
         (+ dt
            (DPSS_eval uas1 uas2 uas3)
