@@ -122,14 +122,14 @@ ZeroMqZyreBridge::start(const std::string& zyreNetworkDevice, const std::string&
     else
     {
         UXAS_LOG_INFORM_ASSIGNMENT(s_typeName(), "::start creating new Zyre node with node ID ", m_zyreNodeId, " zyre endpoint ", zyreEndpoint, " and gossip endpoint ", gossipEndpoint);
-        zyre_set_endpoint(m_zyreNode, m_zyreEndpoint.c_str());
+        zyre_set_endpoint(m_zyreNode, "%s", m_zyreEndpoint.c_str());
         if(m_isGossipBind)
         {
-            zyre_gossip_bind(m_zyreNode, m_gossipEndpoint.c_str());
+            zyre_gossip_bind(m_zyreNode, "%s", m_gossipEndpoint.c_str());
         }
         else
         {
-            zyre_gossip_connect(m_zyreNode, m_gossipEndpoint.c_str());
+            zyre_gossip_connect(m_zyreNode, "%s", m_gossipEndpoint.c_str());
         }
     }
 
