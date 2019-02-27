@@ -1,51 +1,38 @@
-; *************** BEGIN INITIALIZATION FOR PROGRAMMING MODE *************** ;
+; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
 ; (Nothing to see here!  Your actual file is after this initialization code);
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the TRACE* book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "trace-star" :uncertified-okp nil :dir :acl2s-modes :ttags ((:acl2s-interaction)) :load-compiled-file nil);v4.0 change
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%") (value :invisible))
+(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the EVALABLE-LD-PRINTING book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "hacking/evalable-ld-printing" :uncertified-okp nil :dir :system :ttags ((:evalable-ld-printing)) :load-compiled-file nil);v4.0 change
-
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%") (value :invisible))
-(include-book "acl2s/defunc" :dir :system :uncertified-okp nil :load-compiled-file :comp) ;lets add defunc at least harshrc [2015-02-01 Sun]
-(include-book "custom" :dir :acl2s-modes :uncertified-okp nil :load-compiled-file :comp)
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading programming mode.") (value :invisible))
+;Common base theory for all modes.
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%") (value :invisible))
+(include-book "acl2s/base-theory" :dir :system :ttags :all)
 
 
-(er-progn 
-  (program)
-  (defun book-beginning () ()) ; to prevent book development
-  (set-irrelevant-formals-ok :warn)
-  (set-bogus-mutual-recursion-ok :warn)
-  (set-ignore-ok :warn)
-  (set-verify-guards-eagerness 0)
-  (set-default-hints '(("Goal" :error "This depends on a proof, and proofs are disabled in Programming mode.  The session mode can be changed under the \"ACL2s\" menu.")))
-  (reset-prehistory t)
-  (set-guard-checking :none)
-  (set-guard-checking :nowarn)
-  (assign evalable-ld-printingp t)
-  (assign evalable-printing-abstractions '(list cons))
-  (assign triple-print-prefix "; "))
-  
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "custom" :dir :acl2s-modes :ttags :all)
+
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
+
+;Settings common to all ACL2s modes
+(acl2s-common-settings)
+;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
+
+(acl2::xdoc acl2s::defunc) ; almost 3 seconds
+
+; Non-events:
+;(set-guard-checking :none)
+
 (acl2::in-package "ACL2S")
 
-(cw "~@0Programming mode loaded.~%~@1"
-      #+acl2s-startup "${NoMoReSnIp}$~%" #-acl2s-startup ""
-      #+acl2s-startup "${SnIpMeHeRe}$~%" #-acl2s-startup "")
-
-; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
-;$ACL2s-SMode$;Programming
+; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
+;$ACL2s-SMode$;ACL2s
 ;DPSS CONSTANTS
-(defconst *n_int* 3)
+(defconst *n_int* 3) ;number of UAVs
 (defconst *n_real* 3.)
-(defconst *p* 10.)
-(defconst *v* 1.)
-(defmacro dpss_t () (/ *p* *v*))
+(defconst *p* 10.) ;size of perimeter
+(defconst *v* 1.) ;UAV velocity
+(defmacro dpss_t () (/ *p* *v*)) ;macro for convergence bound
 (defconst *left* 0)
 (defconst *right* 1)
 (defconst *left_real* 0.)
@@ -99,15 +86,15 @@
 ;Goal update
 (defun set_goal (ag)
   (if (uasp ag)
-    (if (and (= (uas-meet_ln ag) 1) (= (uas-meet_rn ag) 1))
+    (if (and (= (uas-meet_ln ag) *true_int*) (= (uas-meet_rn ag) *true_int*))
       (if (<= (uas-pre_loc ag) (uas-s_l ag))
         (set-uas-goal (uas-s_r ag) ag)
         (set-uas-goal (uas-s_l ag) ag))
-      (if (= (uas-meet_ln ag) 1)
+      (if (= (uas-meet_ln ag) *true_int*)
         (if (<= (uas-pre_loc ag) (uas-s_l ag))
           (set-uas-goal *p* ag)
           (set-uas-goal (uas-s_l ag) ag))
-        (if (= (uas-meet_rn ag) 1)
+        (if (= (uas-meet_rn ag) *true_int*)
           (if (>= (uas-pre_loc ag) (uas-s_r ag))
             (set-uas-goal 0. ag)
             (set-uas-goal (uas-s_r ag) ag))
@@ -193,6 +180,7 @@
         (min_time (nth 1 uas_list) (delta_t_nums (nthcdr 1 uas_list))))
   '(1.)))
 
+;compute shared borders for pairs of neighbors
 (defmacro p_12 () (* 1. (/ *p* *n_real*)))
 (defmacro p_23 () (* 2. (/ *p* *n_real*)))
 
@@ -203,13 +191,13 @@
         (and (and (= (uas-loc uas1) (p_12)) (= (uas-loc uas2) (p_12)) (= (uas-loc uas3) *p*))
              (and (= (uas-pre_loc uas1) 0.) (= (uas-loc uas2) (p_23)) (= (uas-loc uas3) (p_23)))))
     )
-  )
+  )#|ACL2s-ToDo-Line|#
 
-;TODO: how do we update state for the UAS during these recursive calls?
 
 ;Recursively evaluates next steps for uavs
 (defun DPSS_eval (uas1 uas2 uas3)
     (if (and (uasp uas1) (uasp uas2) (uasp uas3))
+      ;Compute dt between "interesting events"
       (let ((dt (min_time (time_to_reach_target_position (uas-dir uas1) (uas-loc uas1) (uas-goal uas1))
                      (min_time (time_to_reach_target_position (uas-dir uas2) (uas-loc uas2) (uas-goal uas2))
                                (min_time (time_to_reach_target_position (uas-dir uas3) (uas-loc uas3) (uas-goal uas3))
@@ -231,6 +219,7 @@
        (set-uas-pre_goal (uas-goal uas1) uas1)
        (set-uas-pre_goal (uas-goal uas2) uas2)
        (set-uas-pre_goal (uas-goal uas3) uas3)
+       
        ;Use the dt we calculated before to "step" all of the UAVs forward
        
        ;Update meet variables if necessary
@@ -238,12 +227,17 @@
          (progn$
           (set-uas-meet_rn 't uas1)
           (set-uas-meet_ln 't uas2))
-         ())
+         (progn$
+          (set-uas-meet_rn 'f uas1)
+          (set-uas-meet_ln 'f uas2)))
        (if (= (uas-loc uas2) (uas-loc uas3))
          (progn$
           (set-uas-meet_rn 't uas2)
           (set-uas-meet_ln 't uas3))
-         ())
+         (progn$
+          (set-uas-meet_rn 'f uas1)
+          (set-uas-meet_ln 'f uas2)))
+       
        
        ;Step forward UAS1
        (set_direction uas1)
@@ -261,7 +255,7 @@
        (set_loc uas3 dt)
        
        ;Print out the updated state information
-       (cw "t:= ~p0\n UAS1: ~p1\n\t\tUAS2: ~p2\n\t\tUAS3: ~p3\n\t\t" (uas-loc uas1) (uas-loc uas2) (uas-loc uas3))
+       (cw "UAS1: ~p0\n\t\tUAS2: ~p1\n\t\tUAS3: ~p2\n\t\t" (uas-loc uas1) (uas-loc uas2) (uas-loc uas3))
        
         (+ dt
            (DPSS_eval uas1 uas2 uas3)
@@ -277,7 +271,7 @@
   (let*  ((uas1 (nth-uas 1))
          (uas2 (nth-uas 1))
          (uas3 (nth-uas 1)))
-    (and 
+    (progn$
      (set-uas-loc init_pos_uas1 uas1)
     (set-uas-loc init_pos_uas2 uas2)
     (set-uas-loc init_pos_uas3 uas3)
@@ -287,9 +281,9 @@
     (set-uas-dir init_dir_uas1 uas1)
     (set-uas-dir init_dir_uas2 uas2)
     (set-uas-dir init_dir_uas3 uas3)
-    (set-uas-st nil uas1)
-    (set-uas-st nil uas2)
-    (set-uas-st nil uas3)
+    ;(set-uas-st nil uas1)
+    ;(set-uas-st nil uas2)
+    ;(set-uas-st nil uas3)
     (set-uas-meet_ln nil uas1)
     (set-uas-meet_ln nil uas2)
     (set-uas-meet_ln nil uas3)
