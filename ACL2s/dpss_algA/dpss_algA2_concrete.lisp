@@ -1,86 +1,69 @@
-; *************** BEGIN INITIALIZATION FOR PROGRAMMING MODE *************** ;
+; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
 ; (Nothing to see here!  Your actual file is after this initialization code);
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the TRACE* book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "trace-star" :uncertified-okp nil :dir :acl2s-modes :ttags ((:acl2s-interaction)) :load-compiled-file nil);v4.0 change
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%") (value :invisible))
+(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the EVALABLE-LD-PRINTING book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "hacking/evalable-ld-printing" :uncertified-okp nil :dir :system :ttags ((:evalable-ld-printing)) :load-compiled-file nil);v4.0 change
-
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%") (value :invisible))
-(include-book "acl2s/defunc" :dir :system :uncertified-okp nil :load-compiled-file :comp) ;lets add defunc at least harshrc [2015-02-01 Sun]
-(include-book "custom" :dir :acl2s-modes :uncertified-okp nil :load-compiled-file :comp)
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading programming mode.") (value :invisible))
+;Common base theory for all modes.
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%") (value :invisible))
+(include-book "acl2s/base-theory" :dir :system :ttags :all)
 
 
-(er-progn 
-  (program)
-  (defun book-beginning () ()) ; to prevent book development
-  (set-irrelevant-formals-ok :warn)
-  (set-bogus-mutual-recursion-ok :warn)
-  (set-ignore-ok :warn)
-  (set-verify-guards-eagerness 0)
-  (set-default-hints '(("Goal" :error "This depends on a proof, and proofs are disabled in Programming mode.  The session mode can be changed under the \"ACL2s\" menu.")))
-  (reset-prehistory t)
-  (set-guard-checking :none)
-  (set-guard-checking :nowarn)
-  (assign evalable-ld-printingp t)
-  (assign evalable-printing-abstractions '(list cons))
-  (assign triple-print-prefix "; "))
-  
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "custom" :dir :acl2s-modes :ttags :all)
+
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
+
+;Settings common to all ACL2s modes
+(acl2s-common-settings)
+;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
+
+(acl2::xdoc acl2s::defunc) ; almost 3 seconds
+
+; Non-events:
+;(set-guard-checking :none)
+
 (acl2::in-package "ACL2S")
 
-(cw "~@0Programming mode loaded.~%~@1"
-      #+acl2s-startup "${NoMoReSnIp}$~%" #-acl2s-startup ""
-      #+acl2s-startup "${SnIpMeHeRe}$~%" #-acl2s-startup "")
-
-; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
-;$ACL2s-SMode$;Programming
+; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
+;$ACL2s-SMode$;ACL2s
 ;DPSS CONSTANTS
 (defconst *n_int* 3)
-(defconst *n_real* 3.)
 (defconst *p* 10.)
 (defconst *v* 1.)
-(defmacro dpss_t () (/ *p* *v*))
-(defconst *left* 0)
-(defconst *right* 1)
-(defconst *left_real* 0.)
-(defconst *right_real* 1.)
-
-(defconst *true_int* 1)
-(defconst *false_int* 0)
+(defconst *dpss_t* (/ *p* *v*))
 
 ;Convenient definitions for ranges and enums
-(defdata bool (range integer (0 <= _ <= 1)))
 (defdata direction (enum '(left right)))
 (defdata position (range rational (0. <= _ <= *p*)))
-(defdata id (range integer (0. < _ <= *n_int*)))
-;(defdata state (enum '(null escorted escorting converged)))
-
+(defdata id (range integer (0 < _ <= *n_int*)))
 
 ;Record (struct) representing single UAV
 (defdata UAS (record (uasid . id)
-                     (dir . bool)
-                     (pre_dir . bool)
+                     (dir . boolean)
+                     (pre_dir . boolean)
                      (loc . position)
                      (pre_loc . position)
                      (goal . position)
                      (pre_goal . position)
-                     ;(st . state)
-                     (meet_ln . bool)
-                     (meet_rn . bool)
+                     (meet_ln . boolean)
+                     (meet_rn . boolean)
                      (s_l . position)
-                     (s_r . position)))
+                     (s_r . position)))#|ACL2s-ToDo-Line|#
 
-;Full system consisting of a list of UAVs
-;(defdata system (listof UAS))
+
+(define return_def ()
+  1
+ )
+
+(define set_direction (ag :UAS d :direction) :uas
+  ag
+  )
+  
+
 
 ;Direction update
-(defun set_direction (ag)
+(defun set_direction (ag) 
   (if (uasp ag)
     (if (<= (uas-pre_loc ag) 0.)
       (set-uas-dir *right* ag)
