@@ -64,11 +64,6 @@
                      (s_l . position)
                      (s_r . position)))
 
-(defunc andm (a b)
-  :input-contract (and (booleanp a) (booleanp b))
-  :output-contract (booleanp (and a b))
-  (if a b nil))
-
 ;Direction update
 (defunc set_direction (ag)
   :input-contract (uasp ag)
@@ -175,8 +170,7 @@
              (and (= (uas-pre_loc uas1) *p_12*) (= (uas-loc uas2) *p_12*) (= (uas-loc uas3) *p*)))
         (and (and (= (uas-loc uas1) *p_12*) (= (uas-loc uas2) *p_12*) (= (uas-loc uas3) *p*))
              (and (= (uas-pre_loc uas1) 0.) (= (uas-loc uas2) *p_23*) (= (uas-loc uas3) *p_23*))))
-)#|ACL2s-ToDo-Line|#
-
+)
 
 ;Recursively evaluates next steps for uavs
 (defunc DPSS_eval (uas1 uas2 uas3)
