@@ -1,32 +1,45 @@
-; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
+; *************** BEGIN INITIALIZATION FOR PROGRAMMING MODE *************** ;
 ; (Nothing to see here!  Your actual file is after this initialization code);
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%") (value :invisible))
-(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the TRACE* book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+; only load for interactive sessions: 
+#+acl2s-startup (include-book "trace-star" :uncertified-okp nil :dir :acl2s-modes :ttags ((:acl2s-interaction)) :load-compiled-file nil);v4.0 change
 
-;Common base theory for all modes.
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%") (value :invisible))
-(include-book "acl2s/base-theory" :dir :system :ttags :all)
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the EVALABLE-LD-PRINTING book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+; only load for interactive sessions: 
+#+acl2s-startup (include-book "hacking/evalable-ld-printing" :uncertified-okp nil :dir :system :ttags ((:evalable-ld-printing)) :load-compiled-file nil);v4.0 change
 
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "custom" :dir :acl2s-modes :ttags :all)
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%") (value :invisible))
+(include-book "acl2s/defunc" :dir :system :uncertified-okp nil :load-compiled-file :comp) ;lets add defunc at least harshrc [2015-02-01 Sun]
+(include-book "custom" :dir :acl2s-modes :uncertified-okp nil :load-compiled-file :comp)
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading programming mode.") (value :invisible))
 
-;Settings common to all ACL2s modes
-(acl2s-common-settings)
-;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
 
-(acl2::xdoc acl2s::defunc) ; almost 3 seconds
-
-; Non-events:
-;(set-guard-checking :none)
-
+(er-progn 
+  (program)
+  (defun book-beginning () ()) ; to prevent book development
+  (set-irrelevant-formals-ok :warn)
+  (set-bogus-mutual-recursion-ok :warn)
+  (set-ignore-ok :warn)
+  (set-verify-guards-eagerness 0)
+  (set-default-hints '(("Goal" :error "This depends on a proof, and proofs are disabled in Programming mode.  The session mode can be changed under the \"ACL2s\" menu.")))
+  (reset-prehistory t)
+  (set-guard-checking :none)
+  (set-guard-checking :nowarn)
+  (assign evalable-ld-printingp t)
+  (assign evalable-printing-abstractions '(list cons))
+  (assign triple-print-prefix "; "))
+  
 (acl2::in-package "ACL2S")
 
-; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
-;$ACL2s-SMode$;ACL2s
+(cw "~@0Programming mode loaded.~%~@1"
+      #+acl2s-startup "${NoMoReSnIp}$~%" #-acl2s-startup ""
+      #+acl2s-startup "${SnIpMeHeRe}$~%" #-acl2s-startup "")
+
+; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
+;$ACL2s-SMode$;Programming
 ;DPSS CONSTANTS
 (defconst *n* 3)
 (defconst *p* 10.)
@@ -54,26 +67,25 @@
 (defunc andm (a b)
   :input-contract (and (booleanp a) (booleanp b))
   :output-contract (booleanp (and a b))
-  (if a b nil))#|ACL2s-ToDo-Line|#
+  (if a b nil))
 
-
-
-;((<= (uas-pre_loc ag) 0.) (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-;        ((>= (uas-pre_loc ag) *p*) (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-;        ((uas-meet_ln ag)
-;         (if (<= (uas-pre_loc ag) (uas-s_l ag)) 
-;           (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-;           (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))
-;        ((uas-meet_rn ag)
-;         (if (< (uas-pre_loc ag) (uas-s_r ag)) 
-;           (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-;           (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))
 ;Direction update
 (defunc set_direction (ag)
   :input-contract (uasp ag)
-  :output-contract (uasp (set_direction))
-  ;(UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-  (UAS (uas-uasid ag) 'left 'left 1. 1. 1. 1. nil nil 1. 1.)
+  :output-contract (uasp (set_direction ag))
+  (cond
+   ((<= (uas-pre_loc ag) 0.) (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
+   ((>= (uas-pre_loc ag) *p*) (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
+   ((uas-meet_ln ag)
+    (if (<= (uas-pre_loc ag) (uas-s_l ag))
+      (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
+      (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))
+   ((uas-meet_rn ag)
+    (if (< (uas-pre_loc ag) (uas-s_r ag))
+      (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
+      (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))
+   (t (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
+   )
 )
 
 (defunc set_loc (ag dt)
@@ -163,7 +175,8 @@
              (and (= (uas-pre_loc uas1) *p_12*) (= (uas-loc uas2) *p_12*) (= (uas-loc uas3) *p*)))
         (and (and (= (uas-loc uas1) *p_12*) (= (uas-loc uas2) *p_12*) (= (uas-loc uas3) *p*))
              (and (= (uas-pre_loc uas1) 0.) (= (uas-loc uas2) *p_23*) (= (uas-loc uas3) *p_23*))))
-)
+)#|ACL2s-ToDo-Line|#
+
 
 ;Recursively evaluates next steps for uavs
 (defunc DPSS_eval (uas1 uas2 uas3)
