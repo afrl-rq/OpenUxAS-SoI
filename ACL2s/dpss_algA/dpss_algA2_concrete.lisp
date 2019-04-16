@@ -48,11 +48,11 @@
 (defmacro dpss_t () (/ *p* *v*)) ;macro for convergence bound
 (defconst *left* 0)
 (defconst *right* 1)
-(defconst *left_real* 0.)
-(defconst *right_real* 1.)
+;(defconst *left_real* 0.)
+;(defconst *right_real* 1.)
 
-(defconst *true_int* 1)
-(defconst *false_int* 0)
+;(defconst *true_int* 1)
+;(defconst *false_int* 0)
 
 ;Convenient definitions for ranges and enums
 (defdata bool (range integer (0 <= _ <= 1)))
@@ -329,5 +329,4 @@
 (defthm uas_time_bound
   (implies (and (positionp p_uas1) (positionp p_uas2) (positionp p_uas3) (directionp d_uas1) (directionp d_uas2) (directionp d_uas3))
            (<= (DPSS p_uas1 p_uas2 p_uas3 d_uas1 d_uas2 d_uas3)
-              (* 2 (dpss_t)))))#|ACL2s-ToDo-Line|#
-
+              (* 2 (dpss_t)))))
