@@ -131,7 +131,7 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
     m_DivertState.heading_deg = m_CurrentState.heading_deg;
     m_DivertState.altitude_m = m_CurrentState.altitude_m;
     m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
-    m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;       
+    m_DivertState.vertical_speed_mps = 0; // hold current altitude while diverting m_CurrentState.vertical_speed_mps;       
 
     std::cout << "Current heading = " << m_CurrentState.heading_deg << std::endl;
     struct intervals
@@ -157,6 +157,7 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
     }
     uint initial_band = 0;  //band that the initial heading was in.
     bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    //Of the reported bad bands, find which one the current heading is in
     for (uint i = 0; i < bands.size(); i++) //loop over the bands trying to set divert action to the maximum (right hand turn) of an interval until no 
         //more consecutive intervals are found
     {
@@ -284,7 +285,7 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
     m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
     m_DivertState.altitude_m = m_CurrentState.altitude_m;
     m_DivertState.heading_deg = m_CurrentState.heading_deg;
-    m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
+    m_DivertState.vertical_speed_mps = 0;   //hold altitude while divertingm_CurrentState.vertical_speed_mps;
     struct intervals
     {
         double lower;
@@ -318,22 +319,23 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
     {
         if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
         {
-            m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps;
+            m_DivertState.horizontal_speed_mps = bands[i].lower - m_groundspeed_interval_buffer_mps; //if DivertState is in a bad band, alter to less than minimum
         }
     }
 
     if (m_DivertState.horizontal_speed_mps < m_ground_speed_min_mps)  //If divert speed is less than min, a speed up is preferred.
     {
+        m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps; //reset divert horizontal speed to current then check higher speeds
         for (uint i = initial_band; i < bands.size(); i++)
         {
-            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.horizontal_speed_mps))
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.horizontal_speed_mps))
             {
-                m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps;
+                m_DivertState.horizontal_speed_mps = bands[i].upper + m_groundspeed_interval_buffer_mps; //if divertstate is in a bad band, alter to more than maximum
             }
         }
     }
 
-    if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If after checking right turns and left turns no better heading found, keep current heading
+    if (m_DivertState.horizontal_speed_mps > m_ground_speed_max_mps)  //If after checking slow downs and speed up no better heading found, check recovery intervals
     {
         guaranteed_flag = false;
         if (DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size() > 0)
@@ -341,6 +343,7 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
             bool isRecoveryFound = false;
             //ASSERT(Recovery bands will never span the entire range)--Need to set recovery volume to start at well clear volume
             //m_DivertState.horizontal_speed_mps = m_CurrentState.horizontal_speed_mps;
+            //Form vector of recovery intervals
             for (uint i = 0; i < DAIDALUS_bands->getRecoveryGroundSpeedIntervals().size(); i++)
             {
                 temp.lower = DAIDALUS_bands->getRecoveryGroundSpeedIntervals()[i]->getRecoveryGroundSpeeds()[0];
@@ -350,7 +353,7 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
 
             for (int i = r_bands.size(); i >= 0; i--)
             {
-//                if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
+                //Find the first recovery interval that is at a lower speed than current speed
                 if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
                 {
                     m_DivertState.horizontal_speed_mps = r_bands[i].upper - m_groundspeed_interval_buffer_mps / 2.0;
@@ -362,7 +365,7 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
             if (!isRecoveryFound)
             {
                 for (uint i = 0; i < r_bands.size(); i++)
-//                    if ((r_bands[i].lower < m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper < m_CurrentState.horizontal_speed_mps))
+                    //If no lower recovery found, find first recovery interval with higher speeds than current
                     if ((r_bands[i].lower > m_CurrentState.horizontal_speed_mps) && (r_bands[i].upper > m_CurrentState.horizontal_speed_mps))
                     {
                         m_DivertState.horizontal_speed_mps = r_bands[i].lower + m_groundspeed_interval_buffer_mps / 2.0;
@@ -373,6 +376,7 @@ bool DAIDALUS_WCV_Response::foundWCVGroundSpeedResolution(const std::shared_ptr<
         }
         else 
         {
+            //If no recovery found, set default behavior to minimum speed
             m_DivertState.horizontal_speed_mps = m_ground_speed_min_mps;
         }
     }
@@ -405,11 +409,12 @@ bool DAIDALUS_WCV_Response::foundWCVVerticalSpeedResolution(const std::shared_pt
     }
     uint initial_band = 0;  //band that the initial heading was in.
     bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    //Of the reported bad bands, find which one the current vertical speed is in
     for (uint i = 0; i < bands.size(); i++)
     {
         if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.vertical_speed_mps))
         {
-            m_DivertState.vertical_speed_mps = bands[i].upper + m_verticalspeed_interval_buffer_mps;
+            m_DivertState.vertical_speed_mps = bands[i].upper + m_verticalspeed_interval_buffer_mps; //if DivertState is in a bad band, alter to more than maximum
             if (!isFound)
             {
                 initial_band = i;
@@ -418,24 +423,26 @@ bool DAIDALUS_WCV_Response::foundWCVVerticalSpeedResolution(const std::shared_pt
         }
     }
 
-    if (m_DivertState.vertical_speed_mps > m_vertical_speed_max_mps)  //If divert heading is greater than 360, a left turn is preferred.
+    if (m_DivertState.vertical_speed_mps > m_vertical_speed_max_mps)  //If divert vertical speed  is greater than max, a decrease turn is preferred.
     {
+        m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps; //reset divert speed to current speed and check lowers speeds
         for (int i = initial_band; i >= 0; i--)
         {
             if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.vertical_speed_mps))
             {
-                m_DivertState.vertical_speed_mps = bands[i].lower - m_verticalspeed_interval_buffer_mps;
+                m_DivertState.vertical_speed_mps = bands[i].lower - m_verticalspeed_interval_buffer_mps; //if divert speed in a bad band, alter to less than the minimum
             }
         }
     }
 
-    if (m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps)//If after checking right turns and left turns no better heading found, keep current heading
+    if (m_DivertState.vertical_speed_mps < m_vertical_speed_min_mps)//If after checking speed increases and decreases no better heading found, check recovery
     {
         guaranteed_flag = false;
         if (DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size() > 0)
         {
             //m_DivertState.vertical_speed_mps = m_CurrentState.vertical_speed_mps;
             bool isRecoveryFound = false;
+            //Form a vector of recovery bands
             for (uint i = 0; i < DAIDALUS_bands->getRecoveryVerticalSpeedIntervals().size(); i++)
             {
                 temp.lower = DAIDALUS_bands->getRecoveryVerticalSpeedIntervals()[i]->getRecoveryVerticalSpeed()[0];
@@ -445,6 +452,7 @@ bool DAIDALUS_WCV_Response::foundWCVVerticalSpeedResolution(const std::shared_pt
 
             for (uint i = 0; i < bands.size(); i++)
             {
+                //Find first recovery interval with speeds greater than current and set divert to just over minimum
                 if ((r_bands[i].lower > m_CurrentState.vertical_speed_mps) && (r_bands[i].upper > m_CurrentState.vertical_speed_mps))
                 {
                     m_DivertState.vertical_speed_mps = r_bands[i].lower + m_verticalspeed_interval_buffer_mps / 2.0;
@@ -455,6 +463,7 @@ bool DAIDALUS_WCV_Response::foundWCVVerticalSpeedResolution(const std::shared_pt
 
             if (!isRecoveryFound)
             {
+                //if no faster recovery found, check lower recovery
                 for (int i = r_bands.size(); i >= 0; i--)
                     if ((r_bands[i].lower < m_CurrentState.vertical_speed_mps) && (r_bands[i].upper < m_CurrentState.vertical_speed_mps))
                     {
@@ -494,11 +503,12 @@ bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<lar
     }
     uint initial_band = 0;  //band that the initial heading was in.
     bool isFound = false;  //boolean stating whether the band that the initial heading was in has been identified
+    //Of the reported bad bands, find which one the current altitude is in
     for (uint i = 0; i < bands.size(); i++)
     {
         if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.altitude_m))
         {
-            m_DivertState.altitude_m = bands[i].upper + m_altitude_interval_buffer_m;
+            m_DivertState.altitude_m = bands[i].upper + m_altitude_interval_buffer_m; //if DivertState is in a bad band, alter to more than maximum
             if (!isFound)
             {
                 initial_band = i;
@@ -509,22 +519,24 @@ bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<lar
 
     if (m_DivertState.altitude_m > m_altitude_max_m)  //If divert altitude is greater than altitude max, a descent is preferred.
     {
+        m_DivertState.altitude_m = m_CurrentState.altitude_m; //reset divert altitude to current altitude then check bands below current altitude
         for (int i = initial_band; i >= 0; i--)
         {
-            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.altitude_m))
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.altitude_m))
             {
-                m_DivertState.altitude_m = bands[i].lower - m_altitude_interval_buffer_m;
+                m_DivertState.altitude_m = bands[i].lower - m_altitude_interval_buffer_m; //if Divert altitude is in a bad band, alter to less than minimum
             }
         }
     }
 
-    if (m_DivertState.altitude_m < m_altitude_min_m)//If after checking right turns and left turns no better heading found, keep current heading
+    if (m_DivertState.altitude_m < m_altitude_min_m)//If after checking ascents and descents no better heading found, check recovery bands
     {
         guaranteed_flag = false;
         if (DAIDALUS_bands->getRecoveryAltitudeIntervals().size() > 0)
         {
             //m_DivertState.altitude_m = m_CurrentState.altitude_m;
             bool isRecoveryFound = false;
+            //Form a vector of recovery band intervals
             for (uint i = 0; i < DAIDALUS_bands->getRecoveryAltitudeIntervals().size(); i++)
             {
                 temp.lower = DAIDALUS_bands->getRecoveryAltitudeIntervals()[i]->getRecoveryAltitude()[0];
@@ -532,16 +544,19 @@ bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<lar
                 r_bands.push_back(temp);
             }
 
+            //Find the first recovery band that is at an altitude greater than the current altitude and set divert altitude to just over the minimum
             for (uint i = 0; i < r_bands.size(); i++)
             {
                 if ((r_bands[i].lower > m_CurrentState.altitude_m) && (r_bands[i].upper > m_CurrentState.altitude_m))
                 {
-                    m_DivertState.altitude_m = r_bands[i].lower + m_altitude_interval_buffer_m / 2.0;
+                    m_DivertState.altitude_m = r_bands[i].lower + m_altitude_interval_buffer_m / 2.0; 
                     isRecoveryFound = true;
                     break;
                 }
             }
 
+            //If no recovery greater than current altitude exists, find the first recovery interval lower than current altitude and set divert to just 
+            //under the maximum of that recovery interval
             if (!isRecoveryFound)
             {
                 for (int i = r_bands.size(); i >= 0; i--)
@@ -554,6 +569,7 @@ bool DAIDALUS_WCV_Response::foundWCVAltitudeResolution(const std::shared_ptr<lar
         }
         else
         {
+            //if no solution and no recovery found default to diverting to maximum altitude
             guaranteed_flag = false;
             m_DivertState.altitude_m = m_altitude_max_m;
             std::cout << "No way to avoid violation of Well Clear Volume" << std::endl;
