@@ -8,8 +8,6 @@ Files:
 
 * `cfg_CordonTask.xml` - The UxAS configuration file for this example. This configuration file sets up the services and bridges.
 * `runUxAS_CordonTask.py` - This script runs UxAS with the details in the UxAS configuration file
-* `runAMASE_CordonTask.py` - This script runs AMASE with the AMASE configuration file.
-* `Scenario_CordonTask.xml` - The AMASE configuration file for this example.
 * `MessagesToSend/` - Contains the messages send by UxAS with the send messages service.
 * `MessagesToSend/GroundVehicleConfiguration_13.xml` - Details for ground vehicle 13.
 * `MessagesToSend/GroundVehicleState_13.xml` - Ground vehicle 13's initial state.
@@ -28,6 +26,4 @@ Running the example:
 --------------------
 1. Open a terminal window in the directory: "examples/tasks/CordonTask"
 2. enter the command `python3 runUxAS_CordonTask.py` or `./runUxAS_CordonTask.py`
-3. open another terminal window in the directory: "examples/tasks/CordonTask"
-4. enter the command `python3 runAMASE_CordonTask.py` or `./runAMASE_CordonTask.py`
-5. start the AMASE simulation (i.e. press the play button)
+3. start the AMASE simulation (i.e. press the play button)

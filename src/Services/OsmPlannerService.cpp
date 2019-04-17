@@ -23,7 +23,6 @@
 //#include "Vehicle.h"
 #include "PathInformation.h"
 #include "FileSystemUtilities.h"
-#include "UnitConversions.h"
 #include "Constants/UxAS_String.h"
 
 #include "Constants/Convert.h"
@@ -238,11 +237,10 @@ bool OsmPlannerService::bProcessEgressRequest(const std::shared_ptr<uxas::messag
     return true;
      */
 
-    double dummy = 0.0;
     std::vector<n_FrameworkLib::CPosition> intersections;
     n_FrameworkLib::CPosition center(egressRequest->getStartLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
                                      egressRequest->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                                     egressRequest->getStartLocation()->getAltitude(), dummy);
+                                     egressRequest->getStartLocation()->getAltitude(), m_flatEarth);
 
     findRoadIntersectionsOfCircle(center, egressRequest->getRadius(), intersections);
 
@@ -300,13 +298,13 @@ bool OsmPlannerService::bProcessRoutePlanRequest(const std::shared_ptr<uxas::mes
 
             n_FrameworkLib::CPosition positionStart((*itRequest)->getStartLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
                                                     (*itRequest)->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                                                    0.0, 0.0);
+                                                    0.0, m_flatEarth);
             int64_t nodeIdStart(-1);
             double lengthFromStartToNode(-1.0);
 
             n_FrameworkLib::CPosition positionEnd((*itRequest)->getEndLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
                                                   (*itRequest)->getEndLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                                                  0.0, 0.0);
+                                                  0.0, m_flatEarth);
             int64_t nodeIdEnd(-1);
             double lengthFromNodeToEnd(-1.0);
 
@@ -543,11 +541,11 @@ bool OsmPlannerService::isProcessRoadPointsRequest(const std::shared_ptr<uxas::m
 
             n_FrameworkLib::CPosition positionStart((*itRequest)->getStartLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
                                                     (*itRequest)->getStartLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                                                    0.0, 0.0);
+                                                    0.0, m_flatEarth);
 
             n_FrameworkLib::CPosition positionEnd((*itRequest)->getEndLocation()->getLatitude() * n_Const::c_Convert::dDegreesToRadians(),
                                                   (*itRequest)->getEndLocation()->getLongitude() * n_Const::c_Convert::dDegreesToRadians(),
-                                                  0.0, 0.0);
+                                                  0.0, m_flatEarth);
             int64_t nodeIdStart(-1);
             double lengthFromStartToNode_m(-1.0);
             int64_t nodeIdEnd(-1);
@@ -950,8 +948,6 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
 
     auto startTime = std::chrono::system_clock::now();
 
-    uxas::common::utilities::CUnitConversions cUnitConversions;
-
     m_wayIdVsNodeId.clear();
     m_cellVsPlanningNodeIds.clear();
     m_cellVsAllNodeIds.clear();
@@ -1096,7 +1092,7 @@ bool OsmPlannerService::isBuildRoadGraphWithOsm(const string & osmFile)
                                     double lon = ndCurrent.attribute("lon").as_double() * n_Const::c_Convert::dDegreesToRadians();
                                     double dNorth_m(0.0);
                                     double dEast_m(0.0);
-                                    auto newNode = std::unique_ptr<n_FrameworkLib::CPosition>(new n_FrameworkLib::CPosition(lat, lon, 0.0, 0.0));
+                                    auto newNode = std::unique_ptr<n_FrameworkLib::CPosition>(new n_FrameworkLib::CPosition(lat, lon, 0.0, m_flatEarth));
                                     northMax_m = (newNode->m_north_m > northMax_m) ? (newNode->m_north_m) : (northMax_m);
                                     northMin_m = (newNode->m_north_m < northMin_m) ? (newNode->m_north_m) : (northMin_m);
                                     eastMax_m = (newNode->m_east_m > eastMax_m) ? (newNode->m_east_m) : (eastMax_m);
@@ -1207,7 +1203,9 @@ bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, 
         edgeIdsReverse->m_highwayId = *itHighway;
 
         auto itHighwayNodes = m_wayIdVsNodeId.equal_range(*itHighway);
-
+        double distance = 0;
+        n_FrameworkLib::CPosition previousNode; //used to find distance between nodes
+        n_FrameworkLib::CPosition currentNode; //used to find distance between nodes
         for (auto itHighwayNode = itHighwayNodes.first; itHighwayNode != itHighwayNodes.second; itHighwayNode++)
         {
             auto itIsPlanningNode = nodeIdVs_isPlanningNode.find(itHighwayNode->second);
@@ -1217,6 +1215,7 @@ bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, 
                 {
                     if (itEdgeFirst == m_wayIdVsNodeId.end())
                     {
+                        previousNode = *(m_idVsNode->find(itHighwayNode->second)->second);
                         // found the start of a planning edge
                         itEdgeFirst = itHighwayNode;
                         edgeIdsForward->m_nodeIds.push_back(itHighwayNode->second);
@@ -1225,16 +1224,22 @@ bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, 
                     else
                     {
                         // found the end of a planning edge
+                        //set the current node
+                        currentNode = *(m_idVsNode->find(itHighwayNode->second)->second);
                         //forward
                         edgeIdsForward->m_nodeIds.push_back(itHighwayNode->second);
                         //reverse
                         edgeIdsReverse->m_nodeIds.push_front(itHighwayNode->second);
-
+                        //add to distance 
+                        distance += previousNode.relativeDistance2D_m(currentNode);
+                                               
                         auto idPairForward = std::make_pair(itEdgeFirst->second, itHighwayNode->second);
                         auto itEdgeNodeIds = m_nodeIdsVsEdgeNodeIds.find(idPairForward);
                         if (itEdgeNodeIds == m_nodeIdsVsEdgeNodeIds.end())
                         {
                             // found a new edge
+                            //assign distance before inserting edge
+                            edgeIdsForward->m_distance_m = distance;
                             m_nodeIdsVsEdgeNodeIds.insert(std::make_pair(idPairForward, std::move(edgeIdsForward)));
                         }
 
@@ -1244,6 +1249,8 @@ bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, 
                         if (itEdgeNodeIds == m_nodeIdsVsEdgeNodeIds.end())
                         {
                             // found a new edge
+                            //assign distance before inserting edge
+                            edgeIdsReverse->m_distance_m = distance;;
                             m_nodeIdsVsEdgeNodeIds.insert(std::make_pair(idPairReverse, std::move(edgeIdsReverse)));
                         }
 
@@ -1256,12 +1263,21 @@ bool OsmPlannerService::isProcessHighwayNodes(const std::unordered_map<int64_t, 
                         itEdgeFirst = itHighwayNode;
                         edgeIdsForward->m_nodeIds.push_back(itHighwayNode->second);
                         edgeIdsReverse->m_nodeIds.push_front(itHighwayNode->second);
-                    }
+                        
+                        //reset distance and set new previousNode
+                        distance = 0;
+                        previousNode = *(m_idVsNode->find(itHighwayNode->second)->second);                    }
                 }
                 else
                 {
                     if (itEdgeFirst != m_wayIdVsNodeId.end())
                     {
+                        currentNode = *(m_idVsNode->find(itHighwayNode->second)->second);
+                        distance += previousNode.relativeDistance2D_m(currentNode);
+
+                        //after distance is calculated, set the previous node to the current node
+                        previousNode = currentNode;
+                        
                         // in the middle of a planning edge
                         edgeIdsForward->m_nodeIds.push_back(itHighwayNode->second);
                         edgeIdsReverse->m_nodeIds.push_front(itHighwayNode->second);

@@ -31,4 +31,4 @@ Running the example:
 ### What happens?
 * When the AMASE simulation starts, vehicles 102 and 103 will be initialized and begin flying east.
 * After 4 seconds, an automation request for the watch task is sent.
-* Once plan has been calculated, vehicles 102 will begin watching vehicle 103.
+* Once plan has been calculated, vehicle 102 will begin watching vehicle 103.
