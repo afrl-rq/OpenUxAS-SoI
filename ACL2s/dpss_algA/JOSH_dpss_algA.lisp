@@ -31,39 +31,25 @@
 (defconst *n_int* 3)
 (defconst *p* 10.)
 (defconst *v* 1.)
-(defconst *dpss_t* (/ *p* *v*))
+(defconst dpss_t (/ *p* *v*))
 
 ;Convenient definitions for ranges and enums
 (defdata direction (enum '(left right)))
 (defdata position (range rational (0. <= _ <= *p*)))
-(defdata id (range integer (0 < _ <= *n_int*)))
+(defdata id (range integer (0. < _ <= *n_int*)))
 
 ;Record (struct) representing single UAV
 (defdata UAS (record (uasid . id)
-                     (dir . boolean)
-                     (pre_dir . boolean)
+                     (dir . bool)
                      (loc . position)
-                     (pre_loc . position)
                      (goal . position)
-                     (pre_goal . position)
-                     (meet_ln . boolean)
-                     (meet_rn . boolean)
+                     (meet_ln . bool)
+                     (meet_rn . bool)
                      (s_l . position)
-                     (s_r . position)))#|ACL2s-ToDo-Line|#
-
-
-(define return_def ()
-  1
- )
-
-(define set_direction (ag :UAS d :direction) :uas
-  ag
-  )
-  
-
+                     (s_r . position)))
 
 ;Direction update
-(defun set_direction (ag) 
+(defun set_direction (ag)
   (if (uasp ag)
     (if (<= (uas-pre_loc ag) 0.)
       (set-uas-dir *right* ag)
@@ -244,7 +230,7 @@
        (set_loc uas3 dt)
        
        ;Print out the updated state information
-       (cw "t:= ~p0\n UAS1: ~p1\n\t\tUAS2: ~p2\n\t\tUAS3: ~p3\n\t\t" (uas-loc uas1) (uas-loc uas2) (uas-loc uas3))
+       (cw "stepping")
        
         (+ dt
            (DPSS_eval uas1 uas2 uas3)

@@ -29,39 +29,24 @@
 ;$ACL2s-SMode$;ACL2s
 ;DPSS CONSTANTS
 (defconst *n_int* 3)
-(defconst *n_real* 3.)
 (defconst *p* 10.)
 (defconst *v* 1.)
-(defmacro dpss_t () (/ *p* *v*))
-(defconst *left* 0)
-(defconst *right* 1)
-(defconst *left_real* 0.)
-(defconst *right_real* 1.)
-
-(defconst *true_int* 1)
-(defconst *false_int* 0)
+(defconst dpss_t (/ *p* *v*))
 
 ;Convenient definitions for ranges and enums
-(defdata bool (range integer (0 <= _ <= 1)))
 (defdata direction (enum '(left right)))
 (defdata position (range rational (0. <= _ <= *p*)))
 (defdata id (range integer (0. < _ <= *n_int*)))
-(defdata state (enum '(null escorted escorting converged)))
-
 
 ;Record (struct) representing single UAV
 (defdata UAS (record (uasid . id)
                      (dir . bool)
                      (loc . position)
                      (goal . position)
-                     (st . state)
                      (meet_ln . bool)
                      (meet_rn . bool)
                      (s_l . position)
                      (s_r . position)))
-
-;Full system consisting of a list of UAVs
-;(defdata system (listof UAS))
 
 ;Direction update function
 (defun set_direction (ag)
