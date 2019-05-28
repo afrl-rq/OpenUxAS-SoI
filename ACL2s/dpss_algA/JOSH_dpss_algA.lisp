@@ -23,15 +23,21 @@
 ; Non-events:
 ;(set-guard-checking :none)
 
-(acl2::in-package "ACL2S")
-
-; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
-;$ACL2s-SMode$;ACL2s
+; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
+;$ACL2s-SMode$;Programming
 ;DPSS CONSTANTS
-(defconst *n_int* 3)
-(defconst *p* 10.)
-(defconst *v* 1.)
-(defconst dpss_t (/ *p* *v*))
+(defconst *n_int* 3) ;number of UAVs
+(defconst *n_real* 3.)
+(defconst *p* 10.) ;size of perimeter
+(defconst *v* 1.) ;UAV velocity
+(defmacro dpss_t () (/ *p* *v*)) ;macro for convergence bound
+(defconst *left* 0)
+(defconst *right* 1)
+;(defconst *left_real* 0.)
+;(defconst *right_real* 1.)
+
+;(defconst *true_int* 1)
+;(defconst *false_int* 0)
 
 ;Convenient definitions for ranges and enums
 (defdata direction (enum '(left right)))
