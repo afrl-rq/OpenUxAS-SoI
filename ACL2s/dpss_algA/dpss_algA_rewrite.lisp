@@ -1,45 +1,38 @@
-; *************** BEGIN INITIALIZATION FOR PROGRAMMING MODE *************** ;
+; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
 ; (Nothing to see here!  Your actual file is after this initialization code);
+(make-event
+ (er-progn
+  (set-deferred-ttag-notes t state)
+  (value '(value-triple :invisible))))
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the TRACE* book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "trace-star" :uncertified-okp nil :dir :acl2s-modes :ttags ((:acl2s-interaction)) :load-compiled-file nil);v4.0 change
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the EVALABLE-LD-PRINTING book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "hacking/evalable-ld-printing" :uncertified-okp nil :dir :system :ttags ((:evalable-ld-printing)) :load-compiled-file nil);v4.0 change
-
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%") (value :invisible))
-(include-book "acl2s/defunc" :dir :system :uncertified-okp nil :load-compiled-file :comp) ;lets add defunc at least harshrc [2015-02-01 Sun]
-(include-book "custom" :dir :acl2s-modes :uncertified-okp nil :load-compiled-file :comp)
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading programming mode.") (value :invisible))
+;Common base theory for all modes.
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "acl2s/base-theory" :dir :system :ttags :all)
 
 
-(er-progn 
-  (program)
-  (defun book-beginning () ()) ; to prevent book development
-  (set-irrelevant-formals-ok :warn)
-  (set-bogus-mutual-recursion-ok :warn)
-  (set-ignore-ok :warn)
-  (set-verify-guards-eagerness 0)
-  (set-default-hints '(("Goal" :error "This depends on a proof, and proofs are disabled in Programming mode.  The session mode can be changed under the \"ACL2s\" menu.")))
-  (reset-prehistory t)
-  (set-guard-checking :none)
-  (set-guard-checking :nowarn)
-  (assign evalable-ld-printingp t)
-  (assign evalable-printing-abstractions '(list cons))
-  (assign triple-print-prefix "; "))
-  
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "acl2s/custom" :dir :system :ttags :all)
+
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
+
+;Settings common to all ACL2s modes
+(acl2s-common-settings)
+;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
+
+(acl2::xdoc acl2s::defunc) ; almost 3 seconds
+
+; Non-events:
+;(set-guard-checking :none)
+
 (acl2::in-package "ACL2S")
 
-(cw "~@0Programming mode loaded.~%~@1"
-      #+acl2s-startup "${NoMoReSnIp}$~%" #-acl2s-startup ""
-      #+acl2s-startup "${SnIpMeHeRe}$~%" #-acl2s-startup "")
+; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
+;$ACL2s-SMode$;ACL2s
+;Assumption: all updates occur in parallel (accomplished through lets)
 
-; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
-;$ACL2s-SMode$;Programming
 ;DPSS CONSTANTS
 (defconst *n* 3)
 (defconst *p* 10.)
@@ -65,70 +58,89 @@
                      (s_r . position)))
 
 ;Direction update
+;Note: Pre dir is now updated here also
 (defunc set_direction (ag)
   :input-contract (uasp ag)
   :output-contract (uasp (set_direction ag))
-  (cond
-   ((<= (uas-pre_loc ag) 0.) (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-   ((>= (uas-pre_loc ag) *p*) (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-   ((uas-meet_ln ag)
-    (if (<= (uas-pre_loc ag) (uas-s_l ag))
-      (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-      (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))
-   ((uas-meet_rn ag)
-    (if (< (uas-pre_loc ag) (uas-s_r ag))
-      (UAS (uas-uasid ag) 'right (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-      (UAS (uas-uasid ag) 'left (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))
-   (t (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-   )
-)
+  (let* ((ag~ (set-uas-pre_dir (uas-dir ag) ag)))
+    (cond
+     ;If at or past left perimeter border, set direction to right
+     ((<= (uas-loc ag~) 0.) (set-uas-dir 'right ag~))
+     ;If at or past the right perimeter border, set direction to left
+     ((>= (uas-loc ag~) *p*) (set-uas-dir 'left ag~))
+     ;If co-located with left neighbor
+     ((uas-meet_ln ag~)
+      ;If to the left of the left meeting point
+      (if (<= (uas-loc ag~) (uas-s_l ag~))
+        ;Then set direction to right
+        (set-uas-dir 'right ag~)
+        ;Else set direction to left
+        (set-uas-dir 'left ag~)))
+     ;If co-located with right neighbor
+     ((uas-meet_rn ag~)
+      ;If to the left of the right meeting point
+      (if (< (uas-loc ag~) (uas-s_r ag~))
+        ;Then set direction to right
+        (set-uas-dir 'right ag~)
+        ;Else set direction to left
+        (set-uas-dir 'left ag~)))
+     ;Else, don't change direction
+     (t ag~))))
+   
+;Test: pre-dir should be equal to the previous direction
+(test? (implies (uasp ag)
+                (equal (uas-dir ag) (uas-pre_dir (set-direction ag)))))
 
+;Location Update
+;Simply based on velocity, direction, length of dt, and current position
+;TODO: use a macro for the bounds checking in the input contract and function body (improve readability)
 (defunc set_loc (ag dt)
   :input-contract (and (uasp ag) (rationalp dt) (<= (+ (uas-loc ag) (* *v* dt)) *p*) (> dt 0) (>= (- (uas-loc ag) (* *v* dt)) 0.))
   :output-contract (uasp (set_loc ag dt))
-  (if (equal (uas-dir ag) 'right)
-    (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (+ (uas-loc ag) (* *v* dt)) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-    (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (- (uas-loc ag) (* *v* dt)) (uas-pre_loc ag) (uas-goal ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-)
+  (let* ((ag~ (set-uas-pre_loc (uas-pre_loc ag) ag)))
+    ;If moving right
+    (if (equal (uas-dir ag~) 'right)
+      ;Increment location by (v * dt) 
+      (set-uas-loc (+ (uas-loc ag~) (* *v* dt)) ag~)
+      ;Decrement location by (v * dt)
+      (set-uas-loc (- (uas-loc ag~) (* *v* dt)) ag~))))
 
+;Goal update
+;TODO: consider using cond, or something else to reduce this nested if structure
 (defunc set_goal (ag)
   :input-contract (uasp ag)
   :output-contract (uasp ag)
-    (if (and (uas-meet_ln ag) (uas-meet_rn ag))
-      (if (<= (uas-pre_loc ag) (uas-s_l ag))
-        (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-s_r ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-        (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-s_l ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-      (if (uas-meet_ln ag)
-        (if (<= (uas-pre_loc ag) (uas-s_l ag))
-          (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) *p* (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-          (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-s_l ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-        (if (uas-meet_rn ag)
-          (if (>= (uas-pre_loc ag) (uas-s_r ag))
-            (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) 0. (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-            (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) (uas-s_r ag) (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag)))
-          (if (equal (uas-pre_dir ag) 'right)
-            (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) *p* (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))
-            (UAS (uas-uasid ag) (uas-dir ag) (uas-pre_dir ag) (uas-loc ag) (uas-pre_loc ag) 0. (uas-pre_goal ag) (uas-meet_ln ag) (uas-meet_rn ag) (uas-s_l ag) (uas-s_r ag))))))
-)
-
-  
-
-(defunc max_rat (a b)
-  :input-contract (and (rationalp a) (rationalp b))
-  :output-contract (rationalp (max_rat a b))
-  (if (>= a b)
-    a
-    b)
-)
-
-(defunc min_time (a b)
-  :input-contract (and (rationalp a) (rationalp b))
-  :output-contract (rationalp (min_time a b))
-  (if (>= a b)
-    b
-    a
-    )
-)
+  (let* ((ag~ (set-uas-pre_goal (uas-goal ag) ag)))
+    ;if co-located with left and right UAVs
+    (if (and (uas-meet_ln ag~) (uas-meet_rn ag~))
+      ;If the located to the left of the left boundary point
+      (if (<= (uas-loc ag~) (uas-s_l ag~))
+        ;Set goal to right boundary point
+        (set-uas-goal (uas-s_r ag~) ag~)
+        ;Set goal to left boundary point
+        (set-uas-goal (uas-s_l ag~) ag~))
+      ;If co-located with left neighbor
+      (if (uas-meet_ln ag~)
+        ;If to the left of the left boundary point
+        (if (<= (uas-loc ag~) (uas-s_l ag~))
+          ;Set the goal to the right perimeter edge
+          (set-uas-goal *p* ag~)
+          ;Set the goal to the left boundary point
+          (set-uas-goal 0 ag~))
+        ;If co-located with right neighbor
+        (if (uas-meet_rn ag~)
+          ;If to the right of the right boundary point
+          (if (>= (uas-loc ag~) (uas-s_r ag~))
+            ;Set the goal to the left perimeter edge
+            (set-uas-goal 0 ag~)
+            ;Set the goal to the right boundary point
+            (set-uas-goal (uas-s_r ag~) ag~))
+          ;If moving to the right
+          (if (equal (uas-dir ag~) 'right)
+            ;Set the goal to the right perimeter edge
+            (set-uas-goal *p* ag~)
+            ;Set the goal to the left perimeter edge
+            (set-uas-goal 0 ag~)))))))
 
 (defunc time_to_reach_endpoint (dir loc)
   :input-contract (and (directionp dir) (positionp loc))
@@ -169,17 +181,26 @@
   (or (and (and (= (uas-loc uas1) 0.) (= (uas-loc uas2) *p_23*) (= (uas-loc uas3) *p_23*))
              (and (= (uas-pre_loc uas1) *p_12*) (= (uas-loc uas2) *p_12*) (= (uas-loc uas3) *p*)))
         (and (and (= (uas-loc uas1) *p_12*) (= (uas-loc uas2) *p_12*) (= (uas-loc uas3) *p*))
-             (and (= (uas-pre_loc uas1) 0.) (= (uas-loc uas2) *p_23*) (= (uas-loc uas3) *p_23*))))
-)
+             (and (= (uas-pre_loc uas1) 0.) (= (uas-loc uas2) *p_23*) (= (uas-loc uas3) *p_23*)))))
+
+(defdata lou (listof UAS))
+(defdata lon (listof nat))
+
+(definec get-ids (l :lou) :lon
+  (if (endp l)
+    l
+    (cons (uas-uasid (first l)) (get-ids (rest l)))))
+
+;TODO: add predicate for checking that list of UAS has all exclusive ids
 
 ;Recursively evaluates next steps for uavs
 (defunc DPSS_eval (uas1 uas2 uas3)
   :input-contract (and (uasp uas1) (uasp uas2) (uasp uas3))
   :output-contract (rationalp (DPSS_eval uas1 uas2 uas3))
-      (let* ((dt (min_time (time_to_reach_target_position (uas-dir uas1) (uas-loc uas1) (uas-goal uas1))
-                     (min_time (time_to_reach_target_position (uas-dir uas2) (uas-loc uas2) (uas-goal uas2))
-                               (min_time (time_to_reach_target_position (uas-dir uas3) (uas-loc uas3) (uas-goal uas3))
-                                         (min_time (time_to_reach_neighbor (uas-dir uas1) (uas-dir uas2) (uas-loc uas1) (uas-loc uas2))
+      (let* ((dt (min (time_to_reach_target_position (uas-dir uas1) (uas-loc uas1) (uas-goal uas1))
+                     (min (time_to_reach_target_position (uas-dir uas2) (uas-loc uas2) (uas-goal uas2))
+                               (min (time_to_reach_target_position (uas-dir uas3) (uas-loc uas3) (uas-goal uas3))
+                                         (min (time_to_reach_neighbor (uas-dir uas1) (uas-dir uas2) (uas-loc uas1) (uas-loc uas2))
                                                    (time_to_reach_neighbor (uas-dir uas2) (uas-dir uas3) (uas-loc uas2) (uas-loc uas3))))))))
       (if (optimal? uas1 uas2 uas3)
         0.;termination of recursion: reached optimal state so 'no more important events';recursion: add time to next step ('important event') to recursive call to evaluate
