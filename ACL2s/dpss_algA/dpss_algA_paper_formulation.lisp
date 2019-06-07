@@ -1,45 +1,36 @@
-; *************** BEGIN INITIALIZATION FOR PROGRAMMING MODE *************** ;
+; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
 ; (Nothing to see here!  Your actual file is after this initialization code);
+(make-event
+ (er-progn
+  (set-deferred-ttag-notes t state)
+  (value '(value-triple :invisible))))
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the TRACE* book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "trace-star" :uncertified-okp nil :dir :acl2s-modes :ttags ((:acl2s-interaction)) :load-compiled-file nil);v4.0 change
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the EVALABLE-LD-PRINTING book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-; only load for interactive sessions: 
-#+acl2s-startup (include-book "hacking/evalable-ld-printing" :uncertified-okp nil :dir :system :ttags ((:evalable-ld-printing)) :load-compiled-file nil);v4.0 change
-
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%") (value :invisible))
-(include-book "acl2s/defunc" :dir :system :uncertified-okp nil :load-compiled-file :comp) ;lets add defunc at least harshrc [2015-02-01 Sun]
-(include-book "acl2s/custom" :dir :system :uncertified-okp nil :load-compiled-file :comp)
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading programming mode.") (value :invisible))
+;Common base theory for all modes.
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "acl2s/base-theory" :dir :system :ttags :all)
 
 
-(er-progn 
-  (program)
-  (defun book-beginning () ()) ; to prevent book development
-  (set-irrelevant-formals-ok :warn)
-  (set-bogus-mutual-recursion-ok :warn)
-  (set-ignore-ok :warn)
-  (set-verify-guards-eagerness 0)
-  (set-default-hints '(("Goal" :error "This depends on a proof, and proofs are disabled in Programming mode.  The session mode can be changed under the \"ACL2s\" menu.")))
-  (reset-prehistory t)
-  (set-guard-checking :none)
-  (set-guard-checking :nowarn)
-  (assign evalable-ld-printingp t)
-  (assign evalable-printing-abstractions '(list cons))
-  (assign triple-print-prefix "; "))
-  
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+(include-book "acl2s/custom" :dir :system :ttags :all)
+
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
+
+;Settings common to all ACL2s modes
+(acl2s-common-settings)
+;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
+
+(acl2::xdoc acl2s::defunc) ; almost 3 seconds
+
+; Non-events:
+;(set-guard-checking :none)
+
 (acl2::in-package "ACL2S")
 
-(cw "~@0Programming mode loaded.~%~@1"
-      #+acl2s-startup "${NoMoReSnIp}$~%" #-acl2s-startup ""
-      #+acl2s-startup "${SnIpMeHeRe}$~%" #-acl2s-startup "")
-
-; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
-;$ACL2s-SMode$;Programming
+; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
+;$ACL2s-SMode$;ACL2s
 ;Turns off strict termination, function contract, and body contract checking in ACL2s mode
 ;(set-defunc-termination-strictp nil)
 ;(set-defunc-function-contract-strictp nil)
@@ -56,14 +47,18 @@
 
 ;Directions along line (convenience)
 (defdata direction (enum '(left right)))
-;Valid location along perimeter
-;(Contrast this with getting a new location in function below, which allows leaving perimeter)
+
+;Valid location along perimeter (i.e., within bounds)
 (defdata valid_position (range rational (0 <= _ <= *p*)))
+;Location in general (i.e., MAY NOT BE IN BOUNDS)
 (defdata position rational)
+
 ;Possible number of UAS that may be on either side of individual
 (defdata num_left_right (range integer (0 <= _ < *n*)))
 ;Index of a particular UAS; convenient when checking for valid states
 (defdata index (range integer (0 < _ <= *n*)))
+;list of UAS indices; convenient when checking for valid states
+(defdata id_list (listof index))
 
 ;Record (struct) representing single UAV
 (defdata UAS (record (N_li . num_left_right)   ;number of UAS to left
@@ -74,13 +69,21 @@
                      (goal . valid_position)   ;target destination: useful in events-based model
                      (id . index))) 
 
+;Definitions for creating a non-empty list of UAS
 (defdata uas_list (listof UAS))
-;there is no obvious 'system-level' state; it's just the composition of the constituent UASs (AT LEAST 1)
 (defdata uas_system (cons UAS uas_list))
-;list of UAS indices; convenient when checking for valid states
-(defdata id_list (listof index))
 
-(assign test_sys (list 
+;Used for accumulator to track system evolution
+(defdata time (range rational (0 <= _)))
+
+;The overall state of the system is just the states of all the UAS and the time
+(defdata state (cons time uas_system))
+
+;A trace of the system is just a collection of states
+(defdata trace (listof state))
+
+;Example used for testing functions below (see 'TEST' annotation)
+(assign test_sys (cons 0 (list 
     (list   (cons :0TAG 'UAS)
             (cons :DIR 'RIGHT)
             (cons :GOAL *p*)
@@ -104,7 +107,7 @@
             (cons :N_LI 2)
             (cons :N_RI 0)
             (cons :P_LI *p*)
-            (cons :P_RI 0))))
+            (cons :P_RI 0)))))
 
 ;Computes UAS index (1,2,...,*n*), which determines perimeter slice
 (definec uas-relative_index (u :uas) :index
@@ -133,7 +136,7 @@
 ;TEST 1: UNIQUE IDS
 (check= 
  (valid-unique-ids 
-  (get-ids (@ test_sys))) t)
+  (get-ids (cdr (@ test_sys)))) t)
 
 ;--------------------------------
 ;TEST 2: NON-UNIQUE IDS
@@ -168,25 +171,25 @@
 
 ;Unique ids should ensure that removing one element from the list
 ;totally removes all elements with the same id
-(test? (implies (and (uas_systemp sys) (valid-unique-ids sys))
-                (not (in-list (uas-relative_index (first sys)) (get-ids sys)))))
+(test? (implies (and (uas_systemp sys) (cdr sys) (valid-unique-ids sys))
+                (not (in-list (uas-relative_index (first sys)) (get-ids (rest sys))))))
 
 ;Recurses through system, ensuring every UAS knows the correct number of other UAS
 (definec valid-id-sums (sys :uas_system) :bool
   (and (= (+ 1 (uas-N_li (first sys)) (uas-N_ri (first sys)))
-              *n*)
+          *n*)
        (or (endp (cdr sys)) 
            (valid-id-sums (rest sys)))))
  
 ;Recurses through system, ensuring every UAS knows the correct perimeter length
 (definec valid-per-lens (sys :uas_system) :bool
-  (and (= (+ (uas-P_li (first sys)) (uas-P_ri (first sys)))
-              *p*)
+  (and (valid_positionp (uas-P_li (first sys))) ;Both lengths are within bounds 0 <= _ <= *p*
+       (valid_positionp (uas-P_ri (first sys)))
+       (= (+ (uas-P_li (first sys)) (uas-P_ri (first sys))) *p*)
        (or (endp (cdr sys))
            (valid-per-lens (rest sys)))))
 
 ;Convenience: recurses through system, ensuring UAS are ordered by index in the list
-;(NOT NECESSARILY SPATIALLY)
 (definec valid-ordered (sys :uas_system) :bool
   (or (endp (cdr sys))
       (and (< (uas-relative_index (first sys)) 
@@ -202,7 +205,7 @@
   (and (valid-system-size sys) ;checks to ensure system has correct number of UAS
        (valid-id-sums sys) ;check to ensure left & right uas sum correctly
        (valid-ordered sys) ;checks to ensures that UAS are ordered by id (for convenience)
-       (valid-per-lens sys);check to ensure perimeters sum correctly
+       (valid-per-lens sys);checks to ensure perimeters sum correctly
        (valid-unique-ids (get-ids sys)))) ;check to ensure all ids are unique
 
 ;get shared left border based on index
@@ -239,20 +242,30 @@
             (cons :P_RI 0)))
   *p*)
 
+;Returns the UAS with id, 'id', in the given system, 'sys'
 (defunc get-uas-by-id (id sys)
   :input-contract (and (indexp id) (uas_systemp sys) (in-list id (get-ids sys)))
   :output-contract (and (uasp (get-uas-by-id id sys)) (in-list (get-uas-by-id id sys) sys))
   (if (equal id (uas-relative_index (first sys)))
     (first sys)
-    (get-uas-by-id id (rest sys))))
+    (get-uas-by-id id (rest sys))))#|ACL2s-ToDo-Line|#
+
 
 (defunc get-left-neighbor (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (valid-uas-system sys) (in-list u sys))
-  :output-contract (or (not (get-left-neighbor u sys)) (uasp (get-left-neighbor u sys)))
-  (let ((uas-id (uas-relative_index u)))
-  (if (> uas-id 1) 
-    (get-uas-by-id (1- uas-id) sys)
-    nil)))
+  :output-contract (or (uasp (get-left-neighbor u sys)) (not (get-left-neighbor u sys)))
+  (let ((id (uas-relative_index u)))
+    (if (> id 1)
+      (get-uas-by-id (1- id) sys)
+      nil)))
+
+(defunc get-left-neighbor (u sys)
+  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys))
+  :output-contract (or (uasp (get-left-neighbor u sys)) (not (get-left-neighbor u sys)))
+  (let ((id (uas-relative_index u)))
+    (if (and (> id 1) (in-list (1- id) (get-ids sys)))
+      (get-uas-by-id (1- id) sys)
+      nil)))
   
 (defunc uas-meet_ln (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
@@ -263,11 +276,12 @@
       nil)))
 
 (defunc get-right-neighbor (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
-  :output-contract (or (not (get-right-neighbor u sys)) (uasp (get-right-neighbor u sys)))
-  (if (equal (uas-relative_index u) *n*) 
-    nil
-    (get-uas-by-id (1+ (uas-relative_index u)) sys)))
+  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys))
+  :output-contract (or (uasp (get-right-neighbor u sys)) (not (get-right-neighbor u sys)))
+  (let ((id (uas-relative_index u)))
+    (if (and (< id *n*) (in-list (1+ id) (get-ids sys)))
+      (get-uas-by-id (1+ id) sys)
+      nil)))
   
 (defunc uas-meet_rn (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
@@ -277,6 +291,7 @@
       (equal (uas-P_li u) (uas-P_li rn))
       nil)))
 
+#|
 (check= 
  (uas-meet_rn
   (list   (cons :0TAG 'UAS)
@@ -320,7 +335,7 @@
                      (equal (get-left-neighbor b sys) a)
                      (equal (get-right-neighbor a sys) b))
                 (= (uas-s_l b) (uas-s_r a))))
-  
+|#
 (defunc get-new-direction (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
   :output-contract (directionp (get-new-direction u sys))
@@ -475,19 +490,20 @@
                   (set-uas-dir (get-new-direction (nth (1- n) sys) sys) (nth (1- n) sys)))))))
 
 (defunc step_forward (sys)
-  :input-contract (and (uas_systemp sys) (valid-uas-system sys))
-  :output-contract (and (uas_systemp (step_forward sys)) (valid-uas-system (step_forward sys)))
-  (let* ((dt (compute-dt sys))
-         (sys~ (move-all-uas sys dt (len sys))))
-    (compute-all-step sys~ dt (len sys~))))
+  :input-contract (and (statep sys) (valid-uas-system (cdr sys)))
+  :output-contract (and (statep (step_forward sys)) (valid-uas-system (cdr (step_forward sys))))
+  (let* ((dt (compute-dt (cdr sys)))
+         (sys~ (move-all-uas (cdr sys) dt (len (cdr sys)))))
+    (cons (+ (car sys) dt)
+          (compute-all-step sys~ dt (len sys~)))))
 
 (defunc step_forward_n (sys n)
-  :input-contract (and (uas_systemp sys) (valid-uas-system sys) (natp n))
-  :output-contract t
+  :input-contract (and (statep sys) (valid-uas-system (cdr sys)) (natp n))
+  :output-contract (and (tracep (step_forward_n sys n)))
   (if (= n 0)
-    sys
+    nil
     (let* ((sys~ (step_forward sys)))
-      (cons sys~ (step_forward_n sys~ (1- n))))))#|ACL2s-ToDo-Line|#
+      (cons sys~ (step_forward_n sys~ (1- n))))))
 
 
 ;Proof strategy for valid positions:
