@@ -110,10 +110,10 @@ else
   )
 
   # https://github.com/nmoinvaz/minizip
-  dep_minizip = dependency(
-    'minizip',
-    fallback: ['minizip', 'dep'],
-  )
+#  dep_minizip = dependency(
+#    'minizip',
+#    fallback: ['minizip', 'dep'],
+#  )
 
   dep_wellclear = subproject('wellclear').get_variable('dep')
 endif
@@ -149,7 +149,7 @@ deps = [
   dep_sqlite3,
   dep_sqlitecpp,
   dep_zlib,
-  dep_minizip,
+#  dep_minizip,
   dep_tinygps,
   dep_serial,
   dep_pugixml,
