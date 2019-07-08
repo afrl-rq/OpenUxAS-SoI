@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS FormatVersion="1.0" EntityID="200"  EntityType="Aircraft">
+
+    <Service Type="AutomationRequestValidatorService"/>
+    
+    <!-- Send every message from zeromq bus to an external program using ZeroMQ
+         Note: the external program must 'connect' using a SUB socket (for receive)
+         and 'connect' with a separate PUSH socket (for send).  -->
+    <Bridge Type="LmcpObjectNetworkPublishPullBridge" AddressPUB="tcp://127.0.0.1:5560" AddressPULL="tcp://127.0.0.1:5561">
+        <SubscribeToMessage MessageType="a" />
+        <SubscribeToMessage MessageType="b" />
+        <SubscribeToMessage MessageType="c" />
+        <SubscribeToMessage MessageType="d" />
+        <SubscribeToMessage MessageType="e" />
+        <SubscribeToMessage MessageType="f" />
+        <SubscribeToMessage MessageType="g" />
+        <SubscribeToMessage MessageType="h" />
+        <SubscribeToMessage MessageType="i" />
+        <SubscribeToMessage MessageType="j" />
+        <SubscribeToMessage MessageType="k" />
+        <SubscribeToMessage MessageType="l" />
+        <SubscribeToMessage MessageType="m" />
+        <SubscribeToMessage MessageType="n" />
+        <SubscribeToMessage MessageType="o" />
+        <SubscribeToMessage MessageType="p" />
+        <SubscribeToMessage MessageType="q" />
+        <SubscribeToMessage MessageType="r" />
+        <SubscribeToMessage MessageType="s" />
+        <SubscribeToMessage MessageType="t" />
+        <SubscribeToMessage MessageType="u" />
+        <SubscribeToMessage MessageType="v" />
+        <SubscribeToMessage MessageType="w" />
+        <SubscribeToMessage MessageType="x" />
+        <SubscribeToMessage MessageType="y" />
+        <SubscribeToMessage MessageType="z" />
+        <SubscribeToMessage MessageType="A" />
+        <SubscribeToMessage MessageType="B" />
+        <SubscribeToMessage MessageType="C" />
+        <SubscribeToMessage MessageType="D" />
+        <SubscribeToMessage MessageType="E" />
+        <SubscribeToMessage MessageType="F" />
+        <SubscribeToMessage MessageType="G" />
+        <SubscribeToMessage MessageType="H" />
+        <SubscribeToMessage MessageType="I" />
+        <SubscribeToMessage MessageType="J" />
+        <SubscribeToMessage MessageType="K" />
+        <SubscribeToMessage MessageType="L" />
+        <SubscribeToMessage MessageType="M" />
+        <SubscribeToMessage MessageType="N" />
+        <SubscribeToMessage MessageType="O" />
+        <SubscribeToMessage MessageType="P" />
+        <SubscribeToMessage MessageType="Q" />
+        <SubscribeToMessage MessageType="R" />
+        <SubscribeToMessage MessageType="S" />
+        <SubscribeToMessage MessageType="T" />
+        <SubscribeToMessage MessageType="U" />
+        <SubscribeToMessage MessageType="V" />
+        <SubscribeToMessage MessageType="W" />
+        <SubscribeToMessage MessageType="X" />
+        <SubscribeToMessage MessageType="Y" />
+        <SubscribeToMessage MessageType="Z" />
+    </Bridge>
+</UxAS>
+
+

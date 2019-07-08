@@ -1,0 +1,6 @@
+[submodule "ada/arv-demo/zeromq-Ada"]
+	path = ada/arv-demo/zeromq-Ada
+	url = git@github.com:persan/zeromq-Ada.git
+[submodule "ada/arv-demo/lmcpgen"]
+	path = ada/arv-demo/lmcpgen
+	url = git@github.com:AdaCore/LmcpGen.git

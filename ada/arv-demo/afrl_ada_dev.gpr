@@ -1,0 +1,63 @@
+with "xmlada";
+with "zeromq-Ada/zmq.gpr";
+with "lmcp-src/lmcp_generated_messages.gpr";
+
+project AFRL_Ada_Dev is
+
+   for Languages use ("Ada");
+
+   for Source_Dirs use
+     ("src/**");
+
+   for Exec_Dir use ".";
+
+   for Main use ("demo.adb");
+
+   type Modes is ("debug", "release");
+   App_Mode : Modes := external ("APP_MODE", "debug");
+
+   for Object_Dir use "objs/" & App_Mode;
+
+   package Builder is
+      case App_Mode is
+         when "debug" =>
+            for Default_Switches ("ada") use ("-g", "-j2");
+         when "release" =>
+            for Default_Switches ("ada") use ("-j2");
+      end case;
+   end Builder;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-Wl,--gc-sections");
+   end Linker;
+
+   package Compiler is
+      case App_Mode is
+         when "debug" =>
+            for Default_Switches ("ada") use
+              ("-gnatwa",
+               "-gnatyO",  --  Check that overriding subprograms are explicitly marked as such
+              -- "-gnatdF",  -- have SPARK allow restricted access types
+               "-gnateA",
+               "-g",
+               "-gnata",   -- enable assertions, eg pre/post
+               "-O0");
+         when "release" =>
+            for Default_Switches ("ada") use
+              ("-O2",
+               "-gnatn",
+               "-gnatp",
+               "-fdata-sections",
+               "-ffunction-sections");
+      end case;
+   end Compiler;
+
+   package Pretty_Printer is
+      for Switches ("ada") use ("-nM", "--no-separate-loop-then", "-M120");
+   end Pretty_Printer;
+
+   package Prove is
+      for Proof_Switches ("Ada") use ("--level=2");
+   end Prove;
+
+end AFRL_Ada_Dev;
