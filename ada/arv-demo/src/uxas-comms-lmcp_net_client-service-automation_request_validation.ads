@@ -76,7 +76,8 @@ private
    package Int64_CMASI_Task_Maps is new Ada.Containers.Formal_Hashed_Maps
      (Key_Type     => Int64,
       Element_Type => afrl.cmasi.lmcptask.spark_boundary.Task_Kind_And_Id,  --- TODO: maybe not classwide???
-      Hash         => Int64_Hash);
+      Hash         => Int64_Hash,
+      "="          => afrl.cmasi.lmcptask.spark_boundary."=");
 
    Int64_CMASI_Task_Maps_Max_Capacity : constant := 200; -- arbitrary
 
