@@ -217,6 +217,14 @@
        (valid-per-lens sys);checks to ensure perimeters sum correctly
        (valid-unique-ids (get-ids sys)))) ;check to ensure all ids are unique
 
+(definec below (n :nat) :tl
+  (if (= n 0)
+    nil
+    (cons n (below (1- n)))))
+
+(test? (implies (and (uas_systemp sys) (valid-uas-system sys))
+                (subsetp (below (len sys)) (get-ids sys))))
+
 ;get shared left border based on index
 (definec uas-s_l (u :uas) :valid_position      
   (* (/ *p* *n*) (1- (uas-relative_index u))));S_l = (id - 1) * P/N
@@ -252,19 +260,13 @@
  *p*)
 
 
-
-(thm ;nth-is-id-1, show that using nth returns the UAS w/ a particular id
-  ;(don't need to search)
-  (implies (and (uas_systemp sys)
-                (valid-ordered sys)
-                (valid-system-size sys)
-                (valid-id-sums sys)
-                (integerp i)
-                (> i 0)
-                (<= i *n*))
-           (= (uas-relative_index (nth (1- i) sys))
-              i)))
-                  
+;Returns the UAS with id, 'id', in the given system, 'sys'
+(defunc get-uas-by-id (id sys)
+  :input-contract (and (indexp id) (uas_systemp sys) (in-list id (get-ids sys)))
+  :output-contract (and (uasp (get-uas-by-id id sys)) (in-list (get-uas-by-id id sys) sys))
+  (if (equal id (uas-relative_index (first sys)))
+    (first sys)
+    (get-uas-by-id id (rest sys))))
 
 ;Returns the UAS with id, 'id', in the given system, 'sys' or nil
 (defunc get-uas-by-id (id sys)
@@ -387,6 +389,8 @@
                        (uas_systemp sys)
                        (in-list u sys)
                        (valid-uas-system sys))
+(defunc get-new-direction (u sys)
+  :input-contract (and (uasp u) (uas_systemp sys) (valid-uas-system sys) (in-list u sys))
   :output-contract (directionp (get-new-direction u sys))
   (cond
    ;If at or past left perimeter border, set direction to right
@@ -432,28 +436,30 @@
     ;getting farther from left endpoint
     (+ (uas-P_li u) (* *v* dt))))
 
+#|
 ;Get new goal
 (defunc get-new-goal (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
   :output-contract (valid_positionp (get-new-goal u sys))
-  (let ((to_right_boundary (uas-s_r u))
-        (to_left_boundary (uas-s_l u)))
+  (let ((right_boundary (uas-s_r u))
+        (left_boundary (uas-s_l u)))
     (cond ((and (uas-meet_ln u sys) (uas-meet_rn u sys)) ;if co-located with both neighbors...
-           (if (<= (uas-P_li u) (uas-s_l u)) ;then if to the left of shared left boundary
-             to_right_boundary ;then set goal to right boundary
-             to_left_boundary)) ;else set goal to left boundary
+           (if (<= (uas-s_l u) left_boundary) ;then if to the left of shared left boundary
+             right_boundary ;then set goal to right boundary
+             left_boundary)) ;else set goal to left boundary
           ((uas-meet_ln u sys) ;if co-located with just left neighbor
-           (if (<= (uas-P_li u) (uas-s_l u)) ;then if to the left of shared left boundary
-             *p* ;then set goal to right boundary
-             to_left_boundary)) ;then set goal to left boundary
+           (if (<= (uas-s_l u) left_boundary) ;then if to the left of shared left boundary
+             *p* ;then set goal to right perimeter endpoint
+             left_boundary)) ;then set goal to left boundary
           ((uas-meet_rn u sys) ;if co-located with just right neighbor
-           (if (>= (uas-P_li u) (uas-s_r u)) ;then if to the right of shared right boundary
+           (if (>= (uas-s_l u) right_boundary) ;then if to the right of shared right boundary
              0 ;then set goal to left perimeter endpoint
-             to_right_boundary)) ;then set goal to shared right boundary
+             right_boundary)) ;then set goal to shared right boundary
           (t ;Otherwise,
            (if (equal (uas-dir u) 'right) ;if moving right
              *p* ;then set goal to right perimeter endpoint
              0))))) ;else set goal to left perimeter endpoint
+|#
 
 (definec time_to_reach_endpoint (u :uas) :rational
   ;if moving to the right
@@ -473,42 +479,43 @@
       ;else return time to traverse full perimeter (overestimate?)
       *dpss_t*)))
 
-(defthm has-right-neighbor
-  (implies (and (uasp u)
-                (uas_systemp sys)
-                (member u sys)
-                (valid-uas-system sys)
-                (> (uas-relative_index u) 1))
-           (uasp (get-right-neighbor u sys))))
+(defunc time_to_reach_left_neighbor (u sys)
+  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
+  :output-contract (rationalp (time_to_reach_left_neighbor u sys))
+  (let* ((u-P_li (uas-P_li u))
+        (u-dir (uas-dir u))
+        (ln (get-left-neighbor u sys))
+        (ln-P_li (if ln (uas-P_li ln) nil))
+        (ln-dir (if ln (uas-dir ln) nil)))
+    (if (and ln (not (= ln-P_li u-P_li)) (equal u-dir 'left) (equal ln-dir 'right))
+      (/ (* 1/2 (abs (- ln-P_li u-P_li))) *v*)
+      *dpss_t*)))
 
 (defunc time_to_reach_right_neighbor (u sys)
-  :input-contract (and (uasp u)
-                       (uas_systemp sys)
-                       (in-list u sys)
-                       (valid-uas-system sys))
+  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
   :output-contract (rationalp (time_to_reach_right_neighbor u sys))
-  (if (get-right-neighbor u sys)
-      (if (and (not (= (uas-P_li (get-right-neighbor u sys)) (uas-P_li u)))
-               (equal (uas-dir u) 'right)
-               (equal (uas-dir (get-right-neighbor u sys)) 'left))
-          (/ (* 1/2 (- (uas-P_li (get-right-neighbor u sys)) (uas-P_li u))) *v*)
-        *dpss_t*)
-    *dpss_t*))
+  (let* ((u-P_li (uas-P_li u))
+        (u-dir (uas-dir u))
+        (rn (get-right-neighbor u sys))
+        (rn-P_li (if rn (uas-P_li rn) nil))
+        (rn-dir (if rn (uas-dir rn) nil)))
+    (if (and rn (not (= rn-P_li u-P_li)) (equal u-dir 'right) (equal rn-dir 'left))
+      (/ (* 1/2 (abs (- rn-P_li u-P_li))) *v*)
+      *dpss_t*)))#|ACL2s-ToDo-Line|#
 
-(defunc time_to_reach_left_neighbor (u sys)
-  :input-contract (and (uasp u)
-                       (uas_systemp sys)
-                       (in-list u sys)
-                       (valid-uas-system sys))
-  :output-contract (rationalp (time_to_reach_left_neighbor u sys))
-  (if (get-left-neighbor u sys)
-      (if (and (not (= (uas-P_li (get-left-neighbor u sys)) (uas-P_li u)))
-               (equal (uas-dir u) 'left)
-               (equal (uas-dir (get-left-neighbor u sys)) 'right))
-          (/ (* 1/2 (- (uas-P_li u) (uas-P_li (get-left-neighbor u sys)))) *v*)
-        *dpss_t*)
-    *dpss_t*))
 
+(definec min4 (a :rational b :rational c :rational d :rational) :rational
+  (min a
+       (min b
+            (min c d))))
+
+(defunc compute-individual-dt (u sys)
+  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
+  :output-contract t
+  
+  (min (time_to_reach_goal u) 
+       (min (time_to_reach_endpoint u) 
+            (min (time_to_reach_right_neighbor u sys) (time_to_reach_left_neighbor u sys)))))
 
 (defdata lor (listof rational))
 (defdata ne-lor (cons rational lor))
@@ -563,6 +570,7 @@
   :input-contract (and (uas_systemp sys) (valid-uas-system sys))
   :output-contract (rationalp (compute-dt sys))
   (list-min (compute-all-dt sys (len sys))))
+|#
 
 (defdata prat (range rational (0 <= _)))
 
@@ -571,11 +579,11 @@
    (set-uas-P_ri (get-new-P_ri u dt) u)))
 
 (defunc move-all-uas (sys dt n)
-  :input-contract (and (uas_systemp sys) (valid-uas-system sys) (pratp dt))
+  :input-contract (and (uas_systemp sys) (valid-uas-system sys) (pratp dt) (natp n) (> n 0))
   :output-contract (uas_systemp sys)
   (if (= n 1)
     (list (move-uas (nth (1- n) sys) dt))
-    (append (move-all-uas sys dt (1- n)) (list (move-uas (nth (1- n) sys) dt)))))
+    (append (move-all-uas sys dt n) (list (move-uas (nth n sys) dt)))))
 
 (defunc compute-all-step (sys dt n)
   :input-contract (and (uas_systemp sys) (valid-uas-system sys) (rationalp dt) (>= dt 0) (natp n) (<= n (len sys)))
