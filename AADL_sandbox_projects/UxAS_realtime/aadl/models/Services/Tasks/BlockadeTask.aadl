@@ -1,9 +1,0 @@
-package BlockadeTask_Package
-public
-    -- Included
-    with TaskServiceBase_Package;
-    
-    thread BlockadeTask extends TaskServiceBase_Package::TaskServiceBase
-    end BlockadeTask;
-    
-end BlockadeTask_Package;

@@ -1,8 +1,0 @@
-gnatprove -Pwaypoint_manager.gpr --level=2 -j7
-Phase 1 of 2: generation of Global contracts ...
-Phase 2 of 2: flow analysis and proof ...
-Summary logged in /Users/Dependable/Contracts/RAST/Documents/Produced/SPARK/waypoint_manager/build/gnatprove/gnatprove.out
-
-real	0m10.429s
-user	0m45.197s
-sys	0m1.318s

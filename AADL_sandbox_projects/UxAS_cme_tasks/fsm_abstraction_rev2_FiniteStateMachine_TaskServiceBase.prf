@@ -1,9 +1,0 @@
-(fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase
- (nnreal_to_1_TCC1 0
-  (nnreal_to_1_TCC1-1 nil 3709024418 ("" (subtype-tcc) nil nil)
-   ((nnreal_to_1? const-decl "bool"
-     fsm_abstraction_rev2_FiniteStateMachine_TaskServiceBase nil)
-    (real_le_is_total_order name-judgement "(total_order?[real])"
-     real_props nil))
-   nil)))
-

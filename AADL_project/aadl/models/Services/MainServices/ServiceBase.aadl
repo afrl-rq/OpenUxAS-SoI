@@ -1,8 +1,0 @@
-package ServiceBase_Pkg
-public
-    
-    thread ServiceBase
-    -- This is the basis of all the services. This inherits from LmcpObjectNetworkClientBase.
-    end ServiceBase;
-    
-end ServiceBase_Pkg;

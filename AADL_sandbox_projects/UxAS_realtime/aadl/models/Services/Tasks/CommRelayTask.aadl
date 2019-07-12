@@ -1,9 +1,0 @@
-package CommRelayTask_Package
-public
-    -- Included
-    with TaskServiceBase_Package;
-    
-    thread CommRelayTask extends TaskServiceBase_Package::TaskServiceBase
-    end CommRelayTask;
-    
-end CommRelayTask_Package;

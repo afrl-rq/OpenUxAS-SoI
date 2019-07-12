@@ -1,9 +1,0 @@
-package ZeroMqZyreBridge_Pkg
-public
-    -- empty
-    
-    thread ZeroMqZyreBridge
-    -- Look up in the code what this exactly does.
-    end ZeroMqZyreBridge;
-    
-end ZeroMqZyreBridge_Pkg;

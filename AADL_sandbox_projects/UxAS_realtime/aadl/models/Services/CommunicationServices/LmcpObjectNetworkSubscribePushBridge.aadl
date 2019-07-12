@@ -1,9 +1,0 @@
-package LmcpObjectNetworkSubscribePushBridge_Pkg
-public
-    -- empty
-    
-    thread LmcpObjectNetworkSubscribePushBridge
-    -- Look up in the code what this exactly does. This inherits from LmcpObjectNetworkClientBase
-    end LmcpObjectNetworkSubscribePushBridge;
-    
-end LmcpObjectNetworkSubscribePushBridge_Pkg;
