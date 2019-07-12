@@ -1,36 +1,45 @@
-; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
+; *************** BEGIN INITIALIZATION FOR PROGRAMMING MODE *************** ;
 ; (Nothing to see here!  Your actual file is after this initialization code);
-(make-event
- (er-progn
-  (set-deferred-ttag-notes t state)
-  (value '(value-triple :invisible))))
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the TRACE* book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+; only load for interactive sessions: 
+#+acl2s-startup (include-book "trace-star" :uncertified-okp nil :dir :acl2s-modes :ttags ((:acl2s-interaction)) :load-compiled-file nil);v4.0 change
 
-;Common base theory for all modes.
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/base-theory" :dir :system :ttags :all)
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the EVALABLE-LD-PRINTING book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
+; only load for interactive sessions: 
+#+acl2s-startup (include-book "hacking/evalable-ld-printing" :uncertified-okp nil :dir :system :ttags ((:evalable-ld-printing)) :load-compiled-file nil);v4.0 change
 
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/custom" :dir :system :ttags :all)
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%") (value :invisible))
+(include-book "acl2s/defunc" :dir :system :uncertified-okp nil :load-compiled-file :comp) ;lets add defunc at least harshrc [2015-02-01 Sun]
+(include-book "acl2s/custom" :dir :system :uncertified-okp nil :load-compiled-file :comp)
 
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
+#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading programming mode.") (value :invisible))
 
-;Settings common to all ACL2s modes
-(acl2s-common-settings)
-;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
 
-(acl2::xdoc acl2s::defunc) ; almost 3 seconds
-
-; Non-events:
-;(set-guard-checking :none)
-
+(er-progn 
+  (program)
+  (defun book-beginning () ()) ; to prevent book development
+  (set-irrelevant-formals-ok :warn)
+  (set-bogus-mutual-recursion-ok :warn)
+  (set-ignore-ok :warn)
+  (set-verify-guards-eagerness 0)
+  (set-default-hints '(("Goal" :error "This depends on a proof, and proofs are disabled in Programming mode.  The session mode can be changed under the \"ACL2s\" menu.")))
+  (reset-prehistory t)
+  (set-guard-checking :none)
+  (set-guard-checking :nowarn)
+  (assign evalable-ld-printingp t)
+  (assign evalable-printing-abstractions '(list cons))
+  (assign triple-print-prefix "; "))
+  
 (acl2::in-package "ACL2S")
 
-; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
-;$ACL2s-SMode$;ACL2s
+(cw "~@0Programming mode loaded.~%~@1"
+      #+acl2s-startup "${NoMoReSnIp}$~%" #-acl2s-startup ""
+      #+acl2s-startup "${SnIpMeHeRe}$~%" #-acl2s-startup "")
+
+; **************** END INITIALIZATION FOR PROGRAMMING MODE **************** ;
+;$ACL2s-SMode$;Programming
 ;Turns off strict termination, function contract, and body contract checking in ACL2s mode
 ;(set-defunc-termination-strictp nil)
 ;(set-defunc-function-contract-strictp nil)
@@ -40,7 +49,7 @@
 (defconst *n* 3)
 ;Length of perimeter
 (defconst *p* 10)
-;Speed of individual UAS
+;Speed of individual defconst
 (defconst *v* 1)
 ;Time to traverse perimeter once for one UAS
 (defconst *dpss_t* (/ *p* *v*))
@@ -177,7 +186,7 @@
 ;Recurses through system, ensuring every UAS knows the correct number of other UAS
 (definec valid-id-sums (sys :uas_system) :bool
   (and (= (+ 1 (uas-N_li (first sys)) (uas-N_ri (first sys)))
-          *n*)
+          *n*);[# to left] + [# to right] + 1 = N
        (or (endp (cdr sys)) 
            (valid-id-sums (rest sys)))))
  
@@ -185,7 +194,7 @@
 (definec valid-per-lens (sys :uas_system) :bool
   (and (valid_positionp (uas-P_li (first sys))) ;Both lengths are within bounds 0 <= _ <= *p*
        (valid_positionp (uas-P_ri (first sys)))
-       (= (+ (uas-P_li (first sys)) (uas-P_ri (first sys))) *p*)
+       (= (+ (uas-P_li (first sys)) (uas-P_ri (first sys))) *p*);[perim to left] + [perim to right] = P
        (or (endp (cdr sys))
            (valid-per-lens (rest sys)))))
 
@@ -210,11 +219,11 @@
 
 ;get shared left border based on index
 (definec uas-s_l (u :uas) :valid_position      
-  (* (/ *p* *n*) (1- (uas-relative_index u))))
+  (* (/ *p* *n*) (1- (uas-relative_index u))));S_l = (id - 1) * P/N
 
 ;get shared right border based on index
 (definec uas-s_r (u :uas) :valid_position    
-  (* (/ *p* *n*) (uas-relative_index u)))
+  (* (/ *p* *n*) (uas-relative_index u))); S_R = id * P/N
 
 ;TEST 3: Shared Left border of UAS1 is 0
 (check= 
@@ -240,33 +249,48 @@
             (cons :N_RI 0)
             (cons :P_LI *p*)
             (cons :P_RI 0)))
-  *p*)
+ *p*)
 
-;Returns the UAS with id, 'id', in the given system, 'sys'
+
+
+(thm ;nth-is-id-1, show that using nth returns the UAS w/ a particular id
+  ;(don't need to search)
+  (implies (and (uas_systemp sys)
+                (valid-ordered sys)
+                (valid-system-size sys)
+                (valid-id-sums sys)
+                (integerp i)
+                (> i 0)
+                (<= i *n*))
+           (= (uas-relative_index (nth (1- i) sys))
+              i)))
+                  
+
+;Returns the UAS with id, 'id', in the given system, 'sys' or nil
 (defunc get-uas-by-id (id sys)
-  :input-contract (and (indexp id) (uas_systemp sys) (in-list id (get-ids sys)))
-  :output-contract (and (uasp (get-uas-by-id id sys)) (in-list (get-uas-by-id id sys) sys))
-  (if (equal id (uas-relative_index (first sys)))
-    (first sys)
-    (get-uas-by-id id (rest sys))))#|ACL2s-ToDo-Line|#
+  :input-contract (and (indexp id)
+                       (uas_systemp sys))
+  :output-contract (or (uasp (get-uas-by-id id sys))
+                       (not (get-uas-by-id id sys)))
+  (cond ((endp sys) nil)
+        ((= id (uas-relative_index (first sys))) (first sys))
+        (t (get-uas-by-id id (rest sys)))))
 
-
+;Returns the UAS to the left of the given
+;Note: Need to prove that using nth is fine here  
 (defunc get-left-neighbor (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (valid-uas-system sys) (in-list u sys))
-  :output-contract (or (uasp (get-left-neighbor u sys)) (not (get-left-neighbor u sys)))
+  :input-contract (and (uasp u)
+                       (uas_systemp sys)
+                       (valid-uas-system sys)
+                       (in-list u sys))
+  :output-contract (or (uasp (get-left-neighbor u sys))
+                       (not (get-left-neighbor u sys)))
   (let ((id (uas-relative_index u)))
     (if (> id 1)
-      (get-uas-by-id (1- id) sys)
+        (nth (- id 2) sys)
       nil)))
 
-(defunc get-left-neighbor (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys))
-  :output-contract (or (uasp (get-left-neighbor u sys)) (not (get-left-neighbor u sys)))
-  (let ((id (uas-relative_index u)))
-    (if (and (> id 1) (in-list (1- id) (get-ids sys)))
-      (get-uas-by-id (1- id) sys)
-      nil)))
-  
+;True when the UAS and their left neighbor are co-located
 (defunc uas-meet_ln (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
   :output-contract (booleanp (uas-meet_ln u sys))
@@ -275,14 +299,21 @@
       (equal (uas-P_li u) (uas-P_li ln))
       nil)))
 
+;Returns the UAS to the right of the given
+;Note: Need to prove that using nth is fine here (same as above)
 (defunc get-right-neighbor (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys))
-  :output-contract (or (uasp (get-right-neighbor u sys)) (not (get-right-neighbor u sys)))
+  :input-contract (and (uasp u)
+                       (uas_systemp sys)
+                       (valid-uas-system sys)
+                       (in-list u sys))
+  :output-contract (or (not (get-right-neighbor u sys))
+                       (uasp (get-right-neighbor u sys)))
   (let ((id (uas-relative_index u)))
-    (if (and (< id *n*) (in-list (1+ id) (get-ids sys)))
-      (get-uas-by-id (1+ id) sys)
+    (if (< id *n*)
+      (nth id sys)
       nil)))
-  
+
+;True when the UAS and their right neighbor are co-located
 (defunc uas-meet_rn (u sys)
   :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
   :output-contract (booleanp (uas-meet_rn u sys))
@@ -336,8 +367,26 @@
                      (equal (get-right-neighbor a sys) b))
                 (= (uas-s_l b) (uas-s_r a))))
 |#
+
+;An attempt to determine why admitting function below failed;
+;failure seems to be related to (uas-dir u), which should be
+;guaranteed to have type 'direction'.
+;What axioms are added with Defdata for enums
+(defthm direction-must-be-left
+  (implies (and (uasp u)
+                (not (equal (uas-dir u) 'right)))
+           (equal (uas-dir u) 'left)))
+
+(defthm direction-must-be-right
+  (implies (and (uasp u)
+                (not (equal (uas-dir u) 'left)))
+           (equal (uas-dir u) 'right)))
+
 (defunc get-new-direction (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
+  :input-contract (and (uasp u)
+                       (uas_systemp sys)
+                       (in-list u sys)
+                       (valid-uas-system sys))
   :output-contract (directionp (get-new-direction u sys))
   (cond
    ;If at or past left perimeter border, set direction to right
@@ -358,8 +407,10 @@
       'right
       ;Else set direction to left
       'left))
-   ;Else, don't change direction
    (t (uas-dir u))))
+   ;(t (if (equal (uas-dir u) 'right) 'right 'left))))
+   ;Else, don't change direction
+   ;(t (uas-dir u))))
 
 (defunc get-new-P_ri (u dt)
   :input-contract (and (uasp u) (rationalp dt) (>= dt 0)) ;only update location if won't violate perimeter bounds
@@ -422,29 +473,42 @@
       ;else return time to traverse full perimeter (overestimate?)
       *dpss_t*)))
 
-(defunc time_to_reach_neighbor (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
-  :output-contract (rationalp (time_to_reach_neighbor u sys))
-  (let* ((u-P_li (uas-P_li u))
-         (u-dir (uas-dir u))
-         (ln (get-left-neighbor u sys))
-         (rn (get-right-neighbor u sys))
-         (ln-P_li (if ln (uas-P_li ln) nil))
-         (rn-P_li (if rn (uas-P_li rn) nil))
-         (ln-dir (if ln (uas-dir ln) nil))
-         (rn-dir (if rn (uas-dir rn) nil))
-         (time_to_l (if (and ln (not (equal ln-P_li u-P_li)) (equal u-dir 'left) (equal ln-dir 'right))
-                      (/ (* (/ 1 2) (abs (- ln-P_li u-P_li))) *v*) 
-                      *dpss_t*))
-         (time_to_r (if (and rn (not (equal rn-P_li u-P_li)) (equal u-dir 'right) (equal rn-dir 'left))
-                      (/ (* (/ 1 2) (abs (- rn-P_li u-P_li))) *v*) 
-                      *dpss_t*)))
-    (min time_to_l time_to_r)))
+(defthm has-right-neighbor
+  (implies (and (uasp u)
+                (uas_systemp sys)
+                (member u sys)
+                (valid-uas-system sys)
+                (> (uas-relative_index u) 1))
+           (uasp (get-right-neighbor u sys))))
 
-(defunc compute-individual-dt (u sys)
-  :input-contract (and (uasp u) (uas_systemp sys) (in-list u sys) (valid-uas-system sys))
-  :output-contract (rationalp (compute-individual-dt u sys))
-  (min (time_to_reach_endpoint u) (min (time_to_reach_goal u) (time_to_reach_neighbor u sys))))
+(defunc time_to_reach_right_neighbor (u sys)
+  :input-contract (and (uasp u)
+                       (uas_systemp sys)
+                       (in-list u sys)
+                       (valid-uas-system sys))
+  :output-contract (rationalp (time_to_reach_right_neighbor u sys))
+  (if (get-right-neighbor u sys)
+      (if (and (not (= (uas-P_li (get-right-neighbor u sys)) (uas-P_li u)))
+               (equal (uas-dir u) 'right)
+               (equal (uas-dir (get-right-neighbor u sys)) 'left))
+          (/ (* 1/2 (- (uas-P_li (get-right-neighbor u sys)) (uas-P_li u))) *v*)
+        *dpss_t*)
+    *dpss_t*))
+
+(defunc time_to_reach_left_neighbor (u sys)
+  :input-contract (and (uasp u)
+                       (uas_systemp sys)
+                       (in-list u sys)
+                       (valid-uas-system sys))
+  :output-contract (rationalp (time_to_reach_left_neighbor u sys))
+  (if (get-left-neighbor u sys)
+      (if (and (not (= (uas-P_li (get-left-neighbor u sys)) (uas-P_li u)))
+               (equal (uas-dir u) 'left)
+               (equal (uas-dir (get-left-neighbor u sys)) 'right))
+          (/ (* 1/2 (- (uas-P_li u) (uas-P_li (get-left-neighbor u sys)))) *v*)
+        *dpss_t*)
+    *dpss_t*))
+
 
 (defdata lor (listof rational))
 (defdata ne-lor (cons rational lor))
@@ -454,13 +518,47 @@
     (first l)
     (min (first l) (list-min (rest l)))))
 
-(defunc compute-all-dt (sys i)
-  :input-contract (and (uas_systemp sys) (valid-uas-system sys) (natp i) (<= i (len sys)))
-  :output-contract (lorp (compute-all-dt sys i))
-  (if (= i 0)
-    '()
-    (cons (compute-individual-dt (nth (1- i) sys) sys) (compute-all-dt sys (- i 1)))))
+;compute dt for an individual agent (UAS) in the system
+(defunc compute-individual-dt (u sys)
+  :input-contract (and (uasp u)
+                       (uas_systemp sys)
+                       (in-list u sys)
+                       (valid-uas-system sys))
+  :output-contract (rationalp (compute-individual-dt u sys))
+  (min (time_to_reach_endpoint u)
+       (min (time_to_reach_goal u)
+            (min (time_to_reach_left_neighbor u sys)
+                 (time_to_reach_right_neighbor u sys)))))
 
+(defthm bounded-nth-always-uas
+  (implies (and (uas_systemp sys)
+                (valid-uas-system sys)
+                (integerp i)
+                (< 0 i)
+                (<= i (len sys)))
+           (uasp (nth (1- i) sys))))
+
+(defthm bounded-nth-in-list
+  (implies (and (uas_systemp sys)
+                (valid-uas-system sys)
+                (integerp i)
+                (<= i (len sys))
+                (< i 0))
+           (in-list (nth (1- i) sys) sys)))
+
+;compute dts for all agents (i.e., call above for each and place result in list)
+(defunc compute-all-dt (sys i)
+  :input-contract (and (uas_systemp sys)
+                       (valid-uas-system sys)
+                       (integerp i)
+                       (<= i (len sys)))
+  :output-contract (lorp (compute-all-dt sys i))
+  (if (<= i 0)
+      '()
+    (cons (compute-individual-dt (nth (1- i) sys) sys)
+          (compute-all-dt sys (1- i)))))
+
+;compute dt for overall system (i.e., find for all agents and pick smallest)
 (defunc compute-dt (sys)
   :input-contract (and (uas_systemp sys) (valid-uas-system sys))
   :output-contract (rationalp (compute-dt sys))
@@ -505,6 +603,13 @@
     (let* ((sys~ (step_forward sys)))
       (cons sys~ (step_forward_n sys~ (1- n))))))
 
+(defunc step_forward_t (sys time)
+  :input-contract (and (statep sys) (valid-uas-system (cdr sys)) (rationalp time) (>= time 0))
+  :output-contract (and (tracep (step_forward_t sys time)))
+  (if (>= (car sys) time)
+    (list sys)
+    (let* ((sys~ (step_forward sys)))
+      (cons sys~ (step_forward_t sys~ time)))))#|ACL2s-ToDo-Line|#
 
 ;Proof strategy for valid positions:
 ;Show that all initial configurations are valid
