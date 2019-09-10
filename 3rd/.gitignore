@@ -2,7 +2,7 @@
 
 # downloaded 3rd party libraries
 *.tar
-/boost_1_64_0
+/boost_1_67_0
 /cppzmq-4.2.2
 /czmq-4.0.2
 /googletest-release-1.8.0
