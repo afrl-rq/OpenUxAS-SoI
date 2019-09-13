@@ -2,11 +2,10 @@
 
 # downloaded 3rd party libraries
 *.tar
-/boost_1_64_0
+/boost_1_67_0
 /cppzmq-4.2.2
 /czmq-4.0.2
 /googletest-release-1.8.0
-/minizip-1.2
 /packagecache
 #serial-1.2.1
 /sqlite-amalgamation-3120200
@@ -20,7 +19,6 @@
 /cppzmq.wrap
 /czmq.wrap
 /gtest.wrap
-/minizip.wrap
 /serial.wrap
 /sqlite3.wrap
 /sqlitecpp.wrap
