@@ -1,0 +1,28 @@
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+from e3.fs import cp, sync_tree, mkdir, rm
+import os
+
+
+class SqliteCPP(spec('github')):
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency('sqlite')]
+
+    github_project = 'sqlitecpp'
+
+    @Anod.primitive()
+    def build(self):
+        self.deps['sqlite'].setenv()
+        self.cmake_build(enable_install=False,
+                         params={'SQLITECPP_INTERNAL_SQLITE': 'OFF'})
+        rm(self['INSTALL_DIR'], recursive=True)
+        mkdir(self['INSTALL_DIR'])
+        sync_tree(os.path.join(self['SRC_DIR'], 'include'),
+                  self.include_dir)
+        mkdir(self.lib_dir)
+        cp(os.path.join(self['BUILD_DIR'], '*.a'),
+           self.lib_dir)
+        if self.env.target.platform == 'x86_64-linux':
+            sync_tree(self.lib_dir, self.lib_dir + '64')

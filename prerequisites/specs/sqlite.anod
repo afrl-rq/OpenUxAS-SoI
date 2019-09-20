@@ -1,0 +1,36 @@
+from e3.os.fs import unixpath
+from e3.anod.loader import spec
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+
+
+class Sqlite(spec('common')):
+    """Boost provides free peer-reviewed portable C++ source libraries."""
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name='sqlite-autoconf-3290000.tar.gz',
+                            publish=True)]
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name='sqlite-autoconf-3290000.tar.gz',
+                url='https://www.sqlite.org/2019/'
+                'sqlite-autoconf-3290000.tar.gz')]
+
+    @Anod.primitive()
+    def build(self):
+        configure = Configure(self)
+        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
+        configure.add('--enable-shared=no')
+        configure.add('--enable-static=yes')
+
+        make = Make(self)
+        make.set_var('CFLAGS', '-O2 -g -DSQLITE_ENABLE_COLUMN_METADATA')
+
+        configure()
+        make()
+        make('install')
+        self.adjust_pkg_config(pc_file='sqlite3.pc')

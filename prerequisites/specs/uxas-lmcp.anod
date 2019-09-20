@@ -1,0 +1,48 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import VCS_IGNORE_LIST, sync_tree, cp, mkdir
+import os
+
+
+class UxasLMCP(spec('common')):
+
+    def setenv(self, prefix=None):
+        if prefix is None:
+            prefix = self.build_space.install_dir
+        super(UxasLMCP, self).setenv(prefix=prefix)
+        self.env.add_search_path('CPLUS_INCLUDE_PATH',
+                                 os.path.join(prefix, 'cpp'))
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency('lmcpgen')]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name='uxas-models-src',
+                            publish=True, dest='')]
+
+    @property
+    def source_pkg_build(self):
+        def prepare_src(repos, dest):
+            sync_tree(os.path.join(repos['openuxas']['working_dir'],
+                                   'mdms'),
+                      dest, delete=True,
+                      ignore=VCS_IGNORE_LIST)
+
+        return [self.SourceBuilder(name='uxas-models-src',
+                                   fullname=lambda x: 'lmcpgen-src.tar.gz',
+                                   checkout=["openuxas"],
+                                   prepare_src=prepare_src)]
+
+    @Anod.primitive()
+    def build(self):
+        self.deps['lmcpgen'].generate(
+            language='cpp',
+            model_dir=self['SRC_DIR'],
+            install_dir=os.path.join(self['INSTALL_DIR'], 'cpp'))
+        self.shell('make', '-j%s' % self.jobs,
+                   cwd=os.path.join(self['INSTALL_DIR'], 'cpp'))
+        mkdir(os.path.join(self['INSTALL_DIR'], 'lib'))
+        cp(os.path.join(self['INSTALL_DIR'], 'cpp', '*.a'),
+           os.path.join(self['INSTALL_DIR'], 'lib'))

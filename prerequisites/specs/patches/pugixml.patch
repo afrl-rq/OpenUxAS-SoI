@@ -1,0 +1,62 @@
+diff -c ../pugixml-1.2/src/pugixml.cpp repos/openuxas/3rd/PugiXML/src/pugixml.cpp
+*** src/pugixml.cpp	2012-05-02 11:38:09.000000000 -0400
+--- src/pugixml.cpp	2019-09-06 06:04:37.487726108 -0400
+***************
+*** 3310,3315 ****
+--- 3310,3326 ----
+  	#endif
+  	}
+  
++ 	PUGI__FN int64_t get_value_int64(const char_t* value, int64_t def)
++ 	{
++ 		if (!value) return def;
++ 
++ 	#ifdef PUGIXML_WCHAR_MODE
++ 		return static_cast<unsigned int>(wcstoull(value, 0, 10));
++ 	#else
++ 		return static_cast<int64_t>(strtoull(value, 0, 10));
++ 	#endif
++ 	}
++ 
+  	PUGI__FN double get_value_double(const char_t* value, double def)
+  	{
+  		if (!value) return def;
+***************
+*** 3790,3795 ****
+--- 3801,3812 ----
+  		return impl::get_value_uint(_attr ? _attr->value : 0, def);
+  	}
+  
++ 	PUGI__FN int64_t xml_attribute::as_int64(int64_t def) const
++ 	{
++ 		return impl::get_value_int64(_attr ? _attr->value : 0, def);
++ 	}
++        
++         
+  	PUGI__FN double xml_attribute::as_double(double def) const
+  	{
+  		return impl::get_value_double(_attr ? _attr->value : 0, def);
+diff -c ../pugixml-1.2/src/pugixml.hpp repos/openuxas/3rd/PugiXML/src/pugixml.hpp
+*** src/pugixml.hpp	2012-05-02 11:38:09.000000000 -0400
+--- src/pugixml.hpp	2019-09-06 06:04:37.487726108 -0400
+***************
+*** 11,16 ****
+--- 11,18 ----
+   * Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
+   */
+  
++ #include <cstdint>
++ 
+  #ifndef PUGIXML_VERSION
+  // Define version macro; evaluates to major * 100 + minor so that it's safe to use in less-than comparisons
+  #	define PUGIXML_VERSION 120
+***************
+*** 314,319 ****
+--- 316,322 ----
+  		// Get attribute value as a number, or the default value if conversion did not succeed or attribute is empty
+  		int as_int(int def = 0) const;
+  		unsigned int as_uint(unsigned int def = 0) const;
++ 		int64_t as_int64(int64_t def = 0) const;
+  		double as_double(double def = 0) const;
+  		float as_float(float def = 0) const;
+  

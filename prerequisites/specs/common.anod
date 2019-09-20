@@ -1,0 +1,141 @@
+from e3.anod.package import UnmanagedSourceBuilder
+from e3.anod.spec import Anod
+import os
+from e3.fs import sync_tree, mkdir, rm
+from e3.os.fs import unixpath
+
+
+class Common(Anod):
+    """Helpers for UxAS build."""
+
+    class HTTPSSourceBuilder(UnmanagedSourceBuilder):
+        """Source builder that fetch sources using https."""
+
+        def __init__(self, name, url):
+            UnmanagedSourceBuilder.__init__(
+                self,
+                name=name,
+                fullname=lambda: name,
+                checkout=None)
+            self.url = url
+            self.base_url, self.filename = url.rsplit('/', 1)
+
+    class LocalSourceBuilder(UnmanagedSourceBuilder):
+        def __init__(self, name):
+            UnmanagedSourceBuilder.__init__(
+                self,
+                name=name,
+                fullname=lambda: name,
+                checkout=None)
+            self.url = name
+            self.filename = name
+
+    def setenv(self, prefix=None, shared=True):
+        """Common setenv for all uxas dependencies."""
+        prefix = self['INSTALL_DIR'] if prefix is None else prefix
+
+        if not shared:
+            lib_dir = os.path.join(prefix, 'lib/static')
+            if not os.path.isdir(lib_dir):
+                lib_dir = os.path.join(prefix, 'lib')
+        else:
+            lib_dir = os.path.join(prefix, 'lib')
+
+        if self.env.target.platform == 'x86_64-linux':
+            # For 64-bit Linux add path according to multiarch conventions,
+            # because on some Linux distributives (OpenSUSE for example)
+            # libraries are installed in this directory and not in just
+            # 'lib'.
+            self.env.add_search_path('LIBRARY_PATH', lib_dir + '64')
+        self.env.add_search_path('LIBRARY_PATH', lib_dir)
+        self.env.add_search_path('C_INCLUDE_PATH',
+                                 os.path.join(prefix, 'include'))
+        self.env.add_search_path('CPLUS_INCLUDE_PATH',
+                                 os.path.join(prefix, 'include'))
+        if shared:
+            self.env.add_dll_path(os.path.join(prefix, 'lib'))
+
+        # Some libraries are using pkgconfig
+        self.env.add_search_path(
+            'PKG_CONFIG_PATH',
+            os.path.join(prefix, 'lib', 'pkgconfig'))
+        self.env.add_search_path(
+            'CMAKE_PREFIX_PATH',
+            os.path.join(prefix, 'share', 'cmake'))
+
+    @property
+    def lib_dir(self):
+        return os.path.join(self['INSTALL_DIR'], 'lib')
+
+    @property
+    def include_dir(self):
+        return os.path.join(self['INSTALL_DIR'], 'include')
+
+    def adjust_pkg_config(self, pc_file):
+        pkgconfig_file = os.path.join(
+            self.build_space.install_dir, 'lib', 'pkgconfig', pc_file)
+        with open(pkgconfig_file) as fd:
+            content = fd.read()
+        new_content = []
+        for line in content.splitlines():
+            if line.startswith("prefix="):
+                new_content.append("prefix=%s" % self.build_space.install_dir)
+            elif line.startswith("exec_prefix="):
+                new_content.append("exec_prefix=%s" %
+                                   self.build_space.install_dir)
+            elif line.startswith("includedir="):
+                new_content.append("includedir=%s" % self.include_dir)
+            elif line.startswith("libdir="):
+                new_content.append("libdir=%s" % self.lib_dir)
+            else:
+                new_content.append(line)
+
+        with open(pkgconfig_file, 'w') as fd:
+            fd.write("\n".join(new_content))
+
+    def cmake_build(self, cmake_dir=None, make_target=None,
+                    params=None, enable_install=True):
+        """Use cmake to build and installation (optional)."""
+
+        if cmake_dir is None:
+            cmake_dir = self.build_space.src_dir
+
+        # Ensure gcc is used in all cases
+        os.environ['CC'] = 'gcc'
+        os.environ['CXX'] = 'g++'
+
+        # Compute cmake command line
+        cmake_cmd = ['cmake']
+        cmake_cmd.append('-DCMAKE_CXX_FLAGS=-std=c++11')
+        if params:
+            for var, value in params.iteritems():
+                cmake_cmd.append('-D%s=%s' % (var, value))
+        cmake_cmd.append(cmake_dir)
+
+        # Launch cmake
+        self.shell(*cmake_cmd, cwd=self['BUILD_DIR'])
+
+        # And then make
+        if make_target is None:
+            self.shell('make', '-j', 'VERBOSE=1', cwd=self['BUILD_DIR'])
+        else:
+            self.shell('make', '-j', 'VERBOSE=1', make_target,
+                       cwd=self['BUILD_DIR'])
+
+        if enable_install:
+            # Perform the installation in a temporary directory and move it
+            # to the final destination (removing default /usr/local
+            # directory).
+            tmp_dir = os.path.join(self['BUILD_DIR'], 'install-tmp')
+            mkdir(tmp_dir)
+            self.shell('make', 'install',
+                       'DESTDIR=%s' % unixpath(tmp_dir),
+                       cwd=self['BUILD_DIR'])
+            sync_tree(os.path.join(tmp_dir, 'usr', 'local'),
+                      self['INSTALL_DIR'],
+                      delete=True)
+            rm(tmp_dir, recursive=True)
+
+            if self.env.target.platform == 'x86_64-linux':
+                if os.path.isdir(self.lib_dir):
+                    sync_tree(self.lib_dir, self.lib_dir + '64')
