@@ -34,3 +34,7 @@ openuxas:
     vcs: git
     url: git@github.com:AdaCore/OpenUxAS.git
     revision: ada
+amase:
+    vcs: git
+    url: https://github.com/afrl-rq/OpenAMASE.git
+    revision: master
