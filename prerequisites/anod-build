@@ -271,9 +271,11 @@ class UxasBuilder(Walk):
         return self.JOB_CLASSES.get(data.__class__, UxasJob)(
             uid, data, notify_end, sandbox=self.sandbox)
 
+
 if __name__ == '__main__':
     m = Main()
     m.argument_parser.add_argument('spec_name', help='spec to build')
+    m.argument_parser.add_argument('--qualifier', help='optional qualifier')
     m.parse_args()
     asr = AnodSpecRepository(SPEC_DIR)
     ac = AnodContext(asr)
@@ -284,6 +286,7 @@ if __name__ == '__main__':
 
     ac.add_anod_action(name=m.args.spec_name,
                        primitive='build',
+                       qualifier=m.args.qualifier,
                        sandbox=sbx,
                        upload=False)
     actions = ac.schedule(resolver=ac.always_create_source_resolver)
