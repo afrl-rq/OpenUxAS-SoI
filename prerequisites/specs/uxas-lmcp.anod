@@ -1,21 +1,45 @@
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
-from e3.fs import VCS_IGNORE_LIST, sync_tree, cp, mkdir
+from e3.fs import VCS_IGNORE_LIST, sync_tree, cp, mkdir, find
 import os
 
 
 class UxasLMCP(spec('common')):
+    """Generate LMCP sources using LMCPgen.
+
+    The specification takes one qualifier called lang. The accepted
+    value are the following:
+
+     * cpp:  to build C++ version
+     * java: to build Java version
+     * ada:  to build Ada version
+    """
+
+    @property
+    def language(self):
+        """Return selected language."""
+        return self.parsed_qualifier.get('lang', 'cpp')
+
+    @property
+    def build_space_name(self):
+        # We use a separate build space for each language
+        return "%s-%s" % (self.name, self.language)
 
     def setenv(self, prefix=None):
         if prefix is None:
             prefix = self.build_space.install_dir
         super(UxasLMCP, self).setenv(prefix=prefix)
-        self.env.add_search_path('CPLUS_INCLUDE_PATH',
-                                 os.path.join(prefix, 'cpp'))
+        if self.language == 'java':
+            self.env.add_search_path(
+                'CLASSPATH',
+                os.path.join(prefix, 'lmcplib.jar'))
 
     @property
     def build_deps(self):
-        return [Anod.Dependency('lmcpgen')]
+        result = [Anod.Dependency('lmcpgen')]
+        if self.language == 'java':
+            result.append([Anod.Dependency('ant')])
+        return result
 
     @property
     def build_source_list(self):
@@ -35,14 +59,32 @@ class UxasLMCP(spec('common')):
                                    checkout=["openuxas"],
                                    prepare_src=prepare_src)]
 
+    def merge(self, prefix):
+        if self.language == 'java':
+            sync_tree(self.build_space.install_dir, prefix, delete=False)
+
     @Anod.primitive()
     def build(self):
         self.deps['lmcpgen'].generate(
-            language='cpp',
+            language=self.language,
             model_dir=self['SRC_DIR'],
-            install_dir=os.path.join(self['INSTALL_DIR'], 'cpp'))
-        self.shell('make', '-j%s' % self.jobs,
-                   cwd=os.path.join(self['INSTALL_DIR'], 'cpp'))
-        mkdir(os.path.join(self['INSTALL_DIR'], 'lib'))
-        cp(os.path.join(self['INSTALL_DIR'], 'cpp', '*.a'),
-           os.path.join(self['INSTALL_DIR'], 'lib'))
+            install_dir=self.build_space.build_dir)
+
+        if self.language == 'cpp':
+            self.shell('make', '-j%s' % self.jobs,
+                       cwd=self.build_space.build_dir)
+            mkdir(self.lib_dir)
+            cp(os.path.join(self.build_space.build_dir, '*.a'),
+               self.lib_dir)
+            for include_file in find(self.build_space.build_dir, '*.h'):
+                target_file = os.path.join(
+                    self.include_dir,
+                    os.path.relpath(include_file, self.build_space.build_dir))
+                mkdir(os.path.dirname(target_file))
+                cp(include_file, target_file)
+
+        elif self.language == 'java':
+            self.shell('ant', 'jar',
+                       cwd=self.build_space.build_dir)
+            sync_tree(os.path.join(self.build_space.build_dir, 'dist'),
+                      self.build_space.install_dir)

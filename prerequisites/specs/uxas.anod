@@ -12,7 +12,7 @@ class Uxas(spec('common')):
             Anod.Dependency('pugixml'),
             Anod.Dependency('zeromq'),
             Anod.Dependency('cppzmq'),
-            Anod.Dependency('uxas-lmcp'),
+            Anod.Dependency('uxas-lmcp', qualifier='lang=cpp'),
             Anod.Dependency('serial'),
             Anod.Dependency('czmq'),
             Anod.Dependency('zyre'),
