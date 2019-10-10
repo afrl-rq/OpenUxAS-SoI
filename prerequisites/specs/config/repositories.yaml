@@ -38,3 +38,7 @@ amase:
     vcs: git
     url: https://github.com/afrl-rq/OpenAMASE.git
     revision: master
+zeromqada:
+    vcs: git
+    url: https://github.com/persan/zeromq-Ada.git
+    revision: master
