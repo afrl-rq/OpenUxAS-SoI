@@ -29,8 +29,7 @@ class Uxas(spec('common')):
     def source_pkg_build(self):
         return [self.SourceBuilder(name='uxas-src',
                                    fullname=lambda x: 'uxas-src.tar.gz',
-                                   checkout=["openuxas"]),
-                self.LocalSourceBuilder(name='UxasAll.gpr')]
+                                   checkout=["openuxas"])]
 
     @Anod.primitive()
     def build(self):
