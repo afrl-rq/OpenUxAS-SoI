@@ -55,6 +55,10 @@ class Common(Anod):
         if shared:
             self.env.add_dll_path(os.path.join(prefix, 'lib'))
 
+        if os.path.isdir(os.path.join(prefix, 'share', 'gpr')):
+            self.env.add_search_path('GPR_PROJECT_PATH',
+                                     os.path.join(prefix, 'share', 'gpr'))
+
         # Some libraries are using pkgconfig
         self.env.add_search_path(
             'PKG_CONFIG_PATH',

@@ -88,3 +88,11 @@ class UxasLMCP(spec('common')):
                        cwd=self.build_space.build_dir)
             sync_tree(os.path.join(self.build_space.build_dir, 'dist'),
                       self.build_space.install_dir)
+
+        elif self.language == 'ada':
+            self.shell('gprbuild', '-j0', '-p',
+                       '-P', 'lmcp_generated_messages.gpr',
+                       cwd=self.build_space.build_dir)
+            self.shell('gprinstall', '-p', '-P', 'lmcp_generated_messages.gpr',
+                       '--prefix=%s' % self.build_space.install_dir,
+                       cwd=self.build_space.build_dir)
