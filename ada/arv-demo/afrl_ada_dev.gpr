@@ -1,6 +1,6 @@
 with "xmlada";
-with "zeromq-Ada/zmq.gpr";
-with "lmcp-src/lmcp_generated_messages.gpr";
+with "zmq.gpr";
+with "lmcp_generated_messages.gpr";
 
 project AFRL_Ada_Dev is
 
