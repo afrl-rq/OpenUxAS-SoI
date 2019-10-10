@@ -1,0 +1,37 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import sync_tree
+import os
+
+
+class LmcpGen(spec('common')):
+
+    # Java and ant are required
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name='lmcpgen-src',
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency('ant')]
+
+    @property
+    def source_pkg_build(self):
+        return [self.SourceBuilder(name='lmcpgen-src',
+                                   fullname=lambda x: 'lmcpgen-src.tar.gz',
+                                   checkout=["lmcpgen"])]
+
+    def generate(self, language, model_dir, install_dir):
+        self.shell(
+            'java', '-Xmx2048m', '-jar',
+            os.path.join(self['INSTALL_DIR'], 'LmcpGen.jar'),
+            '-mdmdir', model_dir, '-dir', install_dir, '-%s' % language)
+
+    @Anod.primitive()
+    def build(self):
+        self.deps['ant'].setenv()
+        self.shell('ant', cwd=self['SRC_DIR'])
+        sync_tree(os.path.join(self['SRC_DIR'], 'dist'),
+                  self['INSTALL_DIR'])

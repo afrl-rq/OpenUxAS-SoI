@@ -1,0 +1,83 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import sync_tree, cp, mkdir
+from e3.os.fs import chmod
+import os
+
+AMASE_LAUNCHER_SCRIPT = """#!/usr/bin/env python
+
+import subprocess
+import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+if __name__ == "__main__":
+    os.chdir(os.path.join(ROOT_DIR, 'share'))
+    sys.exit(subprocess.call(
+        ['java', '-Xmx2048m',
+         '-splash:%s' % os.path.join(ROOT_DIR, 'share', 'data', 'splash.png'),
+         '-classpath', os.path.join(ROOT_DIR, 'lib', '*'),
+         'avtas.app.Application', '--config',
+         os.path.join(ROOT_DIR, 'share', 'config', 'amase')] +
+        sys.argv[1:]))
+"""
+
+
+class AMASE(spec('common')):
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency('ant'),
+                Anod.Dependency('uxas-lmcp', qualifier='lang=java')]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name='amase-src',
+                            publish=True, dest='')]
+
+    @property
+    def source_pkg_build(self):
+        return [self.SourceBuilder(name='amase-src',
+                                   fullname=lambda x: 'amase-src.tar.gz',
+                                   checkout=["amase"])]
+
+    @property
+    def amase_src(self):
+        return os.path.join(self.build_space.src_dir, 'OpenAMASE')
+
+    @property
+    def amase_script(self):
+        return os.path.join(self.build_space.install_dir, 'bin', 'amase')
+
+    def share_dir(self, subdir=None):
+        result = os.path.join(self.build_space.install_dir, 'share')
+        if subdir is not None:
+            result = os.path.join(result, subdir)
+        return result
+
+    @Anod.primitive()
+    def build(self):
+        self.deps['ant'].setenv()
+
+        # Deploy newest lmcplib.jar
+        self.deps['uxas-lmcp'].merge(
+            prefix=os.path.join(self.amase_src, 'lib'))
+
+        # Build AMASE
+        self.shell('ant', 'jar', cwd=self.amase_src)
+
+        # And finally package it
+        mkdir(self.lib_dir)
+        mkdir(self.share_dir())
+        sync_tree(os.path.join(self.amase_src, 'lib'), self.lib_dir)
+        sync_tree(os.path.join(self.amase_src, 'data'),
+                  self.share_dir('data'))
+        sync_tree(os.path.join(self.amase_src, 'config'),
+                  self.share_dir('config'))
+        cp(os.path.join(self.amase_src, 'dist', '*.jar'), self.lib_dir)
+
+        mkdir(os.path.dirname(self.amase_script))
+        with open(self.amase_script, 'w') as fd:
+            fd.write(AMASE_LAUNCHER_SCRIPT)
+        chmod('+x', self.amase_script)

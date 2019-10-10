@@ -1,0 +1,47 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+import os
+
+
+class ZeroMQAda(spec('common')):
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency('zeromq')]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name='zeromqada-src',
+                            publish=True, dest='')]
+
+    @property
+    def source_pkg_build(self):
+        return [self.SourceBuilder(name='zeromqada-src',
+                                   fullname=lambda x: 'zeromqada-src.tar.gz',
+                                   checkout=["zeromqada"])]
+
+    @Anod.primitive()
+    def build(self):
+        self.deps['zeromq'].setenv()
+        self.shell(os.path.join(self.build_space.src_dir, 'configure'),
+                   cwd=self.build_space.src_dir)
+        self.shell('make',
+                   cwd=self.build_space.src_dir)
+        self.shell('gprinstall', 'zmq.gpr', '-p',
+                   '--prefix=%s' % self.build_space.install_dir,
+                   cwd=self.build_space.src_dir)
+        # Patch zmq.gpr
+        zmq_gpr = os.path.join(self.build_space.install_dir,
+                               'share', 'gpr', 'zmq.gpr')
+        with open(zmq_gpr) as fd:
+            content = fd.read().splitlines()
+
+        new_content = []
+        with open(zmq_gpr, 'w') as fd:
+            for l in content:
+                if 'package Linker' in l:
+                    new_content.append(l)
+                    new_content.append('for Linker_Options use  ("-lzmq");')
+                else:
+                    new_content.append(l)
+            fd.write('\n'.join(new_content))

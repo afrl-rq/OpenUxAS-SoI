@@ -1,0 +1,63 @@
+*** CMakeLists.txt	2015-04-22 00:50:41.000000000 -0400
+--- CMakeLists.txt	2019-09-13 11:49:21.637706659 -0400
+***************
+*** 1,29 ****
+  cmake_minimum_required(VERSION 2.8.3)
+  project(serial)
+  
+- # Find catkin
+- find_package(catkin REQUIRED)
+- 
+  if(APPLE)
+  	find_library(IOKIT_LIBRARY IOKit)
+  	find_library(FOUNDATION_LIBRARY Foundation)
+  endif()
+  
+- if(UNIX AND NOT APPLE)
+-     # If Linux, add rt and pthread
+-     catkin_package(
+-         LIBRARIES ${PROJECT_NAME}
+-         INCLUDE_DIRS include
+-         DEPENDS rt pthread
+-     )
+- else()
+-     # Otherwise normal call
+-     catkin_package(
+-         LIBRARIES ${PROJECT_NAME}
+-         INCLUDE_DIRS include
+-     )
+- endif()
+- 
+  ## Sources
+  set(serial_SRCS
+      src/serial.cc
+--- 1,11 ----
+***************
+*** 64,76 ****
+  
+  ## Install executable
+  install(TARGETS ${PROJECT_NAME}
+!     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+!     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  )
+  
+  ## Install headers
+  install(FILES include/serial/serial.h include/serial/v8stdint.h
+!   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/serial)
+  
+  ## Tests
+  if(CATKIN_ENABLE_TESTING)
+--- 46,58 ----
+  
+  ## Install executable
+  install(TARGETS ${PROJECT_NAME}
+!     ARCHIVE DESTINATION lib
+!     LIBRARY DESTINATION lib
+  )
+  
+  ## Install headers
+  install(FILES include/serial/serial.h include/serial/v8stdint.h
+!   DESTINATION include/serial)
+  
+  ## Tests
+  if(CATKIN_ENABLE_TESTING)

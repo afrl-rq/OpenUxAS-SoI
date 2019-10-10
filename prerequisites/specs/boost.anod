@@ -1,0 +1,40 @@
+import os
+from e3.fs import sync_tree
+from e3.os.fs import unixpath
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+
+
+class Boost(spec('common')):
+    """Boost provides free peer-reviewed portable C++ source libraries."""
+
+    @property
+    def build_deps(self):
+        return []
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name='boost_1_68_0.tar.bz2',
+                            publish=True)]
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name='boost_1_68_0.tar.bz2',
+                url='https://dl.bintray.com/boostorg/release/1.68.0/source/'
+                'boost_1_68_0.tar.bz2')]
+
+    @Anod.primitive()
+    def build(self):
+        bootstrap_args = [os.environ['SHELL'], './bootstrap.sh',
+                          '--prefix=%s' % unixpath(self['INSTALL_DIR']),
+                          '--without-icu',
+                          '--with-libraries=filesystem,system,regex,date_time']
+        self.shell(*bootstrap_args, cwd=self['SRC_DIR'])
+        self.shell(os.path.join(self['SRC_DIR'], 'b2'),
+                   'link=static',
+                   'toolset=gcc', 'cxxstd=11',
+                   'install', cwd=self['SRC_DIR'])
+        sync_tree(os.path.join(self['INSTALL_DIR'], 'lib'),
+                  os.path.join(self['INSTALL_DIR'], 'lib64'), delete=True)

@@ -1,0 +1,35 @@
+from e3.anod.loader import spec
+from e3.fs import cp
+
+
+class GitHub(spec('common')):
+
+    has_local_patch = False
+
+    @property
+    def build_source_list(self):
+        result = [self.Source(name=self.github_project,
+                              publish=True,
+                              dest='')]
+        if self.has_local_patch:
+            result.append(self.Source(name=self.github_project + '.patch',
+                                      publish=True,
+                                      unpack_cmd=cp,
+                                      dest='patches'))
+        return result
+
+    @property
+    def source_pkg_build(self):
+
+        def fullname(*args, **kwargs):
+            return "%s-src.tar.gz" % self.github_project
+
+        result = [
+            self.SourceBuilder(
+                name=self.github_project,
+                fullname=fullname,
+                checkout=[self.github_project])]
+        if self.has_local_patch:
+            result.append(self.LocalSourceBuilder(
+                name=self.github_project + '.patch'))
+        return result

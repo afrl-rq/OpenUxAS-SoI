@@ -1,0 +1,16 @@
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+
+
+class CppZMQ(spec('github')):
+
+    github_project = 'cppzmq'
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency('zeromq')]
+
+    @Anod.primitive()
+    def build(self):
+        self.deps['zeromq'].setenv()
+        self.cmake_build()

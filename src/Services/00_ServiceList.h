@@ -41,8 +41,6 @@
 //define SUBSCRIBE_TO_TASKS to subscribe to all tasks                              ///
 //////////////////////////////////////////////////////////////////////////////////////
 
-#include "config.h"
-
 #ifdef AFRL_INTERNAL_ENABLED
 #include "AFRLInternalServices.h"
 #endif

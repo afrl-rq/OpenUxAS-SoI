@@ -1,0 +1,22 @@
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+from e3.fs import cp, mkdir
+import os
+
+
+class ZeroMQ(spec('github')):
+
+    @property
+    def build_deps(self):
+        return []
+
+    github_project = 'libzmq'
+
+    @Anod.primitive()
+    def build(self):
+        self.cmake_build(params={
+            'BUILD_TESTS': 'OFF'})
+        self.adjust_pkg_config(pc_file='libzmq.pc')
+        mkdir(os.path.join(self.lib_dir, 'static'))
+        cp(os.path.join(self.lib_dir, 'libzmq.a'),
+           os.path.join(self.lib_dir,  'static'))

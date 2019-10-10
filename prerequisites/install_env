@@ -1,0 +1,20 @@
+#!/bin/bash
+
+mkdir -p sbx-env
+if test -d sbx-env/production; then
+   (cd sbx-env/production && ./bin/redeploy)
+else   
+   deploy-anod-sandbox production sbx-env/production
+fi
+echo "Retrieve latest python distrib with latest e3"
+(cd sbx-env/production && ./bin/anod install e3 --qualifier=exp,distrib --query-range=10)
+
+if test -d sbx-env/wave; then
+   (cd sbx-env/wave && ./bin/redeploy)
+else
+   deploy-anod-sandbox wave sbx-env/wave
+fi
+echo "Install Java 10.x"
+(cd sbx-env/wave && ./bin/anod build java --qualifier="version=10")
+(cd sbx-env/wave && ./bin/anod build cmake --all --when-missing=install)
+(cd sbx-env/wave && ./bin/anod install gnat)
