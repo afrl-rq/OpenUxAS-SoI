@@ -84,6 +84,7 @@ class UxasLMCP(spec('common')):
                 cp(include_file, target_file)
 
         elif self.language == 'java':
+            self.deps['ant'].setenv()
             self.shell('ant', 'jar',
                        cwd=self.build_space.build_dir)
             sync_tree(os.path.join(self.build_space.build_dir, 'dist'),
