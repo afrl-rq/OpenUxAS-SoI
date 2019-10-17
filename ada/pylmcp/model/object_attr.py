@@ -173,6 +173,9 @@ class ObjectAttr(object):
             elif type_name == "uint16":
                 value = struct.unpack_from(">H", payload, pos)[0]
                 size = struct.calcsize(">H")
+            elif type_name == "uint32":
+                value = struct.unpack_from(">I", payload, pos)[0]
+                size = struct.calcsize(">I")
             elif type_name == "bool":
                 value = struct.unpack_from(">?", payload, pos)[0]
                 size = struct.calcsize(">?")
@@ -182,13 +185,22 @@ class ObjectAttr(object):
 
         size = 0
         if self.is_array:
-            size, array_size = unpack_simple_type("uint16", payload, pos)
-            pos += size
+            total_size = 0
+            if self.is_static_array:
+                array_size = self.min_array_length
+            else:
+                if self.is_large_array:
+                    size, array_size = unpack_simple_type("uint32", payload, pos)
+                else:
+                    size, array_size = unpack_simple_type("uint16", payload, pos)
+                pos += size
+                total_size += size
             value = []
             for idx in range(array_size):
                 item_size, item = unpack_simple_type(self.attr_type, payload, pos)
                 pos += item_size
+                total_size += item_size
                 value.append(item)
-            return (size, value)
+            return (total_size, value)
         else:
             return unpack_simple_type(self.attr_type, payload, pos)

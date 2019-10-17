@@ -1,5 +1,6 @@
 from pylmcp import Object
 
+
 class Message(object):
     def __init__(self, obj):
         self.obj = obj
@@ -7,7 +8,7 @@ class Message(object):
         self.descriptor = obj.object_class.full_name
         self.content_type = 'lmcp'
         self.source_group = ''
-        self.source_entity_id = 300
+        self.source_entity_id = 100
         self.source_service_id = 51
 
     @classmethod
@@ -22,6 +23,8 @@ class Message(object):
         print len(source_group)
         print source_entity_id
         print source_service_id
+
+        # ??? Not implemented ???
         obj = Object.unpack(data=payload)
         return None
         # return Message(obj)
@@ -36,4 +39,3 @@ class Message(object):
                                str(self.source_service_id)])
         raw_msg = "$".join([self.address, attributes, payload])
         socket.send(raw_msg)
-

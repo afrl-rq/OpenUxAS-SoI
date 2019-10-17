@@ -106,9 +106,15 @@ class ObjectClass(object):
             result += attr.pack(value=value[attr.name])
 
         if include_headers:
-            # ??? not complete ???
-            header = struct.pack(">IIB", 0, len(result), 1)
-            return header + result
+            # ??? not complete ???. The constant there should be computed
+            header = struct.pack(">iIB", 1280131920, len(result), 1)
+            result = header + result
+            # Compute the final checksum and append it
+            sum = 0
+            for x in range(len(result)):
+                sum += ord(result[x]) & 0xFF
+            result += struct.pack(">I", sum)
+            return result
         else:
             return result
 
