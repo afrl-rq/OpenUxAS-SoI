@@ -38,3 +38,6 @@ examples/**/datawork/**
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/settings.json
+
+# Ignore pyc files
+*.pyc
