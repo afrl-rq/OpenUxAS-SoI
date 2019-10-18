@@ -7,7 +7,8 @@ class ZeroMQAda(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency('zeromq')]
+        return [Anod.Dependency('compiler'),
+                Anod.Dependency('zeromq')]
 
     @property
     def build_source_list(self):

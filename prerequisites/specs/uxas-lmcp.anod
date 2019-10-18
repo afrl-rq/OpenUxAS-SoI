@@ -38,7 +38,11 @@ class UxasLMCP(spec('common')):
     def build_deps(self):
         result = [Anod.Dependency('lmcpgen')]
         if self.language == 'java':
-            result.append([Anod.Dependency('ant')])
+            result += [Anod.Dependency('java'),
+                       Anod.Dependency('ant')]
+        elif self.language in ('cpp', 'ada'):
+            result.append(Anod.Dependency('compiler'))
+
         return result
 
     @property

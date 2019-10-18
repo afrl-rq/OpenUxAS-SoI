@@ -8,7 +8,9 @@ class SqliteCPP(spec('github')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency('sqlite')]
+        return [Anod.Dependency('sqlite'),
+                Anod.Dependency('compiler'),
+                Anod.Dependency('cmake')]
 
     github_project = 'sqlitecpp'
 

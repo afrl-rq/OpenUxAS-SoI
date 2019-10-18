@@ -28,7 +28,8 @@ class AMASE(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency('ant'),
+        return [Anod.Dependency('java'),
+                Anod.Dependency('ant'),
                 Anod.Dependency('uxas-lmcp', qualifier='lang=java')]
 
     @property

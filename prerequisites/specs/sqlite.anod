@@ -8,6 +8,10 @@ class Sqlite(spec('common')):
     """Boost provides free peer-reviewed portable C++ source libraries."""
 
     @property
+    def build_deps(self):
+        return [Anod.Dependency('compiler')]
+
+    @property
     def build_source_list(self):
         return [Anod.Source(name='sqlite-autoconf-3290000.tar.gz',
                             publish=True)]

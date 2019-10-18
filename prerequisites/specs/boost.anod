@@ -10,7 +10,7 @@ class Boost(spec('common')):
 
     @property
     def build_deps(self):
-        return []
+        return [Anod.Dependency('compiler')]
 
     @property
     def build_source_list(self):
