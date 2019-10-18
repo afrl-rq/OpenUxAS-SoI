@@ -7,6 +7,10 @@ project UxasAll is
     for Main use ("UxAS_Main.cpp");
     for Languages use ("C++");
 
+    package Builder is
+       for Executable ("UxAS_Main.cpp") use "uxas";
+    end Builder;
+
     package Compiler is
        for Default_switches ("C++") use ("-fPIC", "-std=c++11", "-Wall");
     end Compiler;

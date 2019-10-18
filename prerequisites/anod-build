@@ -23,6 +23,10 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 SPEC_DIR = os.path.join(ROOT_DIR, 'specs')
 SBX_DIR = os.path.join(ROOT_DIR, 'sbx')
 
+# Uxas repo root directory
+OPENUXAS_ROOT_DIR = os.path.dirname(ROOT_DIR)
+os.environ['OPENUXAS_ROOT_DIR'] = OPENUXAS_ROOT_DIR
+
 
 def add_anod_files_to_fingerprint(anod_instance, fingerprint):
     """Add the Anod's spec and yaml files to the given fingerprint.
