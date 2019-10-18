@@ -41,3 +41,7 @@ examples/**/datawork/**
 
 # Ignore pyc files
 *.pyc
+
+# Ignore build directories
+/prerequisites/sbx
+/prerequisites/sbx-env

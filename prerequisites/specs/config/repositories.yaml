@@ -31,9 +31,13 @@ lmcpgen:
     url: git@github.com:AdaCore/LmcpGen.git
     revision: ada
 openuxas:
-    vcs: git
-    url: git@github.com:AdaCore/OpenUxAS.git
-    revision: ada
+    # To force use of remote repo use that config
+    # vcs: git
+    # url: git@github.com:AdaCore/OpenUxAS.git
+    # revision: ada
+    vcs: external
+    url: $OPENUXAS_ROOT_DIR
+    revision: None
 amase:
     vcs: git
     url: https://github.com/afrl-rq/OpenAMASE.git
