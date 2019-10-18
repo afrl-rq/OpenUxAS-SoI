@@ -11,7 +11,7 @@ class Series(object):
 
     def __init__(self, name, namespace, version, model_db):
         """Initialize a series.
-        
+
         :param name: series name
         :type name: str
         :param namespace: namespace
@@ -87,4 +87,3 @@ class Series(object):
 
     def __str__(self):
         return "series: %s, namespace: %s" % (self.name, self.namespace)
-

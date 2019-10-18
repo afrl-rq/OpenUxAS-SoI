@@ -7,7 +7,7 @@ class ObjectClass(object):
 
     def __init__(self, name, id, extends, attrs, series, model_db):
         """Initialize an LMCP class.
-        
+
         :param name: class name
         :type name: str
         :param id: an integer id for the class
@@ -58,7 +58,7 @@ class ObjectClass(object):
     @property
     def series_id(self):
         """Return the series id.
-        
+
         :rtype: int
         """
         return self.series.id
@@ -119,6 +119,15 @@ class ObjectClass(object):
             return result
 
     @classmethod
+    def unpack(self, payload):
+        exists = payload.unpack("bool")
+        if not exists:
+            return None
+        else:
+            full_id = payload.unpack_struct(">qIH")
+            return full_id
+
+    @classmethod
     def from_xml(cls, node, id, series, model_db):
         # Parse the object attributes
         attrs = []
@@ -148,4 +157,3 @@ class ObjectClass(object):
         return "\n".join(["lmcp_type:           %s" % self.id,
                           "series_name:         %s" % self.series_name,
                           "full_lmcp_type_name: %s" % self.full_name])
-

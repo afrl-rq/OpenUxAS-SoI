@@ -3,8 +3,6 @@ import random
 import struct
 from pylmcp.model.enum import EnumModel
 
-def print_bytes(msg):
-    print(" ".join(["%02X" % ord(c) for c in msg]))
 
 class ObjectAttr(object):
 
@@ -14,7 +12,7 @@ class ObjectAttr(object):
         'uint16': {'rep': '>H'},
         'uint32': {'rep': '>I'},
         'bool': {'rep': '>?'},
-        'string': {'rep': None}, # ????
+        'string': {'rep': None},  # ????
         'real32': {'rep': '>f'},
         'real64': {'rep': '>d'},
         'byte': {'rep': '>B'}}
@@ -37,8 +35,8 @@ class ObjectAttr(object):
         self.optional = optional
 
         self.is_large_array = is_large_array
-        self.max_array_length=max_array_length
-        self.min_array_length=min_array_length
+        self.max_array_length = max_array_length
+        self.min_array_length = min_array_length
 
         self.is_array = self.min_array_length is not None
         self.is_static_array = \
@@ -49,7 +47,8 @@ class ObjectAttr(object):
             result = ''
             if type_name in self.BASIC_TYPES:
                 if self.BASIC_TYPES[type_name]['rep'] is not None:
-                    result = struct.pack(self.BASIC_TYPES[type_name]['rep'], value)
+                    result = struct.pack(
+                        self.BASIC_TYPES[type_name]['rep'], value)
                 elif type_name == 'string':
                     result += struct.pack('>H', len(value))
                     result += struct.pack('%ss' % len(value), value)
@@ -61,15 +60,8 @@ class ObjectAttr(object):
                     result += struct.pack("B", value is not None)
                     if value is not None:
                         result += model.pack(value, include_headers=False)
-
-                        # result += struct.pack(">q", model.series_id)
-                        # result += struct.pack(">I", model.id)
-                        # result += struct.pack(">H", model.version)
-                        # for field in model.attrs:
-                        #     result += field.pack(value[field.name])
             return result
 
-        print("pack %s (%s)" % (self.attr_type, value))
         if self.is_array:
             result = ''
             if not self.is_static_array:
@@ -81,7 +73,6 @@ class ObjectAttr(object):
                 result += pack_simple_value(self.attr_type, el)
         else:
             result = pack_simple_value(self.attr_type, value)
-        print_bytes(result)
         return result
 
     def random_value(self):
@@ -90,7 +81,7 @@ class ObjectAttr(object):
             if type_name == 'byte':
                 return random.randint(0, 255)
             elif type_name == 'int32':
-                return random.randint(-2 ** 31, 2 ** 31 -1)
+                return random.randint(-2 ** 31, 2 ** 31 - 1)
             elif type_name == 'int64':
                 return random.randint(-2 ** 63, 2 ** 63 - 1)
             elif type_name == 'uint16':
@@ -120,7 +111,8 @@ class ObjectAttr(object):
 
         if self.is_array:
             if self.is_static_array:
-                return [random_simple_value(self.attr_type)] * self.max_array_length
+                return [random_simple_value(self.attr_type)] * \
+                    self.max_array_length
             else:
                 return [random_simple_value(self.attr_type),
                         random_simple_value(self.attr_type)]
@@ -129,7 +121,7 @@ class ObjectAttr(object):
 
     @classmethod
     def from_xml(cls, node, object_class, model_db):
-        optional=node.attrib.get('Optional', "false") == "true"
+        optional = node.attrib.get('Optional', "false") == "true"
         is_large_array = node.attrib.get('LargeArray', "false") == "true"
         attr_type = node.attrib['Type']
         series = node.attrib.get('Series')
@@ -164,43 +156,36 @@ class ObjectAttr(object):
             object_class=object_class,
             model_db=model_db)
 
-    def unpack(self, payload, pos):
+    def unpack(self, payload):
 
-        def unpack_simple_type(type_name, payload, pos):
-            if type_name == "int64":
-                value = struct.unpack_from(">q", payload, pos)[0]
-                size = struct.calcsize(">q")
-            elif type_name == "uint16":
-                value = struct.unpack_from(">H", payload, pos)[0]
-                size = struct.calcsize(">H")
-            elif type_name == "uint32":
-                value = struct.unpack_from(">I", payload, pos)[0]
-                size = struct.calcsize(">I")
-            elif type_name == "bool":
-                value = struct.unpack_from(">?", payload, pos)[0]
-                size = struct.calcsize(">?")
+        def unpack_simple_type(type_name, payload):
+            value = None
+
+            if type_name in payload.SUPPORTED_TYPES:
+                value = payload.unpack(type_name)
             else:
-                raise Exception("not implemented: %s" % type_name)
-            return (size, value)
+                # This is not a simple type so check in the database
+                obj_type = self.model_db.types[type_name]
+                if isinstance(obj_type, EnumModel):
+                    value = payload.unpack("int32")
+                else:
+                    from pylmcp import Object
+                    value = Object.unpack(payload)
+            return value
 
-        size = 0
         if self.is_array:
-            total_size = 0
+            # This is an array first unpack the bounds if necessary
             if self.is_static_array:
                 array_size = self.min_array_length
             else:
                 if self.is_large_array:
-                    size, array_size = unpack_simple_type("uint32", payload, pos)
+                    array_size = payload.unpack("uint32")
                 else:
-                    size, array_size = unpack_simple_type("uint16", payload, pos)
-                pos += size
-                total_size += size
+                    array_size = payload.unpack("uint16")
+
             value = []
             for idx in range(array_size):
-                item_size, item = unpack_simple_type(self.attr_type, payload, pos)
-                pos += item_size
-                total_size += item_size
-                value.append(item)
-            return (total_size, value)
+                value.append(unpack_simple_type(self.attr_type, payload))
+            return value
         else:
-            return unpack_simple_type(self.attr_type, payload, pos)
+            return unpack_simple_type(self.attr_type, payload)

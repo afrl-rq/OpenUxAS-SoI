@@ -20,7 +20,8 @@ class EnumModel(object):
         entries = []
         default_value = 0
         for child in node:
-            entries.append(EntryModel.from_xml(child, default_value=default_value))
+            entries.append(EntryModel.from_xml(child,
+                                               default_value=default_value))
             default_value += 1
 
         return cls(

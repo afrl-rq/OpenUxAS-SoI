@@ -1,6 +1,21 @@
+"""Handle a database of LMCP messages descriptions.
+
+The module allows to create a database containing the description of all
+objects and enums available.
+
+A LMCP model database contains a list of "Series" (i.e: correspond to one XML
+file). Each Series contains a list of classes and enums defined in the XML
+file.
+
+By default a database is computed with all xml files present in the xml_models
+subdirectory. The pylmcp.Object class (used to create instance of objects) use
+by default this database
+"""
+
 import os
 from e3.fs import ls
 from pylmcp.model.series import Series
+
 
 class ModelDatabase(object):
     """Gather all the LMCP models."""
@@ -9,7 +24,7 @@ class ModelDatabase(object):
         """Initialize the database."""
         self.series = {}
 
-        # Available classes indexed by their full lmcp name
+        # Available classes indexed by their full lmcp name. (dot notation)
         self.classes = {}
 
         # Available classes indexed by their interger triplet
@@ -21,6 +36,11 @@ class ModelDatabase(object):
         self.types = {}
 
     def add_series(self, series):
+        """Add a series.
+
+        :param series: the series to add in the database
+        :type series: pylmcp.model.series.Series
+        """
         # Register the series
         self.series[series.name] = series
 
@@ -37,24 +57,21 @@ class ModelDatabase(object):
         for e in series.enums.values():
             self.types["%s/%s" % (series.name, e.name)] = e
 
-    def new_msg(self, type_name):
-        return Object(self.structs[type_name])
-
     @classmethod
     def load_series_from_dir(cls, path):
+        """Load all series as xml files from a given directory.
+        
+        :param path: the directory containing the list of xml models
+        :type path: str
+        :return: a model database
+        :rtype: pylmcp.model.ModelDatabase
+        """
         model_db = cls()
         for xml_model in ls(os.path.join(path, '*.xml')):
             model_db.add_series(
                 Series.load_model(xml_model, model_db=model_db))
         return model_db
 
-    def unpack_msg(self, payload):
-        unpack_str = ">IIBqIH"
-        ctrl, size, is_valid, series_num, type_num, version = struct.unpack_from(unpack_str, payload, 0)
-        struct_model = self.struct_ids[(series_num, type_num, version)]
-        return Message.unpack(struct_model,
-                              payload,
-                              pos=struct.calcsize(unpack_str))
 
 # Initialize the default LMCP database model
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
