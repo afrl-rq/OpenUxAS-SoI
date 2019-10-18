@@ -1,0 +1,15 @@
+from e3.anod.spec import Anod
+import os
+
+
+class Compiler(Anod):
+
+    @property
+    def build_deps(self):
+        return [Anod.BuildVar(
+            "compiler_version",
+            os.environ["OPENUXAS_COMPILER_VERSION"])]
+
+    @Anod.primitive()
+    def build(self):
+        pass

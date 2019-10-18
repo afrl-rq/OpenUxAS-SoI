@@ -15,7 +15,8 @@ class LmcpGen(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency('ant')]
+        return [Anod.Dependency('java'),
+                Anod.Dependency('ant')]
 
     @property
     def source_pkg_build(self):

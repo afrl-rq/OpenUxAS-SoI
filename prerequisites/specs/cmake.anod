@@ -1,0 +1,14 @@
+from e3.anod.spec import Anod
+import os
+
+
+class Cmake(Anod):
+    @property
+    def build_deps(self):
+        return [Anod.BuildVar(
+            "cmake_version",
+            os.environ["OPENUXAS_CMAKE_VERSION"])]
+
+    @Anod.primitive()
+    def build(self):
+        pass

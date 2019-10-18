@@ -15,9 +15,11 @@ from e3.archive import unpack_archive
 from e3.fingerprint import Fingerprint
 from e3.fs import mkdir, sync_tree, rm, cp
 from e3.os.fs import cd
+from e3.os.process import Run
 import json
 import logging
 import os
+import sys
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 SPEC_DIR = os.path.join(ROOT_DIR, 'specs')
@@ -45,6 +47,11 @@ def add_anod_files_to_fingerprint(anod_instance, fingerprint):
     for yaml_name in anod_instance.data_files:
         fingerprint.add_file(os.path.join(anod_instance.spec_dir,
                                           yaml_name + '.yaml'))
+
+    deps = getattr(anod_instance, '%s_deps' % anod_instance.kind, ())
+    for dep in deps:
+        if isinstance(dep, anod_instance.BuildVar):
+            fingerprint.add(dep.name, dep.value)
 
 
 class UxasEmptyJob(EmptyJob):
@@ -281,6 +288,37 @@ if __name__ == '__main__':
     m.argument_parser.add_argument('spec_name', help='spec to build')
     m.argument_parser.add_argument('--qualifier', help='optional qualifier')
     m.parse_args()
+
+    # Check for gcc version
+    try:
+        p = Run(['gcc', '--version'])
+        version = p.out.splitlines()[0]
+        os.environ['OPENUXAS_COMPILER_VERSION'] = version
+        logging.info("Compiler version: %s", version)
+    except Exception:
+        logging.critical("cannot find gcc")
+        sys.exit(1)
+
+    # Check for java version
+    try:
+        p = Run(['java', '--version'])
+        version = p.out.splitlines()[0]
+        os.environ['OPENUXAS_JAVA_VERSION'] = version
+        logging.info("Java version: %s", version)
+    except Exception:
+        logging.critical("cannot find java")
+        sys.exit(1)
+
+    # Check for gcc version
+    try:
+        p = Run(['cmake', '--version'])
+        version = p.out.splitlines()[0]
+        os.environ['OPENUXAS_CMAKE_VERSION'] = version
+        logging.info("Cmake version: %s", version)
+    except Exception:
+        logging.critical("cannot find cmake")
+        sys.exit(1)
+
     asr = AnodSpecRepository(SPEC_DIR)
     ac = AnodContext(asr)
     sbx = SandBox()

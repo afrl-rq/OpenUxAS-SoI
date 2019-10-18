@@ -8,7 +8,8 @@ class ZeroMQ(spec('github')):
 
     @property
     def build_deps(self):
-        return []
+        return [Anod.Dependency('compiler'),
+                Anod.Dependency('cmake')]
 
     github_project = 'libzmq'
 

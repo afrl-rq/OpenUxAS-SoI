@@ -8,7 +8,9 @@ class CZMQ(spec('github')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency('zeromq')]
+        return [Anod.Dependency('compiler'),
+                Anod.Dependency('cmake'),
+                Anod.Dependency('zeromq')]
 
     github_project = 'czmq'
 
