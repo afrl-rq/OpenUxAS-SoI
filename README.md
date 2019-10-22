@@ -260,6 +260,7 @@ The [install prerequisities script](https://raw.githubusercontent.com/afrl-rq/Op
    * `sudo apt install oracle-java9-set-default`
 1. Install `ant` for command line build of java programs: in terminal
    * `sudo apt install ant`
+1. Remove any previously installed versions of ZMQ - They're likely to cause compile errors which, if fixed, will leave you with a seg-fault.
 1. [Build](#build-uxas)
 
 ## Install Prerequisites on Mac OS X
