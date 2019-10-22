@@ -148,18 +148,15 @@ sudo python3 setup.py install
 cd ../../..
 
 echo "Preparing UxAS build ..."
-rm -rf build_release build_debug
+rm -rf build build_debug
 python3 prepare
 sh RunLmcpGen.sh
-meson build_release --buildtype=release
+meson build --buildtype=release
 meson build_debug --buildtype=debug
 
 echo "Performing initial UxAS build ..."
-ninja -C build_debug
+ninja -C build
 ninja -C build_release
-
-# Alias the debug build
-ln -s build_debug build
 
 cat <<'EOF'
 
@@ -173,7 +170,7 @@ Subsequent builds are done using:
 
 and 
 
-  $ ninja -C build_release
+  $ ninja -C build
 EOF
 
 # --eof--
