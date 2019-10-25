@@ -16,5 +16,4 @@ else
 fi
 echo "Install Java 10.x"
 (cd sbx-env/wave && ./bin/anod build java --qualifier="version=10")
-(cd sbx-env/wave && ./bin/anod build cmake --all --when-missing=install)
 (cd sbx-env/wave && ./bin/anod install gnat)
