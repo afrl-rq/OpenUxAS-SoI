@@ -71,7 +71,6 @@ class Object(object):
                 result[k] = v.as_dict()
             else:
                 result[k] = v
-        print(result)
         return result
 
     def __str__(self):
