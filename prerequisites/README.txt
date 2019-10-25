@@ -61,3 +61,9 @@ By:
 
 In that case the build script will pick the content of your directory instead of doing an
 automatic checkout. In that case the script do not try to do updates.
+
+Force rebuild
+-------------
+
+If you pass --force to uxas-build command, current state will be ignore and
+everything rebuilt from scratch
