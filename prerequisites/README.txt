@@ -9,6 +9,8 @@ You need to ensure that you have:
 * Git installed
 * Cmake
 * C++ compiler
+* pkg-config
+* libuuid (uuid-dev package on ubuntu or debian)
 * Ada compiler (to build ada demo)
 * Java (oracle version)
 * Python with e3-core package installed
