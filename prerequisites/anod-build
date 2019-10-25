@@ -187,13 +187,18 @@ class UxasBuilder(Walk):
                    Checkout: UxasCheckout,
                    CreateSource: UxasCreateSource}
 
-    def __init__(self, actions, sandbox):
+    def __init__(self, actions, sandbox, force):
         self.sandbox = sandbox
+        self.force = force
         mkdir(self.fingerprints_dir)
         super(UxasBuilder, self).__init__(actions)
 
     def compute_fingerprint(self, uid, data, is_prediction=False):
         """See Walk.compute_fingerprint."""
+        if is_prediction and self.force:
+            # Force a rebuild
+            return None
+
         # All fingerprints start with the same minimum amount
         # of data: The fingerprint of all the predecessors.
         f = Fingerprint()
@@ -287,6 +292,10 @@ if __name__ == '__main__':
     m = Main()
     m.argument_parser.add_argument('spec_name', help='spec to build')
     m.argument_parser.add_argument('--qualifier', help='optional qualifier')
+    m.argument_parser.add_argument('--force',
+        help='force rebuild of everything',
+        action="store_true",
+        default=False)
     m.parse_args()
 
     # Check for gcc version
@@ -333,4 +342,4 @@ if __name__ == '__main__':
                        upload=False)
     actions = ac.schedule(resolver=ac.always_create_source_resolver)
 
-    walker = UxasBuilder(actions, sandbox=sbx)
+    walker = UxasBuilder(actions, sandbox=sbx, force=m.args.force)
