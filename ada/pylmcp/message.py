@@ -25,9 +25,15 @@ class Message(object):
             self.address = address
 
     @classmethod
-    def read(self, socket):
-        raw_msg = socket.recv(0, True, False)
+    def unpack(self, raw_msg):
+        """Unpack a received message.
 
+        :param raw_msg: the received message
+        :type raw_msg: str
+        :return: a Message object
+        :rtype: pylmcp.message.Message
+        """
+        # Unpack headers and payload
         address, attributes, payload = raw_msg.split('$', 2)
         content_type, descriptor, source_group, \
             source_entity_id, source_service_id = \
@@ -52,7 +58,12 @@ class Message(object):
                        address=address,
                        descriptor=descriptor)
 
-    def send(self, socket):
+    def pack(self):
+        """Create a message that can be sent through the network.
+
+        :return: a string
+        :rtype: str
+        """
         payload = self.obj.pack()
         attributes = "|".join([self.content_type,
                                self.descriptor,
@@ -60,7 +71,7 @@ class Message(object):
                                str(self.source_entity_id),
                                str(self.source_service_id)])
         raw_msg = "$".join([self.address, attributes, payload])
-        socket.send(raw_msg)
+        return raw_msg
 
     def as_dict(self):
         return {'address': self.address,
