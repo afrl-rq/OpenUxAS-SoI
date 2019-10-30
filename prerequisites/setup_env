@@ -1,6 +1,5 @@
 #!/bin/bash
 eval `./sbx-env/production/bin/anod setenv e3 --qualifier=exp,distrib`
 eval `./sbx-env/wave/bin/anod setenv java --qualifier="version=10"`
-eval `./sbx-env/wave/bin/anod setenv cmake`
 eval `./sbx-env/wave/bin/anod setenv gnat` 
 
