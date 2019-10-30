@@ -1,28 +1,45 @@
 project UxasAll is
-    for Source_dirs use (".", "Communications", "Includes", "Services", "Tasks", "DPSS",
-                         "Plans",
-                         "Utilities",
-                         "../resources/AutomationDiagramDataService",
-                         "VisilibityLib");
-    for Main use ("UxAS_Main.cpp");
-    for Languages use ("C++");
+   for Source_dirs use (".", "Communications", "Includes", "Services", "Tasks", "DPSS",
+                        "Plans",
+                        "Utilities",
+                        "../resources/AutomationDiagramDataService",
+                        "VisilibityLib");
+   for Main use ("UxAS_Main.cpp");
+   for Languages use ("C++");
+
+   type Modes is ("release", "gcov");
+   Scenario : Modes := external ("SCENARIO", "release");
+
+   DEFAULT_CPP_FLAGS := ("-fPIC", "-std=c++11", "-Wall");
+
+   DEFAULT_LINK_FLAGS := ("-std=c++11", "-llmcp", "-lzyre", "-lpugixml",
+                          "-lboost_filesystem", "-lboost_regex",
+                          "-lboost_date_time", "-lboost_system", "-lSQLiteCpp",
+                          "-lsqlite3", "-lczmq", "-luuid", "-lserial", "-lzmq",
+                          "-ldl", "-lpthread", "-static-libstdc++",
+                          "-static-libgcc");
 
     package Builder is
        for Executable ("UxAS_Main.cpp") use "uxas";
     end Builder;
 
-    package Compiler is
-       for Default_switches ("C++") use ("-fPIC", "-std=c++11", "-Wall");
+   package Compiler is
+      case Scenario is
+         when "release" =>
+            for Default_switches ("C++") use DEFAULT_CPP_FLAGS;
+         when "gcov" =>
+            for Default_Switches ("C++") use DEFAULT_CPP_FLAGS &
+                                             ("-fprofile-arcs", "-ftest-coverage");
+      end case;
     end Compiler;
 
-    package Linker is
-      for Default_Switches ("C++") use ("-std=c++11", "-llmcp", "-lzyre",
-                                        "-lpugixml", "-lboost_filesystem",
-                                        "-lboost_regex", "-lboost_date_time",
-                                        "-lboost_system", "-lSQLiteCpp",
-                                        "-lsqlite3", "-lczmq", "-luuid",
-                                        "-lserial", "-lzmq", "-ldl",
-                                        "-lpthread", "-static-libstdc++",
-                                        "-static-libgcc");
+   package Linker is
+      case Scenario is
+         when "release" =>
+            for Default_Switches ("C++") use DEFAULT_LINK_FLAGS;
+         when "gcov"    =>
+            for Default_Switches ("C++") use DEFAULT_LINK_FLAGS &
+                                             ("-fprofile-arcs", "-ftest-coverage");
+      end case;
    end Linker;
  end UxasAll;
