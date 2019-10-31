@@ -29,7 +29,8 @@ project UxasAll is
             for Default_switches ("C++") use DEFAULT_CPP_FLAGS;
          when "gcov" =>
             for Default_Switches ("C++") use DEFAULT_CPP_FLAGS &
-                                             ("-fprofile-arcs", "-ftest-coverage");
+                                             ("-fprofile-arcs", "-ftest-coverage",
+                                              "-DGCOV_MODE=1");
       end case;
     end Compiler;
 
@@ -39,7 +40,8 @@ project UxasAll is
             for Default_Switches ("C++") use DEFAULT_LINK_FLAGS;
          when "gcov"    =>
             for Default_Switches ("C++") use DEFAULT_LINK_FLAGS &
-                                             ("-fprofile-arcs", "-ftest-coverage");
+                                             ("-fprofile-arcs", "-ftest-coverage",
+                                              "-DGCOV_MODE=1");
       end case;
    end Linker;
  end UxasAll;

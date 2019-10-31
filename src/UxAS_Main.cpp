@@ -37,6 +37,10 @@
 #include <thread>
 #include <locale>
 
+#ifdef GCOV_MODE
+#include <csignal>
+#endif
+
 #define ARG_CFG_PATH "-cfgPath"
 #define ARG_VERSION "-version"
 #define ARG_RUN_UNTIL "-runUntil"
@@ -46,6 +50,15 @@
 #define PATCH_VERSION "0"
 
 #define BEFORE_LOG_MANAGER_INITIALIZATION_LOG_MESSAGE(message) std::cout << message << std::endl; std::cout.flush();
+
+#ifdef GCOV_MODE
+extern "C" void __gcov_flush();
+
+void signalHandler( int signum ) {
+    __gcov_flush();
+    std::exit(signum);
+}
+#endif
 
 int
 main(int argc, char** argv)
@@ -67,6 +80,10 @@ main(int argc, char** argv)
     // declare relative paths of configuration files with default values
     // example arguments: -cfgBasePath ./cfg/cfgbase2.xml
     //
+
+    #ifdef GCOV_MODE
+    signal (SIGINT, signalHandler);
+    #endif
     std::string cfgPath{"cfg.xml"};
 	uint32_t runUntil_sec = 0;
 
