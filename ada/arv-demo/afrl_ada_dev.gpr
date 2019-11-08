@@ -13,35 +13,44 @@ project AFRL_Ada_Dev is
 
    for Main use ("demo.adb");
 
-   type Modes is ("debug", "release");
+   type Modes is ("debug", "release", "gcov");
    App_Mode : Modes := external ("APP_MODE", "debug");
 
    for Object_Dir use "objs/" & App_Mode;
 
+   DEBUG_COMPILER_FLAGS :=
+     ("-gnatwa",
+      "-gnatyO",  --  Check that overriding subprograms are explicitly marked as such
+   -- "-gnatdF",  -- have SPARK allow restricted access types
+      "-gnateA",
+      "-g",
+      "-gnata",   -- enable assertions, eg pre/post
+      "-O0");
+
    package Builder is
       case App_Mode is
-         when "debug" =>
-            for Default_Switches ("ada") use ("-g", "-j2");
          when "release" =>
             for Default_Switches ("ada") use ("-j2");
+	 when others    =>
+	    for Default_Switches ("ada") use ("-g", "-j2");
       end case;
    end Builder;
 
    package Linker is
-      for Default_Switches ("ada") use ("-Wl,--gc-sections");
+      case App_Mode is
+         when "gcov" =>
+            for Default_Switches ("ada") use ("-Wl,--gc-sections", "-fprofile-arcs", "-ftest-coverage", "-gnateDGcov");
+	 when others =>
+	    for Default_Switches ("ada") use ("-Wl,--gc-sections");
+      end case;
    end Linker;
 
    package Compiler is
       case App_Mode is
-         when "debug" =>
-            for Default_Switches ("ada") use
-              ("-gnatwa",
-               "-gnatyO",  --  Check that overriding subprograms are explicitly marked as such
-              -- "-gnatdF",  -- have SPARK allow restricted access types
-               "-gnateA",
-               "-g",
-               "-gnata",   -- enable assertions, eg pre/post
-               "-O0");
+         when "debug"   =>
+            for Default_Switches ("ada") use DEBUG_COMPILER_FLAGS;
+	 when "gcov"    =>
+	    for Default_Switches ("ada") use DEBUG_COMPILER_FLAGS & ("-fprofile-arcs", "-ftest-coverage", "-gnateDGcov");
          when "release" =>
             for Default_Switches ("ada") use
               ("-O2",
