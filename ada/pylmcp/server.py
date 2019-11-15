@@ -1,8 +1,15 @@
 """Implement a server that can send/receive uxas message."""
 from Queue import Queue
 from pylmcp.message import Message
+from pylmcp import Object
+from pylmcp.uxas import UxAS, PublishPullBridge, SubscribePushBridge, AutomationRequestValidator
 import threading
+import time
 import zmq
+
+
+class ServerTimeout(Exception):
+    pass
 
 
 class Server(object):
@@ -17,17 +24,29 @@ class Server(object):
 
     def __init__(self,
                  out_url="tcp://127.0.0.1:5561",
-                 in_url="tcp://127.0.0.1:5560"):
+                 in_url="tcp://127.0.0.1:5560",
+                 bridge_service=True,
+                 bridge_cfg=None,
+                 entity_id=100):
         """Start a server that listen for UxAS messages.
 
         :param out_url: url on which messages can be sent
         :type out_url: str
         :param in_url: url on which the server listen
         :type in_url: str
+        :param bridge_service: if True start an uxas with the
+            PubPull bridge set
+        :type bridge_service: bool
+        :param bridge_cfg: if not None, use that as base
+            configuration for the bridge
+        :type bridge_cfg: pylmcp.uxas.UxASConfig
+        :param entity_id: entity id
+        :type entity_id: int
         """
         self.out_url = out_url
         self.in_url = in_url
         self.ctx = zmq.Context()
+        self.entity_id = entity_id
 
         # Set incoming messages socket (subscribe to all messages)
         self.in_socket = self.ctx.socket(zmq.SUB)
@@ -48,12 +67,42 @@ class Server(object):
         # charge of listening for incoming messages to stop
         self.stop_listening = False
 
+        if bridge_service:
+            self.bridge = UxAS(self.entity_id)
+            if bridge_cfg is not None:
+                self.bridge.cfg = bridge_cfg
+            self.bridge.cfg += PublishPullBridge(
+                pub_address=self.in_url,
+                pull_address=self.out_url)
+            # self.bridge.cfg += AutomationRequestValidator()
+            self.bridge.run()
+            # Needed ???
+            time.sleep(0.2)
+        else:
+            self.bridge = None
+
         # Start the listening thread
         self.start_listening()
 
     def stop(self):
         """Stop listening for new messages."""
         self.stop_listening = True
+        if self.bridge is not None:
+            self.bridge.interrupt()
+
+    def get_uxas(self, **kwargs):
+        """Get an uxas instance.
+
+        The instance has at least the SubscribePushBridge service enabled.
+
+        :param kwargs: arguments are passed to the UxAS initialize function.
+        :type kwargs: dict
+        """
+        result = UxAS(entity_id=self.entity_id, **kwargs)
+        result.cfg += SubscribePushBridge(
+            sub_address=self.in_url,
+            push_address=self.out_url)
+        return result
 
     def __del__(self):
         # Ensure that we don't block on termination
@@ -81,16 +130,54 @@ class Server(object):
     def send_msg(self, msg):
         """Send an UxAS message.
 
-        :param msg: a UxAS message
-        :type msg: pylmcp.message.Message
+        :param msg: a UxAS message or an LMCP Object. When an object is
+            given, a message is create automatically with the bridge
+            entity_id and a service_id set to 0
+        :type msg: pylmcp.message.Message | pylmcp.Object
         """
-        self.out_socket.send(msg.pack())
+        if isinstance(msg, Object):
+            m = Message(obj=msg,
+                        source_entity_id=self.bridge.cfg.entity_id,
+                        source_service_id=0)
+        else:
+            m = msg
+
+        return self.out_socket.send(m.pack())
 
     def __enter__(self):
         return self
 
     def __exit__(self, _type, _value, _tb):
         self.stop()
+
+    def wait_for_msg(self, descriptor=None, timeout=10.0):
+        """Wait for a message.
+
+        :param descriptor: if not None wait for a specific message that match
+            the descriptor name
+        :type descriptor: str
+        :param timeout: timeout in s
+        :type timeout: float | int
+        """
+        start_time = time.time()
+        current_time = start_time
+        msg = None
+
+        while current_time - start_time < timeout:
+            if self.has_msg():
+                msg = self.read_msg()
+                if descriptor is None or msg.descriptor == descriptor:
+                    break
+                else:
+                    print "discard: %s" % msg.descriptor
+                    msg = None
+            time.sleep(0.2)
+            current_time = time.time()
+
+        if msg is None:
+            raise ServerTimeout
+
+        return msg
 
     def start_listening(self):
         """Starts a thread listening for incoming messages.
