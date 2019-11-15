@@ -1,7 +1,10 @@
 import json
+import re
 from pylmcp.model import LMCP_DB
 from pylmcp.model.object_class import ObjectClass
 
+class InvalidObjectClass(Exception):
+    pass
 
 class Object(object):
     """A LMCP Object."""
@@ -11,14 +14,23 @@ class Object(object):
     def __init__(self, class_name, randomize=False, **kwargs):
         """Initialize a LMCP Object.
 
-        :param class_name: an object class name
+        :param class_name: an object class name (partial name accepted)
         :type class_name: str
         :param randomize: if True non set attributes are created
             randomly
         :type randomize: bool
         :param kwargs: user can set any valid attribute for the class
         """
-        self.object_class = self.DB.classes[class_name]
+
+        object_class = [k for k in self.DB.classes.keys()
+                        if k.endswith(class_name)]
+        if len(object_class) == 0:
+            raise InvalidObjectClass("invalid class: %s" % class_name)
+        elif len(object_class) > 1:
+            raise InvalidObjectClass(
+                "ambiguous class name: %s" % class_name)
+
+        self.object_class = self.DB.classes[object_class[0]]
         self.data = {}
 
         # Initialize to None every attributes
