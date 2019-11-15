@@ -27,6 +27,8 @@ class UxasAda(spec('common')):
     def build_type(self):
         if 'debug' in self.parsed_qualifier:
             return 'debug'
+	elif 'gcov' in self.parsed_qualifier:
+	    return 'gcov'
         else:
             return 'release'
 

@@ -1,5 +1,6 @@
 with Ada.Text_IO;    use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
+with Ctrl_C_Handler;
 
 with UxAS.Common.Configuration_Manager;  use UxAS.Common;
 
@@ -19,6 +20,8 @@ procedure Demo is
 
    All_Enabled_Services : DOM.Core.Element;
 begin
+   Ctrl_C_Handler;
+
    Configuration_Manager.Instance.Load_Base_XML_File (XML_Cfg_File_Name, Success);
    if not Success then
       Put_Line ("Could not load base XML file '" & XML_Cfg_File_Name & "'");

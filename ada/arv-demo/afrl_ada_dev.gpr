@@ -13,35 +13,55 @@ project AFRL_Ada_Dev is
 
    for Main use ("demo.adb");
 
-   type Modes is ("debug", "release");
+   type Modes is ("debug", "release", "gcov");
    App_Mode : Modes := external ("APP_MODE", "debug");
 
    for Object_Dir use "objs/" & App_Mode;
 
+   DEBUG_COMPILER_FLAGS :=
+     ("-gnatwa",
+      "-gnatyO",  --  Check that overriding subprograms are explicitly marked as such
+   -- "-gnatdF",  -- have SPARK allow restricted access types
+      "-gnateA",
+      "-g",
+      "-O0");
+
+   package Naming is
+
+      for Specification ("Ctrl_C_Handler") use "ctrl_c_handler.ads";
+
+      case App_Mode is
+         when "gcov"              =>
+            for Implementation ("Ctrl_C_Handler") use "ctrl_c_handler__gcov.adb";
+         when "debug" | "release" =>
+            for Implementation ("Ctrl_C_Handler") use "ctrl_c_handler__dummy.adb";
+      end case;
+   end Naming;
+
    package Builder is
       case App_Mode is
-         when "debug" =>
-            for Default_Switches ("ada") use ("-g", "-j2");
-         when "release" =>
+         when "release"        =>
             for Default_Switches ("ada") use ("-j2");
+	 when "debug" | "gcov" =>
+	    for Default_Switches ("ada") use ("-g", "-j2");
       end case;
    end Builder;
 
    package Linker is
-      for Default_Switches ("ada") use ("-Wl,--gc-sections");
+      case App_Mode is
+         when "gcov"              =>
+            for Default_Switches ("ada") use ("-Wl,--gc-sections", "-fprofile-arcs", "-ftest-coverage");
+	 when "debug" | "release" =>
+	    for Default_Switches ("ada") use ("-Wl,--gc-sections");
+      end case;
    end Linker;
 
    package Compiler is
       case App_Mode is
-         when "debug" =>
-            for Default_Switches ("ada") use
-              ("-gnatwa",
-               "-gnatyO",  --  Check that overriding subprograms are explicitly marked as such
-              -- "-gnatdF",  -- have SPARK allow restricted access types
-               "-gnateA",
-               "-g",
-               "-gnata",   -- enable assertions, eg pre/post
-               "-O0");
+         when "debug"   =>
+            for Default_Switches ("ada") use DEBUG_COMPILER_FLAGS & ("-gnata");
+	 when "gcov"    =>
+	    for Default_Switches ("ada") use DEBUG_COMPILER_FLAGS & ("-fprofile-arcs", "-ftest-coverage");
          when "release" =>
             for Default_Switches ("ada") use
               ("-O2",
