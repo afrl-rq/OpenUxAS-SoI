@@ -1,7 +1,6 @@
 with Ada.Text_IO;    use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
-with GNAT.OS_Lib;
-with GNAT.Ctrl_C;
+with Ctrl_C_Handler;
 
 with UxAS.Common.Configuration_Manager;  use UxAS.Common;
 
@@ -21,20 +20,7 @@ procedure Demo is
 
    All_Enabled_Services : DOM.Core.Element;
 begin
-
-   #if GCOV then
-   declare
-      procedure Flush;
-      pragma Import (C, Flush, "__gcov_flush");
-      procedure SIGINT_Exit is
-      begin
-         Flush;
-         GNAT.OS_Lib.OS_Exit (1);
-      end SIGINT_Exit;
-   begin
-      GNAT.Ctrl_C.Install_Handler (SIGINT_Exit'Unrestricted_Access);
-   end;
-   #end if;
+   Ctrl_C_Handler;
 
    Configuration_Manager.Instance.Load_Base_XML_File (XML_Cfg_File_Name, Success);
    if not Success then
