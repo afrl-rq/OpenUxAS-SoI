@@ -1,19 +1,36 @@
-#!/bin/bash
+#!/usr/bin/env python
+import os
+import sys
+from subprocess import check_output, check_call, STDOUT
 
-mkdir -p sbx-env
-if test -d sbx-env/production; then
-   (cd sbx-env/production && ./bin/redeploy)
-else   
-   deploy-anod-sandbox production sbx-env/production
-fi
-echo "Retrieve latest python distrib with latest e3"
-(cd sbx-env/production && ./bin/anod install e3 --qualifier=exp,distrib --query-range=10)
+ROOT_DIR=os.path.dirname(os.path.abspath(__file__))
 
-if test -d sbx-env/wave; then
-   (cd sbx-env/wave && ./bin/redeploy)
-else
-   deploy-anod-sandbox wave sbx-env/wave
-fi
-echo "Install Java 10.x"
-(cd sbx-env/wave && ./bin/anod build java --qualifier="version=10")
-(cd sbx-env/wave && ./bin/anod install gnat)
+if __name__ == '__main__':
+    def check_version(program):
+        program_version = check_output([program, '--version']).splitlines()[0]
+        print("%-24s: Found %s" % (program, program_version.decode('utf-8')))
+
+    try:
+        assert sys.version[0] == '3', "Python 3.x required. Found: %s" % sys.version.splitlines()[0]
+        check_version('git')
+        check_version('cmake')
+        check_version('g++')
+        check_version('pkg-config')
+
+        assert os.path.isfile('/usr/include/uuid/uuid.h'), 'Missing uuid.h'
+
+        # Create python venv with e3-core
+        vpython_dir = os.path.join(ROOT_DIR, 'vpython')
+        vpython_bin = os.path.join(vpython_dir, 'bin')
+        check_call([sys.executable, '-m', 'venv', vpython_dir])
+        os.environ['PATH'] = "%s:%s" % (vpython_bin, os.environ['PATH'])
+        check_call([os.path.join(vpython_bin, 'pip'), 'install', 'wheel'])
+        check_call([os.path.join(vpython_bin, 'pip'), 'install',
+                    'git+https://github.com/AdaCore/e3-core.git@e3transition'])
+        print('To setup your environment just do:')
+        print('export PATH=%s:$PATH' % vpython_bin)
+    except Exception as e:
+        print(str(e))
+        print('Abort...')
+        sys.exit(1)
+

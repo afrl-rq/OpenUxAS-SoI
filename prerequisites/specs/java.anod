@@ -1,15 +1,23 @@
 from e3.anod.spec import Anod
+from e3.archive import unpack_archive
 import os
 
 
 class Java(Anod):
 
-    @property
-    def build_deps(self):
-        return [Anod.BuildVar(
-            "java_version",
-            os.environ["OPENUXAS_JAVA_VERSION"])]
+    def setenv(self):
+        self.env.add_path(os.path.join(self.build_space.install_dir, 'bin'))
 
     @Anod.primitive()
     def build(self):
-        pass
+        self.shell('wget', '--no-cookies',
+                   '--no-check-certificate', '--header',
+                   'Cookie: oraclelicense=accept-securebackup-cookie',
+                   'https://download.oracle.com/otn-pub/java/jdk/13.0.1+9/'
+                   'cec27d702aa74d5a8630c65ae61e4305/'
+                   'jdk-13.0.1_linux-x64_bin.tar.gz',
+                   cwd=self.build_space.build_dir)
+        unpack_archive(os.path.join(self.build_space.build_dir,
+                                    'jdk-13.0.1_linux-x64_bin.tar.gz'),
+                       self.build_space.install_dir,
+                       remove_root_dir=True)

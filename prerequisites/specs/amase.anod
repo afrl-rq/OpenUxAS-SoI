@@ -59,6 +59,7 @@ class AMASE(spec('common')):
 
     @Anod.primitive()
     def build(self):
+        self.deps['java'].setenv()
         self.deps['ant'].setenv()
 
         # Deploy newest lmcplib.jar

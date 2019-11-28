@@ -32,6 +32,7 @@ class LmcpGen(spec('common')):
 
     @Anod.primitive()
     def build(self):
+        self.deps['java'].setenv()
         self.deps['ant'].setenv()
         self.shell('ant', cwd=self['SRC_DIR'])
         sync_tree(os.path.join(self['SRC_DIR'], 'dist'),
