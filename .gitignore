@@ -45,3 +45,4 @@ examples/**/datawork/**
 # Ignore build directories
 /prerequisites/sbx
 /prerequisites/sbx-env
+/prerequisites/vpython

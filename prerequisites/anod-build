@@ -310,7 +310,9 @@ def check_tool(tool):
 
 if __name__ == '__main__':
     m = Main()
-    m.argument_parser.add_argument('spec_name', help='spec to build')
+    m.argument_parser.add_argument(
+        'spec_name', help='spec to build. This is '
+        'the basename of an .anod file (without the extension)')
     m.argument_parser.add_argument('--qualifier', help='optional qualifier')
     m.argument_parser.add_argument(
         '--force',
@@ -323,8 +325,6 @@ if __name__ == '__main__':
     # in case of some tool change.
     gcc_version = check_tool('gcc')
     os.environ['OPENUXAS_COMPILER_VERSION'] = gcc_version
-    java_version = check_tool('java')
-    os.environ['OPENUXAS_JAVA_VERSION'] = java_version
     cmake_version = check_tool('cmake')
     os.environ['OPENUXAS_CMAKE_VERSION'] = cmake_version
     check_tool('pkg-config')
