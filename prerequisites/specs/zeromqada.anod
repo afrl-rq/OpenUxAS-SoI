@@ -1,5 +1,7 @@
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.diff import patch
+from e3.fs import cp
 import os
 
 
@@ -12,17 +14,25 @@ class ZeroMQAda(spec('common')):
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name='zeromqada-src',
-                            publish=True, dest='')]
+        return [self.Source(name='zeromqada-src',
+                            publish=True, dest=''),
+                self.Source(name='zeromqada.patch',
+                            publish=True,
+                            unpack_cmd=cp,
+                            dest='patches')]
 
     @property
     def source_pkg_build(self):
         return [self.SourceBuilder(name='zeromqada-src',
                                    fullname=lambda x: 'zeromqada-src.tar.gz',
-                                   checkout=["zeromqada"])]
+                                   checkout=["zeromqada"]),
+                self.LocalSourceBuilder(name='zeromqada.patch')]
 
     @Anod.primitive()
     def build(self):
+        patch(os.path.join(self.build_space.src_dir, 'patches',
+                           'zeromqada.patch'),
+              self.build_space.src_dir)
         self.deps['zeromq'].setenv()
         self.shell(os.path.join(self.build_space.src_dir, 'configure'),
                    cwd=self.build_space.src_dir)

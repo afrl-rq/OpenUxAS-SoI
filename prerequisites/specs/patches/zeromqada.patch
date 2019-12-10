@@ -1,0 +1,94 @@
+*** configure.orig	2019-12-10 10:02:57.474442824 +0100
+--- configure	2019-12-10 10:06:58.609386154 +0100
+***************
+*** 15,21 ****
+      os.environ["GPR_PROJECT_PATH"] = ""
+      response = subprocess.Popen(
+           ["gnatls", "-v"],
+!          stdout=subprocess.PIPE).communicate()[0].split("\n")
+      for line in response:
+          if "Project Search Path" in line:
+              projects = True
+--- 15,21 ----
+      os.environ["GPR_PROJECT_PATH"] = ""
+      response = subprocess.Popen(
+           ["gnatls", "-v"],
+!          stdout=subprocess.PIPE).communicate()[0].decode('utf-8').split("\n")
+      for line in response:
+          if "Project Search Path" in line:
+              projects = True
+***************
+*** 43,56 ****
+  
+  
+  def whichzmqversion():
+!     with file("_locate_zmq.c", "w") as outf:
+          outf.write("#include <zmq.h>\n")
+          outf.write("#include <stdio.h>\n")
+          outf.write('int main() { printf("%d.%d.%d",ZMQ_VERSION_MAJOR,ZMQ_VERSION_MINOR,ZMQ_VERSION_PATCH);}')
+      response = subprocess.Popen(["gcc", "_locate_zmq.c", "-lzmq"],
+!                                 stdout=subprocess.PIPE).communicate()[0].split("\n")
+      response = subprocess.Popen([join(dirname(__file__),"a.out")],
+!                                 stdout=subprocess.PIPE).communicate()[0]
+      os.remove("_locate_zmq.c")
+      os.remove("a.out")
+      return response
+--- 43,56 ----
+  
+  
+  def whichzmqversion():
+!     with open("_locate_zmq.c", "w") as outf:
+          outf.write("#include <zmq.h>\n")
+          outf.write("#include <stdio.h>\n")
+          outf.write('int main() { printf("%d.%d.%d",ZMQ_VERSION_MAJOR,ZMQ_VERSION_MINOR,ZMQ_VERSION_PATCH);}')
+      response = subprocess.Popen(["gcc", "_locate_zmq.c", "-lzmq"],
+!                                 stdout=subprocess.PIPE).communicate()[0].decode('utf-8').split("\n")
+      response = subprocess.Popen([join(dirname(__file__),"a.out")],
+!                                 stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
+      os.remove("_locate_zmq.c")
+      os.remove("a.out")
+      return response
+***************
+*** 58,67 ****
+  
+  def whichzmq():
+      ret = "/usr"
+!     with file("_locate_zmq.c", "w") as outf:
+          outf.write("#include <zmq.h>")
+      response = subprocess.Popen(["gcc", "-E", "-pipe", "_locate_zmq.c"],
+!                                 stdout=subprocess.PIPE).communicate()[0].split("\n")
+      os.remove("_locate_zmq.c")
+      for line in response:
+          if "/zmq.h" in line:
+--- 58,67 ----
+  
+  def whichzmq():
+      ret = "/usr"
+!     with open("_locate_zmq.c", "w") as outf:
+          outf.write("#include <zmq.h>")
+      response = subprocess.Popen(["gcc", "-E", "-pipe", "_locate_zmq.c"],
+!                                 stdout=subprocess.PIPE).communicate()[0].decode('utf-8').split("\n")
+      os.remove("_locate_zmq.c")
+      for line in response:
+          if "/zmq.h" in line:
+***************
+*** 190,198 ****
+                  if splitext(f)[1] == ".in":
+                      src = join(root, f)
+                      tgt = join(root, splitext(f)[0])
+!                     with file(src) as inf:
+!                         print src, tgt
+!                         with file(tgt, "w") as outf:
+                              outf.write(inf.read() % args.__dict__)
+  
+  
+--- 190,198 ----
+                  if splitext(f)[1] == ".in":
+                      src = join(root, f)
+                      tgt = join(root, splitext(f)[0])
+!                     with open(src) as inf:
+!                         print(src, tgt)
+!                         with open(tgt, "w") as outf:
+                              outf.write(inf.read() % args.__dict__)
+  
+  
