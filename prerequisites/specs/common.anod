@@ -112,7 +112,7 @@ class Common(Anod):
         cmake_cmd = ['cmake']
         cmake_cmd.append('-DCMAKE_CXX_FLAGS=-std=c++11')
         if params:
-            for var, value in params.iteritems():
+            for var, value in params.items():
                 cmake_cmd.append('-D%s=%s' % (var, value))
         cmake_cmd.append(cmake_dir)
 

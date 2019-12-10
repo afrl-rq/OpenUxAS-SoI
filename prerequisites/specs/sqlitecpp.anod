@@ -17,8 +17,11 @@ class SqliteCPP(spec('github')):
     @Anod.primitive()
     def build(self):
         self.deps['sqlite'].setenv()
+
+        # CPPLint is disabled to avoid need for Python 2.x
         self.cmake_build(enable_install=False,
-                         params={'SQLITECPP_INTERNAL_SQLITE': 'OFF'})
+                         params={'SQLITECPP_INTERNAL_SQLITE': 'OFF',
+                                 'SQLITECPP_RUN_CPPLINT': 'OFF'})
         rm(self['INSTALL_DIR'], recursive=True)
         mkdir(self['INSTALL_DIR'])
         sync_tree(os.path.join(self['SRC_DIR'], 'include'),
