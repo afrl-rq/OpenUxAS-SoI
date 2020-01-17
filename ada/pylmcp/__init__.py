@@ -15,22 +15,25 @@ class Object(object):
         """Initialize a LMCP Object.
 
         :param class_name: an object class name (partial name accepted)
-        :type class_name: str
+        :type class_name: str | ObjectClass
         :param randomize: if True non set attributes are created
             randomly
         :type randomize: bool
         :param kwargs: user can set any valid attribute for the class
         """
 
-        object_class = [k for k in self.DB.classes.keys()
-                        if k.endswith(class_name)]
-        if len(object_class) == 0:
-            raise InvalidObjectClass("invalid class: %s" % class_name)
-        elif len(object_class) > 1:
-            raise InvalidObjectClass(
-                "ambiguous class name: %s" % class_name)
+        if isinstance(class_name, ObjectClass):
+            self.object_class = class_name
+        else:
+            object_class = [k for k in self.DB.classes.keys()
+                            if k.endswith(class_name)]
+            if len(object_class) == 0:
+                raise InvalidObjectClass("invalid class: %s" % class_name)
+            elif len(object_class) > 1:
+                raise InvalidObjectClass(
+                    "ambiguous class name: %s" % class_name)
 
-        self.object_class = self.DB.classes[object_class[0]]
+            self.object_class = self.DB.classes[object_class[0]]
         self.data = {}
 
         # Initialize to None every attributes

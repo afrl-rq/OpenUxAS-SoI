@@ -102,10 +102,8 @@ class ObjectAttr(object):
                 if isinstance(model, EnumModel):
                     return 0
                 else:
-                    result = {}
-                    for attr in model.attrs:
-                        result[attr.name] = attr.random_value()
-                    return result
+                    from pylmcp import Object
+                    return Object(class_name=model, randomize=True)
             else:
                 raise Exception("%s not implemented" % type_name)
 
