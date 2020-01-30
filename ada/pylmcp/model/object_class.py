@@ -1,27 +1,35 @@
+from __future__ import annotations
 import struct
+import typing
 from pylmcp.model.object_attr import ObjectAttr
+
+if typing.TYPE_CHECKING:
+    from typing import List, Optional, Tuple
+    import pylmcp.model
+    import pylmcp.model.series
+    import pylmcp.util
 
 
 class ObjectClass(object):
     """Message class (i.e: Struct)."""
 
-    def __init__(self, name, id, extends, attrs, series, model_db):
+    def __init__(self,
+                 name: str,
+                 id: int,
+                 extends: typing.Optional[str],
+                 attrs: typing.List[ObjectAttr],
+                 series: pylmcp.model.series.Series,
+                 model_db: pylmcp.model.ModelDatabase) -> None:
         """Initialize an LMCP class.
 
         :param name: class name
-        :type name: str
         :param id: an integer id for the class
-        :type id: int
         :param extends: a class name from which this class is derived.
             The class name is in the format SERIES_NAME/CLASS_NAME
-        :type extends: str | None
         :param attrs: a list of ObjAttr instance defining the attributes
             for the this class
-        :type attrs: list[pylmcp.model.obj_attr.ObjectAttr]
         :param series: the series in which this class is defined
-        :type series: pylmcp.model.series.Series
         :param model_db: the model database
-        :type model_db: pylmcp.model.ModelDatabase
         """
         self.name = name
         self.__attrs = attrs
@@ -34,68 +42,51 @@ class ObjectClass(object):
         self.full_name = "%s.%s" % (self.namespace.replace('/', '.'), name)
 
     @property
-    def attrs(self):
+    def attrs(self) -> typing.List[ObjectAttr]:
         """Return the full list of attributes.
 
         :return: the complete list of attributes (including the attributes
             declared in the parent classes)
-        :rtype: list[pylmcp.model.obj_attr.ObjectAttr
         """
-        result = []
+        result: typing.List[ObjectAttr] = []
         if self.extends:
             result += self.model_db.types[self.extends].attrs
         result += self.__attrs
         return result
 
     @property
-    def full_id(self):
-        """Return a tuple that represents the full class id.
-
-        :rtype: (int, int, int)
-        """
+    def full_id(self) -> Tuple[int, int, int]:
+        """Return a tuple that represents the full class id."""
         return (self.series_id, self.id, self.version)
 
     @property
-    def series_id(self):
-        """Return the series id.
-
-        :rtype: int
-        """
+    def series_id(self) -> int:
+        """Return the series id."""
         return self.series.id
 
     @property
-    def series_name(self):
-        """Return the series name.
-
-        :rtype: str
-        """
+    def series_name(self) -> str:
+        """Return the series name."""
         return self.series.name
 
     @property
-    def namespace(self):
-        """Return the namespace in which the class is declared.
-
-        :rtype: str
-        """
+    def namespace(self) -> str:
+        """Return the namespace in which the class is declared."""
         return self.series.namespace
 
     @property
-    def version(self):
-        """The class version (i.e same as series version)
-
-        :rtype: int
-        """
+    def version(self) -> int:
+        """The class version (i.e same as series version)."""
         return self.series.version
 
-    def pack(self, value, include_headers=True):
+    def pack(self,
+             value: dict,
+             include_headers: bool = True) -> bytes:
         """Pack the message into its binary format.
 
         :param value: attribute's values
-        :type value: dict
         :param include_headers: add LMCP header
-        :type include_headers: bool
         :return: the binary representation
-        :rtype: string
         """
 
         # Starts with the object type
@@ -112,19 +103,22 @@ class ObjectClass(object):
             # Compute the final checksum and append it
             sum = 0
             for x in range(len(result)):
-                sum += ord(result[x]) & 0xFF
+                sum += result[x] & 0xFF
             result += struct.pack(">I", sum)
             return result
         else:
             return result
 
     @classmethod
-    def unpack(self, payload):
+    def unpack(self,
+               payload: pylmcp.util.Buffer) -> Optional[Tuple[int, int, int]]:
         exists = payload.unpack("bool")
         if not exists:
             return None
         else:
-            full_id = payload.unpack_struct(">qIH")
+            full_id = typing.cast(
+                Tuple[int, int, int],
+                payload.unpack_struct(">qIH"))
             return full_id
 
     @classmethod
@@ -153,7 +147,7 @@ class ObjectClass(object):
             series=series,
             model_db=model_db)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "\n".join(["lmcp_type:           %s" % self.id,
                           "series_name:         %s" % self.series_name,
                           "full_lmcp_type_name: %s" % self.full_name])

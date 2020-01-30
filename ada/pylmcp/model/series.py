@@ -1,7 +1,14 @@
+from __future__ import annotations
+
 from xml.etree import ElementTree
 from pylmcp.model.object_class import ObjectClass
 from pylmcp.model.enum import EnumModel
 import logging
+import typing
+
+if typing.TYPE_CHECKING:
+    from pylmcp.model import ModelDatabase
+    from typing import Dict
 
 
 logger = logging.getLogger('pylmcp.series')
@@ -9,23 +16,23 @@ logger = logging.getLogger('pylmcp.series')
 
 class Series(object):
 
-    def __init__(self, name, namespace, version, model_db):
+    def __init__(self,
+                 name: str,
+                 namespace: str,
+                 version: int,
+                 model_db: ModelDatabase) -> None:
         """Initialize a series.
 
         :param name: series name
-        :type name: str
         :param namespace: namespace
-        :type namespace: str
         :param version: version
-        :type version: int
         :param model_db: the model database
-        :type model_db: ModelDatabase
         """
         self.name = name
         self.namespace = namespace
         self.version = version
-        self.classes = {}
-        self.enums = {}
+        self.classes: Dict[str, ObjectClass]= {}
+        self.enums: Dict[str, EnumModel] = {}
         self.model_db = model_db
 
         # Compute series id
