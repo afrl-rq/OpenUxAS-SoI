@@ -1,7 +1,15 @@
+from __future__ import annotations
+
 import json
 import re
+import typing
 from pylmcp.model import LMCP_DB
+from pylmcp.util import Buffer
 from pylmcp.model.object_class import ObjectClass
+
+if typing.TYPE_CHECKING:
+    from typing import Dict, Any, Optional
+
 
 class InvalidObjectClass(Exception):
     pass
@@ -11,7 +19,10 @@ class Object(object):
 
     DB = LMCP_DB
 
-    def __init__(self, class_name, randomize=False, **kwargs):
+    def __init__(self,
+                 class_name: typing.Union[str, ObjectClass],
+                 randomize: bool = False,
+                 **kwargs):
         """Initialize a LMCP Object.
 
         :param class_name: an object class name (partial name accepted)
@@ -34,7 +45,7 @@ class Object(object):
                     "ambiguous class name: %s" % class_name)
 
             self.object_class = self.DB.classes[object_class[0]]
-        self.data = {}
+        self.data: Dict[str, Any] = {}
 
         # Initialize to None every attributes
         for f in self.attributes:
@@ -72,8 +83,8 @@ class Object(object):
     def __getitem__(self, key):
         return self.data[key]
 
-    def as_dict(self):
-        result = {}
+    def as_dict(self) -> Dict[str, Any]:
+        result: Dict[str, Any] = {}
         for k, v in self.data.items():
             if isinstance(v, list):
                 result[k] = []
@@ -91,7 +102,7 @@ class Object(object):
     def __str__(self):
         return json.dumps(self.as_dict(), indent=2)
 
-    def set_attributes_randomly(self):
+    def set_attributes_randomly(self) -> None:
         """Set object attributes randomly."""
         for f in self.attributes:
             self.data[f.name] = f.random_value()
@@ -101,22 +112,22 @@ class Object(object):
         return self.object_class.attrs
 
     @property
-    def attribute_names(self):
+    def attribute_names(self) -> typing.List[str]:
         return [f.name for f in self.object_class.attrs]
 
-    def pack(self):
+    def pack(self) -> bytes:
         return self.object_class.pack(value=self.data)
 
     @classmethod
-    def unpack(cls, data):
+    def unpack(cls, data: Buffer) -> Optional[Object]:
         full_id = ObjectClass.unpack(data)
         if full_id is None:
             return None
-        else:
-            object_class = cls.DB.class_ids[full_id]
-            result = cls(class_name=object_class.full_name)
 
-            for attr in object_class.attrs:
-                value = attr.unpack(data)
-                result.data[attr.name] = value
-            return result
+        object_class = cls.DB.class_ids[full_id]
+        result = cls(class_name=object_class.full_name)
+
+        for attr in object_class.attrs:
+            value = attr.unpack(data)
+            result.data[attr.name] = value
+        return result

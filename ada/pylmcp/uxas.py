@@ -35,14 +35,14 @@ class PublishPullBridge(object):
         :rtype: xml.etree.Element
         """
         result = xml_el(
-            tag='Bridge',
+            'Bridge',
             attrib={'Type': 'LmcpObjectNetworkPublishPullBridge',
                     'AddressPUB': self.publish_address,
                     'AddressPULL': self.pull_address})
         for c in ALL_MESSAGES:
             xml_sub(
                 result,
-                tag='SubscribeToMessage',
+                'SubscribeToMessage',
                 attrib={'MessageType': c})
         return result
 
@@ -70,18 +70,18 @@ class SubscribePushBridge(object):
         :rtype: xml.etree.Element
         """
         result = xml_el(
-            tag='Bridge',
+            'Bridge',
             attrib={'Type': 'LmcpObjectNetworkSubscribePushBridge',
                     'AddressSUB': self.sub_address,
                     'AddressPUSH': self.push_address})
         for c in ALL_MESSAGES:
             xml_sub(
                 result,
-                tag='SubscribeToExternalMessage',
+                'SubscribeToExternalMessage',
                 attrib={'MessageType': c})
             xml_sub(
                 result,
-                tag='SubscribeToMessage',
+                'SubscribeToMessage',
                 attrib={'MessageType': c})
         return result
 
@@ -99,7 +99,7 @@ class AutomationRequestValidator(object):
         :rtype: xml.etree.Element
         """
         result = xml_el(
-            tag='Service',
+            'Service',
             attrib={'Type': 'AutomationRequestValidatorService'})
         return result
 
@@ -135,7 +135,7 @@ class UxASConfig(object):
         :rtype: str
         """
         result = xml_el(
-            tag='UxAS',
+            'UxAS',
             attrib={'FormatVersion': '1.0',
                     'EntityID': str(self.entity_id),
                     'EntityType': self.entity_type})
@@ -143,8 +143,8 @@ class UxASConfig(object):
         for el in self.elements:
             result.append(el.as_xml())
 
-        result = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n' + \
-            "\n".join(xml_dump(result))
+        result = b'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n' + \
+            b"\n".join(xml_dump(result))
         return result
 
 

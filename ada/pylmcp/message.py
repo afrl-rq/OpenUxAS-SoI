@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pylmcp import Object
 from pylmcp.util import Buffer
 import json
@@ -5,11 +6,12 @@ import json
 
 class Message(object):
 
-    def __init__(self, obj,
-                 source_entity_id,
-                 source_service_id,
-                 source_group='',
-                 content_type='lmcp',
+    def __init__(self,
+                 obj: Object,
+                 source_entity_id: int,
+                 source_service_id: int,
+                 source_group: str = '',
+                 content_type: str = 'lmcp',
                  address=None,
                  descriptor=None):
         self.obj = obj
@@ -25,19 +27,17 @@ class Message(object):
             self.address = address
 
     @classmethod
-    def unpack(self, raw_msg):
+    def unpack(self, raw_msg: bytes) -> Message:
         """Unpack a received message.
 
         :param raw_msg: the received message
-        :type raw_msg: str
         :return: a Message object
-        :rtype: pylmcp.message.Message
         """
         # Unpack headers and payload
-        address, attributes, payload = raw_msg.split('$', 2)
+        address, attributes, payload = raw_msg.split(b'$', 2)
         content_type, descriptor, source_group, \
             source_entity_id, source_service_id = \
-            attributes.split('|', 4)
+            attributes.split(b'|', 4)
 
         # Unpack the LMCP object
         buf = Buffer(payload)
@@ -49,28 +49,32 @@ class Message(object):
         buf.unpack("uint32")
 
         obj = Object.unpack(data=buf)
+        assert obj is not None
 
-        return Message(obj=obj,
-                       source_entity_id=source_entity_id,
-                       source_service_id=source_service_id,
-                       source_group=source_group,
-                       content_type=content_type,
-                       address=address,
-                       descriptor=descriptor)
+        return Message(
+            obj=obj,
+            source_entity_id=int(source_entity_id.decode('utf-8')),
+            source_service_id=int(source_service_id.decode('utf-8')),
+            source_group=source_group.decode('utf-8'),
+            content_type=content_type.decode('utf-8'),
+            address=address.decode('utf-8'),
+            descriptor=descriptor.decode('utf-8'))
 
-    def pack(self):
+    def pack(self) -> bytes:
         """Create a message that can be sent through the network.
 
         :return: a string
         :rtype: str
         """
         payload = self.obj.pack()
-        attributes = "|".join([self.content_type,
-                               self.descriptor,
-                               self.source_group,
-                               str(self.source_entity_id),
-                               str(self.source_service_id)])
-        raw_msg = "$".join([self.address, attributes, payload])
+        attributes = b"|".join([self.content_type.encode('utf-8'),
+                                self.descriptor.encode('utf-8'),
+                                self.source_group.encode('utf-8'),
+                                str(self.source_entity_id).encode('utf-8'),
+                                str(self.source_service_id).encode('utf-8')])
+        raw_msg = b"$".join([self.address.encode('utf-8'),
+                             attributes,
+                             payload])
         return raw_msg
 
     def as_dict(self):

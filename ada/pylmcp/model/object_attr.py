@@ -44,14 +44,14 @@ class ObjectAttr(object):
 
     def pack(self, value):
         def pack_simple_value(type_name, value):
-            result = ''
+            result = b''
             if type_name in self.BASIC_TYPES:
                 if self.BASIC_TYPES[type_name]['rep'] is not None:
                     result = struct.pack(
                         self.BASIC_TYPES[type_name]['rep'], value)
                 elif type_name == 'string':
                     result += struct.pack('>H', len(value))
-                    result += struct.pack('%ss' % len(value), value)
+                    result += struct.pack('%ss' % len(value), value.encode('utf-8'))
             else:
                 model = self.model_db.types[type_name]
                 if isinstance(model, EnumModel):
@@ -63,7 +63,7 @@ class ObjectAttr(object):
             return result
 
         if self.is_array:
-            result = ''
+            result = b''
             if not self.is_static_array:
                 if self.is_large_array:
                     result += struct.pack('>I', len(value))
@@ -93,9 +93,13 @@ class ObjectAttr(object):
             elif type_name == 'string':
                 return "Hello"
             elif type_name == 'real32':
-                return random.random()
+                return struct.unpack_from(
+                    '>f',
+                    struct.pack('>f', random.random()))[0]
             elif type_name == 'real64':
-                return random.random()
+                return struct.unpack_from(
+                    '>d',
+                    struct.pack('>d', random.random()))[0]
 
             elif type_name in self.model_db.types:
                 model = self.model_db.types[type_name]

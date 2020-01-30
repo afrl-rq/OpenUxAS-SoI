@@ -35,7 +35,8 @@ class ModelDatabase(object):
         # name (SERIES_NAME/NAME)
         self.types = {}
 
-    def add_series(self, series):
+    def add_series(self,
+                   series: Series) -> None:
         """Add a series.
 
         :param series: the series to add in the database
@@ -58,7 +59,7 @@ class ModelDatabase(object):
             self.types["%s/%s" % (series.name, e.name)] = e
 
     @classmethod
-    def load_series_from_dir(cls, path):
+    def load_series_from_dir(cls, path: str) -> 'ModelDatabase':
         """Load all series as xml files from a given directory.
         
         :param path: the directory containing the list of xml models

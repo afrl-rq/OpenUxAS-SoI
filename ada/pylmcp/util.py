@@ -1,9 +1,9 @@
+from __future__ import annotations
 import struct
+import typing
 
-
-def bytes_as_str(msg):
-    """Return a string representing a series of bytes."""
-    print(" ".join(["%02X" % ord(c) for c in msg]))
+if typing.TYPE_CHECKING:
+    from typing import Any, Tuple
 
 
 class Buffer(object):
@@ -24,16 +24,33 @@ class Buffer(object):
         'byte': '>B',
         'bool': '>?'}
 
-    def __init__(self, data=''):
+    def __init__(self, data: bytes = b'') -> None:
+        """Initialize a buffer.
+
+        :param data: content of the buffer
+        """
         self.data = data
         self.pos = 0
 
-    def unpack_struct(self, fmt):
+    def unpack_struct(self, fmt: str) -> Tuple[Any, ...]:
+        """Unpack a list of elements from the buffer.
+
+        Position of the buffer is updated.
+
+        :param fmt: a string compliant with struct.unpack_from fmt argument.
+        :return: a list of unpack objects
+        """
         result = struct.unpack_from(fmt, self.data, self.pos)
         self.pos += struct.calcsize(fmt)
         return result
 
-    def unpack(self, type_name):
+    def unpack(self, type_name: str) -> Any:
+        """Unpack a simple element from the buffer.
+
+        Position of the buffer is updated.
+
+        :param type_name: a type name from SUPPORTED_TYPES
+        """
         assert type_name in self.SUPPORTED_TYPES, \
             'unknown type: %s' % type_name
         if type_name in self.BASIC_TYPES:

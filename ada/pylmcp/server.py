@@ -1,10 +1,11 @@
 """Implement a server that can send/receive uxas message."""
-from Queue import Queue
+from queue import Queue
 from pylmcp.message import Message
 from pylmcp import Object
-from pylmcp.uxas import UxAS, PublishPullBridge, SubscribePushBridge, AutomationRequestValidator
+from pylmcp.uxas import UxAS, PublishPullBridge, SubscribePushBridge, AutomationRequestValidator, UxASConfig
 import threading
 import time
+import typing
 import zmq
 
 
@@ -23,11 +24,11 @@ class Server(object):
     """
 
     def __init__(self,
-                 out_url="tcp://127.0.0.1:5561",
-                 in_url="tcp://127.0.0.1:5560",
-                 bridge_service=True,
-                 bridge_cfg=None,
-                 entity_id=100):
+                 out_url: str = "tcp://127.0.0.1:5561",
+                 in_url: str = "tcp://127.0.0.1:5560",
+                 bridge_service: bool = True,
+                 bridge_cfg: typing.Union[None, UxASConfig] = None,
+                 entity_id: int = 100):
         """Start a server that listen for UxAS messages.
 
         :param out_url: url on which messages can be sent
@@ -51,7 +52,7 @@ class Server(object):
         # Set incoming messages socket (subscribe to all messages)
         self.in_socket = self.ctx.socket(zmq.SUB)
         self.in_socket.connect(self.in_url)
-        self.in_socket.setsockopt(zmq.SUBSCRIBE, "")
+        self.in_socket.setsockopt(zmq.SUBSCRIBE, b"")
 
         # Set socket to send messages
         self.out_socket = self.ctx.socket(zmq.PUSH)
@@ -61,11 +62,13 @@ class Server(object):
         self.listen_task = None
 
         # Internal queue holding all zeromq received messages
-        self.in_msg_queue = Queue()
+        self.in_msg_queue = Queue() # type: Queue
 
         # Setting stop_listening to True will cause the thread in
         # charge of listening for incoming messages to stop
         self.stop_listening = False
+
+        self.bridge = None # type: typing.Union[UxAS, None]
 
         if bridge_service:
             self.bridge = UxAS(self.entity_id)
@@ -78,8 +81,6 @@ class Server(object):
             self.bridge.run()
             # Needed ???
             time.sleep(0.2)
-        else:
-            self.bridge = None
 
         # Start the listening thread
         self.start_listening()
@@ -169,7 +170,6 @@ class Server(object):
                 if descriptor is None or msg.descriptor == descriptor:
                     break
                 else:
-                    print "discard: %s" % msg.descriptor
                     msg = None
             time.sleep(0.2)
             current_time = time.time()
