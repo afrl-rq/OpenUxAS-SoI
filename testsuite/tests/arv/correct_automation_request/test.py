@@ -40,11 +40,10 @@ with Server(bridge_cfg=bridge_cfg) as server:
             descriptor='uxas.messages.task.UniqueAutomationRequest',
             timeout=10.0)
         assert(msg.descriptor == "uxas.messages.task.UniqueAutomationRequest")
-        assert(cmp(msg.obj.as_dict()['OriginalRequest'], obj.as_dict()) == 1),\
+        assert(msg.obj['OriginalRequest'] == obj),\
             "%s\nvs\n%s" % \
             (msg.obj.as_dict()['OriginalRequest'], obj.as_dict())
         unique_id = msg.obj.data["RequestID"]
-
         # UniqueAutomationReponse
         obj = Object(
             class_name='uxas.messages.task.UniqueAutomationResponse',
@@ -54,12 +53,12 @@ with Server(bridge_cfg=bridge_cfg) as server:
         msg = server.wait_for_msg(descriptor="afrl.cmasi.AutomationResponse",
                                   timeout=10.0)
         assert (msg.descriptor == "afrl.cmasi.AutomationResponse")
-        assert (cmp
-                (msg.obj.as_dict(), obj.as_dict()['OriginalResponse']) == 1),\
-            "%s\nvs\n%s" %\
+        assert (msg.obj == obj['OriginalResponse']),\
+            "%s\nvs\n%s" % \
             (msg.obj.as_dict(), obj.as_dict()['OriginalResponse'])
         obj = Object(class_name='RemoveTasks', TaskList=[1000])
         server.send_msg(obj)
         time.sleep(0.1)
+        print "OK"
     finally:
         print "Here"

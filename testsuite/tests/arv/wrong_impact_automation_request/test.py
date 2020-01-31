@@ -14,11 +14,14 @@ with Server(bridge_cfg=bridge_cfg) as server:
 
         msg = server.wait_for_msg(
             descriptor="afrl.impact.ImpactAutomationResponse",
-            timeout=5.0)
+            timeout=10.0)
         assert (msg.descriptor == "afrl.impact.ImpactAutomationResponse")
-        assert (cmp(msg.obj.as_dict()['VehicleCommandList'], []) == 1), \
-            "%s\nvs\n%s" % (msg.obj.as_dict()['VehicleCommandList'], [])
-        assert (cmp(msg.obj.as_dict()['MissionCommandList'], []) == 1), \
-            "%s\nvs\n%s" % (msg.obj.as_dict()['MissionCommandList'], [])
+        assert (msg.obj['TrialResponse']['VehicleCommandList'] == []), \
+            "%s\nvs\n%s" %\
+            (msg.obj.as_dict()['TrialResponse']['VehicleCommandList'], [])
+        assert (msg.obj['TrialResponse']['MissionCommandList'] == []), \
+            "%s\nvs\n%s" %\
+            (msg.obj.as_dict()['TrialResponse']['MissionCommandList'], [])
+        print "OK"
     finally:
         print "Here"
