@@ -58,5 +58,6 @@ class Buffer(object):
         elif type_name == 'string':
             string_size = self.unpack('uint16')
             value = self.unpack_struct('%ss' % string_size)[0]
+            value = value.decode('utf-8')
 
         return value
