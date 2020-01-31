@@ -102,6 +102,22 @@ class Object(object):
     def __str__(self):
         return json.dumps(self.as_dict(), indent=2)
 
+    def __eq__(self, other):
+        # First ensure that other is an Object
+        if not isinstance(other, Object):
+            return False
+
+        # Ensure that lmcp class are equals
+        if self.object_class.name != other.object_class.name:
+            return False
+
+        # Finally check if data associated with the object
+        # is equal
+        return self.data == other.data
+
+    def __neq__(self, other):
+        return not (self == other)
+
     def set_attributes_randomly(self) -> None:
         """Set object attributes randomly."""
         for f in self.attributes:
