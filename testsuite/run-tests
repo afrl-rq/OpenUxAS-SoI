@@ -24,7 +24,7 @@ TEST_DIR = os.path.join(ROOT_DIR, 'tests')
 # Result dir
 RESULT_DIR = os.path.join(ROOT_DIR, 'results')
 
-sys.path.append(ROOT_DIR)
+sys.path.insert(0, ROOT_DIR)
 
 
 def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
@@ -113,6 +113,7 @@ class TestJob(ProcessJob):
 
         # Compute the default urls used by the bridge
         port = self.slot * 2 + 5560
+        logging.debug('Port used for %s: %s', self.uid, port)
         return {'output': os.path.join(RESULT_DIR, self.uid + '.out'),
                 'ignore_environ': False,
                 'env': {'IN_SERVER_URL': 'tcp://127.0.0.1:%s' % port,
@@ -142,6 +143,10 @@ class TestData(object):
 class TestsuiteLoop(Walk):
     """The testsuite test scheduler."""
 
+    def __init__(self, actions, jobs):
+        self.jobs = jobs
+        super(TestsuiteLoop, self).__init__(actions)
+
     def create_job(self, uid, data, predecessors, notify_end):
         """See Walk.create_job doc."""
         return TestJob(uid, data, notify_end)
@@ -149,7 +154,7 @@ class TestsuiteLoop(Walk):
     def set_scheduling_params(self):
         """See Walk.set_scheduling_params doc."""
         super(TestsuiteLoop, self).set_scheduling_params()
-        self.tokens = 4
+        self.tokens = self.jobs
         self.job_timeout = 60
 
 
@@ -221,7 +226,7 @@ def main() -> int:
     mkdir(RESULT_DIR)
     Env().add_search_path('PYTHONPATH', ROOT_DIR)
 
-    TestsuiteLoop(actions=get_test_list())
+    TestsuiteLoop(actions=get_test_list(), jobs=m.args.jobs)
 
     if m.args.gcda_dir is not None:
         gcda_files = find(root=m.args.gcda_dir, pattern='*.gcda')
@@ -230,6 +235,9 @@ def main() -> int:
         if m.args.display_includes_coverage:
             source_files += find(root=m.args.gcda_dir, pattern='*.h')
         source_files.sort()
+        logging.info('Found %s gcda files, Found %s source files',
+                     len(gcda_files),
+                     len(source_files))
         dump_gcov_summary(gcda_files, source_files)
 
     return 0
