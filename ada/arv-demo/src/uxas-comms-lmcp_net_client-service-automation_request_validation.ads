@@ -176,12 +176,6 @@ private
       Result : out Boolean);
 
    overriding
-   procedure Process_Received_Serialized_LMCP_Message
-     (This             : in out Automation_Request_Validator_Service;
-      Received_Message : not null Any_Addressed_Attributed_Message;
-      Should_Terminate : out Boolean);
-
-   overriding
    procedure Process_Received_LMCP_Message
      (This             : in out Automation_Request_Validator_Service;
       Received_Message : not null Any_LMCP_Message;

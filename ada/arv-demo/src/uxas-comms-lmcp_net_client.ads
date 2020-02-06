@@ -207,8 +207,7 @@ is
    procedure Process_Received_LMCP_Message
      (This             : in out LMCP_Object_Network_Client_Base;
       Received_Message : not null Any_LMCP_Message;
-      Should_Terminate : out Boolean)
-     is abstract;
+      Should_Terminate : out Boolean);
 
    --  The virtual processReceivedSerializedLmcpMessage is
    --  repeatedly invoked by the LmcpObjectNetworkClientBase class in an
@@ -225,8 +224,7 @@ is
    procedure Process_Received_Serialized_LMCP_Message
      (This             : in out LMCP_Object_Network_Client_Base;
       Received_Message : not null Any_Addressed_Attributed_Message;
-      Should_Terminate : out Boolean)
-     is abstract;
+      Should_Terminate : out Boolean);
 
 --  end protected:  -------------------------------------------------
 

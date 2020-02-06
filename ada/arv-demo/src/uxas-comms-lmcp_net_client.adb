@@ -477,6 +477,34 @@ package body UxAS.Comms.LMCP_Net_Client is
       end loop;
    end Execute_Serialized_Network_Client;
 
+   -----------------------------------
+   -- Process_Received_LMCP_Message --
+   -----------------------------------
+
+   procedure Process_Received_LMCP_Message
+     (This             : in out LMCP_Object_Network_Client_Base;
+      Received_Message : not null Any_LMCP_Message;
+      Should_Terminate : out Boolean)
+   is
+      pragma Unreferenced (This, Received_Message);
+   begin
+      Should_Terminate := False; -- per the C++ version
+   end Process_Received_LMCP_Message;
+
+   ----------------------------------------------
+   -- Process_Received_Serialized_LMCP_Message --
+   ----------------------------------------------
+
+   procedure Process_Received_Serialized_LMCP_Message
+     (This             : in out LMCP_Object_Network_Client_Base;
+      Received_Message : not null Any_Addressed_Attributed_Message;
+      Should_Terminate : out Boolean)
+   is
+      pragma Unreferenced (This, Received_Message);
+   begin
+      Should_Terminate := False; -- per the C++ version
+   end Process_Received_Serialized_LMCP_Message;
+
    ------------------------------
    -- Add_Subscription_Address --
    ------------------------------

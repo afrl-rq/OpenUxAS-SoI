@@ -259,23 +259,6 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation is
        Msg.all in ImpactAutomationRequest'Class or
        Msg.all in TaskAutomationRequest'Class);
 
-   ----------------------------------------------
-   -- Process_Received_Serialized_LMCP_Message --
-   ----------------------------------------------
-
-   overriding
-   procedure Process_Received_Serialized_LMCP_Message
-     (This             : in out Automation_Request_Validator_Service;
-      Received_Message : not null Any_Addressed_Attributed_Message;
-      Should_Terminate : out Boolean)
-   is
-      pragma Unreferenced (This, Received_Message, Should_Terminate); -- unless we need to implement this
-   begin
-      --  we may not need to implement this procedure for our demo
-      --  pragma Compile_Time_Warning (Standard.True, "Process_Received_Serialized_LMCP_Message unimplemented");
-      raise Program_Error with "Unimplemented procedure Process_Received_Serialized_LMCP_Message";
-   end Process_Received_Serialized_LMCP_Message;
-
    -----------------------------------
    -- Process_Received_LMCP_Message --
    -----------------------------------
