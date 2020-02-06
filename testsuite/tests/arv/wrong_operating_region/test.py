@@ -1,4 +1,5 @@
 import time
+import os
 from pylmcp import Object
 from pylmcp.server import Server
 from pylmcp.uxas import AutomationRequestValidator, UxASConfig
@@ -43,6 +44,6 @@ with Server(bridge_cfg=bridge_cfg) as server:
             "%s\nvs\n%s" % (msg.obj.as_dict()['VehicleCommandList'], [])
         assert (msg.obj['MissionCommandList'] == []), \
             "%s\nvs\n%s" % (msg.obj.as_dict()['MissionCommandList'], [])
-        print "OK"
+        print("OK")
     finally:
-        print "Here"
+        print("Here")

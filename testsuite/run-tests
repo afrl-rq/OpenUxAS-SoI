@@ -1,0 +1,208 @@
+#!/usr/bin/env python
+import os
+import re
+import sys
+import logging
+from typing import List
+
+from e3.main import Main
+from e3.fs import find, rm, mkdir
+from e3.collection.dag import DAG
+from e3.job.walk import Walk
+from e3.job import ProcessJob
+from e3.env import Env
+from e3.os.process import Run
+
+# Directory in which the run-tests script is located
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Directory in which tests are found
+TEST_DIR = os.path.join(ROOT_DIR, 'tests')
+
+# Result dir
+RESULT_DIR = os.path.join(ROOT_DIR, 'results')
+
+sys.path.append(ROOT_DIR)
+
+
+def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
+    """Display a coverage summary.
+
+    :param gcda_files: a list of gcda files to process with gcov
+    :param source_files: a list of source files to consider. Coverage
+        information about files not in this list will not be displayed.
+    """
+
+    # Reset the directory containing the gcov files
+    gcr = os.path.join(RESULT_DIR, 'gcov')
+    rm(gcr, recursive=True)
+    mkdir(gcr)
+
+    # Run gcov to produce de gcov files
+    Run(['gcov'] + gcda_files, cwd=gcr)
+
+    total_sources = 0
+    total_covered = 0
+
+    for source_file in source_files:
+        base_file = os.path.basename(source_file)
+        if not os.path.isfile(os.path.join(gcr, base_file + '.gcov')):
+            # In case we don't have coverage information for a given file
+            # Just try to compute the total number of missed lines
+            # (not completely accurate) discarding both ada and cpp comments
+            total = 1
+            covered = 0
+            with open(source_file) as fd:
+                total = len([line for line in fd
+                             if line.strip() and
+                             not re.match(r' *--', line) and
+                             not re.match(r' *//', line)])
+        else:
+            # We have a gcov file so process it
+            with open(os.path.join(gcr, base_file + '.gcov')) as fd:
+                total = 0
+                covered = 0
+                for line in fd:
+                    if re.match(r' *-:', line):
+                        pass
+                    elif re.match(r' *[#=]{5}:', line):
+                        total += 1
+                    else:
+                        total += 1
+                        covered += 1
+
+        # Update global counters
+        total_sources += total
+        total_covered += covered
+
+        # Display file information
+        logging.info('%6.2f %% %8d/%-8d %s',
+                     float(covered) * 100.0 / float(total),
+                     covered,
+                     total,
+                     os.path.basename(source_file))
+
+    # Display global counters
+    logging.info('%6.2f %% %8d/%-8d %s',
+                 float(total_covered) * 100.0 / float(total_sources),
+                 total_covered,
+                 total_sources,
+                 'TOTAL')
+
+
+class TestJob(ProcessJob):
+    """Handle a test execution."""
+
+    @property
+    def cmdline(self):
+        """See e3.job.ProcessJob."""
+        return [sys.executable, self.data.test_path]
+
+    @property
+    def cmd_options(self):
+        """See e3.job.ProcessJob."""
+
+        # Compute the default urls used by the bridge
+        port = self.slot * 2 + 5560
+        return {'output': os.path.join(RESULT_DIR, self.uid + 'out'),
+                'ignore_environ': False,
+                'env': {'IN_SERVER_URL': 'tcp://127.0.0.1:%s' % port,
+                        'OUT_SERVER_URL': 'tcp://127.0.0.1:%s' % (port + 1)}}
+
+
+class TestData(object):
+    """Handle test data related to a given test.
+
+    This the data associated with each test job
+    """
+
+    def __init__(self, uid: str, test_path: str) -> None:
+        """Initialize a test data.
+
+        :param uid: the test uid
+        :param test_path: path to the test.py file
+        """
+        self.uid = uid
+        self.test_path = test_path
+
+    def __str__(self) -> str:
+        """Compute a string representation for display purpose."""
+        return self.uid
+
+
+class TestsuiteLoop(Walk):
+    """The testsuite test scheduler."""
+
+    def create_job(self, uid, data, predecessors, notify_end):
+        """See Walk.create_job doc."""
+        return TestJob(uid, data, notify_end)
+
+    def set_scheduling_params(self):
+        """See Walk.set_scheduling_params doc."""
+        super(TestsuiteLoop, self).set_scheduling_params()
+        self.tokens = 4
+        self.job_timeout = 60
+
+
+def get_test_uid(path: str) -> str:
+    """Compute the test uid from its path.
+
+    :param path: path to the test.py implementing the test
+    :return: an unique uid that does not contain path separators
+    """
+    return os.path.dirname(
+        os.path.relpath(path,
+                        TEST_DIR)).replace('/', '.').replace('\\', '.')
+
+
+def get_test_list() -> DAG:
+    """Fetch the list of tests and return a DAG.
+
+    :return: a dag representing the tests to perform.
+    """
+    test_dag = DAG()
+    test_list = find(root=TEST_DIR, pattern='test.py')
+
+    for test in test_list:
+        test_dag.add_vertex(
+            get_test_uid(test),
+            data=TestData(uid=get_test_uid(test), test_path=test))
+    return test_dag
+
+
+def main() -> int:
+    """Main of the testsuite driver.
+
+    :return: 0 in case of success
+    """
+    m = Main()
+    m.argument_parser.add_argument(
+        '--gcda-dir',
+        metavar="DIR",
+        help="root directory containing .gcda files (gcov traces) and "
+        "sources. When set a coverage summary will be displayed")
+    m.argument_parser.add_argument(
+        '--jobs',
+        type=int,
+        default=Env().build.cpu.cores,
+        help="Set parallelism (default: %s)" % Env().build.cpu.cores)
+
+    m.parse_args()
+    rm(RESULT_DIR, recursive=True)
+    mkdir(RESULT_DIR)
+    Env().add_search_path('PYTHONPATH', ROOT_DIR)
+
+    TestsuiteLoop(actions=get_test_list())
+
+    if m.args.gcda_dir is not None:
+        gcda_files = find(root=m.args.gcda_dir, pattern='*.gcda')
+        source_files = find(root=m.args.gcda_dir, pattern='*.cpp') + \
+            find(root=m.args.gcda_dir, pattern='*.c') + \
+            find(root=m.args.gcda_dir, pattern='*.h')
+        dump_gcov_summary(gcda_files, source_files)
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

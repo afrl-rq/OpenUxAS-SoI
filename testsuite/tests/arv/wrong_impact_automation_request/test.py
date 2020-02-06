@@ -22,6 +22,6 @@ with Server(bridge_cfg=bridge_cfg) as server:
         assert (msg.obj['TrialResponse']['MissionCommandList'] == []), \
             "%s\nvs\n%s" %\
             (msg.obj.as_dict()['TrialResponse']['MissionCommandList'], [])
-        print "OK"
+        print("OK")
     finally:
-        print "Here"
+        print("Here")

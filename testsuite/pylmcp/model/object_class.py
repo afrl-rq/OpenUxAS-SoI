@@ -1,10 +1,11 @@
 from __future__ import annotations
 import struct
 import typing
+from typing import Tuple
 from pylmcp.model.object_attr import ObjectAttr
 
 if typing.TYPE_CHECKING:
-    from typing import List, Optional, Tuple
+    from typing import List, Optional
     import pylmcp.model
     import pylmcp.model.series
     import pylmcp.util

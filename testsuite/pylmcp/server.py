@@ -7,7 +7,10 @@ import threading
 import time
 import typing
 import zmq
+import os
 
+DEFAULT_IN_URL=os.environ.get('IN_SERVER_URL', 'tcp://127.0.0.1:5560')
+DEFAULT_OUT_URL=os.environ.get('OUT_SERVER_URL', 'tcp://127.0.0.1:5561')
 
 class ServerTimeout(Exception):
     pass
@@ -24,8 +27,8 @@ class Server(object):
     """
 
     def __init__(self,
-                 out_url: str = "tcp://127.0.0.1:5561",
-                 in_url: str = "tcp://127.0.0.1:5560",
+                 out_url: str = DEFAULT_IN_URL,
+                 in_url: str = DEFAULT_OUT_URL,
                  bridge_service: bool = True,
                  bridge_cfg: typing.Union[None, UxASConfig] = None,
                  entity_id: int = 100):

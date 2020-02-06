@@ -65,6 +65,6 @@ with Server(bridge_cfg=bridge_cfg) as server:
         assert (msg.obj['TrialResponse'] == obj['OriginalResponse']),\
             "%s\nvs\n%s" %\
             (msg.obj.as_dict(), obj.as_dict()['OriginalResponse'])
-        print "OK"
+        print("OK")
     finally:
-        print "Here"
+        print("Here")
