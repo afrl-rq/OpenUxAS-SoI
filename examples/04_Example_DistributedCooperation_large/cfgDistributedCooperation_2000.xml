@@ -35,7 +35,7 @@
     <Service Type="PlanBuilderService"/>
     <Service Type="AutomationDiagramDataService"/>
     <!--Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" LookAheadTime="180" RTCAAlertLevels="3" HorizontalAcceleration="2.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinHorizontalRecovery="200"/-->
-    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" CollisionAvoidanceFactor=".1" DTHR="100" ZTHR="100"/>
+    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" CollisionAvoidanceFactor=".1" DTHR="200" ZTHR="200"/>
     <Service Type="DAIDALUS_WCV_Response" />
 
     <Service Type="WaypointPlanManagerService" VehicleID="2000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
