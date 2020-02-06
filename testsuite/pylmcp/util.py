@@ -1,9 +1,6 @@
-from __future__ import annotations
 import struct
 import typing
-
-if typing.TYPE_CHECKING:
-    from typing import Any, Tuple
+from typing import Any, Tuple
 
 
 class Buffer(object):

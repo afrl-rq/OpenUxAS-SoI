@@ -1,14 +1,10 @@
-from __future__ import annotations
-
 import json
 import re
 import typing
+from typing import Dict, Any, Optional
 from pylmcp.model import LMCP_DB
 from pylmcp.util import Buffer
 from pylmcp.model.object_class import ObjectClass
-
-if typing.TYPE_CHECKING:
-    from typing import Dict, Any, Optional
 
 
 class InvalidObjectClass(Exception):
@@ -135,7 +131,7 @@ class Object(object):
         return self.object_class.pack(value=self.data)
 
     @classmethod
-    def unpack(cls, data: Buffer) -> Optional[Object]:
+    def unpack(cls, data: Buffer) -> Optional["Object"]:
         full_id = ObjectClass.unpack(data)
         if full_id is None:
             return None
