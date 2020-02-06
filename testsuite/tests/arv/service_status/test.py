@@ -13,6 +13,6 @@ with Server(bridge_cfg=bridge_cfg) as server:
                      randomize=True)
         server.send_msg(obj)
         time.sleep(1)
-        print "OK"
+        print("OK")
     finally:
-        print "Here"
+        print("Here")

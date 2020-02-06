@@ -60,6 +60,6 @@ with Server(bridge_cfg=bridge_cfg) as server:
         obj = Object(class_name='RemoveTasks', TaskList=[1000])
         server.send_msg(obj)
         time.sleep(0.1)
-        print "OK"
+        print("OK")
     finally:
-        print "Here"
+        print("Here")

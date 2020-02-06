@@ -66,6 +66,6 @@ with Server(bridge_cfg=bridge_cfg) as server:
             "%s\nvs\n%s" %\
             (msg.obj.as_dict()['OriginalResponse'],
              obj.as_dict()['OriginalResponse'])
-        print "OK"
+        print("OK")
     finally:
-        print "Here"
+        print("Here")
