@@ -89,7 +89,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     # Install unique ID creation library: in terminal
     sudo apt -y install uuid-dev
     # Install Boost libraries (**optional but recommended**; see external dependencies section): in terminal
-    sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-system-dev
+    sudo apt-get -y install libboost-filesystem-dev libboost-regex-dev libboost-system-dev
     # Install pip3: in terminal
     sudo apt -y install python3-pip
     sudo -H pip3 install --upgrade pip
@@ -101,11 +101,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     sudo apt -y install python3-tk
     sudo -H pip3 install matplotlib
     sudo -H pip3 install pandas
-    # Install Oracle JDK
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt -y update
-    sudo apt -y install oracle-java9-installer
-    sudo apt -y install oracle-java9-set-default
+    # Install Java
+    sudo apt -y install openjdk-11-jdk
     # Install ant for command line build of java programs
     sudo apt -y install ant
     echo "Dependencies installed!"
@@ -129,28 +126,51 @@ if [ $current_directory == "OpenUxAS" ] && [ -d $git_directory ]; then
    cd ..
 fi
 
-echo "Checking out LmcpGen ..."
-git clone https://github.com/afrl-rq/LmcpGen.git
+if [ ! -d LmcpGen ]; then
+	echo "Checking out LmcpGen ..."
+	git clone https://github.com/afrl-rq/LmcpGen.git
+fi
 cd LmcpGen
 ant -q jar
 cd ..
-echo "Checking out OpenAMASE ..."
-git clone https://github.com/afrl-rq/OpenAMASE.git
+
+if [ ! -d OpenAMASE ]; then
+	echo "Checkout out OpenAMASE..."
+	git clone https://github.com/afrl-rq/OpenAMASE.git
+fi
 cd OpenAMASE/OpenAMASE
 ant -q jar
 cd ../..
-    
+  
 echo "Configuring UxAS plotting utilities ..."
 cd OpenUxAS/src/Utilities/localcoords
 sudo python3 setup.py install
 cd ../../..
 
 echo "Preparing UxAS build ..."
+rm -rf build build_debug
 python3 prepare
 sh RunLmcpGen.sh
 meson build --buildtype=release
 meson build_debug --buildtype=debug
 
-echo "Complete! To build, type 'ninja -C build'"
+echo "Performing initial UxAS build ..."
+ninja -C build
+ninja -C build_release
+
+cat <<'EOF'
+
+================================================================
+
+DONE!
+
+Subsequent builds are done using:
+
+  $ ninja -C build_debug
+
+and 
+
+  $ ninja -C build
+EOF
 
 # --eof--
