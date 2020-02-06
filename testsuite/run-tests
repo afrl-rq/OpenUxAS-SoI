@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import itertools
 import os
 import re
 import sys
@@ -32,6 +33,13 @@ def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
     :param source_files: a list of source files to consider. Coverage
         information about files not in this list will not be displayed.
     """
+
+    # Find a common root directory for sources (to improve readability of
+    # of the summary)
+    src_prefix = ''.join(
+        c[0] for c in itertools.takewhile(lambda x: all(x[0] == y for y in x),
+                                          zip(*source_files)))
+    src_prefix = src_prefix[0:src_prefix.rfind('/')]
 
     # Reset the directory containing the gcov files
     gcr = os.path.join(RESULT_DIR, 'gcov')
@@ -80,7 +88,7 @@ def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
                      float(covered) * 100.0 / float(total),
                      covered,
                      total,
-                     os.path.basename(source_file))
+                     os.path.relpath(source_file, src_prefix))
 
     # Display global counters
     logging.info('%6.2f %% %8d/%-8d %s',
@@ -186,6 +194,12 @@ def main() -> int:
         type=int,
         default=Env().build.cpu.cores,
         help="Set parallelism (default: %s)" % Env().build.cpu.cores)
+    m.argument_parser.add_argument(
+        '--display-includes-coverage',
+        default=False,
+        action="store_true",
+        help="If used coverage summary will show coverage information of "
+        "include files (.h)")
 
     m.parse_args()
     rm(RESULT_DIR, recursive=True)
@@ -197,8 +211,10 @@ def main() -> int:
     if m.args.gcda_dir is not None:
         gcda_files = find(root=m.args.gcda_dir, pattern='*.gcda')
         source_files = find(root=m.args.gcda_dir, pattern='*.cpp') + \
-            find(root=m.args.gcda_dir, pattern='*.c') + \
-            find(root=m.args.gcda_dir, pattern='*.h')
+            find(root=m.args.gcda_dir, pattern='*.c')
+        if m.args.display_includes_coverage:
+            source_files += find(root=m.args.gcda_dir, pattern='*.h')
+        source_files.sort()
         dump_gcov_summary(gcda_files, source_files)
 
     return 0
