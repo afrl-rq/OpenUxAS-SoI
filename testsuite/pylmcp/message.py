@@ -1,4 +1,3 @@
-from __future__ import annotations
 from pylmcp import Object
 from pylmcp.util import Buffer
 import json
@@ -27,7 +26,7 @@ class Message(object):
             self.address = address
 
     @classmethod
-    def unpack(self, raw_msg: bytes) -> Message:
+    def unpack(self, raw_msg: bytes) -> "Message":
         """Unpack a received message.
 
         :param raw_msg: the received message

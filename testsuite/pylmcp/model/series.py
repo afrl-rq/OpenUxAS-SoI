@@ -1,14 +1,12 @@
-from __future__ import annotations
-
 from xml.etree import ElementTree
 from pylmcp.model.object_class import ObjectClass
 from pylmcp.model.enum import EnumModel
 import logging
 import typing
+from typing import Dict
 
 if typing.TYPE_CHECKING:
     from pylmcp.model import ModelDatabase
-    from typing import Dict
 
 
 logger = logging.getLogger('pylmcp.series')
@@ -20,7 +18,7 @@ class Series(object):
                  name: str,
                  namespace: str,
                  version: int,
-                 model_db: ModelDatabase) -> None:
+                 model_db: "ModelDatabase") -> None:
         """Initialize a series.
 
         :param name: series name

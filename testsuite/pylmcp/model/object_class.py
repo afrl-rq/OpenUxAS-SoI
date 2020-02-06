@@ -1,11 +1,9 @@
-from __future__ import annotations
 import struct
 import typing
-from typing import Tuple
+from typing import Tuple, List, Optional
 from pylmcp.model.object_attr import ObjectAttr
 
 if typing.TYPE_CHECKING:
-    from typing import List, Optional
     import pylmcp.model
     import pylmcp.model.series
     import pylmcp.util
@@ -19,8 +17,8 @@ class ObjectClass(object):
                  id: int,
                  extends: typing.Optional[str],
                  attrs: typing.List[ObjectAttr],
-                 series: pylmcp.model.series.Series,
-                 model_db: pylmcp.model.ModelDatabase) -> None:
+                 series: "pylmcp.model.series.Series",
+                 model_db: "pylmcp.model.ModelDatabase") -> None:
         """Initialize an LMCP class.
 
         :param name: class name
@@ -112,7 +110,7 @@ class ObjectClass(object):
 
     @classmethod
     def unpack(self,
-               payload: pylmcp.util.Buffer) -> Optional[Tuple[int, int, int]]:
+               payload: "pylmcp.util.Buffer") -> Optional[Tuple[int, int, int]]:
         exists = payload.unpack("bool")
         if not exists:
             return None
