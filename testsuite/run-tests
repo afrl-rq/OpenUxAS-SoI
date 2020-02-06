@@ -112,7 +112,7 @@ class TestJob(ProcessJob):
 
         # Compute the default urls used by the bridge
         port = self.slot * 2 + 5560
-        return {'output': os.path.join(RESULT_DIR, self.uid + 'out'),
+        return {'output': os.path.join(RESULT_DIR, self.uid + '.out'),
                 'ignore_environ': False,
                 'env': {'IN_SERVER_URL': 'tcp://127.0.0.1:%s' % port,
                         'OUT_SERVER_URL': 'tcp://127.0.0.1:%s' % (port + 1)}}
