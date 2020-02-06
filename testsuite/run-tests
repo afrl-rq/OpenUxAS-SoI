@@ -8,6 +8,7 @@ from typing import List
 
 from e3.main import Main
 from e3.fs import find, rm, mkdir
+from e3.os.fs import which
 from e3.collection.dag import DAG
 from e3.job.walk import Walk
 from e3.job import ProcessJob
@@ -202,6 +203,20 @@ def main() -> int:
         "include files (.h)")
 
     m.parse_args()
+
+    try:
+        import zmq
+    except ImportError:
+        logging.critical("zmp package is required. do pip install zmq")
+        return 1
+
+    uxas_bin = which('uxas')
+    if not uxas_bin:
+        logging.critical("uxas executable should be in the path")
+        return 1
+    else:
+        logging.info("uxas found in %s", uxas_bin)
+
     rm(RESULT_DIR, recursive=True)
     mkdir(RESULT_DIR)
     Env().add_search_path('PYTHONPATH', ROOT_DIR)
