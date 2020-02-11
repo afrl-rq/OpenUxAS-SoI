@@ -9,6 +9,8 @@ with UxAS.Comms.Transport.Network_Name;
 with AVTAS.LMCP.Factory;
 with AVTAS.LMCP.ByteBuffers;  use AVTAS.LMCP.ByteBuffers;
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 package body UxAS.Comms.LMCP_Object_Message_Sender_Pipes is
 
    ------------------------
@@ -29,7 +31,7 @@ package body UxAS.Comms.LMCP_Object_Message_Sender_Pipes is
          Entity_Id      => Entity_Id,
          Service_Id     => Service_Id,
          Zmq_SocketType => ZMQ.Sockets.PUB,
-         Socket_Address => InProc_From_MessageHub,
+         Socket_Address => To_String (InProc_From_MessageHub),
          Is_Server      => True);
    end Initialize_Publish;
 
@@ -97,7 +99,7 @@ package body UxAS.Comms.LMCP_Object_Message_Sender_Pipes is
          Entity_Id      => Entity_Id,
          Service_Id     => Service_Id,
          Zmq_SocketType => ZMQ.Sockets.PUSH,
-         Socket_Address => InProc_To_MessageHub,
+         Socket_Address => To_String (InProc_To_MessageHub),
          Is_Server      => False);
    end Initialize_Push;
 

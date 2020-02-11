@@ -11,6 +11,8 @@ use  UxAS.Common.String_Constant.Lmcp_Network_Socket_Address;
 
 with AVTAS.LMCP.ByteBuffers;   use AVTAS.LMCP.ByteBuffers;
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 package body UxAS.Comms.LMCP_Object_Message_Receiver_Pipes is
 
    procedure Initialize_Zmq_Socket
@@ -36,7 +38,7 @@ package body UxAS.Comms.LMCP_Object_Message_Receiver_Pipes is
          Entity_Id      => Entity_Id,
          Service_Id     => Service_Id,
          Zmq_SocketType => ZMQ.Sockets.PULL,
-         Socket_Address => InProc_To_MessageHub,
+         Socket_Address => To_String (InProc_To_MessageHub),
          Is_Server      => True);
    end Initialize_Pull;
 
@@ -97,7 +99,7 @@ package body UxAS.Comms.LMCP_Object_Message_Receiver_Pipes is
          Entity_Id      => Entity_Id,
          Service_Id     => Service_Id,
          Zmq_SocketType => ZMQ.Sockets.SUB,
-         Socket_Address => InProc_From_MessageHub,
+         Socket_Address => To_String (InProc_From_MessageHub),
          Is_Server      => False);
    end Initialize_Subscription;
 
