@@ -110,8 +110,8 @@ procedure Demo is
             if Service_Type_Name = "LmcpObjectNetworkPublishPullBridge" then
                Pub_Address  := To_Unbounded_String (DOM.Core.Elements.Get_Attribute (Next, Name => "AddressPUB"));
                Pull_Address := To_Unbounded_String (DOM.Core.Elements.Get_Attribute (Next, Name => "AddressPULL"));
-               Put_Line ("Found bridge addressPUB:  " & To_String (Pub_Address));
-               Put_Line ("Found bridge addressPULL: " & To_String (Pull_Address));
+               Put_Line ("Found bridge addressPUB:  """ & To_String (Pub_Address) & '"');
+               Put_Line ("Found bridge addressPULL: """ & To_String (Pull_Address) & '"');
                return;
             end if;
             Next := Next_Sibling (Next);
