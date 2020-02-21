@@ -4,7 +4,9 @@ import os
 import re
 import sys
 import logging
+import socket
 from typing import List
+from queue import Queue
 
 from e3.main import Main
 from e3.fs import find, rm, mkdir
@@ -102,22 +104,36 @@ def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
 class TestJob(ProcessJob):
     """Handle a test execution."""
 
+    PORTS = Queue()
+
     @property
     def cmdline(self):
         """See e3.job.ProcessJob."""
         return [sys.executable, self.data.test_path]
+
+    def on_start(self, scheduler):
+        logging.info("[%-10s %-9s %4ds] %s",
+                     self.queue_name, 'start', 0, self.data)
+        self.in_port = self.PORTS.get()
+        self.out_port = self.PORTS.get()
+        logging.debug('Reserve ports: %s, %s', self.in_port, self.out_port)
+
+    def on_finish(self, scheduler):
+        self.PORTS.put(self.in_port)
+        self.PORTS.put(self.out_port)
+        logging.debug('Release ports: %s, %s', self.in_port, self.out_port)
 
     @property
     def cmd_options(self):
         """See e3.job.ProcessJob."""
 
         # Compute the default urls used by the bridge
-        port = self.slot * 2 + 5560
-        logging.debug('Port used for %s: %s', self.uid, port)
         return {'output': os.path.join(RESULT_DIR, self.uid + '.out'),
                 'ignore_environ': False,
-                'env': {'IN_SERVER_URL': 'tcp://127.0.0.1:%s' % port,
-                        'OUT_SERVER_URL': 'tcp://127.0.0.1:%s' % (port + 1)}}
+                'env': {'IN_SERVER_URL':
+                        'tcp://127.0.0.1:%s' % self.in_port,
+                        'OUT_SERVER_URL':
+                        'tcp://127.0.0.1:%s' % self.out_port}}
 
 
 class TestData(object):
@@ -145,16 +161,52 @@ class TestsuiteLoop(Walk):
 
     def __init__(self, actions, jobs):
         self.jobs = jobs
+        self.next_port = 5560
         super(TestsuiteLoop, self).__init__(actions)
 
     def create_job(self, uid, data, predecessors, notify_end):
         """See Walk.create_job doc."""
         return TestJob(uid, data, notify_end)
 
+    def find_port(self) -> int:
+        """Find the next available port.
+
+        :return: an available port
+        """
+        port = None
+        start_port = self.next_port
+
+        # Do a maximum of 100 attempts.
+        for attempts in range(100):
+            try:
+                s = socket.socket()
+                s.bind(('127.0.0.1', self.next_port))
+                s.close()
+                port = self.next_port
+                self.next_port += 1
+                break
+            except OSError:
+                self.next_port += 1
+
+        if port is None:
+            raise OSError("cannot find a valid port in range: %s - %s" %
+                          (start_port, self.next_port - 1))
+        logging.debug('allocate port: %s', port)
+        return port
+
     def set_scheduling_params(self):
         """See Walk.set_scheduling_params doc."""
         super(TestsuiteLoop, self).set_scheduling_params()
         self.tokens = self.jobs
+
+        for idx in range(self.jobs * 4):
+            # For each worker we allocate 4 ports. Each job will use 2 ports.
+            # By allocating twice the necessary number we ensure that ports
+            # are not reused immediatly. This ensure that the system has time
+            # to release the port once the process using it is finished and
+            # thus avoid "Port in used" errors
+            TestJob.PORTS.put(self.find_port())
+
         self.job_timeout = 60
 
 
