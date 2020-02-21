@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-import itertools
 import os
 import re
 import sys
 import logging
 import socket
-from typing import List
 from queue import Queue
 
 from e3.main import Main
-from e3.fs import find, rm, mkdir
+from e3.fs import find, rm, mkdir, cp, ls
 from e3.os.fs import which
 from e3.collection.dag import DAG
 from e3.job.walk import Walk
@@ -29,20 +27,19 @@ RESULT_DIR = os.path.join(ROOT_DIR, 'results')
 sys.path.insert(0, ROOT_DIR)
 
 
-def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
+def dump_gcov_summary(source_dir: str,
+                      gcda_dir: str,
+                      display_includes_coverage: bool) -> None:
     """Display a coverage summary.
 
+    :param source_dir: root source dir
+    :param gcda_dir: directory containing the gcda files
+    :param display_includes_coverage: if True display coverage summary for
+        include files
     :param gcda_files: a list of gcda files to process with gcov
     :param source_files: a list of source files to consider. Coverage
         information about files not in this list will not be displayed.
     """
-
-    # Find a common root directory for sources (to improve readability of
-    # of the summary)
-    src_prefix = ''.join(
-        c[0] for c in itertools.takewhile(lambda x: all(x[0] == y for y in x),
-                                          zip(*source_files)))
-    src_prefix = src_prefix[0:src_prefix.rfind('/')]
 
     # Reset the directory containing the gcov files
     gcr = os.path.join(RESULT_DIR, 'gcov')
@@ -50,37 +47,38 @@ def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
     mkdir(gcr)
 
     # Run gcov to produce de gcov files
-    Run(['gcov'] + gcda_files, cwd=gcr)
+    for f in find(root=source_dir, pattern='*.gcno'):
+        cp(f, os.path.join(gcda_dir, os.path.relpath(f, source_dir)))
+
+    gcno_files = find(root=gcda_dir, pattern='*.gcno')
+
+    Run(['gcov', '-p'] + gcno_files, cwd=gcr)
 
     total_sources = 0
     total_covered = 0
 
-    for source_file in source_files:
-        base_file = os.path.basename(source_file)
-        if not os.path.isfile(os.path.join(gcr, base_file + '.gcov')):
-            # In case we don't have coverage information for a given file
-            # Just try to compute the total number of missed lines
-            # (not completely accurate) discarding both ada and cpp comments
-            total = 1
+    for gcov_file in ls(os.path.join(gcr, '*.gcov')):
+        # Decode original source paths (-p option of gcov)
+        source_file = os.path.basename(gcov_file).replace('#', '/')[:-5]
+
+        # Ignores all source that are not part of the project
+        if os.path.relpath(source_file, source_dir).startswith('..'):
+            continue
+
+        if not display_includes_coverage and source_file.endswith('.h'):
+            continue
+
+        with open(gcov_file) as fd:
+            total = 0
             covered = 0
-            with open(source_file) as fd:
-                total = len([line for line in fd
-                             if line.strip() and
-                             not re.match(r' *--', line) and
-                             not re.match(r' *//', line)])
-        else:
-            # We have a gcov file so process it
-            with open(os.path.join(gcr, base_file + '.gcov')) as fd:
-                total = 0
-                covered = 0
-                for line in fd:
-                    if re.match(r' *-:', line):
-                        pass
-                    elif re.match(r' *[#=]{5}:', line):
-                        total += 1
-                    else:
-                        total += 1
-                        covered += 1
+            for line in fd:
+                if re.match(r' *-:', line):
+                    pass
+                elif re.match(r' *[#=]{5}:', line):
+                    total += 1
+                else:
+                    total += 1
+                    covered += 1
 
         # Update global counters
         total_sources += total
@@ -91,7 +89,7 @@ def dump_gcov_summary(gcda_files: List[str], source_files: List[str]) -> None:
                      float(covered) * 100.0 / float(total),
                      covered,
                      total,
-                     os.path.relpath(source_file, src_prefix))
+                     os.path.relpath(source_file, source_dir))
 
     # Display global counters
     logging.info('%6.2f %% %8d/%-8d %s',
@@ -243,10 +241,10 @@ def main() -> int:
     """
     m = Main()
     m.argument_parser.add_argument(
-        '--gcda-dir',
+        '--src-dir',
         metavar="DIR",
-        help="root directory containing .gcda files (gcov traces) and "
-        "sources. When set a coverage summary will be displayed")
+        help="root directory containing sources. When set a coverage summary "
+        "will be displayed")
     m.argument_parser.add_argument(
         '--jobs',
         type=int,
@@ -278,19 +276,22 @@ def main() -> int:
     mkdir(RESULT_DIR)
     Env().add_search_path('PYTHONPATH', ROOT_DIR)
 
+    # Ensure gcda are stored in the testsuite dir. It ensures that we don't
+    # pollute uxas build dir and ease reset of coverage info on each run.
+    if m.args.src_dir:
+        gcda_dir = os.path.join(RESULT_DIR, 'gcda')
+        rm(gcda_dir, recursive=True)
+        mkdir(gcda_dir)
+        os.environ['GCOV_PREFIX'] = gcda_dir
+        os.environ['GCOV_PREFIX_STRIP'] = \
+            str(len(m.args.src_dir.split(os.sep)) - 1)
+
     TestsuiteLoop(actions=get_test_list(), jobs=m.args.jobs)
 
-    if m.args.gcda_dir is not None:
-        gcda_files = find(root=m.args.gcda_dir, pattern='*.gcda')
-        source_files = find(root=m.args.gcda_dir, pattern='*.cpp') + \
-            find(root=m.args.gcda_dir, pattern='*.c')
-        if m.args.display_includes_coverage:
-            source_files += find(root=m.args.gcda_dir, pattern='*.h')
-        source_files.sort()
-        logging.info('Found %s gcda files, Found %s source files',
-                     len(gcda_files),
-                     len(source_files))
-        dump_gcov_summary(gcda_files, source_files)
+    if m.args.src_dir is not None:
+        dump_gcov_summary(m.args.src_dir,
+                          gcda_dir,
+                          m.args.display_includes_coverage)
 
     return 0
 
