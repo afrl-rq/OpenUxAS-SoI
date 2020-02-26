@@ -1,3 +1,0 @@
-1555502989759 INFO:  LogManager successfully opened stream for logger [FileLogger] having name [UxasMainFileLogger] and configuration [./log/log]
-1555502989759 ERROR: ConfigurationManager::loadXml failed to load base XML file cfg.xml
-1555502989759 ERROR: UxAS_Main failed to load base XML configuration from [cfg.xml]

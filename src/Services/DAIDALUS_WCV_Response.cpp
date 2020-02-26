@@ -190,7 +190,7 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
         }
     }
 
-    if (m_DivertState.heading_deg <= (m_CurrentState.heading_deg + 180.0))
+    if (m_DivertState.heading_deg <= std::fmod((m_CurrentState.heading_deg + 180.0)+360.0, 360.0))
     {
         m_DivertState.heading_deg = std::fmod(m_DivertState.heading_deg + 360.0, 360.0);
     }
