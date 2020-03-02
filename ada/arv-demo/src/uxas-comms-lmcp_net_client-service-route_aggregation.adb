@@ -1,14 +1,68 @@
 with DOM.Core.Elements;
-with UxAS.Messages.Lmcptask.UniqueAutomationRequest; use UxAS.Messages.Lmcptask.UniqueAutomationRequest;
-with UxAS.Messages.Lmcptask.TaskPlanOptions;         use UxAS.Messages.Lmcptask.TaskPlanOptions;
-with UxAS.Messages.Route.RouteRequest;               use UxAS.Messages.Route.RouteRequest;
-with UxAS.Messages.Route.RoutePlanResponse;          use UxAS.Messages.Route.RoutePlanResponse;
-with AFRL.CMASI.EntityConfiguration;                 use AFRL.CMASI.EntityConfiguration;
-with AFRL.CMASI.EntityState;                         use AFRL.CMASI.EntityState;
+
+with UxAS.Messages.Route.RouteRequest;          use UxAS.Messages.Route.RouteRequest;
+with UxAS.Messages.Route.RoutePlanResponse;     use UxAS.Messages.Route.RoutePlanResponse;
+with AFRL.CMASI.AirVehicleState;                use AFRL.CMASI.AirVehicleState;
+with AFRL.Vehicles.GroundVehicleState;          use AFRL.Vehicles.GroundVehicleState;
+with AFRL.Vehicles.SurfaceVehicleState;         use AFRL.Vehicles.SurfaceVehicleState;
+with AFRL.CMASI.AirVehicleConfiguration;        use AFRL.CMASI.AirVehicleConfiguration;
+with AFRL.Vehicles.GroundVehicleConfiguration;  use AFRL.Vehicles.GroundVehicleConfiguration;
+with AFRL.Vehicles.SurfaceVehicleConfiguration; use AFRL.Vehicles.SurfaceVehicleConfiguration;
+with AFRL.Impact.ImpactAutomationRequest;       use AFRL.Impact.ImpactAutomationRequest;
+with AFRL.CMASI.AutomationRequest;              use AFRL.CMASI.AutomationRequest;
+with Avtas.Lmcp.Types;
 
 with Ada.Characters.Handling;
+with Route_Aggregator_Message_Conversions;
+
+with Ada.Text_IO; use Ada.Text_IO; -- temporarily
+--  with Route_Aggregator_Common;
 
 package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
+
+   procedure Handle_RoutePlanResponse_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : RoutePlanResponse_Any);
+
+   procedure Handle_RouteRequest_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : RouteRequest_Any);
+
+   procedure Handle_AirVehicleState_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityState_Any);
+
+   procedure Handle_GroundVehicleState_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityState_Any);
+
+   procedure Handle_SurfaceVehicleState_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityState_Any);
+
+   procedure Handle_AirVehicleConfig_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityConfiguration_Any);
+
+   procedure Handle_GroundVehicleConfig_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityConfiguration_Any);
+
+   procedure Handle_SurfaceVehicleConfig_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityConfiguration_Any);
+
+   procedure Handle_UniqueAutomationRequest_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : UniqueAutomationRequest_Any);
+
+   procedure Handle_ImpactAutomationRequest_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : ImpactAutomationRequest_Any);
+
+   procedure Handle_TaskPlanOptions_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : TaskPlanOptions_Any);
 
    ---------------------------------
    -- Registry_Service_Type_Names --
@@ -21,16 +75,14 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
    -- Create --
    ------------
 
-   type Route_Aggregator_Service_Ref is access all Route_Aggregator_Service;
-
    function Create return Any_Service is
-      Result : Route_Aggregator_Service_Ref;
+      Result : Any_Service;
    begin
       Result := new Route_Aggregator_Service;
       Result.Construct_Service
         (Service_Type        => Type_Name,
          Work_Directory_Name => Directory_Name);
-      return Any_Service (Result);
+      return Result;
    end Create;
 
    ---------------
@@ -56,7 +108,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
          use Ada.Characters.Handling;
       begin
          if Attr_Value = "" then
-            This.Config.M_FastPlan := False;
+            This.Config.M_FastPlan := False;  -- FastPlan is an optional parameter
          elsif To_Lower (Attr_Value) = "true" then
             This.Config.M_FastPlan := True;
          elsif To_Lower (Attr_Value) = "false" then
@@ -130,89 +182,305 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
       Should_Terminate :    out Boolean)
    is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Process_Received_LMCP_Message unimplemented");
-      raise Program_Error
-        with "Unimplemented procedure Process_Received_LMCP_Message";
+Put_Line ("Route_Aggregator_Service processing a received LMCP message");
 
-      --  // successful de-serialization of message
       --  if (uxas::messages::route::isRoutePlanResponse(receivedLmcpMessage->m_object.get()))
-      --  {
-      --      auto rplan = std::static_pointer_cast<uxas::messages::route::RoutePlanResponse>(receivedLmcpMessage->m_object);
-      --      m_routePlanResponses[rplan->getResponseID()] = rplan;
-      --      for (auto p : rplan->getRouteResponses())
-      --      {
-      --          m_routePlans[p->getRouteID()] = std::make_pair(rplan->getResponseID(), std::shared_ptr<uxas::messages::route::RoutePlan>(p->clone()));
-      --      }
-      --      CheckAllRoutePlans();
-      --  }
+      if Received_Message.Payload.all in RoutePlanResponse'Class then
+         This.Handle_RoutePlanResponse_Msg (RoutePlanResponse_Any (Received_Message.Payload));
+
       --  else if (uxas::messages::route::isRouteRequest(receivedLmcpMessage->m_object.get()))
-      --  {
-      --      auto rreq = std::static_pointer_cast<uxas::messages::route::RouteRequest>(receivedLmcpMessage->m_object);
-      --      HandleRouteRequest(rreq);
-      --  }
+      elsif Received_Message.Payload.all in RouteRequest'Class then
+         This.Handle_RouteRequest_Msg (RouteRequest_Any (Received_Message.Payload));
+
       --  else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object))
-      --  {
-      --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
-      --      m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
-      --      m_airVehicles.insert(id);
-      --  }
+      elsif Received_Message.Payload.all in AirVehicleState'Class then
+         This.Handle_AirVehicleState_Msg (EntityState_Any (Received_Message.Payload));
+
       --  else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in GroundVehicleState'Class then
+         This.Handle_GroundVehicleState_Msg (EntityState_Any (Received_Message.Payload));
+
+      --  else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in SurfaceVehicleState'Class then
+         This.Handle_SurfaceVehicleState_Msg (EntityState_Any (Received_Message.Payload));
+
+      --  else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object))
+      elsif Received_Message.Payload.all in AirVehicleConfiguration'Class then
+         This.Handle_AirVehicleConfig_Msg (EntityConfiguration_Any (Received_Message.Payload));
+
+      --  else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in GroundVehicleConfiguration'Class then
+         This.Handle_GroundVehicleConfig_Msg (EntityConfiguration_Any (Received_Message.Payload));
+
+      --  else if (afrl::vehicles::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in SurfaceVehicleConfiguration'Class then
+         This.Handle_SurfaceVehicleConfig_Msg (EntityConfiguration_Any (Received_Message.Payload));
+
+      --  else if (uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in UniqueAutomationRequest'Class then
+         This.Handle_UniqueAutomationRequest_Msg (UniqueAutomationRequest_Any (Received_Message.Payload));
+
+      --  else if (afrl::impact::isImpactAutomationRequest(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in ImpactAutomationRequest'Class then
+         This.Handle_ImpactAutomationRequest_Msg (ImpactAutomationRequest_Any (Received_Message.Payload));
+
+      --  else if (uxas::messages::task::isTaskPlanOptions(receivedLmcpMessage->m_object.get()))
+      elsif Received_Message.Payload.all in TaskPlanOptions'Class then
+         This.Handle_TaskPlanOptions_Msg (TaskPlanOptions_Any (Received_Message.Payload));
+      end if;
+
+      --  return (false); // always false implies never terminating service from here
+      Should_Terminate := False;
+   end Process_Received_LMCP_Message;
+
+   ----------------------------------
+   -- Handle_RoutePlanResponse_Msg --
+   ----------------------------------
+
+   procedure Handle_RoutePlanResponse_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : RoutePlanResponse_Any)
+   is
+      use Route_Aggregator_Message_Conversions;
+   begin
+      Route_Aggregator.Handle_Route_Plan_Response (This.Mailbox, This.State, As_RoutePlanResponse_Message (Msg));
+   end Handle_RoutePlanResponse_Msg;
+
+   -----------------------------
+   -- Handle_RouteRequest_Msg --
+   -----------------------------
+
+   procedure Handle_RouteRequest_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : RouteRequest_Any)
+   is
+      use Route_Aggregator_Message_Conversions;
+   begin
+      Route_Aggregator.Handle_Route_Request (This.Config, This.Mailbox, This.State, As_RouteRequest_Message (Msg));
+   end Handle_RouteRequest_Msg;
+
+   --------------------------------
+   -- Handle_AirVehicleState_Msg --
+   --------------------------------
+
+   procedure Handle_AirVehicleState_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityState_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetID);
+   begin
+      --  {
+      --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
+      --      m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
+      --      m_airVehicles.insert(id);
+      --  }
+      This.Config.M_EntityStates := Route_Aggregator_Common.Add (This.Config.M_EntityStates, Id);
+      -- we will use the Id values in M_EntityStates to access the pointer values in Entity_Mapping
+      This.Entity_Mapping (Id) := Msg;
+      This.Config.M_AirVehicles := Add (This.Config.M_AirVehicles, Id);
+   end Handle_AirVehicleState_Msg;
+
+   -----------------------------------
+   -- Handle_GroundVehicleState_Msg --
+   -----------------------------------
+
+   procedure Handle_GroundVehicleState_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityState_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetID);
+   begin
       --  {
       --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
       --      m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
       --      m_groundVehicles.insert(id);
       --  }
-      --  else if (afrl::vehicles::isSurfaceVehicleState(receivedLmcpMessage->m_object.get()))
+      This.Config.M_EntityStates := Route_Aggregator_Common.Add (This.Config.M_EntityStates, Id);
+      -- we will use the Id values in M_EntityStates to access the pointer values in Entity_Mapping
+      This.Entity_Mapping (Id) := Msg;
+      This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
+   end Handle_GroundVehicleState_Msg;
+
+   ------------------------------------
+   -- Handle_SurfaceVehicleState_Msg --
+   ------------------------------------
+
+   procedure Handle_SurfaceVehicleState_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityState_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetID);
+   begin
       --  {
       --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object)->getID();
       --      m_entityStates[id] = std::static_pointer_cast<afrl::cmasi::EntityState>(receivedLmcpMessage->m_object);
       --      m_surfaceVehicles.insert(id);
       --  }
-      --  else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleConfiguration>(receivedLmcpMessage->m_object))
+      This.Config.M_EntityStates := Route_Aggregator_Common.Add (This.Config.M_EntityStates, Id);
+      -- we will use the Id values in M_EntityStates to access the pointer values in Entity_Mapping
+      This.Entity_Mapping (Id) := Msg;
+      This.Config.M_SurfaceVehicles := Add (This.Config.M_SurfaceVehicles, Id);
+   end Handle_SurfaceVehicleState_Msg;
+
+   ---------------------------------
+   -- Handle_AirVehicleConfig_Msg --
+   ---------------------------------
+
+   procedure Handle_AirVehicleConfig_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityConfiguration_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetID);
+   begin
       --  {
       --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
       --      m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
       --      m_airVehicles.insert(id);
       --  }
-      --  else if (afrl::vehicles::isGroundVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+      This.Entity_Configurations (Id) := Msg;
+      This.Config.M_AirVehicles := Add (This.Config.M_AirVehicles, Id);
+   end Handle_AirVehicleConfig_Msg;
+
+   ------------------------------------
+   -- Handle_GroundVehicleConfig_Msg --
+   ------------------------------------
+
+   procedure Handle_GroundVehicleConfig_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityConfiguration_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetID);
+   begin
       --  {
       --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
       --      m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
       --      m_groundVehicles.insert(id);
       --  }
-      --  else if (afrl::vehicles::isSurfaceVehicleConfiguration(receivedLmcpMessage->m_object.get()))
+      This.Entity_Configurations (Id) := Msg;
+      This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
+      end Handle_GroundVehicleConfig_Msg;
+
+      -------------------------------------
+      -- Handle_SurfaceVehicleConfig_Msg --
+      -------------------------------------
+
+   procedure Handle_SurfaceVehicleConfig_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : EntityConfiguration_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetID);
+   begin
       --  {
       --      int64_t id = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object)->getID();
       --      m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
       --      m_surfaceVehicles.insert(id);
       --  }
-      --  else if (uxas::messages::task::isUniqueAutomationRequest(receivedLmcpMessage->m_object.get()))
+      This.Entity_Configurations (Id) := Msg;
+      This.Config.M_SurfaceVehicles := Add (This.Config.M_SurfaceVehicles, Id);
+   end Handle_SurfaceVehicleConfig_Msg;
+
+   ----------------------------------------
+   -- Handle_UniqueAutomationRequest_Msg --
+   ----------------------------------------
+
+   procedure Handle_UniqueAutomationRequest_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : UniqueAutomationRequest_Any)
+   is
+   begin
       --  {
       --      auto areq = std::static_pointer_cast<uxas::messages::task::UniqueAutomationRequest>(receivedLmcpMessage->m_object);
       --      m_uniqueAutomationRequests[m_autoRequestId++] = areq;
       --      //ResetTaskOptions(areq); // clear m_taskOptions and wait for refresh from tasks
       --      CheckAllTaskOptionsReceived();
       --  }
-      --  else if (afrl::impact::isImpactAutomationRequest(receivedLmcpMessage->m_object.get()))
+      This.M_AutoRequestId := This.M_AutoRequestId + 1;
+      This.M_UniqueAutomationRequests (This.M_AutoRequestId) := Msg;
+      This.Check_All_Task_Options_Received;
+   end Handle_UniqueAutomationRequest_Msg;
+
+   ----------------------------------------
+   -- Handle_ImpactAutomationRequest_Msg --
+   ----------------------------------------
+
+   procedure Handle_ImpactAutomationRequest_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : ImpactAutomationRequest_Any)
+   is
+      AReq : constant UniqueAutomationRequest_Any := new UniqueAutomationRequest;
+   begin
       --  {
       --      auto sreq = std::static_pointer_cast<afrl::impact::ImpactAutomationRequest>(receivedLmcpMessage->m_object);
       --      auto areq = std::shared_ptr<uxas::messages::task::UniqueAutomationRequest>();
+      --
       --      areq->setOriginalRequest(sreq->getTrialRequest()->clone());
       --      m_uniqueAutomationRequests[m_autoRequestId++] = areq;
       --      areq->setRequestID(m_autoRequestId);
       --      //ResetTaskOptions(areq); // clear m_taskOptions and wait for refresh from tasks
       --      CheckAllTaskOptionsReceived();
       --  }
-      --  else if (uxas::messages::task::isTaskPlanOptions(receivedLmcpMessage->m_object.get()))
+      AReq.SetOriginalRequest (new AutomationRequest'(Msg.GetTrialRequest.all));
+      This.M_AutoRequestId := This.M_AutoRequestId + 1;
+      This.M_UniqueAutomationRequests (This.M_AutoRequestId) := AReq;
+      AReq.SetRequestID (Avtas.Lmcp.Types.Int64 (This.M_AutoRequestId));
+      This.Check_All_Task_Options_Received;
+   end Handle_ImpactAutomationRequest_Msg;
+
+   --------------------------------
+   -- Handle_TaskPlanOptions_Msg --
+   --------------------------------
+
+   procedure Handle_TaskPlanOptions_Msg
+     (This : in out Route_Aggregator_Service;
+      Msg  : TaskPlanOptions_Any)
+   is
+      Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetTaskID);
+   begin
       --  {
       --      auto taskOptions = std::static_pointer_cast<uxas::messages::task::TaskPlanOptions>(receivedLmcpMessage->m_object);
       --      m_taskOptions[taskOptions->getTaskID()] = taskOptions;
       --      CheckAllTaskOptionsReceived();
       --  }
+      This.M_TaskOptions (Id) := Msg;
+      This.Check_All_Task_Options_Received;
+   end Handle_TaskPlanOptions_Msg;
+
+   -------------------------------------
+   -- Check_All_Task_Options_Received --
+   -------------------------------------
+
+   procedure Check_All_Task_Options_Received
+     (This : in out Route_Aggregator_Service)
+   is
+   begin
+      pragma Unreferenced (This); -- for now...
+      pragma Compile_Time_Warning (True, "Check_All_Task_Options_Received is not implemented");
+      --  // loop through all automation requests; delete when fulfilled
+      --  auto areqIter = m_uniqueAutomationRequests.begin();
+      --  while (areqIter != m_uniqueAutomationRequests.end())
+      --  {
+      --    // check that to see if all options from all tasks have been received for this request
+      --    bool isAllReceived{true};
+      --    for (size_t t = 0; t < areqIter->second->getOriginalRequest()->getTaskList().size(); t++)
+      --    {
+      --        int64_t taskId = areqIter->second->getOriginalRequest()->getTaskList().at(t);
+      --        if (m_taskOptions.find(taskId) == m_taskOptions.end())
+      --        {
+      --            isAllReceived = false;
+      --            break;
+      --        }
+      --    }
       --
-      --  return (false); // always false implies never terminating service from here
-   end Process_Received_LMCP_Message;
+      --    // if all task options have NOT been received, wait until more come
+      --    if (isAllReceived)
+      --    {
+      --        // Build messages for matrix
+      --        BuildMatrixRequests(areqIter->first, areqIter->second);
+      --
+      --    }
+      --    areqIter++;
+      --  }
+   end Check_All_Task_Options_Received;
 
    -----------------------------
    -- Package Executable Part --
