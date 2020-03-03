@@ -70,13 +70,12 @@ ZeroMqAddressedAttributedMessageTcpReceiverSender::getNextMessage()
     // immediately. If the value of timeout is -1, zmq_poll() shall block
     // indefinitely until a requested event has occurred on at least one
     // zmq_pollitem_t. The resolution of timeout is 1 millisecond.
+    std::lock_guard<std::mutex> lock(m_data_guard);
     zmq::poll(&pollItems[0], 1, uxas::common::ConfigurationManager::getZeroMqReceiveSocketPollWaitTime_ms()); // wait time units are milliseconds
     if (pollItems[0].revents & ZMQ_POLLIN)
     {
         try
         {
-            std::lock_guard<std::mutex> lock(m_data_guard);
-            
             // ZMQ_STREAM sockets always return two frames, the first identifying the sender
             // (see http://api.zeromq.org/4-1:zmq-socket)
 
