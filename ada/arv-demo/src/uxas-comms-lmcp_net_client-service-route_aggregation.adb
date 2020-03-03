@@ -360,9 +360,9 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
       end Handle_GroundVehicleConfig_Msg;
 
-      -------------------------------------
-      -- Handle_SurfaceVehicleConfig_Msg --
-      -------------------------------------
+   -------------------------------------
+   -- Handle_SurfaceVehicleConfig_Msg --
+   -------------------------------------
 
    procedure Handle_SurfaceVehicleConfig_Msg
      (This : in out Route_Aggregator_Service;
@@ -449,38 +449,63 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
    -- Check_All_Task_Options_Received --
    -------------------------------------
 
+   procedure BuildMatrixRequests
+     (Key : Route_Aggregator_Common.Int64;
+      Msg : UniqueAutomationRequest_Any);
+
    procedure Check_All_Task_Options_Received
      (This : in out Route_Aggregator_Service)
    is
+      AllReceived : Boolean;
+      TaskId : AVTAS.LMCP.Types.Int64;
+      C : Id_UniqueAutomationRequest_Mapping.Cursor;
+      AReq : UniqueAutomationRequest_Any;
    begin
-      pragma Unreferenced (This); -- for now...
-      pragma Compile_Time_Warning (True, "Check_All_Task_Options_Received is not implemented");
       --  // loop through all automation requests; delete when fulfilled
       --  auto areqIter = m_uniqueAutomationRequests.begin();
       --  while (areqIter != m_uniqueAutomationRequests.end())
-      --  {
-      --    // check that to see if all options from all tasks have been received for this request
-      --    bool isAllReceived{true};
-      --    for (size_t t = 0; t < areqIter->second->getOriginalRequest()->getTaskList().size(); t++)
-      --    {
-      --        int64_t taskId = areqIter->second->getOriginalRequest()->getTaskList().at(t);
-      --        if (m_taskOptions.find(taskId) == m_taskOptions.end())
-      --        {
-      --            isAllReceived = false;
-      --            break;
-      --        }
-      --    }
-      --
-      --    // if all task options have NOT been received, wait until more come
-      --    if (isAllReceived)
-      --    {
-      --        // Build messages for matrix
-      --        BuildMatrixRequests(areqIter->first, areqIter->second);
-      --
-      --    }
-      --    areqIter++;
-      --  }
+
+      --  for AReq : UniqueAutomationRequest_Any of This.M_UniqueAutomationRequests loop
+      C := Id_UniqueAutomationRequest_Mapping.First (This.M_UniqueAutomationRequests);
+      while Id_UniqueAutomationRequest_Mapping.Has_Element (C) loop
+         AReq := Id_UniqueAutomationRequest_Mapping.Element (C);
+
+         --  check that to see if all options from all tasks have been received for this request
+         AllReceived := True;
+         --  for (size_t t = 0; t < areqIter->second->getOriginalRequest()->getTaskList().size(); t++)
+         for T in Ada.Containers.Count_Type range 0 .. afrl.cmasi.AutomationRequest.Vect_Int64.Length (AReq.getOriginalRequest.getTaskList.all) loop
+            --  int64_t taskId = areqIter->second->getOriginalRequest()->getTaskList().at(t);
+            TaskId := AFRL.CMASI.AutomationRequest.Vect_Int64.Element (AReq.GetOriginalRequest.GetTaskList.all, Natural (T));
+
+            --  if (m_taskOptions.find(taskId) == m_taskOptions.end())
+            if not Id_TaskPlanOptions_Mapping.Contains (This.M_TaskOptions, Route_Aggregator_Common.Int64 (TaskId)) then
+               AllReceived := False;
+               exit;
+            end if;
+         end loop;
+
+         if AllReceived then
+            --  Build messages for matrix
+            --  BuildMatrixRequests(areqIter->first, areqIter->second);
+            BuildMatrixRequests (Key => Id_UniqueAutomationRequest_Mapping.Key (C),
+                                 Msg => Id_UniqueAutomationRequest_Mapping.Element (C));
+         end if;
+
+         Id_UniqueAutomationRequest_Mapping.Next (C);
+      end loop;
    end Check_All_Task_Options_Received;
+
+   -------------------------
+   -- BuildMatrixRequests --
+   -------------------------
+
+   procedure BuildMatrixRequests
+     (Key : Route_Aggregator_Common.Int64;
+      Msg : UniqueAutomationRequest_Any)
+   is
+   begin
+      null;
+   end BuildMatrixRequests;
 
    -----------------------------
    -- Package Executable Part --
