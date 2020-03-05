@@ -1,27 +1,27 @@
+with Ada.Text_IO; use Ada.Text_IO; -- temporarily
+
 with Ada.Containers.Vectors;
 with DOM.Core.Elements;
+with Ada.Characters.Handling;
+with Route_Aggregator_Message_Conversions;
 
 with UxAS.Messages.Route.RouteRequest;          use UxAS.Messages.Route.RouteRequest;
 with UxAS.Messages.Route.RoutePlanRequest;      use UxAS.Messages.Route.RoutePlanRequest;
 with UxAS.Messages.Route.RoutePlanResponse;     use UxAS.Messages.Route.RoutePlanResponse;
-with AFRL.CMASI.AirVehicleState;                use AFRL.CMASI.AirVehicleState;
+with UxAS.Messages.LMCPTASK.PlanningState;      use UxAS.Messages.LMCPTASK.PlanningState;
+with UxAS.Messages.LMCPTASK.TaskOption;
+with UXAS.Messages.Route.RouteConstraints;
 with AFRL.Vehicles.GroundVehicleState;          use AFRL.Vehicles.GroundVehicleState;
 with AFRL.Vehicles.SurfaceVehicleState;         use AFRL.Vehicles.SurfaceVehicleState;
-with AFRL.CMASI.AirVehicleConfiguration;        use AFRL.CMASI.AirVehicleConfiguration;
 with AFRL.Vehicles.GroundVehicleConfiguration;  use AFRL.Vehicles.GroundVehicleConfiguration;
 with AFRL.Vehicles.SurfaceVehicleConfiguration; use AFRL.Vehicles.SurfaceVehicleConfiguration;
 with AFRL.Impact.ImpactAutomationRequest;       use AFRL.Impact.ImpactAutomationRequest;
+with AFRL.CMASI.AirVehicleConfiguration;        use AFRL.CMASI.AirVehicleConfiguration;
 with AFRL.CMASI.AutomationRequest;              use AFRL.CMASI.AutomationRequest;
---  with AVTAS.LMCP.Types;
+with AFRL.CMASI.Location3D;                     use AFRL.CMASI.Location3D;
+with AFRL.CMASI.AirVehicleState;                use AFRL.CMASI.AirVehicleState;
 
-with Ada.Characters.Handling;
-with Route_Aggregator_Message_Conversions;
-
-with Ada.Text_IO; use Ada.Text_IO; -- temporarily
-with AFRL.CMASI.Location3D;
-with UxAS.Messages.LMCPTASK.PlanningState; use UxAS.Messages.LMCPTASK.PlanningState;
-with UxAS.Messages.LMCPTASK.TaskOption;
-with uxas.messages.route.RouteConstraints;
+with UxAS.Common.String_Constant.Message_Group;
 
 package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
 
@@ -68,6 +68,17 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
    procedure Handle_TaskPlanOptions_Msg
      (This : in out Route_Aggregator_Service;
       Msg  : TaskPlanOptions_Any);
+
+   procedure Check_All_Route_Plans
+     (This : in out Route_Aggregator_Service);
+
+   package RoutePlanRequest_Sequences is new Ada.Containers.Vectors
+     (Index_Type   => Positive,
+      Element_Type => RoutePlanRequest_Any);
+
+   procedure Euclidian_Plan
+     (This : in out Route_Aggregator_Service;
+      Plan : RoutePlanRequest_Any);
 
    ---------------------------------
    -- Registry_Service_Type_Names --
@@ -507,11 +518,6 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       ReqId : AVTAS.LMCP.Types.Int64;
       AReq  : UniqueAutomationRequest_Any)
    is
-
-      package RoutePlanRequest_Sequences is new Ada.Containers.Vectors
-        (Index_Type   => Positive,
-         Element_Type => RoutePlanRequest_Any);
-
       --  std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendAirPlanRequest;
       sendAirPlanRequest    : RoutePlanRequest_Sequences.Vector;
       --  std::vector< std::shared_ptr<uxas::messages::route::RoutePlanRequest> > sendGroundPlanRequest;
@@ -721,37 +727,53 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
                   --  // found routes between all task options
                   --  for (size_t t1 = 0; t1 < taskOptionList.size(); t1++)
                   for T1 in Natural range 1 .. Natural (TaskOptionList.Length) loop
-                     null;
-                  --  {
-                  --      for (size_t t2 = 0; t2 < taskOptionList.size(); t2++)
-                  --      {
-                  --          if (t1 != t2)
-                  --          {
-                  --              auto option1 = taskOptionList.at(t1);
-                  --              auto option2 = taskOptionList.at(t2);
-                  --
-                  --              // build map from request to full task/option information
-                  --              AggregatorTaskOptionPair* top = new AggregatorTaskOptionPair(vehicleId, option1->getTaskID(), option1->getOptionID(), option2->getTaskID(), option2->getOptionID());
-                  --              m_routeTaskPairing[m_routeId] = std::shared_ptr<AggregatorTaskOptionPair>(top);
-                  --
-                  --              uxas::messages::route::RouteConstraints* r = new uxas::messages::route::RouteConstraints;
-                  --              r->setStartLocation(option1->getEndLocation()->clone());
-                  --              r->setStartHeading(option1->getEndHeading());
-                  --              r->setEndLocation(option2->getStartLocation()->clone());
-                  --              r->setEndHeading(option2->getStartHeading());
-                  --              r->setRouteID(m_routeId);
-                  --              planRequest->getRouteRequests().push_back(r);
-                  --              m_pendingAutoReq[reqId].insert(m_routeId);
-                  --              m_routeId++;
-                  --          }
-                  --      }
-                  --  }
+                     --  for (size_t t2 = 0; t2 < taskOptionList.size(); t2++)
+                     for T2 in Natural range 1 .. Natural (TaskOptionList.Length) loop
+                        --  if (t1 != t2)
+                        if T1 /= T2 then
+                           declare
+                              --  auto option1 = taskOptionList.at(t1);
+                              Option1 : constant UxAS.Messages.LMCPtask.TaskOption.TaskOption_Any := TaskOptionList.Element (T1);
+                              --  auto option2 = taskOptionList.at(t2);
+                              Option2 : constant UxAS.Messages.LMCPtask.TaskOption.TaskOption_Any := TaskOptionList.Element (T2);
+                              TOP     : AggregatorTaskOptionPair_Reference;
+                              R       : UXAS.Messages.Route.RouteConstraints.RouteConstraints_Any;
+                           begin
+                              --  // build map from request to full task/option information
+                              --  AggregatorTaskOptionPair* top = new AggregatorTaskOptionPair(vehicleId, option1->getTaskID(), option1->getOptionID(), option2->getTaskID(), option2->getOptionID());
+                              TOP := new AggregatorTaskOptionPair'(vehicleId, option1.getTaskID, option1.getOptionID, option2.getTaskID, option2.getOptionID);
+                              --  m_routeTaskPairing[m_routeId] = std::shared_ptr<AggregatorTaskOptionPair>(top);
+                              This.M_RouteTaskPairing (This.m_routeId) := TOP;
+
+                              --  uxas::messages::route::RouteConstraints* r = new uxas::messages::route::RouteConstraints;
+                              R := new UXAS.Messages.Route.RouteConstraints.RouteConstraints;
+                              --  r->setStartLocation(option1->getEndLocation()->clone());
+                              R.setStartLocation (new AFRL.CMASI.Location3d.Location3D'(AFRL.CMASI.Location3d.Location3D (Option1.getEndLocation.all)));
+                              --  r->setStartHeading(option1->getEndHeading());
+                              R.setStartHeading (Option1.getEndHeading);
+                              --  r->setEndLocation(option2->getStartLocation()->clone());
+                              R.setEndLocation (new AFRL.CMASI.Location3d.Location3D'(AFRL.CMASI.Location3d.Location3D (Option2.getStartLocation.all)));
+                              --  r->setEndHeading(option2->getStartHeading());
+                              R.setEndHeading (Option2.getStartHeading);
+                              --  r->setRouteID(m_routeId);
+                              R.setRouteID (This.m_routeId);
+                              --  planRequest->getRouteRequests().push_back(r);
+                              Uxas.Messages.Route.RoutePlanRequest.Vect_RouteConstraints_Acc.Append
+                                (PlanRequest.GetRouteRequests.all,
+                                 UXAS.Messages.Route.RouteConstraints.RouteConstraints_Acc (R));
+                              --  m_pendingAutoReq[reqId].insert(m_routeId);
+                                This.M_PendingAutoReq (ReqId).Include (This.M_RouteId);
+                              --  m_routeId++;
+                              This.M_RouteId := This.M_RouteId + 1;
+                           end;
+                        end if;
+                     end loop;
                   end loop;
 
                   --  // send this plan request to the prescribed route planner for ground vehicles
                   --  if (m_groundVehicles.find(vehicleId) != m_groundVehicles.end())
                   if Contains (This.Config.M_GroundVehicles, Route_Aggregator_Common.Int64 (VehicleId)) then
-                     --      sendGroundPlanRequest.push_back(planRequest);
+                     --  sendGroundPlanRequest.push_back(planRequest);
                      SendGroundPlanRequest.Append (PlanRequest);
                   else
                      --  sendAirPlanRequest.push_back(planRequest);
@@ -762,35 +784,65 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
          end Make_Request;
       end loop For_Each_Vehicle;
 
-      --  // send all requests for aircraft plans
+      --  send all requests for aircraft plans
       --  for (size_t k = 0; k < sendAirPlanRequest.size(); k++)
-      --  {
-      --      std::shared_ptr<avtas::lmcp::Object> pRequest = std::static_pointer_cast<avtas::lmcp::Object>(sendAirPlanRequest.at(k));
-      --      sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::AircraftPathPlanner(), pRequest);
-      --  }
-      --
-      --  // send all requests for ground plans
+      for K in Natural range 1 .. Natural (SendAirPlanRequest.Length) loop
+         --  std::shared_ptr<avtas::lmcp::Object> pRequest = std::static_pointer_cast<avtas::lmcp::Object>(sendAirPlanRequest.at(k));
+         --  sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::AircraftPathPlanner(), pRequest);
+         This.Send_LMCP_Object_Limited_Cast_Message
+           (UxAS.Common.String_Constant.Message_Group.AircraftPathPlanner,
+            Object_Any (SendAirPlanRequest.Element (K)));
+      end loop;
+
+      --  send all requests for ground plans
       --  for (size_t k = 0; k < sendGroundPlanRequest.size(); k++)
-      --  {
-      --      std::shared_ptr<avtas::lmcp::Object> pRequest = std::static_pointer_cast<avtas::lmcp::Object>(sendGroundPlanRequest.at(k));
-      --      if (m_fastPlan)
-      --      {
-      --          // short-circuit and just plan with straight line planner
-      --          EuclideanPlan(sendGroundPlanRequest.at(k));
-      --      }
-      --      else
-      --      {
-      --          // send externally
-      --          sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::GroundPathPlanner(), pRequest);
-      --      }
-      --  }
-      --
+      for K in Natural range 1 .. Natural (SendGroundPlanRequest.Length) loop
+         --  std::shared_ptr<avtas::lmcp::Object> pRequest = std::static_pointer_cast<avtas::lmcp::Object>(sendGroundPlanRequest.at(k));
+         --  if (m_fastPlan)
+         if This.Config.M_FastPlan then
+            --  short-circuit and just plan with straight line planner
+            --  EuclideanPlan(sendGroundPlanRequest.at(k));
+            This.Euclidian_Plan (SendGroundPlanRequest.Element (K));
+         else  --  send externally
+            --  sendSharedLmcpObjectLimitedCastMessage(uxas::common::MessageGroup::GroundPathPlanner(), pRequest);
+            This.Send_LMCP_Object_Limited_Cast_Message
+              (UxAS.Common.String_Constant.Message_Group.GroundPathPlanner,
+               Object_Any (SendGroundPlanRequest.Element (K)));
+         end if;
+      end loop;
+
       --  // fast planning should be complete, so kick off sending response
       --  if (m_fastPlan)
-      --  {
-      --      CheckAllRoutePlans();
-      --  }
+      if This.config.m_fastPlan then
+         --  CheckAllRoutePlans();
+         This.Check_All_Route_Plans;
+      end if;
    end BuildMatrixRequests;
+
+   --------------------
+   -- Euclidian_Plan --
+   --------------------
+
+   procedure Euclidian_Plan
+     (This : in out Route_Aggregator_Service;
+      Plan : RoutePlanRequest_Any)
+   is
+   begin
+      pragma Compile_Time_Warning (True, "procedure Euclidian_Plan is not implemented");
+   end Euclidian_Plan;
+
+   ---------------------------
+   -- Check_All_Route_Plans --
+   ---------------------------
+
+   procedure Check_All_Route_Plans
+     (This : in out Route_Aggregator_Service)
+   is
+   begin
+      pragma Compile_Time_Warning (True, "procedure Check_All_Route_Plans is not implemented");
+      --  we might not implement this because the demo (waterways search) does
+      --  not set FastPlan to True in the config XML
+   end Check_All_Route_Plans;
 
    -----------------------------
    -- Package Executable Part --
