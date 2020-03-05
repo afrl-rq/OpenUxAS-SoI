@@ -2,13 +2,16 @@ with DOM.Core;
 
 with Route_Aggregator;                               use Route_Aggregator;
 with Route_Aggregator_Communication;                 use Route_Aggregator_Communication;
-with Ada.Containers.Ordered_Maps;
-with AFRL.CMASI.EntityState;                         use AFRL.CMASI.EntityState;
 with Route_Aggregator_Common;                        use Route_Aggregator_Common;
+
+with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Ordered_Sets;
+
+with AVTAS.LMCP.Types;
+with AFRL.CMASI.EntityState;                         use AFRL.CMASI.EntityState;
 with Afrl.Cmasi.EntityConfiguration;                 use Afrl.Cmasi.EntityConfiguration;
 with Uxas.Messages.Lmcptask.UniqueAutomationRequest; use Uxas.Messages.Lmcptask.UniqueAutomationRequest;
 with UxAS.Messages.Lmcptask.TaskPlanOptions;         use UxAS.Messages.Lmcptask.TaskPlanOptions;
-
 
 package UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
 
@@ -50,8 +53,39 @@ private
       Element_Type => UniqueAutomationRequest_Any);
 
    package Id_TaskPlanOptions_Mapping is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Route_Aggregator_Common.Int64,
+     (Key_Type     => AVTAS.LMCP.Types.Int64,
       Element_Type => TaskPlanOptions_Any);
+
+   package Int64_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => AVTAS.LMCP.Types.Int64,
+      "<"          => AVTAS.LMCP.Types."<",
+      "="          => AVTAS.LMCP.Types."=");
+
+   package Pending_Auto_Requests_Mapping is new Ada.Containers.Ordered_Maps
+     (Key_Type     => AVTAS.LMCP.Types.Int64,
+      Element_Type => Int64_Sets.Set,
+      "<"          => AVTAS.LMCP.Types."<",
+      "="          => Int64_Sets."=");
+
+   type AggregatorTaskOptionPair is record
+      --  int64_t vehicleId{0};
+      vehicleId : AVTAS.LMCP.Types.Int64 := 0;
+      --  int64_t taskId{0};
+      taskId : AVTAS.LMCP.Types.Int64 := 0;
+      --  int64_t taskOption{0};
+      taskOption : AVTAS.LMCP.Types.Int64 := 0;
+      --  int64_t prevTaskId{0};
+      prevTaskId : AVTAS.LMCP.Types.Int64 := 0;
+      --  int64_t prevTaskOption{0};
+      prevTaskOption : AVTAS.LMCP.Types.Int64 := 0;
+   end record;
+
+   type AggregatorTaskOptionPair_Reference is access all AggregatorTaskOptionPair;
+
+   package RouteId_AggregatorPair_Mapping is new Ada.Containers.Ordered_Maps
+     (Key_Type     => AVTAS.LMCP.Types.Int64,
+      Element_Type => AggregatorTaskOptionPair_Reference);
+
 
    type Route_Aggregator_Service is new Service_Base with record
       Entity_Mapping             : Id_EntityState_Mapping.Map;
@@ -59,6 +93,18 @@ private
       M_AutoRequestId            : Route_Aggregator_Common.Int64 := 0;
       M_UniqueAutomationRequests : Id_UniqueAutomationRequest_Mapping.Map;
       M_TaskOptions              : Id_TaskPlanOptions_Mapping.Map;
+
+      --  std::unordered_map<int64_t, std::unordered_set<int64_t> > m_pendingAutoReq;
+      M_PendingAutoReq           : Pending_Auto_Requests_Mapping.Map;
+
+      --  Mapping from route ID to the corresponding task/option pair:
+      --                 route id,      task+option pair
+      --  std::unordered_map<int64_t, std::shared_ptr<AggregatorTaskOptionPair> > m_routeTaskPairing;
+      M_RouteTaskPairing : RouteId_AggregatorPair_Mapping.Map;
+
+      --  Starting ID for uniquely identifying route plan
+      --  int64_t m_routeId{1000000}; // start outside of any task or waypoint id
+      m_routeId : AVTAS.LMCP.Types.Int64 := 1_000_000;
 
       --  the following types are defined in SPARK code
       Mailbox : Route_Aggregator_Mailbox;
@@ -85,5 +131,10 @@ private
 
    procedure Check_All_Task_Options_Received
      (This : in out Route_Aggregator_Service);
+
+   procedure BuildMatrixRequests
+     (This  : in out Route_Aggregator_Service;
+      ReqId : AVTAS.LMCP.Types.Int64;
+      AReq  : UniqueAutomationRequest_Any);
 
 end UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation;
