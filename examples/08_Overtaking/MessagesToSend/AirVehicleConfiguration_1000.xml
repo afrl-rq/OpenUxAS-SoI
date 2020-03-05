@@ -4,14 +4,47 @@
   <NominalFlightProfile>
     <FlightProfile Series="CMASI">
       <Name/>
-      <Airspeed>20.0</Airspeed>
+      <Airspeed>30.0</Airspeed>
       <PitchAngle>0.0</PitchAngle>
       <VerticalSpeed>0.0</VerticalSpeed>
       <MaxBankAngle>20.0</MaxBankAngle>
       <EnergyRate>3.0E-4</EnergyRate>
     </FlightProfile>
   </NominalFlightProfile>
-  <AlternateFlightProfiles/>
+  <AlternateFlightProfiles>
+    <FlightProfile Series="CMASI">
+      <Name/>
+      <Airspeed>5.1444</Airspeed>
+      <PitchAngle>0.0</PitchAngle>
+      <VerticalSpeed>0.0</VerticalSpeed>
+      <MaxBankAngle>20.0</MaxBankAngle>
+      <EnergyRate>3.0E-4</EnergyRate>
+  </FlightProfile>
+  <FlightProfile Series="CMASI">
+      <Name/>
+      <Airspeed>360.11</Airspeed>
+      <PitchAngle>0.0</PitchAngle>
+      <VerticalSpeed>0.0</VerticalSpeed>
+      <MaxBankAngle>20.0</MaxBankAngle>
+      <EnergyRate>3.0E-4</EnergyRate>
+  </FlightProfile>
+  <FlightProfile Series="CMASI">
+      <Name/>
+      <Airspeed>30.0</Airspeed>
+      <PitchAngle>0.0</PitchAngle>
+      <VerticalSpeed>-30.48</VerticalSpeed>
+      <MaxBankAngle>20.0</MaxBankAngle>
+      <EnergyRate>3.0E-4</EnergyRate>
+  </FlightProfile>
+  <FlightProfile Series="CMASI">
+      <Name/>
+      <Airspeed>30.0</Airspeed>
+      <PitchAngle>0.0</PitchAngle>
+      <VerticalSpeed>30.48</VerticalSpeed>
+      <MaxBankAngle>20.0</MaxBankAngle>
+      <EnergyRate>3.0E-4</EnergyRate>
+  </FlightProfile>
+  </AlternateFlightProfiles>
   <AvailableLoiterTypes/>
   <AvailableTurnTypes/>
   <MinimumAltitude>0.0</MinimumAltitude>
@@ -22,7 +55,7 @@
   <Affiliation>Unknown</Affiliation>
   <EntityType/>
   <Label>UAV_1</Label>
-  <NominalSpeed>20.0</NominalSpeed>
+  <NominalSpeed>30.0</NominalSpeed>
   <NominalAltitude>500.0</NominalAltitude>
   <NominalAltitudeType>AGL</NominalAltitudeType>
   <PayloadConfigurationList>

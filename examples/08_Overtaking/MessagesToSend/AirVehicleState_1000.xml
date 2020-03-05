@@ -1,10 +1,10 @@
 <AirVehicleState Series="CMASI">
-  <Airspeed>20.0</Airspeed>
+  <Airspeed>30.0</Airspeed>
   <VerticalSpeed>0.0</VerticalSpeed>
   <WindSpeed>0.0</WindSpeed>
   <WindDirection>0.0</WindDirection>
   <ID>1000</ID>
-  <u>20.0</u>
+  <u>30.0</u>
   <v>0.0</v>
   <w>0.0</w>
   <udot>0.0</udot>
@@ -17,11 +17,11 @@
   <q>0.0</q>
   <r>0.0</r>
   <Course>0.0</Course>
-  <Groundspeed>0.0</Groundspeed>
+  <Groundspeed>35.0</Groundspeed>
   <Location>
     <Location3D Series="CMASI">
       <Latitude>39.0766124717729</Latitude>
-      <Longitude>-82.91164574827039</Longitude>
+      <Longitude>-82.8989168805116</Longitude>
       <Altitude>500.0</Altitude>
       <AltitudeType>MSL</AltitudeType>
     </Location3D>

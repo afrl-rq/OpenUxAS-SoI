@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UxAS EntityID="1000" FormatVersion="1.0" EntityType="Aircraft">
+	
+    <!-- NOTE:: "NetworkDevice" must be set equal to an active network interface device, e.g. wlan0 -->
+    <!-- on Linux and Mac, type 'ifconfig' to find interface name -->
+    <!-- on Windows, type 'ipconfig' to find interface name (name is after adapter type)	
+	     Windows example name: Wireless Network Connection
+	-->
+    <Bridge Type="LmcpObjectNetworkZeroMqZyreBridge" NetworkDevice="enp0s3">
+        <SubscribeToExternalMessage MessageType="afrl.cmasi.AirVehicleState"/>
+    </Bridge>
+
+    <!-- Connect to AMASE on a single vehicle port (see config folder in OpenAMASE) -->
+    <Bridge Type="LmcpObjectNetworkTcpBridge" TcpAddress="tcp://127.0.0.1:9800" Server="FALSE" ConsiderSelfGenerated="TRUE">
+        <SubscribeToMessage MessageType="afrl.cmasi.KeepInZone" />
+        <SubscribeToMessage MessageType="afrl.cmasi.MissionCommand" />
+        <SubscribeToMessage MessageType="afrl.cmasi.PointSearchTask"/>
+        <SubscribeToMessage MessageType="larcfm.DAIDALUS.DAIDALUSConfiguration" />
+        <SubscribeToMessage MessageType="larcfm.DAIDALUS.WellClearViolationIntervals" />
+        <SubscribeToMessage MessageType="afrl.cmasi.VehicleActionCommand" />
+    </Bridge>
+    <Service Type="Test_SimulationTime"/>
+    <Service Type="TaskManagerService"/>
+    <Service Type="AutomationRequestValidatorService"/>
+    <Service Type="SensorManagerService"/>
+    <Service Type="RouteAggregatorService"/>
+    <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
+    <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>
+    <Service Type="PlanBuilderService"/>
+    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" CollisionAvoidanceFactor=".1" /> <!--DTHR="100" ZTHR="100"/> <!-- RecoveryStabilityTime="0" DTHR="100" ZTHR="100"/ -->
+    <!--Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" RTCAAlertLevels="1" LookAheadTime="180" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" EarlyAlertTime1="55" AlertTime1="25" DTHR="100" ZTHR="100"/ -->
+    <Service Type="DAIDALUS_WCV_Response"/> <!-- ManeuverType="GroundSpeed"/-->
+
+    <Service Type="WaypointPlanManagerService" VehicleID="1000" NumberWaypointsToServe="1000" NumberWaypointsOverlap="5"
+             DefaultLoiterRadius_m="250"  param.turnType="FlyOver" AddLoiterToEndOfSegments="FALSE"
+             AddLoiterToEndOfMission="FALSE" LoopBackToFirstTask="FALSE" GimbalPayloadId="1"/>
+    <Service Type="SendMessagesService" PathToMessageFiles="../MessagesToSend/">
+        <Message MessageFileName="AirVehicleConfiguration_1000.xml" SendTime_ms="50"/>
+        <Message MessageFileName="AirVehicleConfiguration_2000.xml" SendTime_ms="60"/>
+
+        <!-- boundaries -->
+        <Message MessageFileName="KeepInZone_10.xml" SendTime_ms="200"/>
+        <Message MessageFileName="OperatingRegion_11.xml" SendTime_ms="210"/>
+
+         <!-- the tasks -->
+        <Message MessageFileName="PointSearchTask_0.xml" SendTime_ms="300"/>
+        <Message MessageFileName="PointSearchTask_1.xml" SendTime_ms="310"/>
+        <Message MessageFileName="AutomationRequest.xml" SendTime_ms="1000"/>
+    </Service>
+
+    <Service Type="MessageLoggerDataService" FilesPerSubDirectory="10000" LogFileName="testfile">
+        <LogMessage MessageType="uxas" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="afrl" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="eid" NumberMessagesToSkip="0"/>
+        <LogMessage MessageType="larcfm" NumberMessagesToSkip="0"/>
+    </Service>
+</UxAS>

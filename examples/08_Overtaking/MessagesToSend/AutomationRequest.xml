@@ -2,14 +2,12 @@
       <EntityList>
         <int64>1000</int64>
         <int64>2000</int64>
-        <int64>4208</int64>
       </EntityList>
       <TaskList>
         <int64>0</int64>
         <int64>1</int64>
-        <int64>2</int64>
       </TaskList>
-      <TaskRelationships>|(p0 p1 p2)</TaskRelationships>
+      <TaskRelationships>|(p0 p1)</TaskRelationships>
       <OperatingRegion>11</OperatingRegion>
       <RedoAllTasks>false</RedoAllTasks>
     </AutomationRequest>

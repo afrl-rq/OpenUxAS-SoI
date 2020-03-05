@@ -7,8 +7,7 @@ SAVE_DIR=$(pwd)
 BIN2="../../../OpenAMASE/OpenAMASE"
 # run OpenAMASE in separate terminal.  Note: requires "gnome-terminal"
 cd $BIN2
-#/usr/bin/gnome-terminal -x java -Xmx2048m -splash:./data/amase_splash.png -classpath ./dist/*:./lib/*  avtas.app.Application --config config/amase --scenario "../../OpenUxAS/examples/00_Collision/MessagesToSend/collision_mkii.xml"; 
-/usr/bin/gnome-terminal -x java -Xmx2048m -splash:./data/amase_splash.png -classpath ./dist/*:./lib/*  avtas.app.Application --config config/daidalus --scenario "../../OpenUxAS/examples/00_Collision/MessagesToSend/collision_mkii.xml"; 
+/usr/bin/gnome-terminal -x java -Xmx2048m -splash:./data/amase_splash.png -classpath ./dist/*:./lib/*  avtas.app.Application --config config/daidalus --scenario "../../OpenUxAS/examples/08_Overtaking/MessagesToSend/overtaking.xml"; 
 sleep 5s
 # change back to original directory
 cd $SAVE_DIR
@@ -27,7 +26,7 @@ mkdir -p ${RUN_DIR}
 # change to the data directory
 cd ${RUN_DIR}
 # run UxAS is a separate terminal. Note: requires "gnome-terminal"
-/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgCollision_$UAV.xml"
+/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgOvertaking_$UAV.xml"
 # change back to the original directory
 cd $SAVE_DIR
 
@@ -42,21 +41,6 @@ mkdir -p ${RUN_DIR}
 # change to the data directory
 cd ${RUN_DIR}
 # run UxAS is a separate terminal. Note: requires "gnome-terminal"
-/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgCollision_$UAV.xml"
-# change back to the original directory
-cd $SAVE_DIR
-
-#set the UAV ID
-UAV=4208
-#define the runinnig directory
-RUN_DIR=UAV_${UAV}
-#remove old data
-rm -Rf ${RUN_DIR} 
-#add new data directory
-mkdir -p ${RUN_DIR}
-# change to the data directory
-cd ${RUN_DIR}
-# run UxAS is a separate terminal. Note: requires "gnome-terminal"
-/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgCollision_$UAV.xml"
+/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgOvertaking_$UAV.xml"
 # change back to the original directory
 cd $SAVE_DIR

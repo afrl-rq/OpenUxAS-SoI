@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <AMASE>
   <ScenarioData>
-    <SimulationView Latitude="39.0865" Longitude="-82.8683" LongExtent="0.12"/>
+    <SimulationView Latitude="39.0865" Longitude="-82.8683" LongExtent="0.16"/>
     <ScenarioName>Collision Scenario</ScenarioName>
     <ScenarioDuration>300</ScenarioDuration>
   </ScenarioData>
@@ -208,7 +208,7 @@
       <Location>
         <Location3D Series="CMASI">
           <Latitude>39.0766124717729</Latitude>
-          <Longitude>-82.8699876356053</Longitude>
+          <Longitude>-82.8989168805116</Longitude>
           <Altitude>500.0</Altitude>
           <AltitudeType>MSL</AltitudeType>
         </Location3D>
