@@ -246,6 +246,7 @@ LmcpObjectNetworkTcpBridge::executeTcpReceiveProcessing()
             {
                 UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing ignoring external message with entity ID ", m_entityIdString, " since it matches its own entity ID");
             }
+            //std::this_thread::sleep_for(std::chrono::microseconds(10000));
         }
         UXAS_LOG_INFORM(s_typeName(), "::executeTcpReceiveProcessing exiting infinite loop thread [", std::this_thread::get_id(), "]");
     }

@@ -1,0 +1,27 @@
+<KeepInZone Series="CMASI">
+  <ZoneID>10</ZoneID>
+  <MinAltitude>0.0</MinAltitude>
+  <MinAltitudeType>AGL</MinAltitudeType>
+  <MaxAltitude>5000.0</MaxAltitude>
+  <MaxAltitudeType>MSL</MaxAltitudeType>
+  <AffectedAircraft/>
+  <StartTime>0</StartTime>
+  <EndTime>0</EndTime>
+  <Padding>0.0</Padding>
+  <Label/>
+  <Boundary>
+    <Rectangle Series="CMASI">
+      <CenterPoint>
+        <Location3D Series="CMASI">
+          <Latitude>39.08659200449692</Latitude>
+          <Longitude>-82.8683466637458</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </CenterPoint>
+      <Width>9250.577</Width>
+      <Height>5491.18</Height>
+      <Rotation>0.0</Rotation>
+    </Rectangle>
+  </Boundary>
+</KeepInZone>
