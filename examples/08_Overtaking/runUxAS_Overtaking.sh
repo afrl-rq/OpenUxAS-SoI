@@ -26,7 +26,7 @@ mkdir -p ${RUN_DIR}
 # change to the data directory
 cd ${RUN_DIR}
 # run UxAS is a separate terminal. Note: requires "gnome-terminal"
-/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgOvertaking_$UAV.xml"
+/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgOvertaking_$UAV.xml" 
 # change back to the original directory
 cd $SAVE_DIR
 
@@ -41,6 +41,6 @@ mkdir -p ${RUN_DIR}
 # change to the data directory
 cd ${RUN_DIR}
 # run UxAS is a separate terminal. Note: requires "gnome-terminal"
-/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgOvertaking_$UAV.xml"
+/usr/bin/gnome-terminal -e $BIN" -cfgPath ../cfgOvertaking_$UAV.xml" 
 # change back to the original directory
 cd $SAVE_DIR

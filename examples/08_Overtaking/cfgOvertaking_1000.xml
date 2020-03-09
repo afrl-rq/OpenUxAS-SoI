@@ -27,7 +27,7 @@
     <Service Type="RoutePlannerVisibilityService" MinimumWaypointSeparation_m="50"/>
     <Service Type="AssignmentTreeBranchBoundService" NumberNodesMaximum="0" CostFunction="MINMAX"/>
     <Service Type="PlanBuilderService"/>
-    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" CollisionAvoidanceFactor=".1" /> <!--DTHR="100" ZTHR="100"/> <!-- RecoveryStabilityTime="0" DTHR="100" ZTHR="100"/ -->
+    <Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" CollisionAvoidanceFactor=".1" DTHR="500" ZTHR="500"/> <!-- RecoveryStabilityTime="0" DTHR="100" ZTHR="100"/ -->
     <!--Service Type="DAIDALUS_WCV_Detection" TrackStep="0.5" RTCAAlertLevels="1" LookAheadTime="180" HorizontalAcceleration="10.0" VerticalAcceleration=".25" TurnRate="3.0" VerticalRate="2.54" MinGroundSpeed="14.9" MaxGroundSpeed="35.1" MaxAltitude="1000" EarlyAlertTime1="55" AlertTime1="25" DTHR="100" ZTHR="100"/ -->
     <Service Type="DAIDALUS_WCV_Response"/> <!-- ManeuverType="GroundSpeed"/-->
 
