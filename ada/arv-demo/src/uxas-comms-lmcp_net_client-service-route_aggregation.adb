@@ -827,8 +827,13 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
      (This : in out Route_Aggregator_Service;
       Plan : RoutePlanRequest_Any)
    is
+      use Route_Aggregator_Message_Conversions;
    begin
-      pragma Compile_Time_Warning (True, "procedure Euclidian_Plan is not implemented");
+      Route_Aggregator.Euclidean_Plan
+        (Data               => This.Config,
+         RoutePlanResponses => This.State.m_routePlanResponses,
+         RoutePlans         => This.State.m_routePlans,
+         Request            => As_RoutePlanRequest_Message (Plan));
    end Euclidian_Plan;
 
    ---------------------------
@@ -839,9 +844,7 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
      (This : in out Route_Aggregator_Service)
    is
    begin
-      pragma Compile_Time_Warning (True, "procedure Check_All_Route_Plans is not implemented");
-      --  we might not implement this because the demo (waterways search) does
-      --  not set FastPlan to True in the config XML
+      Route_Aggregator.Check_All_Route_Plans (This.Mailbox, This.State);
    end Check_All_Route_Plans;
 
    -----------------------------
