@@ -197,9 +197,10 @@ bool DAIDALUS_WCV_Response::foundWCVHeadingResolution(const std::shared_ptr<larc
     else 
     {
         //this branch attempts to find a left turn for divert heading by looping over the intervals from last to first--already know some bands exist
+        m_DivertState.heading_deg = m_CurrentState.heading_deg;
         for (int i = initial_band; i >= 0; i--)
         {
-            if (isInRange(bands[i].lower, bands[i].upper, m_CurrentState.heading_deg))
+            if (isInRange(bands[i].lower, bands[i].upper, m_DivertState.heading_deg))
             {
                 m_DivertState.heading_deg = bands[i].lower - m_heading_interval_buffer_deg; // set divert heading to just under the interval minimum 
                 // that contains the current heading--loop over the bands from the current band to the initial band
