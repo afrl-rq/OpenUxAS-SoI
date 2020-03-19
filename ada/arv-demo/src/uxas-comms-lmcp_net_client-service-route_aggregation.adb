@@ -182,9 +182,15 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
    procedure Initialize
      (This : in out Route_Aggregator_Service; Result : out Boolean)
    is
-      pragma Unreferenced (This);
    begin
       Result := True; --  per the C++ version
+
+      Route_Aggregator_Communication.Initialize
+        (This.Mailbox,
+         Source_Group => Value (This.Message_Source_Group),
+         Unique_Id    => Route_Aggregator_Common.Int64 (UxAS.Comms.LMCP_Net_Client.Unique_Entity_Send_Message_Id),
+         Entity_Id    => Route_Aggregator_Common.UInt32 (This.Entity_Id),
+         Service_Id   => Route_Aggregator_Common.UInt32 (This.Network_Id));
    end Initialize;
 
    -----------------------------------

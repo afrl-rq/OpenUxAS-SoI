@@ -6,6 +6,8 @@ with Interfaces;
 
 package Route_Aggregator_Common with SPARK_Mode is
 
+   type UInt32 is new Interfaces.Unsigned_32;
+
    type Int64 is new Integer;
    type Real32 is new Interfaces.IEEE_Float_32;
    type Real64 is new Interfaces.IEEE_Float_64;

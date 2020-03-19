@@ -9,6 +9,7 @@ with Afrl.Cmasi.Location3D;                 use Afrl.Cmasi.Location3D;
 with Uxas.Messages.Route.RouteRequest;      use Uxas.Messages.Route.RouteRequest;
 with Uxas.Messages.Route.RoutePlanRequest;  use Uxas.Messages.Route.RoutePlanRequest;
 with Uxas.Messages.Route.RouteConstraints;  use Uxas.Messages.Route.RouteConstraints;
+with AVTAS.LMCP.Object;
 
 package Route_Aggregator_Message_Conversions is
 
@@ -29,5 +30,7 @@ package Route_Aggregator_Message_Conversions is
    function As_RouteRequest_Message (Msg : not null RouteRequest_Any) return Route_Aggregator_Messages.RouteRequest;
 
    function As_RoutePlanRequest_Message (Msg : not null RoutePlanRequest_Any) return Route_Aggregator_Messages.RoutePlanRequest;
+
+   function As_Object_Any (Msg : Route_Aggregator_Messages.Message_Root'Class) return AVTAS.LMCP.Object.Object_Any;
 
 end Route_Aggregator_Message_Conversions;
