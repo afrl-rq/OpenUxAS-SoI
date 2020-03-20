@@ -1,3 +1,6 @@
+# Platform
+PLATFORM:=$(shell python -c "import sys; print(sys.platform)")
+
 # Control whether full command line should be displayed during compilation
 DEBUG_BUILD=false
 
@@ -32,9 +35,15 @@ ifeq ($(ENABLE_COVERAGE),true)
 endif
 
 # Linker flags
-LINKER_FLAGS:=-std=c++11 -llmcp -lzyre -lpugixml -lboost_filesystem \
- -lboost_regex -lboost_date_time -lboost_system -lSQLiteCpp -lsqlite3 \
- -lczmq -luuid -lserial -lzmq -ldl -lpthread -static-libstdc++ -static-libgcc
+ifeq ($(PLATFORM),linux)
+    LINKER_FLAGS:=-std=c++11 -llmcp -lzyre -lpugixml -lboost_filesystem \
+-lboost_regex -lboost_date_time -lboost_system -lSQLiteCpp -lsqlite3 \
+-lczmq -luuid -lserial -lzmq -ldl -lpthread -static-libstdc++ -static-libgcc
+else
+    LINKER_FLAGS:=-std=c++11 -llmcp -lzyre -lpugixml -lboost_filesystem \
+-lboost_regex -lboost_date_time -lboost_system -lSQLiteCpp -lsqlite3 \
+-lczmq -lserial -lzmq -ldl -lpthread
+endif
 
 # Include flags
 INCLUDES=$(foreach source_dir, $(SOURCE_DIRS), -I$(source_dir))
