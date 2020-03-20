@@ -182,6 +182,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
    procedure Initialize
      (This : in out Route_Aggregator_Service; Result : out Boolean)
    is
+   --     pragma Unreferenced (This);
    begin
       Result := True; --  per the C++ version
 
@@ -204,7 +205,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
       Should_Terminate :    out Boolean)
    is
    begin
-Put_Line ("Route_Aggregator_Service processing a received LMCP message");
+Put_Line ("Route_Aggregator_Service processing a received message");
 
       --  if (uxas::messages::route::isRoutePlanResponse(receivedLmcpMessage->m_object.get()))
       if Received_Message.Payload.all in RoutePlanResponse'Class then
@@ -298,8 +299,10 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --  }
       This.Config.M_EntityStates := Route_Aggregator_Common.Add (This.Config.M_EntityStates, Id);
       -- we will use the Id values in M_EntityStates to access the pointer values in Entity_Mapping
-      This.Entity_Mapping (Id) := Msg;
-      This.Config.M_AirVehicles := Add (This.Config.M_AirVehicles, Id);
+      This.Entity_Mapping.Include (Id, Msg);
+      if not Contains (This.Config.M_AirVehicles, Id) then
+         This.Config.M_AirVehicles := Add (This.Config.M_AirVehicles, Id);
+      end if;
    end Handle_AirVehicleState_Msg;
 
    -----------------------------------
@@ -319,8 +322,10 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --  }
       This.Config.M_EntityStates := Route_Aggregator_Common.Add (This.Config.M_EntityStates, Id);
       -- we will use the Id values in M_EntityStates to access the pointer values in Entity_Mapping
-      This.Entity_Mapping (Id) := Msg;
-      This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
+      This.Entity_Mapping.Include (Id, Msg);
+      if not Contains (This.Config.M_GroundVehicles, Id) then
+         This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
+      end if;
    end Handle_GroundVehicleState_Msg;
 
    ------------------------------------
@@ -340,8 +345,10 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --  }
       This.Config.M_EntityStates := Route_Aggregator_Common.Add (This.Config.M_EntityStates, Id);
       -- we will use the Id values in M_EntityStates to access the pointer values in Entity_Mapping
-      This.Entity_Mapping (Id) := Msg;
-      This.Config.M_SurfaceVehicles := Add (This.Config.M_SurfaceVehicles, Id);
+      This.Entity_Mapping.Include (Id, Msg);
+      if not Contains (This.Config.M_SurfaceVehicles, Id) then
+         This.Config.M_SurfaceVehicles := Add (This.Config.M_SurfaceVehicles, Id);
+      end if;
    end Handle_SurfaceVehicleState_Msg;
 
    ---------------------------------
@@ -359,8 +366,10 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --      m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
       --      m_airVehicles.insert(id);
       --  }
-      This.Entity_Configurations (Id) := Msg;
-      This.Config.M_AirVehicles := Add (This.Config.M_AirVehicles, Id);
+      This.Entity_Configurations.Include (Id, Msg);
+      if not Contains (This.Config.M_AirVehicles, Id) then
+         This.Config.M_AirVehicles := Add (This.Config.M_AirVehicles, Id);
+      end if;
    end Handle_AirVehicleConfig_Msg;
 
    ------------------------------------
@@ -378,8 +387,10 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --      m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
       --      m_groundVehicles.insert(id);
       --  }
-      This.Entity_Configurations (Id) := Msg;
-      This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
+      This.Entity_Configurations.Include (Id, Msg);
+      if not Contains (This.Config.M_GroundVehicles, Id) then
+         This.Config.M_GroundVehicles := Add (This.Config.M_GroundVehicles, Id);
+      end if;
       end Handle_GroundVehicleConfig_Msg;
 
    -------------------------------------
@@ -397,8 +408,10 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --      m_entityConfigurations[id] = std::static_pointer_cast<afrl::cmasi::EntityConfiguration>(receivedLmcpMessage->m_object);
       --      m_surfaceVehicles.insert(id);
       --  }
-      This.Entity_Configurations (Id) := Msg;
-      This.Config.M_SurfaceVehicles := Add (This.Config.M_SurfaceVehicles, Id);
+      This.Entity_Configurations.Include (Id, Msg);
+      if not Contains (This.Config.M_SurfaceVehicles, Id) then
+         This.Config.M_SurfaceVehicles := Add (This.Config.M_SurfaceVehicles, Id);
+      end if;
    end Handle_SurfaceVehicleConfig_Msg;
 
    ----------------------------------------
@@ -417,7 +430,7 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --      CheckAllTaskOptionsReceived();
       --  }
       This.M_AutoRequestId := This.M_AutoRequestId + 1;
-      This.M_UniqueAutomationRequests (This.M_AutoRequestId) := Msg;
+      This.M_UniqueAutomationRequests.Include (This.M_AutoRequestId, Msg);
       This.Check_All_Task_Options_Received;
    end Handle_UniqueAutomationRequest_Msg;
 
@@ -443,7 +456,7 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --  }
       AReq.SetOriginalRequest (new AutomationRequest'(Msg.GetTrialRequest.all));
       This.M_AutoRequestId := This.M_AutoRequestId + 1;
-      This.M_UniqueAutomationRequests (This.M_AutoRequestId) := AReq;
+      This.M_UniqueAutomationRequests.Include (This.M_AutoRequestId, AReq);
       AReq.SetRequestID (Avtas.Lmcp.Types.Int64 (This.M_AutoRequestId));
       This.Check_All_Task_Options_Received;
    end Handle_ImpactAutomationRequest_Msg;
@@ -464,7 +477,7 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
       --      m_taskOptions[taskOptions->getTaskID()] = taskOptions;
       --      CheckAllTaskOptionsReceived();
       --  }
-      This.M_TaskOptions (Id) := Msg;
+      This.M_TaskOptions.Include (Id, Msg);
       This.Check_All_Task_Options_Received;
    end Handle_TaskPlanOptions_Msg;
 
