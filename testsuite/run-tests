@@ -7,7 +7,7 @@ import socket
 from queue import Queue
 
 from e3.main import Main
-from e3.fs import find, rm, mkdir, cp, ls
+from e3.fs import find, rm, mkdir, cp, ls, mv
 from e3.os.fs import which
 from e3.collection.dag import DAG
 from e3.job.walk import Walk
@@ -28,6 +28,7 @@ sys.path.insert(0, ROOT_DIR)
 
 
 def dump_gcov_summary(source_dir: str,
+                      build_dir: str,
                       gcda_dir: str,
                       display_includes_coverage: bool) -> None:
     """Display a coverage summary.
@@ -47,12 +48,14 @@ def dump_gcov_summary(source_dir: str,
     mkdir(gcr)
 
     # Run gcov to produce de gcov files
-    for f in find(root=source_dir, pattern='*.gcno'):
-        cp(f, os.path.join(gcda_dir, os.path.relpath(f, source_dir)))
+    for f in find(root=build_dir, pattern='*.gcno'):
+        cp(f, os.path.join(gcda_dir, os.path.relpath(f, build_dir)))
 
     gcno_files = find(root=gcda_dir, pattern='*.gcno')
 
-    Run(['gcov', '-p'] + gcno_files, cwd=gcr)
+    Run(['gcov', '-p'] + gcno_files, cwd=source_dir,
+        output=os.path.join(gcr, 'gcov.out'))
+    mv(os.path.join(source_dir, '*.gcov'), gcr)
 
     total_sources = 0
     total_covered = 0
@@ -62,10 +65,12 @@ def dump_gcov_summary(source_dir: str,
         source_file = os.path.basename(gcov_file).replace('#', '/')[:-5]
 
         # Ignores all source that are not part of the project
-        if os.path.relpath(source_file, source_dir).startswith('..'):
+        if os.path.isabs(source_file):
             continue
 
-        if not display_includes_coverage and source_file.endswith('.h'):
+        if not display_includes_coverage and \
+                (source_file.endswith('.h') or
+                 source_file.endswith('.hpp')):
             continue
 
         with open(gcov_file) as fd:
@@ -85,13 +90,23 @@ def dump_gcov_summary(source_dir: str,
         total_covered += covered
 
         # Display file information
+        if total == 0:
+            percent = 0.0
+        else:
+            percent = float(covered) * 100.0 / float(total)
+
         logging.info('%6.2f %% %8d/%-8d %s',
-                     float(covered) * 100.0 / float(total),
+                     percent,
                      covered,
                      total,
-                     os.path.relpath(source_file, source_dir))
+                     source_file)
 
     # Display global counters
+    if total_sources == 0:
+        percent = 0.0
+    else:
+        percent = float(total_covered) * 100.0 / float(total_sources)
+
     logging.info('%6.2f %% %8d/%-8d %s',
                  float(total_covered) * 100.0 / float(total_sources),
                  total_covered,
@@ -241,10 +256,19 @@ def main() -> int:
     """
     m = Main()
     m.argument_parser.add_argument(
-        '--src-dir',
+        '--source-dir',
         metavar="DIR",
-        help="root directory containing sources. When set a coverage summary "
-        "will be displayed")
+        default=os.environ.get('UXAS_SOURCE_DIR'),
+        help="root directory containing uxas sources. When set a coverage "
+        "summary will be displayed. Default is the value of the env var "
+        "UXAS_SOURCE_DIR: %s" % os.environ.get('UXAS_SOURCE_DIR'))
+    m.argument_parser.add_argument(
+        '--build-dir',
+        metavar="DIR",
+        default=os.environ.get('UXAS_BUILD_DIR'),
+        help="root directory containing uxas build. When set a coverage "
+        "summary will be displayed. Default is the value of the env var "
+        "UXAS_BUILD_DIR: %s" % os.environ.get('UXAS_BUILD_DIR'))
     m.argument_parser.add_argument(
         '--jobs',
         type=int,
@@ -278,18 +302,22 @@ def main() -> int:
 
     # Ensure gcda are stored in the testsuite dir. It ensures that we don't
     # pollute uxas build dir and ease reset of coverage info on each run.
-    if m.args.src_dir:
+    if m.args.source_dir and m.args.build_dir:
+        logging.info('Enable coverage mode')
+        logging.info('Sources: %s', m.args.source_dir)
+        logging.info('Objects: %s', m.args.build_dir)
         gcda_dir = os.path.join(RESULT_DIR, 'gcda')
         rm(gcda_dir, recursive=True)
         mkdir(gcda_dir)
         os.environ['GCOV_PREFIX'] = gcda_dir
         os.environ['GCOV_PREFIX_STRIP'] = \
-            str(len(m.args.src_dir.split(os.sep)) - 1)
+            str(len(m.args.source_dir.split(os.sep)) - 1)
 
     TestsuiteLoop(actions=get_test_list(), jobs=m.args.jobs)
 
-    if m.args.src_dir is not None:
-        dump_gcov_summary(m.args.src_dir,
+    if m.args.source_dir is not None and m.args.build_dir is not None:
+        dump_gcov_summary(m.args.source_dir,
+                          m.args.build_dir,
                           gcda_dir,
                           m.args.display_includes_coverage)
 
