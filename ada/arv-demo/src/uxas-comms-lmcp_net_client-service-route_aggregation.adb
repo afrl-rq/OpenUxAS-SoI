@@ -205,7 +205,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
       Should_Terminate :    out Boolean)
    is
    begin
-Put_Line ("Route_Aggregator_Service processing a received message");
+Put_Line ("Route_Aggregator_Service processing a received LMCP message");
 
       --  if (uxas::messages::route::isRoutePlanResponse(receivedLmcpMessage->m_object.get()))
       if Received_Message.Payload.all in RoutePlanResponse'Class then
@@ -570,7 +570,8 @@ Put_Line ("Route_Aggregator_Service processing a received message");
       --          areq->getOriginalRequest()->getEntityList().push_back(entity.second->getID());
       --      }
       --  }
-      if AReq.GetOriginalRequest.GetEntityList.Is_Empty then
+--  CE19 bug   if AReq.GetOriginalRequest.GetEntityList.Is_Empty then
+      if AFRL.CMASI.AutomationRequest.Vect_Int64.Is_Empty (AReq.GetOriginalRequest.GetEntityList.all) then
          for Id : Route_Aggregator_Common.Int64 of This.Config.M_EntityStates loop
             declare
                Entity : EntityState_Any;
@@ -584,13 +585,15 @@ Put_Line ("Route_Aggregator_Service processing a received message");
 
       --  // to minimize network traffic make a separate request for each vehicle
       --  for (size_t v = 0; v < areq->getOriginalRequest()->getEntityList().size(); v++)
-      For_Each_Vehicle : for V in Positive range 1 .. Natural (AReq.GetOriginalRequest.GetEntityList.Length) loop
+--  CE19 bug    For_Each_Vehicle : for V in Positive range 1 .. Natural (AReq.GetOriginalRequest.GetEntityList.Length) loop
+      For_Each_Vehicle : for V in Positive range 1 .. Natural (afrl.cmasi.AutomationRequest.Vect_Int64.Length (AReq.GetOriginalRequest.GetEntityList.all)) loop
          --  {
          Make_Request : declare
             --  only check vehicles that have valid states
 
             --      int64_t vehicleId = areq->getOriginalRequest()->getEntityList().at(v);
-            VehicleId : constant AVTAS.LMCP.Types.Int64 := AReq.GetOriginalRequest.GetEntityList.Element (V);
+--  CE19 bug            VehicleId : constant AVTAS.LMCP.Types.Int64 := AReq.GetOriginalRequest.GetEntityList.Element (V);
+            VehicleId : constant AVTAS.LMCP.Types.Int64 := AFRL.CMASI.AutomationRequest.Vect_Int64.Element (AReq.GetOriginalRequest.GetEntityList.all, V);
             --      auto vehicle = m_entityStates.find(vehicleId);
             VId       : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (VehicleId);
             VehicleCursor   : constant Id_EntityState_Mapping.Cursor := This.Entity_Mapping.Find (VId);
@@ -648,16 +651,18 @@ Put_Line ("Route_Aggregator_Service processing a received message");
 
                begin
                   --  for (size_t t = 0; t < areq->getOriginalRequest()->getTaskList().size(); t++)
-                  for T in Positive range 1 .. Natural (AReq.GetOriginalRequest.getTaskList.Length) loop
+--  CE19 bug                  for T in Positive range 1 .. Natural (AReq.GetOriginalRequest.getTaskList.Length) loop
+                  for T in Positive range 1 .. Natural (AFRL.CMASI.AutomationRequest.Vect_Int64.Length (AReq.GetOriginalRequest.getTaskList.all)) loop
                      --  int64_t taskId = areq->getOriginalRequest()->getTaskList().at(t);
-                     TaskId := AReq.GetOriginalRequest.getTaskList.Element (T);
+--  CE19 bug                   TaskId := AReq.GetOriginalRequest.getTaskList.Element (T);
+                     TaskId := AFRL.CMASI.AutomationRequest.Vect_Int64.Element (AReq.GetOriginalRequest.getTaskList.all, T);
                      --  if (m_taskOptions.find(taskId) != m_taskOptions.end())
                      if This.M_TaskOptions.Contains (TaskId) then
                         -- for (size_t o = 0; o < m_taskOptions[taskId]->getOptions().size(); o++)
                         for K in Natural range 1 .. Natural (This.M_TaskOptions.Element (TaskId).GetOptions.Length) loop
                            --  auto option = m_taskOptions[taskId]->getOptions().at(o);
                            Option := This.M_TaskOptions.Element (taskId).getOptions.Element (K);
-
+                           --
                            --  auto elig = std::find_if(option->getEligibleEntities().begin(), option->getEligibleEntities().end(),
                            --                           [&](int64_t v)
                            --                           {
@@ -674,7 +679,8 @@ Put_Line ("Route_Aggregator_Service processing a received message");
                            --  {
                            --      taskOptionList.push_back(std::shared_ptr<uxas::messages::task::TaskOption>(option->clone()));
                            --  }
-                           if Option.GetEligibleEntities.Is_Empty or else Found_Elig then
+--  CE19 bug                    if Option.GetEligibleEntities.Is_Empty or else Found_Elig then
+                           if uxas.messages.lmcptask.TaskOption.Vect_Int64.Is_Empty (Option.GetEligibleEntities.all) or else Found_Elig then
                               TaskOption_Vectors.Append (TaskOptionList, new UxAS.Messages.LMCPtask.TaskOption.TaskOption'(Option.all));
                            end if;
                         end loop;
