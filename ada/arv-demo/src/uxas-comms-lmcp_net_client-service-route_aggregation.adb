@@ -646,29 +646,22 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
                   --  Elig   : AVTAS.LMCP.Types.Int64;
                   Found_Elig : Boolean := False;
 
-                  Options_Length : Natural;  -- for CE19 bug
-                  TPO : TaskPlanOptions_Any; -- for CE19 bug
-
                   --  std::shared_ptr<uxas::messages::route::RoutePlanRequest> planRequest(new uxas::messages::route::RoutePlanRequest);
                   PlanRequest : constant RoutePlanRequest_Any := new RoutePlanRequest;
 
                begin
                   --  for (size_t t = 0; t < areq->getOriginalRequest()->getTaskList().size(); t++)
---  CE19 bug      for T in Positive range 1 .. Natural (AReq.GetOriginalRequest.getTaskList.Length) loop
+--  CE19 bug                  for T in Positive range 1 .. Natural (AReq.GetOriginalRequest.getTaskList.Length) loop
                   for T in Positive range 1 .. Natural (AFRL.CMASI.AutomationRequest.Vect_Int64.Length (AReq.GetOriginalRequest.getTaskList.all)) loop
                      --  int64_t taskId = areq->getOriginalRequest()->getTaskList().at(t);
---  CE19 bug         TaskId := AReq.GetOriginalRequest.getTaskList.Element (T);
+--  CE19 bug                   TaskId := AReq.GetOriginalRequest.getTaskList.Element (T);
                      TaskId := AFRL.CMASI.AutomationRequest.Vect_Int64.Element (AReq.GetOriginalRequest.getTaskList.all, T);
                      --  if (m_taskOptions.find(taskId) != m_taskOptions.end())
                      if This.M_TaskOptions.Contains (TaskId) then
                         -- for (size_t o = 0; o < m_taskOptions[taskId]->getOptions().size(); o++)
---  CE19 bug            for K in Natural range 1 .. Natural (This.M_TaskOptions.Element (TaskId).GetOptions.Length) loop
-                        TPO := Id_TaskPlanOptions_Mapping.Element (This.M_TaskOptions, taskId);
-                        Options_Length := Natural (Vect_TaskOption_Acc.Length (TPO.getOptions.all));
-                        for K in Natural range 1 .. Options_Length loop
+                        for K in Natural range 1 .. Natural (This.M_TaskOptions.Element (TaskId).GetOptions.Length) loop
                            --  auto option = m_taskOptions[taskId]->getOptions().at(o);
---  CE19 bug               Option := This.M_TaskOptions.Element (taskId).getOptions.Element (K);
-                           Option := Vect_TaskOption_Acc.Element (TPO.GetOptions.all, K);
+                           Option := This.M_TaskOptions.Element (taskId).getOptions.Element (K);
                            --
                            --  auto elig = std::find_if(option->getEligibleEntities().begin(), option->getEligibleEntities().end(),
                            --                           [&](int64_t v)
@@ -686,7 +679,7 @@ Put_Line ("Route_Aggregator_Service processing a received LMCP message");
                            --  {
                            --      taskOptionList.push_back(std::shared_ptr<uxas::messages::task::TaskOption>(option->clone()));
                            --  }
---  CE19 bug               if Option.GetEligibleEntities.Is_Empty or else Found_Elig then
+--  CE19 bug                    if Option.GetEligibleEntities.Is_Empty or else Found_Elig then
                            if uxas.messages.lmcptask.TaskOption.Vect_Int64.Is_Empty (Option.GetEligibleEntities.all) or else Found_Elig then
                               TaskOption_Vectors.Append (TaskOptionList, new UxAS.Messages.LMCPtask.TaskOption.TaskOption'(Option.all));
                            end if;
