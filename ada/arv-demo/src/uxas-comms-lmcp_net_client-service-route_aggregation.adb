@@ -507,7 +507,7 @@ Put_Line ("Route_Aggregator_Service processing a received message");
          --  for (size_t t = 0; t < areqIter->second->getOriginalRequest()->getTaskList().size(); t++)
          for T in Ada.Containers.Count_Type range 0 .. afrl.cmasi.AutomationRequest.Vect_Int64.Length (AReq.getOriginalRequest.getTaskList.all) loop
             --  int64_t taskId = areqIter->second->getOriginalRequest()->getTaskList().at(t);
-            TaskId := AFRL.CMASI.AutomationRequest.Vect_Int64.Element (AReq.GetOriginalRequest.GetTaskList.all, Natural (T));
+            TaskId := AReq.GetOriginalRequest.GetTaskList.Element (Natural (T));
 
             --  if (m_taskOptions.find(taskId) == m_taskOptions.end())
             --  if not Id_TaskPlanOptions_Mapping.Contains (This.M_TaskOptions, Route_Aggregator_Common.Int64 (TaskId)) then
