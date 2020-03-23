@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<UxAS FormatVersion="1.0" EntityID="200"  EntityType="Aircraft">
+<UxAS FormatVersion="1.0" EntityID="100"  EntityType="Aircraft">
 
     <Service Type="AutomationRequestValidatorService"/>
     
