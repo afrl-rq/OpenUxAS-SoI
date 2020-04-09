@@ -54,7 +54,7 @@ namespace
 {
     bool isInRange (const double lower, const double upper, const double value)
     {
-        return ((lower <= value) && (value <= upper));
+        return ((lower < value) && (value <= upper));
     }
     
 }
