@@ -10,7 +10,7 @@ with UxAS.Messages.Route.RoutePlanRequest;      use UxAS.Messages.Route.RoutePla
 with UxAS.Messages.Route.RoutePlanResponse;     use UxAS.Messages.Route.RoutePlanResponse;
 with UxAS.Messages.LMCPTASK.PlanningState;      use UxAS.Messages.LMCPTASK.PlanningState;
 with UxAS.Messages.LMCPTASK.TaskOption;
-with UXAS.Messages.Route.RouteConstraints;
+with UXAS.Messages.Route.RouteConstraints;      use UXAS.Messages.Route.RouteConstraints;
 with AFRL.Vehicles.GroundVehicleState;          use AFRL.Vehicles.GroundVehicleState;
 with AFRL.Vehicles.SurfaceVehicleState;         use AFRL.Vehicles.SurfaceVehicleState;
 with AFRL.Vehicles.GroundVehicleConfiguration;  use AFRL.Vehicles.GroundVehicleConfiguration;
@@ -211,7 +211,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
 
       --  else if (std::dynamic_pointer_cast<afrl::cmasi::AirVehicleState>(receivedLmcpMessage->m_object))
       elsif Received_Message.Payload.all in AirVehicleState'Class then
-         Put_Line ("Route_Aggregator_Service processing a AirVehicleState message");
+         --  Put_Line ("Route_Aggregator_Service processing a AirVehicleState message");
          This.Handle_AirVehicleState_Msg (EntityState_Any (Received_Message.Payload));
 
       --  else if (afrl::vehicles::isGroundVehicleState(receivedLmcpMessage->m_object.get()))
@@ -444,22 +444,21 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
      (This : in out Route_Aggregator_Service;
       Msg  : ImpactAutomationRequest_Any)
    is
+      --      auto areq = std::shared_ptr<uxas::messages::task::UniqueAutomationRequest>();
       AReq : constant UniqueAutomationRequest_Any := new UniqueAutomationRequest;
    begin
-      --  {
       --      auto sreq = std::static_pointer_cast<afrl::impact::ImpactAutomationRequest>(receivedLmcpMessage->m_object);
-      --      auto areq = std::shared_ptr<uxas::messages::task::UniqueAutomationRequest>();
-      --
+      --  Msg corresponds to sreq in this Ada version
+
       --      areq->setOriginalRequest(sreq->getTrialRequest()->clone());
-      --      m_uniqueAutomationRequests[m_autoRequestId++] = areq;
-      --      areq->setRequestID(m_autoRequestId);
-      --      //ResetTaskOptions(areq); // clear m_taskOptions and wait for refresh from tasks
-      --      CheckAllTaskOptionsReceived();
-      --  }
       AReq.SetOriginalRequest (new AutomationRequest'(Msg.GetTrialRequest.all));
+      --      m_uniqueAutomationRequests[m_autoRequestId++] = areq;
       This.M_UniqueAutomationRequests.Include (This.M_AutoRequestId, AReq);
       This.M_AutoRequestId := This.M_AutoRequestId + 1;
+      --      areq->setRequestID(m_autoRequestId);
       AReq.SetRequestID (Avtas.Lmcp.Types.Int64 (This.M_AutoRequestId));
+      --      //ResetTaskOptions(areq); // clear m_taskOptions and wait for refresh from tasks
+      --      CheckAllTaskOptionsReceived();
       This.Check_All_Task_Options_Received;
    end Handle_ImpactAutomationRequest_Msg;
 
@@ -471,15 +470,14 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
      (This : in out Route_Aggregator_Service;
       Msg  : TaskPlanOptions_Any)
    is
-      --  Id : constant Route_Aggregator_Common.Int64 := Route_Aggregator_Common.Int64 (Msg.GetTaskID);
       Id : constant AVTAS.LMCP.Types.Int64 := Msg.GetTaskID;
    begin
-      --  {
       --      auto taskOptions = std::static_pointer_cast<uxas::messages::task::TaskPlanOptions>(receivedLmcpMessage->m_object);
+      --  Msg corresponds to taskOptions variable in this Ada version
+
       --      m_taskOptions[taskOptions->getTaskID()] = taskOptions;
-      --      CheckAllTaskOptionsReceived();
-      --  }
       This.M_TaskOptions.Include (Id, Msg);
+      --      CheckAllTaskOptionsReceived();
       This.Check_All_Task_Options_Received;
    end Handle_TaskPlanOptions_Msg;
 
@@ -648,9 +646,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
                   --  Elig   : AVTAS.LMCP.Types.Int64;
                   Found_Elig : Boolean := False;
 
-                  --  std::shared_ptr<uxas::messages::route::RoutePlanRequest> planRequest(new uxas::messages::route::RoutePlanRequest);
-                  PlanRequest : constant RoutePlanRequest_Any := new RoutePlanRequest;
-
+                  PlanRequest : RoutePlanRequest_Any;
                begin
                   --  for (size_t t = 0; t < areq->getOriginalRequest()->getTaskList().size(); t++)
                   for T in 0 .. Integer (AReq.GetOriginalRequest.getTaskList.Length - 1) loop
@@ -688,14 +684,20 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
 
                   --  // create a new route plan request
                   --  std::shared_ptr<uxas::messages::route::RoutePlanRequest> planRequest(new uxas::messages::route::RoutePlanRequest);
+                  PlanRequest := new RoutePlanRequest;
+
                   --  planRequest->setAssociatedTaskID(0); // mapping from routeID to proper task
-                  PlanRequest.setAssociatedTaskID (0);
+                  PlanRequest.SetAssociatedTaskID (0);
+
                   --  planRequest->setIsCostOnlyRequest(false);  // request full path for more accurate timing information
-                  PlanRequest.setIsCostOnlyRequest (False);
+                  PlanRequest.SetIsCostOnlyRequest (False);
+
                   --  planRequest->setOperatingRegion(areq->getOriginalRequest()->getOperatingRegion());
-                  PlanRequest.setOperatingRegion (AReq.GetOriginalRequest.getOperatingRegion);
+                  PlanRequest.SetOperatingRegion (AReq.GetOriginalRequest.GetOperatingRegion);
+
                   --  planRequest->setVehicleID(vehicleId);
-                  PlanRequest.setVehicleID (VehicleId);
+                  PlanRequest.SetVehicleID (VehicleId);
+
                   --  //planRequest->setRouteID(m_planrequestId);
                   --  //m_planrequestId++;
 
@@ -705,7 +707,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
                      pragma Assert (Id_EntityState_Mapping.Has_Element (VehicleCursor));
                      Vehicle := This.Entity_Mapping.Element (VId);
                      --  startLocation.reset(vehicle->second->getLocation()->clone());
-                     StartLocation := new AFRL.CMASI.Location3D.Location3D'(AFRL.CMASI.Location3D.Location3D (Vehicle.getLocation.all));
+                     StartLocation := new Location3D'(Location3D (Vehicle.getLocation.all));
                      --  startHeading_deg = vehicle->second->getHeading();
                      StartHeading_Deg := Vehicle.getHeading;
                   end if;
@@ -717,32 +719,39 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
                         --  auto option = taskOptionList.at(t);
                         Option : constant UxAS.Messages.LMCPTASK.TaskOption.TaskOption_Any := TaskOptionList.Element (T);
                         TOP    : AggregatorTaskOptionPair_Reference;
-                        R      : UXAS.Messages.Route.RouteConstraints.RouteConstraints_Any;
+                        R      : RouteConstraints_Acc;
                      begin
                         --  // build map from request to full task/option information
                         --  AggregatorTaskOptionPair* top = new AggregatorTaskOptionPair(vehicleId, 0, 0, option->getTaskID(), option->getOptionID());
-                        TOP := new AggregatorTaskOptionPair'(VehicleId, 0, 0, Option.getTaskID, Option.getOptionID);
+                        TOP := new AggregatorTaskOptionPair'(VehicleId, 0, 0, Option.GetTaskID, Option.GetOptionID);
+
                         --  m_routeTaskPairing[m_routeId] = std::shared_ptr<AggregatorTaskOptionPair>(top);
                         RouteId_AggregatorPair_Mapping.Insert (This.M_RouteTaskPairing, This.M_RouteId, TOP);
 
                         --  uxas::messages::route::RouteConstraints* r = new uxas::messages::route::RouteConstraints;
-                        R := new UXAS.Messages.Route.RouteConstraints.RouteConstraints;
+                        R := new RouteConstraints;
+
                         --  r->setStartLocation(startLocation->clone());
-                        R.setStartLocation (new AFRL.CMASI.Location3d.Location3D'(AFRL.CMASI.Location3d.Location3D (StartLocation.all)));
+                        R.SetStartLocation (new Location3D'(Location3D (StartLocation.all)));
+
                         --  r->setStartHeading(startHeading_deg);
-                        R.setStartHeading (StartHeading_Deg);
+                        R.SetStartHeading (StartHeading_Deg);
+
                         --  r->setEndLocation(option->getStartLocation()->clone());
-                        R.setEndLocation (new AFRL.CMASI.Location3d.Location3D'(AFRL.CMASI.Location3d.Location3D (StartLocation.all)));
+                        R.SetEndLocation (new Location3D'(Location3D (StartLocation.all)));
+
                         --  r->setEndHeading(option->getStartHeading());
-                        R.setEndHeading (StartHeading_Deg);
+                        R.SetEndHeading (StartHeading_Deg);
+
                         --  r->setRouteID(m_routeId);
                         R.SetRouteID (This.M_RouteId);
+
                         --  planRequest->getRouteRequests().push_back(r);
-                        Uxas.Messages.Route.RoutePlanRequest.Vect_RouteConstraints_Acc.Append
-                          (PlanRequest.GetRouteRequests.all,
-                           UXAS.Messages.Route.RouteConstraints.RouteConstraints_Acc (R));
+                        Uxas.Messages.Route.RoutePlanRequest.Vect_RouteConstraints_Acc.Append (PlanRequest.GetRouteRequests.all, R);
+
                         --  m_pendingAutoReq[reqId].insert(m_routeId);
                         This.M_PendingAutoReq (ReqId).Include (This.M_RouteId);
+
                         --  m_routeId++;
                         This.M_RouteId := This.M_RouteId + 1;
                      end;
@@ -753,7 +762,6 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
                   for T1 in 0 .. Integer (TaskOptionList.Length - 1) loop
                      --  for (size_t t2 = 0; t2 < taskOptionList.size(); t2++)
                      for T2 in 0 .. Integer (TaskOptionList.Length - 1) loop
-                        --  if (t1 != t2)
                         if T1 /= T2 then
                            declare
                               --  auto option1 = taskOptionList.at(t1);
@@ -761,32 +769,39 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
                               --  auto option2 = taskOptionList.at(t2);
                               Option2 : constant UxAS.Messages.LMCPtask.TaskOption.TaskOption_Any := TaskOptionList.Element (T2);
                               TOP     : AggregatorTaskOptionPair_Reference;
-                              R       : UXAS.Messages.Route.RouteConstraints.RouteConstraints_Any;
+                              R       : RouteConstraints_Acc;
                            begin
                               --  // build map from request to full task/option information
                               --  AggregatorTaskOptionPair* top = new AggregatorTaskOptionPair(vehicleId, option1->getTaskID(), option1->getOptionID(), option2->getTaskID(), option2->getOptionID());
-                              TOP := new AggregatorTaskOptionPair'(vehicleId, option1.getTaskID, option1.getOptionID, option2.getTaskID, option2.getOptionID);
+                              TOP := new AggregatorTaskOptionPair'(VehicleId, Option1.GetTaskID, Option1.GetOptionID, Option2.GetTaskID, Option2.GetOptionID);
+
                               --  m_routeTaskPairing[m_routeId] = std::shared_ptr<AggregatorTaskOptionPair>(top);
                               RouteId_AggregatorPair_Mapping.Insert (This.M_RouteTaskPairing, This.M_RouteId, TOP);
 
                               --  uxas::messages::route::RouteConstraints* r = new uxas::messages::route::RouteConstraints;
-                              R := new UXAS.Messages.Route.RouteConstraints.RouteConstraints;
+                              R := new RouteConstraints;
+
                               --  r->setStartLocation(option1->getEndLocation()->clone());
-                              R.setStartLocation (new AFRL.CMASI.Location3d.Location3D'(AFRL.CMASI.Location3d.Location3D (Option1.getEndLocation.all)));
+                              R.SetStartLocation (new Location3D'(Location3D (Option1.GetEndLocation.all)));
+
                               --  r->setStartHeading(option1->getEndHeading());
-                              R.setStartHeading (Option1.getEndHeading);
+                              R.SetStartHeading (Option1.GetEndHeading);
+
                               --  r->setEndLocation(option2->getStartLocation()->clone());
-                              R.setEndLocation (new AFRL.CMASI.Location3d.Location3D'(AFRL.CMASI.Location3d.Location3D (Option2.getStartLocation.all)));
+                              R.SetEndLocation (new Location3D'(Location3D (Option2.GetStartLocation.all)));
+
                               --  r->setEndHeading(option2->getStartHeading());
-                              R.setEndHeading (Option2.getStartHeading);
+                              R.SetEndHeading (Option2.GetStartHeading);
+
                               --  r->setRouteID(m_routeId);
-                              R.setRouteID (This.m_routeId);
+                              R.SetRouteID (This.M_RouteId);
+
                               --  planRequest->getRouteRequests().push_back(r);
-                              Uxas.Messages.Route.RoutePlanRequest.Vect_RouteConstraints_Acc.Append
-                                (PlanRequest.GetRouteRequests.all,
-                                 UXAS.Messages.Route.RouteConstraints.RouteConstraints_Acc (R));
+                              Uxas.Messages.Route.RoutePlanRequest.Vect_RouteConstraints_Acc.Append (PlanRequest.GetRouteRequests.all, R);
+
                               --  m_pendingAutoReq[reqId].insert(m_routeId);
-                                This.M_PendingAutoReq (ReqId).Include (This.M_RouteId);
+                              This.M_PendingAutoReq (ReqId).Include (This.M_RouteId);
+
                               --  m_routeId++;
                               This.M_RouteId := This.M_RouteId + 1;
                            end;
@@ -836,9 +851,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
       end loop;
 
       --  // fast planning should be complete, so kick off sending response
-      --  if (m_fastPlan)
       if This.config.m_fastPlan then
-         --  CheckAllRoutePlans();
          This.Check_All_Route_Plans;
       end if;
    end BuildMatrixRequests;
