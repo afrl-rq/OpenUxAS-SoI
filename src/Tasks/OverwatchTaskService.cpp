@@ -66,12 +66,13 @@ OverwatchTaskService::configureDynamicTask(const pugi::xml_node& ndComponent)
             UXAS_LOG_ERROR("**OverwatchTaskService::bConfigure failed to cast a WatchTask from the task pointer.");
             isSuccessful = false;
         }
-        else
-        {
-            UXAS_LOG_ERROR("**OverwatchTaskService::bConfigure failed: taskObject[" + m_task->getFullLmcpTypeName() + "] is not a WatchTask.");
-            isSuccessful = false;
-        }
     }
+    else
+    {
+        UXAS_LOG_ERROR("**OverwatchTaskService::bConfigure failed: taskObject[" + m_task->getFullLmcpTypeName() + "] is not a WatchTask.");
+        isSuccessful = false;
+    }
+    
 
     if (m_entityStates.find(m_watchTask->getWatchedEntityID()) != m_entityStates.end())
     {
