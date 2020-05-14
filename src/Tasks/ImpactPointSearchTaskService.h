@@ -176,6 +176,8 @@ public: //virtual
 private:
     bool isCalculateOption(const int64_t& taskId, int64_t& optionId, const double& wedgeHeading_rad);
 private:
+    bool m_useDesiredAction = true;
+
     std::shared_ptr<afrl::impact::ImpactPointSearchTask> m_pointSearchTask;
     std::shared_ptr<afrl::impact::PointOfInterest> m_pointOfInterest;
     std::unordered_map < int64_t, std::shared_ptr<VisiLibity::Polygon > > m_KeepOutZoneIDVsPolygon;
