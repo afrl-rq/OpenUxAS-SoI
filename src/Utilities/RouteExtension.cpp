@@ -319,7 +319,7 @@ double RouteExtension::SlideBisectionSearch(double extendlen, double R)
 std::vector<DubinsWaypoint> RouteExtension::BuildRaceTrack(int32_t N, double tracklen, double R, DubinsWaypoint& startwp, DubinsWaypoint& endwp)
 {
     const double pi = n_Const::c_Convert::dPi();
-    double psi = atan2(endwp.y - startwp.y, endwp.x - startwp.y);
+    double psi = atan2(endwp.y - startwp.y, endwp.x - startwp.x);
     double x = startwp.x;
     double y = startwp.y;
 
@@ -381,7 +381,7 @@ std::vector<DubinsWaypoint> RouteExtension::BuildRaceTrack(int32_t N, double tra
 std::vector<DubinsWaypoint> RouteExtension::BuildSingleBubble(double th, double R, DubinsWaypoint& startwp, DubinsWaypoint& endwp)
 {
     const double pi = n_Const::c_Convert::dPi();
-    double psi = atan2(endwp.y - startwp.y, endwp.x - startwp.y);
+    double psi = atan2(endwp.y - startwp.y, endwp.x - startwp.x);
     double x = startwp.x;
     double y = startwp.y;
 
@@ -427,7 +427,7 @@ std::vector<DubinsWaypoint> RouteExtension::BuildSingleBubble(double th, double 
 std::vector<DubinsWaypoint> RouteExtension::BuildSlideBack(double th, double R, DubinsWaypoint& startwp, DubinsWaypoint& endwp)
 {
     const double pi = n_Const::c_Convert::dPi();
-    double psi = atan2(endwp.y - startwp.y, endwp.x - startwp.y);
+    double psi = atan2(endwp.y - startwp.y, endwp.x - startwp.x);
     double x = startwp.x;
     double y = startwp.y;
 
