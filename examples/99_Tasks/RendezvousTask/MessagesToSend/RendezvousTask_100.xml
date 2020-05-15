@@ -2,18 +2,47 @@
 <RendezvousTask Series="UXTASK">
   <!--Rendezvous Task Fields-->
   <NumberOfParticipants>3</NumberOfParticipants>
-  <Location>
-    <Location3D Series="CMASI">
-      <Latitude>30.525723268898915</Latitude>
-      <Longitude>-87.20688664886517</Longitude>
-      <Altitude>0.0</Altitude>
-      <AltitudeType>MSL</AltitudeType>
-    </Location3D>
-  </Location>
-  
   <Heading>0</Heading>
-  <MultiLocationRendezvous>false</MultiLocationRendezvous>
-  
+  <MultiLocationRendezvous>true</MultiLocationRendezvous>
+  <RendezvousStates>
+    <PlanningState Series="UXTASK">
+      <EntityID>101</EntityID>
+      <PlanningPosition>
+        <Location3D Series="CMASI">
+          <Latitude>30.525723268898915</Latitude>
+          <Longitude>-87.20688664886517</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </PlanningPosition>
+      <PlanningHeading>0</PlanningHeading>
+    </PlanningState>
+    <PlanningState Series="UXTASK">
+      <EntityID>102</EntityID>
+      <PlanningPosition>
+        <Location3D Series="CMASI">
+          <Latitude>30.525723268898915</Latitude>
+          <Longitude>-87.20688664886517</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </PlanningPosition>
+      <PlanningHeading>0</PlanningHeading>
+    </PlanningState>
+    <PlanningState Series="UXTASK">
+      <EntityID>103</EntityID>
+      <PlanningPosition>
+        <Location3D Series="CMASI">
+          <Latitude>30.525723268898915</Latitude>
+          <Longitude>-87.20688664886517</Longitude>
+          <Altitude>0.0</Altitude>
+          <AltitudeType>MSL</AltitudeType>
+        </Location3D>
+      </PlanningPosition>
+      <PlanningHeading>0</PlanningHeading>
+    </PlanningState>
+  </RendezvousStates>
+
   <!--Task Specific Fields-->
   <TaskID>100</TaskID>
   <Label/>
