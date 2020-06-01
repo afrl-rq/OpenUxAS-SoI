@@ -92,9 +92,10 @@ ImpactPointSearchTaskService::configureTask(const pugi::xml_node& ndComponent)
             }
             if (m_pointSearchTask->getDesiredAction() == nullptr)
             {
-                sstrErrors << "ERROR:: **ImpactPointSearchTaskService::bConfigure PointOfInterest. Missing Loiter Action " << std::endl;
-                CERR_FILE_LINE_MSG(sstrErrors.str())
-                isSuccessful = false;
+                m_useDesiredAction = false;
+                auto dummyDesiredAction = std::make_shared<afrl::cmasi::LoiterAction>();
+                dummyDesiredAction->setLocation(m_pointSearchTask->getSearchLocation()->clone());
+                m_pointSearchTask->setDesiredAction(dummyDesiredAction->clone());
             }
 
             for (auto koz : m_keepOutZones)
@@ -389,30 +390,33 @@ bool ImpactPointSearchTaskService::isProcessTaskImplementationRouteResponse(std:
         {
 
             auto action = m_pointSearchTask->getDesiredAction();
-
-            //make sure the action has this task associated with it.
-            if (std::find(action->getAssociatedTaskList().begin(), action->getAssociatedTaskList().end(), m_task->getTaskID()) == action->getAssociatedTaskList().end())
+            if (m_useDesiredAction) 
             {
-                action->getAssociatedTaskList().push_back(m_task->getTaskID());
-            }
-            auto state = m_entityStates[taskImplementationResponse.get()->getVehicleID()];
-            auto cast = static_cast<std::shared_ptr<avtas::lmcp::Object>>(state);
+                //make sure the action has this task associated with it.
+                if (std::find(action->getAssociatedTaskList().begin(), action->getAssociatedTaskList().end(), m_task->getTaskID()) == action->getAssociatedTaskList().end())
+                {
+                    action->getAssociatedTaskList().push_back(m_task->getTaskID());
+                }
+                auto state = m_entityStates[taskImplementationResponse.get()->getVehicleID()];
+                auto cast = static_cast<std::shared_ptr<avtas::lmcp::Object>>(state);
 
-            auto finalWaypoint = taskImplementationResponse->getTaskWaypoints().back();
-            //hotfix for surface vehicles staying in place if the next waypoint has a loiter 
-            if (afrl::vehicles::isSurfaceVehicleState(cast))
-            {
-                auto newFinalWp = finalWaypoint->clone();
-                auto newFinalWaypointNumber = finalWaypoint->getNumber() + 1;
-                finalWaypoint->setNextWaypoint(newFinalWaypointNumber);
-                newFinalWp->setNumber(newFinalWaypointNumber);
-                newFinalWp->setNextWaypoint(newFinalWaypointNumber);
-                taskImplementationResponse->getTaskWaypoints().push_back(newFinalWp);
-                finalWaypoint = newFinalWp;
+                auto finalWaypoint = taskImplementationResponse->getTaskWaypoints().back();
+                //hotfix for surface vehicles staying in place if the next waypoint has a loiter 
+                if (afrl::vehicles::isSurfaceVehicleState(cast))
+                {
+                    auto newFinalWp = finalWaypoint->clone();
+                    auto newFinalWaypointNumber = finalWaypoint->getNumber() + 1;
+                    finalWaypoint->setNextWaypoint(newFinalWaypointNumber);
+                    newFinalWp->setNumber(newFinalWaypointNumber);
+                    newFinalWp->setNextWaypoint(newFinalWaypointNumber);
+                    taskImplementationResponse->getTaskWaypoints().push_back(newFinalWp);
+                    finalWaypoint = newFinalWp;
+                }
+                action->getLocation()->setAltitude(finalWaypoint->getAltitude());
+                finalWaypoint->getVehicleActionList().push_back(action->clone());
+                finalWaypoint->setTurnType(afrl::cmasi::TurnType::TurnShort);
             }
-            action->getLocation()->setAltitude(finalWaypoint->getAltitude());
-            finalWaypoint->getVehicleActionList().push_back(action->clone());
-            finalWaypoint->setTurnType(afrl::cmasi::TurnType::TurnShort);
+
 
             //set up a gimbal stare action
             auto gimbalStareAction = std::make_shared<afrl::cmasi::GimbalStareAction>();
